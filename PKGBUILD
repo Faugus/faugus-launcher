@@ -8,7 +8,10 @@ depends=('python' 'python-gobject' 'umu-launcher' 'p7zip')
 provides=('faugus-launcher')
 conflicts=('faugus-launcher')
 
-source=("${pkgname}::git+https://github.com/Faugus/faugus-launcher.git")
+source=("${pkgname}::git+https://github.com/Faugus/faugus-launcher.git"
+	"faugus-launcher.py"
+	"faugus-launcher.desktop"
+	"faugus-launcher.png")
 sha256sums=('SKIP')
 
 package() {
