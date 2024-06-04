@@ -1,5 +1,5 @@
 # Faugus Launcher
-Simple and Lightweight Windows Game/App Launcher
+A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
 
 # Installation
 ### Arch-based distributions (AUR)
