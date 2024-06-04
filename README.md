@@ -7,6 +7,22 @@ A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-
 yay -S faugus-launcher
 ```
 
+# Information
+### Default prefix location
+```
+~/.config/faugus-launcher/prefixes/
+```
+
+### Shortcut locations
+For Desktop Environments that support icons on the Desktop
+```
+~/Desktop/
+```
+For Application Launchers
+```
+~/.local/share/applications/
+```
+
 # Screenshots
 ### Adwaita
 
