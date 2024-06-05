@@ -6,12 +6,6 @@ A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-
 ```
 yay -S faugus-launcher
 ```
-### Fedora-based distributions (Copr)
-```
-sudo dnf copr enable gloriouseggroll/nobara-40
-sudo dnf copr enable faugus/faugus-launcher
-sudo dnf install faugus-launcher
-```
 
 # Information
 ### Default prefix location
