@@ -1,10 +1,10 @@
 pkgname=faugus-launcher
 pkgver=1.0
-pkgrel=17
+pkgrel=18
 pkgdesc="Simple and Lightweight Game Launcher"
 arch=('x86_64')
 license=('GPL')
-depends=('python' 'python-gobject' 'umu-launcher' 'p7zip')
+depends=('python' 'python-gobject' 'umu-launcher' 'p7zip' 'git')
 provides=('faugus-launcher')
 conflicts=('faugus-launcher')
 
