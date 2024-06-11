@@ -307,6 +307,10 @@ class Main(Gtk.Window):
                     self.save_games()
                     self.update_list()
 
+                    self.button_edit.set_sensitive(False)
+                    self.button_delete.set_sensitive(False)
+                    self.button_play.set_sensitive(False)
+
                 confirmation_dialog.destroy()
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
@@ -349,11 +353,25 @@ class Main(Gtk.Window):
 
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state)
+
+                # Select the added game
+                self.select_game_by_title(title)
+
+
         else:
             add_game_dialog.destroy()
 
         # Ensure the dialog is destroyed when canceled
         add_game_dialog.destroy()
+
+    def select_game_by_title(self, title):
+        # Seleciona um item na lista com base no título
+        for row in self.game_list.get_children():
+            hbox = row.get_child()
+            game_label = hbox.get_children()[0]
+            if game_label.get_text() == title:
+                self.game_list.select_row(row)
+                break
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
@@ -381,6 +399,9 @@ class Main(Gtk.Window):
 
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state)
+
+                # Select the game that was edited
+                self.select_game_by_title(game.title)
 
         edit_game_dialog.destroy()
 
