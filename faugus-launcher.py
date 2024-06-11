@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import shutil
 import signal
 import subprocess
@@ -74,6 +75,7 @@ class Main(Gtk.Window):
         # Create button for killing processes
         button_kill = Gtk.Button(label="Kill")
         button_kill.connect("clicked", self.on_button_kill_clicked)
+        button_kill.set_tooltip_text("Force close all running games")
         button_kill.set_size_request(50, 50)
         button_kill.set_margin_top(10)
         button_kill.set_margin_end(10)
@@ -120,6 +122,12 @@ class Main(Gtk.Window):
         box_main.pack_end(box_bottom, False, True, 0)
         self.add(box_main)
 
+        self.button_edit.set_sensitive(False)
+        self.button_delete.set_sensitive(False)
+        self.button_play.set_sensitive(False)
+
+        self.game_running2 = False
+
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
 
@@ -162,17 +170,21 @@ class Main(Gtk.Window):
 
                 print(command)
 
+                # faugus-run path
+                faugus_run_path = "/usr/bin/faugus-run"
+
+                self.game_running2 = True
+
                 # Launch the game with subprocess
                 if self.checkbox_close_after_launch.get_active():
-                    subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    import sys
+                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     sys.exit()
                 else:
-                    self.game_running = subprocess.Popen(["/bin/bash", "-c", command])
+                    self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command])
                     self.button_play.set_image(
                         Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
-                self.button_play.set_sensitive(False)
+                    self.button_play.set_sensitive(False)
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -186,7 +198,9 @@ class Main(Gtk.Window):
             subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
                            r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
                            shell=True)
+        self.button_play.set_sensitive(True)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        self.game_running2 = False
 
     def on_button_add_clicked(self, widget):
         # Handle add button click event
@@ -411,7 +425,7 @@ class Main(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={game.title}
-    Exec=sh -c '{command}'
+    Exec=/usr/bin/faugus-run '{command}'
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
@@ -486,51 +500,6 @@ class Main(Gtk.Window):
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
 
-    def create_desktop_entry(self, game, shortcut_state):
-        # Create the .desktop file in ~/.local/share/applications/
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
-
-        prefix = game.prefix
-        path = game.path
-        launch_arguments = game.launch_arguments
-        game_arguments = game.game_arguments
-
-        mangohud = ""
-        if game.mangohud:
-            mangohud = "MANGOHUD=1"
-
-        gamemode = ""
-        if game.gamemode:
-            gamemode = "gamemoderun"
-
-        command = (f'{mangohud} '
-                   f'WINEPREFIX={prefix} '
-                   f'GAMEID={title_formatted} '
-                   f'{launch_arguments} '
-                   f'{gamemode} '
-                   f'"/usr/bin/umu-run" "{path}" "{game_arguments}"')
-
-        desktop_file_content = f"""[Desktop Entry]
-                                Name={game.title}
-                                Exec=sh -c '{command}'
-                                Icon=application-x-executable
-                                Type=Application
-                                Categories=Game;
-                                """
-
-        desktop_directory = os.path.expanduser("~/.local/share/applications/")
-        if not os.path.exists(desktop_directory):
-            os.makedirs(desktop_directory)
-
-        desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{game.title}.desktop")
-
-        with open(desktop_file_path, 'w') as desktop_file:
-            desktop_file.write(desktop_file_content)
-
-        os.chmod(desktop_file_path, 0o755)
-
     def remove_desktop_entry(self, game):
         # Remove the .desktop file from ~/.local/share/applications/
         desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{game.title}.desktop")
@@ -564,10 +533,6 @@ class Main(Gtk.Window):
         hbox.set_halign(Gtk.Align.CENTER)
         listbox_row.set_valign(Gtk.Align.START)
 
-        self.button_edit.set_sensitive(False)
-        self.button_delete.set_sensitive(False)
-        self.button_play.set_sensitive(False)
-
     def update_list(self):
         # Update the game list
         for row in self.game_list.get_children():
@@ -583,6 +548,7 @@ class Main(Gtk.Window):
             self.game_running = None
         self.button_play.set_sensitive(True)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        self.game_running2 = False
 
     def load_games(self):
         # Load games from file
@@ -665,7 +631,11 @@ class Main(Gtk.Window):
 
                 self.button_edit.set_sensitive(True)
                 self.button_delete.set_sensitive(True)
-                self.button_play.set_sensitive(True)
+
+                if self.game_running2 == True:
+                    self.button_play.set_sensitive(False)
+                else:
+                    self.button_play.set_sensitive(True)
 
 
 class Game:
