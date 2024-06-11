@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import gi
 gi.require_version("Gtk", "3.0")  # Certifique-se de especificar a versão antes de importar Gtk
 from gi.repository import Gtk, GLib
