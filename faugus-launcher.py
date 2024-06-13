@@ -177,7 +177,8 @@ class Main(Gtk.Window):
 
                 # Launch the game with subprocess
                 if self.checkbox_close_after_launch.get_active():
-                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL)
                     sys.exit()
                 else:
                     self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command])
@@ -643,8 +644,9 @@ class Main(Gtk.Window):
             current_time = event.time
             if current_row == self.last_clicked_row and current_time - self.last_click_time < 500:
                 # Double-click detected, trigger play button click event
-                widget = self.button_play
-                self.on_button_play_clicked(widget)
+                if self.game_running2 == False:
+                    widget = self.button_play
+                    self.on_button_play_clicked(widget)
             else:
                 # Single-click, update last click details and enable buttons
                 self.last_clicked_row = current_row
@@ -805,7 +807,6 @@ class AddGame(Gtk.Dialog):
         # Button for creating shortcut
         self.checkbox_shortcut = Gtk.CheckButton(label="Create Shortcut")
         self.checkbox_shortcut.connect("toggled", self.on_checkbox_toggled)
-
 
         # Button for selection shortcut icon
         self.button_shortcut_icon = Gtk.Button()
@@ -1044,8 +1045,12 @@ class AddGame(Gtk.Dialog):
         winecfg_command = (f'WINEPREFIX={prefix} '
                            f'GAMEID={title_formatted} '
                            f'"/usr/bin/umu-run" "winecfg"')
-        subprocess.Popen(["/bin/bash", "-c", winecfg_command])
         print(winecfg_command)
+
+        # faugus-run path
+        faugus_run_path = "/usr/bin/faugus-run"
+
+        subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
 
     def on_button_winetricks_clicked(self, widget):
         # Handle the click event of the Winetricks button
@@ -1057,11 +1062,15 @@ class AddGame(Gtk.Dialog):
 
         # Open Winetricks for the specified Wine prefix
         winetricks_command = (f'WINEPREFIX={prefix} '
-                              f'GAMEID=winetricks-gui '
+                              f'GAMEID=winetricks-gui  '
                               f'STORE="none" '
                               f'"/usr/bin/umu-run" ""')
-        subprocess.Popen(["/bin/bash", "-c", winetricks_command])
         print(winetricks_command)
+
+        # faugus-run path
+        faugus_run_path = "/usr/bin/faugus-run"
+
+        subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
 
     def on_button_search_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
