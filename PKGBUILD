@@ -1,6 +1,6 @@
 pkgname=faugus-launcher
 pkgver=1.0
-pkgrel=20
+pkgrel=22
 pkgdesc="Simple and Lightweight Game Launcher"
 arch=('x86_64')
 license=('GPL')
