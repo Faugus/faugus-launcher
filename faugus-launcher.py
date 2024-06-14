@@ -2,10 +2,10 @@
 
 import os
 import re
-import sys
 import shutil
 import signal
 import subprocess
+import sys
 
 import gi
 
@@ -199,8 +199,6 @@ class Main(Gtk.Window):
             subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
                            r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
                            shell=True)
-        self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         self.game_running2 = False
 
     def on_button_add_clicked(self, widget):
@@ -357,6 +355,7 @@ class Main(Gtk.Window):
 
                 # Select the added game
                 self.select_game_by_title(title)
+                self.button_play.set_sensitive(True)
 
 
         else:
@@ -566,10 +565,11 @@ class Main(Gtk.Window):
 
     def on_child_process_closed(self, signum, frame):
         # Handle child process closing
-        if self.game_running and self.game_running.poll() is not None:
+        if self.game_running is not None:
             self.game_running = None
-        self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+            self.button_play.set_sensitive(True)
+            self.button_play.set_image(
+                Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         self.game_running2 = False
 
     def load_games(self):
@@ -804,6 +804,12 @@ class AddGame(Gtk.Dialog):
         self.button_winetricks.set_size_request(120, -1)
         self.button_winetricks.connect("clicked", self.on_button_winetricks_clicked)
 
+        # Button for Run
+        self.button_run = Gtk.Button(label="Run")
+        self.button_run.set_size_request(120, -1)
+        self.button_run.connect("clicked", self.on_button_run_clicked)
+        self.button_run.set_tooltip_text("Run a file inside the prefix")
+
         # Button for creating shortcut
         self.checkbox_shortcut = Gtk.CheckButton(label="Create Shortcut")
         self.checkbox_shortcut.connect("toggled", self.on_checkbox_toggled)
@@ -858,8 +864,9 @@ class AddGame(Gtk.Dialog):
 
         grid2.attach(self.button_winecfg, 2, 0, 1, 1)
         grid2.attach(self.button_winetricks, 2, 1, 1, 1)
+        grid2.attach(self.button_run, 2, 2, 1, 1)
 
-        grid2.attach(space_label, 0, 2, 1, 1)
+        # grid2.attach(space_label, 2, 3, 1, 1)
 
         grid2.attach(self.button_shortcut_icon, 2, 3, 1, 1)
         grid2.attach(self.checkbox_shortcut, 0, 3, 1, 1)
@@ -885,6 +892,39 @@ class AddGame(Gtk.Dialog):
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         self.show_all()
+
+    def on_button_run_clicked(self, widget):
+        # Handle the click event of the Run button
+        validation_result = self.validate_fields()
+        if not validation_result:
+            return
+
+        dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix", parent=self,
+                                       action=Gtk.FileChooserAction.OPEN)
+        dialog.set_current_folder(os.path.expanduser("~/"))
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            title = self.entry_title.get_text()
+            prefix = self.entry_prefix.get_text()
+
+            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+            title_formatted = title_formatted.replace(' ', '-')
+            title_formatted = '-'.join(title_formatted.lower().split())
+
+            file_run = dialog.get_filename()
+            run_command = (f'WINEPREFIX={prefix} '
+                           f'GAMEID={title_formatted} '
+                           f'"/usr/bin/umu-run" "{file_run}"')
+            print(run_command)
+
+            # faugus-run path
+            faugus_run_path = "/usr/bin/faugus-run"
+
+            subprocess.Popen([sys.executable, faugus_run_path, run_command])
+
+        dialog.destroy()
 
     def on_checkbox_toggled(self, checkbox):
         # Enable or disable the button based on the checkbox state
@@ -1087,11 +1127,12 @@ class AddGame(Gtk.Dialog):
     def validate_fields(self):
         # Validate the input fields for title and path
         title = self.entry_title.get_text()
-        path = self.entry_path.get_text()
+        # path = self.entry_path.get_text()
+        prefix = self.entry_prefix.get_text()
 
-        if not title or not path:
+        if not title or not prefix:
             # Show a warning message if title or path is empty
-            self.show_warning_message("Title and Path need to be filled")
+            self.show_warning_message("Title and Prefix need to be filled")
             return False
 
         return True
