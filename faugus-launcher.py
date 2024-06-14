@@ -355,8 +355,6 @@ class Main(Gtk.Window):
 
                 # Select the added game
                 self.select_game_by_title(title)
-                self.button_play.set_sensitive(True)
-
 
         else:
             add_game_dialog.destroy()
@@ -372,6 +370,9 @@ class Main(Gtk.Window):
             if game_label.get_text() == title:
                 self.game_list.select_row(row)
                 break
+        self.button_edit.set_sensitive(True)
+        self.button_delete.set_sensitive(True)
+        self.button_play.set_sensitive(True)
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
@@ -945,7 +946,7 @@ class AddGame(Gtk.Dialog):
     def on_button_shortcut_icon_clicked(self, widget):
 
         # Handle the click event of the Winetricks button
-        validation_result = self.validate_fields()
+        validation_result = self.validate_fields2()
         if not validation_result:
             return
 
@@ -1127,12 +1128,23 @@ class AddGame(Gtk.Dialog):
     def validate_fields(self):
         # Validate the input fields for title and path
         title = self.entry_title.get_text()
-        # path = self.entry_path.get_text()
         prefix = self.entry_prefix.get_text()
 
         if not title or not prefix:
             # Show a warning message if title or path is empty
             self.show_warning_message("Title and Prefix need to be filled")
+            return False
+
+        return True
+
+    def validate_fields2(self):
+        # Validate the input fields for title and path
+        title = self.entry_title.get_text()
+        path = self.entry_path.get_text()
+
+        if not title or not path:
+            # Show a warning message if title or path is empty
+            self.show_warning_message("Title and Path need to be filled")
             return False
 
         return True
