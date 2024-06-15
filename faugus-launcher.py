@@ -927,7 +927,8 @@ class AddGame(Gtk.Dialog):
             command_thread = threading.Thread(target=run_command)
             command_thread.start()
 
-        self.set_sensitive(True)
+        else:
+            self.set_sensitive(True)
         dialog.destroy()
 
     def on_checkbox_toggled(self, checkbox):
