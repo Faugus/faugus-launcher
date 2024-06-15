@@ -204,7 +204,7 @@ class Main(Gtk.Window):
 
     def on_button_add_clicked(self, widget):
         # Handle add button click event
-        add_game_dialog = AddGame(self)
+        add_game_dialog = AddGame(self, self.game_running2)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
@@ -218,7 +218,7 @@ class Main(Gtk.Window):
             title = game_label.get_text()
             game = next((j for j in self.games if j.title == title), None)
             if game:
-                edit_game_dialog = AddGame(self)
+                edit_game_dialog = AddGame(self, self.game_running2)
                 edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
                 edit_game_dialog.entry_title.set_text(game.title)
                 edit_game_dialog.entry_path.set_text(game.path)
@@ -726,7 +726,7 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class AddGame(Gtk.Dialog):
-    def __init__(self, parent):
+    def __init__(self, parent, game_running):
         # Initialize the AddGame dialog
         super().__init__(title="Add/Edit Game", parent=parent)
         # self.set_default_size(500, -1)
@@ -895,6 +895,14 @@ class AddGame(Gtk.Dialog):
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         self.show_all()
+
+        if game_running == True:
+            self.button_winecfg.set_sensitive(False)
+            self.button_winecfg.set_tooltip_text("A game is running. Please close the game first.")
+            self.button_winetricks.set_sensitive(False)
+            self.button_winetricks.set_tooltip_text("A game is running. Please close the game first.")
+            self.button_run.set_sensitive(False)
+            self.button_run.set_tooltip_text("A game is running. Please close the game first.")
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
