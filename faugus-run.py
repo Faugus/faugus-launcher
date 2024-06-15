@@ -1,138 +1,132 @@
-#!/usr/bin/env python3
-
 import gi
 
-gi.require_version("Gtk", "3.0")  # Ensure the version is specified before importing Gtk
-from gi.repository import Gtk, GLib
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, GLib, Gdk
 import sys
 import subprocess
 import argparse
+from threading import Thread, Lock
+import re
+
+
+def remove_ansi_escape(text):
+    # Regular expression to remove ANSI escape sequences
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
 
 
 class UMUProtonUpdater:
     def __init__(self, message):
         self.message = message
         self.process = None
+        self.warning_dialog = None
+        self.log_window = None
+        self.text_view = None
+        self.stdout_pipe = None
+        self.stderr_pipe = None
+        self.lock = Lock()
 
     def start_process(self, command):
+        # Start the subprocess
+        self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, text=True)
+
         if command == "winetricks":
-            self.open_log_window(self.message)
-        else:
-            # Start the subprocess
-            self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
-                                            stderr=subprocess.PIPE, text=True)
+            # Show log window for winetricks command
+            self.show_log_window()
 
-            # Display the warning message
-            self.show_warning_dialog()
+        # Display the warning message
+        self.show_warning_dialog()
 
-            # Monitor the subprocess output
-            GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.check_game_output)
-            GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.check_game_output)
+        # Start threads to capture and display output
+        self.stdout_pipe = self.capture_output(self.process.stdout, self.check_game_output)
+        self.stderr_pipe = self.capture_output(self.process.stderr, self.check_game_output)
 
-    def open_log_window(self, command):
-        # Create a new window
-        log_window = Gtk.Window(title="Winetricks Log")
-        log_window.set_default_size(600, 400)
-
-        # Create a TextView to display the log
-        textview = Gtk.TextView()
-        textview.set_editable(False)
-        textview.set_wrap_mode(Gtk.WrapMode.WORD)
-
-        # Create a ScrolledWindow to hold the TextView
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_vexpand(True)
-        scrolled_window.set_hexpand(True)
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scrolled_window.add(textview)
-
-        # Add the ScrolledWindow to the log window
-        log_window.add(scrolled_window)
-
-        # Function to update the TextView with new log lines
-        def update_textview(fd, condition):
-            line = fd.readline()
-            if line:
-                # Remove ANSI escape characters using regex
-                clean_line = remove_ansi_escape(line)
-                end_iter = textview.get_buffer().get_end_iter()
-                textview.get_buffer().insert(end_iter, clean_line)
-                scrolled_window.get_vadjustment().set_value(
-                    scrolled_window.get_vadjustment().get_upper())  # Auto-scroll to bottom
-                return True
-            else:
-                return False
-
-        def remove_ansi_escape(s):
-            import re
-            ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-            return ansi_escape.sub('', s)
-
-        # Run the command and capture the output
-        process_winetricks = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                              universal_newlines=True)
-
-        # Attach the stdout to the TextView
-        GLib.io_add_watch(process_winetricks.stdout, GLib.IO_IN, update_textview)
-
-        # Function to check if the process has terminated and close the log window
-        def check_process():
-            if process_winetricks.poll() is None:
-                return True
-            else:
-                log_window.destroy()
-                return False
-
-        # Add a timeout to periodically check if the process has terminated
-        GLib.timeout_add(100, check_process)
-
-        # Connect the destroy event of the log window to terminate the process
-        def on_log_window_destroy(widget):
-            if process_winetricks.poll() is None:
-                process_winetricks.terminate()
-
-        log_window.connect("destroy", on_log_window_destroy)
-
-        # Show all widgets in the log window
-        log_window.show_all()
+        # Monitor the subprocess
+        GLib.child_watch_add(self.process.pid, self.on_process_exit)
 
     def show_warning_dialog(self):
-        # Display the warning message while UMU-Run is updating
         self.warning_dialog = Gtk.MessageDialog(flags=0, message_type=Gtk.MessageType.WARNING,
                                                 buttons=Gtk.ButtonsType.NONE,
                                                 text="UMU-Proton is updating. Please wait...")
-
         self.warning_dialog.show()
 
-    def check_game_output(self, fd, condition):
-        # Read the game process output
-        line = fd.readline()
-        if not line:
-            return False  # Remove the IO watch if no more lines
+    def show_log_window(self):
+        self.log_window = Gtk.Window(title="Winetricks Logs")
+        self.log_window.set_default_size(600, 400)
 
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
+        self.text_view = Gtk.TextView()
+        self.text_view.set_editable(False)
+        text_buffer = self.text_view.get_buffer()
+
+        scrolled_window.add(self.text_view)
+        self.log_window.add(scrolled_window)
+
+        self.log_window.connect("delete-event", lambda x, y: self.on_log_window_delete_event())
+        self.log_window.show_all()
+
+    def capture_output(self, stream, callback):
+        def read_stream(stream, callback):
+            for line in iter(stream.readline, ''):
+                GLib.idle_add(callback, line)
+            stream.close()
+
+        thread = Thread(target=read_stream, args=(stream, callback))
+        thread.daemon = True
+        thread.start()
+        return thread
+
+    def check_game_output(self, line):
         # Check if the desired message was found in UMU-Run output
         if "Using UMU-Proton" in line or "UMU-Proton is up to date" in line:
             # Close the warning dialog after a short delay
             GLib.timeout_add_seconds(1, self.close_warning_dialog)
-            return False  # Remove the IO watch since we no longer need to monitor the process output
+        else:
+            # Append the line to the log window
+            self.append_to_text_view(line)
 
-        return True  # Continue monitoring the process output
+    def append_to_text_view(self, line):
+        if self.text_view:
+            clean_line = remove_ansi_escape(line)
+            self.lock.acquire()
+            end_iter = self.text_view.get_buffer().get_end_iter()
+            self.text_view.get_buffer().insert(end_iter, clean_line)
+            adj = self.text_view.get_parent().get_vadjustment()
+            adj.set_value(adj.get_upper() - adj.get_page_size())
+            self.lock.release()
 
     def close_warning_dialog(self):
-        # Close the warning dialog
-        self.warning_dialog.destroy()
-        Gtk.main_quit()
-        return False  # Stop the timeout function
+        if self.warning_dialog:
+            self.warning_dialog.destroy()
+            self.warning_dialog = None
+
+    def close_log_window(self):
+        if self.log_window:
+            self.log_window.destroy()
+            self.log_window = None
+
+    def on_log_window_delete_event(self, widget, event):
+        self.close_log_window()
+        return True
+
+    def on_process_exit(self, pid, condition):
+        if self.process.poll() is not None:
+            GLib.idle_add(self.close_warning_dialog)
+            GLib.idle_add(self.close_log_window)
+            GLib.idle_add(Gtk.main_quit)  # Ensure Gtk main loop quits
+        return False
 
 
 def handle_command(message, command=None):
-    # Create the UMUProtonUpdater instance and start the subprocess
     updater = UMUProtonUpdater(message)
     updater.start_process(command)
 
     Gtk.main()
-    updater.process.wait()  # Wait for the UMU-Run process to finish
-    sys.exit(0)  # Exit with success status
+    updater.process.wait()
+    sys.exit(0)
 
 
 def main():

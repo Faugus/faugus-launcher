@@ -6,6 +6,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 
 import gi
 
@@ -731,6 +732,7 @@ class AddGame(Gtk.Dialog):
         # self.set_default_size(500, -1)
         self.set_resizable(False)
         self.set_modal(True)
+        self.parent_window = parent
 
         # Create the content area
         self.box = self.get_content_area()
@@ -900,7 +902,7 @@ class AddGame(Gtk.Dialog):
         if not validation_result:
             return
 
-        dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix", parent=self,
+        dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
                                        action=Gtk.FileChooserAction.OPEN)
         dialog.set_current_folder(os.path.expanduser("~/"))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
@@ -1070,6 +1072,7 @@ class AddGame(Gtk.Dialog):
         self.checkbox_gamemode.set_active(gamemode)
 
     def on_button_winecfg_clicked(self, widget):
+        self.set_sensitive(False)
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields()
         if not validation_result:
@@ -1091,9 +1094,29 @@ class AddGame(Gtk.Dialog):
         # faugus-run path
         faugus_run_path = "/usr/bin/faugus-run"
 
-        subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
+        def run_command():
+            # Supondo que faugus_run_path e winetricks_command estejam definidos
+            process = subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
+            process.wait()  # Aguarda o término do processo
+            print("Processo terminado")
+            GLib.idle_add(self.set_sensitive, True)
+            GLib.idle_add(self.parent_window.set_sensitive, True)
+            GLib.idle_add(self.blocking_window.destroy)
+
+        # Cria uma janela transparente para bloquear a interação com a janela principal
+        self.blocking_window = Gtk.Window()
+        self.blocking_window.set_transient_for(self.parent_window)
+        self.blocking_window.set_decorated(False)
+        self.blocking_window.set_modal(True)
+        self.blocking_window.set_default_size(1, 1)
+        self.blocking_window.show_all()
+
+        # Inicia o comando em um thread separado
+        command_thread = threading.Thread(target=run_command)
+        command_thread.start()
 
     def on_button_winetricks_clicked(self, widget):
+        self.set_sensitive(False)
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields()
         if not validation_result:
@@ -1111,7 +1134,26 @@ class AddGame(Gtk.Dialog):
         # faugus-run path
         faugus_run_path = "/usr/bin/faugus-run"
 
-        subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
+        def run_command():
+            # Supondo que faugus_run_path e winetricks_command estejam definidos
+            process = subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
+            process.wait()  # Aguarda o término do processo
+            print("Processo terminado")
+            GLib.idle_add(self.set_sensitive, True)
+            GLib.idle_add(self.parent_window.set_sensitive, True)
+            GLib.idle_add(self.blocking_window.destroy)
+
+        # Cria uma janela transparente para bloquear a interação com a janela principal
+        self.blocking_window = Gtk.Window()
+        self.blocking_window.set_transient_for(self.parent_window)
+        self.blocking_window.set_decorated(False)
+        self.blocking_window.set_modal(True)
+        self.blocking_window.set_default_size(1, 1)
+        self.blocking_window.show_all()
+
+        # Inicia o comando em um thread separado
+        command_thread = threading.Thread(target=run_command)
+        command_thread.start()
 
     def on_button_search_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
