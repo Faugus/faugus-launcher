@@ -67,7 +67,7 @@ class UMUProtonUpdater:
         scrolled_window.add(self.text_view)
         self.log_window.add(scrolled_window)
 
-        self.log_window.connect("delete-event", lambda x, y: self.on_log_window_delete_event())
+        self.log_window.connect("delete-event", self.on_log_window_delete_event)
         self.log_window.show_all()
 
     def capture_output(self, stream, callback):
@@ -111,7 +111,7 @@ class UMUProtonUpdater:
             self.log_window = None
 
     def on_log_window_delete_event(self, widget, event):
-        self.close_log_window()
+        # Prevent the user from manually closing the log window
         return True
 
     def on_process_exit(self, pid, condition):
@@ -143,3 +143,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
