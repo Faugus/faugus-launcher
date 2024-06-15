@@ -133,60 +133,55 @@ class Main(Gtk.Window):
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
 
     def on_button_play_clicked(self, widget):
-        # Handle play button click event
-        listbox_row = self.game_list.get_selected_row()
-        if listbox_row:
-            # Get the selected game's title
-            hbox = listbox_row.get_child()
-            game_label = hbox.get_children()[0]
-            title = game_label.get_text()
-            # Find the selected game object
-            game = next((j for j in self.games if j.title == title), None)
-            if game and self.game_running is None:
-                # Format the title for command execution
-                title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-                title_formatted = title_formatted.replace(' ', '-')
-                title_formatted = '-'.join(title_formatted.lower().split())
+        if not (listbox_row := self.game_list.get_selected_row()):
+            return
+        # Get the selected game's title
+        hbox = listbox_row.get_child()
+        game_label = hbox.get_children()[0]
+        title = game_label.get_text()
+        # Find the selected game object
+        game = next((j for j in self.games if j.title == title), None)
+        if game and self.game_running is None:
+            # Format the title for command execution
+            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+            title_formatted = title_formatted.replace(' ', '-')
+            title_formatted = '-'.join(title_formatted.lower().split())
 
-                # Extract game launch information
-                launch_arguments = game.launch_arguments
-                path = game.path
-                prefix = game.prefix
-                game_arguments = game.game_arguments
-                mangohud = game.mangohud
+            # Extract game launch information
+            launch_arguments = game.launch_arguments
+            path = game.path
+            prefix = game.prefix
+            game_arguments = game.game_arguments
+            mangohud = game.mangohud
 
-                # Determine if gamemode is enabled
-                gamemode = ""
-                gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
-                if gamemode_enabled:
-                    gamemode = game.gamemode
+            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
+            gamemode = game.gamemode if gamemode_enabled else ""
+            # Construct the command for game launch
+            command = (f'{mangohud} '
+                       f'WINEPREFIX={prefix} '
+                       f'GAMEID={title_formatted} '
+                       f'{launch_arguments} '
+                       f'{gamemode} '
+                       f'"/usr/bin/umu-run" "{path}" "{game_arguments}"')
 
-                # Construct the command for game launch
-                command = (f'{mangohud} '
-                           f'WINEPREFIX={prefix} '
-                           f'GAMEID={title_formatted} '
-                           f'{launch_arguments} '
-                           f'{gamemode} '
-                           f'"/usr/bin/umu-run" "{path}" "{game_arguments}"')
+            print(command)
 
-                print(command)
+            # faugus-run path
+            faugus_run_path = "/usr/bin/faugus-run"
 
-                # faugus-run path
-                faugus_run_path = "/usr/bin/faugus-run"
+            self.game_running2 = True
 
-                self.game_running2 = True
+            # Launch the game with subprocess
+            if self.checkbox_close_after_launch.get_active():
+                subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL)
+                sys.exit()
+            else:
+                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command])
+                self.button_play.set_image(
+                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
-                # Launch the game with subprocess
-                if self.checkbox_close_after_launch.get_active():
-                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
-                                     stderr=subprocess.DEVNULL)
-                    sys.exit()
-                else:
-                    self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command])
-                    self.button_play.set_image(
-                        Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-
-                    self.button_play.set_sensitive(False)
+                self.button_play.set_sensitive(False)
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -210,39 +205,37 @@ class Main(Gtk.Window):
         add_game_dialog.show()
 
     def on_button_edit_clicked(self, widget):
-        # Handle edit button click event
-        listbox_row = self.game_list.get_selected_row()
-        if listbox_row:
-            hbox = listbox_row.get_child()
-            game_label = hbox.get_children()[0]
-            title = game_label.get_text()
-            game = next((j for j in self.games if j.title == title), None)
-            if game:
-                edit_game_dialog = AddGame(self, self.game_running2)
-                edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
-                edit_game_dialog.entry_title.set_text(game.title)
-                edit_game_dialog.entry_path.set_text(game.path)
-                edit_game_dialog.entry_prefix.set_text(game.prefix)
-                edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
-                edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
+        if not (listbox_row := self.game_list.get_selected_row()):
+            return
+        hbox = listbox_row.get_child()
+        game_label = hbox.get_children()[0]
+        title = game_label.get_text()
+        if game := next((j for j in self.games if j.title == title), None):
+            edit_game_dialog = AddGame(self, self.game_running2)
+            edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
+            edit_game_dialog.entry_title.set_text(game.title)
+            edit_game_dialog.entry_path.set_text(game.path)
+            edit_game_dialog.entry_prefix.set_text(game.prefix)
+            edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
+            edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
 
-                mangohud_status = False
-                gamemode_status = False
-                with open("games.txt", "r") as file:
-                    for line in file:
-                        fields = line.strip().split(";")
-                        if len(fields) >= 7 and fields[0] == game.title:
-                            mangohud_status = fields[5] == "MANGOHUD=1"
-                            gamemode_status = fields[6] == "gamemoderun"
+            mangohud_status = False
+            gamemode_status = False
+            with open("games.txt", "r") as file:
+                for line in file:
+                    fields = line.strip().split(";")
+                    if len(fields) >= 7 and fields[0] == game.title:
+                        mangohud_status = fields[5] == "MANGOHUD=1"
+                        gamemode_status = fields[6] == "gamemoderun"
 
-                edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
-                edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
-                edit_game_dialog.check_existing_shortcut()
+            edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
+            edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
+            edit_game_dialog.check_existing_shortcut()
 
-                image = self.set_image_shortcut_icon(game.title)
-                edit_game_dialog.button_shortcut_icon.set_image(image)
+            image = self.set_image_shortcut_icon(game.title)
+            edit_game_dialog.button_shortcut_icon.set_image(image)
 
-                edit_game_dialog.show()
+            edit_game_dialog.show()
 
     def set_image_shortcut_icon(self, title):
 
@@ -252,7 +245,7 @@ class Main(Gtk.Window):
         title_formatted = '-'.join(title_formatted.lower().split())
 
         # Check if the icon file exists
-        icons_path = os.path.expanduser(f"~/.config/faugus-launcher/icons/")
+        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
 
         if os.path.exists(new_icon_path):
@@ -276,86 +269,81 @@ class Main(Gtk.Window):
         return image
 
     def on_button_delete_clicked(self, widget):
-        # Handle delete button click event
-        listbox_row = self.game_list.get_selected_row()
-        if listbox_row:
-            # Retrieve the selected game's title
-            hbox = listbox_row.get_child()
-            game_label = hbox.get_children()[0]
-            title = game_label.get_text()
-            # Find the selected game object
-            game = next((j for j in self.games if j.title == title), None)
-            if game:
-                # Display confirmation dialog
-                confirmation_dialog = ConfirmationDialog(self)
-                response = confirmation_dialog.run()
+        if not (listbox_row := self.game_list.get_selected_row()):
+            return
+        # Retrieve the selected game's title
+        hbox = listbox_row.get_child()
+        game_label = hbox.get_children()[0]
+        title = game_label.get_text()
+        if game := next((j for j in self.games if j.title == title), None):
+            # Display confirmation dialog
+            confirmation_dialog = ConfirmationDialog(self)
+            response = confirmation_dialog.run()
 
-                if response == Gtk.ResponseType.YES:
-                    # Remove game and associated files if required
-                    if confirmation_dialog.get_remove_prefix_state():
-                        game_prefix = game.prefix
-                        prefix_path = os.path.expanduser(game_prefix)
-                        try:
-                            shutil.rmtree(prefix_path)
-                        except FileNotFoundError:
-                            pass
+            if response == Gtk.ResponseType.YES:
+                # Remove game and associated files if required
+                if confirmation_dialog.get_remove_prefix_state():
+                    game_prefix = game.prefix
+                    prefix_path = os.path.expanduser(game_prefix)
+                    try:
+                        shutil.rmtree(prefix_path)
+                    except FileNotFoundError:
+                        pass
 
-                    # Remove the shortcut
-                    self.remove_shortcut(game)
+                # Remove the shortcut
+                self.remove_shortcut(game)
 
-                    self.games.remove(game)
-                    self.save_games()
-                    self.update_list()
+                self.games.remove(game)
+                self.save_games()
+                self.update_list()
 
-                    self.button_edit.set_sensitive(False)
-                    self.button_delete.set_sensitive(False)
-                    self.button_play.set_sensitive(False)
+                self.button_edit.set_sensitive(False)
+                self.button_delete.set_sensitive(False)
+                self.button_play.set_sensitive(False)
 
-                confirmation_dialog.destroy()
+            confirmation_dialog.destroy()
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
-            # Check if fields are validated
             if not add_game_dialog.validate_fields():
                 # If fields are not validated, return and keep the dialog open
                 return True
-            else:
-                # Proceed with adding the game
-                # Get game information from dialog fields
-                title = add_game_dialog.entry_title.get_text()
-                path = add_game_dialog.entry_path.get_text()
-                launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
-                game_arguments = add_game_dialog.entry_game_arguments.get_text()
-                prefix = add_game_dialog.entry_prefix.get_text()
+            # Proceed with adding the game
+            # Get game information from dialog fields
+            title = add_game_dialog.entry_title.get_text()
+            path = add_game_dialog.entry_path.get_text()
+            launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
+            game_arguments = add_game_dialog.entry_game_arguments.get_text()
+            prefix = add_game_dialog.entry_prefix.get_text()
 
-                # Concatenate game information
-                game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
+            # Concatenate game information
+            game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
 
-                # Determine mangohud and gamemode status
-                mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
-                gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
+            # Determine mangohud and gamemode status
+            mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
+            gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
 
-                game_info += f";{mangohud};{gamemode}\n"
+            game_info += f";{mangohud};{gamemode}\n"
 
-                # Write game info to file
-                with open("games.txt", "a") as file:
-                    file.write(game_info)
+            # Write game info to file
+            with open("games.txt", "a") as file:
+                file.write(game_info)
 
-                # Create Game object and update UI
-                game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode)
-                self.games.append(game)
-                self.add_item_list(game)
-                self.update_list()
+            # Create Game object and update UI
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode)
+            self.games.append(game)
+            self.add_item_list(game)
+            self.update_list()
 
-                # Determine the state of the shortcut checkbox
-                shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
+            # Determine the state of the shortcut checkbox
+            shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
 
-                # Call add_remove_shortcut method
-                self.add_shortcut(game, shortcut_state)
+            # Call add_remove_shortcut method
+            self.add_shortcut(game, shortcut_state)
 
-                # Select the added game
-                self.select_game_by_title(title)
+            # Select the added game
+            self.select_game_by_title(title)
 
         else:
             add_game_dialog.destroy()
@@ -378,32 +366,30 @@ class Main(Gtk.Window):
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
         if response_id == Gtk.ResponseType.OK:
-            # Check if fields are validated
             if not edit_game_dialog.validate_fields():
                 # If fields are not validated, return and keep the dialog open
                 return True
-            else:
-                # Update game object with new information
-                game.title = edit_game_dialog.entry_title.get_text()
-                game.path = edit_game_dialog.entry_path.get_text()
-                game.prefix = edit_game_dialog.entry_prefix.get_text()
-                game.launch_arguments = edit_game_dialog.entry_launch_arguments.get_text()
-                game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
-                game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
-                game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
+            # Update game object with new information
+            game.title = edit_game_dialog.entry_title.get_text()
+            game.path = edit_game_dialog.entry_path.get_text()
+            game.prefix = edit_game_dialog.entry_prefix.get_text()
+            game.launch_arguments = edit_game_dialog.entry_launch_arguments.get_text()
+            game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
+            game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
+            game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
 
-                # Save changes and update UI
-                self.save_games()
-                self.update_list()
+            # Save changes and update UI
+            self.save_games()
+            self.update_list()
 
-                # Determine the state of the shortcut checkbox
-                shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
+            # Determine the state of the shortcut checkbox
+            shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
 
-                # Call add_remove_shortcut method
-                self.add_shortcut(game, shortcut_state)
+            # Call add_remove_shortcut method
+            self.add_shortcut(game, shortcut_state)
 
-                # Select the game that was edited
-                self.select_game_by_title(game.title)
+            # Select the game that was edited
+            self.select_game_by_title(game.title)
 
         edit_game_dialog.destroy()
 
@@ -424,16 +410,10 @@ class Main(Gtk.Window):
         launch_arguments = game.launch_arguments
         game_arguments = game.game_arguments
 
-        mangohud = ""
-        if game.mangohud:
-            mangohud = "MANGOHUD=1"
-
-        gamemode = ""
-        if game.gamemode:
-            gamemode = "gamemoderun"
-
+        mangohud = "MANGOHUD=1" if game.mangohud else ""
+        gamemode = "gamemoderun" if game.gamemode else ""
         # Check if the icon file exists
-        icons_path = os.path.expanduser(f"~/.config/faugus-launcher/icons/")
+        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
@@ -473,9 +453,7 @@ class Main(Gtk.Window):
         shutil.copy(desktop_file_path, desktop_shortcut_path)
 
     def update_preview(self, dialog):
-        # Updates the preview widget with the selected image's thumbnail
-        file_path = dialog.get_preview_filename()
-        if file_path:
+        if file_path := dialog.get_preview_filename():
             try:
                 # Create an image widget for the thumbnail
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
@@ -927,8 +905,8 @@ class AddGame(Gtk.Dialog):
 
             file_run = dialog.get_filename()
             run_command2 = (f'WINEPREFIX={prefix} '
-                           f'GAMEID={title_formatted} '
-                           f'"/usr/bin/umu-run" "{file_run}"')
+                            f'GAMEID={title_formatted} '
+                            f'"/usr/bin/umu-run" "{file_run}"')
             print(run_command2)
 
             # faugus-run path
@@ -949,8 +927,8 @@ class AddGame(Gtk.Dialog):
             command_thread = threading.Thread(target=run_command)
             command_thread.start()
 
+        self.set_sensitive(True)
         dialog.destroy()
-
 
     def on_checkbox_toggled(self, checkbox):
         # Enable or disable the button based on the checkbox state
@@ -985,7 +963,7 @@ class AddGame(Gtk.Dialog):
         title_formatted = '-'.join(title_formatted.lower().split())
 
         # Check if the icon file exists
-        icons_path = os.path.expanduser(f"~/.config/faugus-launcher/icons/")
+        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
 
         # Check if the icon directory exists and create if it doesn't
         icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/{title_formatted}/")
@@ -1040,9 +1018,7 @@ class AddGame(Gtk.Dialog):
             return
 
     def update_preview(self, dialog):
-        # Updates the preview widget with the selected image's thumbnail
-        file_path = dialog.get_preview_filename()
-        if file_path:
+        if file_path := dialog.get_preview_filename():
             try:
                 # Create an image widget for the thumbnail
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
