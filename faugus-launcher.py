@@ -897,6 +897,7 @@ class AddGame(Gtk.Dialog):
         self.show_all()
 
     def on_button_run_clicked(self, widget):
+        self.set_sensitive(False)
         # Handle the click event of the Run button
         validation_result = self.validate_fields()
         if not validation_result:
@@ -917,17 +918,31 @@ class AddGame(Gtk.Dialog):
             title_formatted = '-'.join(title_formatted.lower().split())
 
             file_run = dialog.get_filename()
-            run_command = (f'WINEPREFIX={prefix} '
+            run_command2 = (f'WINEPREFIX={prefix} '
                            f'GAMEID={title_formatted} '
                            f'"/usr/bin/umu-run" "{file_run}"')
-            print(run_command)
+            print(run_command2)
 
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
-            subprocess.Popen([sys.executable, faugus_run_path, run_command])
+            def run_command():
+                process = subprocess.Popen([sys.executable, faugus_run_path, run_command2, "winecfg"])
+                process.wait()
+                GLib.idle_add(self.set_sensitive, True)
+                GLib.idle_add(self.parent_window.set_sensitive, True)
+                GLib.idle_add(self.blocking_window.destroy)
+
+            self.blocking_window = Gtk.Window()
+            self.blocking_window.set_transient_for(self.parent_window)
+            self.blocking_window.set_decorated(False)
+            self.blocking_window.set_modal(True)
+
+            command_thread = threading.Thread(target=run_command)
+            command_thread.start()
 
         dialog.destroy()
+
 
     def on_checkbox_toggled(self, checkbox):
         # Enable or disable the button based on the checkbox state
@@ -946,6 +961,7 @@ class AddGame(Gtk.Dialog):
         return image
 
     def on_button_shortcut_icon_clicked(self, widget):
+        self.set_sensitive(False)
 
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields2()
@@ -1006,11 +1022,13 @@ class AddGame(Gtk.Dialog):
             # Delete the folder after the icon is moved
             shutil.rmtree(icon_directory)
             dialog.destroy()
+            self.set_sensitive(True)
 
         else:
             # Delete the folder
             shutil.rmtree(icon_directory)
             dialog.destroy()
+            self.set_sensitive(True)
             return
 
     def update_preview(self, dialog):
@@ -1095,23 +1113,17 @@ class AddGame(Gtk.Dialog):
         faugus_run_path = "/usr/bin/faugus-run"
 
         def run_command():
-            # Supondo que faugus_run_path e winetricks_command estejam definidos
             process = subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
-            process.wait()  # Aguarda o término do processo
-            print("Processo terminado")
+            process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
             GLib.idle_add(self.blocking_window.destroy)
 
-        # Cria uma janela transparente para bloquear a interação com a janela principal
         self.blocking_window = Gtk.Window()
         self.blocking_window.set_transient_for(self.parent_window)
         self.blocking_window.set_decorated(False)
         self.blocking_window.set_modal(True)
-        self.blocking_window.set_default_size(1, 1)
-        self.blocking_window.show_all()
 
-        # Inicia o comando em um thread separado
         command_thread = threading.Thread(target=run_command)
         command_thread.start()
 
@@ -1135,23 +1147,17 @@ class AddGame(Gtk.Dialog):
         faugus_run_path = "/usr/bin/faugus-run"
 
         def run_command():
-            # Supondo que faugus_run_path e winetricks_command estejam definidos
             process = subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
-            process.wait()  # Aguarda o término do processo
-            print("Processo terminado")
+            process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
             GLib.idle_add(self.blocking_window.destroy)
 
-        # Cria uma janela transparente para bloquear a interação com a janela principal
         self.blocking_window = Gtk.Window()
         self.blocking_window.set_transient_for(self.parent_window)
         self.blocking_window.set_decorated(False)
         self.blocking_window.set_modal(True)
-        self.blocking_window.set_default_size(1, 1)
-        self.blocking_window.show_all()
 
-        # Inicia o comando em um thread separado
         command_thread = threading.Thread(target=run_command)
         command_thread.start()
 

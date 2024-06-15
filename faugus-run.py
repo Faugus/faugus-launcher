@@ -82,13 +82,18 @@ class UMUProtonUpdater:
         return thread
 
     def check_game_output(self, line):
+        # Ignore lines containing "zenity", "Gtk-WARNING" or empty lines
+        clean_line = remove_ansi_escape(line).strip()
+        if "zenity" in clean_line or "Gtk-WARNING" in clean_line or "pixbuf" in clean_line or not clean_line:
+            return
+
         # Check if the desired message was found in UMU-Run output
-        if "Using UMU-Proton" in line or "UMU-Proton is up to date" in line:
+        if "Using UMU-Proton" in clean_line or "UMU-Proton is up to date" in clean_line:
             # Close the warning dialog after a short delay
             GLib.timeout_add_seconds(1, self.close_warning_dialog)
         else:
             # Append the line to the log window
-            self.append_to_text_view(line)
+            self.append_to_text_view(clean_line + '\n')
 
     def append_to_text_view(self, line):
         if self.text_view:
@@ -143,4 +148,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
