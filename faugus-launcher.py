@@ -156,14 +156,36 @@ class Main(Gtk.Window):
 
             gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
-            # Construct the command for game launch
-            command = (f'{mangohud} '
-                       f'WINEPREFIX={prefix} '
-                       f'GAMEID={title_formatted} '
-                       f'{launch_arguments} '
-                       f'{gamemode} '
-                       f'"/usr/bin/umu-run" "{path}" "{game_arguments}"')
 
+            # Get the directory containing the executable
+            game_directory = os.path.dirname(path)
+
+            self.working_directory = game_directory
+            os.chdir(self.working_directory)
+
+            command_parts = []
+
+            # Add command parts if they are not empty
+            if mangohud:
+                command_parts.append(mangohud)
+            if prefix:
+                command_parts.append(f'WINEPREFIX={prefix}')
+            if title_formatted:
+                command_parts.append(f'GAMEID={title_formatted}')
+            if gamemode:
+                command_parts.append(gamemode)
+            if launch_arguments:
+                command_parts.append(launch_arguments)
+
+            # Add the fixed command and remaining arguments
+            command_parts.append('"/usr/bin/umu-run"')
+            if path:
+                command_parts.append(f'"{path}"')
+            if game_arguments:
+                command_parts.append(f'"{game_arguments}"')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
             print(command)
 
             # faugus-run path
@@ -418,12 +440,34 @@ class Main(Gtk.Window):
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
 
-        command = (f'{mangohud} '
-                   f'WINEPREFIX={prefix} '
-                   f'GAMEID={title_formatted} '
-                   f'{launch_arguments} '
-                   f'{gamemode} '
-                   f'"/usr/bin/umu-run" "{path}" "{game_arguments}"')
+        # Get the directory containing the executable
+        game_directory = os.path.dirname(path)
+
+        self.working_directory = game_directory
+
+        command_parts = []
+
+        # Add command parts if they are not empty
+        if mangohud:
+            command_parts.append(mangohud)
+        if prefix:
+            command_parts.append(f'WINEPREFIX={prefix}')
+        if title_formatted:
+            command_parts.append(f'GAMEID={title_formatted}')
+        if gamemode:
+            command_parts.append(gamemode)
+        if launch_arguments:
+            command_parts.append(launch_arguments)
+
+        # Add the fixed command and remaining arguments
+        command_parts.append('"/usr/bin/umu-run"')
+        if path:
+            command_parts.append(f'"{path}"')
+        if game_arguments:
+            command_parts.append(f'"{game_arguments}"')
+
+        # Join all parts into a single command
+        command = ' '.join(command_parts)
 
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
@@ -432,7 +476,7 @@ class Main(Gtk.Window):
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
-    Path={os.path.expanduser("~/.config/faugus-launcher/")}
+    Path={game_directory}
     """
 
         # Check if the destination directory exists and create if it doesn't
