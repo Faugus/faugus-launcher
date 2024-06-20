@@ -159,9 +159,7 @@ class Main(Gtk.Window):
 
             # Get the directory containing the executable
             game_directory = os.path.dirname(path)
-
             self.working_directory = game_directory
-            os.chdir(self.working_directory)
 
             command_parts = []
 
@@ -196,10 +194,10 @@ class Main(Gtk.Window):
             # Launch the game with subprocess
             if self.checkbox_close_after_launch.get_active():
                 subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
-                                 stderr=subprocess.DEVNULL)
+                                 stderr=subprocess.DEVNULL, cwd=self.working_directory)
                 sys.exit()
             else:
-                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command])
+                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=self.working_directory)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
