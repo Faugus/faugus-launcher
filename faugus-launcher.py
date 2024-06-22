@@ -153,6 +153,7 @@ class Main(Gtk.Window):
             prefix = game.prefix
             game_arguments = game.game_arguments
             mangohud = game.mangohud
+            sc_controller = game.sc_controller
 
             gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
@@ -166,6 +167,8 @@ class Main(Gtk.Window):
             # Add command parts if they are not empty
             if mangohud:
                 command_parts.append(mangohud)
+            if sc_controller:
+                command_parts.append(sc_controller)
             if prefix:
                 command_parts.append(f'WINEPREFIX={prefix}')
             if title_formatted:
@@ -205,16 +208,10 @@ class Main(Gtk.Window):
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
-        if self.game_running is not None:
-            subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
-                           r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
-                           shell=True)
-            self.game_running.wait()
-            self.game_running = None
-        else:
-            subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
-                           r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
-                           shell=True)
+        subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
+                       r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
+                       shell=True)
+        self.game_running = None
         self.game_running2 = False
 
     def on_button_add_clicked(self, widget):
@@ -241,15 +238,24 @@ class Main(Gtk.Window):
 
             mangohud_status = False
             gamemode_status = False
+            sc_controller_status = False
             with open("games.txt", "r") as file:
                 for line in file:
                     fields = line.strip().split(";")
-                    if len(fields) >= 7 and fields[0] == game.title:
+                    if len(fields) >= 8 and fields[0] == game.title:
                         mangohud_status = fields[5] == "MANGOHUD=1"
                         gamemode_status = fields[6] == "gamemoderun"
+                        sc_controller_status = fields[7] == "SC_CONTROLLER=1"
 
-            edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
-            edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
+            mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+            if mangohud_enabled:
+                edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
+            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
+            if gamemode_enabled:
+                edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
+            sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
+            if sc_controller_enabled:
+                edit_game_dialog.checkbox_sc_controller.set_active(sc_controller_status)
             edit_game_dialog.check_existing_shortcut()
 
             image = self.set_image_shortcut_icon(game.title)
@@ -343,15 +349,16 @@ class Main(Gtk.Window):
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
+            sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
 
-            game_info += f";{mangohud};{gamemode}\n"
+            game_info += f";{mangohud};{gamemode};{sc_controller}\n"
 
             # Write game info to file
             with open("games.txt", "a") as file:
                 file.write(game_info)
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode)
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller)
             self.games.append(game)
             self.add_item_list(game)
             self.update_list()
@@ -372,7 +379,7 @@ class Main(Gtk.Window):
         add_game_dialog.destroy()
 
     def select_game_by_title(self, title):
-        # Seleciona um item na lista com base no título
+        # Select an item from the list based on title
         for row in self.game_list.get_children():
             hbox = row.get_child()
             game_label = hbox.get_children()[0]
@@ -397,6 +404,7 @@ class Main(Gtk.Window):
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
+            game.sc_controller = edit_game_dialog.checkbox_sc_controller.get_active()
 
             # Save changes and update UI
             self.save_games()
@@ -432,6 +440,7 @@ class Main(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
+        sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
         # Check if the icon file exists
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
@@ -448,6 +457,8 @@ class Main(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
+        if sc_controller:
+            command_parts.append(sc_controller)
         if prefix:
             command_parts.append(f'WINEPREFIX={prefix}')
         if title_formatted:
@@ -602,13 +613,15 @@ class Main(Gtk.Window):
                     data = line.strip().split(";")
                     if len(data) >= 5:
                         title, path, prefix, launch_arguments, game_arguments = data[:5]
-                        if len(data) >= 7:
+                        if len(data) >= 8:
                             mangohud = data[5]
                             gamemode = data[6]
+                            sc_controller = data[7]
                         else:
                             mangohud = ""
                             gamemode = ""
-                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode)
+                            sc_controller = ""
+                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller)
                         self.games.append(game)
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.game_list.foreach(Gtk.Widget.destroy)
@@ -624,9 +637,10 @@ class Main(Gtk.Window):
                 # Determine mangohud and gamemode values
                 mangohud_value = "MANGOHUD=1" if game.mangohud else ""
                 gamemode_value = "gamemoderun" if game.gamemode else ""
+                sc_controller_value = "SC_CONTROLLER=1" if game.sc_controller else ""
                 # Construct line with game information
                 line = (f"{game.title};{game.path};{game.prefix};{game.launch_arguments};{game.game_arguments};"
-                        f"{mangohud_value};{gamemode_value}\n")
+                        f"{mangohud_value};{gamemode_value};{sc_controller_value}\n")
                 file.write(line)
 
     def show_warning_message(self, message):
@@ -684,7 +698,7 @@ class Main(Gtk.Window):
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode):
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
@@ -693,6 +707,7 @@ class Game:
         self.mangohud = mangohud  # Boolean indicating whether Mangohud is enabled
         self.gamemode = gamemode  # Boolean indicating whether Gamemode is enabled
         self.prefix = prefix  # Prefix for Wine games
+        self.sc_controller = sc_controller  # Boolean indicating whether SC Controller is enabled
 
 
 class ConfirmationDialog(Gtk.Dialog):
@@ -815,7 +830,14 @@ class AddGame(Gtk.Dialog):
 
         # Checkboxes for optional features
         self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
+        self.checkbox_mangohud.set_tooltip_text(
+            "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
+        self.checkbox_gamemode.set_tooltip_text(
+            "Tweaks your system to improve performance.")
+        self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
+        self.checkbox_sc_controller.set_tooltip_text(
+            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -884,6 +906,7 @@ class AddGame(Gtk.Dialog):
         grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
+        grid2.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
 
         grid2.attach(self.button_winecfg, 2, 0, 1, 1)
         grid2.attach(self.button_winetricks, 2, 1, 1, 1)
@@ -902,15 +925,26 @@ class AddGame(Gtk.Dialog):
         self.box.add(grid3)
 
         # Check if optional features are available and enable/disable accordingly
-        mangohud_enabled = os.path.exists("/usr/bin/mangohud")
-        if not mangohud_enabled:
+        self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
+            self.checkbox_mangohud.set_tooltip_text(
+            "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
         self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
+            self.checkbox_gamemode.set_tooltip_text(
+            "Tweaks your system to improve performance. NOT INSTALLED.")
+
+        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
+        if not self.sc_controller_enabled:
+            self.checkbox_sc_controller.set_sensitive(False)
+            self.checkbox_sc_controller.set_active(False)
+            self.checkbox_sc_controller.set_tooltip_text(
+            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
@@ -1110,11 +1144,6 @@ class AddGame(Gtk.Dialog):
         title_formatted = '-'.join(title_formatted.lower().split())
         prefix = os.path.expanduser("~/.config/faugus-launcher/prefixes/") + title_formatted
         self.entry_prefix.set_text(prefix)
-
-    def load_checkboxes_state(self, mangohud, gamemode):
-        # Set the state of the MangoHud and Feral Game Mode checkboxes
-        self.checkbox_mangohud.set_active(mangohud)
-        self.checkbox_gamemode.set_active(gamemode)
 
     def on_button_winecfg_clicked(self, widget):
         self.set_sensitive(False)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import gi
+import atexit
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -8,12 +9,11 @@ import sys
 import subprocess
 import argparse
 import re
-
+import os
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
-
 
 class UMUProtonUpdater:
     def __init__(self, message):
@@ -24,6 +24,11 @@ class UMUProtonUpdater:
         self.text_view = None
 
     def start_process(self, command):
+        # Check if SC_CONTROLLER=1 is in message before starting scc-daemon
+        if "SC_CONTROLLER=1" in self.message:
+            self.start_scc_daemon()
+
+        # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
@@ -36,6 +41,13 @@ class UMUProtonUpdater:
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
 
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
+
+    def start_scc_daemon(self):
+        working_directory = os.path.expanduser("~/.config/faugus-launcher/")
+        try:
+            subprocess.run(["scc-daemon", "controller.sccprofile", "start"], check=True, cwd=working_directory)
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
         self.warning_dialog = Gtk.MessageDialog(flags=0, message_type=Gtk.MessageType.WARNING,
@@ -112,7 +124,16 @@ def handle_command(message, command=None):
     sys.exit(0)
 
 
+def stop_scc_daemon():
+    try:
+        subprocess.run(["scc-daemon", "stop"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to stop scc-daemon: {e}")
+
+
 def main():
+    atexit.register(stop_scc_daemon)
+
     parser = argparse.ArgumentParser(description="UMU-Proton Updater")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
