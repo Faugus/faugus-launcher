@@ -45,12 +45,15 @@ For Application Launchers
 ```
 
 # Screenshots
-### Adwaita
-
-![Screenshot from 2024-06-03 21-48-47](https://github.com/Faugus/faugus-launcher/assets/112667550/c18de2f8-a333-4803-a478-7f0f575c8bba)![Screenshot from 2024-06-03 21-55-43](https://github.com/Faugus/faugus-launcher/assets/112667550/71407c2c-43bc-4cb2-bbd4-6aca5050de67)
-![Screenshot from 2024-06-03 21-49-47](https://github.com/Faugus/faugus-launcher/assets/112667550/8391bad5-5cbb-4553-ac13-5beeb3d2b646)![Screenshot from 2024-06-03 21-55-49](https://github.com/Faugus/faugus-launcher/assets/112667550/9613eb9d-b82c-49ae-8fa7-b73fcfa047fa)
-
-### Breeze
-
-![Screenshot_20240610_001530](https://github.com/Faugus/faugus-launcher/assets/112667550/2cdff948-e1d9-42ed-9cea-6142e5f6f6c7)![Screenshot_20240610_001623](https://github.com/Faugus/faugus-launcher/assets/112667550/6205abe8-be9f-42ba-9a7e-addf927d6c9e)
-![Screenshot_20240610_001551](https://github.com/Faugus/faugus-launcher/assets/112667550/1b03454f-036a-440a-b776-280017ba786e)![Screenshot_20240610_001633](https://github.com/Faugus/faugus-launcher/assets/112667550/8f882d39-9888-4565-abca-b79171c8176a)
+<p align="center">
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/34df5f76-2d74-41ff-adcb-f5b74f25b444)/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/f90b3689-440a-407d-8fa7-792a7459db25)/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/7b353b17-07d4-4c5a-937d-7603ed302dda)/>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2135e666-c2af-4ba1-9f6c-2a3c6d84b9ab)/>
+</p>
+<p align="center">
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/57404d8f-7a95-4979-b0cb-dcf3956cdf4c)/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/fde8d62d-c683-48db-a914-0d6e210b39df)/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/d3651e99-f342-4d8d-b066-588453a454bd)/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/908f5ed8-4fd7-4e72-9f29-3b7e65bd1e6b)/>
+</p>
