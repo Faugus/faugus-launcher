@@ -4,8 +4,15 @@ A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-
 # Installation
 ### Arch-based distributions (AUR)
 ```
-yay -S faugus-launcher
+yay -S --noconfirm faugus-launcher
 ```
+```
+# Optional tools
+sudo pacman -S --noconfirm mangohud
+sudo pacman -S --noconfirm gamemode
+yay -S --noconfirm sc-controller
+```
+
 ### Fedora-based distributions (Copr)
 ```
 sudo dnf -y copr enable gloriouseggroll/nobara-40
@@ -13,6 +20,12 @@ sudo dnf -y install umu-launcher
 sudo dnf -y copr disable gloriouseggroll/nobara-40
 sudo dnf -y copr enable faugus/faugus-launcher
 sudo dnf -y install faugus-launcher
+```
+```
+# Optional tools
+sudo dnf -y install mangohud
+sudo dnf -y install gamemode
+sudo dnf -y install sc-controller
 ```
 
 # Information
