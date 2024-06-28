@@ -489,21 +489,25 @@ class Main(Gtk.Window):
     """
 
         # Check if the destination directory exists and create if it doesn't
-        desktop_directory = os.path.expanduser("~/.local/share/applications/")
+        applications_directory = os.path.expanduser("~/.local/share/applications/")
+        if not os.path.exists(applications_directory):
+            os.makedirs(applications_directory)
+            
+        desktop_directory = os.path.expanduser("~/Desktop")
         if not os.path.exists(desktop_directory):
             os.makedirs(desktop_directory)
 
-        desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+        applications_shortcut_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
 
-        with open(desktop_file_path, 'w') as desktop_file:
+        with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
 
         # Make the .desktop file executable
-        os.chmod(desktop_file_path, 0o755)
+        os.chmod(applications_shortcut_path, 0o755)
 
         # Copy the shortcut to Desktop
         desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
-        shutil.copy(desktop_file_path, desktop_shortcut_path)
+        shutil.copy(applications_shortcut_path, desktop_shortcut_path)
 
     def update_preview(self, dialog):
         if file_path := dialog.get_preview_filename():
