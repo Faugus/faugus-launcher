@@ -45,8 +45,10 @@ For Application Launchers
 ```
 
 ### Using SC Controller with Faugus Launcher
-Save the SC Controller profile at ~/.config/faugus-launcher/controller.sccprofile
-
+Save the SC Controller profile at
+```
+~/.config/faugus-launcher/controller.sccprofile
+```
 https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-857f-21e3eb666074
 
 # Screenshots
