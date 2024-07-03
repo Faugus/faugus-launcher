@@ -53,14 +53,14 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 
 # Screenshots
 <p align="center">
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2555a761-c12a-48cb-8888-5f007bb71031)/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/cfc9a0a9-8999-4473-ac00-f0fb44b2095c)/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e09130c7-9b46-4a9a-bf8c-9f215a5b3d24)/>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/3fe492ef-7fe3-472e-8e54-ee475a51c38c)/>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2555a761-c12a-48cb-8888-5f007bb71031/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/cfc9a0a9-8999-4473-ac00-f0fb44b2095c/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e09130c7-9b46-4a9a-bf8c-9f215a5b3d24/>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/3fe492ef-7fe3-472e-8e54-ee475a51c38c/>
 </p>
 <p align="center">
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/fcfeceb3-815d-4cac-98d1-c7ae3b1b89f0)/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/4aacdcf3-edd7-47b4-a1f3-1256a6421e0b)/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e769090b-6a15-44e0-8e54-23b49e7d45b9)/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/5294e6a5-88b0-42d7-8f0d-63badda7efe9)/>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/a2c5993b-5a67-46a4-9ba4-31ddc1c69377/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/7b00bcf6-1db8-4c2e-9208-ac9f843f2a49/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/d5b0368c-1986-46dd-aa2d-67e5c7ad2433/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/5979a28b-b057-4ca9-b758-bf869a32d217/>
 </p>
