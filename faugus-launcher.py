@@ -1370,7 +1370,10 @@ class AddGame(Gtk.Dialog):
     def on_button_search_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
         dialog = Gtk.FileChooserDialog(title="Select the game's .exe", parent=self, action=Gtk.FileChooserAction.OPEN)
-        dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
+        if not self.entry_path.get_text():
+            dialog.set_current_folder(os.path.expanduser("~/"))
+        else:
+            dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
         response = dialog.run()
