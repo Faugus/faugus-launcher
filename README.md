@@ -53,14 +53,14 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 
 # Screenshots
 <p align="center">
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/34df5f76-2d74-41ff-adcb-f5b74f25b444)/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/f90b3689-440a-407d-8fa7-792a7459db25)/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/7b353b17-07d4-4c5a-937d-7603ed302dda)/>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2135e666-c2af-4ba1-9f6c-2a3c6d84b9ab)/>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2555a761-c12a-48cb-8888-5f007bb71031)/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/cfc9a0a9-8999-4473-ac00-f0fb44b2095c)/><br>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e09130c7-9b46-4a9a-bf8c-9f215a5b3d24)/>
+  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/3fe492ef-7fe3-472e-8e54-ee475a51c38c)/>
 </p>
 <p align="center">
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/57404d8f-7a95-4979-b0cb-dcf3956cdf4c)/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/fde8d62d-c683-48db-a914-0d6e210b39df)/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/d3651e99-f342-4d8d-b066-588453a454bd)/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/908f5ed8-4fd7-4e72-9f29-3b7e65bd1e6b)/>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/fcfeceb3-815d-4cac-98d1-c7ae3b1b89f0)/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/4aacdcf3-edd7-47b4-a1f3-1256a6421e0b)/><br><br>
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e769090b-6a15-44e0-8e54-23b49e7d45b9)/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/5294e6a5-88b0-42d7-8f0d-63badda7efe9)/>
 </p>
