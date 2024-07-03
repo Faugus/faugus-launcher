@@ -24,6 +24,9 @@ class Main(Gtk.Window):
 
         self.game_running = None
 
+        self.games = []  # lista de jogos
+        self.processos = {}  # dicionário para armazenar processos de jogos
+
         # Define the configuration path
         config_path = os.path.expanduser("~/.config/faugus-launcher/")
         # Create the configuration directory if it doesn't exist
@@ -183,7 +186,7 @@ class Main(Gtk.Window):
         title = game_label.get_text()
         # Find the selected game object
         game = next((j for j in self.games if j.title == title), None)
-        if game and self.game_running is None:
+        if game:
             # Format the title for command execution
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
             title_formatted = title_formatted.replace(' ', '-')
@@ -234,19 +237,10 @@ class Main(Gtk.Window):
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
-            self.game_running2 = True
-
             # Launch the game with subprocess
-            if self.load_close_onlaunch():
-                subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
-                                 stderr=subprocess.DEVNULL, cwd=game_directory)
-                sys.exit()
-            else:
-                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-
-                self.button_play.set_sensitive(False)
+            processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+            self.processos[title] = processo
+            self.button_play.set_sensitive(False)
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -270,6 +264,10 @@ class Main(Gtk.Window):
         game_label = hbox.get_children()[0]
         title = game_label.get_text()
         if game := next((j for j in self.games if j.title == title), None):
+            if game.title in self.processos:
+                self.game_running2 = True
+            else:
+                self.game_running2 = False
             edit_game_dialog = AddGame(self, self.game_running2)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
             edit_game_dialog.entry_title.set_text(game.title)
@@ -304,6 +302,14 @@ class Main(Gtk.Window):
             image = self.set_image_shortcut_icon(game.title)
             edit_game_dialog.button_shortcut_icon.set_image(image)
             edit_game_dialog.entry_title.set_sensitive(False)
+
+            if self.game_running2:
+                edit_game_dialog.button_winecfg.set_sensitive(False)
+                edit_game_dialog.button_winecfg.set_tooltip_text(f'{game.title} is running. Please close it first.')
+                edit_game_dialog.button_winetricks.set_sensitive(False)
+                edit_game_dialog.button_winetricks.set_tooltip_text(f'{game.title} is running. Please close it first.')
+                edit_game_dialog.button_run.set_sensitive(False)
+                edit_game_dialog.button_run.set_tooltip_text(f'{game.title} is running. Please close it first.')
 
             edit_game_dialog.show()
 
@@ -494,7 +500,7 @@ class Main(Gtk.Window):
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
 
-        #self.working_directory = game_directory
+        # self.working_directory = game_directory
 
         command_parts = []
 
@@ -645,13 +651,23 @@ class Main(Gtk.Window):
         self.show_all()
 
     def on_child_process_closed(self, signum, frame):
-        # Handle child process closing
-        if self.game_running is not None:
-            self.game_running = None
-            self.button_play.set_sensitive(True)
-            self.button_play.set_image(
-                Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-        self.game_running2 = False
+        for title, processo in list(self.processos.items()):
+            retcode = processo.poll()
+            if retcode is not None:
+                del self.processos[title]
+
+                listbox_row = self.game_list.get_selected_row()
+                if listbox_row:
+                    hbox = listbox_row.get_child()
+                    game_label = hbox.get_children()[0]
+                    selected_title = game_label.get_text()
+
+                    if selected_title not in self.processos:
+                        self.button_play.set_sensitive(True)
+                    else:
+                        self.button_play.set_sensitive(False)
+                self.button_play.set_image(
+                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
     def load_games(self):
         # Load games from file
@@ -713,10 +729,23 @@ class Main(Gtk.Window):
             current_row = listbox.get_row_at_y(event.y)
             current_time = event.time
             if current_row == self.last_clicked_row and current_time - self.last_click_time < 500:
-                # Double-click detected, trigger play button click event
-                if self.game_running2 == False:
-                    widget = self.button_play
-                    self.on_button_play_clicked(widget)
+                # Double-click detected
+                if current_row:
+                    hbox = current_row.get_child()
+                    game_label = hbox.get_children()[0]
+                    title = game_label.get_text()
+
+                    # Check if the game is already running
+                    if title not in self.processos:
+                        widget = self.button_play
+                        self.on_button_play_clicked(widget)
+                    else:
+                        dialog = Gtk.MessageDialog(title=title, text=f"'{title}' is already running.",
+                                                   buttons=Gtk.ButtonsType.OK, parent=self)
+                        dialog.set_resizable(False)
+                        dialog.set_modal(True)
+                        dialog.run()
+                        dialog.destroy()
             else:
                 # Single-click, update last click details and enable buttons
                 self.last_clicked_row = current_row
@@ -725,10 +754,15 @@ class Main(Gtk.Window):
                 self.button_edit.set_sensitive(True)
                 self.button_delete.set_sensitive(True)
 
-                if self.game_running2 == True:
-                    self.button_play.set_sensitive(False)
-                else:
-                    self.button_play.set_sensitive(True)
+                if current_row:
+                    hbox = current_row.get_child()
+                    game_label = hbox.get_children()[0]
+                    title = game_label.get_text()
+
+                    if title in self.processos:
+                        self.button_play.set_sensitive(False)
+                    else:
+                        self.button_play.set_sensitive(True)
 
 
 class Settings(Gtk.Dialog):
@@ -896,7 +930,7 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class AddGame(Gtk.Dialog):
-    def __init__(self, parent, game_running):
+    def __init__(self, parent, game_running2):
         # Initialize the AddGame dialog
         super().__init__(title="Add/Edit Game", parent=parent)
         # self.set_default_size(500, -1)
@@ -1089,14 +1123,6 @@ class AddGame(Gtk.Dialog):
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         self.show_all()
-
-        if game_running == True:
-            self.button_winecfg.set_sensitive(False)
-            self.button_winecfg.set_tooltip_text("A game is running. Please close the game first.")
-            self.button_winetricks.set_sensitive(False)
-            self.button_winetricks.set_tooltip_text("A game is running. Please close the game first.")
-            self.button_run.set_sensitive(False)
-            self.button_run.set_tooltip_text("A game is running. Please close the game first.")
 
     def load_default_prefix(self):
         config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
@@ -1384,7 +1410,7 @@ class AddGame(Gtk.Dialog):
 
     def on_button_search_prefix_clicked(self, widget):
         dialog = Gtk.FileChooserDialog(title="Select a prefix location", parent=self,
-            action=Gtk.FileChooserAction.SELECT_FOLDER)
+                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
 
         if not self.entry_prefix.get_text():
             dialog.set_current_folder(os.path.expanduser(self.default_prefix))
