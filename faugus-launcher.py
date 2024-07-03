@@ -32,6 +32,10 @@ class Main(Gtk.Window):
         self.working_directory = config_path
         os.chdir(self.working_directory)
 
+        config_file = os.path.join(self.working_directory, 'config.ini')
+        if not os.path.exists(config_file):
+            self.save_config("False", "~/.config/faugus-launcher/prefixes")
+
         self.games = []
 
         # Create main box and its components
@@ -64,15 +68,6 @@ class Main(Gtk.Window):
         self.button_delete.set_margin_start(10)
         self.button_delete.set_margin_end(10)
 
-        # Create checkbox for 'Close after launch' option
-        self.checkbox_close_after_launch = Gtk.CheckButton(label="Close after launch")
-        self.checkbox_close_after_launch.set_margin_top(10)
-        self.checkbox_close_after_launch.set_margin_end(10)
-        self.checkbox_close_after_launch.set_margin_bottom(10)
-        self.checkbox_close_after_launch.set_active(False)
-        self.checkbox_close_after_launch.set_active(self.load_config())
-        self.checkbox_close_after_launch.connect("toggled", self.on_checkbox_toggled)
-
         # Create button for killing processes
         button_kill = Gtk.Button(label="Kill")
         button_kill.connect("clicked", self.on_button_kill_clicked)
@@ -82,12 +77,23 @@ class Main(Gtk.Window):
         button_kill.set_margin_end(10)
         button_kill.set_margin_bottom(10)
 
+        # Create button for settings
+        button_settings = Gtk.Button()
+        button_settings.connect("clicked", self.on_button_settings_clicked)
+        button_settings.set_size_request(50, 50)
+        button_settings.set_image(Gtk.Image.new_from_icon_name("applications-system-symbolic", Gtk.IconSize.BUTTON))
+        button_settings.set_margin_top(10)
+        button_settings.set_margin_start(10)
+        button_settings.set_margin_bottom(10)
+
         # Create button for launching games
         self.button_play = Gtk.Button()
         self.button_play.connect("clicked", self.on_button_play_clicked)
         self.button_play.set_size_request(150, 50)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-        self.button_play.set_border_width(10)
+        self.button_play.set_margin_top(10)
+        self.button_play.set_margin_end(10)
+        self.button_play.set_margin_bottom(10)
 
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
@@ -105,9 +111,9 @@ class Main(Gtk.Window):
         self.load_games()
 
         # Pack buttons and other components into the bottom box
-        box_bottom.pack_start(self.button_play, False, False, 0)
+        box_bottom.pack_start(button_settings, False, False, 0)
+        box_bottom.pack_end(self.button_play, False, False, 0)
         box_bottom.pack_end(button_kill, False, False, 0)
-        box_bottom.pack_end(self.checkbox_close_after_launch, False, False, 0)
 
         # Pack buttons into the left box
         box_left.pack_start(self.button_add, False, False, 0)
@@ -131,6 +137,42 @@ class Main(Gtk.Window):
 
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+
+    def load_close_onlaunch(self):
+        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        close_onlaunch = ""
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                config_data = f.read().splitlines()
+            config_dict = dict(line.split('=') for line in config_data)
+            close_onlaunch = config_dict.get('close_onlaunch', '').strip('"')
+        return close_onlaunch
+
+    def on_button_settings_clicked(self, widget):
+        # Handle add button click event
+        settings_dialog = Settings(self)
+        settings_dialog.connect("response", self.on_settings_dialog_response, settings_dialog)
+
+        settings_dialog.show()
+
+    def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
+
+        self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
+        self.entry_default_prefix = settings_dialog.entry_default_prefix
+
+        checkbox_state = self.checkbox_close_after_launch.get_active()
+        default_prefix = self.entry_default_prefix.get_text()
+
+        # Handle dialog response
+        if response_id == Gtk.ResponseType.OK:
+            self.save_config(checkbox_state, default_prefix)
+            settings_dialog.destroy()
+
+        else:
+            settings_dialog.destroy()
+
+        # Ensure the dialog is destroyed when canceled
+        settings_dialog.destroy()
 
     def on_button_play_clicked(self, widget):
         if not (listbox_row := self.game_list.get_selected_row()):
@@ -160,7 +202,7 @@ class Main(Gtk.Window):
 
             # Get the directory containing the executable
             game_directory = os.path.dirname(path)
-            self.working_directory = game_directory
+            # self.working_directory = game_directory
 
             command_parts = []
 
@@ -195,12 +237,12 @@ class Main(Gtk.Window):
             self.game_running2 = True
 
             # Launch the game with subprocess
-            if self.checkbox_close_after_launch.get_active():
+            if self.load_close_onlaunch():
                 subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
-                                 stderr=subprocess.DEVNULL, cwd=self.working_directory)
+                                 stderr=subprocess.DEVNULL, cwd=game_directory)
                 sys.exit()
             else:
-                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=self.working_directory)
+                self.game_running = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
@@ -253,13 +295,15 @@ class Main(Gtk.Window):
             gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
             if gamemode_enabled:
                 edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
-            sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
+            sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+                "/usr/local/bin/sc-controller")
             if sc_controller_enabled:
                 edit_game_dialog.checkbox_sc_controller.set_active(sc_controller_status)
             edit_game_dialog.check_existing_shortcut()
 
             image = self.set_image_shortcut_icon(game.title)
             edit_game_dialog.button_shortcut_icon.set_image(image)
+            edit_game_dialog.entry_title.set_sensitive(False)
 
             edit_game_dialog.show()
 
@@ -492,7 +536,7 @@ class Main(Gtk.Window):
         applications_directory = os.path.expanduser("~/.local/share/applications/")
         if not os.path.exists(applications_directory):
             os.makedirs(applications_directory)
-            
+
         desktop_directory = os.path.expanduser("~/Desktop")
         if not os.path.exists(desktop_directory):
             os.makedirs(desktop_directory)
@@ -625,7 +669,8 @@ class Main(Gtk.Window):
                             mangohud = ""
                             gamemode = ""
                             sc_controller = ""
-                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller)
+                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
+                                    sc_controller)
                         self.games.append(game)
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.game_list.foreach(Gtk.Widget.destroy)
@@ -654,28 +699,13 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def on_checkbox_toggled(self, widget):
-        # Handle checkbox toggling event
-        checkbox_state = widget.get_active()
-        self.save_config(checkbox_state)
-
-    def load_config(self):
-        # Load configuration from file
-        config_file = os.path.join(self.working_directory, 'config.ini')
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                return f.read().strip() == 'close-onlaunch=true'
-        else:
-            # Save default configuration if file does not exist
-            self.save_config(False)
-            return False
-
-    def save_config(self, checkbox_state):
+    def save_config(self, checkbox_state, default_prefix):
         # Save configuration to file
-        value = 'close-onlaunch=true' if checkbox_state else 'close-onlaunch=false'
         config_file = os.path.join(self.working_directory, 'config.ini')
+
         with open(config_file, 'w') as f:
-            f.write(value)
+            f.write(f'close-onlaunch={checkbox_state}\n')
+            f.write(f'default-prefix="{default_prefix}"\n')
 
     def on_button_release_event(self, listbox, event):
         # Handle button release event
@@ -699,6 +729,107 @@ class Main(Gtk.Window):
                     self.button_play.set_sensitive(False)
                 else:
                     self.button_play.set_sensitive(True)
+
+
+class Settings(Gtk.Dialog):
+    def __init__(self, parent):
+        # Initialize the Settings dialog
+        super().__init__(title="Settings", parent=parent)
+        self.set_resizable(False)
+        self.set_modal(True)
+        self.set_default_size(300, 100)
+
+        self.parent = parent
+
+        # Create checkbox for 'Close after launch' option
+        self.checkbox_close_after_launch = Gtk.CheckButton(label="Close after launch")
+        self.checkbox_close_after_launch.set_active(False)
+
+        # Widgets for prefix
+        self.label_default_prefix = Gtk.Label(label="Default prefixes location")
+        self.label_default_prefix.set_halign(Gtk.Align.START)
+        self.entry_default_prefix = Gtk.Entry()
+        self.entry_default_prefix.set_tooltip_text("/path/to/the/prefix")
+        self.button_search_prefix = Gtk.Button()
+        self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
+
+        # Button Cancel
+        self.button_cancel = Gtk.Button(label="Cancel")
+        self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
+        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_halign(Gtk.Align.CENTER)
+
+        # Button Ok
+        self.button_ok = Gtk.Button(label="Ok")
+        self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
+        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_halign(Gtk.Align.CENTER)
+
+        self.box = self.get_content_area()
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+
+        grid2 = Gtk.Grid()
+        grid2.set_row_spacing(10)
+        grid2.set_column_spacing(10)
+        grid2.set_margin_start(10)
+        grid2.set_margin_end(10)
+        grid2.set_margin_top(10)
+        grid2.set_margin_bottom(10)
+
+        # Attach widgets to the grid layout
+        grid.attach(self.label_default_prefix, 0, 0, 4, 1)
+        grid.attach(self.entry_default_prefix, 0, 1, 3, 1)
+        self.entry_default_prefix.set_hexpand(True)
+        grid.attach(self.button_search_prefix, 3, 1, 1, 1)
+        grid.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
+
+        grid2.attach(self.button_cancel, 1, 1, 1, 1)
+        grid2.attach(self.button_ok, 2, 1, 1, 1)
+
+        self.load_config()
+
+        self.box.add(grid)
+        self.box.add(grid2)
+        self.show_all()
+
+    def on_button_search_prefix_clicked(self, widget):
+        # Handle the click event of the search button to select the game's .exe
+        dialog = Gtk.FileChooserDialog(title="Select a prefix location", parent=self,
+                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog.set_current_folder(os.path.expanduser(self.default_prefix))
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.entry_default_prefix.set_text(dialog.get_filename())
+
+        dialog.destroy()
+
+    def load_config(self):
+        # Load configuration from file
+        # config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        config_file = os.path.join(self.parent.working_directory, 'config.ini')
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                config_data = f.read().splitlines()
+            config_dict = dict(line.split('=') for line in config_data)
+            close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
+            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
+
+            self.checkbox_close_after_launch.set_active(close_on_launch)
+            self.entry_default_prefix.set_text(self.default_prefix)
+        else:
+            # Save default configuration if file does not exist
+            print("else")
+            self.parent.save_config(False, '')
 
 
 class Game:
@@ -819,6 +950,9 @@ class AddGame(Gtk.Dialog):
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
         self.entry_prefix.set_tooltip_text("/path/to/the/prefix")
+        self.button_search_prefix = Gtk.Button()
+        self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
 
         # Widgets for launch arguments
         self.label_launch_arguments = Gtk.Label(label="Launch Arguments")
@@ -837,8 +971,7 @@ class AddGame(Gtk.Dialog):
         self.checkbox_mangohud.set_tooltip_text(
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(
-            "Tweaks your system to improve performance.")
+        self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
         self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
         self.checkbox_sc_controller.set_tooltip_text(
             "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
@@ -885,6 +1018,7 @@ class AddGame(Gtk.Dialog):
         space_label = Gtk.Label()
 
         # Event handlers
+        self.default_prefix = self.load_default_prefix()
         self.entry_title.connect("changed", self.update_prefix_entry)
 
         # Attach widgets to the grid layout
@@ -897,7 +1031,9 @@ class AddGame(Gtk.Dialog):
         grid.attach(self.button_search, 3, 3, 1, 1)
 
         grid.attach(self.label_prefix, 0, 4, 4, 1)
-        grid.attach(self.entry_prefix, 0, 5, 4, 1)
+        grid.attach(self.entry_prefix, 0, 5, 3, 1)
+        self.entry_prefix.set_hexpand(True)
+        grid.attach(self.button_search_prefix, 3, 5, 1, 1)
 
         grid.attach(self.label_launch_arguments, 0, 6, 4, 1)
         grid.attach(self.entry_launch_arguments, 0, 7, 4, 1)
@@ -934,21 +1070,21 @@ class AddGame(Gtk.Dialog):
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
             self.checkbox_mangohud.set_tooltip_text(
-            "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
+                "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
         self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(
-            "Tweaks your system to improve performance. NOT INSTALLED.")
+            self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
 
-        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
+        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+            "/usr/local/bin/sc-controller")
         if not self.sc_controller_enabled:
             self.checkbox_sc_controller.set_sensitive(False)
             self.checkbox_sc_controller.set_active(False)
             self.checkbox_sc_controller.set_tooltip_text(
-            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
+                "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
@@ -961,6 +1097,16 @@ class AddGame(Gtk.Dialog):
             self.button_winetricks.set_tooltip_text("A game is running. Please close the game first.")
             self.button_run.set_sensitive(False)
             self.button_run.set_tooltip_text("A game is running. Please close the game first.")
+
+    def load_default_prefix(self):
+        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        default_prefix = ""
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                config_data = f.read().splitlines()
+            config_dict = dict(line.split('=') for line in config_data)
+            default_prefix = config_dict.get('default-prefix', '').strip('"')
+        return default_prefix
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
@@ -1141,12 +1287,12 @@ class AddGame(Gtk.Dialog):
         # Mark the checkbox if the shortcut exists
         self.checkbox_shortcut.set_active(shortcut_exists)
 
-    def update_prefix_entry(self, widget):
-        # Update the prefix entry based on the title
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', self.entry_title.get_text())
+    def update_prefix_entry(self, entry):
+        # Update the prefix entry based on the title and self.default_prefix
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', entry.get_text())
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
-        prefix = os.path.expanduser("~/.config/faugus-launcher/prefixes/") + title_formatted
+        prefix = os.path.expanduser(self.default_prefix) + "/" + title_formatted
         self.entry_prefix.set_text(prefix)
 
     def on_button_winecfg_clicked(self, widget):
@@ -1224,12 +1370,30 @@ class AddGame(Gtk.Dialog):
     def on_button_search_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
         dialog = Gtk.FileChooserDialog(title="Select the game's .exe", parent=self, action=Gtk.FileChooserAction.OPEN)
-        dialog.set_current_folder(os.path.expanduser("~/"))
+        dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             self.entry_path.set_text(dialog.get_filename())
+
+        dialog.destroy()
+
+    def on_button_search_prefix_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog(title="Select a prefix location", parent=self,
+            action=Gtk.FileChooserAction.SELECT_FOLDER)
+
+        if not self.entry_prefix.get_text():
+            dialog.set_current_folder(os.path.expanduser(self.default_prefix))
+        else:
+            dialog.set_current_folder(self.entry_prefix.get_text())
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            new_prefix = dialog.get_filename()
+            self.default_prefix = new_prefix
+            self.entry_title.emit("changed")
 
         dialog.destroy()
 
