@@ -494,7 +494,7 @@ class Main(Gtk.Window):
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
 
-        self.working_directory = game_directory
+        #self.working_directory = game_directory
 
         command_parts = []
 
