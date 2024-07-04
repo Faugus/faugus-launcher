@@ -24,8 +24,8 @@ class Main(Gtk.Window):
 
         self.game_running = None
 
-        self.games = []  # lista de jogos
-        self.processos = {}  # dicionário para armazenar processos de jogos
+        self.games = []
+        self.processos = {}
 
         # Define the configuration path
         config_path = os.path.expanduser("~/.config/faugus-launcher/")
@@ -143,12 +143,14 @@ class Main(Gtk.Window):
 
     def load_close_onlaunch(self):
         config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
-        close_onlaunch = ""
+        close_onlaunch = False
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
-            close_onlaunch = config_dict.get('close_onlaunch', '').strip('"')
+            close_onlaunch_value = config_dict.get('close-onlaunch', '').strip('"')
+            if close_onlaunch_value.lower() == 'true':
+                close_onlaunch = True
         return close_onlaunch
 
     def on_button_settings_clicked(self, widget):
@@ -237,10 +239,18 @@ class Main(Gtk.Window):
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
+
             # Launch the game with subprocess
-            processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
-            self.processos[title] = processo
-            self.button_play.set_sensitive(False)
+            if self.load_close_onlaunch():
+                subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL, cwd=game_directory)
+                sys.exit()
+            else:
+                processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+                self.processos[title] = processo
+                self.button_play.set_sensitive(False)
+                self.button_play.set_image(
+                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -439,6 +449,8 @@ class Main(Gtk.Window):
         self.button_edit.set_sensitive(True)
         self.button_delete.set_sensitive(True)
         self.button_play.set_sensitive(True)
+        self.button_play.set_image(
+            Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
@@ -664,10 +676,12 @@ class Main(Gtk.Window):
 
                     if selected_title not in self.processos:
                         self.button_play.set_sensitive(True)
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
                     else:
                         self.button_play.set_sensitive(False)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
     def load_games(self):
         # Load games from file
@@ -761,8 +775,12 @@ class Main(Gtk.Window):
 
                     if title in self.processos:
                         self.button_play.set_sensitive(False)
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
                     else:
                         self.button_play.set_sensitive(True)
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
 
 class Settings(Gtk.Dialog):
