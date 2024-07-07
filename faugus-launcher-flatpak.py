@@ -344,7 +344,7 @@ class Main(Gtk.Window):
             image.set_from_pixbuf(scaled_pixbuf)
 
         if not os.path.exists(new_icon_path):
-            image_path = "/app/share/icons/faugus-launcher.png"
+            image_path = "/app/share/icons/com.faugus.launcher.png"
 
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
