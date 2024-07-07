@@ -237,7 +237,7 @@ class Main(Gtk.Window):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "flatpak run --command=faugus-run com.faugus.launcher"
+            faugus_run_path = "/app/bin/faugus-run"
 
 
             # Launch the game with subprocess
@@ -344,7 +344,7 @@ class Main(Gtk.Window):
             image.set_from_pixbuf(scaled_pixbuf)
 
         if not os.path.exists(new_icon_path):
-            image_path = "/usr/share/icons/faugus-launcher.png"
+            image_path = "/app/share/icons/faugus-launcher.png"
 
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -507,7 +507,7 @@ class Main(Gtk.Window):
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
         if not os.path.exists(new_icon_path):
-            new_icon_path = "/usr/share/icons/faugus-launcher.png"
+            new_icon_path = "/app/share/icons/faugus-launcher.png"
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
@@ -531,7 +531,7 @@ class Main(Gtk.Window):
             command_parts.append(launch_arguments)
 
         # Add the fixed command and remaining arguments
-        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append('"org.openwinecomponents.umu.umu-launcher"')
         if path:
             command_parts.append(f'"{path}"')
         if game_arguments:
@@ -543,7 +543,7 @@ class Main(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={game.title}
-    Exec=/usr/bin/faugus-run '{command}'
+    Exec=flatpak run --command=faugus-run com.faugus.launcher '{command}'
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
@@ -1174,13 +1174,13 @@ class AddGame(Gtk.Dialog):
             title_formatted = '-'.join(title_formatted.lower().split())
 
             file_run = dialog.get_filename()
-            run_command2 = (f'WINEPREFIX={prefix} '
-                            f'GAMEID={title_formatted} '
-                            f'"/usr/bin/umu-run" "{file_run}"')
+            run_command2 = (f'--env=WINEPREFIX={prefix} '
+                            f'--env=GAMEID={title_formatted} '
+                            f'"org.openwinecomponents.umu.umu-launcher" "{file_run}"')
             print(run_command2)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = "/app/bin/faugus-run"
 
             def run_command():
                 process = subprocess.Popen([sys.executable, faugus_run_path, run_command2, "winecfg"])
@@ -1207,7 +1207,7 @@ class AddGame(Gtk.Dialog):
 
     def set_image_shortcut_icon(self):
 
-        image_path = "/usr/share/icons/faugus-launcher.png"
+        image_path = "/app/share/icons/faugus-launcher.png"
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -1354,13 +1354,13 @@ class AddGame(Gtk.Dialog):
         title_formatted = '-'.join(title_formatted.lower().split())
 
         # Open Winetricks for the specified Wine prefix
-        winecfg_command = (f'WINEPREFIX={prefix} '
-                           f'GAMEID={title_formatted} '
-                           f'"/usr/bin/umu-run" "winecfg"')
+        winecfg_command = (f'--env=WINEPREFIX={prefix} '
+                           f'--env=GAMEID={title_formatted} '
+                           f'"org.openwinecomponents.umu.umu-launcher" "winecfg"')
         print(winecfg_command)
 
         # faugus-run path
-        faugus_run_path = "/usr/bin/faugus-run"
+        faugus_run_path = "/app/bin/faugus-run"
 
         def run_command():
             process = subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
@@ -1387,14 +1387,14 @@ class AddGame(Gtk.Dialog):
         prefix = self.entry_prefix.get_text()
 
         # Open Winetricks for the specified Wine prefix
-        winetricks_command = (f'WINEPREFIX={prefix} '
-                              f'GAMEID=winetricks-gui  '
-                              f'STORE="none" '
-                              f'"/usr/bin/umu-run" ""')
+        winetricks_command = (f'--env=WINEPREFIX={prefix} '
+                              f'--env=GAMEID=winetricks-gui  '
+                              f'--env=STORE="none" '
+                              f'"org.openwinecomponents.umu.umu-launcher" ""')
         print(winetricks_command)
 
         # faugus-run path
-        faugus_run_path = "/usr/bin/faugus-run"
+        faugus_run_path = "/app/bin/faugus-run"
 
         def run_command():
             process = subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
