@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Faugus Launcher
-Exec=com.faugus.launcher
+Exec=
 Icon=com.faugus.launcher
 Categories=Utility;
 
