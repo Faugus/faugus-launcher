@@ -507,7 +507,7 @@ class Main(Gtk.Window):
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
         if not os.path.exists(new_icon_path):
-            new_icon_path = "/app/share/icons/faugus-launcher.png"
+            new_icon_path = "/app/share/icons/com.faugus.launcher.png"
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
@@ -1207,7 +1207,7 @@ class AddGame(Gtk.Dialog):
 
     def set_image_shortcut_icon(self):
 
-        image_path = "/app/share/icons/faugus-launcher.png"
+        image_path = "/app/share/icons/com.faugus.launcher.png"
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
