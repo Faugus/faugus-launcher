@@ -213,20 +213,20 @@ class Main(Gtk.Window):
 
             # Add command parts if they are not empty
             if mangohud:
-                command_parts.append(mangohud)
+                command_parts.append(f'--env=WINEPREFIX={mangohud}')
             if sc_controller:
                 command_parts.append(sc_controller)
             if prefix:
-                command_parts.append(f'WINEPREFIX={prefix}')
+                command_parts.append(f'--env=WINEPREFIX={prefix}')
             if title_formatted:
-                command_parts.append(f'GAMEID={title_formatted}')
+                command_parts.append(f'--env=GAMEID={title_formatted}')
             if gamemode:
                 command_parts.append(gamemode)
             if launch_arguments:
                 command_parts.append(launch_arguments)
 
             # Add the fixed command and remaining arguments
-            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append('"org.openwinecomponents.umu.umu-launcher"')
             if path:
                 command_parts.append(f'"{path}"')
             if game_arguments:
@@ -237,7 +237,7 @@ class Main(Gtk.Window):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = "flatpak run --command=faugus-run com.faugus.launcher"
 
 
             # Launch the game with subprocess

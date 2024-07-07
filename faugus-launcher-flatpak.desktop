@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Faugus Launcher
+Exec=/usr/bin/flatpak run org.faugus.launcher
+Icon=com.faugus.launcher
+Categories=Utility;
+
