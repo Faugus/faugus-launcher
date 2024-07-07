@@ -500,14 +500,14 @@ class Main(Gtk.Window):
         launch_arguments = game.launch_arguments
         game_arguments = game.game_arguments
 
-        mangohud = "MANGOHUD=1" if game.mangohud else ""
+        mangohud = "--env=MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
         sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
         # Check if the icon file exists
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
         if not os.path.exists(new_icon_path):
-            new_icon_path = "/app/share/icons/hicolor/128x128/apps/com.faugus.launcher.png"
+            new_icon_path = "/var/lib/flatpak/exports/share/icons/hicolor/128x128/apps/com.faugus.launcher.png"
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
