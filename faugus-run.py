@@ -29,7 +29,7 @@ class UMUProtonUpdater:
             self.start_scc_daemon()
 
         # Start the main process
-        self.process = subprocess.Popen(["/bin/bash", "-c", f'flatpak-spawn --host flatpak run {self.message}'], stdout=subprocess.PIPE,
+        self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
         if command == "winetricks":
