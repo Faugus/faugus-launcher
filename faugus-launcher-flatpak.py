@@ -522,9 +522,9 @@ class Main(Gtk.Window):
         if sc_controller:
             command_parts.append(sc_controller)
         if prefix:
-            command_parts.append(f'WINEPREFIX={prefix}')
+            command_parts.append(f'--env=WINEPREFIX={prefix}')
         if title_formatted:
-            command_parts.append(f'GAMEID={title_formatted}')
+            command_parts.append(f'--env=GAMEID={title_formatted}')
         if gamemode:
             command_parts.append(gamemode)
         if launch_arguments:
