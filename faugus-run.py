@@ -25,8 +25,11 @@ class UMUProtonUpdater:
 
     def start_process(self, command):
         # Check if SC_CONTROLLER=1 is in message before starting scc-daemon
-        if "SC_CONTROLLER=1" in self.message:
-            self.start_scc_daemon()
+        sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+            "/usr/local/bin/sc-controller")
+        if sc_controller_installed:
+            if "SC_CONTROLLER=1" in self.message:
+                self.start_scc_daemon()
 
         # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
@@ -132,7 +135,10 @@ def stop_scc_daemon():
 
 
 def main():
-    atexit.register(stop_scc_daemon)
+    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+        "/usr/local/bin/sc-controller")
+    if sc_controller_installed:
+        atexit.register(stop_scc_daemon)
 
     parser = argparse.ArgumentParser(description="UMU-Proton Updater")
     parser.add_argument("message", help="The message to be processed")
