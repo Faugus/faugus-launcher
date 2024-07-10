@@ -73,14 +73,23 @@ class UMUProtonUpdater:
         self.log_window.connect("delete-event", self.on_log_window_delete_event)
         self.log_window.show_all()
 
+    def append_log_to_window(self, line):
+        # Append the log line to the log window
+        pass  # Implement your logic here
+
     def on_output(self, source, condition):
         if line := source.readline():
             self.check_game_output(line)
-        return True
+            # Determine where to show the log
+            if "winetricks" in self.message:
+                self.append_log_to_window(line)
+            else:
+                print(line, end='')
+        return True  # Continue watching for more output
 
     def check_game_output(self, line):
         clean_line = remove_ansi_escape(line).strip()
-        if any(keyword in clean_line for keyword in {"zenity", "Gtk-WARNING", "pixbuf"}) or not clean_line:
+        if any(keyword in clean_line for keyword in {"zenity", "Gtk-WARNING", "Gtk-Message", "pixbuf"}) or not clean_line:
             return
 
         if "Using UMU-Proton" in clean_line or "UMU-Proton is up to date" in clean_line:
@@ -135,16 +144,17 @@ def stop_scc_daemon():
 
 
 def main():
-    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-        "/usr/local/bin/sc-controller")
-    if sc_controller_installed:
-        atexit.register(stop_scc_daemon)
-
     parser = argparse.ArgumentParser(description="UMU-Proton Updater")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
 
     args = parser.parse_args()
+
+    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+        "/usr/local/bin/sc-controller")
+    if sc_controller_installed:
+        if "SC_CONTROLLER=1" in args.message:
+            atexit.register(stop_scc_daemon)
 
     handle_command(args.message, args.command)
 
