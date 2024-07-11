@@ -1,6 +1,9 @@
 # Faugus Launcher
 A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
 
+### Support the project
+<a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 # Installation
 ### Arch-based distributions (AUR)
 ```
