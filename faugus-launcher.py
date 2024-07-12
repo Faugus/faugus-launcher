@@ -7,6 +7,7 @@ import signal
 import subprocess
 import sys
 import threading
+import webbrowser
 
 import gi
 
@@ -818,6 +819,30 @@ class Settings(Gtk.Dialog):
         self.button_ok.set_size_request(150, -1)
         self.button_ok.set_halign(Gtk.Align.CENTER)
 
+        # Button Ko-fi
+        self.button_kofi = Gtk.Image()
+        self.button_kofi.set_halign(Gtk.Align.CENTER)
+        kofi_image = GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("~/.local/share/faugus-launcher/images/ko-fi.png"))
+        scaled_kofi_image = kofi_image.scale_simple(155, 35, GdkPixbuf.InterpType.BILINEAR)
+        self.button_kofi.set_from_pixbuf(scaled_kofi_image)
+
+        kofi_box = Gtk.Button()
+        kofi_box.set_relief(Gtk.ReliefStyle.NONE)
+        kofi_box.connect("clicked", self.on_button_kofi_clicked)
+        kofi_box.set_image(self.button_kofi)
+
+        # Button PayPal
+        self.button_paypal = Gtk.Image()
+        self.button_paypal.set_halign(Gtk.Align.CENTER)
+        paypal_image = GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("~/.local/share/faugus-launcher/images/paypal.png"))
+        scaled_paypal_image = paypal_image.scale_simple(155, 35, GdkPixbuf.InterpType.BILINEAR)
+        self.button_paypal.set_from_pixbuf(scaled_paypal_image)
+
+        paypal_box = Gtk.Button()
+        paypal_box.set_relief(Gtk.ReliefStyle.NONE)
+        paypal_box.connect("clicked", self.on_button_paypal_clicked)
+        paypal_box.set_image(self.button_paypal)
+
         self.box = self.get_content_area()
 
         grid = Gtk.Grid()
@@ -836,6 +861,14 @@ class Settings(Gtk.Dialog):
         grid2.set_margin_top(10)
         grid2.set_margin_bottom(10)
 
+        grid3 = Gtk.Grid()
+        grid3.set_row_spacing(10)
+        grid3.set_column_spacing(10)
+        grid3.set_margin_start(10)
+        grid3.set_margin_end(10)
+        grid3.set_margin_top(10)
+        grid3.set_margin_bottom(10)
+
         # Attach widgets to the grid layout
         grid.attach(self.label_default_prefix, 0, 0, 4, 1)
         grid.attach(self.entry_default_prefix, 0, 1, 3, 1)
@@ -843,14 +876,26 @@ class Settings(Gtk.Dialog):
         grid.attach(self.button_search_prefix, 3, 1, 1, 1)
         grid.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
 
-        grid2.attach(self.button_cancel, 1, 1, 1, 1)
-        grid2.attach(self.button_ok, 2, 1, 1, 1)
+        grid2.attach(kofi_box, 1, 1, 1, 1)
+        grid2.attach(paypal_box, 2, 1, 1, 1)
+        grid2.set_column_homogeneous(True)
+
+        grid3.attach(self.button_cancel, 1, 1, 1, 1)
+        grid3.attach(self.button_ok, 2, 1, 1, 1)
+        grid3.set_column_homogeneous(True)
 
         self.load_config()
 
         self.box.add(grid)
         self.box.add(grid2)
+        self.box.add(grid3)
         self.show_all()
+
+    def on_button_kofi_clicked(self, widget):
+        webbrowser.open("https://ko-fi.com/K3K210EMDU")
+
+    def on_button_paypal_clicked(self, widget):
+        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&amount=5&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
