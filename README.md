@@ -2,8 +2,8 @@
 A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
 
 ### Support the project
-<a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/user-attachments/assets/45200200-db9c-4568-aaa9-dae7f5d08534/></a>&nbsp;&nbsp;
-<a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&amount=5&no_recurring=0&currency_code=USD' target='_blank'><img src=https://github.com/user-attachments/assets/83eb324f-cda3-4be7-916f-adf314081ead/></a>
+<a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/user-attachments/assets/7b149ac2-00c4-4234-b6b8-4ec6f2d2fcca width="155.5" height="38"/></a>&nbsp;&nbsp;
+<a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&amount=5&no_recurring=0&currency_code=USD' target='_blank'><img src=https://github.com/user-attachments/assets/e075f3cb-1951-49c6-8e54-babfece0c926 width="155.5" height="38"/></a>
 
 # Installation
 ### Arch-based distributions (AUR)
