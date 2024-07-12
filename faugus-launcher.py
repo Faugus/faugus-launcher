@@ -822,7 +822,7 @@ class Settings(Gtk.Dialog):
         # Button Ko-fi
         self.button_kofi = Gtk.Image()
         self.button_kofi.set_halign(Gtk.Align.CENTER)
-        kofi_image = GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("~/.local/share/faugus-launcher/images/ko-fi.png"))
+        kofi_image = GdkPixbuf.Pixbuf.new_from_file("/usr/share/faugus-launcher/images/ko-fi.png")
         scaled_kofi_image = kofi_image.scale_simple(155, 35, GdkPixbuf.InterpType.BILINEAR)
         self.button_kofi.set_from_pixbuf(scaled_kofi_image)
 
@@ -834,7 +834,7 @@ class Settings(Gtk.Dialog):
         # Button PayPal
         self.button_paypal = Gtk.Image()
         self.button_paypal.set_halign(Gtk.Align.CENTER)
-        paypal_image = GdkPixbuf.Pixbuf.new_from_file(os.path.expanduser("~/.local/share/faugus-launcher/images/paypal.png"))
+        paypal_image = GdkPixbuf.Pixbuf.new_from_file("/usr/share/faugus-launcher/images/paypal.png")
         scaled_paypal_image = paypal_image.scale_simple(155, 35, GdkPixbuf.InterpType.BILINEAR)
         self.button_paypal.set_from_pixbuf(scaled_paypal_image)
 
