@@ -1268,6 +1268,7 @@ class AddGame(Gtk.Dialog):
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields2()
         if not validation_result:
+            self.set_sensitive(True)
             return
 
         title = self.entry_title.get_text()
@@ -1389,6 +1390,7 @@ class AddGame(Gtk.Dialog):
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields()
         if not validation_result:
+            self.set_sensitive(True)
             return
 
         title = self.entry_title.get_text()
@@ -1427,6 +1429,7 @@ class AddGame(Gtk.Dialog):
         # Handle the click event of the Winetricks button
         validation_result = self.validate_fields()
         if not validation_result:
+            self.set_sensitive(True)
             return
 
         prefix = self.entry_prefix.get_text()
