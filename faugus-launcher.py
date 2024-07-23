@@ -1202,6 +1202,7 @@ class AddGame(Gtk.Dialog):
         # Handle the click event of the Run button
         validation_result = self.validate_fields()
         if not validation_result:
+            self.set_sensitive(True)
             return
 
         dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
