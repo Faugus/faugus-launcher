@@ -203,7 +203,7 @@ class Main(Gtk.Window):
             mangohud = game.mangohud
             sc_controller = game.sc_controller
 
-            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
+            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
 
             # Get the directory containing the executable
@@ -301,7 +301,7 @@ class Main(Gtk.Window):
             mangohud_enabled = os.path.exists("/usr/bin/mangohud")
             if mangohud_enabled:
                 edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
-            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
+            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
             if gamemode_enabled:
                 edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
             sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
@@ -1169,7 +1169,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_mangohud.set_tooltip_text(
                 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
-        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun")
+        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
