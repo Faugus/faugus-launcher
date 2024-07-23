@@ -32,7 +32,7 @@ sudo dnf -y install gamemode
 sudo dnf -y install sc-controller
 ```
 
-### Debian-based distributions
+### Debian-based distributions (Experimental)
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
@@ -41,6 +41,11 @@ wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/dow
 wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-43/umu-launcher_1.0-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
+```
+```
+# Optional tools
+sudo apt -y install mangohud
+sudo apt -y install gamemode
 ```
 
 # Information
