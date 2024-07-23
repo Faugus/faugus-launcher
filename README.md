@@ -33,6 +33,7 @@ sudo dnf -y install sc-controller
 ```
 
 ### Debian-based distributions (Experimental)
+AppArmor may prevent umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
