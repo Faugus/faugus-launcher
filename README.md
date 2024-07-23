@@ -19,9 +19,6 @@ yay -S --noconfirm sc-controller
 
 ### Fedora-based distributions (Copr)
 ```
-sudo dnf -y copr enable gloriouseggroll/nobara-40
-sudo dnf -y install umu-launcher
-sudo dnf -y copr disable gloriouseggroll/nobara-40
 sudo dnf -y copr enable faugus/faugus-launcher
 sudo dnf -y install faugus-launcher
 ```
