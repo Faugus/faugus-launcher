@@ -1,5 +1,5 @@
 # Faugus Launcher
-A Simple and Lightweight app to run Windows' Games/Apps using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
+A simple and lightweight app for running Windows games using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
 
 ### Support the project
 <a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/ko-fi.png width="155" height="35"/></a>&nbsp;&nbsp;
