@@ -364,7 +364,7 @@ class Main(Gtk.Window):
         title = game_label.get_text()
         if game := next((j for j in self.games if j.title == title), None):
             # Display confirmation dialog
-            confirmation_dialog = ConfirmationDialog(self)
+            confirmation_dialog = ConfirmationDialog(self, title)
             response = confirmation_dialog.run()
 
             if response == Gtk.ResponseType.YES:
@@ -943,44 +943,61 @@ class Game:
 
 
 class ConfirmationDialog(Gtk.Dialog):
-    def __init__(self, parent):
+    def __init__(self, parent, title):
         # Initialize the ConfirmationDialog
         Gtk.Dialog.__init__(self, title="Remove Game", parent=parent, modal=True)
 
         # Configure dialog properties
         self.set_decorated(False)
         self.set_resizable(False)
-        self.set_default_size(300, 100)
 
-        # Create a grid layout for the dialog
+        # Create a frame
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5, 0.5)
+
+        # Create a grid layout for the frame
         grid = Gtk.Grid()
-        grid.set_column_homogeneous(True)
-        grid.set_row_homogeneous(True)
-        grid.set_row_spacing(10)
-        grid.set_column_spacing(10)
-        grid.set_border_width(10)
 
-        # Add grid to dialog's content area
-        self.get_content_area().add(grid)
+        # Add grid to frame
+        frame.add(grid)
+
+        # Add frame to dialog's content area
+        content_area = self.get_content_area()
+        content_area.set_border_width(0)
+        content_area.add(frame)
 
         # Create a label
         label = Gtk.Label()
-        label.set_label("Are you sure?")
+        label.set_label(f"Are you sure you want to delete {title}?")
         label.set_halign(Gtk.Align.CENTER)
+        label.set_margin_top(20)
+        label.set_margin_start(20)
+        label.set_margin_end(20)
+        label.set_margin_bottom(20)
         grid.attach(label, 0, 0, 2, 1)
 
         # Create "No" button
         button_no = Gtk.Button(label="Cancel")
+        button_no.set_size_request(150, -1)
+        button_no.set_margin_start(20)
+        button_no.set_margin_end(20)
+        button_no.set_margin_bottom(20)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
         grid.attach(button_no, 0, 1, 1, 1)
 
         # Create "Yes" button
         button_yes = Gtk.Button(label="Confirm")
+        button_yes.set_size_request(150, -1)
+        button_yes.set_margin_end(20)
+        button_yes.set_margin_bottom(20)
         button_yes.connect("clicked", lambda x: self.response(Gtk.ResponseType.YES))
         grid.attach(button_yes, 1, 1, 1, 1)
 
         # Create a checkbox to optionally remove the prefix
         self.checkbox = Gtk.CheckButton(label="Also remove the prefix")
+        self.checkbox.set_margin_start(20)
+        self.checkbox.set_margin_end(20)
+        self.checkbox.set_margin_bottom(20)
         self.checkbox.set_halign(Gtk.Align.CENTER)
         grid.attach(self.checkbox, 0, 2, 2, 1)
 
@@ -996,7 +1013,6 @@ class AddGame(Gtk.Dialog):
     def __init__(self, parent, game_running2):
         # Initialize the AddGame dialog
         super().__init__(title="Add/Edit Game", parent=parent)
-        # self.set_default_size(500, -1)
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
@@ -1525,8 +1541,30 @@ class AddGame(Gtk.Dialog):
         dialog.destroy()
 
 
+def run_file(file_path):
+    # Get the directory of the file
+    file_dir = os.path.dirname(os.path.abspath(file_path))
+
+    # Define paths
+    prefix_path = os.path.expanduser("~/.config/faugus-launcher/prefixes/default")
+    faugus_run_path = "/usr/bin/faugus-run"
+    runner_command = f"WINEPREFIX={prefix_path} GAMEID=default /usr/bin/umu-run '{file_path}'"
+
+    # Run the command in the directory of the file
+    subprocess.run([faugus_run_path, runner_command], cwd=file_dir)
+
+
+
+def main():
+    if len(sys.argv) == 1:
+        # Executed without arguments
+        app = Main()
+        app.connect("destroy", Gtk.main_quit)
+        app.show_all()
+        Gtk.main()
+    elif len(sys.argv) == 2:
+        # Executed with a file as argument
+        run_file(sys.argv[1])
+
 if __name__ == "__main__":
-    app = Main()
-    app.connect("destroy", Gtk.main_quit)
-    app.show_all()
-    Gtk.main()
+    main()

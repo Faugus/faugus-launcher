@@ -4,7 +4,7 @@ import gi
 import atexit
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib, Gdk
+from gi.repository import Gtk, GLib, Gdk, GdkPixbuf
 import sys
 import subprocess
 import argparse
@@ -53,10 +53,47 @@ class UMUProtonUpdater:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
-        self.warning_dialog = Gtk.MessageDialog(flags=0, message_type=Gtk.MessageType.WARNING,
-                                                buttons=Gtk.ButtonsType.NONE,
-                                                text="UMU-Proton is updating. Please wait...")
-        self.warning_dialog.show()
+        # Create a new window for the dialog
+        self.warning_dialog = Gtk.Window()
+        self.warning_dialog.set_decorated(False)
+        self.warning_dialog.set_resizable(False)
+
+        # Create the Frame with border
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5, 0.5)
+        frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+
+        # Create the Grid
+        grid = Gtk.Grid()
+        frame.add(grid)
+
+        # Load the image with GdkPixbuf
+        image_path = "/usr/share/icons/faugus-launcher.png"
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+
+        # Resize the image to 75x75 pixels
+        pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
+
+        # Create a Gtk.Image from the GdkPixbuf
+        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        image.set_margin_top(20)
+        image.set_margin_start(20)
+        image.set_margin_end(20)
+        image.set_margin_bottom(20)
+        grid.attach(image, 0, 0, 1, 1)
+
+        # Create the Label
+        label = Gtk.Label(label="UMU-Proton is updating. Please wait...")
+        label.set_margin_bottom(20)
+        label.set_margin_start(20)
+        label.set_margin_end(20)
+        grid.attach(label, 0, 1, 1, 1)
+
+        # Add the frame to the window
+        self.warning_dialog.add(frame)
+
+        # Show the window
+        self.warning_dialog.show_all()
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
