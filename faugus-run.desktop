@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Faugus Run
+Exec=faugus-launcher %f run
+Icon=faugus-launcher
+Categories=Utility;
+NoDisplay=true

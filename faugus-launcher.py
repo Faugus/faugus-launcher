@@ -262,13 +262,15 @@ class Main(Gtk.Window):
         self.game_running2 = False
 
     def on_button_add_clicked(self, widget):
+        file_path=""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.game_running2)
+        add_game_dialog = AddGame(self, self.game_running2, file_path)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
 
     def on_button_edit_clicked(self, widget):
+        file_path=""
         if not (listbox_row := self.game_list.get_selected_row()):
             return
         hbox = listbox_row.get_child()
@@ -279,7 +281,7 @@ class Main(Gtk.Window):
                 self.game_running2 = True
             else:
                 self.game_running2 = False
-            edit_game_dialog = AddGame(self, self.game_running2)
+            edit_game_dialog = AddGame(self, self.game_running2, file_path)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
             edit_game_dialog.entry_title.set_text(game.title)
             edit_game_dialog.entry_path.set_text(game.path)
@@ -1010,7 +1012,7 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class AddGame(Gtk.Dialog):
-    def __init__(self, parent, game_running2):
+    def __init__(self, parent, game_running2, file_path):
         # Initialize the AddGame dialog
         super().__init__(title="Add/Edit Game", parent=parent)
         self.set_resizable(False)
@@ -1053,6 +1055,8 @@ class AddGame(Gtk.Dialog):
         self.label_path = Gtk.Label(label="Path")
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
+        if file_path:
+            self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text("/path/to/the/exe")
         self.button_search = Gtk.Button()
         self.button_search.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -1541,18 +1545,31 @@ class AddGame(Gtk.Dialog):
         dialog.destroy()
 
 
-def run_file(file_path):
-    # Get the directory of the file
-    file_dir = os.path.dirname(os.path.abspath(file_path))
 
-    # Define paths
-    prefix_path = os.path.expanduser("~/.config/faugus-launcher/prefixes/default")
-    faugus_run_path = "/usr/bin/faugus-run"
-    runner_command = f"WINEPREFIX={prefix_path} GAMEID=default /usr/bin/umu-run '{file_path}'"
+def run_file(file_path, mode):
+    if mode == "run":
+        # Get the directory of the file
+        file_dir = os.path.dirname(os.path.abspath(file_path))
 
-    # Run the command in the directory of the file
-    subprocess.run([faugus_run_path, runner_command], cwd=file_dir)
+        # Define paths
+        prefix_path = os.path.expanduser("~/.config/faugus-launcher/prefixes/default")
+        faugus_run_path = "/usr/bin/faugus-run"
+        runner_command = f"WINEPREFIX={prefix_path} GAMEID=default /usr/bin/umu-run '{file_path}'"
 
+        # Run the command in the directory of the file
+        subprocess.run([faugus_run_path, runner_command], cwd=file_dir)
+    elif mode == "launcher":
+        main_window = Main()
+
+        game_running2 = None  # Or pass the appropriate value for game_running2
+        dialog = AddGame(main_window, game_running2, file_path)
+
+        # Connect the response signal to the on_dialog_response method of the Main instance
+        dialog.connect("response", main_window.on_dialog_response, dialog)
+
+        response = dialog.run()
+
+        dialog.destroy()
 
 
 def main():
@@ -1563,8 +1580,15 @@ def main():
         app.show_all()
         Gtk.main()
     elif len(sys.argv) == 2:
-        # Executed with a file as argument
-        run_file(sys.argv[1])
+        if sys.argv[1].endswith(".exe"):
+            # Executed with a file (via faugus-launcher.desktop)
+            run_file(sys.argv[1], "launcher")
+        else:
+            # Executed with one argument (mode)
+            print(f"Launcher activated from app launcher")
+    elif len(sys.argv) == 3 and sys.argv[2] == "run":
+        # Executed with a file and mode as arguments (via faugus-runner.desktop)
+        run_file(sys.argv[1], "run")
 
 if __name__ == "__main__":
     main()
