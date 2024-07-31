@@ -1042,12 +1042,26 @@ class Settings(Gtk.Dialog):
             dialog.set_current_folder(os.path.expanduser("~/"))
             dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
+            file_filter = Gtk.FileFilter()
+            file_filter.set_name("Windows files")
+            file_filter.add_pattern("*.exe")
+            file_filter.add_pattern("*.msi")
+            file_filter.add_pattern("*.bat")
+            file_filter.add_pattern("*.lnk")
+            file_filter.add_pattern("*.reg")
+            dialog.add_filter(file_filter)
+
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 file_run = dialog.get_filename()
-                run_command2 = (f'WINEPREFIX={default_prefix}/default '
-                                f'GAMEID=default '
-                                f'"/usr/bin/umu-run" "{file_run}"')
+                if not file_run.endswith(".reg"):
+                    run_command2 = (f'WINEPREFIX={default_prefix}/default '
+                                    f'GAMEID=default '
+                                    f'"/usr/bin/umu-run" "{file_run}"')
+                else:
+                    run_command2 = (f'WINEPREFIX={default_prefix}/default '
+                                    f'GAMEID=default '
+                                    f'"/usr/bin/umu-run" regedit "{file_run}"')
                 print(run_command2)
 
                 # faugus-run path
@@ -1493,6 +1507,15 @@ class AddGame(Gtk.Dialog):
         dialog.set_current_folder(os.path.expanduser("~/"))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
+        file_filter = Gtk.FileFilter()
+        file_filter.set_name("Windows files")
+        file_filter.add_pattern("*.exe")
+        file_filter.add_pattern("*.msi")
+        file_filter.add_pattern("*.bat")
+        file_filter.add_pattern("*.lnk")
+        file_filter.add_pattern("*.reg")
+        dialog.add_filter(file_filter)
+
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             title = self.entry_title.get_text()
@@ -1503,9 +1526,14 @@ class AddGame(Gtk.Dialog):
             title_formatted = '-'.join(title_formatted.lower().split())
 
             file_run = dialog.get_filename()
-            run_command2 = (f'WINEPREFIX={prefix} '
-                            f'GAMEID={title_formatted} '
-                            f'"/usr/bin/umu-run" "{file_run}"')
+            if not file_run.endswith(".reg"):
+                run_command2 = (f'WINEPREFIX={prefix} '
+                                f'GAMEID={title_formatted} '
+                                f'"/usr/bin/umu-run" "{file_run}"')
+            else:
+                run_command2 = (f'WINEPREFIX={prefix} '
+                                f'GAMEID={title_formatted} '
+                                f'"/usr/bin/umu-run" regedit "{file_run}"')
             print(run_command2)
 
             # faugus-run path
