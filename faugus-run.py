@@ -54,7 +54,7 @@ class UMUProtonUpdater:
 
     def show_warning_dialog(self):
         # Create a new window for the dialog
-        self.warning_dialog = Gtk.Window()
+        self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
 
