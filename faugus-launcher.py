@@ -1834,9 +1834,10 @@ def run_file(file_path):
             f.write(f'gamemode=False\n')
             f.write(f'sc-controller=False\n')
 
-    mangohud = "MANGOHUD=1" if mangohud else ""
-    gamemode = "gamemoderun" if gamemode else ""
-    sc_controller = "SC_CONTROLLER=1" if sc_controller else ""
+    if not file_path.endswith(".reg"):
+        mangohud = "MANGOHUD=1" if mangohud else ""
+        gamemode = "gamemoderun" if gamemode else ""
+        sc_controller = "SC_CONTROLLER=1" if sc_controller else ""
 
     # Get the directory of the file
     file_dir = os.path.dirname(os.path.abspath(file_path))
@@ -1845,25 +1846,31 @@ def run_file(file_path):
     prefix_path = os.path.expanduser(f"{default_prefix}/default")
     faugus_run_path = "/usr/bin/faugus-run"
 
-    mangohud_enabled = os.path.exists("/usr/bin/mangohud")
-    gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
-    sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
+    if not file_path.endswith(".reg"):
+        mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
     command_parts = []
 
+    if not file_path.endswith(".reg"):
     # Add command parts if they are not empty
-    if mangohud_enabled and mangohud:
-        command_parts.append(mangohud)
-    if sc_controller_enabled and sc_controller:
-        command_parts.append(sc_controller)
+        if mangohud_enabled and mangohud:
+            command_parts.append(mangohud)
+        if sc_controller_enabled and sc_controller:
+            command_parts.append(sc_controller)
     command_parts.append(os.path.expanduser(f"WINEPREFIX={default_prefix}/default"))
     command_parts.append('GAMEID=default')
-    if gamemode_enabled and gamemode:
-        command_parts.append(gamemode)
+    if not file_path.endswith(".reg"):
+        if gamemode_enabled and gamemode:
+            command_parts.append(gamemode)
 
     # Add the fixed command and remaining arguments
     command_parts.append('"/usr/bin/umu-run"')
-    command_parts.append(f'"{file_path}"')
+    if file_path.endswith(".reg"):
+        command_parts.append(f'regedit "{file_path}"')
+    else:
+        command_parts.append(f'"{file_path}"')
 
     # Join all parts into a single command
     command = ' '.join(command_parts)
@@ -1878,7 +1885,7 @@ def main():
         app.connect("destroy", Gtk.main_quit)
         app.show_all()
         Gtk.main()
-    elif len(sys.argv) == 2 and sys.argv[1].endswith(".exe"):
+    elif len(sys.argv) == 2 and any(sys.argv[1].endswith(ext) for ext in [".exe", ".lnk", ".msi", ".reg", ".bat"]):
         # Executed with a file (via faugus-launcher.desktop or faugus-runner.desktop)
         run_file(sys.argv[1])
     else:
