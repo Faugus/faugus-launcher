@@ -2,5 +2,6 @@
 Type=Application
 Name=Faugus Launcher
 Exec=faugus-launcher %f
+MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-registry
 Icon=faugus-launcher
 Categories=Utility;
