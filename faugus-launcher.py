@@ -1832,6 +1832,259 @@ class AddGame(Gtk.Dialog):
 
         return True
 
+class CreateShortcut(Gtk.Window):
+    def __init__(self, file_path):
+        super().__init__(title="Faugus Launcher")
+        self.file_path = file_path
+        self.set_resizable(False)
+
+        game_title = os.path.basename(file_path)
+        self.set_title(game_title)
+
+        self.entry_title = Gtk.Entry()
+        self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.set_tooltip_text("Game Title")
+
+        self.button_shortcut_icon = Gtk.Button()
+        self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
+        self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
+
+        # Button Cancel
+        self.button_cancel = Gtk.Button(label="Cancel")
+        self.button_cancel.connect("clicked", self.on_cancel_clicked)
+        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_halign(Gtk.Align.CENTER)
+
+        # Button Ok
+        self.button_ok = Gtk.Button(label="Ok")
+        self.button_ok.connect("clicked", self.on_ok_clicked)
+        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_halign(Gtk.Align.CENTER)
+
+        css_provider = Gtk.CssProvider()
+        css = """
+        .entry {
+            border-color: Red;
+        }
+        """
+        css_provider.load_from_data(css.encode('utf-8'))
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        # Create the Grids
+        self.grid1 = Gtk.Grid()
+        self.grid1.set_row_spacing(10)
+        self.grid1.set_column_spacing(10)
+        self.grid1.set_margin_start(10)
+        self.grid1.set_margin_end(10)
+        self.grid1.set_margin_top(10)
+        self.grid1.set_margin_bottom(10)
+        self.grid1.set_valign(Gtk.Align.CENTER)
+
+        self.grid2 = Gtk.Grid()
+        self.grid2.set_row_spacing(10)
+        self.grid2.set_column_spacing(10)
+        self.grid2.set_margin_end(10)
+        self.grid2.set_margin_top(10)
+        self.grid2.set_margin_bottom(10)
+
+        self.grid3 = Gtk.Grid()
+        self.grid3.set_row_spacing(10)
+        self.grid3.set_column_spacing(10)
+        self.grid3.set_margin_start(10)
+        self.grid3.set_margin_end(10)
+        self.grid3.set_margin_bottom(10)
+
+        self.entry_title.set_hexpand(True)
+        self.entry_title.set_valign(Gtk.Align.CENTER)
+        self.grid1.attach(self.entry_title, 0, 0, 1, 1)
+
+        self.grid2.attach(self.button_shortcut_icon, 0, 0, 1, 1)
+
+        self.grid3.attach(self.button_cancel, 0, 0, 1, 1)
+        self.grid3.attach(self.button_ok, 1, 0, 1, 1)
+
+        # Create a main grid to hold the grids
+        self.main_grid = Gtk.Grid()
+
+        # Attach grid1 and grid2 to the main grid in the same row
+        self.main_grid.attach(self.grid1, 0, 0, 1, 1)
+        self.main_grid.attach(self.grid2, 1, 0, 1, 1)
+
+        # Attach grid3 to the main grid in the next row
+        self.main_grid.attach(self.grid3, 0, 1, 2, 1)
+
+        # Add the main grid to the window
+        self.add(self.main_grid)
+
+        # Set the image for the shortcut icon button
+        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+
+        # Connect the destroy signal to Gtk.main_quit
+        self.connect("destroy", Gtk.main_quit)
+
+    def on_cancel_clicked(self, widget):
+        self.destroy()
+
+    def on_ok_clicked(self, widget):
+        # Handle the click event of the Winetricks button
+        validation_result = self.validate_fields()
+        if not validation_result:
+            self.set_sensitive(True)
+            return
+
+        title = self.entry_title.get_text()
+
+        # Handle the click event of the Create Shortcut button
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        path = self.file_path
+
+        # Check if the icon file exists
+        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
+        new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
+        if not os.path.exists(new_icon_path):
+            new_icon_path = "/usr/share/icons/faugus-launcher.png"
+
+        # Get the directory containing the executable
+        game_directory = os.path.dirname(path)
+
+        # Create a .desktop file
+        desktop_file_content = f"""[Desktop Entry]
+    Name={title}
+    Exec=/usr/bin/faugus-launcher '{path}'
+    Icon={new_icon_path}
+    Type=Application
+    Categories=Game;
+    Path={game_directory}
+    """
+
+        # Check if the destination directory exists and create if it doesn't
+        applications_directory = os.path.expanduser("~/.local/share/applications/")
+        if not os.path.exists(applications_directory):
+            os.makedirs(applications_directory)
+
+        desktop_directory = os.path.expanduser("~/Desktop")
+        if not os.path.exists(desktop_directory):
+            os.makedirs(desktop_directory)
+
+        applications_shortcut_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+
+        with open(applications_shortcut_path, 'w') as desktop_file:
+            desktop_file.write(desktop_file_content)
+
+        # Make the .desktop file executable
+        os.chmod(applications_shortcut_path, 0o755)
+
+        # Copy the shortcut to Desktop
+        desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
+        shutil.copy(applications_shortcut_path, desktop_shortcut_path)
+
+        self.destroy()
+
+    def on_entry_changed(self, widget, entry):
+        if entry.get_text():
+            entry.get_style_context().remove_class("entry")
+
+    def set_image_shortcut_icon(self):
+        image_path = "/usr/share/icons/faugus-launcher.png"
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+
+        image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+        return image
+
+    def on_button_shortcut_icon_clicked(self, widget):
+        self.set_sensitive(False)
+
+        # Handle the click event of the Winetricks button
+        validation_result = self.validate_fields()
+        if not validation_result:
+            self.set_sensitive(True)
+            return
+
+        title = self.entry_title.get_text()
+        path = self.file_path
+
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
+        icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/{title_formatted}/")
+        if not os.path.exists(icon_directory):
+            os.makedirs(icon_directory)
+
+        os.system(f'7z e "{path}" -o{icon_directory} -r -aoa')
+
+        dialog = Gtk.FileChooserDialog(title="Select an icon for the shortcut", action=Gtk.FileChooserAction.OPEN)
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        filter_ico = Gtk.FileFilter()
+        filter_ico.set_name("Image files")
+        filter_ico.add_mime_type("image/*")
+        dialog.add_filter(filter_ico)
+        dialog.set_current_folder(icon_directory)
+        dialog.connect("update-preview", self.update_preview)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            file_path = dialog.get_filename()
+            shutil.move(file_path, os.path.expanduser(f"{icons_path}{title_formatted}.ico"))
+
+            image_path = f"{icons_path}{title_formatted}.ico"
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+
+            image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
+
+            shutil.rmtree(icon_directory)
+            dialog.destroy()
+            self.set_sensitive(True)
+
+        else:
+            shutil.rmtree(icon_directory)
+            dialog.destroy()
+            self.set_sensitive(True)
+
+    def update_preview(self, dialog):
+        if file_path := dialog.get_preview_filename():
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+                max_width = 400
+                max_height = 400
+                width = pixbuf.get_width()
+                height = pixbuf.get_height()
+
+                if width > max_width or height > max_height:
+                    ratio = min(max_width / width, max_height / height)
+                    new_width = int(width * ratio)
+                    new_height = int(height * ratio)
+                    pixbuf = pixbuf.scale_simple(new_width, new_height, GdkPixbuf.InterpType.BILINEAR)
+
+                image = Gtk.Image.new_from_pixbuf(pixbuf)
+                dialog.set_preview_widget(image)
+                dialog.set_preview_widget_active(True)
+                dialog.get_preview_widget().set_size_request(max_width, max_height)
+            except GLib.Error:
+                dialog.set_preview_widget_active(False)
+        else:
+            dialog.set_preview_widget_active(False)
+
+    def validate_fields(self):
+
+        title = self.entry_title.get_text()
+
+        self.entry_title.get_style_context().remove_class("entry")
+
+        if not title:
+            self.entry_title.get_style_context().add_class("entry")
+            return False
+
+        return True
 
 def run_file(file_path):
     config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
@@ -1882,7 +2135,7 @@ def run_file(file_path):
     command_parts = []
 
     if not file_path.endswith(".reg"):
-    # Add command parts if they are not empty
+        # Add command parts if they are not empty
         if mangohud_enabled and mangohud:
             command_parts.append(mangohud)
         if sc_controller_enabled and sc_controller:
@@ -1913,11 +2166,16 @@ def main():
         app.connect("destroy", Gtk.main_quit)
         app.show_all()
         Gtk.main()
-    elif len(sys.argv) == 2 and any(sys.argv[1].endswith(ext) for ext in [".exe", ".lnk", ".msi", ".reg", ".bat"]):
-        # Executed with a file (via faugus-launcher.desktop or faugus-runner.desktop)
+    elif len(sys.argv) == 2:
+        # Executed with a file
         run_file(sys.argv[1])
+    elif len(sys.argv) == 3 and sys.argv[2] == "shortcut":
+        # Executed with a file and the "shortcut" argument
+        app = CreateShortcut(sys.argv[1])
+        app.show_all()
+        Gtk.main()
     else:
-        print(f"Invalid arguments")
+        print("Invalid arguments")
 
 if __name__ == "__main__":
     main()

@@ -156,10 +156,54 @@ class UMUProtonUpdater:
     def on_log_window_delete_event(self, widget, event):
         return True
 
+    def show_exit_warning(self):
+        # Extract the last part of the string
+        parts = self.message.split()
+        if parts:
+            last_part = parts[-1].strip('"')  # Remove any surrounding quotes
+
+            # Check if the file is a .reg file
+            if last_part.endswith(".reg"):
+                # Create a custom dialog
+                dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                dialog.set_resizable(False)
+
+                # Create the Grids
+                self.grid = Gtk.Grid()
+                self.grid.set_row_spacing(20)
+                self.grid.set_column_spacing(0)
+                self.grid.set_margin_start(10)
+                self.grid.set_margin_end(10)
+                self.grid.set_margin_top(10)
+                self.grid.set_margin_bottom(10)
+
+                self.label = Gtk.Label(label="The keys and values were successfully added to the registry.")
+
+                # Button Ok
+                self.button_ok = Gtk.Button(label="Ok")
+                self.button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+                self.button_ok.set_size_request(150, -1)
+                self.button_ok.set_halign(Gtk.Align.CENTER)
+
+                self.grid.attach(self.label, 0, 0, 1, 1)
+                self.grid.attach(self.button_ok, 0, 1, 1, 1)
+
+                dialog.get_content_area().add(self.grid)
+
+                # Show the dialog
+                dialog.show_all()
+
+                # Run the dialog and wait for response
+                dialog.run()
+
+                # Destroy the dialog after response
+                dialog.destroy()
+
     def on_process_exit(self, pid, condition):
         if self.process.poll() is not None:
             GLib.idle_add(self.close_warning_dialog)
             GLib.idle_add(self.close_log_window)
+            GLib.idle_add(self.show_exit_warning)
             GLib.idle_add(Gtk.main_quit)
         return False
 
