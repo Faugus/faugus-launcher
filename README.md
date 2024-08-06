@@ -46,6 +46,10 @@ sudo apt -y install mangohud
 sudo apt -y install gamemode
 ```
 
+# Usage
+[![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
+
+
 # Information
 ### Default prefix location
 ```
