@@ -38,7 +38,8 @@ class UMUProtonUpdater:
         if command == "winetricks":
             self.show_log_window()
 
-        self.show_warning_dialog()
+        if "PROTONPATH" not in self.message:
+            self.show_warning_dialog()
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)

@@ -1840,25 +1840,49 @@ class CreateShortcut(Gtk.Window):
 
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
+        print(self.file_path)
 
+        self.default_prefix = ""
+
+        self.label_title = Gtk.Label(label="Title")
+        self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
         self.entry_title.set_tooltip_text("Game Title")
+
+        self.label_launch_arguments = Gtk.Label(label="Launch Arguments")
+        self.label_launch_arguments.set_halign(Gtk.Align.START)
+        self.entry_launch_arguments = Gtk.Entry()
+        self.entry_launch_arguments.set_tooltip_text("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440")
+
+        self.label_game_arguments = Gtk.Label(label="Game Arguments")
+        self.label_game_arguments.set_halign(Gtk.Align.START)
+        self.entry_game_arguments = Gtk.Entry()
+        self.entry_game_arguments.set_tooltip_text("e.g.: -d3d11 -fullscreen")
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
+        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
+        self.checkbox_mangohud.set_tooltip_text(
+            "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
+        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
+        self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
+        self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
+        self.checkbox_sc_controller.set_tooltip_text(
+            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
+
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
-        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_size_request(120, -1)
         self.button_cancel.set_halign(Gtk.Align.CENTER)
 
         # Button Ok
         self.button_ok = Gtk.Button(label="Ok")
         self.button_ok.connect("clicked", self.on_ok_clicked)
-        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_size_request(120, -1)
         self.button_ok.set_halign(Gtk.Align.CENTER)
 
         css_provider = Gtk.CssProvider()
@@ -1883,6 +1907,7 @@ class CreateShortcut(Gtk.Window):
         self.grid2 = Gtk.Grid()
         self.grid2.set_row_spacing(10)
         self.grid2.set_column_spacing(10)
+        self.grid2.set_margin_start(10)
         self.grid2.set_margin_end(10)
         self.grid2.set_margin_top(10)
         self.grid2.set_margin_bottom(10)
@@ -1892,26 +1917,72 @@ class CreateShortcut(Gtk.Window):
         self.grid3.set_column_spacing(10)
         self.grid3.set_margin_start(10)
         self.grid3.set_margin_end(10)
+        self.grid3.set_margin_top(10)
         self.grid3.set_margin_bottom(10)
+        self.grid3.set_valign(Gtk.Align.CENTER)
+        self.grid3.set_halign(Gtk.Align.END)
+
+        self.grid4 = Gtk.Grid()
+        self.grid4.set_row_spacing(10)
+        self.grid4.set_column_spacing(10)
+        self.grid4.set_margin_start(10)
+        self.grid4.set_margin_end(10)
+        self.grid4.set_margin_top(10)
+        self.grid4.set_margin_bottom(10)
 
         self.entry_title.set_hexpand(True)
         self.entry_title.set_valign(Gtk.Align.CENTER)
-        self.grid1.attach(self.entry_title, 0, 0, 1, 1)
+        self.grid1.attach(self.label_title, 0, 0, 1, 1)
+        self.grid1.attach(self.entry_title, 0, 1, 1, 1)
+        self.grid1.attach(self.label_launch_arguments, 0, 2, 1, 1)
+        self.grid1.attach(self.entry_launch_arguments, 0, 3, 1, 1)
+        self.grid1.attach(self.label_game_arguments, 0, 4, 1, 1)
+        self.grid1.attach(self.entry_game_arguments, 0, 5, 1, 1)
 
-        self.grid2.attach(self.button_shortcut_icon, 0, 0, 1, 1)
+        self.grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
+        self.grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
+        self.grid2.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
 
-        self.grid3.attach(self.button_cancel, 0, 0, 1, 1)
-        self.grid3.attach(self.button_ok, 1, 0, 1, 1)
+        self.grid3.attach(self.button_shortcut_icon, 0, 0, 1, 1)
+
+
+        self.grid4.attach(self.button_cancel, 0, 0, 1, 1)
+        self.grid4.attach(self.button_ok, 1, 0, 1, 1)
 
         # Create a main grid to hold the grids
         self.main_grid = Gtk.Grid()
 
         # Attach grid1 and grid2 to the main grid in the same row
-        self.main_grid.attach(self.grid1, 0, 0, 1, 1)
-        self.main_grid.attach(self.grid2, 1, 0, 1, 1)
+        self.main_grid.attach(self.grid1, 0, 0, 2, 1)
+        self.main_grid.attach(self.grid2, 0, 1, 2, 1)
+        self.main_grid.attach(self.grid3, 1, 1, 1, 1)
 
         # Attach grid3 to the main grid in the next row
-        self.main_grid.attach(self.grid3, 0, 1, 2, 1)
+        self.main_grid.attach(self.grid4, 0, 2, 2, 1)
+
+        self.load_config()
+
+        # Check if optional features are available and enable/disable accordingly
+        self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        if not self.mangohud_enabled:
+            self.checkbox_mangohud.set_sensitive(False)
+            self.checkbox_mangohud.set_active(False)
+            self.checkbox_mangohud.set_tooltip_text(
+                "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
+
+        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        if not self.gamemode_enabled:
+            self.checkbox_gamemode.set_sensitive(False)
+            self.checkbox_gamemode.set_active(False)
+            self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
+
+        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
+            "/usr/local/bin/sc-controller")
+        if not self.sc_controller_enabled:
+            self.checkbox_sc_controller.set_sensitive(False)
+            self.checkbox_sc_controller.set_active(False)
+            self.checkbox_sc_controller.set_tooltip_text(
+                "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         # Add the main grid to the window
         self.add(self.main_grid)
@@ -1922,11 +1993,69 @@ class CreateShortcut(Gtk.Window):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
+    def load_config(self):
+        # Load configuration from file
+        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        if os.path.isfile(config_file):
+            with open(config_file, 'r') as f:
+                config_data = f.read().splitlines()
+            config_dict = dict(line.split('=') for line in config_data)
+            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
+
+            mangohud = config_dict.get('mangohud', 'False') == 'True'
+            gamemode = config_dict.get('gamemode', 'False') == 'True'
+            sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+
+            self.checkbox_mangohud.set_active(mangohud)
+            self.checkbox_gamemode.set_active(gamemode)
+            self.checkbox_sc_controller.set_active(sc_controller)
+
+        else:
+            # Save default configuration if file does not exist
+            self.save_config(False, '', "False", "False", "False")
+
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state):
+        # Path to the configuration file
+        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+
+        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        # Create the configuration directory if it doesn't exist
+        if not os.path.exists(config_path):
+            os.makedirs(config_path)
+
+        default_prefix = os.path.expanduser(f"{config_path}prefixes")
+        self.default_prefix = os.path.expanduser(f"{config_path}prefixes")
+
+        # Dictionary to store existing configurations
+        config = {}
+
+        # Read the existing configuration file
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                for line in f:
+                    key, value = line.strip().split('=', 1)
+                    config[key] = value.strip('"')
+
+        # Update configurations with new values
+        config['close-onlaunch'] = checkbox_state
+        config['default-prefix'] = default_prefix
+        config['mangohud'] = mangohud_state
+        config['gamemode'] = gamemode_state
+        config['sc-controller'] = sc_controller_state
+
+        # Write configurations back to the file
+        with open(config_file, 'w') as f:
+            for key, value in config.items():
+                if key == 'default-prefix':
+                    f.write(f'{key}="{value}"\n')
+                else:
+                    f.write(f'{key}={value}\n')
+
     def on_cancel_clicked(self, widget):
         self.destroy()
 
     def on_ok_clicked(self, widget):
-        # Handle the click event of the Winetricks button
+
         validation_result = self.validate_fields()
         if not validation_result:
             self.set_sensitive(True)
@@ -1939,21 +2068,52 @@ class CreateShortcut(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        path = self.file_path
-
         # Check if the icon file exists
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
         new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
 
+        launch_arguments = self.entry_launch_arguments.get_text()
+        game_arguments = self.entry_game_arguments.get_text()
+
+        mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
+        gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
+        sc_controller = "SC_CONTROLLER=1" if self.checkbox_sc_controller.get_active() else ""
+
         # Get the directory containing the executable
-        game_directory = os.path.dirname(path)
+        game_directory = os.path.dirname(self.file_path)
+
+        command_parts = []
+
+        # Add command parts if they are not empty
+        if mangohud:
+            command_parts.append(mangohud)
+        if sc_controller:
+            command_parts.append(sc_controller)
+
+        command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
+        command_parts.append(f'GAMEID=default')
+
+        if gamemode:
+            command_parts.append(gamemode)
+        if launch_arguments:
+            command_parts.append(launch_arguments)
+
+        # Add the fixed command and remaining arguments
+        command_parts.append('"/usr/bin/umu-run"')
+        if self.file_path:
+            command_parts.append(f'"{self.file_path}"')
+        if game_arguments:
+            command_parts.append(f'"{game_arguments}"')
+
+        # Join all parts into a single command
+        command = ' '.join(command_parts)
 
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={title}
-    Exec=/usr/bin/faugus-launcher '{path}'
+    Exec=/usr/bin/faugus-run '{command}'
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
