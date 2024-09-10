@@ -38,7 +38,7 @@ class Main(Gtk.Window):
 
         config_file = os.path.join(self.working_directory, 'config.ini')
         if not os.path.exists(config_file):
-            self.save_config("False", "~/.config/faugus-launcher/prefixes", "False", "False", "False")
+            self.save_config("False", "~/.config/faugus-launcher/prefixes", "False", "False", "False", "UMU-Proton Latest (default)")
 
         self.games = []
 
@@ -169,6 +169,7 @@ class Main(Gtk.Window):
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
         self.checkbox_sc_controller = settings_dialog.checkbox_sc_controller
+        self.combo_box_runner = settings_dialog.combo_box_runner
 
         checkbox_state = self.checkbox_close_after_launch.get_active()
         default_prefix = self.entry_default_prefix.get_text()
@@ -176,13 +177,14 @@ class Main(Gtk.Window):
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
         sc_controller_state = self.checkbox_sc_controller.get_active()
+        default_runner = self.combo_box_runner.get_active_text()
 
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
             if default_prefix == "":
                 settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state)
+                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
                 settings_dialog.destroy()
 
         else:
@@ -213,6 +215,8 @@ class Main(Gtk.Window):
             game_arguments = game.game_arguments
             mangohud = game.mangohud
             sc_controller = game.sc_controller
+            protonfix = game.protonfix
+            runner = game.runner
 
             gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
@@ -229,8 +233,12 @@ class Main(Gtk.Window):
                 command_parts.append(sc_controller)
             if prefix:
                 command_parts.append(f'WINEPREFIX={prefix}')
-            if title_formatted:
+            if protonfix:
+                command_parts.append(f'GAMEID={protonfix}')
+            else:
                 command_parts.append(f'GAMEID={title_formatted}')
+            if runner:
+                command_parts.append(f'PROTONPATH={runner}')
             if gamemode:
                 command_parts.append(gamemode)
             if launch_arguments:
@@ -299,6 +307,15 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(f"Edit {game.title}")
+            edit_game_dialog.entry_protonfix.set_text(game.protonfix)
+
+            model = edit_game_dialog.combo_box_runner.get_model()
+            index_to_activate = 0
+            for i, row in enumerate(model):
+                if row[0] == game.runner:
+                    index_to_activate = i
+                    break
+            edit_game_dialog.combo_box_runner.set_active(index_to_activate)
 
             mangohud_status = False
             gamemode_status = False
@@ -416,6 +433,8 @@ class Main(Gtk.Window):
             launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             prefix = add_game_dialog.entry_prefix.get_text()
+            protonfix = add_game_dialog.entry_protonfix.get_text()
+            runner = add_game_dialog.combo_box_runner.get_active_text()
 
             # Concatenate game information
             game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
@@ -425,14 +444,19 @@ class Main(Gtk.Window):
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
 
-            game_info += f";{mangohud};{gamemode};{sc_controller}\n"
+            if runner == "UMU-Proton Latest (default)":
+                runner = ""
+            if runner == "Proton-GE Latest":
+                runner = "GE-Proton"
+
+            game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner}\n"
 
             # Write game info to file
             with open("games.txt", "a") as file:
                 file.write(game_info)
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller)
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner)
             self.games.append(game)
             self.add_item_list(game)
             self.update_list()
@@ -481,6 +505,13 @@ class Main(Gtk.Window):
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.sc_controller = edit_game_dialog.checkbox_sc_controller.get_active()
+            game.protonfix = edit_game_dialog.entry_protonfix.get_text()
+            game.runner = edit_game_dialog.combo_box_runner.get_active_text()
+
+            if game.runner == "UMU-Proton Latest (default)":
+                game.runner = ""
+            if game.runner == "Proton-GE Latest":
+                game.runner = "GE-Proton"
 
             # Save changes and update UI
             self.save_games()
@@ -513,6 +544,8 @@ class Main(Gtk.Window):
         path = game.path
         launch_arguments = game.launch_arguments
         game_arguments = game.game_arguments
+        protonfix = game.protonfix
+        runner = game.runner
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
@@ -535,8 +568,12 @@ class Main(Gtk.Window):
             command_parts.append(sc_controller)
         if prefix:
             command_parts.append(f'WINEPREFIX={prefix}')
-        if title_formatted:
+        if protonfix:
+            command_parts.append(f'GAMEID={protonfix}')
+        else:
             command_parts.append(f'GAMEID={title_formatted}')
+        if runner:
+            command_parts.append(f'PROTONPATH={runner}')
         if gamemode:
             command_parts.append(gamemode)
         if launch_arguments:
@@ -703,16 +740,20 @@ class Main(Gtk.Window):
                     data = line.strip().split(";")
                     if len(data) >= 5:
                         title, path, prefix, launch_arguments, game_arguments = data[:5]
-                        if len(data) >= 8:
+                        if len(data) >= 10:
                             mangohud = data[5]
                             gamemode = data[6]
                             sc_controller = data[7]
+                            protonfix = data[8]
+                            runner = data[9]
                         else:
                             mangohud = ""
                             gamemode = ""
                             sc_controller = ""
+                            protonfix = ""
+                            runner = ""
                         game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
-                                    sc_controller)
+                                    sc_controller, protonfix, runner)
                         self.games.append(game)
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.game_list.foreach(Gtk.Widget.destroy)
@@ -731,7 +772,7 @@ class Main(Gtk.Window):
                 sc_controller_value = "SC_CONTROLLER=1" if game.sc_controller else ""
                 # Construct line with game information
                 line = (f"{game.title};{game.path};{game.prefix};{game.launch_arguments};{game.game_arguments};"
-                        f"{mangohud_value};{gamemode_value};{sc_controller_value}\n")
+                        f"{mangohud_value};{gamemode_value};{sc_controller_value};{game.protonfix};{game.runner}\n")
                 file.write(line)
 
     def show_warning_message(self, message):
@@ -741,7 +782,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -755,12 +796,15 @@ class Main(Gtk.Window):
                     key, value = line.strip().split('=', 1)
                     config[key] = value.strip('"')
 
+        default_runner = (f'"{default_runner}"')
+
         # Update configurations with new values
         config['close-onlaunch'] = checkbox_state
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
         config['sc-controller'] = sc_controller_state
+        config['default-runner'] = default_runner
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -857,6 +901,11 @@ class Settings(Gtk.Dialog):
         self.label_default_prefix_tools = Gtk.Label(label="Default prefix tools")
         self.label_default_prefix_tools.set_halign(Gtk.Align.START)
 
+        # Widgets for runner
+        self.label_runner = Gtk.Label(label="Default Runner")
+        self.label_runner.set_halign(Gtk.Align.START)
+        self.combo_box_runner = Gtk.ComboBoxText()
+
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game")
         self.checkbox_close_after_launch.set_active(False)
@@ -952,6 +1001,22 @@ class Settings(Gtk.Dialog):
         grid5.set_margin_top(10)
         grid5.set_margin_bottom(10)
 
+        grid6 = Gtk.Grid()
+        grid6.set_row_spacing(10)
+        grid6.set_column_spacing(10)
+        grid6.set_margin_start(10)
+        grid6.set_margin_end(10)
+        grid6.set_margin_bottom(10)
+
+        grid7 = Gtk.Grid()
+        grid7.set_row_spacing(10)
+        grid7.set_column_spacing(10)
+        grid7.set_margin_start(10)
+        grid7.set_margin_end(10)
+
+        grid7.set_margin_bottom(10)
+
+
         # Create a frame
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -968,7 +1033,12 @@ class Settings(Gtk.Dialog):
         grid.attach(self.entry_default_prefix, 0, 1, 3, 1)
         self.entry_default_prefix.set_hexpand(True)
         grid.attach(self.button_search_prefix, 3, 1, 1, 1)
-        grid.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
+
+        grid6.attach(self.label_runner, 0, 6, 1, 1)
+        grid6.attach(self.combo_box_runner, 0, 7, 1, 1)
+        self.combo_box_runner.set_hexpand(True)
+
+        grid7.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
 
         grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
@@ -988,6 +1058,7 @@ class Settings(Gtk.Dialog):
         grid5.attach(self.button_ok, 1, 0, 1, 1)
         grid5.set_halign(Gtk.Align.CENTER)
 
+        self.populate_combobox_with_runners()
         self.load_config()
 
         # Check if optional features are available and enable/disable accordingly
@@ -1013,11 +1084,37 @@ class Settings(Gtk.Dialog):
                 "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         self.box.add(grid)
+        self.box.add(grid6)
+        self.box.add(grid7)
         self.box.add(grid2)
         self.box.add(frame)
         self.box.add(grid4)
         self.box.add(grid5)
+
         self.show_all()
+
+    def populate_combobox_with_runners(self):
+        # List of default entries
+        self.combo_box_runner.append_text("UMU-Proton Latest (default)")
+        self.combo_box_runner.append_text("Proton-GE Latest")
+
+        # Path to the directory containing the folders
+        runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
+
+        try:
+            # Check if the directory exists
+            if os.path.exists(runner_path):
+                # Iterate over the folders in the directory
+                for entry in os.listdir(runner_path):
+                    entry_path = os.path.join(runner_path, entry)
+                    # Add to ComboBox only if it's a directory and not "UMU-Latest"
+                    if os.path.isdir(entry_path) and entry != "UMU-Latest":
+                        self.combo_box_runner.append_text(entry)
+        except Exception as e:
+            print(f"Error accessing the directory: {e}")
+
+        # Set the active item, if desired
+        self.combo_box_runner.set_active(0)
 
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
@@ -1033,8 +1130,9 @@ class Settings(Gtk.Dialog):
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
+            default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
             self.set_sensitive(False)
 
             dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
@@ -1053,22 +1151,42 @@ class Settings(Gtk.Dialog):
 
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
+                runner = self.combo_box_runner.get_active_text()
+
+                if runner == "UMU-Proton Latest (default)":
+                    runner = ""
+                if runner == "Proton-GE Latest":
+                    runner = "GE-Proton"
+
+                command_parts = []
                 file_run = dialog.get_filename()
                 if not file_run.endswith(".reg"):
-                    run_command2 = (f'WINEPREFIX={default_prefix}/default '
-                                    f'GAMEID=default '
-                                    f'"/usr/bin/umu-run" "{file_run}"')
+                    if default_prefix:
+                        command_parts.append(f'WINEPREFIX={default_prefix}/default ')
+                    if file_run:
+                        command_parts.append(f'GAMEID={file_run}')
+                    if runner:
+                        command_parts.append(f'PROTONPATH={runner}')
+                    command_parts.append(f'"/usr/bin/umu-run" "{file_run}"')
                 else:
-                    run_command2 = (f'WINEPREFIX={default_prefix}/default '
-                                    f'GAMEID=default '
-                                    f'"/usr/bin/umu-run" regedit "{file_run}"')
-                print(run_command2)
+                    if default_prefix:
+                        command_parts.append(f'WINEPREFIX={default_prefix}/default ')
+                    if file_run:
+                        command_parts.append(f'GAMEID={file_run}')
+                    if runner:
+                        command_parts.append(f'PROTONPATH={runner}')
+                    command_parts.append(f'"/usr/bin/umu-run" regedit "{file_run}"')
+
+                # Join all parts into a single command
+                command = ' '.join(command_parts)
+
+                print(command)
 
                 # faugus-run path
                 faugus_run_path = "/usr/bin/faugus-run"
 
                 def run_command():
-                    process = subprocess.Popen([sys.executable, faugus_run_path, run_command2, "winecfg"])
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
                     process.wait()
                     GLib.idle_add(self.set_sensitive, True)
                     GLib.idle_add(self.parent.set_sensitive, True)
@@ -1097,21 +1215,42 @@ class Settings(Gtk.Dialog):
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
+            default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
             self.set_sensitive(False)
 
-            # Open Winetricks for the specified Wine prefix
-            winecfg_command = (f'WINEPREFIX={default_prefix}/default '
-                            f'GAMEID=default '
-                            f'"/usr/bin/umu-run" "winecfg"')
-            print(winecfg_command)
+            runner = self.combo_box_runner.get_active_text()
+
+            if runner == "UMU-Proton Latest (default)":
+                runner = ""
+            if runner == "Proton-GE Latest":
+                runner = "GE-Proton"
+
+            command_parts = []
+
+            # Add command parts if they are not empty
+
+            if default_prefix:
+                command_parts.append(f'WINEPREFIX={default_prefix}')
+            command_parts.append(f'GAMEID=default')
+            if runner:
+                command_parts.append(f'PROTONPATH={runner}')
+
+            # Add the fixed command and remaining arguments
+            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append('"winecfg"')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
+
+            print(command)
 
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent.set_sensitive, True)
@@ -1135,22 +1274,42 @@ class Settings(Gtk.Dialog):
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
+            default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
             self.set_sensitive(False)
 
-            # Open Winetricks for the specified Wine prefix
-            winetricks_command = (f'WINEPREFIX={default_prefix}/default '
-                                f'GAMEID=winetricks-gui '
-                                f'STORE="none" '
-                                f'"/usr/bin/umu-run" ""')
-            print(winetricks_command)
+            runner = self.combo_box_runner.get_active_text()
+
+            if runner == "UMU-Proton Latest (default)":
+                runner = ""
+            if runner == "Proton-GE Latest":
+                runner = "GE-Proton"
+
+            command_parts = []
+
+            # Add command parts if they are not empty
+
+            command_parts.append(f'WINEPREFIX=default')
+            command_parts.append(f'GAMEID=winetricks-gui')
+            command_parts.append(f'STORE=none')
+            if runner:
+                command_parts.append(f'PROTONPATH={runner}')
+
+            # Add the fixed command and remaining arguments
+            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append('""')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
+
+            print(command)
 
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent.set_sensitive, True)
@@ -1196,6 +1355,7 @@ class Settings(Gtk.Dialog):
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
             sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+            self.default_runner = config_dict.get('default-runner', '').strip('"')
 
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.entry_default_prefix.set_text(self.default_prefix)
@@ -1203,14 +1363,23 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_active(gamemode)
             self.checkbox_sc_controller.set_active(sc_controller)
 
+
+            model = self.combo_box_runner.get_model()
+            index_to_activate = 0
+            for i, row in enumerate(model):
+                if row[0] == self.default_runner:
+                    index_to_activate = i
+                    break
+            self.combo_box_runner.set_active(index_to_activate)
+
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False")
+            self.parent.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller):
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
@@ -1220,6 +1389,8 @@ class Game:
         self.gamemode = gamemode  # Boolean indicating whether Gamemode is enabled
         self.prefix = prefix  # Prefix for Wine games
         self.sc_controller = sc_controller  # Boolean indicating whether SC Controller is enabled
+        self.protonfix = protonfix
+        self.runner = runner
 
 
 class ConfirmationDialog(Gtk.Dialog):
@@ -1283,8 +1454,13 @@ class AddGame(Gtk.Dialog):
         self.set_modal(True)
         self.parent_window = parent
 
-        # Create the content area
         self.box = self.get_content_area()
+        self.box.set_margin_start(0)
+        self.box.set_margin_end(0)
+        self.box.set_margin_top(0)
+        self.box.set_margin_bottom(0)
+
+
         grid = Gtk.Grid()
         grid.set_row_spacing(10)
         grid.set_column_spacing(10)
@@ -1294,6 +1470,7 @@ class AddGame(Gtk.Dialog):
         grid.set_margin_bottom(10)
 
         grid2 = Gtk.Grid()
+
         grid2.set_row_spacing(10)
         grid2.set_column_spacing(10)
         grid2.set_margin_start(10)
@@ -1308,6 +1485,19 @@ class AddGame(Gtk.Dialog):
         grid3.set_margin_end(10)
         grid3.set_margin_top(10)
         grid3.set_margin_bottom(10)
+
+        grid4 = Gtk.Grid()
+        grid4.set_row_spacing(10)
+        grid4.set_column_spacing(10)
+        grid4.set_margin_start(10)
+        grid4.set_margin_end(10)
+
+        grid5 = Gtk.Grid()
+        grid5.set_row_spacing(10)
+        grid5.set_column_spacing(10)
+        grid5.set_margin_start(10)
+        grid5.set_margin_end(10)
+
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -1348,6 +1538,21 @@ class AddGame(Gtk.Dialog):
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
         self.button_search_prefix.set_size_request(50, -1)
+
+        # Widgets for runner
+        self.label_runner = Gtk.Label(label="Runner")
+        self.label_runner.set_halign(Gtk.Align.START)
+        self.combo_box_runner = Gtk.ComboBoxText()
+
+        # Widgets for protonfix
+        self.label_protonfix = Gtk.Label(label="Protonfix")
+        self.label_protonfix.set_halign(Gtk.Align.START)
+        self.entry_protonfix = Gtk.Entry()
+        self.entry_protonfix.set_tooltip_text("UMU ID")
+        self.button_search_protonfix = Gtk.Button()
+        self.button_search_protonfix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.set_size_request(50, -1)
 
         # Widgets for launch arguments
         self.label_launch_arguments = Gtk.Label(label="Launch Arguments")
@@ -1393,6 +1598,7 @@ class AddGame(Gtk.Dialog):
 
         # Button for selection shortcut icon
         self.button_shortcut_icon = Gtk.Button()
+        self.button_shortcut_icon.set_size_request(120, -1)
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
         self.button_shortcut_icon.set_sensitive(False)  # Initially disable the button
@@ -1401,17 +1607,42 @@ class AddGame(Gtk.Dialog):
         self.button_cancel = Gtk.Button(label="Cancel")
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
         self.button_cancel.set_size_request(150, -1)
-        self.button_cancel.set_halign(Gtk.Align.CENTER)
 
         # Button Ok
         self.button_ok = Gtk.Button(label="Ok")
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
-        self.button_ok.set_halign(Gtk.Align.CENTER)
 
         # Event handlers
         self.default_prefix = self.load_default_prefix()
         self.entry_title.connect("changed", self.update_prefix_entry)
+
+        self.default_runner = self.load_default_runner()
+
+        # Criação das abas
+        self.notebook = Gtk.Notebook()
+        self.box.add(self.notebook)
+        self.notebook.set_margin_start(10)
+        self.notebook.set_margin_end(10)
+        self.notebook.set_margin_top(10)
+        self.notebook.set_margin_bottom(10)
+        #notebook.set_show_border(False)
+
+        # Página 1
+        page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label1 = Gtk.Label(label="Game")
+        tab_box1.pack_start(tab_label1, True, True, 0)
+        tab_box1.set_hexpand(True)
+        self.notebook.append_page(page1, tab_box1)
+
+        # Página 2
+        page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label2 = Gtk.Label(label="Tools")
+        tab_box2.pack_start(tab_label2, True, True, 0)
+        tab_box2.set_hexpand(True)
+        self.notebook.append_page(page2, tab_box2)
 
         # Attach widgets to the grid layout
         grid.attach(self.label_title, 0, 0, 4, 1)
@@ -1427,32 +1658,67 @@ class AddGame(Gtk.Dialog):
         self.entry_prefix.set_hexpand(True)
         grid.attach(self.button_search_prefix, 3, 5, 1, 1)
 
-        grid.attach(self.label_launch_arguments, 0, 6, 1, 1)
-        grid.attach(self.entry_launch_arguments, 0, 7, 4, 1)
+        grid5.attach(self.label_runner, 0, 6, 1, 1)
+        grid5.attach(self.combo_box_runner, 0, 7, 1, 1)
+        self.combo_box_runner.set_hexpand(True)
 
-        grid.attach(self.label_game_arguments, 0, 8, 1, 1)
-        grid.attach(self.entry_game_arguments, 0, 9, 4, 1)
+        page1.add(grid)
+        page1.add(grid5)
 
-        self.box.add(grid)
+        grid2.attach(self.button_shortcut_icon, 2, 6, 1, 1)
+        grid2.attach(self.checkbox_shortcut, 0, 6, 1, 1)
+        self.checkbox_shortcut.set_hexpand(True)
 
-        grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
+        page1.add(grid2)
+
+        grid3.attach(self.label_protonfix, 0, 0, 1, 1)
+        grid3.attach(self.entry_protonfix, 0, 1, 3, 1)
+        self.entry_protonfix.set_hexpand(True)
+        grid3.attach(self.button_search_protonfix, 3, 1, 1, 1)
+
+        grid3.attach(self.label_launch_arguments, 0, 2, 1, 1)
+        grid3.attach(self.entry_launch_arguments, 0, 3, 4, 1)
+
+        grid3.attach(self.label_game_arguments, 0, 4, 1, 1)
+        grid3.attach(self.entry_game_arguments, 0, 5, 4, 1)
+
+        page2.add(grid3)
+
+        grid4.attach(self.checkbox_mangohud, 0, 6, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
-        grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid2.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
+        grid4.attach(self.checkbox_gamemode, 0, 7, 1, 1)
+        self.checkbox_gamemode.set_hexpand(True)
+        grid4.attach(self.checkbox_sc_controller, 0, 8, 1, 1)
+        self.checkbox_sc_controller.set_hexpand(True)
 
-        grid2.attach(self.button_winecfg, 2, 0, 1, 1)
-        grid2.attach(self.button_winetricks, 2, 1, 1, 1)
-        grid2.attach(self.button_run, 2, 2, 1, 1)
+        grid4.attach(self.button_winecfg, 2, 6, 1, 1)
+        grid4.attach(self.button_winetricks, 2, 7, 1, 1)
+        grid4.attach(self.button_run, 2, 8, 1, 1)
 
-        grid2.attach(self.button_shortcut_icon, 2, 3, 1, 1)
-        grid2.attach(self.checkbox_shortcut, 0, 3, 1, 1)
+        page2.add(grid4)
 
-        self.box.add(grid2)
+        botton_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        botton_box.set_margin_start(10)
+        botton_box.set_margin_end(10)
+        #botton_box.set_margin_top(10)
+        botton_box.set_margin_bottom(10)
+        self.button_cancel.set_hexpand(True)
+        self.button_ok.set_hexpand(True)
 
-        grid3.attach(self.button_cancel, 1, 1, 1, 1)
-        grid3.attach(self.button_ok, 2, 1, 1, 1)
+        botton_box.pack_start(self.button_cancel, True, True, 0)
+        botton_box.pack_start(self.button_ok, True, True, 0)
 
-        self.box.add(grid3)
+        self.box.add(botton_box)
+
+        self.populate_combobox_with_runners()
+
+        model = self.combo_box_runner.get_model()
+        index_to_activate = 0
+        for i, row in enumerate(model):
+            if row[0] == self.default_runner:
+                index_to_activate = i
+                break
+        self.combo_box_runner.set_active(index_to_activate)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
@@ -1478,7 +1744,33 @@ class AddGame(Gtk.Dialog):
 
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+
+        tab_box1.show_all()
+        tab_box2.show_all()
         self.show_all()
+
+    def populate_combobox_with_runners(self):
+        # List of default entries
+        self.combo_box_runner.append_text("UMU-Proton Latest (default)")
+        self.combo_box_runner.append_text("Proton-GE Latest")
+
+        # Path to the directory containing the folders
+        runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
+
+        try:
+            # Check if the directory exists
+            if os.path.exists(runner_path):
+                # Iterate over the folders in the directory
+                for entry in os.listdir(runner_path):
+                    entry_path = os.path.join(runner_path, entry)
+                    # Add to ComboBox only if it's a directory and not "UMU-Latest"
+                    if os.path.isdir(entry_path) and entry != "UMU-Latest":
+                        self.combo_box_runner.append_text(entry)
+        except Exception as e:
+            print(f"Error accessing the directory: {e}")
+
+        # Set the active item, if desired
+        self.combo_box_runner.set_active(0)
 
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
@@ -1492,6 +1784,16 @@ class AddGame(Gtk.Dialog):
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
             default_prefix = config_dict.get('default-prefix', '').strip('"')
+        return default_prefix
+
+    def load_default_runner(self):
+        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        default_prefix = ""
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                config_data = f.read().splitlines()
+            config_dict = dict(line.split('=') for line in config_data)
+            default_prefix = config_dict.get('default-runner', '').strip('"')
         return default_prefix
 
     def on_button_run_clicked(self, widget):
@@ -1525,22 +1827,45 @@ class AddGame(Gtk.Dialog):
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
 
+            runner = self.combo_box_runner.get_active_text()
+
+            if runner == "UMU-Proton Latest (default)":
+                runner = ""
+            if runner == "Proton-GE Latest":
+                runner = "GE-Proton"
+
+            command_parts = []
+
+            # Add command parts if they are not empty
+
             file_run = dialog.get_filename()
             if not file_run.endswith(".reg"):
-                run_command2 = (f'WINEPREFIX={prefix} '
-                                f'GAMEID={title_formatted} '
-                                f'"/usr/bin/umu-run" "{file_run}"')
+                if prefix:
+                    command_parts.append(f'WINEPREFIX={prefix}')
+                if title_formatted:
+                    command_parts.append(f'GAMEID={title_formatted}')
+                if runner:
+                    command_parts.append(f'PROTONPATH={runner}')
+                command_parts.append(f'"/usr/bin/umu-run" "{file_run}"')
             else:
-                run_command2 = (f'WINEPREFIX={prefix} '
-                                f'GAMEID={title_formatted} '
-                                f'"/usr/bin/umu-run" regedit "{file_run}"')
-            print(run_command2)
+                if prefix:
+                    command_parts.append(f'WINEPREFIX={prefix}')
+                if title_formatted:
+                    command_parts.append(f'GAMEID={title_formatted}')
+                if runner:
+                    command_parts.append(f'PROTONPATH={runner}')
+                command_parts.append(f'"/usr/bin/umu-run" regedit "{file_run}"')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
+
+            print(command)
 
             # faugus-run path
             faugus_run_path = "/usr/bin/faugus-run"
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, run_command2, "winecfg"])
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -1557,6 +1882,9 @@ class AddGame(Gtk.Dialog):
         else:
             self.set_sensitive(True)
         dialog.destroy()
+
+    def on_button_search_protonfix_clicked(self, widget):
+        webbrowser.open("https://umu.openwinecomponents.org/")
 
     def on_checkbox_toggled(self, checkbox):
         # Enable or disable the button based on the checkbox state
@@ -1712,17 +2040,38 @@ class AddGame(Gtk.Dialog):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        # Open Winetricks for the specified Wine prefix
-        winecfg_command = (f'WINEPREFIX={prefix} '
-                           f'GAMEID={title_formatted} '
-                           f'"/usr/bin/umu-run" "winecfg"')
-        print(winecfg_command)
+        runner = self.combo_box_runner.get_active_text()
+
+        if runner == "UMU-Proton Latest (default)":
+            runner = ""
+        if runner == "Proton-GE Latest":
+            runner = "GE-Proton"
+
+        command_parts = []
+
+        # Add command parts if they are not empty
+
+        if prefix:
+            command_parts.append(f'WINEPREFIX={prefix}')
+        if title_formatted:
+            command_parts.append(f'GAMEID={title_formatted}')
+        if runner:
+            command_parts.append(f'PROTONPATH={runner}')
+
+        # Add the fixed command and remaining arguments
+        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append('"winecfg"')
+
+        # Join all parts into a single command
+        command = ' '.join(command_parts)
+
+        print(command)
 
         # faugus-run path
         faugus_run_path = "/usr/bin/faugus-run"
 
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, winecfg_command, "winecfg"])
+            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -1746,18 +2095,38 @@ class AddGame(Gtk.Dialog):
 
         prefix = self.entry_prefix.get_text()
 
-        # Open Winetricks for the specified Wine prefix
-        winetricks_command = (f'WINEPREFIX={prefix} '
-                              f'GAMEID=winetricks-gui '
-                              f'STORE="none" '
-                              f'"/usr/bin/umu-run" ""')
-        print(winetricks_command)
+        runner = self.combo_box_runner.get_active_text()
+
+        if runner == "UMU-Proton Latest (default)":
+            runner = ""
+        if runner == "Proton-GE Latest":
+            runner = "GE-Proton"
+
+        command_parts = []
+
+        # Add command parts if they are not empty
+
+        if prefix:
+            command_parts.append(f'WINEPREFIX={prefix}')
+        command_parts.append(f'GAMEID=winetricks-gui')
+        command_parts.append(f'STORE=none')
+        if runner:
+            command_parts.append(f'PROTONPATH={runner}')
+
+        # Add the fixed command and remaining arguments
+        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append('""')
+
+        # Join all parts into a single command
+        command = ' '.join(command_parts)
+
+        print(command)
 
         # faugus-run path
         faugus_run_path = "/usr/bin/faugus-run"
 
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, winetricks_command, "winetricks"])
+            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -1818,16 +2187,24 @@ class AddGame(Gtk.Dialog):
             if not title or not prefix:
                 if not title:
                     self.entry_title.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
                 if not prefix:
                     self.entry_prefix.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
                 return False
 
         if entry == "path":
             if not title or not path:
                 if not title:
                     self.entry_title.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
                 if not path:
                     self.entry_path.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
                 return False
 
         return True
@@ -1849,6 +2226,15 @@ class CreateShortcut(Gtk.Window):
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
         self.entry_title.set_tooltip_text("Game Title")
+
+        self.label_protonfix = Gtk.Label(label="Protonfix")
+        self.label_protonfix.set_halign(Gtk.Align.START)
+        self.entry_protonfix = Gtk.Entry()
+        self.entry_protonfix.set_tooltip_text("UMU ID")
+        self.button_search_protonfix = Gtk.Button()
+        self.button_search_protonfix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.set_size_request(50, -1)
 
         self.label_launch_arguments = Gtk.Label(label="Launch Arguments")
         self.label_launch_arguments.set_halign(Gtk.Align.START)
@@ -1933,11 +2319,21 @@ class CreateShortcut(Gtk.Window):
         self.entry_title.set_hexpand(True)
         self.entry_title.set_valign(Gtk.Align.CENTER)
         self.grid1.attach(self.label_title, 0, 0, 1, 1)
-        self.grid1.attach(self.entry_title, 0, 1, 1, 1)
-        self.grid1.attach(self.label_launch_arguments, 0, 2, 1, 1)
-        self.grid1.attach(self.entry_launch_arguments, 0, 3, 1, 1)
-        self.grid1.attach(self.label_game_arguments, 0, 4, 1, 1)
-        self.grid1.attach(self.entry_game_arguments, 0, 5, 1, 1)
+        self.grid1.attach(self.entry_title, 0, 1, 4, 1)
+
+        self.grid1.attach(self.label_protonfix, 0, 2, 1, 1)
+        self.grid1.attach(self.entry_protonfix, 0, 3, 3, 1)
+        self.entry_protonfix.set_hexpand(True)
+        self.grid1.attach(self.button_search_protonfix, 3, 3, 1, 1)
+
+        self.grid1.attach(self.label_launch_arguments, 0, 4, 1, 1)
+        self.grid1.attach(self.entry_launch_arguments, 0, 5, 4, 1)
+        self.entry_launch_arguments.set_hexpand(True)
+
+        self.grid1.attach(self.label_game_arguments, 0, 6, 1, 1)
+        self.grid1.attach(self.entry_game_arguments, 0, 7, 4, 1)
+        self.entry_game_arguments.set_hexpand(True)
+
 
         self.grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
@@ -1993,6 +2389,9 @@ class CreateShortcut(Gtk.Window):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
+    def on_button_search_protonfix_clicked(self, widget):
+        webbrowser.open("https://umu.openwinecomponents.org/")
+
     def load_config(self):
         # Load configuration from file
         config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
@@ -2005,6 +2404,7 @@ class CreateShortcut(Gtk.Window):
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
             sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+            self.default_runner = config_dict.get('default-runner', '').strip('"')
 
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
@@ -2012,9 +2412,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
         config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
 
@@ -2025,6 +2425,8 @@ class CreateShortcut(Gtk.Window):
 
         default_prefix = os.path.expanduser(f"{config_path}prefixes")
         self.default_prefix = os.path.expanduser(f"{config_path}prefixes")
+
+        default_runner = (f'"{default_runner}"')
 
         # Dictionary to store existing configurations
         config = {}
@@ -2042,6 +2444,7 @@ class CreateShortcut(Gtk.Window):
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
         config['sc-controller'] = sc_controller_state
+        config['default-runner'] = default_runner
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -2050,6 +2453,7 @@ class CreateShortcut(Gtk.Window):
                     f.write(f'{key}="{value}"\n')
                 else:
                     f.write(f'{key}={value}\n')
+
 
     def on_cancel_clicked(self, widget):
         self.destroy()
@@ -2074,6 +2478,7 @@ class CreateShortcut(Gtk.Window):
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
 
+        protonfix = self.entry_protonfix.get_text()
         launch_arguments = self.entry_launch_arguments.get_text()
         game_arguments = self.entry_game_arguments.get_text()
 
@@ -2092,8 +2497,12 @@ class CreateShortcut(Gtk.Window):
         if sc_controller:
             command_parts.append(sc_controller)
 
-        command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
-        command_parts.append(f'GAMEID=default')
+        #command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
+
+        if protonfix:
+            command_parts.append(f'GAMEID={protonfix}')
+        else:
+            command_parts.append(f'GAMEID={title_formatted}')
 
         if gamemode:
             command_parts.append(gamemode)
@@ -2256,6 +2665,7 @@ def run_file(file_path):
         mangohud = config_dict.get('mangohud', 'False') == 'True'
         gamemode = config_dict.get('gamemode', 'False') == 'True'
         sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+        default_runner = config_dict.get('default-runner', '').strip('"')
     else:
         # Define the configuration path
         config_path = os.path.expanduser("~/.config/faugus-launcher/")
@@ -2267,6 +2677,7 @@ def run_file(file_path):
         mangohud = 'False'
         gamemode = 'False'
         sc_controller = 'False'
+        default_runner = 'UMU-Proton Latest (default)'
 
         with open(config_file, 'w') as f:
             f.write(f'close-onlaunch=False\n')
@@ -2274,6 +2685,7 @@ def run_file(file_path):
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
             f.write(f'sc-controller=False\n')
+            f.write(f'default_runner="UMU-Proton Latest (default)"\n')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
@@ -2292,6 +2704,11 @@ def run_file(file_path):
         gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
         sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
+    if default_runner == "UMU-Proton Latest (default)":
+        default_runner = ""
+    if default_runner == "Proton-GE Latest":
+        default_runner = "GE-Proton"
+
     command_parts = []
 
     if not file_path.endswith(".reg"):
@@ -2302,6 +2719,8 @@ def run_file(file_path):
             command_parts.append(sc_controller)
     command_parts.append(os.path.expanduser(f"WINEPREFIX={default_prefix}/default"))
     command_parts.append('GAMEID=default')
+    if default_runner:
+        command_parts.append(f'PROTONPATH={default_runner}')
     if not file_path.endswith(".reg"):
         if gamemode_enabled and gamemode:
             command_parts.append(gamemode)

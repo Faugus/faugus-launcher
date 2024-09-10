@@ -22,6 +22,7 @@ class UMUProtonUpdater:
         self.warning_dialog = None
         self.log_window = None
         self.text_view = None
+        self.default_runner = None
 
     def start_process(self, command):
         # Check if SC_CONTROLLER=1 is in message before starting scc-daemon
@@ -31,6 +32,17 @@ class UMUProtonUpdater:
             if "SC_CONTROLLER=1" in self.message:
                 self.start_scc_daemon()
 
+        self.load_config()
+
+        if self.default_runner == "UMU-Proton Latest (default)":
+            self.default_runner = ""
+        if self.default_runner == "Proton-GE Latest":
+            self.default_runner = "GE-Proton"
+        if not "WINEPREFIX" in self.message:
+            if self.default_runner:
+                self.message = (f'PROTONPATH={self.default_runner} ') + self.message
+        print(self.message)
+
         # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
@@ -38,13 +50,63 @@ class UMUProtonUpdater:
         if command == "winetricks":
             self.show_log_window()
 
-        if "PROTONPATH" not in self.message:
-            self.show_warning_dialog()
+        self.show_warning_dialog()
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
 
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
+
+    def load_config(self):
+        # Load configuration from file
+        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        if os.path.isfile(config_file):
+            with open(config_file, 'r') as f:
+                config_dict = dict(line.split('=') for line in f.read().splitlines())
+            self.default_runner = config_dict.get('default-runner', '').strip('"')
+        else:
+            # Save default configuration if file does not exist
+            self.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
+
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
+        # Path to the configuration file
+        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+
+        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        # Create the configuration directory if it doesn't exist
+        if not os.path.exists(config_path):
+            os.makedirs(config_path)
+
+        default_prefix = os.path.expanduser(f"{config_path}prefixes")
+        self.default_prefix = os.path.expanduser(f"{config_path}prefixes")
+
+        default_runner = (f'"{default_runner}"')
+
+        # Dictionary to store existing configurations
+        config = {}
+
+        # Read the existing configuration file
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                for line in f:
+                    key, value = line.strip().split('=', 1)
+                    config[key] = value.strip('"')
+
+        # Update configurations with new values
+        config['close-onlaunch'] = checkbox_state
+        config['default-prefix'] = default_prefix
+        config['mangohud'] = mangohud_state
+        config['gamemode'] = gamemode_state
+        config['sc-controller'] = sc_controller_state
+        config['default-runner'] = default_runner
+
+        # Write configurations back to the file
+        with open(config_file, 'w') as f:
+            for key, value in config.items():
+                if key == 'default-prefix':
+                    f.write(f'{key}="{value}"\n')
+                else:
+                    f.write(f'{key}={value}\n')
 
     def start_scc_daemon(self):
         working_directory = os.path.expanduser("~/.config/faugus-launcher/")
@@ -130,10 +192,26 @@ class UMUProtonUpdater:
         if any(keyword in clean_line for keyword in {"zenity", "Gtk-WARNING", "Gtk-Message", "pixbuf"}) or not clean_line:
             return
 
-        if "Using UMU-Proton" in clean_line or "UMU-Proton is up to date" in clean_line:
-            GLib.timeout_add_seconds(1, self.close_warning_dialog)
+        if "PROTONPATH=" in self.message:
+            if re.search(r'\bGE-Proton\b', self.message):
+                # Proton-GE Latest
+                if "GE-Proton is up to date" in clean_line:
+                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
+                else:
+                    self.append_to_text_view(clean_line + '\n')
+            else:
+                # Specific Proton-GE or UMU-Proton
+                if "steamrt is up to date" in clean_line:
+                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
+                else:
+                    self.append_to_text_view(clean_line + '\n')
+
         else:
-            self.append_to_text_view(clean_line + '\n')
+            # UMU Latest
+            if "UMU-Proton is up to date" in clean_line:
+                GLib.timeout_add_seconds(1, self.close_warning_dialog)
+            else:
+                self.append_to_text_view(clean_line + '\n')
 
     def append_to_text_view(self, line):
         if self.text_view:
