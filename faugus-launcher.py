@@ -309,8 +309,11 @@ class Main(Gtk.Window):
             edit_game_dialog.set_title(f"Edit {game.title}")
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
 
+            #edit_game_dialog.populate_combobox_with_runners()
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
+            if game.runner == "GE-Proton":
+                game.runner = "Proton-GE Latest"
             for i, row in enumerate(model):
                 if row[0] == game.runner:
                     index_to_activate = i
@@ -1714,6 +1717,8 @@ class AddGame(Gtk.Dialog):
 
         model = self.combo_box_runner.get_model()
         index_to_activate = 0
+        if self.default_runner == "GE-Proton":
+            self.default_runner == "Proton-GE Latest"
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
                 index_to_activate = i
@@ -1788,13 +1793,13 @@ class AddGame(Gtk.Dialog):
 
     def load_default_runner(self):
         config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
-        default_prefix = ""
+        default_runner = ""
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
-            default_prefix = config_dict.get('default-runner', '').strip('"')
-        return default_prefix
+            default_runner = config_dict.get('default-runner', '').strip('"')
+        return default_runner
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
