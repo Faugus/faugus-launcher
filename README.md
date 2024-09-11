@@ -78,12 +78,11 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Main window
 <img src=https://github.com/user-attachments/assets/31e535df-380d-4e3c-8626-0baf478dc072/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/7bef8540-861a-4971-b8db-968c37b69743/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/c5fbfb89-05f0-4649-b209-8a614011a3af/><br>
+<img src=https://github.com/user-attachments/assets/96781eaf-40dc-4399-91e1-363e86dc7742/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/c5fbfb89-05f0-4649-b209-8a614011a3af/><br>
 ### Settings
 <img src=https://github.com/user-attachments/assets/229867a7-35fe-4000-99dd-ec8081d41f7f/><br>
 ### Create shortcut from .exe
 <img src=https://github.com/user-attachments/assets/5284eb26-8e87-4fc8-b795-9aed07c2f1e7/><br>
-
 
 ## Light theme
 ### Main window
