@@ -74,15 +74,23 @@ Save the SC Controller profile at
 https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-857f-21e3eb666074
 
 # Screenshots
-<p align="center">
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/2555a761-c12a-48cb-8888-5f007bb71031/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/cfc9a0a9-8999-4473-ac00-f0fb44b2095c/><br>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/e09130c7-9b46-4a9a-bf8c-9f215a5b3d24/>
-  <img src=https://github.com/Faugus/faugus-launcher/assets/112667550/3fe492ef-7fe3-472e-8e54-ee475a51c38c/>
-</p>
-<p align="center">
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/a2c5993b-5a67-46a4-9ba4-31ddc1c69377/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/7b00bcf6-1db8-4c2e-9208-ac9f843f2a49/><br><br>
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/d5b0368c-1986-46dd-aa2d-67e5c7ad2433/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src=https://github.com/Faugus/faugus-launcher/assets/112667550/5979a28b-b057-4ca9-b758-bf869a32d217/>
-</p>
+## Dark theme
+### Main window
+<img src=https://github.com/user-attachments/assets/31e535df-380d-4e3c-8626-0baf478dc072/><br>
+### Add/Edit game
+<img src=https://github.com/user-attachments/assets/7bef8540-861a-4971-b8db-968c37b69743/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/c5fbfb89-05f0-4649-b209-8a614011a3af/><br>
+### Settings
+<img src=https://github.com/user-attachments/assets/229867a7-35fe-4000-99dd-ec8081d41f7f/><br>
+### Create shortcut from .exe
+<img src=https://github.com/user-attachments/assets/5284eb26-8e87-4fc8-b795-9aed07c2f1e7/><br>
+
+
+## Light theme
+### Main window
+<img src=https://github.com/user-attachments/assets/2ec59e62-8df6-446a-afec-08a36023ac4a/><br>
+### Add/Edit game
+<img src=https://github.com/user-attachments/assets/025e1654-7db4-4709-8175-91b85b3de59d/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/43f59ea5-2988-4350-9e67-0ad4cff8ae3f/><br>
+### Settings
+<img src=https://github.com/user-attachments/assets/56a9d912-a1b9-4ac8-a251-83a6b046bd2e/><br>
+### Create shortcut from .exe
+<img src=https://github.com/user-attachments/assets/6b425cc6-05ba-46da-b01e-882ea3985d72/>
