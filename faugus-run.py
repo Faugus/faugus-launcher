@@ -197,6 +197,8 @@ class UMUProtonUpdater:
                 # Proton-GE Latest
                 if "GE-Proton is up to date" in clean_line:
                     GLib.timeout_add_seconds(1, self.close_warning_dialog)
+                if "Using GE-Proton" in clean_line:
+                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
                 else:
                     self.append_to_text_view(clean_line + '\n')
             else:
@@ -209,6 +211,8 @@ class UMUProtonUpdater:
         else:
             # UMU Latest
             if "UMU-Proton is up to date" in clean_line:
+                GLib.timeout_add_seconds(1, self.close_warning_dialog)
+            if "Using UMU-Proton" in clean_line:
                 GLib.timeout_add_seconds(1, self.close_warning_dialog)
             else:
                 self.append_to_text_view(clean_line + '\n')
