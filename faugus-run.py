@@ -41,9 +41,9 @@ class UMUProtonUpdater:
             self.default_runner = "GE-Proton"
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
-                self.message = f'WINEPREFIX={self.default_prefix} PROTONPATH={self.default_runner} {self.message}'
+                self.message = f'WINEPREFIX={self.default_prefix}/default PROTONPATH={self.default_runner} {self.message}'
             else:
-                self.message = f'WINEPREFIX={self.default_prefix} {self.message}'
+                self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
         print(self.message)
         print(self.default_runner)
 
@@ -151,7 +151,7 @@ class UMUProtonUpdater:
         grid.attach(image, 0, 0, 1, 1)
 
         # Create the Label
-        label = Gtk.Label(label="UMU-Proton is updating. Please wait...")
+        label = Gtk.Label(label="Updating. Please wait...")
         label.set_margin_bottom(20)
         label.set_margin_start(20)
         label.set_margin_end(20)
