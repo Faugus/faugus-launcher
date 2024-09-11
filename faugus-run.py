@@ -23,6 +23,7 @@ class UMUProtonUpdater:
         self.log_window = None
         self.text_view = None
         self.default_runner = None
+        self.default_prefix = None
 
     def start_process(self, command):
         # Check if SC_CONTROLLER=1 is in message before starting scc-daemon
@@ -38,10 +39,13 @@ class UMUProtonUpdater:
             self.default_runner = ""
         if self.default_runner == "Proton-GE Latest":
             self.default_runner = "GE-Proton"
-        if not "WINEPREFIX" in self.message:
+        if "WINEPREFIX" not in self.message:
             if self.default_runner:
-                self.message = (f'PROTONPATH={self.default_runner} ') + self.message
+                self.message = f'WINEPREFIX={self.default_prefix} PROTONPATH={self.default_runner} {self.message}'
+            else:
+                self.message = f'WINEPREFIX={self.default_prefix} {self.message}'
         print(self.message)
+        print(self.default_runner)
 
         # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
@@ -64,6 +68,7 @@ class UMUProtonUpdater:
             with open(config_file, 'r') as f:
                 config_dict = dict(line.split('=') for line in f.read().splitlines())
             self.default_runner = config_dict.get('default-runner', '').strip('"')
+            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
