@@ -1,5 +1,5 @@
 # Faugus Launcher
-A simple and lightweight app for running Windows games using [UMU-Launcher/UMU-Proton](https://github.com/Open-Wine-Components/umu-launcher)
+A simple and lightweight app for running Windows games using [UMU-Launcher](https://github.com/Open-Wine-Components/umu-launcher)
 
 ### Support the project
 <a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/ko-fi.png width="155" height="35"/></a>&nbsp;&nbsp;
@@ -34,9 +34,9 @@ AppArmor may prevent umu-launcher from working properly. <a href='https://gist.g
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-66/faugus-launcher_1.0-66_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-55/python3-umu-launcher_1.0-1.20240823.9b12f90_all.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-55/umu-launcher_1.0-1.20240823.9b12f90_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/faugus-launcher_1.0-71_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/python3-umu-launcher_1.0-1.20240912.9b12f90_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/umu-launcher_1.0-1.20240912.9b12f90_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
