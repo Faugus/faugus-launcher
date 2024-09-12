@@ -38,7 +38,7 @@ class Main(Gtk.Window):
 
         config_file = os.path.join(self.working_directory, 'config.ini')
         if not os.path.exists(config_file):
-            self.save_config("False", "~/.config/faugus-launcher/prefixes", "False", "False", "False", "UMU-Proton Latest (default)")
+            self.save_config("False", "~/.config/faugus-launcher/prefixes", "False", "False", "False", "GE-Proton Latest (default)")
 
         self.games = []
 
@@ -313,7 +313,7 @@ class Main(Gtk.Window):
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
             if game.runner == "GE-Proton":
-                game.runner = "Proton-GE Latest"
+                game.runner = "GE-Proton Latest (default)"
             for i, row in enumerate(model):
                 if row[0] == game.runner:
                     index_to_activate = i
@@ -447,9 +447,9 @@ class Main(Gtk.Window):
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
 
-            if runner == "UMU-Proton Latest (default)":
+            if runner == "UMU-Proton Latest":
                 runner = ""
-            if runner == "Proton-GE Latest":
+            if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
 
             game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner}\n"
@@ -511,9 +511,9 @@ class Main(Gtk.Window):
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combo_box_runner.get_active_text()
 
-            if game.runner == "UMU-Proton Latest (default)":
+            if game.runner == "UMU-Proton Latest":
                 game.runner = ""
-            if game.runner == "Proton-GE Latest":
+            if game.runner == "GE-Proton Latest (default)":
                 game.runner = "GE-Proton"
 
             # Save changes and update UI
@@ -1098,8 +1098,8 @@ class Settings(Gtk.Dialog):
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combo_box_runner.append_text("UMU-Proton Latest (default)")
-        self.combo_box_runner.append_text("Proton-GE Latest")
+        self.combo_box_runner.append_text("GE-Proton Latest (default)")
+        self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
         runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
@@ -1156,9 +1156,9 @@ class Settings(Gtk.Dialog):
             if response == Gtk.ResponseType.OK:
                 runner = self.combo_box_runner.get_active_text()
 
-                if runner == "UMU-Proton Latest (default)":
+                if runner == "UMU-Proton Latest":
                     runner = ""
-                if runner == "Proton-GE Latest":
+                if runner == "GE-Proton Latest (default)":
                     runner = "GE-Proton"
 
                 command_parts = []
@@ -1225,9 +1225,9 @@ class Settings(Gtk.Dialog):
 
             runner = self.combo_box_runner.get_active_text()
 
-            if runner == "UMU-Proton Latest (default)":
+            if runner == "UMU-Proton Latest":
                 runner = ""
-            if runner == "Proton-GE Latest":
+            if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
 
             command_parts = []
@@ -1284,9 +1284,9 @@ class Settings(Gtk.Dialog):
 
             runner = self.combo_box_runner.get_active_text()
 
-            if runner == "UMU-Proton Latest (default)":
+            if runner == "UMU-Proton Latest":
                 runner = ""
-            if runner == "Proton-GE Latest":
+            if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
 
             command_parts = []
@@ -1378,7 +1378,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
 
 
 class Game:
@@ -1718,7 +1718,7 @@ class AddGame(Gtk.Dialog):
         model = self.combo_box_runner.get_model()
         index_to_activate = 0
         if self.default_runner == "GE-Proton":
-            self.default_runner == "Proton-GE Latest"
+            self.default_runner == "GE-Proton Latest (default)"
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
                 index_to_activate = i
@@ -1756,8 +1756,8 @@ class AddGame(Gtk.Dialog):
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combo_box_runner.append_text("UMU-Proton Latest (default)")
-        self.combo_box_runner.append_text("Proton-GE Latest")
+        self.combo_box_runner.append_text("GE-Proton Latest (default)")
+        self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
         runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
@@ -1834,9 +1834,9 @@ class AddGame(Gtk.Dialog):
 
             runner = self.combo_box_runner.get_active_text()
 
-            if runner == "UMU-Proton Latest (default)":
+            if runner == "UMU-Proton Latest":
                 runner = ""
-            if runner == "Proton-GE Latest":
+            if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
 
             command_parts = []
@@ -2047,9 +2047,9 @@ class AddGame(Gtk.Dialog):
 
         runner = self.combo_box_runner.get_active_text()
 
-        if runner == "UMU-Proton Latest (default)":
+        if runner == "UMU-Proton Latest":
             runner = ""
-        if runner == "Proton-GE Latest":
+        if runner == "GE-Proton Latest (default)":
             runner = "GE-Proton"
 
         command_parts = []
@@ -2102,9 +2102,9 @@ class AddGame(Gtk.Dialog):
 
         runner = self.combo_box_runner.get_active_text()
 
-        if runner == "UMU-Proton Latest (default)":
+        if runner == "UMU-Proton Latest":
             runner = ""
-        if runner == "Proton-GE Latest":
+        if runner == "GE-Proton Latest (default)":
             runner = "GE-Proton"
 
         command_parts = []
@@ -2417,7 +2417,7 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
@@ -2682,7 +2682,7 @@ def run_file(file_path):
         mangohud = 'False'
         gamemode = 'False'
         sc_controller = 'False'
-        default_runner = 'UMU-Proton Latest (default)'
+        default_runner = 'GE-Proton Latest (default)'
 
         with open(config_file, 'w') as f:
             f.write(f'close-onlaunch=False\n')
@@ -2690,7 +2690,7 @@ def run_file(file_path):
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
             f.write(f'sc-controller=False\n')
-            f.write(f'default_runner="UMU-Proton Latest (default)"\n')
+            f.write(f'default_runner="GE-Proton Latest (default)"\n')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
@@ -2709,9 +2709,9 @@ def run_file(file_path):
         gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
         sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
-    if default_runner == "UMU-Proton Latest (default)":
+    if default_runner == "UMU-Proton Latest":
         default_runner = ""
-    if default_runner == "Proton-GE Latest":
+    if default_runner == "GE-Proton Latest (default)":
         default_runner = "GE-Proton"
 
     command_parts = []

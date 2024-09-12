@@ -35,9 +35,9 @@ class UMUProtonUpdater:
 
         self.load_config()
 
-        if self.default_runner == "UMU-Proton Latest (default)":
+        if self.default_runner == "UMU-Proton Latest":
             self.default_runner = ""
-        if self.default_runner == "Proton-GE Latest":
+        if self.default_runner == "GE-Proton Latest (default)":
             self.default_runner = "GE-Proton"
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
@@ -71,7 +71,7 @@ class UMUProtonUpdater:
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "UMU-Proton Latest (default)")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
@@ -199,7 +199,7 @@ class UMUProtonUpdater:
 
         if "PROTONPATH=" in self.message:
             if re.search(r'\bGE-Proton\b', self.message):
-                # Proton-GE Latest
+                # GE-Proton Latest (default)
                 if "GE-Proton is up to date" in clean_line:
                     GLib.timeout_add_seconds(1, self.close_warning_dialog)
                 if "Using GE-Proton" in clean_line:
