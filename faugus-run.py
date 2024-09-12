@@ -72,6 +72,7 @@ class UMUProtonUpdater:
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
+            self.default_runner = "GE-Proton Latest (default)"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
