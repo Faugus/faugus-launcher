@@ -76,20 +76,20 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 # Screenshots
 ## Dark theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/31e535df-380d-4e3c-8626-0baf478dc072/><br>
+<img src=https://github.com/user-attachments/assets/d59e945a-0f60-4b1f-9044-f3c277ab1bd1/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/96781eaf-40dc-4399-91e1-363e86dc7742/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/c5fbfb89-05f0-4649-b209-8a614011a3af/><br>
+<img src=https://github.com/user-attachments/assets/cf70c8e4-6b59-4ce6-9958-93b5b80ea244/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/0bbb79ff-447c-4d7f-a788-32ea5251770b/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/229867a7-35fe-4000-99dd-ec8081d41f7f/><br>
+<img src=https://github.com/user-attachments/assets/f129f4b2-261d-4268-b822-967ffd7bde41/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/5284eb26-8e87-4fc8-b795-9aed07c2f1e7/><br>
+<img src=https://github.com/user-attachments/assets/080c37b0-5ad0-4192-b4f2-f1bdd08dcb75/><br>
 
 ## Light theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/2ec59e62-8df6-446a-afec-08a36023ac4a/><br>
+<img src=https://github.com/user-attachments/assets/19186863-52b7-4773-99ac-cdcc574b97f0/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/025e1654-7db4-4709-8175-91b85b3de59d/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/43f59ea5-2988-4350-9e67-0ad4cff8ae3f/><br>
+<img src=https://github.com/user-attachments/assets/3f1c6328-ef2f-48ca-a0c5-9d9847ddf478/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/f818721e-447a-4e0d-aec5-111892a3de9e/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/56a9d912-a1b9-4ac8-a251-83a6b046bd2e/><br>
+<img src=https://github.com/user-attachments/assets/3e66a2fc-9755-48c6-a0b1-3eacaae821ca/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/6b425cc6-05ba-46da-b01e-882ea3985d72/>
+<img src=https://github.com/user-attachments/assets/4d5feb01-0667-4c57-8285-cbfb3bc97c93/>
