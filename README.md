@@ -51,9 +51,14 @@ sudo apt -y install gamemode
 
 
 # Information
-### Default prefix location
+### Default prefixes location
 ```
 ~/.config/faugus-launcher/prefixes/
+```
+
+### Runners location
+```
+~/.local/share/Steam/compatibilitytools.d/
 ```
 
 ### Shortcut locations
