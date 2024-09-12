@@ -34,9 +34,9 @@ AppArmor may prevent umu-launcher from working properly. <a href='https://gist.g
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/faugus-launcher_1.0-71_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/python3-umu-launcher_1.0-1.20240912.9b12f90_all.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-71/umu-launcher_1.0-1.20240912.9b12f90_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-72/faugus-launcher_1.0-72_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-72/python3-umu-launcher_1.0-1.20240912.9b12f90_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-72/umu-launcher_1.0-1.20240912.9b12f90_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
