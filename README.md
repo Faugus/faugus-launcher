@@ -29,8 +29,7 @@ sudo dnf -y install gamemode
 sudo dnf -y install sc-controller
 ```
 
-### Debian-based distributions (Experimental)
-AppArmor may prevent umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
+### Debian-based distributions
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
@@ -45,6 +44,11 @@ sudo rm -r ~/faugus-launcher
 sudo apt -y install mangohud
 sudo apt -y install gamemode
 ```
+ATTENTION: If you get the following message when trying to run something
+```
+pressure-vessel-wrap[2264]: E: Child process exited with code 1: bwrap: setting up uid map: Permission denied
+```
+It's the AppArmor preventing umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
