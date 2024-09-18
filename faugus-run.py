@@ -45,7 +45,6 @@ class UMUProtonUpdater:
             else:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
         print(self.message)
-        print(self.default_runner)
 
         # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
@@ -64,11 +63,19 @@ class UMUProtonUpdater:
     def load_config(self):
         # Load configuration from file
         config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
-                config_dict = dict(line.split('=') for line in f.read().splitlines())
-            self.default_runner = config_dict.get('default-runner', '').strip('"')
-            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
+                config_dict = {}
+                for line in f.read().splitlines():
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"')
+                        config_dict[key] = value
+
+            self.default_runner = config_dict.get('default-runner', '')
+            self.default_prefix = config_dict.get('default-prefix', '')
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
