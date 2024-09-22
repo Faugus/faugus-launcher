@@ -909,6 +909,9 @@ class Settings(Gtk.Dialog):
         self.label_runner.set_halign(Gtk.Align.START)
         self.combo_box_runner = Gtk.ComboBoxText()
 
+        self.button_proton_manager = Gtk.Button(label="GE-Proton Manager")
+        self.button_proton_manager.connect("clicked", self.on_button_proton_manager_clicked)
+
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game")
         self.checkbox_close_after_launch.set_active(False)
@@ -1009,6 +1012,7 @@ class Settings(Gtk.Dialog):
         grid6.set_column_spacing(10)
         grid6.set_margin_start(10)
         grid6.set_margin_end(10)
+        grid6.set_margin_top(10)
         grid6.set_margin_bottom(10)
 
         grid7 = Gtk.Grid()
@@ -1016,7 +1020,7 @@ class Settings(Gtk.Dialog):
         grid7.set_column_spacing(10)
         grid7.set_margin_start(10)
         grid7.set_margin_end(10)
-
+        grid7.set_margin_top(10)
         grid7.set_margin_bottom(10)
 
 
@@ -1039,7 +1043,9 @@ class Settings(Gtk.Dialog):
 
         grid6.attach(self.label_runner, 0, 6, 1, 1)
         grid6.attach(self.combo_box_runner, 0, 7, 1, 1)
+        grid6.attach(self.button_proton_manager, 0, 8, 1, 1)
         self.combo_box_runner.set_hexpand(True)
+        self.button_proton_manager.set_hexpand(True)
 
         grid7.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
 
@@ -1096,6 +1102,28 @@ class Settings(Gtk.Dialog):
 
         self.show_all()
 
+    def on_button_proton_manager_clicked(self, widget):
+        self.set_sensitive(False)
+
+        proton_manager = "/usr/bin/faugus-proton-manager"
+        def run_command():
+            process = subprocess.Popen([sys.executable, proton_manager])
+            process.wait()
+            GLib.idle_add(self.set_sensitive, True)
+            GLib.idle_add(self.parent.set_sensitive, True)
+            GLib.idle_add(self.blocking_window.destroy)
+
+            GLib.idle_add(lambda: self.combo_box_runner.remove_all())
+            GLib.idle_add(self.populate_combobox_with_runners)
+
+        self.blocking_window = Gtk.Window()
+        self.blocking_window.set_transient_for(self.parent)
+        self.blocking_window.set_decorated(False)
+        self.blocking_window.set_modal(True)
+
+        command_thread = threading.Thread(target=run_command)
+        command_thread.start()
+
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combo_box_runner.append_text("GE-Proton Latest (default)")
@@ -1107,12 +1135,22 @@ class Settings(Gtk.Dialog):
         try:
             # Check if the directory exists
             if os.path.exists(runner_path):
+                # List to hold version directories
+                versions = []
                 # Iterate over the folders in the directory
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
-                    # Add to ComboBox only if it's a directory and not "UMU-Latest"
+                    # Add to list only if it's a directory and not "UMU-Latest"
                     if os.path.isdir(entry_path) and entry != "UMU-Latest":
-                        self.combo_box_runner.append_text(entry)
+                        versions.append(entry)
+
+                # Sort versions in descending order
+                versions.sort(key=lambda v: [int(x) if x.isdigit() else x for x in v.replace('GE-Proton', '').split('-')], reverse=True)
+
+                # Add sorted versions to ComboBox
+                for version in versions:
+                    self.combo_box_runner.append_text(version)
+
         except Exception as e:
             print(f"Error accessing the directory: {e}")
 
@@ -1164,18 +1202,14 @@ class Settings(Gtk.Dialog):
                 command_parts = []
                 file_run = dialog.get_filename()
                 if not file_run.endswith(".reg"):
-                    if default_prefix:
-                        command_parts.append(f'WINEPREFIX={default_prefix}/default ')
                     if file_run:
-                        command_parts.append(f'GAMEID={file_run}')
+                        command_parts.append(f'GAMEID=default')
                     if runner:
                         command_parts.append(f'PROTONPATH={runner}')
                     command_parts.append(f'"/usr/bin/umu-run" "{file_run}"')
                 else:
-                    if default_prefix:
-                        command_parts.append(f'WINEPREFIX={default_prefix}/default ')
                     if file_run:
-                        command_parts.append(f'GAMEID={file_run}')
+                        command_parts.append(f'GAMEID=default')
                     if runner:
                         command_parts.append(f'PROTONPATH={runner}')
                     command_parts.append(f'"/usr/bin/umu-run" regedit "{file_run}"')
@@ -1234,8 +1268,6 @@ class Settings(Gtk.Dialog):
 
             # Add command parts if they are not empty
 
-            if default_prefix:
-                command_parts.append(f'WINEPREFIX={default_prefix}')
             command_parts.append(f'GAMEID=default')
             if runner:
                 command_parts.append(f'PROTONPATH={runner}')
@@ -1293,7 +1325,6 @@ class Settings(Gtk.Dialog):
 
             # Add command parts if they are not empty
 
-            command_parts.append(f'WINEPREFIX=default')
             command_parts.append(f'GAMEID=winetricks-gui')
             command_parts.append(f'STORE=none')
             if runner:
@@ -1765,12 +1796,22 @@ class AddGame(Gtk.Dialog):
         try:
             # Check if the directory exists
             if os.path.exists(runner_path):
+                # List to hold version directories
+                versions = []
                 # Iterate over the folders in the directory
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
-                    # Add to ComboBox only if it's a directory and not "UMU-Latest"
+                    # Add to list only if it's a directory and not "UMU-Latest"
                     if os.path.isdir(entry_path) and entry != "UMU-Latest":
-                        self.combo_box_runner.append_text(entry)
+                        versions.append(entry)
+
+                # Sort versions in descending order
+                versions.sort(key=lambda v: [int(x) if x.isdigit() else x for x in v.replace('GE-Proton', '').split('-')], reverse=True)
+
+                # Add sorted versions to ComboBox
+                for version in versions:
+                    self.combo_box_runner.append_text(version)
+
         except Exception as e:
             print(f"Error accessing the directory: {e}")
 
