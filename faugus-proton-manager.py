@@ -53,9 +53,8 @@ class ProtonDownloader(Gtk.Window):
     def get_releases(self):
         # Fetch all releases using pagination
         page = 1
-        headers = {"Authorization": "token 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"}  # Your token here
         while True:
-            response = requests.get(GITHUB_API_URL, headers=headers, params={"page": page, "per_page": 100})
+            response = requests.get(GITHUB_API_URL, params={"page": page, "per_page": 100})
             if response.status_code == 200:
                 releases = response.json()
                 if not releases:
