@@ -89,7 +89,7 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/cf70c8e4-6b59-4ce6-9958-93b5b80ea244/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/0bbb79ff-447c-4d7f-a788-32ea5251770b/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/f129f4b2-261d-4268-b822-967ffd7bde41/><br>
+<img src=https://github.com/user-attachments/assets/99f7b161-5e72-47c4-a108-37e68d2db5fc/><br>
 ### Create shortcut from .exe
 <img src=https://github.com/user-attachments/assets/080c37b0-5ad0-4192-b4f2-f1bdd08dcb75/><br>
 
@@ -99,6 +99,6 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/3f1c6328-ef2f-48ca-a0c5-9d9847ddf478/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/f818721e-447a-4e0d-aec5-111892a3de9e/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/3e66a2fc-9755-48c6-a0b1-3eacaae821ca/><br>
+<img src=https://github.com/user-attachments/assets/b3d5969f-81aa-47df-8d0d-1e77161665ee/><br>
 ### Create shortcut from .exe
 <img src=https://github.com/user-attachments/assets/4d5feb01-0667-4c57-8285-cbfb3bc97c93/>
