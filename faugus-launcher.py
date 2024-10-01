@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import os
 import re
@@ -1145,7 +1145,13 @@ class Settings(Gtk.Dialog):
                         versions.append(entry)
 
                 # Sort versions in descending order
-                versions.sort(key=lambda v: [int(x) if x.isdigit() else x for x in v.replace('GE-Proton', '').split('-')], reverse=True)
+                def version_key(v):
+                    # Remove 'GE-Proton' and split the remaining part into segments of digits and non-digits
+                    v_parts = re.split(r'(\d+)', v.replace('GE-Proton', ''))
+                    # Convert numeric parts to integers for proper sorting
+                    return [int(part) if part.isdigit() else part for part in v_parts]
+
+                versions.sort(key=version_key, reverse=True)
 
                 # Add sorted versions to ComboBox
                 for version in versions:
@@ -1806,7 +1812,13 @@ class AddGame(Gtk.Dialog):
                         versions.append(entry)
 
                 # Sort versions in descending order
-                versions.sort(key=lambda v: [int(x) if x.isdigit() else x for x in v.replace('GE-Proton', '').split('-')], reverse=True)
+                def version_key(v):
+                    # Remove 'GE-Proton' and split the remaining part into segments of digits and non-digits
+                    v_parts = re.split(r'(\d+)', v.replace('GE-Proton', ''))
+                    # Convert numeric parts to integers for proper sorting
+                    return [int(part) if part.isdigit() else part for part in v_parts]
+
+                versions.sort(key=version_key, reverse=True)
 
                 # Add sorted versions to ComboBox
                 for version in versions:
