@@ -33,9 +33,9 @@ sudo dnf -y install sc-controller
 ```
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-74/faugus-launcher_1.0-74_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-74/python3-umu-launcher_1.0-1.20240912.9b12f90_all.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-74/umu-launcher_1.0-1.20240912.9b12f90_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-75/faugus-launcher_1.0-75_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-75/python3-umu-launcher_1.1.1-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/v1.0-75/umu-launcher_1.1.1-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
