@@ -204,31 +204,8 @@ class UMUProtonUpdater:
         clean_line = remove_ansi_escape(line).strip()
         if any(keyword in clean_line for keyword in {"zenity", "Gtk-WARNING", "Gtk-Message", "pixbuf"}) or not clean_line:
             return
-
-        if "PROTONPATH=" in self.message:
-            if re.search(r'\bGE-Proton\b', self.message):
-                # GE-Proton Latest (default)
-                if "GE-Proton is up to date" in clean_line:
-                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
-                if "Using GE-Proton" in clean_line:
-                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
-                else:
-                    self.append_to_text_view(clean_line + '\n')
-            else:
-                # Specific Proton-GE or UMU-Proton
-                if "steamrt is up to date" in clean_line:
-                    GLib.timeout_add_seconds(1, self.close_warning_dialog)
-                else:
-                    self.append_to_text_view(clean_line + '\n')
-
-        else:
-            # UMU Latest
-            if "UMU-Proton is up to date" in clean_line:
-                GLib.timeout_add_seconds(1, self.close_warning_dialog)
-            if "Using UMU-Proton" in clean_line:
-                GLib.timeout_add_seconds(1, self.close_warning_dialog)
-            else:
-                self.append_to_text_view(clean_line + '\n')
+        if "ProtonFixes" in clean_line:
+            GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, line):
         if self.text_view:
