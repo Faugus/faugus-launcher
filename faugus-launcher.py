@@ -318,6 +318,8 @@ class Main(Gtk.Window):
                 if row[0] == game.runner:
                     index_to_activate = i
                     break
+            if not game.runner:
+                index_to_activate = 1
             edit_game_dialog.combo_box_runner.set_active(index_to_activate)
 
             mangohud_status = False
@@ -1367,7 +1369,7 @@ class Settings(Gtk.Dialog):
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
     def on_button_paypal_clicked(self, widget):
-        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&amount=5&no_recurring=0&currency_code=USD")
+        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
         # Handle the click event of the search button to select the game's .exe
