@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 
 import gi
-import atexit
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib, Gdk, GdkPixbuf
+from gi.repository import Gtk, GLib, GdkPixbuf
+
+import atexit
 import sys
 import subprocess
 import argparse
 import re
 import os
 
+
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
 
-class UMUProtonUpdater:
+
+class FaugusRun:
     def __init__(self, message):
         self.message = message
         self.process = None
@@ -26,7 +29,7 @@ class UMUProtonUpdater:
         self.default_prefix = None
 
     def start_process(self, command):
-        # Check if SC_CONTROLLER=1 is in message before starting scc-daemon
+
         sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
             "/usr/local/bin/sc-controller")
         if sc_controller_installed:
@@ -46,7 +49,6 @@ class UMUProtonUpdater:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
         print(self.message)
 
-        # Start the main process
         self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
@@ -61,7 +63,6 @@ class UMUProtonUpdater:
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
 
     def load_config(self):
-        # Load configuration from file
         config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
 
         if os.path.isfile(config_file):
@@ -77,16 +78,14 @@ class UMUProtonUpdater:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
             self.default_runner = "GE-Proton Latest (default)"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
-        # Path to the configuration file
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
+                    default_runner):
         config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
 
         config_path = os.path.expanduser("~/.config/faugus-launcher/")
-        # Create the configuration directory if it doesn't exist
         if not os.path.exists(config_path):
             os.makedirs(config_path)
 
@@ -95,17 +94,14 @@ class UMUProtonUpdater:
 
         default_runner = (f'"{default_runner}"')
 
-        # Dictionary to store existing configurations
         config = {}
 
-        # Read the existing configuration file
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
                 for line in f:
                     key, value = line.strip().split('=', 1)
                     config[key] = value.strip('"')
 
-        # Update configurations with new values
         config['close-onlaunch'] = checkbox_state
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
@@ -113,7 +109,6 @@ class UMUProtonUpdater:
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
 
-        # Write configurations back to the file
         with open(config_file, 'w') as f:
             for key, value in config.items():
                 if key == 'default-prefix':
@@ -129,28 +124,23 @@ class UMUProtonUpdater:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
-        # Create a new window for the dialog
+
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
 
-        # Create the Frame with border
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
 
-        # Create the Grid
         grid = Gtk.Grid()
         frame.add(grid)
 
-        # Load the image with GdkPixbuf
         image_path = "/usr/share/icons/faugus-launcher.png"
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
 
-        # Resize the image to 75x75 pixels
         pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
 
-        # Create a Gtk.Image from the GdkPixbuf
         image = Gtk.Image.new_from_pixbuf(pixbuf)
         image.set_margin_top(20)
         image.set_margin_start(20)
@@ -158,17 +148,14 @@ class UMUProtonUpdater:
         image.set_margin_bottom(20)
         grid.attach(image, 0, 0, 1, 1)
 
-        # Create the Label
         label = Gtk.Label(label="Updating. Please wait...")
         label.set_margin_bottom(20)
         label.set_margin_start(20)
         label.set_margin_end(20)
         grid.attach(label, 0, 1, 1, 1)
 
-        # Add the frame to the window
         self.warning_dialog.add(frame)
 
-        # Show the window
         self.warning_dialog.show_all()
 
     def show_log_window(self):
@@ -186,33 +173,32 @@ class UMUProtonUpdater:
         self.log_window.connect("delete-event", self.on_log_window_delete_event)
         self.log_window.show_all()
 
-    def append_log_to_window(self, line):
-        # Append the log line to the log window
-        pass  # Implement your logic here
-
     def on_output(self, source, condition):
         if line := source.readline():
-            self.check_game_output(line)
-            # Determine where to show the log
+            clean_line = remove_ansi_escape(line).strip()
+            self.check_game_output(clean_line)
             if "winetricks" in self.message:
-                self.append_log_to_window(line)
+                self.append_to_text_view(clean_line)
             else:
                 print(line, end='')
-        return True  # Continue watching for more output
+        return True
 
-    def check_game_output(self, line):
-        clean_line = remove_ansi_escape(line).strip()
-        if any(keyword in clean_line for keyword in {"zenity", "Gtk-WARNING", "Gtk-Message", "pixbuf"}) or not clean_line:
-            return
+
+    def check_game_output(self, clean_line):
+
         if "ProtonFixes" in clean_line:
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
-    def append_to_text_view(self, line):
+    def append_to_text_view(self, clean_line):
         if self.text_view:
-            clean_line = remove_ansi_escape(line)
+
+            if any(keyword in clean_line for keyword in
+                   {"zenity", "Gtk-WARNING", "Gtk-Message", "pixbuf"}) or not clean_line:
+                return
+
             buffer = self.text_view.get_buffer()
             end_iter = buffer.get_end_iter()
-            buffer.insert(end_iter, clean_line)
+            buffer.insert(end_iter, clean_line + "\n")
             adj = self.text_view.get_parent().get_vadjustment()
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
@@ -230,18 +216,14 @@ class UMUProtonUpdater:
         return True
 
     def show_exit_warning(self):
-        # Extract the last part of the string
         parts = self.message.split()
         if parts:
-            last_part = parts[-1].strip('"')  # Remove any surrounding quotes
+            last_part = parts[-1].strip('"')
 
-            # Check if the file is a .reg file
             if last_part.endswith(".reg"):
-                # Create a custom dialog
                 dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
                 dialog.set_resizable(False)
 
-                # Create the Grids
                 self.grid = Gtk.Grid()
                 self.grid.set_row_spacing(20)
                 self.grid.set_column_spacing(0)
@@ -252,7 +234,6 @@ class UMUProtonUpdater:
 
                 self.label = Gtk.Label(label="The keys and values were successfully added to the registry.")
 
-                # Button Ok
                 self.button_ok = Gtk.Button(label="Ok")
                 self.button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
                 self.button_ok.set_size_request(150, -1)
@@ -263,13 +244,8 @@ class UMUProtonUpdater:
 
                 dialog.get_content_area().add(self.grid)
 
-                # Show the dialog
                 dialog.show_all()
-
-                # Run the dialog and wait for response
                 dialog.run()
-
-                # Destroy the dialog after response
                 dialog.destroy()
 
     def on_process_exit(self, pid, condition):
@@ -282,7 +258,7 @@ class UMUProtonUpdater:
 
 
 def handle_command(message, command=None):
-    updater = UMUProtonUpdater(message)
+    updater = FaugusRun(message)
     updater.start_process(command)
 
     Gtk.main()
@@ -298,14 +274,13 @@ def stop_scc_daemon():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="UMU-Proton Updater")
+    parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
 
     args = parser.parse_args()
 
-    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-        "/usr/local/bin/sc-controller")
+    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
     if sc_controller_installed:
         if "SC_CONTROLLER=1" in args.message:
             atexit.register(stop_scc_daemon)
