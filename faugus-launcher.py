@@ -22,6 +22,7 @@ class Main(Gtk.Window):
         # Initialize the main window with title and default size
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_default_size(580, 580)
+        self.set_resizable(False)
 
         self.game_running = None
 
@@ -47,12 +48,12 @@ class Main(Gtk.Window):
         box_top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_right.set_border_width(10)
         box_bottom = Gtk.Box()
 
         # Create buttons for adding, editing, and deleting games
         self.button_add = Gtk.Button(label="New")
         self.button_add.connect("clicked", self.on_button_add_clicked)
+        self.button_add.set_can_focus(False)
         self.button_add.set_size_request(50, 50)
         self.button_add.set_margin_top(10)
         self.button_add.set_margin_start(10)
@@ -60,6 +61,7 @@ class Main(Gtk.Window):
 
         self.button_edit = Gtk.Button(label="Edit")
         self.button_edit.connect("clicked", self.on_button_edit_clicked)
+        self.button_edit.set_can_focus(False)
         self.button_edit.set_size_request(50, 50)
         self.button_edit.set_margin_top(10)
         self.button_edit.set_margin_start(10)
@@ -67,6 +69,7 @@ class Main(Gtk.Window):
 
         self.button_delete = Gtk.Button(label="Del")
         self.button_delete.connect("clicked", self.on_button_delete_clicked)
+        self.button_delete.set_can_focus(False)
         self.button_delete.set_size_request(50, 50)
         self.button_delete.set_margin_top(10)
         self.button_delete.set_margin_start(10)
@@ -75,6 +78,7 @@ class Main(Gtk.Window):
         # Create button for killing processes
         button_kill = Gtk.Button(label="Kill")
         button_kill.connect("clicked", self.on_button_kill_clicked)
+        button_kill.set_can_focus(False)
         button_kill.set_tooltip_text("Force close all running games")
         button_kill.set_size_request(50, 50)
         button_kill.set_margin_top(10)
@@ -84,6 +88,7 @@ class Main(Gtk.Window):
         # Create button for settings
         button_settings = Gtk.Button()
         button_settings.connect("clicked", self.on_button_settings_clicked)
+        button_settings.set_can_focus(False)
         button_settings.set_size_request(50, 50)
         button_settings.set_image(Gtk.Image.new_from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON))
         button_settings.set_margin_top(10)
@@ -93,11 +98,19 @@ class Main(Gtk.Window):
         # Create button for launching games
         self.button_play = Gtk.Button()
         self.button_play.connect("clicked", self.on_button_play_clicked)
+        self.button_play.set_can_focus(False)
         self.button_play.set_size_request(150, 50)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         self.button_play.set_margin_top(10)
         self.button_play.set_margin_end(10)
         self.button_play.set_margin_bottom(10)
+
+        self.entry_search = Gtk.Entry()
+        self.entry_search.set_placeholder_text("Game Title...")
+        self.entry_search.connect("changed", self.on_search_changed)
+        #self.entry_search.set_size_request(-1, 50)
+        self.entry_search.set_margin_top(10)
+        self.entry_search.set_margin_end(10)
 
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
@@ -111,22 +124,28 @@ class Main(Gtk.Window):
         # Create list box for displaying games
         self.game_list = Gtk.ListBox(halign=Gtk.Align.START, valign=Gtk.Align.START)
         self.game_list.connect("button-release-event", self.on_button_release_event)
+
+        self.connect("key-press-event", self.on_key_press_event)
+
         scroll_box.add(self.game_list)
         self.load_games()
 
-        # Pack buttons and other components into the bottom box
-        box_bottom.pack_start(button_settings, False, False, 0)
-        box_bottom.pack_end(self.button_play, False, False, 0)
-        box_bottom.pack_end(button_kill, False, False, 0)
+        # Pack left and scrolled box into the top box
+        box_top.pack_start(box_left, False, True, 0)
+        box_top.pack_start(box_right, True, True, 0)
 
         # Pack buttons into the left box
         box_left.pack_start(self.button_add, False, False, 0)
         box_left.pack_start(self.button_edit, False, False, 0)
         box_left.pack_start(self.button_delete, False, False, 0)
 
-        # Pack left and scrolled box into the top box
-        box_top.pack_start(box_left, False, True, 0)
-        box_top.pack_start(scroll_box, True, True, 0)
+        box_right.pack_start(self.entry_search, False, False, 0)
+        box_right.pack_start(scroll_box, True, True, 0)
+
+        # Pack buttons and other components into the bottom box
+        box_bottom.pack_start(button_settings, False, False, 0)
+        box_bottom.pack_end(self.button_play, False, False, 0)
+        box_bottom.pack_end(button_kill, False, False, 0)
 
         # Pack top and bottom boxes into the main box
         box_main.pack_start(box_top, True, True, 0)
@@ -141,6 +160,184 @@ class Main(Gtk.Window):
 
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+
+    def load_games(self):
+        # Load games from file
+        try:
+            with open("games.txt", "r") as file:
+                for line in file:
+                    data = line.strip().split(";")
+                    if len(data) >= 5:
+                        title, path, prefix, launch_arguments, game_arguments = data[:5]
+                        if len(data) >= 10:
+                            mangohud = data[5]
+                            gamemode = data[6]
+                            sc_controller = data[7]
+                            protonfix = data[8]
+                            runner = data[9]
+                        else:
+                            mangohud = ""
+                            gamemode = ""
+                            sc_controller = ""
+                            protonfix = ""
+                            runner = ""
+                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
+                                    sc_controller, protonfix, runner)
+                        self.games.append(game)
+                self.games = sorted(self.games, key=lambda x: x.title.lower())
+                self.filtered_games = self.games[:]  # Initialize filtered_games
+                self.game_list.foreach(Gtk.Widget.destroy)
+                for game in self.filtered_games:
+                    self.add_item_list(game)
+        except FileNotFoundError:
+            pass
+
+    def add_item_list(self, game):
+        # Add a game item to the list
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        hbox.set_border_width(10)
+        hbox.set_size_request(500, -1)
+
+        game_label = Gtk.Label.new(game.title)
+        hbox.pack_start(game_label, True, True, 0)
+
+        listbox_row = Gtk.ListBoxRow()
+        listbox_row.add(hbox)
+        listbox_row.set_activatable(False)
+        listbox_row.set_can_focus(False)
+        listbox_row.set_selectable(True)
+        self.game_list.add(listbox_row)
+
+        hbox.set_halign(Gtk.Align.CENTER)
+        listbox_row.set_valign(Gtk.Align.START)
+
+    def on_search_changed(self, entry):
+        search_text = entry.get_text().lower()
+        # Filter games based on the search text
+        self.filtered_games = [game for game in self.games if search_text in game.title.lower()]
+
+        self.game_list.foreach(Gtk.Widget.destroy)  # Clear the current list
+
+        if self.filtered_games:  # If there are filtered games, add them
+            for game in self.filtered_games:
+                self.add_item_list(game)
+
+            # Select the first item in the list
+            self.game_list.select_row(self.game_list.get_row_at_index(0))
+        else:  # If there are no games, add a message or leave the list empty
+            pass
+
+        self.game_list.show_all()  # Show all items in the list, including the message
+        self.update_button_sensitivity(self.game_list.get_selected_row())
+
+    def on_key_press_event(self, listbox, event):
+        # Check for arrow key press
+        if event.keyval in (Gdk.KEY_Up, Gdk.KEY_Down):
+            # Grab focus on the ListBox to ensure navigation works
+            self.game_list.grab_focus()
+
+            # Get the list of rows in the ListBox
+            rows = self.game_list.get_children()
+            selected_row = self.game_list.get_selected_row()
+
+            # Handle Up arrow key
+            if event.keyval == Gdk.KEY_Up:
+                if selected_row:
+                    current_index = rows.index(selected_row)
+                    if current_index > 0:
+                        self.game_list.select_row(rows[current_index - 1])
+                        self.update_button_sensitivity(rows[current_index - 1])
+            # Handle Down arrow key
+            elif event.keyval == Gdk.KEY_Down:
+                if selected_row:
+                    current_index = rows.index(selected_row)
+                    if current_index < len(rows) - 1:
+                        self.game_list.select_row(rows[current_index + 1])
+                        self.update_button_sensitivity(rows[current_index + 1])
+
+        # Check for Enter key press
+        if event.keyval == Gdk.KEY_Return:
+            selected_row = self.game_list.get_selected_row()
+            if selected_row:
+                # Simulate double-click behavior
+                hbox = selected_row.get_child()
+                game_label = hbox.get_children()[0]
+                title = game_label.get_text()
+
+                # Check if the game is already running
+                if title not in self.processos:
+                    widget = self.button_play
+                    self.on_button_play_clicked(widget)
+                else:
+                    dialog = Gtk.MessageDialog(title=title, text=f"'{title}' is already running.",
+                                               buttons=Gtk.ButtonsType.OK, parent=self)
+                    dialog.set_resizable(False)
+                    dialog.set_modal(True)
+                    dialog.run()
+                    dialog.destroy()
+
+        # Check for Delete key press
+        if event.keyval == Gdk.KEY_Delete:
+            selected_row = self.game_list.get_selected_row()
+            if selected_row:
+                self.on_button_delete_clicked(self.button_delete)
+
+            # Stop further event propagation
+            return True
+
+    def on_button_release_event(self, listbox, event):
+        # Handle button release event
+
+        if event.type == Gdk.EventType.BUTTON_RELEASE and event.button == Gdk.BUTTON_PRIMARY:
+            current_row = listbox.get_row_at_y(event.y)
+            current_time = event.time
+            if current_row == self.last_clicked_row and current_time - self.last_click_time < 500:
+                # Double-click detected
+                if current_row:
+                    hbox = current_row.get_child()
+                    game_label = hbox.get_children()[0]
+                    title = game_label.get_text()
+
+                    # Check if the game is already running
+                    if title not in self.processos:
+                        widget = self.button_play
+                        self.on_button_play_clicked(widget)
+                    else:
+                        dialog = Gtk.MessageDialog(title=title, text=f"'{title}' is already running.",
+                                                   buttons=Gtk.ButtonsType.OK, parent=self)
+                        dialog.set_resizable(False)
+                        dialog.set_modal(True)
+                        dialog.run()
+                        dialog.destroy()
+            else:
+                # Single-click, update last click details and enable buttons
+                self.last_clicked_row = current_row
+                self.last_click_time = current_time
+                self.update_button_sensitivity(current_row)
+
+    def update_button_sensitivity(self, row):
+        # Enable buttons based on the selected row
+        if row:
+            hbox = row.get_child()
+            game_label = hbox.get_children()[0]
+            title = game_label.get_text()
+
+            self.button_edit.set_sensitive(True)
+            self.button_delete.set_sensitive(True)
+
+            if title in self.processos:
+                self.button_play.set_sensitive(False)
+                self.button_play.set_image(
+                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+            else:
+                self.button_play.set_sensitive(True)
+                self.button_play.set_image(
+                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        else:
+            # Disable buttons if no row is selected
+            self.button_edit.set_sensitive(False)
+            self.button_delete.set_sensitive(False)
+            self.button_play.set_sensitive(False)
 
     def load_close_onlaunch(self):
         config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
@@ -189,9 +386,6 @@ class Main(Gtk.Window):
 
         else:
             settings_dialog.destroy()
-
-        # Ensure the dialog is destroyed when canceled
-        #settings_dialog.destroy()
 
     def on_button_play_clicked(self, widget):
         if not (listbox_row := self.game_list.get_selected_row()):
@@ -309,7 +503,6 @@ class Main(Gtk.Window):
             edit_game_dialog.set_title(f"Edit {game.title}")
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
 
-            #edit_game_dialog.populate_combobox_with_runners()
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
             if game.runner == "GE-Proton":
@@ -688,25 +881,6 @@ class Main(Gtk.Window):
         if os.path.exists(desktop_link_path):
             os.remove(desktop_link_path)
 
-    def add_item_list(self, game):
-        # Add a game item to the list
-        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        hbox.set_border_width(10)
-        hbox.set_size_request(500, -1)
-
-        game_label = Gtk.Label.new(game.title)
-        hbox.pack_start(game_label, True, True, 0)
-
-        listbox_row = Gtk.ListBoxRow()
-        listbox_row.add(hbox)
-        listbox_row.set_activatable(False)
-        listbox_row.set_can_focus(False)
-        listbox_row.set_selectable(True)
-        self.game_list.add(listbox_row)
-
-        hbox.set_halign(Gtk.Align.CENTER)
-        listbox_row.set_valign(Gtk.Align.START)
-
     def update_list(self):
         # Update the game list
         for row in self.game_list.get_children():
@@ -714,6 +888,7 @@ class Main(Gtk.Window):
 
         self.games.clear()
         self.load_games()
+        self.entry_search.set_text("")
         self.show_all()
 
     def on_child_process_closed(self, signum, frame):
@@ -736,36 +911,6 @@ class Main(Gtk.Window):
                         self.button_play.set_sensitive(False)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-
-    def load_games(self):
-        # Load games from file
-        try:
-            with open("games.txt", "r") as file:
-                for line in file:
-                    data = line.strip().split(";")
-                    if len(data) >= 5:
-                        title, path, prefix, launch_arguments, game_arguments = data[:5]
-                        if len(data) >= 10:
-                            mangohud = data[5]
-                            gamemode = data[6]
-                            sc_controller = data[7]
-                            protonfix = data[8]
-                            runner = data[9]
-                        else:
-                            mangohud = ""
-                            gamemode = ""
-                            sc_controller = ""
-                            protonfix = ""
-                            runner = ""
-                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
-                                    sc_controller, protonfix, runner)
-                        self.games.append(game)
-                self.games = sorted(self.games, key=lambda x: x.title.lower())
-                self.game_list.foreach(Gtk.Widget.destroy)
-                for game in self.games:
-                    self.add_item_list(game)
-        except FileNotFoundError:
-            pass
 
     def save_games(self):
         # Save game information to file
@@ -818,51 +963,6 @@ class Main(Gtk.Window):
                     f.write(f'{key}="{value}"\n')
                 else:
                     f.write(f'{key}={value}\n')
-
-    def on_button_release_event(self, listbox, event):
-        # Handle button release event
-        if event.type == Gdk.EventType.BUTTON_RELEASE and event.button == Gdk.BUTTON_PRIMARY:
-            current_row = listbox.get_row_at_y(event.y)
-            current_time = event.time
-            if current_row == self.last_clicked_row and current_time - self.last_click_time < 500:
-                # Double-click detected
-                if current_row:
-                    hbox = current_row.get_child()
-                    game_label = hbox.get_children()[0]
-                    title = game_label.get_text()
-
-                    # Check if the game is already running
-                    if title not in self.processos:
-                        widget = self.button_play
-                        self.on_button_play_clicked(widget)
-                    else:
-                        dialog = Gtk.MessageDialog(title=title, text=f"'{title}' is already running.",
-                                                   buttons=Gtk.ButtonsType.OK, parent=self)
-                        dialog.set_resizable(False)
-                        dialog.set_modal(True)
-                        dialog.run()
-                        dialog.destroy()
-            else:
-                # Single-click, update last click details and enable buttons
-                self.last_clicked_row = current_row
-                self.last_click_time = current_time
-
-                self.button_edit.set_sensitive(True)
-                self.button_delete.set_sensitive(True)
-
-                if current_row:
-                    hbox = current_row.get_child()
-                    game_label = hbox.get_children()[0]
-                    title = game_label.get_text()
-
-                    if title in self.processos:
-                        self.button_play.set_sensitive(False)
-                        self.button_play.set_image(
-                            Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-                    else:
-                        self.button_play.set_sensitive(True)
-                        self.button_play.set_image(
-                            Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
 
 class Settings(Gtk.Dialog):
