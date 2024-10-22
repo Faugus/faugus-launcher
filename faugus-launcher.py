@@ -1289,14 +1289,21 @@ class Settings(Gtk.Dialog):
             dialog.set_current_folder(os.path.expanduser("~/"))
             dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
-            file_filter = Gtk.FileFilter()
-            file_filter.set_name("Windows files")
-            file_filter.add_pattern("*.exe")
-            file_filter.add_pattern("*.msi")
-            file_filter.add_pattern("*.bat")
-            file_filter.add_pattern("*.lnk")
-            file_filter.add_pattern("*.reg")
-            dialog.add_filter(file_filter)
+            # Windows files filter
+            windows_filter = Gtk.FileFilter()
+            windows_filter.set_name("Windows files")
+            windows_filter.add_pattern("*.exe")
+            windows_filter.add_pattern("*.msi")
+            windows_filter.add_pattern("*.bat")
+            windows_filter.add_pattern("*.lnk")
+            windows_filter.add_pattern("*.reg")
+            dialog.add_filter(windows_filter)
+
+            # All files filter
+            all_files_filter = Gtk.FileFilter()
+            all_files_filter.set_name("All files")
+            all_files_filter.add_pattern("*")
+            dialog.add_filter(all_files_filter)
 
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
@@ -1969,14 +1976,21 @@ class AddGame(Gtk.Dialog):
         dialog.set_current_folder(os.path.expanduser("~/"))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
-        file_filter = Gtk.FileFilter()
-        file_filter.set_name("Windows files")
-        file_filter.add_pattern("*.exe")
-        file_filter.add_pattern("*.msi")
-        file_filter.add_pattern("*.bat")
-        file_filter.add_pattern("*.lnk")
-        file_filter.add_pattern("*.reg")
-        dialog.add_filter(file_filter)
+        # Windows files filter
+        windows_filter = Gtk.FileFilter()
+        windows_filter.set_name("Windows files")
+        windows_filter.add_pattern("*.exe")
+        windows_filter.add_pattern("*.msi")
+        windows_filter.add_pattern("*.bat")
+        windows_filter.add_pattern("*.lnk")
+        windows_filter.add_pattern("*.reg")
+        dialog.add_filter(windows_filter)
+
+        # All files filter
+        all_files_filter = Gtk.FileFilter()
+        all_files_filter.set_name("All files")
+        all_files_filter.add_pattern("*")
+        dialog.add_filter(all_files_filter)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -2308,6 +2322,22 @@ class AddGame(Gtk.Dialog):
         else:
             dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        # Windows files filter
+        windows_filter = Gtk.FileFilter()
+        windows_filter.set_name("Windows files")
+        windows_filter.add_pattern("*.exe")
+        windows_filter.add_pattern("*.msi")
+        windows_filter.add_pattern("*.bat")
+        windows_filter.add_pattern("*.lnk")
+        windows_filter.add_pattern("*.reg")
+        dialog.add_filter(windows_filter)
+
+        # All files filter
+        all_files_filter = Gtk.FileFilter()
+        all_files_filter.set_name("All files")
+        all_files_filter.add_pattern("*")
+        dialog.add_filter(all_files_filter)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
