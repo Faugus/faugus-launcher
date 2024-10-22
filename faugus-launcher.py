@@ -106,7 +106,7 @@ class Main(Gtk.Window):
         self.button_play.set_margin_bottom(10)
 
         self.entry_search = Gtk.Entry()
-        self.entry_search.set_placeholder_text("Game Title...")
+        self.entry_search.set_placeholder_text("Search...")
         self.entry_search.connect("changed", self.on_search_changed)
         #self.entry_search.set_size_request(-1, 50)
         self.entry_search.set_margin_top(10)
