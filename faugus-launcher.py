@@ -15,7 +15,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
-
+from PIL import Image
 
 class Main(Gtk.Window):
     def __init__(self):
@@ -538,7 +538,7 @@ class Main(Gtk.Window):
                 edit_game_dialog.checkbox_sc_controller.set_active(sc_controller_status)
             edit_game_dialog.check_existing_shortcut()
 
-            image = self.set_image_shortcut_icon(game.title)
+            image = self.set_image_shortcut_icon(game.title, edit_game_dialog.icons_path, edit_game_dialog.icon_temp)
             edit_game_dialog.button_shortcut_icon.set_image(image)
             edit_game_dialog.entry_title.set_sensitive(False)
 
@@ -552,7 +552,7 @@ class Main(Gtk.Window):
 
             edit_game_dialog.show()
 
-    def set_image_shortcut_icon(self, title):
+    def set_image_shortcut_icon(self, title, icons_path, icon_temp):
 
         # Handle the click event of the Create Shortcut button
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
@@ -560,26 +560,18 @@ class Main(Gtk.Window):
         title_formatted = '-'.join(title_formatted.lower().split())
 
         # Check if the icon file exists
-        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
+        icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
 
-        if os.path.exists(new_icon_path):
-            image_path = f"{icons_path}{title_formatted}.ico"
+        if os.path.exists(icon_path):
+            shutil.copy(icon_path, icon_temp)
+        if not os.path.exists(icon_path):
+            icon_temp = "/usr/share/icons/faugus-launcher.png"
 
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_temp)
+        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
 
-            image = Gtk.Image.new_from_file(image_path)
-            image.set_from_pixbuf(scaled_pixbuf)
-
-        if not os.path.exists(new_icon_path):
-            image_path = "/usr/share/icons/faugus-launcher.png"
-
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-
-            image = Gtk.Image.new_from_file(image_path)
-            image.set_from_pixbuf(scaled_pixbuf)
+        image = Gtk.Image.new_from_file(icon_temp)
+        image.set_from_pixbuf(scaled_pixbuf)
 
         return image
 
@@ -634,6 +626,10 @@ class Main(Gtk.Window):
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combo_box_runner.get_active_text()
 
+            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+            title_formatted = title_formatted.replace(' ', '-')
+            title_formatted = '-'.join(title_formatted.lower().split())
+
             # Concatenate game information
             game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
 
@@ -662,13 +658,20 @@ class Main(Gtk.Window):
             # Determine the state of the shortcut checkbox
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
 
+            icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
+            icon_final = f'{add_game_dialog.icons_path}{title_formatted}.ico'
+
             # Call add_remove_shortcut method
-            self.add_shortcut(game, shortcut_state)
+            self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
 
             # Select the added game
             self.select_game_by_title(title)
 
         else:
+            if os.path.isfile(add_game_dialog.icon_temp):
+                os.remove(add_game_dialog.icon_temp)
+            if os.path.isdir(add_game_dialog.icon_directory):
+                shutil.rmtree(add_game_dialog.icon_directory)
             add_game_dialog.destroy()
 
         # Ensure the dialog is destroyed when canceled
@@ -706,6 +709,11 @@ class Main(Gtk.Window):
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combo_box_runner.get_active_text()
 
+            # Handle the click event of the Create Shortcut button
+            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+            title_formatted = title_formatted.replace(' ', '-')
+            title_formatted = '-'.join(title_formatted.lower().split())
+
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
             if game.runner == "GE-Proton Latest (default)":
@@ -718,20 +726,32 @@ class Main(Gtk.Window):
             # Determine the state of the shortcut checkbox
             shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
 
+            icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
+            icon_final = f'{edit_game_dialog.icons_path}{title_formatted}.ico'
+
             # Call add_remove_shortcut method
-            self.add_shortcut(game, shortcut_state)
+            self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
 
             # Select the game that was edited
             self.select_game_by_title(game.title)
+        else:
+            if os.path.isfile(edit_game_dialog.icon_temp):
+                os.remove(edit_game_dialog.icon_temp)
+
+        if os.path.isdir(edit_game_dialog.icon_directory):
+            shutil.rmtree(edit_game_dialog.icon_directory)
 
         edit_game_dialog.destroy()
 
-    def add_shortcut(self, game, shortcut_state):
+    def add_shortcut(self, game, shortcut_state, icon_temp, icon_final):
         # Check if the shortcut checkbox is checked
         if not shortcut_state:
             # Remove existing shortcut if it exists
             self.remove_shortcut(game)
             return
+
+        if os.path.isfile(os.path.expanduser(icon_temp)):
+            os.rename(os.path.expanduser(icon_temp), icon_final)
 
         # Handle the click event of the Create Shortcut button
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
@@ -1603,12 +1623,21 @@ class AddGame(Gtk.Dialog):
         self.set_modal(True)
         self.parent_window = parent
 
+        self.icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/icon_temp/")
+
+        if not os.path.exists(self.icon_directory):
+            os.makedirs(self.icon_directory)
+
+        self.icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
+        self.icon_extracted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.ico')
+        self.icon_converted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.png')
+        self.icon_temp = f'{self.icons_path}icon_temp.ico'
+
         self.box = self.get_content_area()
         self.box.set_margin_start(0)
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
-
 
         grid = Gtk.Grid()
         grid.set_row_spacing(10)
@@ -1768,7 +1797,6 @@ class AddGame(Gtk.Dialog):
 
         self.default_runner = self.load_default_runner()
 
-        # Criação das abas
         self.notebook = Gtk.Notebook()
         self.box.add(self.notebook)
         self.notebook.set_margin_start(10)
@@ -1777,7 +1805,6 @@ class AddGame(Gtk.Dialog):
         self.notebook.set_margin_bottom(10)
         #notebook.set_show_border(False)
 
-        # Página 1
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label1 = Gtk.Label(label="Game")
@@ -1785,7 +1812,6 @@ class AddGame(Gtk.Dialog):
         tab_box1.set_hexpand(True)
         self.notebook.append_page(page1, tab_box1)
 
-        # Página 2
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label2 = Gtk.Label(label="Tools")
@@ -2067,11 +2093,12 @@ class AddGame(Gtk.Dialog):
     def set_image_shortcut_icon(self):
 
         image_path = "/usr/share/icons/faugus-launcher.png"
+        shutil.copy(image_path, self.icon_temp)
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
 
-        image = Gtk.Image.new_from_file(image_path)
+        image = Gtk.Image.new_from_file(self.icon_temp)
         image.set_from_pixbuf(scaled_pixbuf)
 
         return image
@@ -2079,30 +2106,37 @@ class AddGame(Gtk.Dialog):
     def on_button_shortcut_icon_clicked(self, widget):
         self.set_sensitive(False)
 
-        # Handle the click event of the Winetricks button
         validation_result = self.validate_fields(entry="path")
         if not validation_result:
             self.set_sensitive(True)
             return
 
-        title = self.entry_title.get_text()
         path = self.entry_path.get_text()
 
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        if not os.path.exists(self.icon_directory):
+            os.makedirs(self.icon_directory)
 
-        # Check if the icon file exists
-        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
+        try:
+            # Attempt to extract the icon
+            command = f'icoextract "{path}" "{self.icon_extracted}"'
+            result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-        # Check if the icon directory exists and create if it doesn't
-        icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/{title_formatted}/")
-        if not os.path.exists(icon_directory):
-            os.makedirs(icon_directory)
+            # Check if there was an error in executing the command
+            if result.returncode != 0:
+                if "NoIconsAvailableError" in result.stderr:
+                    print("The file does not contain icons.")
+                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                else:
+                    print(f"Error extracting icon: {result.stderr}")
+            else:
+                # Convert the extracted icon to PNG
+                command_magick = shutil.which("magick") or shutil.which("convert")
+                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                if os.path.isfile(self.icon_extracted):
+                    os.remove(self.icon_extracted)
 
-        # Execute 7z command to extract icon
-        os.system(f'7z e "{path}" -o{icon_directory} -r -aoa')
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
         # Open file dialog to select .ico file
         dialog = Gtk.FileChooserDialog(title="Select an icon for the shortcut", action=Gtk.FileChooserAction.OPEN)
@@ -2115,7 +2149,7 @@ class AddGame(Gtk.Dialog):
         dialog.add_filter(filter_ico)
 
         # Set the initial directory to the icon directory
-        dialog.set_current_folder(icon_directory)
+        dialog.set_current_folder(self.icon_directory)
 
         # Connect signal to update preview widget when file selection changes
         dialog.connect("update-preview", self.update_preview)
@@ -2124,29 +2158,43 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
             # Move and rename the icon file
-            shutil.move(file_path, os.path.expanduser(f"{icons_path}{title_formatted}.ico"))
+            shutil.copy(file_path, self.icon_temp)
 
-            image_path = f"{icons_path}{title_formatted}.ico"
-
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-
-            image = Gtk.Image.new_from_file(image_path)
+            image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
 
             self.button_shortcut_icon.set_image(image)
 
-            # Delete the folder after the icon is moved
-            shutil.rmtree(icon_directory)
-            dialog.destroy()
-            self.set_sensitive(True)
+        # Delete the folder after the icon is moved
+        if os.path.isdir(self.icon_directory):
+            shutil.rmtree(self.icon_directory)
+        dialog.destroy()
+        self.set_sensitive(True)
 
-        else:
-            # Delete the folder
-            shutil.rmtree(icon_directory)
-            dialog.destroy()
-            self.set_sensitive(True)
-            return
+    def find_largest_resolution(self, directory):
+        largest_image = None
+        largest_resolution = (0, 0)  # (width, height)
+
+        # Define a set of valid image extensions
+        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
+
+        for file_name in os.listdir(directory):
+            file_path = os.path.join(directory, file_name)
+            if os.path.isfile(file_path):
+                # Check if the file has a valid image extension
+                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
+                    try:
+                        with Image.open(file_path) as img:
+                            width, height = img.size
+                            if width * height > largest_resolution[0] * largest_resolution[1]:
+                                largest_resolution = (width, height)
+                                largest_image = file_path
+                    except IOError:
+                        print(f'Unable to open {file_path}')
+
+        return largest_image
 
     def update_preview(self, dialog):
         if file_path := dialog.get_preview_filename():
@@ -2341,7 +2389,46 @@ class AddGame(Gtk.Dialog):
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
+            path = dialog.get_filename()
+
+            if not os.path.exists(self.icon_directory):
+                os.makedirs(self.icon_directory)
+
+            try:
+                # Attempt to extract the icon
+                command = f'icoextract "{path}" "{self.icon_extracted}"'
+                result = subprocess.run(command, shell=True, text=True, capture_output=True)
+
+                # Check if there was an error in executing the command
+                if result.returncode != 0:
+                    if "NoIconsAvailableError" in result.stderr:
+                        print("The file does not contain icons.")
+                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                    else:
+                        print(f"Error extracting icon: {result.stderr}")
+                else:
+                    # Convert the extracted icon to PNG
+                    command_magick = shutil.which("magick") or shutil.which("convert")
+                    os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                    if os.path.isfile(self.icon_extracted):
+                        os.remove(self.icon_extracted)
+
+                    largest_image = self.find_largest_resolution(self.icon_directory)
+                    shutil.move(largest_image, os.path.expanduser(self.icon_temp))
+
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+                    scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+                    image = Gtk.Image.new_from_file(self.icon_temp)
+                    image.set_from_pixbuf(scaled_pixbuf)
+
+                    self.button_shortcut_icon.set_image(image)
+
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
             self.entry_path.set_text(dialog.get_filename())
+        if os.path.isdir(self.icon_directory):
+            shutil.rmtree(self.icon_directory)
 
         dialog.destroy()
 
@@ -2408,6 +2495,16 @@ class CreateShortcut(Gtk.Window):
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
         print(self.file_path)
+
+        self.icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/icon_temp/")
+
+        if not os.path.exists(self.icon_directory):
+            os.makedirs(self.icon_directory)
+
+        self.icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
+        self.icon_extracted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.ico')
+        self.icon_converted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.png')
+        self.icon_temp = f'{self.icons_path}icon_temp.ico'
 
         self.default_prefix = ""
 
@@ -2515,7 +2612,6 @@ class CreateShortcut(Gtk.Window):
         self.grid1.attach(self.entry_protonfix, 0, 3, 3, 1)
         self.entry_protonfix.set_hexpand(True)
         self.grid1.attach(self.button_search_protonfix, 3, 3, 1, 1)
-
         self.grid1.attach(self.label_launch_arguments, 0, 4, 1, 1)
         self.grid1.attach(self.entry_launch_arguments, 0, 5, 4, 1)
         self.entry_launch_arguments.set_hexpand(True)
@@ -2524,13 +2620,11 @@ class CreateShortcut(Gtk.Window):
         self.grid1.attach(self.entry_game_arguments, 0, 7, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-
         self.grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.grid2.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
 
         self.grid3.attach(self.button_shortcut_icon, 0, 0, 1, 1)
-
 
         self.grid4.attach(self.button_cancel, 0, 0, 1, 1)
         self.grid4.attach(self.button_ok, 1, 0, 1, 1)
@@ -2573,11 +2667,73 @@ class CreateShortcut(Gtk.Window):
         # Add the main grid to the window
         self.add(self.main_grid)
 
-        # Set the image for the shortcut icon button
-        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+        # Handle the click event of the Create Shortcut button
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game_title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        if not os.path.exists(self.icon_directory):
+            os.makedirs(self.icon_directory)
+
+        try:
+            # Attempt to extract the icon
+            command = f'icoextract "{file_path}" "{self.icon_extracted}"'
+            result = subprocess.run(command, shell=True, text=True, capture_output=True)
+
+            # Check if there was an error in executing the command
+            if result.returncode != 0:
+                if "NoIconsAvailableError" in result.stderr:
+                    print("The file does not contain icons.")
+                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                else:
+                    print(f"Error extracting icon: {result.stderr}")
+            else:
+                # Convert the extracted icon to PNG
+                command_magick = shutil.which("magick") or shutil.which("convert")
+                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                if os.path.isfile(self.icon_extracted):
+                    os.remove(self.icon_extracted)
+
+                largest_image = self.find_largest_resolution(self.icon_directory)
+                shutil.move(largest_image, os.path.expanduser(self.icon_temp))
+
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+                scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+                image = Gtk.Image.new_from_file(self.icon_temp)
+                image.set_from_pixbuf(scaled_pixbuf)
+
+                self.button_shortcut_icon.set_image(image)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+        shutil.rmtree(self.icon_directory)
 
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
+
+    def find_largest_resolution(self, directory):
+        largest_image = None
+        largest_resolution = (0, 0)  # (width, height)
+
+        # Define a set of valid image extensions
+        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
+
+        for file_name in os.listdir(directory):
+            file_path = os.path.join(directory, file_name)
+            if os.path.isfile(file_path):
+                # Check if the file has a valid image extension
+                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
+                    try:
+                        with Image.open(file_path) as img:
+                            width, height = img.size
+                            if width * height > largest_resolution[0] * largest_resolution[1]:
+                                largest_resolution = (width, height)
+                                largest_image = file_path
+                    except IOError:
+                        print(f'Unable to open {file_path}')
+
+        return largest_image
 
     def on_button_search_protonfix_clicked(self, widget):
         webbrowser.open("https://umu.openwinecomponents.org/")
@@ -2646,6 +2802,10 @@ class CreateShortcut(Gtk.Window):
 
 
     def on_cancel_clicked(self, widget):
+        if os.path.isfile(self.icon_temp):
+            os.remove(self.icon_temp)
+        if os.path.isdir(self.icon_directory):
+            shutil.rmtree(self.icon_directory)
         self.destroy()
 
     def on_ok_clicked(self, widget):
@@ -2661,6 +2821,9 @@ class CreateShortcut(Gtk.Window):
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
+
+        if os.path.isfile(os.path.expanduser(self.icon_temp)):
+            os.rename(os.path.expanduser(self.icon_temp),f'{self.icons_path}{title_formatted}.ico')
 
         # Check if the icon file exists
         icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
@@ -2740,6 +2903,10 @@ class CreateShortcut(Gtk.Window):
         desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
         shutil.copy(applications_shortcut_path, desktop_shortcut_path)
 
+        if os.path.isfile(self.icon_temp):
+            os.remove(self.icon_temp)
+        if os.path.isdir(self.icon_directory):
+            shutil.rmtree(self.icon_directory)
         self.destroy()
 
     def on_entry_changed(self, widget, entry):
@@ -2756,58 +2923,68 @@ class CreateShortcut(Gtk.Window):
         return image
 
     def on_button_shortcut_icon_clicked(self, widget):
-        self.set_sensitive(False)
 
-        # Handle the click event of the Winetricks button
-        validation_result = self.validate_fields()
-        if not validation_result:
-            self.set_sensitive(True)
-            return
-
-        title = self.entry_title.get_text()
         path = self.file_path
 
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        if not os.path.exists(self.icon_directory):
+            os.makedirs(self.icon_directory)
 
-        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/{title_formatted}/")
-        if not os.path.exists(icon_directory):
-            os.makedirs(icon_directory)
+        try:
+            # Attempt to extract the icon
+            command = f'icoextract "{path}" "{self.icon_extracted}"'
+            result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-        os.system(f'7z e "{path}" -o{icon_directory} -r -aoa')
+            # Check if there was an error in executing the command
+            if result.returncode != 0:
+                if "NoIconsAvailableError" in result.stderr:
+                    print("The file does not contain icons.")
+                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                else:
+                    print(f"Error extracting icon: {result.stderr}")
+            else:
+                # Convert the extracted icon to PNG
+                command_magick = shutil.which("magick") or shutil.which("convert")
+                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                if os.path.isfile(self.icon_extracted):
+                    os.remove(self.icon_extracted)
 
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+        # Open file dialog to select .ico file
         dialog = Gtk.FileChooserDialog(title="Select an icon for the shortcut", action=Gtk.FileChooserAction.OPEN)
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
+        # Add a filter to limit selection to .ico files
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
-        filter_ico.add_mime_type("image/*")
+        filter_ico.add_mime_type("image/*")  # Other image formats
         dialog.add_filter(filter_ico)
-        dialog.set_current_folder(icon_directory)
+
+        # Set the initial directory to the icon directory
+        dialog.set_current_folder(self.icon_directory)
+
+        # Connect signal to update preview widget when file selection changes
         dialog.connect("update-preview", self.update_preview)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             file_path = dialog.get_filename()
-            shutil.move(file_path, os.path.expanduser(f"{icons_path}{title_formatted}.ico"))
+            # Move and rename the icon file
+            shutil.copy(file_path, self.icon_temp)
 
-            image_path = f"{icons_path}{title_formatted}.ico"
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
 
-            image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
 
-            shutil.rmtree(icon_directory)
-            dialog.destroy()
-            self.set_sensitive(True)
-
-        else:
-            shutil.rmtree(icon_directory)
-            dialog.destroy()
-            self.set_sensitive(True)
+        # Delete the folder after the icon is moved
+        if os.path.isdir(self.icon_directory):
+            shutil.rmtree(self.icon_directory)
+        dialog.destroy()
+        self.set_sensitive(True)
 
     def update_preview(self, dialog):
         if file_path := dialog.get_preview_filename():
