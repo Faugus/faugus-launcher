@@ -21,7 +21,7 @@ class Main(Gtk.Window):
     def __init__(self):
         # Initialize the main window with title and default size
         Gtk.Window.__init__(self, title="Faugus Launcher")
-        self.set_default_size(580, 580)
+        self.set_default_size(400, 620)
         self.set_resizable(False)
 
         self.game_running = None
@@ -108,8 +108,10 @@ class Main(Gtk.Window):
         self.entry_search = Gtk.Entry()
         self.entry_search.set_placeholder_text("Search...")
         self.entry_search.connect("changed", self.on_search_changed)
-        #self.entry_search.set_size_request(-1, 50)
+        self.entry_search.set_size_request(-1, 50)
         self.entry_search.set_margin_top(10)
+        self.entry_search.set_margin_start(10)
+        self.entry_search.set_margin_bottom(10)
         self.entry_search.set_margin_end(10)
 
         # Create scrolled window for game list
@@ -139,11 +141,11 @@ class Main(Gtk.Window):
         box_left.pack_start(self.button_edit, False, False, 0)
         box_left.pack_start(self.button_delete, False, False, 0)
 
-        box_right.pack_start(self.entry_search, False, False, 0)
         box_right.pack_start(scroll_box, True, True, 0)
 
         # Pack buttons and other components into the bottom box
         box_bottom.pack_start(button_settings, False, False, 0)
+        box_bottom.pack_start(self.entry_search, True, True, 0)
         box_bottom.pack_end(self.button_play, False, False, 0)
         box_bottom.pack_end(button_kill, False, False, 0)
 
@@ -157,6 +159,9 @@ class Main(Gtk.Window):
         self.button_play.set_sensitive(False)
 
         self.game_running2 = False
+
+        self.game_list.select_row(self.game_list.get_row_at_index(0))
+        self.update_button_sensitivity(self.game_list.get_selected_row())
 
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
@@ -195,11 +200,33 @@ class Main(Gtk.Window):
     def add_item_list(self, game):
         # Add a game item to the list
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        hbox.set_border_width(10)
-        hbox.set_size_request(500, -1)
+        hbox.set_border_width(5)
+        hbox.set_size_request(400, -1)
+
+        # Handle the click event of the Create Shortcut button
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        game_icon = os.path.expanduser(f'~/.config/faugus-launcher/icons/{title_formatted}.ico')
 
         game_label = Gtk.Label.new(game.title)
-        hbox.pack_start(game_label, True, True, 0)
+
+        if os.path.isfile(game_icon):
+            pass
+        else:
+            game_icon = "/usr/share/icons/faugus-launcher.png"
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
+        scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
+        image = Gtk.Image.new_from_file(game_icon)
+        image.set_from_pixbuf(scaled_pixbuf)
+        image.set_margin_end(10)
+
+        #self.button_shortcut_icon.set_image(image)
+
+        hbox.pack_start(image, False, False, 0)
+        hbox.pack_start(game_label, False, False, 0)
 
         listbox_row = Gtk.ListBoxRow()
         listbox_row.add(hbox)
@@ -261,7 +288,7 @@ class Main(Gtk.Window):
             if selected_row:
                 # Simulate double-click behavior
                 hbox = selected_row.get_child()
-                game_label = hbox.get_children()[0]
+                game_label = hbox.get_children()[1]
                 title = game_label.get_text()
 
                 # Check if the game is already running
@@ -295,7 +322,7 @@ class Main(Gtk.Window):
                 # Double-click detected
                 if current_row:
                     hbox = current_row.get_child()
-                    game_label = hbox.get_children()[0]
+                    game_label = hbox.get_children()[1]
                     title = game_label.get_text()
 
                     # Check if the game is already running
@@ -319,7 +346,7 @@ class Main(Gtk.Window):
         # Enable buttons based on the selected row
         if row:
             hbox = row.get_child()
-            game_label = hbox.get_children()[0]
+            game_label = hbox.get_children()[1]
             title = game_label.get_text()
 
             self.button_edit.set_sensitive(True)
@@ -392,7 +419,7 @@ class Main(Gtk.Window):
             return
         # Get the selected game's title
         hbox = listbox_row.get_child()
-        game_label = hbox.get_children()[0]
+        game_label = hbox.get_children()[1]
         title = game_label.get_text()
         # Find the selected game object
         game = next((j for j in self.games if j.title == title), None)
@@ -486,7 +513,7 @@ class Main(Gtk.Window):
         if not (listbox_row := self.game_list.get_selected_row()):
             return
         hbox = listbox_row.get_child()
-        game_label = hbox.get_children()[0]
+        game_label = hbox.get_children()[1]
         title = game_label.get_text()
         if game := next((j for j in self.games if j.title == title), None):
             if game.title in self.processos:
@@ -580,7 +607,7 @@ class Main(Gtk.Window):
             return
         # Retrieve the selected game's title
         hbox = listbox_row.get_child()
-        game_label = hbox.get_children()[0]
+        game_label = hbox.get_children()[1]
         title = game_label.get_text()
         if game := next((j for j in self.games if j.title == title), None):
             # Display confirmation dialog
@@ -652,8 +679,6 @@ class Main(Gtk.Window):
             # Create Game object and update UI
             game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner)
             self.games.append(game)
-            self.add_item_list(game)
-            self.update_list()
 
             # Determine the state of the shortcut checkbox
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
@@ -663,6 +688,9 @@ class Main(Gtk.Window):
 
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+
+            self.add_item_list(game)
+            self.update_list()
 
             # Select the added game
             self.select_game_by_title(title)
@@ -681,7 +709,7 @@ class Main(Gtk.Window):
         # Select an item from the list based on title
         for row in self.game_list.get_children():
             hbox = row.get_child()
-            game_label = hbox.get_children()[0]
+            game_label = hbox.get_children()[1]
             if game_label.get_text() == title:
                 self.game_list.select_row(row)
                 break
@@ -719,18 +747,18 @@ class Main(Gtk.Window):
             if game.runner == "GE-Proton Latest (default)":
                 game.runner = "GE-Proton"
 
-            # Save changes and update UI
-            self.save_games()
-            self.update_list()
+            icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
+            icon_final = f'{edit_game_dialog.icons_path}{title_formatted}.ico'
 
             # Determine the state of the shortcut checkbox
             shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
 
-            icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
-            icon_final = f'{edit_game_dialog.icons_path}{title_formatted}.ico'
-
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+
+            # Save changes and update UI
+            self.save_games()
+            self.update_list()
 
             # Select the game that was edited
             self.select_game_by_title(game.title)
@@ -744,10 +772,13 @@ class Main(Gtk.Window):
         edit_game_dialog.destroy()
 
     def add_shortcut(self, game, shortcut_state, icon_temp, icon_final):
+
         # Check if the shortcut checkbox is checked
         if not shortcut_state:
             # Remove existing shortcut if it exists
             self.remove_shortcut(game)
+            if os.path.isfile(os.path.expanduser(icon_temp)):
+                os.rename(os.path.expanduser(icon_temp), icon_final)
             return
 
         if os.path.isfile(os.path.expanduser(icon_temp)):
@@ -920,7 +951,7 @@ class Main(Gtk.Window):
                 listbox_row = self.game_list.get_selected_row()
                 if listbox_row:
                     hbox = listbox_row.get_child()
-                    game_label = hbox.get_children()[0]
+                    game_label = hbox.get_children()[1]
                     selected_title = game_label.get_text()
 
                     if selected_title not in self.processos:
@@ -1772,14 +1803,12 @@ class AddGame(Gtk.Dialog):
 
         # Button for creating shortcut
         self.checkbox_shortcut = Gtk.CheckButton(label="Create Shortcut")
-        self.checkbox_shortcut.connect("toggled", self.on_checkbox_toggled)
 
         # Button for selection shortcut icon
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
-        self.button_shortcut_icon.set_sensitive(False)  # Initially disable the button
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
@@ -2085,10 +2114,6 @@ class AddGame(Gtk.Dialog):
 
     def on_button_search_protonfix_clicked(self, widget):
         webbrowser.open("https://umu.openwinecomponents.org/")
-
-    def on_checkbox_toggled(self, checkbox):
-        # Enable or disable the button based on the checkbox state
-        self.button_shortcut_icon.set_sensitive(checkbox.get_active())
 
     def set_image_shortcut_icon(self):
 
