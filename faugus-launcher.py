@@ -17,6 +17,15 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from PIL import Image
 
+config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
+faugus_launcher_dir = f'{config_dir}/faugus-launcher'
+prefixes_dir = f'{faugus_launcher_dir}/prefixes'
+icons_dir = f'{faugus_launcher_dir}/icons'
+config_file_dir = f'{faugus_launcher_dir}/config.ini'
+desktop_dir = os.getenv('XDG_DESKTOP_DIR', os.path.expanduser('~/Desktop'))
+share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
+app_dir = f'{share_dir}/applications'
+
 class Main(Gtk.Window):
     def __init__(self):
         # Initialize the main window with title and default size
@@ -30,16 +39,16 @@ class Main(Gtk.Window):
         self.processos = {}
 
         # Define the configuration path
-        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
         if not os.path.exists(config_path):
             os.makedirs(config_path)
         self.working_directory = config_path
         os.chdir(self.working_directory)
 
-        config_file = os.path.join(self.working_directory, 'config.ini')
+        config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", "~/.config/faugus-launcher/prefixes", "False", "False", "False", "GE-Proton Latest (default)")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton Latest (default)")
 
         self.games = []
 
@@ -208,7 +217,7 @@ class Main(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        game_icon = os.path.expanduser(f'~/.config/faugus-launcher/icons/{title_formatted}.ico')
+        game_icon = f'{icons_dir}/{title_formatted}.ico'
 
         game_label = Gtk.Label.new(game.title)
 
@@ -367,7 +376,7 @@ class Main(Gtk.Window):
             self.button_play.set_sensitive(False)
 
     def load_close_onlaunch(self):
-        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        config_file = config_file_dir
         close_onlaunch = False
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
@@ -684,7 +693,7 @@ class Main(Gtk.Window):
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
 
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
-            icon_final = f'{add_game_dialog.icons_path}{title_formatted}.ico'
+            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
 
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
@@ -748,7 +757,7 @@ class Main(Gtk.Window):
                 game.runner = "GE-Proton"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
-            icon_final = f'{edit_game_dialog.icons_path}{title_formatted}.ico'
+            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
 
             # Determine the state of the shortcut checkbox
             shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
@@ -800,8 +809,8 @@ class Main(Gtk.Window):
         gamemode = "gamemoderun" if game.gamemode else ""
         sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
         # Check if the icon file exists
-        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
+        icons_path = icons_dir
+        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
 
@@ -849,15 +858,15 @@ class Main(Gtk.Window):
     """
 
         # Check if the destination directory exists and create if it doesn't
-        applications_directory = os.path.expanduser("~/.local/share/applications/")
+        applications_directory = app_dir
         if not os.path.exists(applications_directory):
             os.makedirs(applications_directory)
 
-        desktop_directory = os.path.expanduser("~/Desktop")
+        desktop_directory = desktop_dir
         if not os.path.exists(desktop_directory):
             os.makedirs(desktop_directory)
 
-        applications_shortcut_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+        applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
 
         with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
@@ -866,7 +875,7 @@ class Main(Gtk.Window):
         os.chmod(applications_shortcut_path, 0o755)
 
         # Copy the shortcut to Desktop
-        desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
+        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copy(applications_shortcut_path, desktop_shortcut_path)
 
     def update_preview(self, dialog):
@@ -903,31 +912,31 @@ class Main(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+        desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
 
         if os.path.exists(desktop_file_path):
             os.remove(desktop_file_path)
 
         # Remove shortcut from Desktop if exists
-        desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
+        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         if os.path.exists(desktop_shortcut_path):
             os.remove(desktop_shortcut_path)
 
         # Remove icon file
-        icon_file_path = os.path.expanduser(f"~/.config/faugus-launcher/icons/{title_formatted}.ico")
+        icon_file_path = f"{icons_dir}/{title_formatted}.ico"
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
 
     def remove_desktop_entry(self, game):
         # Remove the .desktop file from ~/.local/share/applications/
-        desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{game.title}.desktop")
+        desktop_file_path = f"{app_dir}/{game.title}.desktop"
 
         if os.path.exists(desktop_file_path):
             os.remove(desktop_file_path)
 
     def remove_shortcut_from_desktop(self, game):
         # Remove the shortcut from the desktop if it exists
-        desktop_link_path = os.path.expanduser(f"~/Desktop/{game.title}.desktop")
+        desktop_link_path = f"{desktop_dir}/{game.title}.desktop"
 
         if os.path.exists(desktop_link_path):
             os.remove(desktop_link_path)
@@ -1283,7 +1292,7 @@ class Settings(Gtk.Dialog):
         self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
-        runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
+        runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
@@ -1654,15 +1663,15 @@ class AddGame(Gtk.Dialog):
         self.set_modal(True)
         self.parent_window = parent
 
-        self.icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/icon_temp/")
+        self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(self.icon_directory):
             os.makedirs(self.icon_directory)
 
-        self.icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        self.icon_extracted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.ico')
-        self.icon_converted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.png')
-        self.icon_temp = f'{self.icons_path}icon_temp.ico'
+        self.icons_path = icons_dir
+        self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
+        self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
+        self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
         self.box = self.get_content_area()
         self.box.set_margin_start(0)
@@ -1961,7 +1970,7 @@ class AddGame(Gtk.Dialog):
         self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
-        runner_path = os.path.expanduser('~/.local/share/Steam/compatibilitytools.d/')
+        runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
@@ -1999,7 +2008,7 @@ class AddGame(Gtk.Dialog):
             entry.get_style_context().remove_class("entry")
 
     def load_default_prefix(self):
-        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        config_file = config_file_dir
         default_prefix = ""
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
@@ -2009,7 +2018,7 @@ class AddGame(Gtk.Dialog):
         return default_prefix
 
     def load_default_runner(self):
-        config_file = os.path.expanduser('~/.config/faugus-launcher/config.ini')
+        config_file = config_file_dir
         default_runner = ""
         if os.path.exists(config_file):
             with open(config_file, 'r') as f:
@@ -2256,7 +2265,7 @@ class AddGame(Gtk.Dialog):
             return  # If there's no title, there's no shortcut to check
 
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title).replace(' ', '-').lower()
-        desktop_file_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+        desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
 
         # Check if the shortcut file exists
         shortcut_exists = os.path.exists(desktop_file_path)
@@ -2521,15 +2530,15 @@ class CreateShortcut(Gtk.Window):
         self.set_title(game_title)
         print(self.file_path)
 
-        self.icon_directory = os.path.expanduser(f"~/.config/faugus-launcher/icons/icon_temp/")
+        self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(self.icon_directory):
             os.makedirs(self.icon_directory)
 
-        self.icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        self.icon_extracted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.ico')
-        self.icon_converted = os.path.expanduser(f'{self.icons_path}icon_temp/icon.png')
-        self.icon_temp = f'{self.icons_path}icon_temp.ico'
+        self.icons_path = icons_dir
+        self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
+        self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
+        self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
         self.default_prefix = ""
 
@@ -2765,7 +2774,7 @@ class CreateShortcut(Gtk.Window):
 
     def load_config(self):
         # Load configuration from file
-        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        config_file = config_file_dir
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
                 config_data = f.read().splitlines()
@@ -2787,15 +2796,15 @@ class CreateShortcut(Gtk.Window):
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
         # Path to the configuration file
-        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        config_file = config_file_dir
 
-        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
         if not os.path.exists(config_path):
             os.makedirs(config_path)
 
-        default_prefix = os.path.expanduser(f"{config_path}prefixes")
-        self.default_prefix = os.path.expanduser(f"{config_path}prefixes")
+        default_prefix = prefixes_dir
+        self.default_prefix = prefixes_dir
 
         default_runner = (f'"{default_runner}"')
 
@@ -2848,11 +2857,11 @@ class CreateShortcut(Gtk.Window):
         title_formatted = '-'.join(title_formatted.lower().split())
 
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
-            os.rename(os.path.expanduser(self.icon_temp),f'{self.icons_path}{title_formatted}.ico')
+            os.rename(os.path.expanduser(self.icon_temp),f'{self.icons_path}/{title_formatted}.ico')
 
         # Check if the icon file exists
-        icons_path = os.path.expanduser("~/.config/faugus-launcher/icons/")
-        new_icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
+        icons_path = icons_dir
+        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = "/usr/share/icons/faugus-launcher.png"
 
@@ -2908,15 +2917,15 @@ class CreateShortcut(Gtk.Window):
     """
 
         # Check if the destination directory exists and create if it doesn't
-        applications_directory = os.path.expanduser("~/.local/share/applications/")
+        applications_directory = app_dir
         if not os.path.exists(applications_directory):
             os.makedirs(applications_directory)
 
-        desktop_directory = os.path.expanduser("~/Desktop")
+        desktop_directory = desktop_dir
         if not os.path.exists(desktop_directory):
             os.makedirs(desktop_directory)
 
-        applications_shortcut_path = os.path.expanduser(f"~/.local/share/applications/{title_formatted}.desktop")
+        applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
 
         with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
@@ -2925,7 +2934,7 @@ class CreateShortcut(Gtk.Window):
         os.chmod(applications_shortcut_path, 0o755)
 
         # Copy the shortcut to Desktop
-        desktop_shortcut_path = os.path.expanduser(f"~/Desktop/{title_formatted}.desktop")
+        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copy(applications_shortcut_path, desktop_shortcut_path)
 
         if os.path.isfile(self.icon_temp):
@@ -3048,7 +3057,7 @@ class CreateShortcut(Gtk.Window):
         return True
 
 def run_file(file_path):
-    config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+    config_file = config_file_dir
     if os.path.exists(config_file):
         with open(config_file, 'r') as f:
             config_data = f.read().splitlines()
@@ -3060,12 +3069,12 @@ def run_file(file_path):
         default_runner = config_dict.get('default-runner', '').strip('"')
     else:
         # Define the configuration path
-        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
         if not os.path.exists(config_path):
             os.makedirs(config_path)
 
-        default_prefix = os.path.expanduser(f"{config_path}prefixes")
+        default_prefix = prefixes_dir
         mangohud = 'False'
         gamemode = 'False'
         sc_controller = 'False'

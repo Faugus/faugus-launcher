@@ -12,6 +12,11 @@ import argparse
 import re
 import os
 
+config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
+faugus_launcher_dir = f'{config_dir}/faugus-launcher'
+prefixes_dir = f'{faugus_launcher_dir}/prefixes'
+config_file_dir = f'{faugus_launcher_dir}/config.ini'
+
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -63,7 +68,7 @@ class FaugusRun:
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
 
     def load_config(self):
-        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        config_file = config_file_dir
 
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
@@ -83,14 +88,14 @@ class FaugusRun:
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
                     default_runner):
-        config_file = os.path.expanduser("~/.config/faugus-launcher/config.ini")
+        config_file = config_file_dir
 
-        config_path = os.path.expanduser("~/.config/faugus-launcher/")
+        config_path = faugus_launcher_dir
         if not os.path.exists(config_path):
             os.makedirs(config_path)
 
-        default_prefix = os.path.expanduser(f"{config_path}prefixes")
-        self.default_prefix = os.path.expanduser(f"{config_path}prefixes")
+        default_prefix = prefixes_dir
+        self.default_prefix = prefixes_dir
 
         default_runner = (f'"{default_runner}"')
 
@@ -117,7 +122,7 @@ class FaugusRun:
                     f.write(f'{key}={value}\n')
 
     def start_scc_daemon(self):
-        working_directory = os.path.expanduser("~/.config/faugus-launcher/")
+        working_directory = faugus_launcher_dir
         try:
             subprocess.run(["scc-daemon", "controller.sccprofile", "start"], check=True, cwd=working_directory)
         except subprocess.CalledProcessError as e:
