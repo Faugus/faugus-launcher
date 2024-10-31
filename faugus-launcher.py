@@ -22,9 +22,25 @@ faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
 icons_dir = f'{faugus_launcher_dir}/icons'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
-desktop_dir = os.getenv('XDG_DESKTOP_DIR', os.path.expanduser('~/Desktop'))
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
+
+def get_desktop_dir():
+    try:
+        # Run the command and capture its output
+        desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
+        return desktop_dir
+    except FileNotFoundError:
+        print("xdg-user-dir not found; falling back to ~/Desktop")
+        # xdg-user-dir is not installed, fallback to ~/Desktop
+        return os.path.expanduser('~/Desktop')
+    except subprocess.CalledProcessError:
+        print("Error running xdg-user-dir; falling back to ~/Desktop")
+        # xdg-user-dir command failed for some other reason
+        return os.path.expanduser('~/Desktop')
+
+desktop_dir = get_desktop_dir()
+
 
 class Main(Gtk.Window):
     def __init__(self):
