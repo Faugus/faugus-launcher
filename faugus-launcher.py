@@ -519,9 +519,11 @@ class Main(Gtk.Window):
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
-        subprocess.run(r"ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver' | perl "
-                       r"-pe 's;^.*/proc/(\d+)/exe.*$;$1;g;' | xargs -n 1 kill | killall -s9 winedevice.exe tee",
-                       shell=True)
+        subprocess.run(r"""
+    for pid in $(ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver|winedevice.exe' | awk -F'/' '{print $3}'); do
+        kill -9 "$pid"
+    done
+""", shell=True)
         self.game_running = None
         self.game_running2 = False
 
