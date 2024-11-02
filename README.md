@@ -57,7 +57,7 @@ Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/v1
 ```
 flatpak install -y faugus-launcher-0.1.0.flatpak
 ```
-ATTENTION: Optional tools (MangoHud, GameMode and SC-Conttoler) are not available yet!
+ATTENTION: Optional tools (MangoHud, GameMode and SC-Controller) are not available yet!
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
