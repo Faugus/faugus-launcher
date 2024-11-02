@@ -55,6 +55,7 @@ It's the AppArmor preventing umu-launcher from working properly. <a href='https:
 ### Flatpak (EXPERIMENTAL)
 Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/v1.1-3/faugus-launcher-0.1.0.flatpak">faugus-launcher-0.1.0.flatpak</a> and run:
 ```
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install -y faugus-launcher-0.1.0.flatpak
 ```
 ATTENTION: Optional tools (MangoHud, GameMode and SC-Controller) are not available yet!
