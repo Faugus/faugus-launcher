@@ -856,11 +856,11 @@ class Main(Gtk.Window):
             command_parts.append(launch_arguments)
 
         # Add the fixed command and remaining arguments
-        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append("'/usr/bin/umu-run'")
         if path:
-            command_parts.append(f'"{path}"')
+            command_parts.append(f"'{path}'")
         if game_arguments:
-            command_parts.append(f'"{game_arguments}"')
+            command_parts.append(f"'{game_arguments}'")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
@@ -868,7 +868,7 @@ class Main(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={game.title}
-    Exec=/usr/bin/faugus-run '{command}'
+    Exec=/usr/bin/faugus-run "{command}"
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
@@ -2915,11 +2915,11 @@ class CreateShortcut(Gtk.Window):
             command_parts.append(launch_arguments)
 
         # Add the fixed command and remaining arguments
-        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append("'/usr/bin/umu-run'")
         if self.file_path:
-            command_parts.append(f'"{self.file_path}"')
+            command_parts.append(f"'{self.file_path}'")
         if game_arguments:
-            command_parts.append(f'"{game_arguments}"')
+            command_parts.append(f"'{game_arguments}'")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
@@ -2927,7 +2927,7 @@ class CreateShortcut(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={title}
-    Exec=/usr/bin/faugus-run '{command}'
+    Exec=/usr/bin/faugus-run "{command}"
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
