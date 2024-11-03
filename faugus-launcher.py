@@ -2296,6 +2296,7 @@ class AddGame(Gtk.Dialog):
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', entry.get_text())
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
+        self.default_prefix = self.load_default_prefix()
         prefix = os.path.expanduser(self.default_prefix) + "/" + title_formatted
         self.entry_prefix.set_text(prefix)
 
@@ -2498,7 +2499,8 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.OK:
             new_prefix = dialog.get_filename()
             self.default_prefix = new_prefix
-            self.entry_title.emit("changed")
+            #self.entry_title.emit("changed")
+            self.entry_prefix.set_text(self.default_prefix)
 
         dialog.destroy()
 
