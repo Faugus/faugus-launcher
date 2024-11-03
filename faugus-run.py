@@ -133,12 +133,15 @@ class FaugusRun:
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
+        self.warning_dialog.set_default_size(280, -1)
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
         frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
 
         grid = Gtk.Grid()
+        grid.set_halign(Gtk.Align.CENTER)
+        grid.set_valign(Gtk.Align.CENTER)
         frame.add(grid)
 
         image_path = "/usr/share/icons/faugus-launcher.png"
@@ -153,11 +156,26 @@ class FaugusRun:
         image.set_margin_bottom(20)
         grid.attach(image, 0, 0, 1, 1)
 
-        label = Gtk.Label(label="Updating. Please wait...")
-        label.set_margin_bottom(20)
-        label.set_margin_start(20)
-        label.set_margin_end(20)
-        grid.attach(label, 0, 1, 1, 1)
+        protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
+        if protonpath == "Using UMU-Proton":
+            protonpath = "UMU-Proton Latest"
+        if not protonpath:
+            protonpath = "Using UMU-Proton Latest"
+        else:
+            protonpath = f"Using {protonpath}"
+        print(protonpath)
+
+        self.label = Gtk.Label(label=protonpath)
+        self.label.set_margin_start(20)
+        self.label.set_margin_end(20)
+
+        self.label2 = Gtk.Label()
+        self.label2.set_margin_bottom(20)
+        self.label2.set_margin_start(20)
+        self.label2.set_margin_end(20)
+
+        grid.attach(self.label, 0, 1, 1, 1)
+        grid.attach(self.label2, 0, 2, 1, 1)
 
         self.warning_dialog.add(frame)
 
@@ -190,6 +208,34 @@ class FaugusRun:
 
 
     def check_game_output(self, clean_line):
+        if "Downloading GE-Proton" in clean_line:
+            self.label.set_text("Downloading GE-Proton...")
+        if "Downloading UMU-Proton" in clean_line:
+            self.label.set_text("Downloading UMU-Proton...")
+        if "Downloading latest steamrt sniper" in clean_line:
+            self.label2.set_text("Downloading Steam Runtime...")
+        if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
+            self.label2.set_text("Extracting Steam Runtime...")
+        if "Extracting GE-Proton" in clean_line:
+            self.label.set_text("Extracting GE-Proton...")
+        if "Extracting UMU-Proton" in clean_line:
+            self.label.set_text("Extracting UMU-Proton...")
+        if "GE-Proton is up to date" in clean_line:
+            self.label.set_text("GE-Proton is up to date")
+            GLib.timeout_add_seconds(3, lambda: self.label.set_text("") or False)
+        if "UMU-Proton is up to date" in clean_line:
+            self.label.set_text("UMU-Proton is up to date")
+            GLib.timeout_add_seconds(3, lambda: self.label.set_text("") or False)
+        if "steamrt is up to date" in clean_line:
+            self.label2.set_text("Steam Runtime is up to date")
+            GLib.timeout_add_seconds(3, lambda: self.label2.set_text("") or False)
+        if "->" in clean_line and "GE-Proton" in clean_line:
+            self.label.set_text("GE-Proton is up to date")
+        if "->" in clean_line and "UMU-Proton" in clean_line:
+            self.label.set_text("UMU-Proton is up to date")
+        if "mtree is OK" in clean_line:
+            self.label2.set_text("Steam Runtime is up to date")
+
 
         if "ProtonFixes" in clean_line:
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
