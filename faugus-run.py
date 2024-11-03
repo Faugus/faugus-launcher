@@ -129,7 +129,6 @@ class FaugusRun:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
-
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
@@ -222,13 +221,10 @@ class FaugusRun:
             self.label.set_text("Extracting UMU-Proton...")
         if "GE-Proton is up to date" in clean_line:
             self.label.set_text("GE-Proton is up to date")
-            GLib.timeout_add_seconds(3, lambda: self.label.set_text("") or False)
         if "UMU-Proton is up to date" in clean_line:
             self.label.set_text("UMU-Proton is up to date")
-            GLib.timeout_add_seconds(3, lambda: self.label.set_text("") or False)
         if "steamrt is up to date" in clean_line:
             self.label2.set_text("Steam Runtime is up to date")
-            GLib.timeout_add_seconds(3, lambda: self.label2.set_text("") or False)
         if "->" in clean_line and "GE-Proton" in clean_line:
             self.label.set_text("GE-Proton is up to date")
         if "->" in clean_line and "UMU-Proton" in clean_line:
