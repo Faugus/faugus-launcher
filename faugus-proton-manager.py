@@ -12,11 +12,14 @@ from gi.repository import Gtk
 GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
 STEAM_COMPATIBILITY_PATH = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 
+faugus_png = "/usr/share/icons/faugus-launcher.png"
+
 class ProtonDownloader(Gtk.Window):
     def __init__(self):
         super().__init__(title="Faugus GE-Proton Manager")
         self.set_resizable(False)
         self.set_modal(True)
+        self.set_icon_from_file(faugus_png)
 
         self.set_border_width(10)
         self.set_default_size(400, 395)

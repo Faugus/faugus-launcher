@@ -17,7 +17,7 @@ faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
-
+faugus_png = "/usr/share/icons/faugus-launcher.png"
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -42,6 +42,7 @@ class FaugusRun:
             buttons=Gtk.ButtonsType.CLOSE,
             text=f"{protonpath} was not found",
         )
+        dialog.set_icon_from_file(faugus_png)
         dialog.format_secondary_text("Please install it or use another Proton version.")
         dialog.run()
         dialog.destroy()
@@ -153,6 +154,7 @@ class FaugusRun:
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
         self.warning_dialog.set_default_size(280, -1)
+        self.warning_dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -163,7 +165,7 @@ class FaugusRun:
         grid.set_valign(Gtk.Align.CENTER)
         frame.add(grid)
 
-        image_path = "/usr/share/icons/faugus-launcher.png"
+        image_path = faugus_png
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
 
         pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
@@ -203,6 +205,7 @@ class FaugusRun:
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
         self.log_window.set_default_size(600, 400)
+        self.log_window.set_icon_from_file(faugus_png)
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -290,6 +293,7 @@ class FaugusRun:
             if last_part.endswith(".reg"):
                 dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
                 dialog.set_resizable(False)
+                dialog.set_icon_from_file(faugus_png)
 
                 self.grid = Gtk.Grid()
                 self.grid.set_row_spacing(20)

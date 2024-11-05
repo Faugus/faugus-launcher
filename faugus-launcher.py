@@ -24,6 +24,7 @@ icons_dir = f'{faugus_launcher_dir}/icons'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
+faugus_png = "/usr/share/icons/faugus-launcher.png"
 
 def get_desktop_dir():
     try:
@@ -48,6 +49,7 @@ class Main(Gtk.Window):
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_default_size(400, 620)
         self.set_resizable(False)
+        self.set_icon_from_file(faugus_png)
 
         self.game_running = None
 
@@ -240,7 +242,7 @@ class Main(Gtk.Window):
         if os.path.isfile(game_icon):
             pass
         else:
-            game_icon = "/usr/share/icons/faugus-launcher.png"
+            game_icon = faugus_png
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
         scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
@@ -325,6 +327,7 @@ class Main(Gtk.Window):
                                                buttons=Gtk.ButtonsType.OK, parent=self)
                     dialog.set_resizable(False)
                     dialog.set_modal(True)
+                    dialog.set_icon_from_file(faugus_png)
                     dialog.run()
                     dialog.destroy()
 
@@ -359,6 +362,7 @@ class Main(Gtk.Window):
                                                    buttons=Gtk.ButtonsType.OK, parent=self)
                         dialog.set_resizable(False)
                         dialog.set_modal(True)
+                        dialog.set_icon_from_file(faugus_png)
                         dialog.run()
                         dialog.destroy()
             else:
@@ -619,7 +623,7 @@ class Main(Gtk.Window):
         if os.path.exists(icon_path):
             shutil.copy(icon_path, icon_temp)
         if not os.path.exists(icon_path):
-            icon_temp = "/usr/share/icons/faugus-launcher.png"
+            icon_temp = faugus_png
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_temp)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -830,7 +834,7 @@ class Main(Gtk.Window):
         icons_path = icons_dir
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
-            new_icon_path = "/usr/share/icons/faugus-launcher.png"
+            new_icon_path = faugus_png
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(path)
@@ -1007,6 +1011,7 @@ class Main(Gtk.Window):
         # Show a warning message dialog
         dialog = Gtk.MessageDialog(transient_for=self, flags=0, message_type=Gtk.MessageType.WARNING,
                                    buttons=Gtk.ButtonsType.OK, text=message, )
+        dialog.set_icon_from_file(faugus_png)
         dialog.run()
         dialog.destroy()
 
@@ -1050,6 +1055,7 @@ class Settings(Gtk.Dialog):
         self.set_resizable(False)
         self.set_modal(True)
         self.parent = parent
+        self.set_icon_from_file(faugus_png)
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -1624,6 +1630,7 @@ class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title):
         # Initialize the ConfirmationDialog
         Gtk.Dialog.__init__(self, title=f"Delete {title}", parent=parent, modal=True)
+        self.set_icon_from_file(faugus_png)
 
         # Configure dialog properties
         self.set_resizable(False)
@@ -1680,6 +1687,7 @@ class AddGame(Gtk.Dialog):
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
+        self.set_icon_from_file(faugus_png)
 
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
@@ -2144,7 +2152,7 @@ class AddGame(Gtk.Dialog):
 
     def set_image_shortcut_icon(self):
 
-        image_path = "/usr/share/icons/faugus-launcher.png"
+        image_path = faugus_png
         shutil.copy(image_path, self.icon_temp)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
@@ -2545,6 +2553,7 @@ class CreateShortcut(Gtk.Window):
         super().__init__(title="Faugus Launcher")
         self.file_path = file_path
         self.set_resizable(False)
+        self.set_icon_from_file(faugus_png)
 
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
@@ -2883,7 +2892,7 @@ class CreateShortcut(Gtk.Window):
         icons_path = icons_dir
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
-            new_icon_path = "/usr/share/icons/faugus-launcher.png"
+            new_icon_path = faugus_png
 
         protonfix = self.entry_protonfix.get_text()
         launch_arguments = self.entry_launch_arguments.get_text()
@@ -2968,7 +2977,7 @@ class CreateShortcut(Gtk.Window):
             entry.get_style_context().remove_class("entry")
 
     def set_image_shortcut_icon(self):
-        image_path = "/usr/share/icons/faugus-launcher.png"
+        image_path = faugus_png
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
