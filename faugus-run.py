@@ -16,6 +16,7 @@ config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
+share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 
 
 def remove_ansi_escape(text):
@@ -33,6 +34,19 @@ class FaugusRun:
         self.default_runner = None
         self.default_prefix = None
 
+    def show_error_dialog(self, protonpath):
+        dialog = Gtk.MessageDialog(
+            title="Error",
+            flags=0,
+            message_type=Gtk.MessageType.ERROR,
+            buttons=Gtk.ButtonsType.CLOSE,
+            text=f"{protonpath} was not found",
+        )
+        dialog.format_secondary_text("Please install it or use another Proton version.")
+        dialog.run()
+        dialog.destroy()
+        sys.exit(1)
+
     def start_process(self, command):
 
         sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
@@ -42,6 +56,12 @@ class FaugusRun:
                 self.start_scc_daemon()
 
         self.load_config()
+
+        protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
+        if protonpath and protonpath != "GE-Proton":
+            protonpath_path = f'{share_dir}/Steam/compatibilitytools.d/{protonpath}'
+            if not os.path.isdir(protonpath_path):
+                self.show_error_dialog(protonpath)
 
         if self.default_runner == "UMU-Proton Latest":
             self.default_runner = ""
