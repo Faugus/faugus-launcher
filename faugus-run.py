@@ -33,6 +33,7 @@ class FaugusRun:
         self.text_view = None
         self.default_runner = None
         self.default_prefix = None
+        self.discrete_gpu = None
 
     def show_error_dialog(self, protonpath):
         dialog = Gtk.MessageDialog(
@@ -68,6 +69,15 @@ class FaugusRun:
             self.default_runner = ""
         if self.default_runner == "GE-Proton Latest (default)":
             self.default_runner = "GE-Proton"
+
+        discrete_gpu = "DRI_PRIME=1"
+        if not self.discrete_gpu:
+            discrete_gpu = "DRI_PRIME=0"
+        if self.discrete_gpu:
+            discrete_gpu = "DRI_PRIME=1"
+        if self.discrete_gpu == None:
+            discrete_gpu = "DRI_PRIME=1"
+
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
                 self.message = f'WINEPREFIX={self.default_prefix}/default PROTONPATH={self.default_runner} {self.message}'
@@ -75,7 +85,7 @@ class FaugusRun:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
         print(self.message)
 
-        self.process = subprocess.Popen(["/bin/bash", "-c", self.message], stdout=subprocess.PIPE,
+        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
         if command == "winetricks":
@@ -101,14 +111,15 @@ class FaugusRun:
                         value = value.strip().strip('"')
                         config_dict[key] = value
 
+            self.discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
             self.default_runner = "GE-Proton Latest (default)"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
-                    default_runner):
+                    default_runner, checkbox_discrete_gpu_state):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -134,6 +145,7 @@ class FaugusRun:
         config['gamemode'] = gamemode_state
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
+        config['discrete-gpu'] = checkbox_discrete_gpu_state
 
         with open(config_file, 'w') as f:
             for key, value in config.items():

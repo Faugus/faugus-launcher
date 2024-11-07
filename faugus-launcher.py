@@ -66,7 +66,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton Latest (default)")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton Latest (default)", "True")
 
         self.games = []
 
@@ -415,7 +415,7 @@ class Main(Gtk.Window):
         settings_dialog.show()
 
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
-
+        self.checkbox_discrete_gpu = settings_dialog.checkbox_discrete_gpu
         self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
         self.entry_default_prefix = settings_dialog.entry_default_prefix
 
@@ -425,6 +425,7 @@ class Main(Gtk.Window):
         self.combo_box_runner = settings_dialog.combo_box_runner
 
         checkbox_state = self.checkbox_close_after_launch.get_active()
+        checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
         default_prefix = self.entry_default_prefix.get_text()
 
         mangohud_state = self.checkbox_mangohud.get_active()
@@ -437,7 +438,7 @@ class Main(Gtk.Window):
             if default_prefix == "":
                 settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
+                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
                 settings_dialog.destroy()
 
         else:
@@ -1015,7 +1016,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -1038,6 +1039,7 @@ class Main(Gtk.Window):
         config['gamemode'] = gamemode_state
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
+        config['discrete-gpu'] = checkbox_discrete_gpu_state
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -1097,6 +1099,10 @@ class Settings(Gtk.Dialog):
 
         self.button_proton_manager = Gtk.Button(label="GE-Proton Manager")
         self.button_proton_manager.connect("clicked", self.on_button_proton_manager_clicked)
+
+        # Create checkbox for 'Use discrete GPU' option
+        self.checkbox_discrete_gpu = Gtk.CheckButton(label="Use discrete GPU")
+        self.checkbox_discrete_gpu.set_active(False)
 
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game")
@@ -1233,7 +1239,8 @@ class Settings(Gtk.Dialog):
         self.combo_box_runner.set_hexpand(True)
         self.button_proton_manager.set_hexpand(True)
 
-        grid7.attach(self.checkbox_close_after_launch, 0, 2, 4, 1)
+        grid7.attach(self.checkbox_discrete_gpu, 0, 2, 4, 1)
+        grid7.attach(self.checkbox_close_after_launch, 0, 3, 4, 1)
 
         grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
@@ -1365,7 +1372,7 @@ class Settings(Gtk.Dialog):
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
 
             dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
@@ -1453,7 +1460,7 @@ class Settings(Gtk.Dialog):
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
 
             runner = self.combo_box_runner.get_active_text()
@@ -1503,6 +1510,7 @@ class Settings(Gtk.Dialog):
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
+            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             default_prefix = self.entry_default_prefix.get_text()
 
             mangohud_state = self.checkbox_mangohud.get_active()
@@ -1510,7 +1518,7 @@ class Settings(Gtk.Dialog):
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
 
             runner = self.combo_box_runner.get_active_text()
@@ -1583,6 +1591,7 @@ class Settings(Gtk.Dialog):
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
             close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
+            discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
@@ -1590,7 +1599,9 @@ class Settings(Gtk.Dialog):
             sc_controller = config_dict.get('sc-controller', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
 
+            self.checkbox_discrete_gpu.set_active(discrete_gpu)
             self.checkbox_close_after_launch.set_active(close_on_launch)
+
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
@@ -1608,7 +1619,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
 
 
 class Game:
@@ -2821,9 +2832,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -2854,6 +2865,7 @@ class CreateShortcut(Gtk.Window):
         config['gamemode'] = gamemode_state
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
+        config['discrete-gpu'] = checkbox_discrete_gpu_state
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
