@@ -25,6 +25,9 @@ config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
 faugus_png = "/usr/share/icons/faugus-launcher.png"
+faugus_run = "/usr/bin/faugus-run"
+faugus_proton_manager = "/usr/bin/faugus-proton-manager"
+umu_run = "/usr/bin/umu-run"
 
 def get_desktop_dir():
     try:
@@ -496,7 +499,7 @@ class Main(Gtk.Window):
                 command_parts.append(launch_arguments)
 
             # Add the fixed command and remaining arguments
-            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append(f'"{umu_run}"')
             if path:
                 command_parts.append(f'"{path}"')
             if game_arguments:
@@ -507,7 +510,7 @@ class Main(Gtk.Window):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = faugus_run
 
 
             # Launch the game with subprocess
@@ -861,7 +864,7 @@ class Main(Gtk.Window):
             command_parts.append(launch_arguments)
 
         # Add the fixed command and remaining arguments
-        command_parts.append("'/usr/bin/umu-run'")
+        command_parts.append(f"'{umu_run}'")
         if path:
             command_parts.append(f"'{path}'")
         if game_arguments:
@@ -873,7 +876,7 @@ class Main(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={game.title}
-    Exec=/usr/bin/faugus-run "{command}"
+    Exec={faugus_run} "{command}"
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
@@ -1298,7 +1301,7 @@ class Settings(Gtk.Dialog):
     def on_button_proton_manager_clicked(self, widget):
         self.set_sensitive(False)
 
-        proton_manager = "/usr/bin/faugus-proton-manager"
+        proton_manager = faugus_proton_manager
         def run_command():
             process = subprocess.Popen([sys.executable, proton_manager])
             process.wait()
@@ -1412,13 +1415,13 @@ class Settings(Gtk.Dialog):
                         command_parts.append(f'GAMEID=default')
                     if runner:
                         command_parts.append(f'PROTONPATH={runner}')
-                    command_parts.append(f'"/usr/bin/umu-run" "{file_run}"')
+                    command_parts.append(f'"{umu_run}" "{file_run}"')
                 else:
                     if file_run:
                         command_parts.append(f'GAMEID=default')
                     if runner:
                         command_parts.append(f'PROTONPATH={runner}')
-                    command_parts.append(f'"/usr/bin/umu-run" regedit "{file_run}"')
+                    command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
                 # Join all parts into a single command
                 command = ' '.join(command_parts)
@@ -1426,7 +1429,7 @@ class Settings(Gtk.Dialog):
                 print(command)
 
                 # faugus-run path
-                faugus_run_path = "/usr/bin/faugus-run"
+                faugus_run_path = faugus_run
 
                 def run_command():
                     process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
@@ -1479,7 +1482,7 @@ class Settings(Gtk.Dialog):
                 command_parts.append(f'PROTONPATH={runner}')
 
             # Add the fixed command and remaining arguments
-            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append(f'"{umu_run}"')
             command_parts.append('"winecfg"')
 
             # Join all parts into a single command
@@ -1488,7 +1491,7 @@ class Settings(Gtk.Dialog):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = faugus_run
 
             def run_command():
                 process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
@@ -1538,7 +1541,7 @@ class Settings(Gtk.Dialog):
                 command_parts.append(f'PROTONPATH={runner}')
 
             # Add the fixed command and remaining arguments
-            command_parts.append('"/usr/bin/umu-run"')
+            command_parts.append(f'"{umu_run}"')
             command_parts.append('""')
 
             # Join all parts into a single command
@@ -1547,7 +1550,7 @@ class Settings(Gtk.Dialog):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = faugus_run
 
             def run_command():
                 process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
@@ -2121,7 +2124,7 @@ class AddGame(Gtk.Dialog):
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
                     command_parts.append(f'PROTONPATH={runner}')
-                command_parts.append(f'"/usr/bin/umu-run" "{file_run}"')
+                command_parts.append(f'"{umu_run}" "{file_run}"')
             else:
                 if prefix:
                     command_parts.append(f'WINEPREFIX={prefix}')
@@ -2129,7 +2132,7 @@ class AddGame(Gtk.Dialog):
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
                     command_parts.append(f'PROTONPATH={runner}')
-                command_parts.append(f'"/usr/bin/umu-run" regedit "{file_run}"')
+                command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
             # Join all parts into a single command
             command = ' '.join(command_parts)
@@ -2137,7 +2140,7 @@ class AddGame(Gtk.Dialog):
             print(command)
 
             # faugus-run path
-            faugus_run_path = "/usr/bin/faugus-run"
+            faugus_run_path = faugus_run
 
             def run_command():
                 process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
@@ -2353,7 +2356,7 @@ class AddGame(Gtk.Dialog):
             command_parts.append(f'PROTONPATH={runner}')
 
         # Add the fixed command and remaining arguments
-        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append(f'"{umu_run}"')
         command_parts.append('"winecfg"')
 
         # Join all parts into a single command
@@ -2362,7 +2365,7 @@ class AddGame(Gtk.Dialog):
         print(command)
 
         # faugus-run path
-        faugus_run_path = "/usr/bin/faugus-run"
+        faugus_run_path = faugus_run
 
         def run_command():
             process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
@@ -2408,7 +2411,7 @@ class AddGame(Gtk.Dialog):
             command_parts.append(f'PROTONPATH={runner}')
 
         # Add the fixed command and remaining arguments
-        command_parts.append('"/usr/bin/umu-run"')
+        command_parts.append(f'"{umu_run}"')
         command_parts.append('""')
 
         # Join all parts into a single command
@@ -2417,7 +2420,7 @@ class AddGame(Gtk.Dialog):
         print(command)
 
         # faugus-run path
-        faugus_run_path = "/usr/bin/faugus-run"
+        faugus_run_path = faugus_run
 
         def run_command():
             process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
@@ -2938,7 +2941,7 @@ class CreateShortcut(Gtk.Window):
             command_parts.append(launch_arguments)
 
         # Add the fixed command and remaining arguments
-        command_parts.append("'/usr/bin/umu-run'")
+        command_parts.append(f"'{umu_run}'")
         if self.file_path:
             command_parts.append(f"'{self.file_path}'")
         if game_arguments:
@@ -2950,7 +2953,7 @@ class CreateShortcut(Gtk.Window):
         # Create a .desktop file
         desktop_file_content = f"""[Desktop Entry]
     Name={title}
-    Exec=/usr/bin/faugus-run "{command}"
+    Exec={faugus_run} "{command}"
     Icon={new_icon_path}
     Type=Application
     Categories=Game;
@@ -3139,7 +3142,7 @@ def run_file(file_path):
 
     # Define paths
     prefix_path = os.path.expanduser(f"{default_prefix}/default")
-    faugus_run_path = "/usr/bin/faugus-run"
+    faugus_run_path = faugus_run
 
     if not file_path.endswith(".reg"):
         mangohud_enabled = os.path.exists("/usr/bin/mangohud")
@@ -3168,7 +3171,7 @@ def run_file(file_path):
             command_parts.append(gamemode)
 
     # Add the fixed command and remaining arguments
-    command_parts.append('"/usr/bin/umu-run"')
+    command_parts.append(f'"{umu_run}"')
     if file_path.endswith(".reg"):
         command_parts.append(f'regedit "{file_path}"')
     else:
