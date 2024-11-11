@@ -28,6 +28,8 @@ faugus_png = "/usr/share/icons/faugus-launcher.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
+mangohud = "/usr/bin/mangohud"
+gamemoderun = "/usr/bin/gamemoderun"
 
 def get_desktop_dir():
     try:
@@ -472,7 +474,7 @@ class Main(Gtk.Window):
             protonfix = game.protonfix
             runner = game.runner
 
-            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+            gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
 
             # Get the directory containing the executable
@@ -588,10 +590,10 @@ class Main(Gtk.Window):
                         gamemode_status = fields[6] == "gamemoderun"
                         sc_controller_status = fields[7] == "SC_CONTROLLER=1"
 
-            mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+            mangohud_enabled = os.path.exists(mangohud)
             if mangohud_enabled:
                 edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
-            gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+            gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             if gamemode_enabled:
                 edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
             sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
@@ -1267,14 +1269,14 @@ class Settings(Gtk.Dialog):
         self.load_config()
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        self.mangohud_enabled = os.path.exists(mangohud)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
             self.checkbox_mangohud.set_tooltip_text(
                 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
-        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
@@ -1369,6 +1371,7 @@ class Settings(Gtk.Dialog):
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
+            checkbox_discrete_gpu_state = self.checkbox_close_after_launch.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1457,6 +1460,7 @@ class Settings(Gtk.Dialog):
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
+            checkbox_discrete_gpu_state = self.checkbox_close_after_launch.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1976,14 +1980,14 @@ class AddGame(Gtk.Dialog):
         self.combo_box_runner.set_active(index_to_activate)
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        self.mangohud_enabled = os.path.exists(mangohud)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
             self.checkbox_mangohud.set_tooltip_text(
                 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
-        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
@@ -2720,14 +2724,14 @@ class CreateShortcut(Gtk.Window):
         self.load_config()
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists("/usr/bin/mangohud")
+        self.mangohud_enabled = os.path.exists(mangohud)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
             self.checkbox_mangohud.set_tooltip_text(
                 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED.")
 
-        self.gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
         if not self.gamemode_enabled:
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
@@ -3145,8 +3149,8 @@ def run_file(file_path):
     faugus_run_path = faugus_run
 
     if not file_path.endswith(".reg"):
-        mangohud_enabled = os.path.exists("/usr/bin/mangohud")
-        gamemode_enabled = os.path.exists("/usr/bin/gamemoderun") or os.path.exists("/usr/games/gamemoderun")
+        mangohud_enabled = os.path.exists(mangohud)
+        gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
         sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
     if default_runner == "UMU-Proton Latest":
