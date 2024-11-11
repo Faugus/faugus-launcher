@@ -58,6 +58,10 @@ Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/v1
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install faugus-launcher-0.1.5.flatpak
 ```
+```
+# Optional tools
+flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
+```
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
