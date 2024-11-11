@@ -83,7 +83,7 @@ class Main(Gtk.Window):
         box_bottom = Gtk.Box()
 
         # Create buttons for adding, editing, and deleting games
-        self.button_add = Gtk.Button(label="New")
+        self.button_add = Gtk.Button()
         self.button_add.connect("clicked", self.on_button_add_clicked)
         self.button_add.set_can_focus(False)
         self.button_add.set_size_request(50, 50)
@@ -91,24 +91,48 @@ class Main(Gtk.Window):
         self.button_add.set_margin_start(10)
         self.button_add.set_margin_end(10)
 
-        self.button_edit = Gtk.Button(label="Edit")
+        label_add = Gtk.Label(label="New")
+        label_add.set_margin_start(0)
+        label_add.set_margin_end(0)
+        label_add.set_margin_top(0)
+        label_add.set_margin_bottom(0)
+
+        self.button_add.add(label_add)
+
+        self.button_edit = Gtk.Button()
         self.button_edit.connect("clicked", self.on_button_edit_clicked)
         self.button_edit.set_can_focus(False)
         self.button_edit.set_size_request(50, 50)
         self.button_edit.set_margin_top(10)
         self.button_edit.set_margin_start(10)
         self.button_edit.set_margin_end(10)
+        
+        label_edit = Gtk.Label(label="Edit")
+        label_edit.set_margin_start(0)
+        label_edit.set_margin_end(0)
+        label_edit.set_margin_top(0)
+        label_edit.set_margin_bottom(0)
 
-        self.button_delete = Gtk.Button(label="Del")
+        self.button_edit.add(label_edit)
+
+        self.button_delete = Gtk.Button()
         self.button_delete.connect("clicked", self.on_button_delete_clicked)
         self.button_delete.set_can_focus(False)
         self.button_delete.set_size_request(50, 50)
         self.button_delete.set_margin_top(10)
         self.button_delete.set_margin_start(10)
         self.button_delete.set_margin_end(10)
+        
+        label_delete = Gtk.Label(label="Del")
+        label_delete.set_margin_start(0)
+        label_delete.set_margin_end(0)
+        label_delete.set_margin_top(0)
+        label_delete.set_margin_bottom(0)
+
+        self.button_delete.add(label_delete)
 
         # Create button for killing processes
-        button_kill = Gtk.Button(label="Kill")
+        button_kill = Gtk.Button()
         button_kill.connect("clicked", self.on_button_kill_clicked)
         button_kill.set_can_focus(False)
         button_kill.set_tooltip_text("Force close all running games")
@@ -116,6 +140,14 @@ class Main(Gtk.Window):
         button_kill.set_margin_top(10)
         button_kill.set_margin_end(10)
         button_kill.set_margin_bottom(10)
+        
+        label_kill = Gtk.Label(label="Kill")
+        label_kill.set_margin_start(0)
+        label_kill.set_margin_end(0)
+        label_kill.set_margin_top(0)
+        label_kill.set_margin_bottom(0)
+
+        button_kill.add(label_kill)
 
         # Create button for settings
         button_settings = Gtk.Button()
