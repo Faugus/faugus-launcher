@@ -53,12 +53,11 @@ pressure-vessel-wrap[2264]: E: Child process exited with code 1: bwrap: setting 
 It's the AppArmor preventing umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
 
 ### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/v1.1-7/faugus-launcher-0.1.4.flatpak">faugus-launcher-0.1.4.flatpak</a> and run:
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/v1.1-7/faugus-launcher-0.1.5.flatpak">faugus-launcher-0.1.5.flatpak</a> and run:
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install faugus-launcher-0.1.4.flatpak
+flatpak install faugus-launcher-0.1.5.flatpak
 ```
-ATTENTION: Optional tools (MangoHud, GameMode and SC-Controller) are not available yet!
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
