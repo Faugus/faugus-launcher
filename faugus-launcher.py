@@ -2612,7 +2612,7 @@ class AddGame(Gtk.Dialog):
                 return False
 
         if entry == "path+prefix":
-            if not title or not path:
+            if not title or not path or not prefix:
                 if not title:
                     self.entry_title.get_style_context().add_class("entry")
                     self.notebook.set_current_page(0)
