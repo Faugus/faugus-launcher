@@ -2194,7 +2194,7 @@ class AddGame(Gtk.Dialog):
             faugus_run_path = faugus_run
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
+                process = subprocess.Popen([sys.executable, faugus_run_path, command])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -2419,7 +2419,7 @@ class AddGame(Gtk.Dialog):
         faugus_run_path = faugus_run
 
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
+            process = subprocess.Popen([sys.executable, faugus_run_path, command])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
