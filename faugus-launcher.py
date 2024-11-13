@@ -71,7 +71,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton Latest (default)", "True")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True")
 
         self.games = []
 
@@ -106,7 +106,7 @@ class Main(Gtk.Window):
         self.button_edit.set_margin_top(10)
         self.button_edit.set_margin_start(10)
         self.button_edit.set_margin_end(10)
-        
+
         label_edit = Gtk.Label(label="Edit")
         label_edit.set_margin_start(0)
         label_edit.set_margin_end(0)
@@ -122,7 +122,7 @@ class Main(Gtk.Window):
         self.button_delete.set_margin_top(10)
         self.button_delete.set_margin_start(10)
         self.button_delete.set_margin_end(10)
-        
+
         label_delete = Gtk.Label(label="Del")
         label_delete.set_margin_start(0)
         label_delete.set_margin_end(0)
@@ -140,7 +140,7 @@ class Main(Gtk.Window):
         button_kill.set_margin_top(10)
         button_kill.set_margin_end(10)
         button_kill.set_margin_bottom(10)
-        
+
         label_kill = Gtk.Label(label="Kill")
         label_kill.set_margin_start(0)
         label_kill.set_margin_end(0)
@@ -470,6 +470,11 @@ class Main(Gtk.Window):
         sc_controller_state = self.checkbox_sc_controller.get_active()
         default_runner = self.combo_box_runner.get_active_text()
 
+        if default_runner == "UMU-Proton Latest":
+            default_runner = ""
+        if default_runner == "GE-Proton Latest (default)":
+            default_runner = "GE-Proton"
+
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
             if default_prefix == "":
@@ -601,13 +606,18 @@ class Main(Gtk.Window):
 
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
+            game_runner = game.runner
+
             if game.runner == "GE-Proton":
-                game.runner = "GE-Proton Latest (default)"
+                game_runner = "GE-Proton Latest (default)"
+            if game.runner == "":
+                game_runner = "UMU-Proton Latest"
+
             for i, row in enumerate(model):
-                if row[0] == game.runner:
+                if row[0] == game_runner:
                     index_to_activate = i
                     break
-            if not game.runner:
+            if not game_runner:
                 index_to_activate = 1
             edit_game_dialog.combo_box_runner.set_active(index_to_activate)
 
@@ -1171,6 +1181,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_sc_controller.set_tooltip_text(
             "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
 
+        self.label_support = Gtk.Label(label="Support the project")
+        self.label_support.set_halign(Gtk.Align.START)
+
         button_kofi = Gtk.Button(label="Buy me a Coffee")
         button_kofi.set_size_request(150, -1)
         button_kofi.connect("clicked", self.on_button_kofi_clicked)
@@ -1285,12 +1298,13 @@ class Settings(Gtk.Dialog):
         self.checkbox_mangohud.set_hexpand(True)
         grid3.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         grid3.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
-        grid3.attach(self.button_winetricks_default, 1, 0, 1, 1)
-        grid3.attach(self.button_winecfg_default, 1, 1, 1, 1)
+        grid3.attach(self.button_winecfg_default, 1, 0, 1, 1)
+        grid3.attach(self.button_winetricks_default, 1, 1, 1, 1)
         grid3.attach(self.button_run_default, 1, 2, 1, 1)
 
-        grid4.attach(button_kofi, 0, 0, 1, 1)
-        grid4.attach(button_paypal, 1, 0, 1, 1)
+        grid4.attach(self.label_support, 0, 0, 1, 1)
+        grid4.attach(button_kofi, 0, 1, 1, 1)
+        grid4.attach(button_paypal, 1, 1, 1, 1)
         grid4.set_halign(Gtk.Align.CENTER)
 
         grid5.attach(self.button_cancel, 0, 0, 1, 1)
@@ -1403,12 +1417,17 @@ class Settings(Gtk.Dialog):
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_close_after_launch.get_active()
+            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
+
+            if default_runner == "UMU-Proton Latest":
+                default_runner = ""
+            if default_runner == "GE-Proton Latest (default)":
+                default_runner = "GE-Proton"
 
             self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
@@ -1436,26 +1455,20 @@ class Settings(Gtk.Dialog):
 
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                runner = self.combo_box_runner.get_active_text()
-
-                if runner == "UMU-Proton Latest":
-                    runner = ""
-                if runner == "GE-Proton Latest (default)":
-                    runner = "GE-Proton"
 
                 command_parts = []
                 file_run = dialog.get_filename()
                 if not file_run.endswith(".reg"):
                     if file_run:
                         command_parts.append(f'GAMEID=default')
-                    if runner:
-                        command_parts.append(f'PROTONPATH={runner}')
+                    if default_runner:
+                        command_parts.append(f'PROTONPATH={default_runner}')
                     command_parts.append(f'"{umu_run}" "{file_run}"')
                 else:
                     if file_run:
                         command_parts.append(f'GAMEID=default')
-                    if runner:
-                        command_parts.append(f'PROTONPATH={runner}')
+                    if default_runner:
+                        command_parts.append(f'PROTONPATH={default_runner}')
                     command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
                 # Join all parts into a single command
@@ -1467,7 +1480,7 @@ class Settings(Gtk.Dialog):
                 faugus_run_path = faugus_run
 
                 def run_command():
-                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command])
                     process.wait()
                     GLib.idle_add(self.set_sensitive, True)
                     GLib.idle_add(self.parent.set_sensitive, True)
@@ -1492,30 +1505,28 @@ class Settings(Gtk.Dialog):
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_close_after_launch.get_active()
+            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
+            if default_runner == "UMU-Proton Latest":
+                default_runner = ""
+            if default_runner == "GE-Proton Latest (default)":
+                default_runner = "GE-Proton"
+
             self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
-
-            runner = self.combo_box_runner.get_active_text()
-
-            if runner == "UMU-Proton Latest":
-                runner = ""
-            if runner == "GE-Proton Latest (default)":
-                runner = "GE-Proton"
 
             command_parts = []
 
             # Add command parts if they are not empty
 
             command_parts.append(f'GAMEID=default')
-            if runner:
-                command_parts.append(f'PROTONPATH={runner}')
+            if default_runner:
+                command_parts.append(f'PROTONPATH={default_runner}')
 
             # Add the fixed command and remaining arguments
             command_parts.append(f'"{umu_run}"')
@@ -1530,7 +1541,7 @@ class Settings(Gtk.Dialog):
             faugus_run_path = faugus_run
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winecfg"])
+                process = subprocess.Popen([sys.executable, faugus_run_path, command])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent.set_sensitive, True)
@@ -1549,23 +1560,21 @@ class Settings(Gtk.Dialog):
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
             checkbox_state = self.checkbox_close_after_launch.get_active()
-            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             default_prefix = self.entry_default_prefix.get_text()
+            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             sc_controller_state = self.checkbox_sc_controller.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
+            if default_runner == "UMU-Proton Latest":
+                default_runner = ""
+            if default_runner == "GE-Proton Latest (default)":
+                default_runner = "GE-Proton"
+
             self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
             self.set_sensitive(False)
-
-            runner = self.combo_box_runner.get_active_text()
-
-            if runner == "UMU-Proton Latest":
-                runner = ""
-            if runner == "GE-Proton Latest (default)":
-                runner = "GE-Proton"
 
             command_parts = []
 
@@ -1573,8 +1582,8 @@ class Settings(Gtk.Dialog):
 
             command_parts.append(f'GAMEID=winetricks-gui')
             command_parts.append(f'STORE=none')
-            if runner:
-                command_parts.append(f'PROTONPATH={runner}')
+            if default_runner:
+                command_parts.append(f'PROTONPATH={default_runner}')
 
             # Add the fixed command and remaining arguments
             command_parts.append(f'"{umu_run}"')
@@ -1646,6 +1655,8 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_active(gamemode)
             self.checkbox_sc_controller.set_active(sc_controller)
 
+            if self.default_runner == "":
+                self.default_runner = "UMU-Proton Latest"
 
             model = self.combo_box_runner.get_model()
             index_to_activate = 0
@@ -1658,7 +1669,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
 
 
 class Game:
@@ -2003,8 +2014,12 @@ class AddGame(Gtk.Dialog):
 
         model = self.combo_box_runner.get_model()
         index_to_activate = 0
+
+        if self.default_runner == "":
+            self.default_runner = "UMU-Proton Latest"
         if self.default_runner == "GE-Proton":
-            self.default_runner == "GE-Proton Latest (default)"
+            self.default_runner = "GE-Proton Latest (default)"
+
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
                 index_to_activate = i
@@ -2871,7 +2886,7 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state):
         # Path to the configuration file
@@ -3158,7 +3173,7 @@ def run_file(file_path):
         mangohud = 'False'
         gamemode = 'False'
         sc_controller = 'False'
-        default_runner = 'GE-Proton Latest (default)'
+        default_runner = 'GE-Proton'
 
         with open(config_file, 'w') as f:
             f.write(f'close-onlaunch=False\n')
@@ -3166,7 +3181,7 @@ def run_file(file_path):
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
             f.write(f'sc-controller=False\n')
-            f.write(f'default_runner="GE-Proton Latest (default)"\n')
+            f.write(f'default_runner="GE-Proton"\n')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""

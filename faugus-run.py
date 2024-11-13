@@ -80,9 +80,13 @@ class FaugusRun:
 
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
-                self.message = f'WINEPREFIX={self.default_prefix}/default PROTONPATH={self.default_runner} {self.message}'
+                if "PROTONPATH" not in self.message:
+                    self.message = f'WINEPREFIX={self.default_prefix}/default PROTONPATH={self.default_runner} {self.message}'
+                else:
+                    self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
             else:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
+
         print(self.message)
 
         self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {self.message}"], stdout=subprocess.PIPE,
@@ -115,8 +119,8 @@ class FaugusRun:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton Latest (default)", "True")
-            self.default_runner = "GE-Proton Latest (default)"
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
+            self.default_runner = "GE-Proton"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
                     default_runner, checkbox_discrete_gpu_state):
