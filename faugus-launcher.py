@@ -719,7 +719,7 @@ class Main(Gtk.Window):
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
-            if not add_game_dialog.validate_fields(entry="prefix"):
+            if not add_game_dialog.validate_fields(entry="path+prefix"):
                 # If fields are not validated, return and keep the dialog open
                 return True
             # Proceed with adding the game
@@ -801,7 +801,7 @@ class Main(Gtk.Window):
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
         if response_id == Gtk.ResponseType.OK:
-            if not edit_game_dialog.validate_fields(entry="prefix"):
+            if not edit_game_dialog.validate_fields(entry="path+prefix"):
                 # If fields are not validated, return and keep the dialog open
                 return True
             # Update game object with new information
@@ -2607,6 +2607,22 @@ class AddGame(Gtk.Dialog):
 
                 if not path:
                     self.entry_path.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
+                return False
+
+        if entry == "path+prefix":
+            if not title or not path:
+                if not title:
+                    self.entry_title.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
+                if not path:
+                    self.entry_path.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
+                if not prefix:
+                    self.entry_prefix.get_style_context().add_class("entry")
                     self.notebook.set_current_page(0)
 
                 return False
