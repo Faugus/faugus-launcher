@@ -81,7 +81,7 @@ ATTENTION: Gamescope is not working yet!
 ### Shortcut locations
 For Desktop Environments that support icons on the Desktop
 ```
-~/Desktop/![Screenshot_20241113_221136](https://github.com/user-attachments/assets/c09fa1d5-011b-49fd-a2b0-5c7ebb7b6b45)
+~/Desktop/
 
 ```
 For Application Launchers
