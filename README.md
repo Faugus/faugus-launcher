@@ -81,7 +81,8 @@ ATTENTION: Gamescope is not working yet!
 ### Shortcut locations
 For Desktop Environments that support icons on the Desktop
 ```
-~/Desktop/
+~/Desktop/![Screenshot_20241113_221136](https://github.com/user-attachments/assets/c09fa1d5-011b-49fd-a2b0-5c7ebb7b6b45)
+
 ```
 For Application Launchers
 ```
@@ -102,10 +103,9 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/cf70c8e4-6b59-4ce6-9958-93b5b80ea244/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/0bbb79ff-447c-4d7f-a788-32ea5251770b/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/4f28a254-28e3-419d-99a0-18ac5baabb9d/><br>
+<img src=https://github.com/user-attachments/assets/956c087c-68b1-4ee5-9cf8-4c6ba7ec9a26/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/4b250388-b6df-4af0-982f-9da9f06dc1af/><br>
-
 ### Create shortcut from .exe
 <img src=https://github.com/user-attachments/assets/080c37b0-5ad0-4192-b4f2-f1bdd08dcb75/><br>
 
@@ -115,7 +115,7 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/3f1c6328-ef2f-48ca-a0c5-9d9847ddf478/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/f818721e-447a-4e0d-aec5-111892a3de9e/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/84236ab4-e4c3-4fac-ba19-a7b3e63c0838/><br>
+<img src=https://github.com/user-attachments/assets/79c2372a-5dd0-4f3b-af78-4dba90b186ed/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/1e38d572-d1df-48fd-bafb-26310c1c9932/><br>
 ### Create shortcut from .exe
