@@ -82,7 +82,6 @@ ATTENTION: Gamescope is not working yet!
 For Desktop Environments that support icons on the Desktop
 ```
 ~/Desktop/
-
 ```
 For Application Launchers
 ```
