@@ -1298,8 +1298,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_mangohud.set_hexpand(True)
         grid3.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         grid3.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
-        grid3.attach(self.button_winecfg_default, 1, 0, 1, 1)
-        grid3.attach(self.button_winetricks_default, 1, 1, 1, 1)
+        grid3.attach(self.button_winetricks_default, 1, 0, 1, 1)
+        grid3.attach(self.button_winecfg_default, 1, 1, 1, 1)
         grid3.attach(self.button_run_default, 1, 2, 1, 1)
 
         grid4.attach(self.label_support, 0, 0, 1, 1)
@@ -1991,8 +1991,8 @@ class AddGame(Gtk.Dialog):
         grid4.attach(self.checkbox_sc_controller, 0, 8, 1, 1)
         self.checkbox_sc_controller.set_hexpand(True)
 
-        grid4.attach(self.button_winecfg, 2, 6, 1, 1)
-        grid4.attach(self.button_winetricks, 2, 7, 1, 1)
+        grid4.attach(self.button_winetricks, 2, 6, 1, 1)
+        grid4.attach(self.button_winecfg, 2, 7, 1, 1)
         grid4.attach(self.button_run, 2, 8, 1, 1)
 
         page2.add(grid4)
