@@ -28,7 +28,7 @@ faugus_png = "/usr/share/icons/faugus-launcher.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
-mangohud = "/usr/bin/mangohud"
+mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
 
 def get_desktop_dir():
@@ -632,7 +632,7 @@ class Main(Gtk.Window):
                         gamemode_status = fields[6] == "gamemoderun"
                         sc_controller_status = fields[7] == "SC_CONTROLLER=1"
 
-            mangohud_enabled = os.path.exists(mangohud)
+            mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
                 edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
             gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
@@ -1315,7 +1315,7 @@ class Settings(Gtk.Dialog):
         self.load_config()
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists(mangohud)
+        self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
@@ -2027,7 +2027,7 @@ class AddGame(Gtk.Dialog):
         self.combo_box_runner.set_active(index_to_activate)
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists(mangohud)
+        self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
@@ -2787,7 +2787,7 @@ class CreateShortcut(Gtk.Window):
         self.load_config()
 
         # Check if optional features are available and enable/disable accordingly
-        self.mangohud_enabled = os.path.exists(mangohud)
+        self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
             self.checkbox_mangohud.set_active(False)
@@ -3212,7 +3212,7 @@ def run_file(file_path):
     faugus_run_path = faugus_run
 
     if not file_path.endswith(".reg"):
-        mangohud_enabled = os.path.exists(mangohud)
+        mangohud_enabled = os.path.exists(mangohud_dir)
         gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
         sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
