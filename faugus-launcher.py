@@ -2051,9 +2051,21 @@ class AddGame(Gtk.Dialog):
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
+        self.entry_title.connect("key-press-event", self.on_key_press)
+        self.entry_path.connect("key-press-event", self.on_key_press)
+        self.entry_prefix.connect("key-press-event", self.on_key_press)
+        self.entry_protonfix.connect("key-press-event", self.on_key_press)
+        self.entry_launch_arguments.connect("key-press-event", self.on_key_press)
+        self.entry_game_arguments.connect("key-press-event", self.on_key_press)
+
         tab_box1.show_all()
         tab_box2.show_all()
         self.show_all()
+
+    def on_key_press(self, widget, event):
+        if event.string in [';']:
+            return True
+        return False
 
     def populate_combobox_with_runners(self):
         # List of default entries
