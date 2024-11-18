@@ -71,7 +71,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False")
 
         self.games = []
 
@@ -454,6 +454,7 @@ class Main(Gtk.Window):
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
         self.checkbox_discrete_gpu = settings_dialog.checkbox_discrete_gpu
         self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
+        self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
         self.entry_default_prefix = settings_dialog.entry_default_prefix
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
@@ -463,6 +464,7 @@ class Main(Gtk.Window):
 
         checkbox_state = self.checkbox_close_after_launch.get_active()
         checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+        checkbox_splash_disable = self.checkbox_splash_disable.get_active()
         default_prefix = self.entry_default_prefix.get_text()
 
         mangohud_state = self.checkbox_mangohud.get_active()
@@ -480,7 +482,7 @@ class Main(Gtk.Window):
             if default_prefix == "":
                 settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
+                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
                 settings_dialog.destroy()
 
         else:
@@ -1063,7 +1065,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -1087,6 +1089,7 @@ class Main(Gtk.Window):
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
+        config['splash-disable'] = checkbox_splash_disable
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -1154,6 +1157,10 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game")
         self.checkbox_close_after_launch.set_active(False)
+
+        # Create checkbox for 'Splash screen' option
+        self.checkbox_splash_disable = Gtk.CheckButton(label="Disable splash window")
+        self.checkbox_splash_disable.set_active(False)
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -1290,7 +1297,9 @@ class Settings(Gtk.Dialog):
         self.button_proton_manager.set_hexpand(True)
 
         grid7.attach(self.checkbox_discrete_gpu, 0, 2, 4, 1)
-        grid7.attach(self.checkbox_close_after_launch, 0, 3, 4, 1)
+        grid7.attach(self.checkbox_splash_disable, 0, 3, 4, 1)
+        grid7.attach(self.checkbox_close_after_launch, 0, 4, 4, 1)
+
 
         grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
@@ -1418,6 +1427,7 @@ class Settings(Gtk.Dialog):
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1429,7 +1439,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
             self.set_sensitive(False)
 
             dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
@@ -1506,6 +1516,7 @@ class Settings(Gtk.Dialog):
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1517,7 +1528,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
             self.set_sensitive(False)
 
             command_parts = []
@@ -1562,6 +1573,7 @@ class Settings(Gtk.Dialog):
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1573,7 +1585,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
             self.set_sensitive(False)
 
             command_parts = []
@@ -1640,6 +1652,7 @@ class Settings(Gtk.Dialog):
             config_dict = dict(line.split('=') for line in config_data)
             close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
             discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
+            splash_disable = config_dict.get('splash-disable', 'False') == 'True'
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
@@ -1649,6 +1662,7 @@ class Settings(Gtk.Dialog):
 
             self.checkbox_discrete_gpu.set_active(discrete_gpu)
             self.checkbox_close_after_launch.set_active(close_on_launch)
+            self.checkbox_splash_disable.set_active(splash_disable)
 
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
@@ -2914,9 +2928,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -2948,6 +2962,7 @@ class CreateShortcut(Gtk.Window):
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
+        config['splash-disable'] = checkbox_splash_disable
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:

@@ -34,6 +34,7 @@ class FaugusRun:
         self.default_runner = None
         self.default_prefix = None
         self.discrete_gpu = None
+        self.splash_disable = None
 
     def show_error_dialog(self, protonpath):
         dialog = Gtk.MessageDialog(
@@ -116,14 +117,15 @@ class FaugusRun:
                         config_dict[key] = value
 
             self.discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
+            self.splash_disable = config_dict.get('splash-disable', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False")
             self.default_runner = "GE-Proton"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
-                    default_runner, checkbox_discrete_gpu_state):
+                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -150,6 +152,7 @@ class FaugusRun:
         config['sc-controller'] = sc_controller_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
+        config['splash-disable'] = checkbox_splash_disable
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
@@ -216,7 +219,8 @@ class FaugusRun:
 
         self.warning_dialog.add(frame)
 
-        self.warning_dialog.show_all()
+        if not self.splash_disable:
+            self.warning_dialog.show_all()
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
