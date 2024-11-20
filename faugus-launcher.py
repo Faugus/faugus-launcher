@@ -330,9 +330,11 @@ class Main(Gtk.Window):
         self.on_button_play_clicked(widget)
 
     def on_window_delete_event(self, widget, event):
-        # Minimize the window and show the tray icon
-        self.hide()
-        return True  # Returning True prevents the window from closing
+        # Only prevent closing when system tray is active
+        if self.checkbox_system_tray.get_active():
+            self.hide()  # Minimize the window instead of closing
+            return True  # Stop the event to keep the app running
+        return False  # Allow the window to close
 
     def restore_window(self, widget):
         # Restore the window when clicking the tray icon
@@ -611,7 +613,7 @@ class Main(Gtk.Window):
                     self.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
                     if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                         self.disconnect_by_func(self.on_window_delete_event)
-                        del self.window_delete_event_connected  # Remove the flag to indicate disconnection
+                        self.window_delete_event_connected = False
 
                 settings_dialog.destroy()
 
@@ -1668,7 +1670,7 @@ class Settings(Gtk.Dialog):
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
@@ -1676,7 +1678,7 @@ class Settings(Gtk.Dialog):
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
-                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
+                    self.parent.window_delete_event_connected = False
 
             dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
                                         action=Gtk.FileChooserAction.OPEN)
@@ -1772,7 +1774,7 @@ class Settings(Gtk.Dialog):
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
@@ -1780,7 +1782,7 @@ class Settings(Gtk.Dialog):
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
-                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
+                    self.parent.window_delete_event_connected = False
 
             command_parts = []
 
@@ -1844,7 +1846,7 @@ class Settings(Gtk.Dialog):
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
@@ -1852,7 +1854,7 @@ class Settings(Gtk.Dialog):
                 self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
-                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
+                    self.parent.window_delete_event_connected = False
 
             command_parts = []
 
