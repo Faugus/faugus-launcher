@@ -331,7 +331,8 @@ class Main(Gtk.Window):
 
     def on_window_delete_event(self, widget, event):
         # Only prevent closing when system tray is active
-        if self.checkbox_system_tray.get_active():
+        self.load_config()
+        if self.system_tray:
             self.hide()  # Minimize the window instead of closing
             return True  # Stop the event to keep the app running
         return False  # Allow the window to close
