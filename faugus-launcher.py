@@ -8,13 +8,13 @@ import subprocess
 import sys
 import threading
 import webbrowser
-
 import gi
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
+gi.require_version('AppIndicator3', '0.1')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AppIndicator3
 from PIL import Image
 
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
@@ -30,6 +30,27 @@ faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
 mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
+latest_games = f'{faugus_launcher_dir}/latest-games.txt'
+
+lock_file_path = '/tmp/faugus_launcher.lock'
+lock_file = None
+
+def is_already_running():
+    lock_file_path = os.path.join(os.getenv("XDG_RUNTIME_DIR", "/tmp"), "faugus-launcher.lock")
+    current_pid = str(os.getpid())
+
+    if os.path.exists(lock_file_path):
+        with open(lock_file_path, 'r') as lock_file:
+            lock_pid = lock_file.read().strip()
+            try:
+                os.kill(int(lock_pid), 0)
+                return True
+            except OSError:
+                pass
+
+    with open(lock_file_path, 'w') as lock_file:
+        lock_file.write(current_pid)
+    return False
 
 def get_desktop_dir():
     try:
@@ -57,6 +78,8 @@ class Main(Gtk.Window):
         self.set_icon_from_file(faugus_png)
 
         self.game_running = None
+        self.system_tray = False
+        self.start_boot = False
 
         self.games = []
         self.processos = {}
@@ -71,7 +94,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
 
         self.games = []
 
@@ -229,6 +252,96 @@ class Main(Gtk.Window):
 
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+
+
+        self.load_config()
+        # Create the tray indicator
+        self.indicator = AppIndicator3.Indicator.new(
+            "Faugus Launcher",  # Application name
+            faugus_png,         # Path to the icon
+            AppIndicator3.IndicatorCategory.APPLICATION_STATUS
+        )
+        self.indicator.set_menu(self.create_tray_menu())  # Tray menu
+        self.indicator.set_title("Faugus Launcher")  # Change the tooltip text
+
+        if self.system_tray:
+            self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+            self.connect("delete-event", self.on_window_delete_event)
+
+    def load_config(self):
+        config_file = config_file_dir
+
+        if os.path.isfile(config_file):
+            with open(config_file, 'r') as f:
+                config_dict = {}
+                for line in f.read().splitlines():
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"')
+                        config_dict[key] = value
+
+            self.system_tray = config_dict.get('system-tray', 'False') == 'True'
+            self.start_boot = config_dict.get('start-boot', 'False') == 'True'
+        else:
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
+
+    def create_tray_menu(self):
+        # Create the tray menu
+        menu = Gtk.Menu()
+
+        # Add game items from latest-games.txt
+        games_file_path = latest_games
+        if os.path.exists(games_file_path):
+            with open(games_file_path, "r") as games_file:
+                for line in games_file:
+                    game_name = line.strip()
+                    if game_name:
+                        game_item = Gtk.MenuItem(label=game_name)
+                        game_item.connect("activate", self.on_game_selected, game_name)
+                        menu.append(game_item)
+
+        # Add a separator between game items and the other menu items
+        separator = Gtk.SeparatorMenuItem()
+        menu.append(separator)
+
+        # Item to restore the window
+        restore_item = Gtk.MenuItem(label="Open Faugus Launcher")
+        restore_item.connect("activate", self.restore_window)
+        menu.append(restore_item)
+
+        # Item to quit the application
+        quit_item = Gtk.MenuItem(label="Quit")
+        quit_item.connect("activate", self.on_quit_activate)
+        menu.append(quit_item)
+
+        menu.show_all()
+        return menu
+
+    def on_game_selected(self, widget, game_name):
+        # Find the game in the list by name and select it
+        for row in self.game_list.get_children():
+            hbox = row.get_child()
+            game_label = hbox.get_children()[1]
+            if game_label.get_text() == game_name:
+                self.game_list.select_row(row)
+                break
+        # Call the function to run the selected game
+        self.on_button_play_clicked(widget)
+
+    def on_window_delete_event(self, widget, event):
+        # Minimize the window and show the tray icon
+        self.hide()
+        return True  # Returning True prevents the window from closing
+
+    def restore_window(self, widget):
+        # Restore the window when clicking the tray icon
+        self.show_all()
+        self.present()
+
+    def on_quit_activate(self, widget):
+        # Quit the application
+        Gtk.main_quit()
 
     def load_games(self):
         # Load games from file
@@ -455,6 +568,8 @@ class Main(Gtk.Window):
         self.checkbox_discrete_gpu = settings_dialog.checkbox_discrete_gpu
         self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
         self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
+        self.checkbox_system_tray = settings_dialog.checkbox_system_tray
+        self.checkbox_start_boot = settings_dialog.checkbox_start_boot
         self.entry_default_prefix = settings_dialog.entry_default_prefix
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
@@ -465,6 +580,8 @@ class Main(Gtk.Window):
         checkbox_state = self.checkbox_close_after_launch.get_active()
         checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
         checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+        checkbox_system_tray = self.checkbox_system_tray.get_active()
+        checkbox_start_boot = self.checkbox_start_boot.get_active()
         default_prefix = self.entry_default_prefix.get_text()
 
         mangohud_state = self.checkbox_mangohud.get_active()
@@ -482,11 +599,50 @@ class Main(Gtk.Window):
             if default_prefix == "":
                 settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
+                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
+                self.manage_autostart_file(checkbox_start_boot)
+                if checkbox_system_tray:
+                    self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                    if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
+                        self.connect("delete-event", self.on_window_delete_event)
+                        self.window_delete_event_connected = True
+                    self.indicator.set_menu(self.create_tray_menu())
+                else:
+                    self.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                    if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                        self.disconnect_by_func(self.on_window_delete_event)
+                        del self.window_delete_event_connected  # Remove the flag to indicate disconnection
+
                 settings_dialog.destroy()
 
         else:
             settings_dialog.destroy()
+
+    def manage_autostart_file(self, checkbox_start_boot):
+        # Define the path for the autostart file
+        autostart_path = os.path.expanduser('~/.config/autostart/faugus-launcher.desktop')
+        autostart_dir = os.path.dirname(autostart_path)
+
+        # Ensure the autostart directory exists
+        if not os.path.exists(autostart_dir):
+            os.makedirs(autostart_dir)
+
+        if checkbox_start_boot:
+            # Create the autostart file if it does not exist
+            if not os.path.exists(autostart_path):
+                with open(autostart_path, "w") as f:
+                    f.write("""[Desktop Entry]
+    Categories=Utility;
+    Exec=faugus-launcher %f hide
+    Icon=faugus-launcher
+    MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
+    Name=Faugus Launcher
+    Type=Application
+    """)
+        else:
+            # Delete the autostart file if it exists
+            if os.path.exists(autostart_path):
+                os.remove(autostart_path)
 
     def on_button_play_clicked(self, widget):
         if not (listbox_row := self.game_list.get_selected_row()):
@@ -553,6 +709,9 @@ class Main(Gtk.Window):
             # faugus-run path
             faugus_run_path = faugus_run
 
+            # Save the game title to the latest_games.txt file
+            self.update_latest_games_file(title)
+
 
             # Launch the game with subprocess
             if self.load_close_onlaunch():
@@ -565,6 +724,27 @@ class Main(Gtk.Window):
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+
+    def update_latest_games_file(self, title):
+        # Read the existing games from the file, if it exists
+        try:
+            with open(latest_games, 'r') as f:
+                games = f.read().splitlines()
+        except FileNotFoundError:
+            games = []
+
+        # Remove the game if it already exists in the list and add it to the top
+        if title in games:
+            games.remove(title)
+        games.insert(0, title)
+
+        # Keep only the 5 most recent games
+        games = games[:5]
+
+        # Write the updated list back to the file
+        with open(latest_games, 'w') as f:
+            f.write('\n'.join(games))
+        self.indicator.set_menu(self.create_tray_menu())
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -716,7 +896,28 @@ class Main(Gtk.Window):
                 self.button_delete.set_sensitive(False)
                 self.button_play.set_sensitive(False)
 
+                # Remove the game from the latest-games file if it exists
+                self.remove_game_from_latest_games(title)
+
             confirmation_dialog.destroy()
+
+    def remove_game_from_latest_games(self, title):
+        try:
+            # Read the current list of recent games
+            with open(latest_games, 'r') as f:
+                recent_games = f.read().splitlines()
+
+            # Remove the game title if it exists in the list
+            if title in recent_games:
+                recent_games.remove(title)
+
+                # Write the updated list back, maintaining max 5 entries
+                with open(latest_games, 'w') as f:
+                    f.write("\n".join(recent_games[:5]))
+            self.indicator.set_menu(self.create_tray_menu())
+
+        except FileNotFoundError:
+            pass  # Ignore if the file doesn't exist yet
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         # Handle dialog response
@@ -1065,7 +1266,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -1090,6 +1291,8 @@ class Main(Gtk.Window):
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
+        config['system-tray'] = checkbox_system_tray
+        config['start-boot'] = checkbox_start_boot
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -1157,6 +1360,16 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game")
         self.checkbox_close_after_launch.set_active(False)
+
+        # Create checkbox for 'System tray' option
+        self.checkbox_system_tray = Gtk.CheckButton(label="System tray icon")
+        self.checkbox_system_tray.set_active(False)
+        self.checkbox_system_tray.connect("toggled", self.on_checkbox_system_tray_toggled)
+
+        # Create checkbox for 'Start on boot' option
+        self.checkbox_start_boot = Gtk.CheckButton(label="Start on boot")
+        self.checkbox_start_boot.set_active(False)
+        self.checkbox_start_boot.set_sensitive(False)
 
         # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label="Disable splash window")
@@ -1298,8 +1511,9 @@ class Settings(Gtk.Dialog):
 
         grid7.attach(self.checkbox_discrete_gpu, 0, 2, 4, 1)
         grid7.attach(self.checkbox_splash_disable, 0, 3, 4, 1)
-        grid7.attach(self.checkbox_close_after_launch, 0, 4, 4, 1)
-
+        grid7.attach(self.checkbox_system_tray, 0, 4, 4, 1)
+        grid7.attach(self.checkbox_start_boot, 0, 5, 4, 1)
+        grid7.attach(self.checkbox_close_after_launch, 0, 6, 4, 1)
 
         grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
@@ -1347,13 +1561,20 @@ class Settings(Gtk.Dialog):
 
         self.box.add(grid)
         self.box.add(grid6)
-        self.box.add(grid7)
         self.box.add(grid2)
         self.box.add(frame)
+        self.box.add(grid7)
         self.box.add(grid4)
         self.box.add(grid5)
 
         self.show_all()
+
+    def on_checkbox_system_tray_toggled(self, widget):
+        if not widget.get_active():
+            self.checkbox_start_boot.set_active(False)
+            self.checkbox_start_boot.set_sensitive(False)
+        else:
+            self.checkbox_start_boot.set_sensitive(True)
 
     def on_button_proton_manager_clicked(self, widget):
         self.set_sensitive(False)
@@ -1428,6 +1649,8 @@ class Settings(Gtk.Dialog):
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+            checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_system_tray = self.checkbox_system_tray.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1439,8 +1662,21 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
+
+            self.parent.manage_autostart_file(checkbox_start_boot)
+            if checkbox_system_tray:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                    self.connect("delete-event", self.parent.on_window_delete_event)
+                    self.parent.window_delete_event_connected = True
+                self.parent.indicator.set_menu(self.parent.create_tray_menu())
+            else:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                    self.disconnect_by_func(self.parent.on_window_delete_event)
+                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
 
             dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
                                         action=Gtk.FileChooserAction.OPEN)
@@ -1517,6 +1753,8 @@ class Settings(Gtk.Dialog):
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+            checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_system_tray = self.checkbox_system_tray.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1528,8 +1766,21 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
+
+            self.parent.manage_autostart_file(checkbox_start_boot)
+            if checkbox_system_tray:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                    self.connect("delete-event", self.parent.on_window_delete_event)
+                    self.parent.window_delete_event_connected = True
+                self.parent.indicator.set_menu(self.parent.create_tray_menu())
+            else:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                    self.disconnect_by_func(self.parent.on_window_delete_event)
+                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
 
             command_parts = []
 
@@ -1574,6 +1825,8 @@ class Settings(Gtk.Dialog):
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+            checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_system_tray = self.checkbox_system_tray.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -1585,8 +1838,21 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
+
+            self.parent.manage_autostart_file(checkbox_start_boot)
+            if checkbox_system_tray:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                if not hasattr(self, "window_delete_event_connected") or not self.parent.window_delete_event_connected:
+                    self.connect("delete-event", self.parent.on_window_delete_event)
+                    self.parent.window_delete_event_connected = True
+                self.parent.indicator.set_menu(self.parent.create_tray_menu())
+            else:
+                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                    self.disconnect_by_func(self.parent.on_window_delete_event)
+                    del self.parent.window_delete_event_connected  # Remove the flag to indicate disconnection
 
             command_parts = []
 
@@ -1653,6 +1919,8 @@ class Settings(Gtk.Dialog):
             close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
             discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             splash_disable = config_dict.get('splash-disable', 'False') == 'True'
+            system_tray = config_dict.get('system-tray', 'False') == 'True'
+            start_boot = config_dict.get('start-boot', 'False') == 'True'
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
@@ -1663,6 +1931,8 @@ class Settings(Gtk.Dialog):
             self.checkbox_discrete_gpu.set_active(discrete_gpu)
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.checkbox_splash_disable.set_active(splash_disable)
+            self.checkbox_start_boot.set_active(start_boot)
+            self.checkbox_system_tray.set_active(system_tray)
 
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
@@ -1683,7 +1953,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
 
 
 class Game:
@@ -2928,9 +3198,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -2963,6 +3233,8 @@ class CreateShortcut(Gtk.Window):
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
+        config['system-tray'] = checkbox_system_tray
+        config['start-boot'] = checkbox_start_boot
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -3279,16 +3551,26 @@ def run_file(file_path):
 
 def main():
     if len(sys.argv) == 1:
-        # Executed without arguments
         app = Main()
-        app.connect("destroy", Gtk.main_quit)
+        if is_already_running():
+            print("Faugus Launcher is already running.")
+            sys.exit(0)
+
         app.show_all()
+        app.connect("destroy", Gtk.main_quit)
+        Gtk.main()
+    elif len(sys.argv) == 2 and sys.argv[1] == "hide":
+        app = Main()
+        if is_already_running():
+            print("Faugus Launcher is already running.")
+            sys.exit(0)
+
+        app.hide()
+        app.connect("destroy", Gtk.main_quit)
         Gtk.main()
     elif len(sys.argv) == 2:
-        # Executed with a file
         run_file(sys.argv[1])
     elif len(sys.argv) == 3 and sys.argv[2] == "shortcut":
-        # Executed with a file and the "shortcut" argument
         app = CreateShortcut(sys.argv[1])
         app.show_all()
         Gtk.main()

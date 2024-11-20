@@ -121,11 +121,11 @@ class FaugusRun:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
             self.default_runner = "GE-Proton"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
-                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable):
+                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -153,6 +153,8 @@ class FaugusRun:
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
+        config['system-tray'] = checkbox_system_tray
+        config['start-boot'] = checkbox_start_boot
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
