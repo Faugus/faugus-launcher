@@ -25,6 +25,7 @@ config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
 faugus_png = "/usr/share/icons/faugus-launcher.png"
+tray_icon = "/usr/share/icons/faugus-launcher.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
@@ -258,7 +259,7 @@ class Main(Gtk.Window):
         # Create the tray indicator
         self.indicator = AppIndicator3.Indicator.new(
             "Faugus Launcher",  # Application name
-            faugus_png,         # Path to the icon
+            tray_icon,         # Path to the icon
             AppIndicator3.IndicatorCategory.APPLICATION_STATUS
         )
         self.indicator.set_menu(self.create_tray_menu())  # Tray menu
