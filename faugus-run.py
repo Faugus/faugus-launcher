@@ -252,6 +252,9 @@ class FaugusRun:
 
 
     def check_game_output(self, clean_line):
+        if "Downloading" in clean_line:
+            self.warning_dialog.show_all()
+
         if "Downloading GE-Proton" in clean_line:
             self.label.set_text("Downloading GE-Proton...")
         if "Downloading UMU-Proton" in clean_line:
