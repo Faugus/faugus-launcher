@@ -102,7 +102,7 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/cf70c8e4-6b59-4ce6-9958-93b5b80ea244/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/69d5a53c-380f-4b57-a8b1-63313e0d7905/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/956c087c-68b1-4ee5-9cf8-4c6ba7ec9a26/><br>
+<img src=https://github.com/user-attachments/assets/e38392ac-de76-4da0-8ec7-ca2ff734f130/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/4b250388-b6df-4af0-982f-9da9f06dc1af/><br>
 ### Create shortcut from .exe
@@ -114,7 +114,7 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/3f1c6328-ef2f-48ca-a0c5-9d9847ddf478/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/b46b757c-405e-4f73-9c37-b333f47238b0/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/79c2372a-5dd0-4f3b-af78-4dba90b186ed/><br>
+<img src=https://github.com/user-attachments/assets/620ba534-d07f-477f-a21f-52ee86dd170c/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/1e38d572-d1df-48fd-bafb-26310c1c9932/><br>
 ### Create shortcut from .exe
