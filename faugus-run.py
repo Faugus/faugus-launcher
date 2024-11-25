@@ -14,10 +14,15 @@ import os
 
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
+faugus_components = "/usr/bin/faugus-components"
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 faugus_png = "/usr/share/icons/faugus-launcher.png"
+eac_dir = f'PROTON_EAC_RUNTIME={faugus_launcher_dir}/components/eac'
+be_dir = f'PROTON_BATTLEYE_RUNTIME={faugus_launcher_dir}/components/be'
+
+subprocess.run([faugus_components])
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -90,7 +95,7 @@ class FaugusRun:
 
         print(self.message)
 
-        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {self.message}"], stdout=subprocess.PIPE,
+        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
         if command == "winetricks":

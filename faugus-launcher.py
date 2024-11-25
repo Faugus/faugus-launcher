@@ -28,6 +28,7 @@ faugus_png = "/usr/share/icons/faugus-launcher.png"
 tray_icon = "/usr/share/icons/faugus-launcher.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
+faugus_components = "/usr/bin/faugus-components"
 umu_run = "/usr/bin/umu-run"
 mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
@@ -84,6 +85,8 @@ class Main(Gtk.Window):
 
         self.games = []
         self.processos = {}
+
+        subprocess.Popen([faugus_components])
 
         # Define the configuration path
         config_path = faugus_launcher_dir
@@ -2935,6 +2938,8 @@ class CreateShortcut(Gtk.Window):
         self.file_path = file_path
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
+
+        subprocess.Popen([faugus_components])
 
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
