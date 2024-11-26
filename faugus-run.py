@@ -22,8 +22,6 @@ faugus_png = "/usr/share/icons/faugus-launcher.png"
 eac_dir = f'PROTON_EAC_RUNTIME={faugus_launcher_dir}/components/eac'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={faugus_launcher_dir}/components/be'
 
-subprocess.run([faugus_components])
-
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
@@ -94,6 +92,8 @@ class FaugusRun:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
 
         print(self.message)
+
+        subprocess.run([faugus_components])
 
         self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)

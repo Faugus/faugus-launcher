@@ -28,17 +28,15 @@ faugus_png = "/usr/share/icons/faugus-launcher.png"
 tray_icon = "/usr/share/icons/faugus-launcher.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
-faugus_components = "/usr/bin/faugus-components"
 umu_run = "/usr/bin/umu-run"
 mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
 latest_games = f'{faugus_launcher_dir}/latest-games.txt'
 
-lock_file_path = '/tmp/faugus_launcher.lock'
+lock_file_path = os.path.join(share_dir, "faugus-launcher/faugus_launcher.lock")
 lock_file = None
 
 def is_already_running():
-    lock_file_path = os.path.join(os.getenv("XDG_RUNTIME_DIR", "/tmp"), "faugus-launcher.lock")
     current_pid = str(os.getpid())
 
     if os.path.exists(lock_file_path):
@@ -85,8 +83,6 @@ class Main(Gtk.Window):
 
         self.games = []
         self.processos = {}
-
-        subprocess.Popen([faugus_components])
 
         # Define the configuration path
         config_path = faugus_launcher_dir
@@ -347,6 +343,9 @@ class Main(Gtk.Window):
         self.present()
 
     def on_quit_activate(self, widget):
+        if os.path.exists(lock_file_path):
+                os.remove(lock_file_path)
+
         # Quit the application
         Gtk.main_quit()
 
@@ -719,6 +718,8 @@ class Main(Gtk.Window):
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
+            if os.path.exists(lock_file_path):
+                    os.remove(lock_file_path)
 
             # Launch the game with subprocess
             if self.load_close_onlaunch():
@@ -2939,8 +2940,6 @@ class CreateShortcut(Gtk.Window):
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
 
-        subprocess.Popen([faugus_components])
-
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
         print(self.file_path)
@@ -3564,18 +3563,16 @@ def main():
         if is_already_running():
             print("Faugus Launcher is already running.")
             sys.exit(0)
-
         app.show_all()
-        app.connect("destroy", Gtk.main_quit)
+        app.connect("destroy", on_app_destroy)
         Gtk.main()
     elif len(sys.argv) == 2 and sys.argv[1] == "hide":
         app = Main()
         if is_already_running():
             print("Faugus Launcher is already running.")
             sys.exit(0)
-
         app.hide()
-        app.connect("destroy", Gtk.main_quit)
+        app.connect("destroy", on_app_destroy)
         Gtk.main()
     elif len(sys.argv) == 2:
         run_file(sys.argv[1])
@@ -3585,6 +3582,11 @@ def main():
         Gtk.main()
     else:
         print("Invalid arguments")
+
+def on_app_destroy(*args):
+    if os.path.exists(lock_file_path):
+        os.remove(lock_file_path)
+    Gtk.main_quit()
 
 if __name__ == "__main__":
     main()
