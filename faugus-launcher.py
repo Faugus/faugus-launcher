@@ -36,6 +36,10 @@ latest_games = f'{faugus_launcher_dir}/latest-games.txt'
 lock_file_path = os.path.join(share_dir, "faugus-launcher/faugus_launcher.lock")
 lock_file = None
 
+faugus_launcher_share_dir = os.path.join(share_dir, "faugus-launcher")
+if not os.path.exists(faugus_launcher_share_dir):
+    os.makedirs(faugus_launcher_share_dir)
+
 def is_already_running():
     current_pid = str(os.getpid())
 
