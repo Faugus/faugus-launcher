@@ -9,6 +9,7 @@ import sys
 import threading
 import webbrowser
 import gi
+import socket
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -24,19 +25,25 @@ icons_dir = f'{faugus_launcher_dir}/icons'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
-faugus_png = "/usr/share/icons/faugus-launcher.png"
-tray_icon = "/usr/share/icons/faugus-launcher.png"
+faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
+tray_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
+epic_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-epic-games.png"
+battle_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-battlenet.png"
+ubisoft_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-ubisoft-connect.png"
+ea_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-ea.png"
 faugus_run = "/usr/bin/faugus-run"
 faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
 mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
 latest_games = f'{faugus_launcher_dir}/latest-games.txt'
+faugus_launcher_share_dir = f"{share_dir}/faugus-launcher"
+faugus_temp = os.path.expanduser('~/faugus_temp')
 
-lock_file_path = os.path.join(share_dir, "faugus-launcher/faugus_launcher.lock")
+lock_file_path = f"{faugus_launcher_share_dir}/faugus_launcher.lock"
 lock_file = None
 
-faugus_launcher_share_dir = os.path.join(share_dir, "faugus-launcher")
+
 if not os.path.exists(faugus_launcher_share_dir):
     os.makedirs(faugus_launcher_share_dir)
 
@@ -797,6 +804,7 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(f"Edit {game.title}")
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
+            edit_game_dialog.grid0.set_visible(False)
 
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
@@ -931,25 +939,91 @@ class Main(Gtk.Window):
         except FileNotFoundError:
             pass  # Ignore if the file doesn't exist yet
 
+    def show_warning_dialog(self, parent, title):
+        dialog = Gtk.MessageDialog(
+            transient_for=parent,
+            modal=True,
+            message_type=Gtk.MessageType.WARNING,
+            buttons=Gtk.ButtonsType.OK,
+            text=title,
+        )
+        dialog.set_icon_from_file(faugus_png)
+        dialog.run()
+        dialog.destroy()
+
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
             if not add_game_dialog.validate_fields(entry="path+prefix"):
                 # If fields are not validated, return and keep the dialog open
                 return True
+
             # Proceed with adding the game
             # Get game information from dialog fields
-            title = add_game_dialog.entry_title.get_text()
+            prefix = add_game_dialog.entry_prefix.get_text()
+            if add_game_dialog.combo_box_launcher.get_active() == 0:
+                title = add_game_dialog.entry_title.get_text()
+            else:
+                title = add_game_dialog.combo_box_launcher.get_active_text()
+
+            if any(game.title == title for game in self.games):
+                # Display an error message and prevent the dialog from closing
+                self.show_warning_dialog(add_game_dialog, f"{title} already exists")
+                return True
+
             path = add_game_dialog.entry_path.get_text()
             launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
-            prefix = add_game_dialog.entry_prefix.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combo_box_runner.get_active_text()
 
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
+
+            if runner == "UMU-Proton Latest":
+                runner = ""
+            if runner == "GE-Proton Latest (default)":
+                runner = "GE-Proton"
+
+            def check_internet_connection():
+                try:
+                    socket.create_connection(("8.8.8.8", 53), timeout=5)
+                    return True
+                except socket.gaierror:
+                    return False
+                except OSError as e:
+                    if e.errno == 101:
+                        return False
+                    raise
+
+            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
+                self.show_warning_dialog(add_game_dialog, "No internet connection")
+                return True
+            else:
+                if add_game_dialog.combo_box_launcher.get_active() == 1:
+                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
+                    subprocess.run([faugus_run, command, "battle"])
+                    if os.path.exists(faugus_temp):
+                        shutil.rmtree(faugus_temp)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 2:
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
+                    subprocess.run([faugus_run, command, "ea"])
+                    if os.path.exists(faugus_temp):
+                        shutil.rmtree(faugus_temp)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 3:
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run msiexec /i"
+                    subprocess.run([faugus_run, command, "epic"])
+                    if os.path.exists(faugus_temp):
+                        shutil.rmtree(faugus_temp)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 4:
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
+                    subprocess.run([faugus_run, command, "ubisoft"])
+                    if os.path.exists(faugus_temp):
+                        shutil.rmtree(faugus_temp)
 
             # Concatenate game information
             game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
@@ -958,11 +1032,6 @@ class Main(Gtk.Window):
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
-
-            if runner == "UMU-Proton Latest":
-                runner = ""
-            if runner == "GE-Proton Latest (default)":
-                runner = "GE-Proton"
 
             game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner}\n"
 
@@ -2040,7 +2109,7 @@ class ConfirmationDialog(Gtk.Dialog):
 class AddGame(Gtk.Dialog):
     def __init__(self, parent, game_running2, file_path):
         # Initialize the AddGame dialog
-        super().__init__(title="New Game", parent=parent)
+        super().__init__(title="New Game/App", parent=parent)
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
@@ -2062,6 +2131,13 @@ class AddGame(Gtk.Dialog):
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
 
+        self.grid0 = Gtk.Grid()
+        self.grid0.set_row_spacing(10)
+        self.grid0.set_column_spacing(10)
+        self.grid0.set_margin_start(10)
+        self.grid0.set_margin_end(10)
+        self.grid0.set_margin_top(10)
+
         grid = Gtk.Grid()
         grid.set_row_spacing(10)
         grid.set_column_spacing(10)
@@ -2069,6 +2145,13 @@ class AddGame(Gtk.Dialog):
         grid.set_margin_end(10)
         grid.set_margin_top(10)
         grid.set_margin_bottom(10)
+
+        self.grid1 = Gtk.Grid()
+        self.grid1.set_row_spacing(10)
+        self.grid1.set_column_spacing(10)
+        self.grid1.set_margin_start(10)
+        self.grid1.set_margin_end(10)
+        self.grid1.set_margin_top(10)
 
         grid2 = Gtk.Grid()
 
@@ -2092,6 +2175,7 @@ class AddGame(Gtk.Dialog):
         grid4.set_column_spacing(10)
         grid4.set_margin_start(10)
         grid4.set_margin_end(10)
+        grid4.set_margin_bottom(10)
 
         grid5 = Gtk.Grid()
         grid5.set_row_spacing(10)
@@ -2108,6 +2192,9 @@ class AddGame(Gtk.Dialog):
         """
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        self.combo_box_launcher = Gtk.ComboBoxText()
+        self.combo_box_launcher.connect("changed", self.on_combobox_changed)
 
         # Widgets for title
         self.label_title = Gtk.Label(label="Title")
@@ -2228,7 +2315,7 @@ class AddGame(Gtk.Dialog):
 
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label1 = Gtk.Label(label="Game")
+        tab_label1 = Gtk.Label(label="Game/App")
         tab_box1.pack_start(tab_label1, True, True, 0)
         tab_box1.set_hexpand(True)
         self.notebook.append_page(page1, tab_box1)
@@ -2241,13 +2328,16 @@ class AddGame(Gtk.Dialog):
         self.notebook.append_page(page2, tab_box2)
 
         # Attach widgets to the grid layout
-        grid.attach(self.label_title, 0, 0, 4, 1)
-        grid.attach(self.entry_title, 0, 1, 4, 1)
+        self.grid0.attach(self.combo_box_launcher, 0, 0, 4, 1)
+        self.combo_box_launcher.set_hexpand(True)
 
-        grid.attach(self.label_path, 0, 2, 1, 1)
-        grid.attach(self.entry_path, 0, 3, 3, 1)
+        self.grid1.attach(self.label_title, 0, 0, 4, 1)
+        self.grid1.attach(self.entry_title, 0, 1, 4, 1)
+
+        self.grid1.attach(self.label_path, 0, 2, 1, 1)
+        self.grid1.attach(self.entry_path, 0, 3, 3, 1)
         self.entry_path.set_hexpand(True)
-        grid.attach(self.button_search, 3, 3, 1, 1)
+        self.grid1.attach(self.button_search, 3, 3, 1, 1)
 
         grid.attach(self.label_prefix, 0, 4, 1, 1)
         grid.attach(self.entry_prefix, 0, 5, 3, 1)
@@ -2258,7 +2348,10 @@ class AddGame(Gtk.Dialog):
         grid5.attach(self.combo_box_runner, 0, 7, 1, 1)
         self.combo_box_runner.set_hexpand(True)
 
+        page1.add(self.grid0)
+        page1.add(self.grid1)
         page1.add(grid)
+
         page1.add(grid5)
 
         grid2.attach(self.button_shortcut_icon, 2, 6, 1, 1)
@@ -2306,6 +2399,8 @@ class AddGame(Gtk.Dialog):
 
         self.box.add(botton_box)
 
+        self.populate_combobox_with_launchers()
+        self.combo_box_launcher.set_active(0)
         self.populate_combobox_with_runners()
 
         model = self.combo_box_runner.get_model()
@@ -2358,10 +2453,77 @@ class AddGame(Gtk.Dialog):
         tab_box2.show_all()
         self.show_all()
 
+    def on_combobox_changed(self, combo_box):
+        active_index = combo_box.get_active()
+
+        if active_index == 0:
+            self.grid1.set_visible(True)
+            self.entry_launch_arguments.set_text("")
+            self.entry_title.set_text("")
+            self.entry_path.set_text("")
+
+            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+        elif active_index == 1:
+            self.grid1.set_visible(False)
+            self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
+            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
+
+            shutil.copy(battle_icon, os.path.expanduser(self.icon_temp))
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
+        elif active_index == 2:
+            self.grid1.set_visible(False)
+            self.entry_launch_arguments.set_text("")
+            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
+
+            shutil.copy(ea_icon, os.path.expanduser(self.icon_temp))
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
+        elif active_index == 3:
+            self.grid1.set_visible(False)
+            self.entry_launch_arguments.set_text("")
+            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe")
+
+            shutil.copy(epic_icon, os.path.expanduser(self.icon_temp))
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
+        elif active_index == 4:
+            self.grid1.set_visible(False)
+            self.entry_launch_arguments.set_text("")
+            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
+
+            shutil.copy(ubisoft_icon, os.path.expanduser(self.icon_temp))
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
+
     def on_key_press(self, widget, event):
         if event.string in [';']:
             return True
         return False
+
+    def populate_combobox_with_launchers(self):
+        self.combo_box_launcher.append_text("Add a game")
+        self.combo_box_launcher.append_text("Battle.net")
+        self.combo_box_launcher.append_text("EA App")
+        self.combo_box_launcher.append_text("Epic Games")
+        self.combo_box_launcher.append_text("Ubisoft Connect")
+        #self.combo_box_launcher.append_text("HoYoPlay")
 
     def populate_combobox_with_runners(self):
         # List of default entries

@@ -21,7 +21,7 @@ def get_latest_version():
         release_info = response.json()
         return release_info['tag_name']  # Returns the latest tag name
     else:
-        print(f"Failed to access {REPO_URL}. Status code: {response.status_code}")
+        print(f"Failed to access {REPO_URL}. Status code: {response.status_code}", flush=True)
         return None
 
 # Function to get the installed version from a local file
@@ -49,9 +49,9 @@ def download_and_extract(url, download_dir):
 
         # Remove the .tar.gz file after extraction
         os.remove(download_path)
-        print("Done!")
+        print("Done!", flush=True)
     else:
-        print(f"Failed to download {file_name}. Status code: {response.status_code}")
+        print(f"Failed to download {file_name}. Status code: {response.status_code}", flush=True)
 
 # Function to check for updates
 def check_for_updates():
@@ -63,7 +63,6 @@ def check_for_updates():
 
         # Compare the latest version with the installed version
         if latest_version != installed_version:
-            print("New version found. Updating...")
 
             # URLs for the files with the latest version
             be_url = BE_URL.format(latest_version)
@@ -75,16 +74,16 @@ def check_for_updates():
             os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
             # Download and extract the files
-            print("Updating BE...")
+            print("Updating BattlEye...", flush=True)
             download_and_extract(be_url, DOWNLOAD_DIR)
-            print("Updating EAC...")
+            print("Updating Easy Anti-Cheat...", flush=True)
             download_and_extract(eac_url, DOWNLOAD_DIR)
 
             # Update the version file with the latest version
             with open(VERSION_FILE, "w") as f:
                 f.write(latest_version)
         else:
-            print("Components are up to date.")
+            print("Components are up to date.", flush=True)
 
 # Execute the update check
 check_for_updates()
