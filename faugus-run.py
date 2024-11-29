@@ -1,10 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, GdkPixbuf
-from threading import Thread
 
 import atexit
 import sys
@@ -12,7 +11,6 @@ import subprocess
 import argparse
 import re
 import os
-import urllib.request
 
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
@@ -23,7 +21,6 @@ share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
 eac_dir = f'PROTON_EAC_RUNTIME={faugus_launcher_dir}/components/eac'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={faugus_launcher_dir}/components/be'
-faugus_temp = os.path.expanduser('~/faugus_temp')
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -57,7 +54,6 @@ class FaugusRun:
         sys.exit(1)
 
     def start_process(self, command):
-        self.launcher = command
 
         sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
             "/usr/local/bin/sc-controller")
@@ -78,6 +74,14 @@ class FaugusRun:
         if self.default_runner == "GE-Proton Latest (default)":
             self.default_runner = "GE-Proton"
 
+        discrete_gpu = "DRI_PRIME=1"
+        if not self.discrete_gpu:
+            discrete_gpu = "DRI_PRIME=0"
+        if self.discrete_gpu:
+            discrete_gpu = "DRI_PRIME=1"
+        if self.discrete_gpu == None:
+            discrete_gpu = "DRI_PRIME=1"
+
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
                 if "PROTONPATH" not in self.message:
@@ -89,125 +93,15 @@ class FaugusRun:
 
         print(self.message)
 
-        self.show_warning_dialog()
+        subprocess.run([faugus_components])
+
+        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, text=True)
 
         if command == "winetricks":
             self.show_log_window()
 
-        if self.launcher == "epic" or self.launcher == "battle" or self.launcher == "ubisoft" or self.launcher == "ea":
-            self.warning_dialog.show_all()
-
-        if not command:
-            self.components_run()
-            self.umu_run()
-
-        if command == "ea":
-            self.label.set_text("Downloading EA App...")
-            self.label2.set_text("")
-
-            file_path = self.download_launcher(command)
-            self.message = f"{self.message} {file_path} /S"
-
-            self.umu_run()
-
-        if command == "epic":
-            self.label.set_text("Downloading Epic Games...")
-            self.label2.set_text("")
-
-            file_path = self.download_launcher(command)
-            self.message = f"{self.message} {file_path} /passive"
-
-            self.umu_run()
-
-        if command == "battle":
-            self.label.set_text("Downloading Battle.net...")
-            self.label2.set_text("")
-
-            file_path = self.download_launcher(command)
-            self.message = f"PROTON_USE_WINED3D=1 {self.message} {file_path} --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
-
-            self.umu_run()
-
-        if command == "ubisoft":
-            self.label.set_text("Downloading Ubisoft Connect...")
-            self.label2.set_text("")
-
-            file_path = self.download_launcher(command)
-            self.message = f"{self.message} {file_path} /S"
-
-            self.umu_run()
-
-    def components_run(self):
-        self.process = subprocess.Popen(
-            [faugus_components],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
-        )
-
-        GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output_components)
-        GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output_components)
-        self.process.wait()
-
-    def download_launcher(self, command):
-        urls = {
-            "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-            "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
-            "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
-            "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"
-        }
-
-        file_name = {
-            "ea": "EAappInstaller.exe",
-            "epic": "EpicGamesLauncherInstaller.msi",
-            "battle": "Battle.net-Setup.exe",
-            "ubisoft": "UbisoftConnectInstaller.exe"
-        }
-
-        if command not in urls:
-            print("Invalid command!")
-            return None
-
-        os.makedirs(faugus_temp, exist_ok=True)
-        file_path = os.path.join(faugus_temp, file_name[command])
-
-        def report_progress(block_num, block_size, total_size):
-            if total_size > 0:
-                downloaded = block_num * block_size
-                percent = min(downloaded * 100 / total_size, 100)
-                GLib.idle_add(self.update_label, percent)
-
-        try:
-            print(f"Starting download from {urls[command]}")
-            urllib.request.urlretrieve(urls[command], file_path, reporthook=report_progress)
-            print(f"File downloaded successfully: {file_path}")
-            self.label2.set_text("")
-            return file_path
-        except urllib.error.URLError as e:
-            print(f"URL Error: {e}")
-            self.label2.set_text("")
-            return None
-        except Exception as e:
-            print(f"Error downloading file: {e}")
-            self.label2.set_text("")
-            return None
-
-    def update_label(self, percent):
-        self.label2.set_text(f"{int(percent)}%")
-        return False
-
-    def umu_run(self):
-        discrete_gpu = "DRI_PRIME=1"
-        if not self.discrete_gpu:
-            discrete_gpu = "DRI_PRIME=0"
-        if self.discrete_gpu:
-            discrete_gpu = "DRI_PRIME=1"
-        if self.discrete_gpu == None:
-            discrete_gpu = "DRI_PRIME=1"
-
-        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, text=True)
+        self.show_warning_dialog()
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
@@ -361,23 +255,10 @@ class FaugusRun:
                 print(line, end='')
         return True
 
-    def on_output_components(self, source, condition):
-        if line := source.readline():
-            clean_line = line.strip()
-            self.check_game_output(clean_line)
-            print(clean_line)
-        return True
 
     def check_game_output(self, clean_line):
-        if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line:
+        if "Downloading" in clean_line:
             self.warning_dialog.show_all()
-
-        if "Updating BattlEye..." in clean_line:
-            self.label.set_text("Updating BattlEye...")
-        if "Updating Easy Anti-Cheat..." in clean_line:
-            self.label.set_text("Updating Easy Anti-Cheat...")
-        if "Components are up to date." in clean_line:
-            self.label.set_text("Components are up to date")
 
         if "Downloading GE-Proton" in clean_line:
             self.label.set_text("Downloading GE-Proton...")
@@ -404,29 +285,9 @@ class FaugusRun:
         if "mtree is OK" in clean_line:
             self.label2.set_text("Steam Runtime is up to date")
 
+
         if "ProtonFixes" in clean_line:
-            if self.launcher == "ea":
-                self.label.set_text("Installing EA App...")
-                self.label2.set_text("Just wait...")
-                if "exited" in clean_line:
-                    GLib.timeout_add_seconds(0, self.close_warning_dialog)
-            if self.launcher == "epic":
-                self.label.set_text("Installing Epic Games...")
-                self.label2.set_text("Just wait...")
-                if "exited" in clean_line:
-                    GLib.timeout_add_seconds(0, self.close_warning_dialog)
-            if self.launcher == "battle":
-                self.label.set_text("Installing Battle.net...")
-                self.label2.set_text("Close login screen and wait...")
-                if "exited" in clean_line:
-                    GLib.timeout_add_seconds(0, self.close_warning_dialog)
-            if self.launcher == "ubisoft":
-                self.label.set_text("Installing Ubisoft Connect...")
-                self.label2.set_text("Just wait...")
-                if "exited" in clean_line:
-                    GLib.timeout_add_seconds(0, self.close_warning_dialog)
-            if self.launcher == None:
-                GLib.timeout_add_seconds(0, self.close_warning_dialog)
+            GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
@@ -496,55 +357,37 @@ class FaugusRun:
             GLib.idle_add(Gtk.main_quit)
         return False
 
+
 def handle_command(message, command=None):
-    # Create an instance of FaugusRun with the given message
     updater = FaugusRun(message)
+    updater.start_process(command)
 
-    def run_process():
-        # Start the process in a separate thread
-        updater.start_process(command)
-
-    # Create a thread to run the process
-    process_thread = Thread(target=run_process)
-
-    def start_thread():
-        # Start the process thread after GTK main loop is running
-        process_thread.start()
-
-    # Register the thread start function to be called after GTK main loop starts
-    GLib.idle_add(start_thread)
-
-    # Start the GTK main loop (this should be executed first)
     Gtk.main()
-
-    # Wait for the process thread to finish before exiting
-    process_thread.join()
+    updater.process.wait()
     sys.exit(0)
+
 
 def stop_scc_daemon():
     try:
-        # Attempt to stop the SCC daemon
         subprocess.run(["scc-daemon", "stop"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to stop scc-daemon: {e}")
 
+
 def main():
-    # Argument parser setup to read command line arguments
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
 
     args = parser.parse_args()
 
-    # Check if the sc-controller is installed
     sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
     if sc_controller_installed:
-        # If SC_CONTROLLER=1 is in the message, register the stop_scc_daemon function to be called on exit
         if "SC_CONTROLLER=1" in args.message:
             atexit.register(stop_scc_daemon)
 
-    # Call handle_command to start the process and the GTK main loop
     handle_command(args.message, args.command)
+
 
 if __name__ == "__main__":
     main()

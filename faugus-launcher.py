@@ -10,6 +10,7 @@ import threading
 import webbrowser
 import gi
 import socket
+import urllib.request
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -110,11 +111,11 @@ class Main(Gtk.Window):
         self.games = []
 
         # Create main box and its components
-        box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_bottom = Gtk.Box()
+        self.box_bottom = Gtk.Box()
 
         # Create buttons for adding, editing, and deleting games
         self.button_add = Gtk.Button()
@@ -231,8 +232,8 @@ class Main(Gtk.Window):
         self.load_games()
 
         # Pack left and scrolled box into the top box
-        box_top.pack_start(box_left, False, True, 0)
-        box_top.pack_start(box_right, True, True, 0)
+        self.box_top.pack_start(box_left, False, True, 0)
+        self.box_top.pack_start(box_right, True, True, 0)
 
         # Pack buttons into the left box
         box_left.pack_start(self.button_add, False, False, 0)
@@ -242,15 +243,15 @@ class Main(Gtk.Window):
         box_right.pack_start(scroll_box, True, True, 0)
 
         # Pack buttons and other components into the bottom box
-        box_bottom.pack_start(button_settings, False, False, 0)
-        box_bottom.pack_start(self.entry_search, True, True, 0)
-        box_bottom.pack_end(self.button_play, False, False, 0)
-        box_bottom.pack_end(button_kill, False, False, 0)
+        self.box_bottom.pack_start(button_settings, False, False, 0)
+        self.box_bottom.pack_start(self.entry_search, True, True, 0)
+        self.box_bottom.pack_end(self.button_play, False, False, 0)
+        self.box_bottom.pack_end(button_kill, False, False, 0)
 
         # Pack top and bottom boxes into the main box
-        box_main.pack_start(box_top, True, True, 0)
-        box_main.pack_end(box_bottom, False, True, 0)
-        self.add(box_main)
+        self.box_main.pack_start(self.box_top, True, True, 0)
+        self.box_main.pack_end(self.box_bottom, False, True, 0)
+        self.add(self.box_main)
 
         self.button_edit.set_sensitive(False)
         self.button_delete.set_sensitive(False)
@@ -986,45 +987,6 @@ class Main(Gtk.Window):
             if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
 
-            def check_internet_connection():
-                try:
-                    socket.create_connection(("8.8.8.8", 53), timeout=5)
-                    return True
-                except socket.gaierror:
-                    return False
-                except OSError as e:
-                    if e.errno == 101:
-                        return False
-                    raise
-
-            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
-                self.show_warning_dialog(add_game_dialog, "No internet connection")
-                return True
-            else:
-                if add_game_dialog.combo_box_launcher.get_active() == 1:
-                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
-                    subprocess.run([faugus_run, command, "battle"])
-                    if os.path.exists(faugus_temp):
-                        shutil.rmtree(faugus_temp)
-
-                if add_game_dialog.combo_box_launcher.get_active() == 2:
-                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
-                    subprocess.run([faugus_run, command, "ea"])
-                    if os.path.exists(faugus_temp):
-                        shutil.rmtree(faugus_temp)
-
-                if add_game_dialog.combo_box_launcher.get_active() == 3:
-                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run msiexec /i"
-                    subprocess.run([faugus_run, command, "epic"])
-                    if os.path.exists(faugus_temp):
-                        shutil.rmtree(faugus_temp)
-
-                if add_game_dialog.combo_box_launcher.get_active() == 4:
-                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} umu-run"
-                    subprocess.run([faugus_run, command, "ubisoft"])
-                    if os.path.exists(faugus_temp):
-                        shutil.rmtree(faugus_temp)
-
             # Concatenate game information
             game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
 
@@ -1049,6 +1011,74 @@ class Main(Gtk.Window):
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
 
+            def check_internet_connection():
+                try:
+                    socket.create_connection(("8.8.8.8", 53), timeout=5)
+                    return True
+                except socket.gaierror:
+                    return False
+                except OSError as e:
+                    if e.errno == 101:
+                        return False
+                    raise
+
+            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
+                self.show_warning_dialog(add_game_dialog, "No internet connection")
+                return True
+            else:
+                if add_game_dialog.combo_box_launcher.get_active() == 1:
+                    add_game_dialog.label_download.set_text("Downloading Battle.net...")
+                    add_game_dialog.grid6.set_visible(True)
+                    file_path = self.download_launcher("battle", add_game_dialog)
+                    command = f"PROTON_USE_WINED3D=1 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    processo = subprocess.Popen([faugus_run, command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    GLib.timeout_add(100, self.monitor_process, processo, add_game_dialog, game, shortcut_state, icon_temp, icon_final, title)
+
+                    self.box_main.remove(self.box_top)
+                    self.box_main.remove(self.box_bottom)
+                    self.launcher_screen(title, "1")
+
+                    return True
+
+                if add_game_dialog.combo_box_launcher.get_active() == 2:
+                    add_game_dialog.label_download.set_text("Downloading EA App...")
+                    add_game_dialog.grid6.set_visible(True)
+                    file_path = self.download_launcher("ea", add_game_dialog)
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                    processo = subprocess.Popen([faugus_run, command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    GLib.timeout_add(100, self.monitor_process, processo, add_game_dialog, game, shortcut_state, icon_temp, icon_final, title)
+
+                    self.box_main.remove(self.box_top)
+                    self.box_main.remove(self.box_bottom)
+                    self.launcher_screen(title, "2")
+                    return True
+
+                if add_game_dialog.combo_box_launcher.get_active() == 3:
+                    add_game_dialog.label_download.set_text("Downloading Epic Games...")
+                    add_game_dialog.grid6.set_visible(True)
+                    file_path = self.download_launcher("epic", add_game_dialog)
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
+                    processo = subprocess.Popen([faugus_run, command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    GLib.timeout_add(100, self.monitor_process, processo, add_game_dialog, game, shortcut_state, icon_temp, icon_final, title)
+
+                    self.box_main.remove(self.box_top)
+                    self.box_main.remove(self.box_bottom)
+                    self.launcher_screen(title, "3")
+                    return True
+
+                if add_game_dialog.combo_box_launcher.get_active() == 4:
+                    add_game_dialog.label_download.set_text("Downloading Ubisoft Connect...")
+                    add_game_dialog.grid6.set_visible(True)
+                    file_path = self.download_launcher("ubisoft", add_game_dialog)
+                    command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                    processo = subprocess.Popen([faugus_run, command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    GLib.timeout_add(100, self.monitor_process, processo, add_game_dialog, game, shortcut_state, icon_temp, icon_final, title)
+
+                    self.box_main.remove(self.box_top)
+                    self.box_main.remove(self.box_bottom)
+                    self.launcher_screen(title, "4")
+                    return True
+
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
 
@@ -1067,6 +1097,132 @@ class Main(Gtk.Window):
 
         # Ensure the dialog is destroyed when canceled
         add_game_dialog.destroy()
+
+    def launcher_screen(self, title, launcher):
+        self.box_launcher = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_launcher.set_hexpand(True)
+        self.box_launcher.set_vexpand(True)
+
+        grid_launcher = Gtk.Grid()
+        grid_launcher.set_halign(Gtk.Align.CENTER)
+        grid_launcher.set_valign(Gtk.Align.CENTER)
+
+        self.box_launcher.pack_start(grid_launcher, True, True, 0)
+
+        label = Gtk.Label()
+        label.set_margin_start(20)
+        label.set_margin_end(20)
+        label.set_margin_bottom(20)
+        label.set_text(f"Installing {title}...")
+
+        label2 = Gtk.Label()
+        label2.set_margin_start(20)
+        label2.set_margin_end(20)
+        label2.set_margin_bottom(20)
+        label2.set_text("")
+
+        grid_launcher.attach(label, 0, 1, 1, 1)
+        grid_launcher.attach(label2, 0, 2, 1, 1)
+
+        if launcher == "1":
+            image_path = battle_icon
+            label2.set_text("Close the login window and please wait...")
+        elif launcher == "2":
+            image_path = ea_icon
+            label2.set_text("Close the login window and please wait...")
+        elif launcher == "3":
+            image_path = epic_icon
+            label2.set_text("Please wait...")
+        elif launcher == "4":
+            image_path = ubisoft_icon
+            label2.set_text("Please wait...")
+        else:
+            image_path = faugus_png
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+        pixbuf = pixbuf.scale_simple(128, 128, GdkPixbuf.InterpType.BILINEAR)
+
+        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        image.set_margin_top(20)
+        image.set_margin_start(20)
+        image.set_margin_end(20)
+        image.set_margin_bottom(20)
+        grid_launcher.attach(image, 0, 0, 1, 1)
+
+        self.box_main.add(self.box_launcher)
+        self.box_main.show_all()
+
+    def monitor_process(self, processo, add_game_dialog, game, shortcut_state, icon_temp, icon_final, title):
+        retcode = processo.poll()
+
+        if retcode is not None:
+            print(f"{title} installed.")
+
+            if os.path.exists(faugus_temp):
+                shutil.rmtree(faugus_temp)
+
+            self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+            self.add_item_list(game)
+            self.update_list()
+            self.select_game_by_title(title)
+
+            self.box_main.pack_start(self.box_top, True, True, 0)
+            self.box_main.pack_end(self.box_bottom, False, True, 0)
+            self.box_main.remove(self.box_launcher)
+            self.box_launcher.destroy()
+            self.box_main.show_all()
+
+            return False
+
+        return True
+
+    def download_launcher(self, launcher, add_game_dialog):
+        urls = {
+            "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
+            "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+            "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+            "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"
+        }
+
+        file_name = {
+            "ea": "EAappInstaller.exe",
+            "epic": "EpicGamesLauncherInstaller.msi",
+            "battle": "Battle.net-Setup.exe",
+            "ubisoft": "UbisoftConnectInstaller.exe"
+        }
+
+        if launcher not in urls:
+            return None
+
+        os.makedirs(faugus_temp, exist_ok=True)
+        file_path = os.path.join(faugus_temp, file_name[launcher])
+        self.download_completed = False
+
+        def report_progress(block_num, block_size, total_size):
+            if total_size > 0:
+                downloaded = block_num * block_size
+                percent = min(downloaded / total_size, 1.0)
+                GLib.idle_add(add_game_dialog.bar_download.set_fraction, percent)
+                GLib.idle_add(add_game_dialog.bar_download.set_text, f"{int(percent * 100)}%")
+
+        def start_download():
+            try:
+                urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
+                GLib.idle_add(add_game_dialog.bar_download.set_fraction, 1.0)
+                GLib.idle_add(add_game_dialog.bar_download.set_text, "Download complete")
+                GLib.idle_add(on_download_complete)
+            except Exception as e:
+                GLib.idle_add(self.show_warning_dialog, add_game_dialog, f"Error during download: {e}")
+
+        def on_download_complete():
+            self.download_completed = True
+            add_game_dialog.destroy()
+
+        threading.Thread(target=start_download).start()
+
+        while not self.download_completed:
+            GLib.MainContext.default().iteration(True)
+        return file_path
 
     def select_game_by_title(self, title):
         # Select an item from the list based on title
@@ -2183,6 +2339,12 @@ class AddGame(Gtk.Dialog):
         grid5.set_margin_start(10)
         grid5.set_margin_end(10)
 
+        self.grid6 = Gtk.Grid()
+        self.grid6.set_row_spacing(10)
+        self.grid6.set_column_spacing(10)
+        self.grid6.set_margin_start(10)
+        self.grid6.set_margin_end(10)
+        self.grid6.set_margin_bottom(10)
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -2289,6 +2451,11 @@ class AddGame(Gtk.Dialog):
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
 
+
+        self.label_download = Gtk.Label(label="Downloading...")
+        self.label_download.set_halign(Gtk.Align.START)
+        self.bar_download = Gtk.ProgressBar()
+
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -2359,6 +2526,12 @@ class AddGame(Gtk.Dialog):
         self.checkbox_shortcut.set_hexpand(True)
 
         page1.add(grid2)
+
+        self.grid6.attach(self.label_download, 0, 0, 1, 1)
+        self.grid6.attach(self.bar_download, 0, 1, 1, 1)
+        self.bar_download.set_hexpand(True)
+
+        page1.add(self.grid6)
 
         grid3.attach(self.label_protonfix, 0, 0, 1, 1)
         grid3.attach(self.entry_protonfix, 0, 1, 3, 1)
@@ -2452,6 +2625,7 @@ class AddGame(Gtk.Dialog):
         tab_box1.show_all()
         tab_box2.show_all()
         self.show_all()
+        self.grid6.set_visible(False)
 
     def on_combobox_changed(self, combo_box):
         active_index = combo_box.get_active()
