@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import gi
 
@@ -497,36 +497,53 @@ class FaugusRun:
         return False
 
 def handle_command(message, command=None):
+    # Create an instance of FaugusRun with the given message
     updater = FaugusRun(message)
+
     def run_process():
+        # Start the process in a separate thread
         updater.start_process(command)
 
+    # Create a thread to run the process
     process_thread = Thread(target=run_process)
-    process_thread.start()
 
+    def start_thread():
+        # Start the process thread after GTK main loop is running
+        process_thread.start()
+
+    # Register the thread start function to be called after GTK main loop starts
+    GLib.idle_add(start_thread)
+
+    # Start the GTK main loop (this should be executed first)
     Gtk.main()
 
+    # Wait for the process thread to finish before exiting
     process_thread.join()
     sys.exit(0)
 
 def stop_scc_daemon():
     try:
+        # Attempt to stop the SCC daemon
         subprocess.run(["scc-daemon", "stop"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to stop scc-daemon: {e}")
 
 def main():
+    # Argument parser setup to read command line arguments
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
 
     args = parser.parse_args()
 
+    # Check if the sc-controller is installed
     sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
     if sc_controller_installed:
+        # If SC_CONTROLLER=1 is in the message, register the stop_scc_daemon function to be called on exit
         if "SC_CONTROLLER=1" in args.message:
             atexit.register(stop_scc_daemon)
 
+    # Call handle_command to start the process and the GTK main loop
     handle_command(args.message, args.command)
 
 if __name__ == "__main__":
