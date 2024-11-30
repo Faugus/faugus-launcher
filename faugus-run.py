@@ -4,6 +4,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, GdkPixbuf
+from threading import Thread
 
 import atexit
 import sys
@@ -93,20 +94,37 @@ class FaugusRun:
 
         print(self.message)
 
-        subprocess.run([faugus_components])
-
+        self.components_run()
         self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
         if command == "winetricks":
             self.show_log_window()
 
-        self.show_warning_dialog()
-
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
 
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
+
+    def components_run(self):
+        self.process = subprocess.Popen(
+            [faugus_components],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+
+        GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output_components)
+        GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output_components)
+        self.process.wait()
+
+    def on_output_components(self, source, condition):
+        if line := source.readline():
+            clean_line = line.strip()
+            self.check_game_output(clean_line)
+            print(clean_line)
+        return True
 
     def load_config(self):
         config_file = config_file_dir
@@ -257,8 +275,15 @@ class FaugusRun:
 
 
     def check_game_output(self, clean_line):
-        if "Downloading" in clean_line:
+        if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line:
             self.warning_dialog.show_all()
+
+        if "Updating BattlEye..." in clean_line:
+            self.label.set_text("Updating BattlEye...")
+        if "Updating Easy Anti-Cheat..." in clean_line:
+            self.label.set_text("Updating Easy Anti-Cheat...")
+        if "Components are up to date." in clean_line:
+            self.label.set_text("Components are up to date")
 
         if "Downloading GE-Proton" in clean_line:
             self.label.set_text("Downloading GE-Proton...")
@@ -360,19 +385,27 @@ class FaugusRun:
 
 def handle_command(message, command=None):
     updater = FaugusRun(message)
-    updater.start_process(command)
+    updater.show_warning_dialog()
 
+    def run_process():
+        updater.start_process(command)
+
+    process_thread = Thread(target=run_process)
+
+    def start_thread():
+        process_thread.start()
+
+    GLib.idle_add(start_thread)
     Gtk.main()
-    updater.process.wait()
-    sys.exit(0)
 
+    process_thread.join()
+    sys.exit(0)
 
 def stop_scc_daemon():
     try:
         subprocess.run(["scc-daemon", "stop"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to stop scc-daemon: {e}")
-
 
 def main():
     parser = argparse.ArgumentParser(description="Faugus Run")
@@ -387,7 +420,6 @@ def main():
             atexit.register(stop_scc_daemon)
 
     handle_command(args.message, args.command)
-
 
 if __name__ == "__main__":
     main()
