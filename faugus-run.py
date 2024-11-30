@@ -62,8 +62,6 @@ class FaugusRun:
             if "SC_CONTROLLER=1" in self.message:
                 self.start_scc_daemon()
 
-        self.load_config()
-
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
         if protonpath and protonpath != "GE-Proton":
             protonpath_path = f'{share_dir}/Steam/compatibilitytools.d/{protonpath}'
@@ -97,9 +95,6 @@ class FaugusRun:
         self.components_run()
         self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
-
-        if command == "winetricks":
-            self.show_log_window()
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
@@ -194,6 +189,7 @@ class FaugusRun:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
+        self.load_config()
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
@@ -386,6 +382,8 @@ class FaugusRun:
 def handle_command(message, command=None):
     updater = FaugusRun(message)
     updater.show_warning_dialog()
+    if command == "winetricks":
+        updater.show_log_window()
 
     def run_process():
         updater.start_process(command)
