@@ -1096,6 +1096,12 @@ class Main(Gtk.Window):
         self.label_download2.set_visible(False)
         self.label_download2.set_size_request(256, -1)
 
+        self.button_finish_install = Gtk.Button(label="Finish installation")
+        self.button_finish_install.connect("clicked", self.on_button_finish_install_clicked)
+        self.button_finish_install.set_size_request(150, -1)
+        self.button_finish_install.set_halign(Gtk.Align.CENTER)
+
+
         if launcher == "1":
             image_path = battle_icon
             self.label_download.set_text("Downloading Battle.net...")
@@ -1133,11 +1139,16 @@ class Main(Gtk.Window):
         grid_labels.attach(self.label_download, 0, 0, 1, 1)
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
         grid_labels.attach(self.label_download2, 0, 2, 1, 1)
+        grid_labels.attach(self.button_finish_install, 0, 3, 1, 1)
 
         self.box_main.add(self.box_launcher)
         self.box_main.remove(self.box_top)
         self.box_main.remove(self.box_bottom)
         self.box_main.show_all()
+        self.button_finish_install.set_visible(False)
+
+    def on_button_finish_install_clicked(self, widget):
+        self.on_button_kill_clicked(widget)
 
     def monitor_process(self, processo, game, shortcut_state, icon_temp, icon_final, title):
         retcode = processo.poll()
@@ -1203,10 +1214,11 @@ class Main(Gtk.Window):
         def on_download_complete():
             self.label_download.set_text(f"Installing {title}...")
             if launcher == "battle":
-                self.label_download2.set_text("Close the login window and please wait...")
-                command = f"PROTON_USE_WINED3D=1 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                self.label_download2.set_text("Please close the login window and press:")
+                self.button_finish_install.set_visible(True)
+                command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
             elif launcher == "ea":
-                self.label_download2.set_text("Close the login window and please wait...")
+                self.label_download2.set_text("Please close the login window and wait...")
                 command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
             elif launcher == "epic":
                 self.label_download2.set_text("")
@@ -1216,7 +1228,7 @@ class Main(Gtk.Window):
                 command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
             self.bar_download.set_visible(False)
             self.label_download2.set_visible(True)
-            processo = subprocess.Popen([faugus_run, command], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            processo = subprocess.Popen([sys.executable, faugus_run, command])
             GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
 
         threading.Thread(target=start_download).start()
