@@ -13,6 +13,12 @@ import argparse
 import re
 import os
 
+os.environ['LD_PRELOAD'] = (
+    "/usr/lib/libgamemode.so.0:/usr/lib32/libgamemode.so.0:"
+    "/usr/lib/x86_64-linux-gnu/libgamemode.so.0:"
+    "/usr/lib64/libgamemode.so.0"
+)
+
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 faugus_components = "/usr/bin/faugus-components"
