@@ -13,12 +13,6 @@ import argparse
 import re
 import os
 
-os.environ['LD_PRELOAD'] = (
-    "/usr/lib/libgamemode.so.0:/usr/lib32/libgamemode.so.0:"
-    "/usr/lib/x86_64-linux-gnu/libgamemode.so.0:"
-    "/usr/lib64/libgamemode.so.0"
-)
-
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 faugus_components = "/usr/bin/faugus-components"
@@ -95,6 +89,9 @@ class FaugusRun:
                     self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
             else:
                 self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
+        if "gamemoderun" in self.message:
+            self.set_ld_preload()
+            self.message = f'LD_PRELOAD={self.ld_preload} {self.message}'
 
         print(self.message)
 
@@ -106,6 +103,17 @@ class FaugusRun:
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
 
         GLib.child_watch_add(self.process.pid, self.on_process_exit)
+
+    def set_ld_preload(self):
+        lib_paths = [
+            "/usr/lib/libgamemode.so.0",
+            "/usr/lib32/libgamemode.so.0",
+            "/usr/lib/x86_64-linux-gnu/libgamemode.so.0",
+            "/usr/lib64/libgamemode.so.0"
+        ]
+
+        ld_preload_paths = [path for path in lib_paths if os.path.exists(path)]
+        self.ld_preload = ":".join(ld_preload_paths)
 
     def components_run(self):
         self.process = subprocess.Popen(
@@ -124,7 +132,6 @@ class FaugusRun:
         if line := source.readline():
             clean_line = line.strip()
             self.check_game_output(clean_line)
-            print(clean_line)
         return True
 
     def load_config(self):
@@ -269,6 +276,8 @@ class FaugusRun:
         if line := source.readline():
             clean_line = remove_ansi_escape(line).strip()
             self.check_game_output(clean_line)
+            if "libgamemode.so.0" in clean_line or "libgamemodeauto.so.0" in clean_line or "libgamemode.so" in clean_line:
+                return True
             if "winetricks" in self.message:
                 self.append_to_text_view(clean_line)
             else:
