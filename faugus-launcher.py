@@ -718,7 +718,7 @@ class Main(Gtk.Window):
             if path:
                 command_parts.append(f'"{path}"')
             if game_arguments:
-                command_parts.append(f'"{game_arguments}"')
+                command_parts.append(f'{game_arguments}')
 
             # Join all parts into a single command
             command = ' '.join(command_parts)
@@ -1363,7 +1363,7 @@ class Main(Gtk.Window):
         if path:
             command_parts.append(f"'{path}'")
         if game_arguments:
-            command_parts.append(f"'{game_arguments}'")
+            command_parts.append(f"{game_arguments}")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
@@ -3651,7 +3651,7 @@ class CreateShortcut(Gtk.Window):
         if self.file_path:
             command_parts.append(f"'{self.file_path}'")
         if game_arguments:
-            command_parts.append(f"'{game_arguments}'")
+            command_parts.append(f"{game_arguments}")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
