@@ -707,7 +707,10 @@ class Main(Gtk.Window):
             else:
                 command_parts.append(f'GAMEID={title_formatted}')
             if runner:
-                command_parts.append(f'PROTONPATH={runner}')
+                if runner == "Linux-Native":
+                    command_parts.append('UMU_NO_PROTON=1')
+                else:
+                    command_parts.append(f'PROTONPATH={runner}')
             if gamemode:
                 command_parts.append(gamemode)
             if launch_arguments:
@@ -798,14 +801,6 @@ class Main(Gtk.Window):
                 self.game_running2 = False
             edit_game_dialog = AddGame(self, self.game_running2, file_path)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
-            edit_game_dialog.entry_title.set_text(game.title)
-            edit_game_dialog.entry_path.set_text(game.path)
-            edit_game_dialog.entry_prefix.set_text(game.prefix)
-            edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
-            edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
-            edit_game_dialog.set_title(f"Edit {game.title}")
-            edit_game_dialog.entry_protonfix.set_text(game.protonfix)
-            edit_game_dialog.grid0.set_visible(False)
 
             model = edit_game_dialog.combo_box_runner.get_model()
             index_to_activate = 0
@@ -815,6 +810,8 @@ class Main(Gtk.Window):
                 game_runner = "GE-Proton Latest (default)"
             if game.runner == "":
                 game_runner = "UMU-Proton Latest"
+            if game_runner == "Linux-Native":
+                edit_game_dialog.combo_box_launcher.set_active(1)
 
             for i, row in enumerate(model):
                 if row[0] == game_runner:
@@ -822,7 +819,16 @@ class Main(Gtk.Window):
                     break
             if not game_runner:
                 index_to_activate = 1
+
             edit_game_dialog.combo_box_runner.set_active(index_to_activate)
+            edit_game_dialog.entry_title.set_text(game.title)
+            edit_game_dialog.entry_path.set_text(game.path)
+            edit_game_dialog.entry_prefix.set_text(game.prefix)
+            edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
+            edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
+            edit_game_dialog.set_title(f"Edit {game.title}")
+            edit_game_dialog.entry_protonfix.set_text(game.protonfix)
+            edit_game_dialog.grid0.set_visible(False)
 
             mangohud_status = False
             gamemode_status = False
@@ -962,7 +968,7 @@ class Main(Gtk.Window):
             # Proceed with adding the game
             # Get game information from dialog fields
             prefix = add_game_dialog.entry_prefix.get_text()
-            if add_game_dialog.combo_box_launcher.get_active() == 0:
+            if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 title = add_game_dialog.entry_title.get_text()
             else:
                 title = add_game_dialog.combo_box_launcher.get_active_text()
@@ -986,6 +992,8 @@ class Main(Gtk.Window):
                 runner = ""
             if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
+            if add_game_dialog.combo_box_launcher.get_active() == 1:
+                runner = "Linux-Native"
 
             # Concatenate game information
             game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
@@ -1026,10 +1034,6 @@ class Main(Gtk.Window):
                 self.show_warning_dialog(add_game_dialog, "No internet connection")
                 return True
             else:
-                if add_game_dialog.combo_box_launcher.get_active() == 1:
-                    add_game_dialog.destroy()
-                    self.launcher_screen(title, "1", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
-
                 if add_game_dialog.combo_box_launcher.get_active() == 2:
                     add_game_dialog.destroy()
                     self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
@@ -1042,7 +1046,11 @@ class Main(Gtk.Window):
                     add_game_dialog.destroy()
                     self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-            if add_game_dialog.combo_box_launcher.get_active() == 0:
+                if add_game_dialog.combo_box_launcher.get_active() == 5:
+                    add_game_dialog.destroy()
+                    self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+
+            if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
 
@@ -1102,22 +1110,22 @@ class Main(Gtk.Window):
         self.button_finish_install.set_halign(Gtk.Align.CENTER)
 
 
-        if launcher == "1":
+        if launcher == "2":
             image_path = battle_icon
             self.label_download.set_text("Downloading Battle.net...")
             self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "2":
+        elif launcher == "3":
             image_path = ea_icon
             self.label_download.set_text("Downloading EA App...")
             self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "3":
+        elif launcher == "4":
             image_path = epic_icon
             self.label_download.set_text("Downloading Epic Games...")
             self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "4":
+        elif launcher == "5":
             image_path = ubisoft_icon
             self.label_download.set_text("Downloading Ubisoft Connect...")
             self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
@@ -1276,6 +1284,8 @@ class Main(Gtk.Window):
                 game.runner = ""
             if game.runner == "GE-Proton Latest (default)":
                 game.runner = "GE-Proton"
+            if edit_game_dialog.combo_box_launcher.get_active() == 1:
+                runner = "Linux-Native"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
@@ -1352,7 +1362,10 @@ class Main(Gtk.Window):
         else:
             command_parts.append(f'GAMEID={title_formatted}')
         if runner:
-            command_parts.append(f'PROTONPATH={runner}')
+            if runner == "Linux-Native":
+                command_parts.append('UMU_NO_PROTON=1')
+            else:
+                command_parts.append(f'PROTONPATH={runner}')
         if gamemode:
             command_parts.append(gamemode)
         if launch_arguments:
@@ -2344,11 +2357,11 @@ class AddGame(Gtk.Dialog):
         grid4.set_margin_end(10)
         grid4.set_margin_bottom(10)
 
-        grid5 = Gtk.Grid()
-        grid5.set_row_spacing(10)
-        grid5.set_column_spacing(10)
-        grid5.set_margin_start(10)
-        grid5.set_margin_end(10)
+        self.grid5 = Gtk.Grid()
+        self.grid5.set_row_spacing(10)
+        self.grid5.set_column_spacing(10)
+        self.grid5.set_margin_start(10)
+        self.grid5.set_margin_end(10)
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -2510,15 +2523,15 @@ class AddGame(Gtk.Dialog):
         self.entry_prefix.set_hexpand(True)
         grid.attach(self.button_search_prefix, 3, 5, 1, 1)
 
-        grid5.attach(self.label_runner, 0, 6, 1, 1)
-        grid5.attach(self.combo_box_runner, 0, 7, 1, 1)
+        self.grid5.attach(self.label_runner, 0, 6, 1, 1)
+        self.grid5.attach(self.combo_box_runner, 0, 7, 1, 1)
         self.combo_box_runner.set_hexpand(True)
 
         page1.add(self.grid0)
         page1.add(self.grid1)
         page1.add(grid)
 
-        page1.add(grid5)
+        page1.add(self.grid5)
 
         grid2.attach(self.button_shortcut_icon, 2, 6, 1, 1)
         grid2.attach(self.checkbox_shortcut, 0, 6, 1, 1)
@@ -2533,9 +2546,11 @@ class AddGame(Gtk.Dialog):
 
         grid3.attach(self.label_launch_arguments, 0, 2, 1, 1)
         grid3.attach(self.entry_launch_arguments, 0, 3, 4, 1)
+        self.entry_launch_arguments.set_hexpand(True)
 
         grid3.attach(self.label_game_arguments, 0, 4, 1, 1)
         grid3.attach(self.entry_game_arguments, 0, 5, 4, 1)
+        self.entry_game_arguments.set_hexpand(True)
 
         page2.add(grid3)
 
@@ -2624,13 +2639,42 @@ class AddGame(Gtk.Dialog):
 
         if active_index == 0:
             self.grid1.set_visible(True)
+            self.grid5.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.label_protonfix.set_visible(True)
+            self.entry_protonfix.set_visible(True)
+            self.button_search_protonfix.set_visible(True)
+
+            self.entry_launch_arguments.set_text("")
+            self.entry_title.set_text("")
+            self.entry_path.set_text("")
+
+        if active_index == 1:
+            self.grid5.set_visible(False)
+            self.button_winetricks.set_visible(False)
+            self.button_winecfg.set_visible(False)
+            self.button_run.set_visible(False)
+            self.label_protonfix.set_visible(False)
+            self.entry_protonfix.set_visible(False)
+            self.button_search_protonfix.set_visible(False)
+
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
             self.entry_path.set_text("")
 
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-        elif active_index == 1:
+        elif active_index == 2:
             self.grid1.set_visible(False)
+            self.grid5.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.label_protonfix.set_visible(True)
+            self.entry_protonfix.set_visible(True)
+            self.button_search_protonfix.set_visible(True)
+
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
@@ -2641,8 +2685,16 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 2:
+        elif active_index == 3:
             self.grid1.set_visible(False)
+            self.grid5.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.label_protonfix.set_visible(True)
+            self.entry_protonfix.set_visible(True)
+            self.button_search_protonfix.set_visible(True)
+
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
@@ -2653,8 +2705,16 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 3:
+        elif active_index == 4:
             self.grid1.set_visible(False)
+            self.grid5.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.label_protonfix.set_visible(True)
+            self.entry_protonfix.set_visible(True)
+            self.button_search_protonfix.set_visible(True)
+
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe")
@@ -2665,8 +2725,16 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 4:
+        elif active_index == 5:
             self.grid1.set_visible(False)
+            self.grid5.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.label_protonfix.set_visible(True)
+            self.entry_protonfix.set_visible(True)
+            self.button_search_protonfix.set_visible(True)
+
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
@@ -2684,7 +2752,8 @@ class AddGame(Gtk.Dialog):
         return False
 
     def populate_combobox_with_launchers(self):
-        self.combo_box_launcher.append_text("Add a game")
+        self.combo_box_launcher.append_text("Windows game")
+        self.combo_box_launcher.append_text("Linux game")
         self.combo_box_launcher.append_text("Battle.net")
         self.combo_box_launcher.append_text("EA App")
         self.combo_box_launcher.append_text("Epic Games")
@@ -2884,7 +2953,7 @@ class AddGame(Gtk.Dialog):
 
             # Check if there was an error in executing the command
             if result.returncode != 0:
-                if "NoIconsAvailableError" in result.stderr:
+                if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
@@ -3133,15 +3202,16 @@ class AddGame(Gtk.Dialog):
             dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
         dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
-        # Windows files filter
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name("Windows files")
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-        dialog.add_filter(windows_filter)
+        if self.combo_box_launcher.get_active() != 1:
+            # Windows files filter
+            windows_filter = Gtk.FileFilter()
+            windows_filter.set_name("Windows files")
+            windows_filter.add_pattern("*.exe")
+            windows_filter.add_pattern("*.msi")
+            windows_filter.add_pattern("*.bat")
+            windows_filter.add_pattern("*.lnk")
+            windows_filter.add_pattern("*.reg")
+            dialog.add_filter(windows_filter)
 
         # All files filter
         all_files_filter = Gtk.FileFilter()
@@ -3163,7 +3233,7 @@ class AddGame(Gtk.Dialog):
 
                 # Check if there was an error in executing the command
                 if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr:
+                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                         print("The file does not contain icons.")
                         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                     else:
@@ -3189,6 +3259,7 @@ class AddGame(Gtk.Dialog):
                 print(f"An error occurred: {e}")
 
             self.entry_path.set_text(dialog.get_filename())
+
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
 
@@ -3462,7 +3533,7 @@ class CreateShortcut(Gtk.Window):
 
             # Check if there was an error in executing the command
             if result.returncode != 0:
-                if "NoIconsAvailableError" in result.stderr:
+                if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
@@ -3720,7 +3791,7 @@ class CreateShortcut(Gtk.Window):
 
             # Check if there was an error in executing the command
             if result.returncode != 0:
-                if "NoIconsAvailableError" in result.stderr:
+                if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
@@ -3870,6 +3941,7 @@ def run_file(file_path):
             command_parts.append(sc_controller)
     command_parts.append(os.path.expanduser(f"WINEPREFIX={default_prefix}/default"))
     command_parts.append('GAMEID=default')
+    command_parts.append('PROTON_VERB=runinprefix')
     if default_runner:
         command_parts.append(f'PROTONPATH={default_runner}')
     if not file_path.endswith(".reg"):
