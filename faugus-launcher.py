@@ -2652,6 +2652,7 @@ class AddGame(Gtk.Dialog):
             self.entry_path.set_text("")
 
         if active_index == 1:
+            self.grid1.set_visible(True)
             self.grid5.set_visible(False)
             self.button_winetricks.set_visible(False)
             self.button_winecfg.set_visible(False)
