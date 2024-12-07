@@ -588,7 +588,6 @@ class Main(Gtk.Window):
         self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
         self.checkbox_system_tray = settings_dialog.checkbox_system_tray
         self.checkbox_start_boot = settings_dialog.checkbox_start_boot
-        self.checkbox_runinprefix = settings_dialog.checkbox_runinprefix
         self.entry_default_prefix = settings_dialog.entry_default_prefix
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
@@ -601,7 +600,6 @@ class Main(Gtk.Window):
         checkbox_splash_disable = self.checkbox_splash_disable.get_active()
         checkbox_system_tray = self.checkbox_system_tray.get_active()
         checkbox_start_boot = self.checkbox_start_boot.get_active()
-        checkbox_runinprefix = self.checkbox_runinprefix.get_active()
         default_prefix = self.entry_default_prefix.get_text()
 
         mangohud_state = self.checkbox_mangohud.get_active()
@@ -619,7 +617,7 @@ class Main(Gtk.Window):
             if default_prefix == "":
                 settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix)
+                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
                 self.manage_autostart_file(checkbox_start_boot)
                 if checkbox_system_tray:
                     self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
@@ -689,8 +687,6 @@ class Main(Gtk.Window):
             protonfix = game.protonfix
             runner = game.runner
 
-            runinprefix = self.checkbox_runinprefix.get_active()
-
             gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
 
@@ -712,8 +708,6 @@ class Main(Gtk.Window):
                 command_parts.append(f'GAMEID={title_formatted}')
             if runner:
                 command_parts.append(f'PROTONPATH={runner}')
-            if runinprefix:
-                command_parts.append(f'PROTON_VERB=runinprefix')
             if gamemode:
                 command_parts.append(gamemode)
             if launch_arguments:
@@ -1332,8 +1326,6 @@ class Main(Gtk.Window):
         protonfix = game.protonfix
         runner = game.runner
 
-        runinprefix = self.checkbox_runinprefix.get_active()
-
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
         sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
@@ -1361,8 +1353,6 @@ class Main(Gtk.Window):
             command_parts.append(f'GAMEID={title_formatted}')
         if runner:
             command_parts.append(f'PROTONPATH={runner}')
-        if runinprefix:
-            command_parts.append(f'PROTON_VERB=runinprefix')
         if gamemode:
             command_parts.append(gamemode)
         if launch_arguments:
@@ -1524,7 +1514,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -1551,7 +1541,6 @@ class Main(Gtk.Window):
         config['splash-disable'] = checkbox_splash_disable
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
-        config['runinprefix'] = checkbox_runinprefix
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -1633,10 +1622,6 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label="Disable splash window")
         self.checkbox_splash_disable.set_active(False)
-
-        # Create checkbox for 'runinprefixplaceholder' option
-        self.checkbox_runinprefix = Gtk.CheckButton(label="runinprefixplaceholder")
-        self.checkbox_runinprefix.set_active(False)
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -1777,7 +1762,6 @@ class Settings(Gtk.Dialog):
         grid7.attach(self.checkbox_system_tray, 0, 4, 4, 1)
         grid7.attach(self.checkbox_start_boot, 0, 5, 4, 1)
         grid7.attach(self.checkbox_close_after_launch, 0, 6, 4, 1)
-        grid7.attach(self.checkbox_runinprefix, 0, 7, 4, 1)
 
         grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
@@ -1926,7 +1910,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2019,7 +2003,6 @@ class Settings(Gtk.Dialog):
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_runinprefix = self.checkbox_runinprefix.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2031,7 +2014,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2092,7 +2075,6 @@ class Settings(Gtk.Dialog):
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_runinprefix = self.checkbox_runinprefix.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2104,7 +2086,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2187,7 +2169,6 @@ class Settings(Gtk.Dialog):
             splash_disable = config_dict.get('splash-disable', 'False') == 'True'
             system_tray = config_dict.get('system-tray', 'False') == 'True'
             start_boot = config_dict.get('start-boot', 'False') == 'True'
-            runinprefix = config_dict.get('runinprefix', 'False') == 'True'
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
@@ -2200,7 +2181,6 @@ class Settings(Gtk.Dialog):
             self.checkbox_splash_disable.set_active(splash_disable)
             self.checkbox_start_boot.set_active(start_boot)
             self.checkbox_system_tray.set_active(system_tray)
-            self.checkbox_runinprefix.set_active(runinprefix)
 
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
@@ -2814,8 +2794,6 @@ class AddGame(Gtk.Dialog):
 
             runner = self.combo_box_runner.get_active_text()
 
-            runinprefix = self.checkbox_runinprefix.get_active()
-
             if runner == "UMU-Proton Latest":
                 runner = ""
             if runner == "GE-Proton Latest (default)":
@@ -2833,8 +2811,6 @@ class AddGame(Gtk.Dialog):
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
                     command_parts.append(f'PROTONPATH={runner}')
-                if runinprefix:
-                    command_parts.append(f'PROTON_VERB=runinprefix')
                 command_parts.append(f'"{umu_run}" "{file_run}"')
             else:
                 if prefix:
@@ -2843,8 +2819,6 @@ class AddGame(Gtk.Dialog):
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
                     command_parts.append(f'PROTONPATH={runner}')
-                if runinprefix:
-                    command_parts.append(f'PROTON_VERB=runinprefix')
                 command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
             # Join all parts into a single command
@@ -3052,8 +3026,6 @@ class AddGame(Gtk.Dialog):
 
         runner = self.combo_box_runner.get_active_text()
 
-        runinprefix = self.checkbox_runinprefix.get_active()
-
         if runner == "UMU-Proton Latest":
             runner = ""
         if runner == "GE-Proton Latest (default)":
@@ -3069,8 +3041,6 @@ class AddGame(Gtk.Dialog):
             command_parts.append(f'GAMEID={title_formatted}')
         if runner:
             command_parts.append(f'PROTONPATH={runner}')
-        if runinprefix:
-            command_parts.append(f'PROTON_VERB=runinprefix')
 
         # Add the fixed command and remaining arguments
         command_parts.append(f'"{umu_run}"')
@@ -3111,8 +3081,6 @@ class AddGame(Gtk.Dialog):
 
         runner = self.combo_box_runner.get_active_text()
 
-        runinprefix = self.checkbox_runinprefix.get_active()
-
         if runner == "UMU-Proton Latest":
             runner = ""
         if runner == "GE-Proton Latest (default)":
@@ -3128,8 +3096,6 @@ class AddGame(Gtk.Dialog):
         command_parts.append(f'STORE=none')
         if runner:
             command_parts.append(f'PROTONPATH={runner}')
-        if runinprefix:
-            command_parts.append(f'PROTON_VERB=runinprefix')
 
         # Add the fixed command and remaining arguments
         command_parts.append(f'"{umu_run}"')
@@ -3574,7 +3540,7 @@ class CreateShortcut(Gtk.Window):
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_runinprefix):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -3609,7 +3575,6 @@ class CreateShortcut(Gtk.Window):
         config['splash-disable'] = checkbox_splash_disable
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
-        config['runinprefix'] = checkbox_runinprefix
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
