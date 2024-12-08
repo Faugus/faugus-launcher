@@ -12,7 +12,7 @@ from gi.repository import Gtk
 GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
 STEAM_COMPATIBILITY_PATH = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 
-faugus_png = "/usr/share/icons/faugus-launcher.png"
+faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
 
 class ProtonDownloader(Gtk.Window):
     def __init__(self):
