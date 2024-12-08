@@ -93,9 +93,17 @@ class FaugusRun:
             self.set_ld_preload()
             self.message = f'LD_PRELOAD={self.ld_preload} {self.message}'
 
+        for part in self.message.split():
+            if part.startswith("GAMEID="):
+                game_id = part.split("=")[1]
+                if "umu" not in game_id:
+                    self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
+                break
+
         print(self.message)
 
-        self.components_run()
+        if "UMU_NO_PROTON" not in self.message:
+            self.components_run()
         self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE, text=True)
 
@@ -234,7 +242,10 @@ class FaugusRun:
         if protonpath == "Using UMU-Proton":
             protonpath = "UMU-Proton Latest"
         if not protonpath:
-            protonpath = "Using UMU-Proton Latest"
+            if "UMU_NO_PROTON" in self.message:
+                protonpath = "Linux Native"
+            else:
+                protonpath = "Using UMU-Proton Latest"
         else:
             protonpath = f"Using {protonpath}"
         print(protonpath)
@@ -322,7 +333,7 @@ class FaugusRun:
             self.label2.set_text("Steam Runtime is up to date")
 
 
-        if "ProtonFixes" in clean_line:
+        if "fsync: up and running." in clean_line or "SingleInstance" in clean_line:
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
