@@ -3942,7 +3942,6 @@ def run_file(file_path):
             command_parts.append(sc_controller)
     command_parts.append(os.path.expanduser(f"WINEPREFIX={default_prefix}/default"))
     command_parts.append('GAMEID=default')
-    command_parts.append('PROTON_VERB=runinprefix')
     if default_runner:
         command_parts.append(f'PROTONPATH={default_runner}')
     if not file_path.endswith(".reg"):
