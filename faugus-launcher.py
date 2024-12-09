@@ -916,7 +916,7 @@ class Main(Gtk.Window):
         title = game_label.get_text()
         if game := next((j for j in self.games if j.title == title), None):
             # Display confirmation dialog
-            confirmation_dialog = ConfirmationDialog(self, title)
+            confirmation_dialog = ConfirmationDialog(self, title, game.prefix)
             response = confirmation_dialog.run()
 
             if response == Gtk.ResponseType.YES:
@@ -2280,7 +2280,7 @@ class Game:
 
 
 class ConfirmationDialog(Gtk.Dialog):
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, prefix):
         # Initialize the ConfirmationDialog
         Gtk.Dialog.__init__(self, title=f"Delete {title}", parent=parent, modal=True)
         self.set_icon_from_file(faugus_png)
@@ -2323,7 +2323,9 @@ class ConfirmationDialog(Gtk.Dialog):
         # Create a checkbox to optionally remove the prefix
         self.checkbox = Gtk.CheckButton(label="Also remove the prefix")
         self.checkbox.set_halign(Gtk.Align.CENTER)
-        grid.attach(self.checkbox, 0, 1, 2, 1)
+
+        if os.path.basename(prefix) != "default":
+            grid.attach(self.checkbox, 0, 1, 2, 1)
 
         # Display all widgets
         self.show_all()
