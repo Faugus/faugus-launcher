@@ -367,23 +367,28 @@ class Main(Gtk.Window):
             with open("games.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(";")
-                    if len(data) >= 5:
-                        title, path, prefix, launch_arguments, game_arguments = data[:5]
-                        if len(data) >= 10:
-                            mangohud = data[5]
-                            gamemode = data[6]
-                            sc_controller = data[7]
-                            protonfix = data[8]
-                            runner = data[9]
-                        else:
-                            mangohud = ""
-                            gamemode = ""
-                            sc_controller = ""
-                            protonfix = ""
-                            runner = ""
-                        game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
-                                    sc_controller, protonfix, runner)
-                        self.games.append(game)
+
+                    while len(data) < 13:
+                        data.append("")
+
+                    title = data[0]
+                    path = data[1]
+                    prefix = data[2]
+                    launch_arguments = data[3]
+                    game_arguments = data[4]
+                    mangohud = data[5]
+                    gamemode = data[6]
+                    sc_controller = data[7]
+                    protonfix = data[8]
+                    runner = data[9]
+                    addapp_checkbox = data[10]
+                    addapp = data[11]
+                    addapp_bat = data[12]
+
+                    game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
+                                sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
+                    self.games.append(game)
+
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.filtered_games = self.games[:]  # Initialize filtered_games
                 self.game_list.foreach(Gtk.Widget.destroy)
@@ -686,6 +691,9 @@ class Main(Gtk.Window):
             sc_controller = game.sc_controller
             protonfix = game.protonfix
             runner = game.runner
+            addapp_checkbox = game.addapp_checkbox
+            addapp = game.addapp
+            addapp_bat = game.addapp_bat
 
             gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             gamemode = game.gamemode if gamemode_enabled else ""
@@ -718,7 +726,9 @@ class Main(Gtk.Window):
 
             # Add the fixed command and remaining arguments
             command_parts.append(f'"{umu_run}"')
-            if path:
+            if addapp_checkbox == "addapp_enabled":
+                command_parts.append(f'"{addapp_bat}"')
+            elif path:
                 command_parts.append(f'"{path}"')
             if game_arguments:
                 command_parts.append(f'{game_arguments}')
@@ -828,29 +838,36 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(f"Edit {game.title}")
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
-            edit_game_dialog.grid0.set_visible(False)
-
-            mangohud_status = False
-            gamemode_status = False
-            sc_controller_status = False
-            with open("games.txt", "r") as file:
-                for line in file:
-                    fields = line.strip().split(";")
-                    if len(fields) >= 8 and fields[0] == game.title:
-                        mangohud_status = fields[5] == "MANGOHUD=1"
-                        gamemode_status = fields[6] == "gamemoderun"
-                        sc_controller_status = fields[7] == "SC_CONTROLLER=1"
+            edit_game_dialog.entry_addapp.set_text(game.addapp)
+            edit_game_dialog.grid_launcher.set_visible(False)
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
-                edit_game_dialog.checkbox_mangohud.set_active(mangohud_status)
+                if game.mangohud == "MANGOHUD=1":
+                    edit_game_dialog.checkbox_mangohud.set_active(True)
+                else:
+                    edit_game_dialog.checkbox_mangohud.set_active(False)
+
             gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             if gamemode_enabled:
-                edit_game_dialog.checkbox_gamemode.set_active(gamemode_status)
+                if game.gamemode == "gamemoderun":
+                    edit_game_dialog.checkbox_gamemode.set_active(True)
+                else:
+                    edit_game_dialog.checkbox_gamemode.set_active(False)
+
             sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
                 "/usr/local/bin/sc-controller")
             if sc_controller_enabled:
-                edit_game_dialog.checkbox_sc_controller.set_active(sc_controller_status)
+                if game.sc_controller == "SC_CONTROLLER=1":
+                    edit_game_dialog.checkbox_sc_controller.set_active(True)
+                else:
+                    edit_game_dialog.checkbox_sc_controller.set_active(False)
+
+            if game.addapp_checkbox == "addapp_enabled":
+                edit_game_dialog.checkbox_addapp.set_active(True)
+            else:
+                edit_game_dialog.checkbox_addapp.set_active(False)
+
             edit_game_dialog.check_existing_shortcut()
 
             image = self.set_image_shortcut_icon(game.title, edit_game_dialog.icons_path, edit_game_dialog.icon_temp)
@@ -983,10 +1000,13 @@ class Main(Gtk.Window):
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combo_box_runner.get_active_text()
+            addapp = add_game_dialog.entry_addapp.get_text()
 
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
+
+            addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
 
             if runner == "UMU-Proton Latest":
                 runner = ""
@@ -1002,15 +1022,16 @@ class Main(Gtk.Window):
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
+            addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
-            game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner}\n"
+            game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner};{addapp_checkbox};{addapp};{addapp_bat}\n"
 
             # Write game info to file
             with open("games.txt", "a") as file:
                 file.write(game_info)
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner)
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
             self.games.append(game)
 
             # Determine the state of the shortcut checkbox
@@ -1053,6 +1074,11 @@ class Main(Gtk.Window):
             if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+
+                if addapp_checkbox == "addapp_enabled":
+                    with open(addapp_bat, "w") as bat_file:
+                        bat_file.write(f'start "" "z:{addapp}"\n')
+                        bat_file.write(f'start "" "z:{path}"\n')
 
                 self.add_item_list(game)
                 self.update_list()
@@ -1274,18 +1300,22 @@ class Main(Gtk.Window):
             game.sc_controller = edit_game_dialog.checkbox_sc_controller.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combo_box_runner.get_active_text()
+            game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
+            game.addapp = edit_game_dialog.entry_addapp.get_text()
 
             # Handle the click event of the Create Shortcut button
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
 
+            game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
+
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
             if game.runner == "GE-Proton Latest (default)":
                 game.runner = "GE-Proton"
             if edit_game_dialog.combo_box_launcher.get_active() == 1:
-                runner = "Linux-Native"
+                game.runner = "Linux-Native"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
@@ -1295,6 +1325,11 @@ class Main(Gtk.Window):
 
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+
+            if game.addapp_checkbox == True:
+                with open(game.addapp_bat, "w") as bat_file:
+                    bat_file.write(f'start "" "z:{game.addapp}"\n')
+                    bat_file.write(f'start "" "z:{game.path}"\n')
 
             # Save changes and update UI
             self.save_games()
@@ -1335,10 +1370,14 @@ class Main(Gtk.Window):
         game_arguments = game.game_arguments
         protonfix = game.protonfix
         runner = game.runner
+        addapp_checkbox = game.addapp_checkbox
+        addapp_bat = game.addapp_bat
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
         sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
+        addapp = "addapp_enabled" if game.addapp_checkbox else ""
+
         # Check if the icon file exists
         icons_path = icons_dir
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
@@ -1373,7 +1412,10 @@ class Main(Gtk.Window):
 
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
-        if path:
+        print(addapp)
+        if addapp == "addapp_enabled":
+            command_parts.append(f"'{addapp_bat}'")
+        elif path:
             command_parts.append(f"'{path}'")
         if game_arguments:
             command_parts.append(f"{game_arguments}")
@@ -1514,9 +1556,11 @@ class Main(Gtk.Window):
                 mangohud_value = "MANGOHUD=1" if game.mangohud else ""
                 gamemode_value = "gamemoderun" if game.gamemode else ""
                 sc_controller_value = "SC_CONTROLLER=1" if game.sc_controller else ""
+                addapp_checkbox_value = "addapp_enabled" if game.addapp_checkbox else ""
                 # Construct line with game information
                 line = (f"{game.title};{game.path};{game.prefix};{game.launch_arguments};{game.game_arguments};"
-                        f"{mangohud_value};{gamemode_value};{sc_controller_value};{game.protonfix};{game.runner}\n")
+                        f"{mangohud_value};{gamemode_value};{sc_controller_value};{game.protonfix};{game.runner};"
+                        f"{addapp_checkbox_value};{game.addapp};{game.addapp_bat}\n")
                 file.write(line)
 
     def show_warning_message(self, message):
@@ -2218,7 +2262,7 @@ class Settings(Gtk.Dialog):
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner):
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
@@ -2230,6 +2274,9 @@ class Game:
         self.sc_controller = sc_controller  # Boolean indicating whether SC Controller is enabled
         self.protonfix = protonfix
         self.runner = runner
+        self.addapp_checkbox = addapp_checkbox
+        self.addapp = addapp
+        self.addapp_bat = addapp_bat
 
 
 class ConfirmationDialog(Gtk.Dialog):
@@ -2311,57 +2358,84 @@ class AddGame(Gtk.Dialog):
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
 
-        self.grid0 = Gtk.Grid()
-        self.grid0.set_row_spacing(10)
-        self.grid0.set_column_spacing(10)
-        self.grid0.set_margin_start(10)
-        self.grid0.set_margin_end(10)
-        self.grid0.set_margin_top(10)
+        self.grid_launcher = Gtk.Grid()
+        self.grid_launcher.set_row_spacing(10)
+        self.grid_launcher.set_column_spacing(10)
+        self.grid_launcher.set_margin_start(10)
+        self.grid_launcher.set_margin_end(10)
+        self.grid_launcher.set_margin_top(10)
 
-        grid = Gtk.Grid()
-        grid.set_row_spacing(10)
-        grid.set_column_spacing(10)
-        grid.set_margin_start(10)
-        grid.set_margin_end(10)
-        grid.set_margin_top(10)
-        grid.set_margin_bottom(10)
+        self.grid_title = Gtk.Grid()
+        self.grid_title.set_row_spacing(10)
+        self.grid_title.set_column_spacing(10)
+        self.grid_title.set_margin_start(10)
+        self.grid_title.set_margin_end(10)
+        self.grid_title.set_margin_top(10)
 
-        self.grid1 = Gtk.Grid()
-        self.grid1.set_row_spacing(10)
-        self.grid1.set_column_spacing(10)
-        self.grid1.set_margin_start(10)
-        self.grid1.set_margin_end(10)
-        self.grid1.set_margin_top(10)
+        self.grid_path = Gtk.Grid()
+        self.grid_path.set_row_spacing(10)
+        self.grid_path.set_column_spacing(10)
+        self.grid_path.set_margin_start(10)
+        self.grid_path.set_margin_end(10)
+        self.grid_path.set_margin_top(10)
 
-        grid2 = Gtk.Grid()
+        self.grid_prefix = Gtk.Grid()
+        self.grid_prefix.set_row_spacing(10)
+        self.grid_prefix.set_column_spacing(10)
+        self.grid_prefix.set_margin_start(10)
+        self.grid_prefix.set_margin_end(10)
+        self.grid_prefix.set_margin_top(10)
 
-        grid2.set_row_spacing(10)
-        grid2.set_column_spacing(10)
-        grid2.set_margin_start(10)
-        grid2.set_margin_end(10)
-        grid2.set_margin_top(10)
-        grid2.set_margin_bottom(10)
+        self.grid_runner = Gtk.Grid()
+        self.grid_runner.set_row_spacing(10)
+        self.grid_runner.set_column_spacing(10)
+        self.grid_runner.set_margin_start(10)
+        self.grid_runner.set_margin_end(10)
+        self.grid_runner.set_margin_top(10)
 
-        grid3 = Gtk.Grid()
-        grid3.set_row_spacing(10)
-        grid3.set_column_spacing(10)
-        grid3.set_margin_start(10)
-        grid3.set_margin_end(10)
-        grid3.set_margin_top(10)
-        grid3.set_margin_bottom(10)
+        self.grid_shortcut = Gtk.Grid()
+        self.grid_shortcut.set_row_spacing(10)
+        self.grid_shortcut.set_column_spacing(10)
+        self.grid_shortcut.set_margin_start(10)
+        self.grid_shortcut.set_margin_end(10)
+        self.grid_shortcut.set_margin_top(10)
+        self.grid_shortcut.set_margin_bottom(10)
 
-        grid4 = Gtk.Grid()
-        grid4.set_row_spacing(10)
-        grid4.set_column_spacing(10)
-        grid4.set_margin_start(10)
-        grid4.set_margin_end(10)
-        grid4.set_margin_bottom(10)
+        self.grid_protonfix = Gtk.Grid()
+        self.grid_protonfix.set_row_spacing(10)
+        self.grid_protonfix.set_column_spacing(10)
+        self.grid_protonfix.set_margin_start(10)
+        self.grid_protonfix.set_margin_end(10)
+        self.grid_protonfix.set_margin_top(10)
 
-        self.grid5 = Gtk.Grid()
-        self.grid5.set_row_spacing(10)
-        self.grid5.set_column_spacing(10)
-        self.grid5.set_margin_start(10)
-        self.grid5.set_margin_end(10)
+        self.grid_launch_arguments = Gtk.Grid()
+        self.grid_launch_arguments.set_row_spacing(10)
+        self.grid_launch_arguments.set_column_spacing(10)
+        self.grid_launch_arguments.set_margin_start(10)
+        self.grid_launch_arguments.set_margin_end(10)
+        self.grid_launch_arguments.set_margin_top(10)
+
+        self.grid_game_arguments = Gtk.Grid()
+        self.grid_game_arguments.set_row_spacing(10)
+        self.grid_game_arguments.set_column_spacing(10)
+        self.grid_game_arguments.set_margin_start(10)
+        self.grid_game_arguments.set_margin_end(10)
+        self.grid_game_arguments.set_margin_top(10)
+
+        self.grid_addapp = Gtk.Grid()
+        self.grid_addapp.set_row_spacing(10)
+        self.grid_addapp.set_column_spacing(10)
+        self.grid_addapp.set_margin_start(10)
+        self.grid_addapp.set_margin_end(10)
+        self.grid_addapp.set_margin_top(10)
+
+        self.grid_tools = Gtk.Grid()
+        self.grid_tools.set_row_spacing(10)
+        self.grid_tools.set_column_spacing(10)
+        self.grid_tools.set_margin_start(10)
+        self.grid_tools.set_margin_end(10)
+        self.grid_tools.set_margin_top(10)
+        self.grid_tools.set_margin_bottom(10)
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -2432,6 +2506,19 @@ class AddGame(Gtk.Dialog):
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text("e.g.: -d3d11 -fullscreen")
+
+        # Widgets for extra executable
+        self.checkbox_addapp = Gtk.CheckButton(label="Additional Application")
+        self.checkbox_addapp.set_tooltip_text("Additional application to run with the game, like Cheat Engine, Trainers, Mods...")
+        self.checkbox_addapp.connect("toggled", self.on_checkbox_addapp_toggled)
+        self.entry_addapp = Gtk.Entry()
+        self.entry_addapp.set_tooltip_text("/path/to/the/app")
+        self.entry_addapp.set_sensitive(False)
+        self.button_search_addapp = Gtk.Button()
+        self.button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
+        self.button_search_addapp.set_size_request(50, -1)
+        self.button_search_addapp.set_sensitive(False)
 
         # Checkboxes for optional features
         self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
@@ -2506,66 +2593,71 @@ class AddGame(Gtk.Dialog):
         tab_box2.set_hexpand(True)
         self.notebook.append_page(page2, tab_box2)
 
-        # Attach widgets to the grid layout
-        self.grid0.attach(self.combo_box_launcher, 0, 0, 4, 1)
+        self.grid_launcher.attach(self.combo_box_launcher, 0, 0, 4, 1)
         self.combo_box_launcher.set_hexpand(True)
 
-        self.grid1.attach(self.label_title, 0, 0, 4, 1)
-        self.grid1.attach(self.entry_title, 0, 1, 4, 1)
+        self.grid_title.attach(self.label_title, 0, 0, 4, 1)
+        self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
+        self.entry_title.set_hexpand(True)
 
-        self.grid1.attach(self.label_path, 0, 2, 1, 1)
-        self.grid1.attach(self.entry_path, 0, 3, 3, 1)
+        self.grid_path.attach(self.label_path, 0, 0, 1, 1)
+        self.grid_path.attach(self.entry_path, 0, 1, 3, 1)
         self.entry_path.set_hexpand(True)
-        self.grid1.attach(self.button_search, 3, 3, 1, 1)
+        self.grid_path.attach(self.button_search, 3, 1, 1, 1)
 
-        grid.attach(self.label_prefix, 0, 4, 1, 1)
-        grid.attach(self.entry_prefix, 0, 5, 3, 1)
+        self.grid_prefix.attach(self.label_prefix, 0, 0, 1, 1)
+        self.grid_prefix.attach(self.entry_prefix, 0, 1, 3, 1)
         self.entry_prefix.set_hexpand(True)
-        grid.attach(self.button_search_prefix, 3, 5, 1, 1)
+        self.grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
-        self.grid5.attach(self.label_runner, 0, 6, 1, 1)
-        self.grid5.attach(self.combo_box_runner, 0, 7, 1, 1)
+        self.grid_runner.attach(self.label_runner, 0, 0, 1, 1)
+        self.grid_runner.attach(self.combo_box_runner, 0, 1, 1, 1)
         self.combo_box_runner.set_hexpand(True)
 
-        page1.add(self.grid0)
-        page1.add(self.grid1)
-        page1.add(grid)
-
-        page1.add(self.grid5)
-
-        grid2.attach(self.button_shortcut_icon, 2, 6, 1, 1)
-        grid2.attach(self.checkbox_shortcut, 0, 6, 1, 1)
+        self.grid_shortcut.attach(self.button_shortcut_icon, 2, 0, 1, 1)
+        self.grid_shortcut.attach(self.checkbox_shortcut, 0, 0, 1, 1)
         self.checkbox_shortcut.set_hexpand(True)
 
-        page1.add(grid2)
+        page1.add(self.grid_launcher)
+        page1.add(self.grid_title)
+        page1.add(self.grid_path)
+        page1.add(self.grid_prefix)
+        page1.add(self.grid_runner)
+        page1.add(self.grid_shortcut)
 
-        grid3.attach(self.label_protonfix, 0, 0, 1, 1)
-        grid3.attach(self.entry_protonfix, 0, 1, 3, 1)
+        self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
+        self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
         self.entry_protonfix.set_hexpand(True)
-        grid3.attach(self.button_search_protonfix, 3, 1, 1, 1)
+        self.grid_protonfix.attach(self.button_search_protonfix, 3, 1, 1, 1)
 
-        grid3.attach(self.label_launch_arguments, 0, 2, 1, 1)
-        grid3.attach(self.entry_launch_arguments, 0, 3, 4, 1)
+        self.grid_launch_arguments.attach(self.label_launch_arguments, 0, 0, 4, 1)
+        self.grid_launch_arguments.attach(self.entry_launch_arguments, 0, 1, 4, 1)
         self.entry_launch_arguments.set_hexpand(True)
 
-        grid3.attach(self.label_game_arguments, 0, 4, 1, 1)
-        grid3.attach(self.entry_game_arguments, 0, 5, 4, 1)
+        self.grid_game_arguments.attach(self.label_game_arguments, 0, 0, 4, 1)
+        self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        page2.add(grid3)
+        self.grid_addapp.attach(self.checkbox_addapp, 0, 0, 1, 1)
+        self.grid_addapp.attach(self.entry_addapp, 0, 1, 3, 1)
+        self.entry_addapp.set_hexpand(True)
+        self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
 
-        grid4.attach(self.checkbox_mangohud, 0, 6, 1, 1)
+        self.grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
-        grid4.attach(self.checkbox_gamemode, 0, 7, 1, 1)
+        self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.checkbox_gamemode.set_hexpand(True)
-        grid4.attach(self.checkbox_sc_controller, 0, 8, 1, 1)
+        self.grid_tools.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
         self.checkbox_sc_controller.set_hexpand(True)
+        self.grid_tools.attach(self.button_winetricks, 2, 0, 1, 1)
+        self.grid_tools.attach(self.button_winecfg, 2, 1, 1, 1)
+        self.grid_tools.attach(self.button_run, 2, 2, 1, 1)
 
-        grid4.attach(self.button_winetricks, 2, 6, 1, 1)
-        grid4.attach(self.button_winecfg, 2, 7, 1, 1)
-        grid4.attach(self.button_run, 2, 8, 1, 1)
-
-        page2.add(grid4)
+        page2.add(self.grid_protonfix)
+        page2.add(self.grid_launch_arguments)
+        page2.add(self.grid_game_arguments)
+        page2.add(self.grid_addapp)
+        page2.add(self.grid_tools)
 
         botton_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         botton_box.set_margin_start(10)
@@ -2634,32 +2726,68 @@ class AddGame(Gtk.Dialog):
         tab_box2.show_all()
         self.show_all()
 
+    def on_checkbox_addapp_toggled(self, checkbox):
+        is_active = checkbox.get_active()
+        self.entry_addapp.set_sensitive(is_active)
+        self.button_search_addapp.set_sensitive(is_active)
+
+    def on_button_search_addapp_clicked(self, widget):
+        # Handle the click event of the search button to select the game's .exe
+        dialog = Gtk.FileChooserDialog(title="Select the additional application", parent=self, action=Gtk.FileChooserAction.OPEN)
+        if not self.entry_path.get_text():
+            dialog.set_current_folder(os.path.expanduser("~/"))
+        else:
+            dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        # Windows files filter
+        windows_filter = Gtk.FileFilter()
+        windows_filter.set_name("Windows files")
+        windows_filter.add_pattern("*.exe")
+        windows_filter.add_pattern("*.msi")
+        windows_filter.add_pattern("*.bat")
+        windows_filter.add_pattern("*.lnk")
+        windows_filter.add_pattern("*.reg")
+        dialog.add_filter(windows_filter)
+
+        # All files filter
+        all_files_filter = Gtk.FileFilter()
+        all_files_filter.set_name("All files")
+        all_files_filter.add_pattern("*")
+        dialog.add_filter(all_files_filter)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.entry_addapp.set_text(dialog.get_filename())
+
+        dialog.destroy()
+
     def on_combobox_changed(self, combo_box):
         active_index = combo_box.get_active()
 
         if active_index == 0:
-            self.grid1.set_visible(True)
-            self.grid5.set_visible(True)
+            self.grid_title.set_visible(True)
+            self.grid_path.set_visible(True)
+            self.grid_runner.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.label_protonfix.set_visible(True)
-            self.entry_protonfix.set_visible(True)
-            self.button_search_protonfix.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
             self.entry_path.set_text("")
 
         if active_index == 1:
-            self.grid1.set_visible(True)
-            self.grid5.set_visible(False)
+            self.grid_title.set_visible(True)
+            self.grid_path.set_visible(True)
+            self.grid_runner.set_visible(False)
             self.button_winetricks.set_visible(False)
             self.button_winecfg.set_visible(False)
             self.button_run.set_visible(False)
-            self.label_protonfix.set_visible(False)
-            self.entry_protonfix.set_visible(False)
-            self.button_search_protonfix.set_visible(False)
+            self.grid_protonfix.set_visible(False)
+            self.grid_addapp.set_visible(False)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
@@ -2667,14 +2795,14 @@ class AddGame(Gtk.Dialog):
 
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         elif active_index == 2:
-            self.grid1.set_visible(False)
-            self.grid5.set_visible(True)
+            self.grid_title.set_visible(False)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.label_protonfix.set_visible(True)
-            self.entry_protonfix.set_visible(True)
-            self.button_search_protonfix.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
 
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -2687,14 +2815,14 @@ class AddGame(Gtk.Dialog):
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
         elif active_index == 3:
-            self.grid1.set_visible(False)
-            self.grid5.set_visible(True)
+            self.grid_title.set_visible(False)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.label_protonfix.set_visible(True)
-            self.entry_protonfix.set_visible(True)
-            self.button_search_protonfix.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -2707,14 +2835,14 @@ class AddGame(Gtk.Dialog):
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
         elif active_index == 4:
-            self.grid1.set_visible(False)
-            self.grid5.set_visible(True)
+            self.grid_title.set_visible(False)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.label_protonfix.set_visible(True)
-            self.entry_protonfix.set_visible(True)
-            self.button_search_protonfix.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -2727,14 +2855,14 @@ class AddGame(Gtk.Dialog):
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
         elif active_index == 5:
-            self.grid1.set_visible(False)
-            self.grid5.set_visible(True)
+            self.grid_title.set_visible(False)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.label_protonfix.set_visible(True)
-            self.entry_protonfix.set_visible(True)
-            self.button_search_protonfix.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -3385,6 +3513,14 @@ class CreateShortcut(Gtk.Window):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text("e.g.: -d3d11 -fullscreen")
 
+        self.label_addapp = Gtk.Label(label="Additional Application")
+        self.entry_addapp = Gtk.Entry()
+        self.entry_addapp.set_tooltip_text("/path/to/the/app")
+        self.button_search_addapp = Gtk.Button()
+        self.button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
+        self.button_search_addapp.set_size_request(50, -1)
+
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
@@ -3471,6 +3607,11 @@ class CreateShortcut(Gtk.Window):
         self.grid1.attach(self.label_game_arguments, 0, 6, 1, 1)
         self.grid1.attach(self.entry_game_arguments, 0, 7, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
+
+        self.grid1.attach(self.label_addapp, 0, 8, 1, 1)
+        self.grid1.attach(self.entry_addapp, 0, 9, 3, 1)
+        self.entry_addapp.set_hexpand(True)
+        self.grid1.attach(self.button_search_addapp, 3, 9, 1, 1)
 
         self.grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
@@ -3563,6 +3704,34 @@ class CreateShortcut(Gtk.Window):
 
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
+
+    def on_button_search_addapp_clicked(self, widget):
+        # Handle the click event of the search button to select the game's .exe
+        dialog = Gtk.FileChooserDialog(title="Select the additional application", parent=self, action=Gtk.FileChooserAction.OPEN)
+        dialog.set_current_folder(os.path.dirname(self.file_path))
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        # Windows files filter
+        windows_filter = Gtk.FileFilter()
+        windows_filter.set_name("Windows files")
+        windows_filter.add_pattern("*.exe")
+        windows_filter.add_pattern("*.msi")
+        windows_filter.add_pattern("*.bat")
+        windows_filter.add_pattern("*.lnk")
+        windows_filter.add_pattern("*.reg")
+        dialog.add_filter(windows_filter)
+
+        # All files filter
+        all_files_filter = Gtk.FileFilter()
+        all_files_filter.set_name("All files")
+        all_files_filter.add_pattern("*")
+        dialog.add_filter(all_files_filter)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.entry_addapp.set_text(dialog.get_filename())
+
+        dialog.destroy()
 
     def find_largest_resolution(self, directory):
         largest_image = None
@@ -3678,6 +3847,14 @@ class CreateShortcut(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
+        addapp = self.entry_addapp.get_text()
+        addapp_bat = f"{os.path.dirname(self.file_path)}/faugus-{title_formatted}.bat"
+
+        if self.entry_addapp.get_text():
+            with open(addapp_bat, "w") as bat_file:
+                bat_file.write(f'start "" "z:{addapp}"\n')
+                bat_file.write(f'start "" "z:{self.file_path}"\n')
+
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp),f'{self.icons_path}/{title_formatted}.ico')
 
@@ -3720,7 +3897,9 @@ class CreateShortcut(Gtk.Window):
 
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
-        if self.file_path:
+        if self.entry_addapp.get_text():
+            command_parts.append(f"'{addapp_bat}'")
+        elif self.file_path:
             command_parts.append(f"'{self.file_path}'")
         if game_arguments:
             command_parts.append(f"{game_arguments}")
