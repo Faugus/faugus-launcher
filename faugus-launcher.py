@@ -749,9 +749,10 @@ class Main(Gtk.Window):
 
         game_icon = f'{icons_dir}/{title_formatted}.ico'
         game_label = Gtk.Label.new(game.title)
-        game_label.set_line_wrap(True)
-        game_label.set_max_width_chars(1)
-        game_label.set_justify(Gtk.Justification.CENTER)
+        if self.big_interface_active:
+            game_label.set_line_wrap(True)
+            game_label.set_max_width_chars(1)
+            game_label.set_justify(Gtk.Justification.CENTER)
 
         if os.path.isfile(game_icon):
             pass
