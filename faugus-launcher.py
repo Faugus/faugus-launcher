@@ -11,6 +11,7 @@ import webbrowser
 import gi
 import socket
 import urllib.request
+import json
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -37,6 +38,8 @@ faugus_proton_manager = "/usr/bin/faugus-proton-manager"
 umu_run = "/usr/bin/umu-run"
 mangohud_dir = "/usr/bin/mangohud"
 gamemoderun = "/usr/bin/gamemoderun"
+games_txt = f'{faugus_launcher_dir}/games.txt'
+games_json = f'{faugus_launcher_dir}/games.json'
 latest_games = f'{faugus_launcher_dir}/latest-games.txt'
 faugus_launcher_share_dir = f"{share_dir}/faugus-launcher"
 faugus_temp = os.path.expanduser('~/faugus_temp')
@@ -692,28 +695,25 @@ class Main(Gtk.Window):
         Gtk.main_quit()
 
     def load_games(self):
-        # Load games from file
+        # Load games from JSON file
         try:
-            with open("games.txt", "r") as file:
-                for line in file:
-                    data = line.strip().split(";")
+            with open("games.json", "r", encoding="utf-8") as file:
+                games_data = json.load(file)
 
-                    while len(data) < 13:
-                        data.append("")
-
-                    title = data[0]
-                    path = data[1]
-                    prefix = data[2]
-                    launch_arguments = data[3]
-                    game_arguments = data[4]
-                    mangohud = data[5]
-                    gamemode = data[6]
-                    sc_controller = data[7]
-                    protonfix = data[8]
-                    runner = data[9]
-                    addapp_checkbox = data[10]
-                    addapp = data[11]
-                    addapp_bat = data[12]
+                for game_data in games_data:
+                    title = game_data.get("title", "")
+                    path = game_data.get("path", "")
+                    prefix = game_data.get("prefix", "")
+                    launch_arguments = game_data.get("launch_arguments", "")
+                    game_arguments = game_data.get("game_arguments", "")
+                    mangohud = game_data.get("mangohud", "")
+                    gamemode = game_data.get("gamemode", "")
+                    sc_controller = game_data.get("sc_controller", "")
+                    protonfix = game_data.get("protonfix", "")
+                    runner = game_data.get("runner", "")
+                    addapp_checkbox = game_data.get("addapp_checkbox", "")
+                    addapp = game_data.get("addapp", "")
+                    addapp_bat = game_data.get("addapp_bat", "")
 
                     game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
                                 sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
@@ -726,6 +726,8 @@ class Main(Gtk.Window):
                     self.add_item_list(game)
         except FileNotFoundError:
             pass
+        except json.JSONDecodeError as e:
+            print(f"Erro ao ler o arquivo JSON: {e}")
 
     def add_item_list(self, game):
         # Add a game item to the list
@@ -1319,20 +1321,40 @@ class Main(Gtk.Window):
             if add_game_dialog.combo_box_launcher.get_active() == 1:
                 runner = "Linux-Native"
 
-            # Concatenate game information
-            game_info = (f"{title};{path};{prefix};{launch_arguments};{game_arguments}")
-
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
-            game_info += f";{mangohud};{gamemode};{sc_controller};{protonfix};{runner};{addapp_checkbox};{addapp};{addapp_bat}\n"
+            game_info = {
+                "title": title,
+                "path": path,
+                "prefix": prefix,
+                "launch_arguments": launch_arguments,
+                "game_arguments": game_arguments,
+                "mangohud": mangohud,
+                "gamemode": gamemode,
+                "sc_controller": sc_controller,
+                "protonfix": protonfix,
+                "runner": runner,
+                "addapp_checkbox": addapp_checkbox,
+                "addapp": addapp,
+                "addapp_bat": addapp_bat,
+            }
 
-            # Write game info to file
-            with open("games.txt", "a") as file:
-                file.write(game_info)
+            games = []
+            if os.path.exists("games.json"):
+                try:
+                    with open("games.json", "r", encoding="utf-8") as file:
+                        games = json.load(file)
+                except json.JSONDecodeError as e:
+                    print(f"Error reading the JSON file: {e}")
+
+            games.append(game_info)
+
+            with open("games.json", "w", encoding="utf-8") as file:
+                json.dump(games, file, ensure_ascii=False, indent=4)
 
             # Create Game object and update UI
             game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
@@ -1868,19 +1890,27 @@ class Main(Gtk.Window):
                             Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
     def save_games(self):
-        # Save game information to file
-        with open("games.txt", "w") as file:
-            for game in self.games:
-                # Determine mangohud and gamemode values
-                mangohud_value = "MANGOHUD=1" if game.mangohud else ""
-                gamemode_value = "gamemoderun" if game.gamemode else ""
-                sc_controller_value = "SC_CONTROLLER=1" if game.sc_controller else ""
-                addapp_checkbox_value = "addapp_enabled" if game.addapp_checkbox else ""
-                # Construct line with game information
-                line = (f"{game.title};{game.path};{game.prefix};{game.launch_arguments};{game.game_arguments};"
-                        f"{mangohud_value};{gamemode_value};{sc_controller_value};{game.protonfix};{game.runner};"
-                        f"{addapp_checkbox_value};{game.addapp};{game.addapp_bat}\n")
-                file.write(line)
+        games_data = []
+        for game in self.games:
+            game_info = {
+                "title": game.title,
+                "path": game.path,
+                "prefix": game.prefix,
+                "launch_arguments": game.launch_arguments,
+                "game_arguments": game.game_arguments,
+                "mangohud": "MANGOHUD=1" if game.mangohud else "",
+                "gamemode": "gamemoderun" if game.gamemode else "",
+                "sc_controller": "SC_CONTROLLER=1" if game.sc_controller else "",
+                "protonfix": game.protonfix,
+                "runner": game.runner,
+                "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
+                "addapp": game.addapp,
+                "addapp_bat": game.addapp_bat,
+            }
+            games_data.append(game_info)
+
+        with open("games.json", "w", encoding="utf-8") as file:
+            json.dump(games_data, file, ensure_ascii=False, indent=4)
 
     def show_warning_message(self, message):
         # Show a warning message dialog
@@ -4489,7 +4519,45 @@ def run_file(file_path):
     # Run the command in the directory of the file
     subprocess.run([faugus_run_path, command], cwd=file_dir)
 
+def convert_games_txt_to_json(txt_file_path, json_file_path):
+    if not os.path.exists(txt_file_path):
+        return
+
+    games = []
+
+    with open(txt_file_path, 'r', encoding='utf-8') as txt_file:
+        for line in txt_file:
+            fields = line.strip().split(';')
+
+            while len(fields) < 13:
+                fields.append("")
+
+            game = {
+                "title": fields[0],
+                "path": fields[1],
+                "prefix": fields[2],
+                "launch_arguments": fields[3],
+                "game_arguments": fields[4],
+                "mangohud": fields[5],
+                "gamemode": fields[6],
+                "sc_controller": fields[7],
+                "protonfix": fields[8],
+                "runner": fields[9],
+                "addapp_checkbox": fields[10],
+                "addapp": fields[11],
+                "addapp_bat": fields[12],
+            }
+
+            games.append(game)
+
+    with open(json_file_path, 'w', encoding='utf-8') as json_file:
+        json.dump(games, json_file, ensure_ascii=False, indent=4)
+
+    old_file_path = txt_file_path.replace(".txt", "-old.txt")
+    os.rename(txt_file_path, old_file_path)
+
 def main():
+    convert_games_txt_to_json(games_txt, games_json)
     if len(sys.argv) == 1:
         app = Main()
         if is_already_running():
