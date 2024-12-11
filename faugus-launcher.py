@@ -749,6 +749,9 @@ class Main(Gtk.Window):
 
         game_icon = f'{icons_dir}/{title_formatted}.ico'
         game_label = Gtk.Label.new(game.title)
+        game_label.set_line_wrap(True)
+        game_label.set_max_width_chars(1)
+        game_label.set_justify(Gtk.Justification.CENTER)
 
         if os.path.isfile(game_icon):
             pass
@@ -766,6 +769,8 @@ class Main(Gtk.Window):
         if self.big_interface_active:
             hbox.pack_start(image, True, True, 0)
             hbox.pack_start(game_label, True, True, 0)
+            game_label.set_margin_end(20)
+            game_label.set_margin_start(20)
         else:
             image.set_margin_start(10)
             image.set_margin_end(10)
