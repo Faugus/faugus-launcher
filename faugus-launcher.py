@@ -1250,6 +1250,8 @@ class Main(Gtk.Window):
                 self.remove_game_from_latest_games(title)
 
             confirmation_dialog.destroy()
+            self.flowbox.select_child(self.flowbox.get_children()[0])
+            self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
 
     def remove_game_from_latest_games(self, title):
         try:
