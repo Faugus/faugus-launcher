@@ -400,7 +400,6 @@ class Main(Gtk.Window):
         button_kill.set_size_request(50, 50)
         button_kill.set_margin_start(10)
         button_kill.set_margin_top(10)
-        button_kill.set_margin_end(10)
         button_kill.set_margin_bottom(10)
 
         label_kill = Gtk.Label(label="Kill")
@@ -418,16 +417,17 @@ class Main(Gtk.Window):
         button_settings.set_size_request(50, 50)
         button_settings.set_image(Gtk.Image.new_from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON))
         button_settings.set_margin_top(10)
-        button_settings.set_margin_start(40)
+        button_settings.set_margin_start(10)
         button_settings.set_margin_bottom(10)
 
         # Create button for launching games
         self.button_play = Gtk.Button()
         self.button_play.connect("clicked", self.on_button_play_clicked)
         self.button_play.set_can_focus(False)
-        self.button_play.set_size_request(150, 50)
+        self.button_play.set_size_request(50, 50)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         self.button_play.set_margin_top(10)
+        self.button_play.set_margin_start(10)
         self.button_play.set_margin_end(10)
         self.button_play.set_margin_bottom(10)
 
@@ -435,11 +435,11 @@ class Main(Gtk.Window):
         self.entry_search.set_placeholder_text("Search...")
         self.entry_search.connect("changed", self.on_search_changed)
 
-        self.entry_search.set_size_request(200, 50)
+        self.entry_search.set_size_request(170, 50)
         self.entry_search.set_margin_top(10)
-        self.entry_search.set_margin_start(10)
+        self.entry_search.set_margin_start(20)
         self.entry_search.set_margin_bottom(10)
-        self.entry_search.set_margin_end(40)
+        self.entry_search.set_margin_end(20)
 
         grid_left = Gtk.Grid()
         grid_left.get_style_context().add_class('hbox-dark-background')
@@ -453,7 +453,7 @@ class Main(Gtk.Window):
         grid_middle = Gtk.Grid()
         grid_middle.get_style_context().add_class('hbox-dark-background')
 
-        grid_middle.add(button_settings)
+
         grid_middle.add(self.entry_search)
 
         grid_right = Gtk.Grid()
@@ -461,6 +461,7 @@ class Main(Gtk.Window):
         grid_right.set_hexpand(True)
         grid_right.set_halign(Gtk.Align.START)
 
+        grid_right.add(button_settings)
         grid_right.add(button_kill)
         grid_right.add(self.button_play)
 
@@ -503,7 +504,6 @@ class Main(Gtk.Window):
         self.connect("key-press-event", self.on_key_press_event)
 
     def on_item_right_click(self, widget, event):
-        # Mostrar menu de contexto ao clicar com o botão direito
         if event.button == Gdk.BUTTON_SECONDARY:
             item = self.get_item_at_event(event)
             if item:
