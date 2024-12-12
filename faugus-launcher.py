@@ -92,6 +92,7 @@ class Main(Gtk.Window):
 
         self.big_interface_active = False
         self.start_maximized = False
+        self.theme = None
 
         self.game_running = None
         self.system_tray = False
@@ -125,6 +126,9 @@ class Main(Gtk.Window):
             .hbox-dark-background {
                 background-color: rgba(25, 25, 25, 0.5);
             }
+            .hbox-light-background {
+                background-color: rgba(25, 25, 25, 0.1);
+            }
             .hbox-red-background {
                 background-color: rgba(255, 0, 0, 0.5);
             }
@@ -132,6 +136,7 @@ class Main(Gtk.Window):
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(), self.provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+        self.check_theme()
 
         self.load_config()
         if self.big_interface_active:
@@ -175,6 +180,14 @@ class Main(Gtk.Window):
 
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+
+    def check_theme(self):
+        settings = Gtk.Settings.get_default()
+        prefer_dark = settings.get_property('gtk-application-prefer-dark-theme')
+        if prefer_dark:
+            self.theme = "hbox-dark-background"
+        else:
+            self.theme = "hbox-light-background"
 
     def small_interface(self):
         self.set_default_size(400, 620)
@@ -443,7 +456,7 @@ class Main(Gtk.Window):
         self.entry_search.set_margin_end(20)
 
         grid_left = Gtk.Grid()
-        grid_left.get_style_context().add_class('hbox-dark-background')
+        grid_left.get_style_context().add_class(self.theme)
         grid_left.set_hexpand(True)
         grid_left.set_halign(Gtk.Align.END)
 
@@ -452,13 +465,13 @@ class Main(Gtk.Window):
         grid_left.add(self.button_delete)
 
         grid_middle = Gtk.Grid()
-        grid_middle.get_style_context().add_class('hbox-dark-background')
+        grid_middle.get_style_context().add_class(self.theme)
 
 
         grid_middle.add(self.entry_search)
 
         grid_right = Gtk.Grid()
-        grid_right.get_style_context().add_class('hbox-dark-background')
+        grid_right.get_style_context().add_class(self.theme)
         grid_right.set_hexpand(True)
         grid_right.set_halign(Gtk.Align.START)
 
@@ -740,7 +753,7 @@ class Main(Gtk.Window):
         else:
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             hbox.set_size_request(400, -1)
-        hbox.get_style_context().add_class('hbox-dark-background')
+        hbox.get_style_context().add_class(self.theme)
 
         # Handle the click event of the Create Shortcut button
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
