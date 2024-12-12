@@ -111,8 +111,8 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 
 ## Light theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/c3c6b8a6-bfff-46e8-9b28-6adefca3926c/><br><br>
-<img src=https://github.com/user-attachments/assets/301f23c5-3227-4cd4-863a-e5d98f10c80d/><br>
+<img src=https://github.com/user-attachments/assets/5954722d-63d2-4626-a7e3-81c24b488b94/><br><br>
+<img src=https://github.com/user-attachments/assets/b5193602-ffca-4e13-bb14-a586cc680689/><br>
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/f940c1f9-a207-42a8-a690-3c1a7497cb0e/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/10862bfa-cf8e-45b3-a174-4e1475891e56/><br>
 ### Settings
