@@ -98,24 +98,26 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 # Screenshots
 ## Dark theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/46db5689-30a6-41ab-9a22-8206bfabc682/><br>
+<img src=https://github.com/user-attachments/assets/72b6790e-ce02-4405-aa3d-fa2b3720107c/><br><br>
+<img src=https://github.com/user-attachments/assets/958cd1cb-2917-421e-a28a-0cdca0d60c85/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/cf70c8e4-6b59-4ce6-9958-93b5b80ea244/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/69d5a53c-380f-4b57-a8b1-63313e0d7905/><br>
+<img src=https://github.com/user-attachments/assets/a6d30723-6120-4c75-9f13-d183696f8b3f/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/449b3b01-2fd0-47c7-b5b1-eb2759fd5139/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/e38392ac-de76-4da0-8ec7-ca2ff734f130/><br>
+<img src=https://github.com/user-attachments/assets/857b5bbb-c8bf-4a4e-aeab-517c193cc04c/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/4b250388-b6df-4af0-982f-9da9f06dc1af/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/080c37b0-5ad0-4192-b4f2-f1bdd08dcb75/><br>
+<img src=https://github.com/user-attachments/assets/f5a65466-b610-42e4-831e-ab3b696c6ab5/><br>
 
 ## Light theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/31776ca4-0d2c-4e4f-ace9-a796fa7c81b6/><br>
+<img src=https://github.com/user-attachments/assets/c3c6b8a6-bfff-46e8-9b28-6adefca3926c/><br><br>
+<img src=https://github.com/user-attachments/assets/301f23c5-3227-4cd4-863a-e5d98f10c80d/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/3f1c6328-ef2f-48ca-a0c5-9d9847ddf478/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/b46b757c-405e-4f73-9c37-b333f47238b0/><br>
+<img src=https://github.com/user-attachments/assets/f940c1f9-a207-42a8-a690-3c1a7497cb0e/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/10862bfa-cf8e-45b3-a174-4e1475891e56/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/620ba534-d07f-477f-a21f-52ee86dd170c/><br>
+<img src=https://github.com/user-attachments/assets/f076fc73-2cbf-438d-98a7-c200224292dc/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/1e38d572-d1df-48fd-bafb-26310c1c9932/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/4d5feb01-0667-4c57-8285-cbfb3bc97c93/>
+<img src=https://github.com/user-attachments/assets/3f22a1ca-e47c-443d-94f1-d669fd069240/>
