@@ -184,7 +184,9 @@ class Main(Gtk.Window):
     def check_theme(self):
         settings = Gtk.Settings.get_default()
         prefer_dark = settings.get_property('gtk-application-prefer-dark-theme')
-        if prefer_dark:
+        output = subprocess.check_output(['gsettings', 'get', 'org.gnome.desktop.interface', 'gtk-theme']).decode('utf-8')
+        theme = output.strip().strip("'")
+        if prefer_dark or 'dark' in theme:
             self.theme = "hbox-dark-background"
         else:
             self.theme = "hbox-light-background"
