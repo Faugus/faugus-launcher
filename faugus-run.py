@@ -161,11 +161,10 @@ class FaugusRun:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state,
-                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -195,8 +194,9 @@ class FaugusRun:
         config['splash-disable'] = checkbox_splash_disable
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
-        config['big-interface'] = checkbox_big_interface
-        config['start-maximized'] = checkbox_start_maximized
+        config['interface-mode'] = combo_box_interface
+        config['start-maximized'] = checkbox_start_boot
+        config['api-key'] = entry_api_key
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
@@ -336,7 +336,7 @@ class FaugusRun:
             self.label2.set_text("Steam Runtime is up to date")
 
 
-        if "fsync: up and running." in clean_line or "SingleInstance" in clean_line:
+        if "fsync: up and running." in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):

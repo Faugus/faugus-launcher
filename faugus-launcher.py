@@ -12,6 +12,7 @@ import gi
 import socket
 import urllib.request
 import json
+import requests
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -20,10 +21,16 @@ gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AppIndicator3
 from PIL import Image
 
+xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
+data_dirs = xdg_data_dirs.split(':')
+share_dir_system = data_dirs[-1]
+faugus_banner = f'{share_dir_system}/faugus-launcher/faugus-banner.png'
+
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
 icons_dir = f'{faugus_launcher_dir}/icons'
+banners_dir = f'{faugus_launcher_dir}/banners'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 app_dir = f'{share_dir}/applications'
@@ -83,14 +90,13 @@ def get_desktop_dir():
 
 desktop_dir = get_desktop_dir()
 
-
 class Main(Gtk.Window):
     def __init__(self):
         # Initialize the main window with title and default size
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_icon_from_file(faugus_png)
 
-        self.big_interface_active = False
+        self.banner_mode = False
         self.start_maximized = False
         self.theme = None
 
@@ -117,7 +123,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "False", "False")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "Small", "False", "")
 
         self.games = []
 
@@ -139,11 +145,19 @@ class Main(Gtk.Window):
         self.check_theme()
 
         self.load_config()
-        if self.big_interface_active:
+        if self.interface_mode == "List":
+            self.small_interface()
+        if self.interface_mode == "Blocks":
+            if self.start_maximized:
+                self.maximize()
+            self.big_interface()
+        if self.interface_mode == "Banners":
+            self.banner_mode = True
             if self.start_maximized:
                 self.maximize()
             self.big_interface()
         else:
+            self.interface_mode = "List"
             self.small_interface()
 
         # Create the tray indicator
@@ -469,7 +483,6 @@ class Main(Gtk.Window):
         grid_middle = Gtk.Grid()
         grid_middle.get_style_context().add_class(self.theme)
 
-
         grid_middle.add(self.entry_search)
 
         grid_right = Gtk.Grid()
@@ -484,16 +497,17 @@ class Main(Gtk.Window):
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll_box.set_margin_top(20)
-        scroll_box.set_margin_end(20)
-        scroll_box.set_margin_start(20)
-        scroll_box.set_margin_bottom(20)
+        scroll_box.set_margin_top(10)
+        scroll_box.set_margin_end(10)
+        scroll_box.set_margin_start(10)
+        scroll_box.set_margin_bottom(10)
 
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.set_halign(Gtk.Align.CENTER)
         self.flowbox.set_valign(Gtk.Align.CENTER)
         self.flowbox.set_min_children_per_line(2)
+        self.flowbox.set_max_children_per_line(20)
         self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
 
@@ -641,10 +655,11 @@ class Main(Gtk.Window):
 
             self.system_tray = config_dict.get('system-tray', 'False') == 'True'
             self.start_boot = config_dict.get('start-boot', 'False') == 'True'
-            self.big_interface_active = config_dict.get('big-interface', 'False') == 'True'
             self.start_maximized = config_dict.get('start-maximized', 'False') == 'True'
+            self.interface_mode = config_dict.get('interface-mode', '').strip('"')
+            self.api_key = config_dict.get('api-key', '').strip('"')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -731,9 +746,10 @@ class Main(Gtk.Window):
                     addapp_checkbox = game_data.get("addapp_checkbox", "")
                     addapp = game_data.get("addapp", "")
                     addapp_bat = game_data.get("addapp_bat", "")
+                    banner = game_data.get("banner", "")
 
                     game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
-                                sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
+                                sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -749,12 +765,16 @@ class Main(Gtk.Window):
     def add_item_list(self, game):
         # Add a game item to the list
 
-        if self.big_interface_active:
-            hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            hbox.set_size_request(300, 200)
-        else:
+        if self.interface_mode == "List":
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             hbox.set_size_request(400, -1)
+        if self.interface_mode == "Blocks":
+            hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            hbox.set_size_request(300, 200)
+        if self.interface_mode == "Banners":
+            hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            #hbox.set_size_request(200, 300)
+
         hbox.get_style_context().add_class(self.theme)
 
         # Handle the click event of the Create Shortcut button
@@ -764,7 +784,8 @@ class Main(Gtk.Window):
 
         game_icon = f'{icons_dir}/{title_formatted}.ico'
         game_label = Gtk.Label.new(game.title)
-        if self.big_interface_active:
+
+        if self.interface_mode == "Blocks" or self.interface_mode == "Banners":
             game_label.set_line_wrap(True)
             game_label.set_max_width_chars(1)
             game_label.set_justify(Gtk.Justification.CENTER)
@@ -774,20 +795,13 @@ class Main(Gtk.Window):
         else:
             game_icon = faugus_png
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
-        if self.big_interface_active:
-            scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
-        else:
-            scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
-        image = Gtk.Image.new_from_file(game_icon)
-        image.set_from_pixbuf(scaled_pixbuf)
+        self.flowbox_child = Gtk.FlowBoxChild()
 
-        if self.big_interface_active:
-            hbox.pack_start(image, True, True, 0)
-            hbox.pack_start(game_label, True, True, 0)
-            game_label.set_margin_end(20)
-            game_label.set_margin_start(20)
-        else:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
+        if self.interface_mode == "List":
+            scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(game_icon)
+            image.set_from_pixbuf(scaled_pixbuf)
             image.set_margin_start(10)
             image.set_margin_end(10)
             image.set_margin_top(10)
@@ -798,8 +812,31 @@ class Main(Gtk.Window):
             game_label.set_margin_bottom(10)
             hbox.pack_start(image, False, False, 0)
             hbox.pack_start(game_label, False, False, 0)
+        if self.interface_mode == "Blocks":
+            scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(game_icon)
+            image.set_from_pixbuf(scaled_pixbuf)
+            hbox.pack_start(image, True, True, 0)
+            hbox.pack_start(game_label, True, True, 0)
+            game_label.set_margin_end(20)
+            game_label.set_margin_start(20)
+        if self.interface_mode == "Banners":
+            image2 = Gtk.Image()
+            game_label.set_size_request(-1, 50)
+            game_label.set_margin_end(10)
+            game_label.set_margin_start(10)
+            self.flowbox_child.set_margin_start(10)
+            self.flowbox_child.set_margin_end(10)
+            self.flowbox_child.set_margin_top(10)
+            self.flowbox_child.set_margin_bottom(10)
+            if game.banner == "" or not os.path.isfile(game.banner):
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(faugus_banner, 230, 345, False)
+            else:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 230, 345, False)
+            image2.set_from_pixbuf(pixbuf)
+            hbox.pack_start(image2, True, True, 0)
+            hbox.pack_start(game_label, True, True, 0)
 
-        self.flowbox_child = Gtk.FlowBoxChild()
         self.flowbox_child.add(hbox)
         self.flowbox.add(self.flowbox_child)
 
@@ -900,9 +937,12 @@ class Main(Gtk.Window):
         self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
         self.checkbox_system_tray = settings_dialog.checkbox_system_tray
         self.checkbox_start_boot = settings_dialog.checkbox_start_boot
-        self.checkbox_big_interface = settings_dialog.checkbox_big_interface
+
         self.checkbox_start_maximized = settings_dialog.checkbox_start_maximized
+
         self.entry_default_prefix = settings_dialog.entry_default_prefix
+        self.combo_box_interface = settings_dialog.combo_box_interface
+        self.entry_api_key = settings_dialog.entry_api_key
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
@@ -914,9 +954,11 @@ class Main(Gtk.Window):
         checkbox_splash_disable = self.checkbox_splash_disable.get_active()
         checkbox_system_tray = self.checkbox_system_tray.get_active()
         checkbox_start_boot = self.checkbox_start_boot.get_active()
-        checkbox_big_interface = self.checkbox_big_interface.get_active()
         checkbox_start_maximized = self.checkbox_start_maximized.get_active()
         default_prefix = self.entry_default_prefix.get_text()
+
+        combo_box_interface = self.combo_box_interface.get_active_text()
+        entry_api_key = self.entry_api_key.get_text()
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -930,26 +972,28 @@ class Main(Gtk.Window):
 
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
-            if default_prefix == "":
-                settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
+            validation_result = self.validate_settings_fields(settings_dialog, default_prefix, entry_api_key)
+            if not validation_result:
+                return
+
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key)
+            self.manage_autostart_file(checkbox_start_boot)
+
+            if checkbox_system_tray:
+                self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
+                    self.connect("delete-event", self.on_window_delete_event)
+                    self.window_delete_event_connected = True
+                self.indicator.set_menu(self.create_tray_menu())
             else:
-                self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized)
-                self.manage_autostart_file(checkbox_start_boot)
+                self.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                    self.disconnect_by_func(self.on_window_delete_event)
+                    self.window_delete_event_connected = False
 
-                if checkbox_system_tray:
-                    self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-                    if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                        self.connect("delete-event", self.on_window_delete_event)
-                        self.window_delete_event_connected = True
-                    self.indicator.set_menu(self.create_tray_menu())
-                else:
-                    self.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
-                    if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                        self.disconnect_by_func(self.on_window_delete_event)
-                        self.window_delete_event_connected = False
-
-                if self.big_interface_active != checkbox_big_interface:
-                    dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Please restart Faugus Launcher to switch the interface mode.",
+            if validation_result:
+                if self.interface_mode != combo_box_interface:
+                    dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Please restart Faugus Launcher\nto switch the interface mode.",
                                             buttons=Gtk.ButtonsType.OK, parent=self)
                     dialog.set_resizable(False)
                     dialog.set_modal(True)
@@ -957,10 +1001,29 @@ class Main(Gtk.Window):
                     dialog.run()
                     dialog.destroy()
 
-                settings_dialog.destroy()
+            self.load_config()
+            settings_dialog.destroy()
 
         else:
             settings_dialog.destroy()
+
+    def validate_settings_fields(self, settings_dialog, default_prefix, entry_api_key):
+        settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
+        settings_dialog.entry_api_key.get_style_context().remove_class("entry")
+
+        if settings_dialog.combo_box_interface.get_active_text() == "Banners":
+            if not default_prefix or not entry_api_key:
+                if not default_prefix:
+                    settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
+                if not entry_api_key:
+                    settings_dialog.entry_api_key.get_style_context().add_class("entry")
+                return False
+            return True
+        elif not default_prefix:
+            settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
+            return False
+        else:
+            return True
 
     def manage_autostart_file(self, checkbox_start_boot):
         # Define the path for the autostart file
@@ -1116,7 +1179,7 @@ class Main(Gtk.Window):
     def on_button_add_clicked(self, widget):
         file_path=""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.game_running2, file_path)
+        add_game_dialog = AddGame(self, self.game_running2, file_path, self.api_key, self.interface_mode)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
@@ -1135,7 +1198,7 @@ class Main(Gtk.Window):
                 self.game_running2 = True
             else:
                 self.game_running2 = False
-            edit_game_dialog = AddGame(self, self.game_running2, file_path)
+            edit_game_dialog = AddGame(self, self.game_running2, file_path, self.api_key, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model = edit_game_dialog.combo_box_runner.get_model()
@@ -1166,6 +1229,14 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
             edit_game_dialog.entry_addapp.set_text(game.addapp)
             edit_game_dialog.grid_launcher.set_visible(False)
+
+            if not os.path.isfile(game.banner):
+                game.banner = faugus_banner
+            shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
+            allocation = edit_game_dialog.entry_title.get_allocation()
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width -10), -1, True)
+            edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
+            edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
@@ -1260,6 +1331,7 @@ class Main(Gtk.Window):
 
                 # Remove the shortcut
                 self.remove_shortcut(game)
+                self.remove_banner(game)
 
                 self.games.remove(game)
                 self.save_games()
@@ -1272,10 +1344,12 @@ class Main(Gtk.Window):
                 # Remove the game from the latest-games file if it exists
                 self.remove_game_from_latest_games(title)
 
+                if self.flowbox.get_children():
+                    self.flowbox.select_child(self.flowbox.get_children()[0])
+                    self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
+
             confirmation_dialog.destroy()
-            if self.flowbox.get_children():
-                self.flowbox.select_child(self.flowbox.get_children()[0])
-                self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
+
 
     def remove_game_from_latest_games(self, title):
         try:
@@ -1340,6 +1414,22 @@ class Main(Gtk.Window):
 
             addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
 
+            if self.interface_mode == "Banners":
+                banner = os.path.join(banners_dir, f"{title_formatted}.png")
+                temp_banner_path = add_game_dialog.banner_path_temp
+                try:
+                    # Use `magick` to resize the image
+                    subprocess.run([
+                        "magick",
+                        temp_banner_path,
+                        "-resize", "230x345!",
+                        banner
+                    ], check=True)
+                except subprocess.CalledProcessError as e:
+                    print(f"Error resizing banner: {e}")
+            else:
+                banner = ""
+
             if runner == "UMU-Proton Latest":
                 runner = ""
             if runner == "GE-Proton Latest (default)":
@@ -1367,6 +1457,7 @@ class Main(Gtk.Window):
                 "addapp_checkbox": addapp_checkbox,
                 "addapp": addapp,
                 "addapp_bat": addapp_bat,
+                "banner": banner,
             }
 
             games = []
@@ -1383,7 +1474,7 @@ class Main(Gtk.Window):
                 json.dump(games, file, ensure_ascii=False, indent=4)
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat)
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
             self.games.append(game)
 
             # Determine the state of the shortcut checkbox
@@ -1444,7 +1535,8 @@ class Main(Gtk.Window):
             if os.path.isdir(add_game_dialog.icon_directory):
                 shutil.rmtree(add_game_dialog.icon_directory)
             add_game_dialog.destroy()
-
+        if os.path.isfile(add_game_dialog.banner_path_temp):
+            os.remove(add_game_dialog.banner_path_temp)
         # Ensure the dialog is destroyed when canceled
         add_game_dialog.destroy()
 
@@ -1668,6 +1760,23 @@ class Main(Gtk.Window):
 
             game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
 
+            if self.interface_mode == "Banners":
+                banner = os.path.join(banners_dir, f"{title_formatted}.png")
+                temp_banner_path = edit_game_dialog.banner_path_temp
+                try:
+                    # Use `magick` to resize the image
+                    subprocess.run([
+                        "magick",
+                        temp_banner_path,
+                        "-resize", "230x345!",
+                        banner
+                    ], check=True)
+                    game.banner = banner
+                except subprocess.CalledProcessError as e:
+                    print(f"Error resizing banner: {e}")
+            else:
+                game.banner = ""
+
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
             if game.runner == "GE-Proton Latest (default)":
@@ -1701,7 +1810,7 @@ class Main(Gtk.Window):
 
         if os.path.isdir(edit_game_dialog.icon_directory):
             shutil.rmtree(edit_game_dialog.icon_directory)
-
+        os.remove(edit_game_dialog.banner_path_temp)
         edit_game_dialog.destroy()
 
     def add_shortcut(self, game, shortcut_state, icon_temp, icon_final):
@@ -1840,6 +1949,16 @@ class Main(Gtk.Window):
         else:
             dialog.set_preview_widget_active(False)
 
+    def remove_banner(self, game):
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        # Remove banner file
+        banner_file_path = f"{banners_dir}/{title_formatted}.png"
+        if os.path.exists(banner_file_path):
+            os.remove(banner_file_path)
+
     def remove_shortcut(self, game):
         # Remove existing shortcut if it exists
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
@@ -1932,6 +2051,7 @@ class Main(Gtk.Window):
                 "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
                 "addapp": game.addapp,
                 "addapp_bat": game.addapp_bat,
+                "banner": game.banner,
             }
             games_data.append(game_info)
 
@@ -1946,7 +2066,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -1973,8 +2093,9 @@ class Main(Gtk.Window):
         config['splash-disable'] = checkbox_splash_disable
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
-        config['big-interface'] = checkbox_big_interface
+        config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_maximized
+        config['api-key'] = entry_api_key
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -2010,6 +2131,25 @@ class Settings(Gtk.Dialog):
         """
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        # Widgets for Interface mode
+        self.label_interface = Gtk.Label(label="Interface Mode")
+        self.label_interface.set_halign(Gtk.Align.START)
+        self.combo_box_interface = Gtk.ComboBoxText()
+        self.combo_box_interface.connect("changed", self.on_combobox_interface_changed)
+        self.combo_box_interface.append_text("List")
+        self.combo_box_interface.append_text("Blocks")
+        self.combo_box_interface.append_text("Banners")
+
+        self.label_api_key = Gtk.Label(label="SteamGridDB API Key")
+        self.label_api_key.set_halign(Gtk.Align.START)
+        self.label_api_key.set_markup('<a href="https://www.steamgriddb.com/profile/preferences/api">SteamGridDB API Key</a>')
+        self.label_api_key.connect("activate-link", self.on_link_clicked)
+        self.entry_api_key = Gtk.Entry()
+
+        # Create checkbox for 'Start maximized' option
+        self.checkbox_start_maximized = Gtk.CheckButton(label="Start maximized")
+        self.checkbox_start_maximized.set_active(False)
 
         # Widgets for prefix
         self.label_default_prefix = Gtk.Label(label="Default prefixes location")
@@ -2052,16 +2192,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_boot = Gtk.CheckButton(label="Start on boot")
         self.checkbox_start_boot.set_active(False)
         self.checkbox_start_boot.set_sensitive(False)
-
-        # Create checkbox for 'Big interface' option
-        self.checkbox_big_interface = Gtk.CheckButton(label="Big interface")
-        self.checkbox_big_interface.set_active(False)
-        self.checkbox_big_interface.connect("toggled", self.on_checkbox_big_interface_toggled)
-
-        # Create checkbox for 'Start maximized' option
-        self.checkbox_start_maximized = Gtk.CheckButton(label="Start maximized")
-        self.checkbox_start_maximized.set_active(False)
-        self.checkbox_start_maximized.set_sensitive(False)
 
         # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label="Disable splash window")
@@ -2122,60 +2252,75 @@ class Settings(Gtk.Dialog):
 
         self.box = self.get_content_area()
 
-        grid = Gtk.Grid()
-        grid.set_row_spacing(10)
-        grid.set_column_spacing(10)
-        grid.set_margin_start(10)
-        grid.set_margin_end(10)
-        grid.set_margin_top(10)
-        grid.set_margin_bottom(10)
+        grid_interface_mode = Gtk.Grid()
+        grid_interface_mode.set_row_spacing(10)
+        grid_interface_mode.set_column_spacing(10)
+        grid_interface_mode.set_margin_start(10)
+        grid_interface_mode.set_margin_end(10)
+        grid_interface_mode.set_margin_top(10)
+        grid_interface_mode.set_margin_bottom(10)
 
-        grid2 = Gtk.Grid()
-        grid2.set_row_spacing(10)
-        grid2.set_column_spacing(10)
-        grid2.set_margin_start(10)
-        grid2.set_margin_end(10)
-        grid2.set_margin_top(10)
+        self.grid_big_interface = Gtk.Grid()
+        self.grid_big_interface.set_row_spacing(10)
+        self.grid_big_interface.set_column_spacing(10)
+        self.grid_big_interface.set_margin_start(10)
+        self.grid_big_interface.set_margin_end(10)
+        self.grid_big_interface.set_margin_bottom(10)
 
-        grid3 = Gtk.Grid()
-        grid3.set_row_spacing(10)
-        grid3.set_column_spacing(10)
-        grid3.set_margin_start(10)
-        grid3.set_margin_end(10)
-        grid3.set_margin_top(10)
-        grid3.set_margin_bottom(10)
+        grid_prefix = Gtk.Grid()
+        grid_prefix.set_row_spacing(10)
+        grid_prefix.set_column_spacing(10)
+        grid_prefix.set_margin_start(10)
+        grid_prefix.set_margin_end(10)
+        grid_prefix.set_margin_top(10)
+        grid_prefix.set_margin_bottom(10)
 
-        grid4 = Gtk.Grid()
-        grid4.set_row_spacing(10)
-        grid4.set_column_spacing(10)
-        grid4.set_margin_start(10)
-        grid4.set_margin_end(10)
-        grid4.set_margin_top(10)
-        grid4.set_margin_bottom(10)
+        grid_tools_wrap = Gtk.Grid()
+        grid_tools_wrap.set_row_spacing(10)
+        grid_tools_wrap.set_column_spacing(10)
+        grid_tools_wrap.set_margin_start(10)
+        grid_tools_wrap.set_margin_end(10)
+        grid_tools_wrap.set_margin_top(10)
 
-        grid5 = Gtk.Grid()
-        grid5.set_row_spacing(10)
-        grid5.set_column_spacing(10)
-        grid5.set_margin_start(10)
-        grid5.set_margin_end(10)
-        grid5.set_margin_top(10)
-        grid5.set_margin_bottom(10)
+        grid_tools = Gtk.Grid()
+        grid_tools.set_row_spacing(10)
+        grid_tools.set_column_spacing(10)
+        grid_tools.set_margin_start(10)
+        grid_tools.set_margin_end(10)
+        grid_tools.set_margin_top(10)
+        grid_tools.set_margin_bottom(10)
 
-        grid6 = Gtk.Grid()
-        grid6.set_row_spacing(10)
-        grid6.set_column_spacing(10)
-        grid6.set_margin_start(10)
-        grid6.set_margin_end(10)
-        grid6.set_margin_top(10)
-        grid6.set_margin_bottom(10)
+        grid_support = Gtk.Grid()
+        grid_support.set_row_spacing(10)
+        grid_support.set_column_spacing(10)
+        grid_support.set_margin_start(10)
+        grid_support.set_margin_end(10)
+        grid_support.set_margin_top(10)
+        grid_support.set_margin_bottom(10)
 
-        grid7 = Gtk.Grid()
-        grid7.set_row_spacing(10)
-        grid7.set_column_spacing(10)
-        grid7.set_margin_start(10)
-        grid7.set_margin_end(10)
-        grid7.set_margin_top(10)
-        grid7.set_margin_bottom(10)
+        grid_buttons = Gtk.Grid()
+        grid_buttons.set_row_spacing(10)
+        grid_buttons.set_column_spacing(10)
+        grid_buttons.set_margin_start(10)
+        grid_buttons.set_margin_end(10)
+        grid_buttons.set_margin_top(10)
+        grid_buttons.set_margin_bottom(10)
+
+        grid_runner = Gtk.Grid()
+        grid_runner.set_row_spacing(10)
+        grid_runner.set_column_spacing(10)
+        grid_runner.set_margin_start(10)
+        grid_runner.set_margin_end(10)
+        grid_runner.set_margin_top(10)
+        grid_runner.set_margin_bottom(10)
+
+        grid_checkboxes = Gtk.Grid()
+        grid_checkboxes.set_row_spacing(10)
+        grid_checkboxes.set_column_spacing(10)
+        grid_checkboxes.set_margin_start(10)
+        grid_checkboxes.set_margin_end(10)
+        grid_checkboxes.set_margin_top(10)
+        grid_checkboxes.set_margin_bottom(10)
 
         # Create a frame
         frame = Gtk.Frame()
@@ -2186,46 +2331,55 @@ class Settings(Gtk.Dialog):
         frame.set_margin_bottom(10)
 
         # Add grid to frame
-        frame.add(grid3)
+        frame.add(grid_tools)
 
         # Attach widgets to the grid layout
-        grid.attach(self.label_default_prefix, 0, 0, 1, 1)
-        grid.attach(self.entry_default_prefix, 0, 1, 3, 1)
-        self.entry_default_prefix.set_hexpand(True)
-        grid.attach(self.button_search_prefix, 3, 1, 1, 1)
+        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
+        grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
+        self.combo_box_interface.set_hexpand(True)
 
-        grid6.attach(self.label_runner, 0, 6, 1, 1)
-        grid6.attach(self.combo_box_runner, 0, 7, 1, 1)
-        grid6.attach(self.button_proton_manager, 0, 8, 1, 1)
+        # Attach widgets to the grid layout
+        self.grid_big_interface.attach(self.label_api_key, 0, 0, 1, 1)
+        self.grid_big_interface.attach(self.entry_api_key, 3, 0, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 1, 1, 1)
+        self.entry_api_key.set_hexpand(True)
+
+        # Attach widgets to the grid layout
+        grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
+        grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
+        self.entry_default_prefix.set_hexpand(True)
+        grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
+
+        grid_runner.attach(self.label_runner, 0, 6, 1, 1)
+        grid_runner.attach(self.combo_box_runner, 0, 7, 1, 1)
+        grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
         self.combo_box_runner.set_hexpand(True)
         self.button_proton_manager.set_hexpand(True)
 
-        grid7.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
-        grid7.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
-        grid7.attach(self.checkbox_system_tray, 0, 4, 1, 1)
-        grid7.attach(self.checkbox_start_boot, 2, 4, 1, 1)
-        grid7.attach(self.checkbox_big_interface, 0, 5, 1, 1)
-        grid7.attach(self.checkbox_start_maximized, 2, 5, 1, 1)
-        grid7.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+        grid_checkboxes.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
+        grid_checkboxes.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
+        grid_checkboxes.attach(self.checkbox_system_tray, 0, 4, 1, 1)
+        grid_checkboxes.attach(self.checkbox_start_boot, 2, 4, 1, 1)
+        grid_checkboxes.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
 
-        grid2.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
+        grid_tools_wrap.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
 
-        grid3.attach(self.checkbox_mangohud, 0, 0, 1, 1)
+        grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
-        grid3.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid3.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
-        grid3.attach(self.button_winetricks_default, 1, 0, 1, 1)
-        grid3.attach(self.button_winecfg_default, 1, 1, 1, 1)
-        grid3.attach(self.button_run_default, 1, 2, 1, 1)
+        grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
+        grid_tools.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
+        grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
+        grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
+        grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
 
-        grid4.attach(self.label_support, 0, 0, 1, 1)
-        grid4.attach(button_kofi, 0, 1, 1, 1)
-        grid4.attach(button_paypal, 1, 1, 1, 1)
-        grid4.set_halign(Gtk.Align.CENTER)
+        grid_support.attach(self.label_support, 0, 0, 1, 1)
+        grid_support.attach(button_kofi, 0, 1, 1, 1)
+        grid_support.attach(button_paypal, 1, 1, 1, 1)
+        grid_support.set_halign(Gtk.Align.CENTER)
 
-        grid5.attach(self.button_cancel, 0, 0, 1, 1)
-        grid5.attach(self.button_ok, 1, 0, 1, 1)
-        grid5.set_halign(Gtk.Align.CENTER)
+        grid_buttons.attach(self.button_cancel, 0, 0, 1, 1)
+        grid_buttons.attach(self.button_ok, 1, 0, 1, 1)
+        grid_buttons.set_halign(Gtk.Align.CENTER)
 
         self.populate_combobox_with_runners()
         self.load_config()
@@ -2252,22 +2406,34 @@ class Settings(Gtk.Dialog):
             self.checkbox_sc_controller.set_tooltip_text(
                 "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
-        self.box.add(grid)
-        self.box.add(grid6)
-        self.box.add(grid2)
+        self.box.add(grid_interface_mode)
+        self.box.add(self.grid_big_interface)
+        self.box.add(grid_prefix)
+        self.box.add(grid_runner)
+        self.box.add(grid_tools_wrap)
         self.box.add(frame)
-        self.box.add(grid7)
-        self.box.add(grid4)
-        self.box.add(grid5)
+        self.box.add(grid_checkboxes)
+        self.box.add(grid_support)
+        self.box.add(grid_buttons)
 
         self.show_all()
+        self.on_combobox_interface_changed(self.combo_box_interface)
 
-    def on_checkbox_big_interface_toggled(self, widget):
-        if not widget.get_active():
-            self.checkbox_start_maximized.set_active(False)
-            self.checkbox_start_maximized.set_sensitive(False)
-        else:
-            self.checkbox_start_maximized.set_sensitive(True)
+    def on_link_clicked(self, label, uri):
+        webbrowser.open(uri)
+
+    def on_combobox_interface_changed(self, combo_box):
+        active_index = combo_box.get_active()
+        if active_index == 0:
+            self.grid_big_interface.set_visible(False)
+        if active_index == 1:
+            self.grid_big_interface.set_visible(True)
+            self.label_api_key.set_visible(False)
+            self.entry_api_key.set_visible(False)
+        if active_index == 2:
+            self.grid_big_interface.set_visible(True)
+            self.label_api_key.set_visible(True)
+            self.entry_api_key.set_visible(True)
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
@@ -2351,6 +2517,10 @@ class Settings(Gtk.Dialog):
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
+            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+
+            combo_box_interface = self.combo_box_interface.get_active_text()
+            entry_api_key = self.entry_api_key.get_text()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2362,7 +2532,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2455,6 +2625,10 @@ class Settings(Gtk.Dialog):
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
+            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+
+            combo_box_interface = self.combo_box_interface.get_active_text()
+            entry_api_key = self.entry_api_key.get_text()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2466,7 +2640,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2527,8 +2701,10 @@ class Settings(Gtk.Dialog):
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_big_interface = self.checkbox_big_interface.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+
+            combo_box_interface = self.combo_box_interface.get_active_text()
+            entry_api_key = self.entry_api_key.get_text()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2540,7 +2716,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2618,28 +2794,22 @@ class Settings(Gtk.Dialog):
             with open(config_file, 'r') as f:
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
-            close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
-            discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
-            splash_disable = config_dict.get('splash-disable', 'False') == 'True'
-            system_tray = config_dict.get('system-tray', 'False') == 'True'
-            start_boot = config_dict.get('start-boot', 'False') == 'True'
-            big_interface = config_dict.get('big-interface', 'False') == 'True'
-            start_maximized = config_dict.get('start-maximized', 'False') == 'True'
-            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
 
+            close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
+            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
             sc_controller = config_dict.get('sc-controller', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
+            discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
+            splash_disable = config_dict.get('splash-disable', 'False') == 'True'
+            system_tray = config_dict.get('system-tray', 'False') == 'True'
+            start_boot = config_dict.get('start-boot', 'False') == 'True'
+            start_maximized = config_dict.get('start-maximized', 'False') == 'True'
+            self.interface_mode = config_dict.get('interface-mode', '').strip('"')
+            self.api_key = config_dict.get('api-key', '').strip('"')
 
-            self.checkbox_discrete_gpu.set_active(discrete_gpu)
             self.checkbox_close_after_launch.set_active(close_on_launch)
-            self.checkbox_splash_disable.set_active(splash_disable)
-            self.checkbox_start_boot.set_active(start_boot)
-            self.checkbox_system_tray.set_active(system_tray)
-            self.checkbox_big_interface.set_active(big_interface)
-            self.checkbox_start_maximized.set_active(start_maximized)
-
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
@@ -2647,23 +2817,37 @@ class Settings(Gtk.Dialog):
 
             if self.default_runner == "":
                 self.default_runner = "UMU-Proton Latest"
-
             model = self.combo_box_runner.get_model()
             index_to_activate = 0
             for i, row in enumerate(model):
                 if row[0] == self.default_runner:
                     index_to_activate = i
                     break
-            self.combo_box_runner.set_active(index_to_activate)
 
+            self.combo_box_runner.set_active(index_to_activate)
+            self.checkbox_discrete_gpu.set_active(discrete_gpu)
+            self.checkbox_splash_disable.set_active(splash_disable)
+            self.checkbox_system_tray.set_active(system_tray)
+            self.checkbox_start_boot.set_active(start_boot)
+            self.checkbox_start_maximized.set_active(start_maximized)
+
+            model = self.combo_box_interface.get_model()
+            index_to_activate2 = 0
+            for i, row in enumerate(model):
+                if row[0] == self.interface_mode:
+                    index_to_activate2 = i
+                    break
+
+            self.combo_box_interface.set_active(index_to_activate2)
+            self.entry_api_key.set_text(self.api_key)
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "False", "False")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat):
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
@@ -2678,6 +2862,7 @@ class Game:
         self.addapp_checkbox = addapp_checkbox
         self.addapp = addapp
         self.addapp_bat = addapp_bat
+        self.banner = banner
 
 
 class ConfirmationDialog(Gtk.Dialog):
@@ -2737,14 +2922,22 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class AddGame(Gtk.Dialog):
-    def __init__(self, parent, game_running2, file_path):
+    def __init__(self, parent, game_running2, file_path, api_key, interface_mode):
         # Initialize the AddGame dialog
         super().__init__(title="New Game/App", parent=parent)
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
         self.set_icon_from_file(faugus_png)
+        self.api_key = api_key
 
+        self.icon_directory = f"{icons_dir}/icon_temp/"
+
+        if not os.path.exists(banners_dir):
+            os.makedirs(banners_dir)
+
+        self.banner_path_temp = os.path.join(banners_dir, "banner_temp.png")
+        shutil.copy(faugus_banner, self.banner_path_temp)
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(self.icon_directory):
@@ -2760,6 +2953,9 @@ class AddGame(Gtk.Dialog):
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
+
+        grid_page1 = Gtk.Grid()
+        grid_page2 = Gtk.Grid()
 
         self.grid_launcher = Gtk.Grid()
         self.grid_launcher.set_row_spacing(10)
@@ -2857,6 +3053,8 @@ class AddGame(Gtk.Dialog):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        if interface_mode == "Banners":
+            self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text("Game Title")
 
         # Widgets for path
@@ -2975,26 +3173,72 @@ class AddGame(Gtk.Dialog):
         self.default_runner = self.load_default_runner()
 
         self.notebook = Gtk.Notebook()
-        self.box.add(self.notebook)
         self.notebook.set_margin_start(10)
         self.notebook.set_margin_end(10)
         self.notebook.set_margin_top(10)
         self.notebook.set_margin_bottom(10)
         #notebook.set_show_border(False)
 
+        self.box.add(self.notebook)
+
+        self.image_banner = Gtk.Image()
+        self.image_banner.set_margin_end(10)
+        self.image_banner.set_margin_top(10)
+        self.image_banner.set_margin_bottom(10)
+        self.image_banner.set_vexpand(True)
+        self.image_banner.set_valign(Gtk.Align.CENTER)
+
+        self.image_banner2 = Gtk.Image()
+        self.image_banner2.set_margin_end(10)
+        self.image_banner2.set_margin_top(10)
+        self.image_banner2.set_margin_bottom(10)
+        self.image_banner2.set_vexpand(True)
+        self.image_banner2.set_valign(Gtk.Align.CENTER)
+
+        event_box = Gtk.EventBox()
+        event_box.add(self.image_banner)
+        event_box.connect("button-press-event", self.on_image_clicked)
+
+        event_box2 = Gtk.EventBox()
+        event_box2.add(self.image_banner2)
+        event_box2.connect("button-press-event", self.on_image_clicked)
+
+        self.menu = Gtk.Menu()
+
+        # Opção de "Refresh"
+        refresh_item = Gtk.MenuItem(label="Refresh")
+        refresh_item.connect("activate", self.on_refresh)
+        self.menu.append(refresh_item)
+
+        # Opção de "Load from file"
+        load_item = Gtk.MenuItem(label="Load from file")
+        load_item.connect("activate", self.on_load_file)
+        self.menu.append(load_item)
+
+        # Finalizar o menu
+        self.menu.show_all()
+
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label1 = Gtk.Label(label="Game/App")
         tab_box1.pack_start(tab_label1, True, True, 0)
         tab_box1.set_hexpand(True)
-        self.notebook.append_page(page1, tab_box1)
+
+        grid_page1.add(page1)
+        grid_page1.add(event_box)
+
+        self.notebook.append_page(grid_page1, tab_box1)
 
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label2 = Gtk.Label(label="Tools")
         tab_box2.pack_start(tab_label2, True, True, 0)
         tab_box2.set_hexpand(True)
-        self.notebook.append_page(page2, tab_box2)
+
+        grid_page2.add(page2)
+        grid_page2.add(event_box2)
+
+        self.notebook.append_page(grid_page2, tab_box2)
 
         self.grid_launcher.attach(self.combo_box_launcher, 0, 0, 4, 1)
         self.combo_box_launcher.set_hexpand(True)
@@ -3121,6 +3365,113 @@ class AddGame(Gtk.Dialog):
         tab_box1.show_all()
         tab_box2.show_all()
         self.show_all()
+        if interface_mode != "Banners":
+            self.image_banner.set_visible(False)
+            self.image_banner2.set_visible(False)
+        allocation = self.entry_title.get_allocation()
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width -10), -1, True)
+        self.image_banner.set_from_pixbuf(pixbuf)
+        self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def on_image_clicked(self, widget, event):
+        self.menu.popup_at_pointer(event)
+
+    def on_refresh(self, widget):
+        self.get_banner()
+
+    def on_load_file(self, widget):
+        dialog = Gtk.FileChooserDialog(title="Select an image for the banner", action=Gtk.FileChooserAction.OPEN)
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+
+        # Add a filter to limit selection to .ico files
+        filter_ico = Gtk.FileFilter()
+        filter_ico.set_name("Image files")
+        filter_ico.add_mime_type("image/*")  # Other image formats
+        dialog.add_filter(filter_ico)
+
+        # Set the initial directory to the icon directory
+        dialog.set_current_folder(os.path.expanduser("~/"))
+
+        # Connect signal to update preview widget when file selection changes
+        dialog.connect("update-preview", self.update_preview)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            file_path = dialog.get_filename()
+            shutil.copy(file_path, self.banner_path_temp)
+            self.update_image_banner()
+
+        dialog.destroy()
+
+    def get_banner(self):
+        def fetch_banner():
+            title = self.entry_title.get_text()
+            try:
+                # Request SteamGridDB API
+                headers = {"Authorization": f"Bearer {self.api_key}"}
+                response = requests.get(f"https://www.steamgriddb.com/api/v2/search/autocomplete/{title}", headers=headers)
+                response.raise_for_status()
+                data = response.json()
+
+                # Check if any game was found
+                if not data["data"]:
+                    print(f"No game found with the title: {title}")
+                    return
+
+                # Get the ID of the first game found
+                game_id = data["data"][0]["id"]
+
+                # Fetch images for the game with 2:3 filter (Steam Vertical)
+                params = {"dimensions": "600x900"}  # Adjust for the desired format
+                images_response = requests.get(
+                    f"https://www.steamgriddb.com/api/v2/grids/game/{game_id}",
+                    headers=headers,
+                    params=params
+                )
+                images_response.raise_for_status()
+                images_data = images_response.json()
+
+                # Select the first available image
+                if not images_data["data"]:
+                    print("No image found for this game.")
+                    return
+
+                image_url = images_data["data"][0]["url"]
+
+                # Download and save the image
+                image_response = requests.get(image_url)
+                image_response.raise_for_status()
+
+                # Check if the banners directory exists, otherwise create it
+                os.makedirs(banners_dir, exist_ok=True)
+
+                with open(self.banner_path_temp, "wb") as image_file:
+                    image_file.write(image_response.content)
+
+                # Display the image in Gtk.Image on the main thread
+                GLib.idle_add(self.update_image_banner)
+
+            except requests.exceptions.RequestException as e:
+                dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Error downloading the banner from SteamDBGrid.\nCheck the API Key and the internet connection.",
+                                            buttons=Gtk.ButtonsType.OK, parent=self)
+                dialog.set_resizable(False)
+                dialog.set_modal(True)
+                dialog.set_icon_from_file(faugus_png)
+                dialog.run()
+                dialog.destroy()
+
+        # Start the thread
+        threading.Thread(target=fetch_banner, daemon=True).start()
+
+    def update_image_banner(self):
+        allocation = self.image_banner.get_allocation()
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+        self.image_banner.set_from_pixbuf(pixbuf)
+        self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def on_entry_focus_out(self, entry, event):
+        if entry.get_text().strip():
+            self.get_banner()
 
     def on_checkbox_addapp_toggled(self, checkbox):
         is_active = checkbox.get_active()
@@ -4170,9 +4521,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, checkbox_big_interface, checkbox_start_maximized):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -4207,8 +4558,9 @@ class CreateShortcut(Gtk.Window):
         config['splash-disable'] = checkbox_splash_disable
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
-        config['big-interface'] = checkbox_start_boot
+        config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_boot
+        config['api-key'] = entry_api_key
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
