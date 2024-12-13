@@ -24,7 +24,7 @@ from PIL import Image
 xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
 data_dirs = xdg_data_dirs.split(':')
 share_dir_system = data_dirs[-1]
-faugus_banner = f'{share_dir_system}/faugus-launcher/faugus-banner.png'
+faugus_banner = '/usr/share/faugus-launcher/faugus-banner.png'
 
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
@@ -1419,8 +1419,9 @@ class Main(Gtk.Window):
                 temp_banner_path = add_game_dialog.banner_path_temp
                 try:
                     # Use `magick` to resize the image
+                    command_magick = shutil.which("magick") or shutil.which("convert")
                     subprocess.run([
-                        "magick",
+                        command_magick,
                         temp_banner_path,
                         "-resize", "230x345!",
                         banner
@@ -1765,8 +1766,9 @@ class Main(Gtk.Window):
                 temp_banner_path = edit_game_dialog.banner_path_temp
                 try:
                     # Use `magick` to resize the image
+                    command_magick = shutil.which("magick") or shutil.which("convert")
                     subprocess.run([
-                        "magick",
+                        command_magick,
                         temp_banner_path,
                         "-resize", "230x345!",
                         banner
