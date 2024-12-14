@@ -35,7 +35,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/faugus-launcher_1.2.2-2_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/faugus-launcher_1.2.2-3_amd64.deb
 wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/python3-umu-launcher_1.1.4-1_amd64.deb
 wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/umu-launcher_1.1.4-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -53,10 +53,10 @@ pressure-vessel-wrap[2264]: E: Child process exited with code 1: bwrap: setting 
 It's the AppArmor preventing umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
 
 ### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/faugus-launcher-0.2.2-2.flatpak">faugus-launcher-0.2.2-2.flatpak</a> and run:
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.2.2/faugus-launcher-0.2.2-3.flatpak">faugus-launcher-0.2.2-3.flatpak</a> and run:
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install faugus-launcher-0.2.2-2.flatpak
+flatpak install faugus-launcher-0.2.2-3.flatpak
 ```
 ```
 # Optional tools
