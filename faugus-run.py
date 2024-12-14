@@ -214,6 +214,7 @@ class FaugusRun:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
+        self.load_config()
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
