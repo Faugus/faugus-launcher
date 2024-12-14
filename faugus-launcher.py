@@ -156,7 +156,7 @@ class Main(Gtk.Window):
             if self.start_maximized:
                 self.maximize()
             self.big_interface()
-        else:
+        if not self.interface_mode:
             self.interface_mode = "List"
             self.small_interface()
 
@@ -2932,6 +2932,7 @@ class AddGame(Gtk.Dialog):
         self.parent_window = parent
         self.set_icon_from_file(faugus_png)
         self.api_key = api_key
+        self.interface_mode = interface_mode
 
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
@@ -3207,17 +3208,14 @@ class AddGame(Gtk.Dialog):
 
         self.menu = Gtk.Menu()
 
-        # Opção de "Refresh"
         refresh_item = Gtk.MenuItem(label="Refresh")
         refresh_item.connect("activate", self.on_refresh)
         self.menu.append(refresh_item)
 
-        # Opção de "Load from file"
         load_item = Gtk.MenuItem(label="Load from file")
         load_item.connect("activate", self.on_load_file)
         self.menu.append(load_item)
 
-        # Finalizar o menu
         self.menu.show_all()
 
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -3379,7 +3377,14 @@ class AddGame(Gtk.Dialog):
         self.menu.popup_at_pointer(event)
 
     def on_refresh(self, widget):
-        self.get_banner()
+        if self.entry_title.get_text() != "":
+            self.get_banner()
+        else:
+            shutil.copy(faugus_banner, self.banner_path_temp)
+            allocation = self.entry_title.get_allocation()
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+            self.image_banner.set_from_pixbuf(pixbuf)
+            self.image_banner2.set_from_pixbuf(pixbuf)
 
     def on_load_file(self, widget):
         dialog = Gtk.FileChooserDialog(title="Select an image for the banner", action=Gtk.FileChooserAction.OPEN)
@@ -3623,6 +3628,15 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
+        if self.interface_mode == "Banners":
+            if self.entry_title.get_text() != "":
+                self.get_banner()
+            else:
+                shutil.copy(faugus_banner, self.banner_path_temp)
+                allocation = self.entry_title.get_allocation()
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+                self.image_banner.set_from_pixbuf(pixbuf)
+                self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
         self.combo_box_launcher.append_text("Windows game")
