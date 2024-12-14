@@ -161,10 +161,10 @@ class FaugusRun:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -195,8 +195,9 @@ class FaugusRun:
         config['system-tray'] = checkbox_system_tray
         config['start-boot'] = checkbox_start_boot
         config['interface-mode'] = combo_box_interface
-        config['start-maximized'] = checkbox_start_boot
+        config['start-maximized'] = checkbox_start_maximized
         config['api-key'] = entry_api_key
+        config['start-fullscreen'] = checkbox_start_fullscreen
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
@@ -213,7 +214,6 @@ class FaugusRun:
             print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
-        self.load_config()
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
