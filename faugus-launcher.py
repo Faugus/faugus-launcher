@@ -145,7 +145,6 @@ class Main(Gtk.Window):
         self.check_theme()
 
         self.load_config()
-        print(self.interface_mode)
         if self.interface_mode == "List":
             self.small_interface()
         if self.interface_mode == "Blocks":
