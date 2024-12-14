@@ -603,6 +603,14 @@ class Main(Gtk.Window):
             if current_focus not in self.flowbox.get_children():
                 selected_child.grab_focus()
 
+        if self.interface_mode != "List":
+            if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK:
+                if self.get_window().get_state() & Gdk.WindowState.FULLSCREEN:
+                    self.unfullscreen()
+                else:
+                    self.fullscreen()
+                return True
+
         if event.keyval == Gdk.KEY_Return:
             if title not in self.processos:
                 widget = self.button_play
