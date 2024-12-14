@@ -123,7 +123,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "Small", "False", "")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "")
 
         self.games = []
 
@@ -145,6 +145,7 @@ class Main(Gtk.Window):
         self.check_theme()
 
         self.load_config()
+        print(self.interface_mode)
         if self.interface_mode == "List":
             self.small_interface()
         if self.interface_mode == "Blocks":
