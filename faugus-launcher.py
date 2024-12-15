@@ -99,6 +99,7 @@ class Main(Gtk.Window):
         self.banner_mode = False
         self.start_maximized = False
         self.start_fullscreen = False
+        self.fullscreen_activated = False
         self.theme = None
 
         self.game_running = None
@@ -153,6 +154,7 @@ class Main(Gtk.Window):
                 self.maximize()
             if self.start_fullscreen:
                 self.fullscreen()
+                self.fullscreen_activated = True
             self.big_interface()
         if self.interface_mode == "Banners":
             self.banner_mode = True
@@ -160,6 +162,7 @@ class Main(Gtk.Window):
                 self.maximize()
             if self.start_fullscreen:
                 self.fullscreen()
+                self.fullscreen_activated = True
             self.big_interface()
         if not self.interface_mode:
             self.interface_mode = "List"
@@ -366,6 +369,7 @@ class Main(Gtk.Window):
             self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
 
         self.connect("key-press-event", self.on_key_press_event)
+        self.show_all()
 
     def big_interface(self):
         self.set_default_size(1280, 720)
@@ -445,6 +449,24 @@ class Main(Gtk.Window):
 
         button_kill.add(label_kill)
 
+        # Create button for exiting
+        button_bye = Gtk.Button()
+        button_bye.connect("clicked", self.on_button_bye_clicked)
+        button_bye.set_can_focus(False)
+        button_bye.set_size_request(50, 50)
+        button_bye.set_margin_start(10)
+        button_bye.set_margin_top(10)
+        button_bye.set_margin_bottom(10)
+        button_bye.set_margin_end(10)
+
+        label_bye = Gtk.Label(label="Bye")
+        label_bye.set_margin_start(0)
+        label_bye.set_margin_end(0)
+        label_bye.set_margin_top(0)
+        label_bye.set_margin_bottom(0)
+
+        button_bye.add(label_bye)
+
         # Create button for settings
         button_settings = Gtk.Button()
         button_settings.connect("clicked", self.on_button_settings_clicked)
@@ -476,14 +498,14 @@ class Main(Gtk.Window):
         self.entry_search.set_margin_bottom(10)
         self.entry_search.set_margin_end(20)
 
-        grid_left = Gtk.Grid()
-        grid_left.get_style_context().add_class(self.theme)
-        grid_left.set_hexpand(True)
-        grid_left.set_halign(Gtk.Align.END)
+        self.grid_left = Gtk.Grid()
+        self.grid_left.get_style_context().add_class(self.theme)
+        self.grid_left.set_hexpand(True)
+        self.grid_left.set_halign(Gtk.Align.END)
 
-        grid_left.add(self.button_add)
-        grid_left.add(self.button_edit)
-        grid_left.add(self.button_delete)
+        self.grid_left.add(self.button_add)
+        self.grid_left.add(self.button_edit)
+        self.grid_left.add(self.button_delete)
 
         grid_middle = Gtk.Grid()
         grid_middle.get_style_context().add_class(self.theme)
@@ -498,6 +520,10 @@ class Main(Gtk.Window):
         grid_right.add(button_settings)
         grid_right.add(button_kill)
         grid_right.add(self.button_play)
+
+        self.grid_corner = Gtk.Grid()
+        self.grid_corner.get_style_context().add_class(self.theme)
+        self.grid_corner.add(button_bye)
 
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
@@ -521,9 +547,10 @@ class Main(Gtk.Window):
 
         self.box_top.pack_start(scroll_box, True, True, 0)
 
-        self.box_bottom.pack_start(grid_left, True, True, 0)
+        self.box_bottom.pack_start(self.grid_left, True, True, 0)
         self.box_bottom.pack_start(grid_middle, False, False, 0)
-        self.box_bottom.pack_end(grid_right, True, True, 0)
+        self.box_bottom.pack_start(grid_right, True, True, 0)
+        self.box_bottom.pack_end(self.grid_corner, False, False, 0)
 
         self.box_main.pack_start(self.box_top, True, True, 0)
         self.box_main.pack_end(self.box_bottom, False, True, 0)
@@ -538,6 +565,66 @@ class Main(Gtk.Window):
             self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
 
         self.connect("key-press-event", self.on_key_press_event)
+        self.show_all()
+        if self.start_fullscreen:
+            self.fullscreen_activated = True
+            self.grid_corner.set_visible(True)
+            self.grid_left.set_margin_start(70)
+        else:
+            self.fullscreen_activated = False
+            self.grid_corner.set_visible(False)
+            self.grid_left.set_margin_start(0)
+
+    def on_button_bye_clicked(self, widget):
+        menu = Gtk.Menu()
+
+        shutdown_item = Gtk.MenuItem(label="Shut down")
+        reboot_item = Gtk.MenuItem(label="Reboot")
+        logout_item = Gtk.MenuItem(label="Log out")
+        close_item = Gtk.MenuItem(label="Close")
+
+        shutdown_item.connect("activate", self.on_shutdown)
+        reboot_item.connect("activate", self.on_reboot)
+        logout_item.connect("activate", self.on_logout)
+        close_item.connect("activate", self.on_close)
+
+        menu.append(shutdown_item)
+        menu.append(reboot_item)
+        menu.append(logout_item)
+        menu.append(close_item)
+
+        menu.show_all()
+        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+
+    def show_confirmation_dialog(self, message):
+        dialog = Gtk.MessageDialog(
+            transient_for=self,
+            flags=0,
+            title="Faugus Launcher",
+            message_type=Gtk.MessageType.QUESTION,
+            buttons=Gtk.ButtonsType.OK_CANCEL,
+            text=message,
+        )
+        response = dialog.run()
+        dialog.destroy()
+        return response == Gtk.ResponseType.OK
+
+    def on_shutdown(self, widget):
+        if self.show_confirmation_dialog("Are you sure you want to shut down?"):
+            subprocess.run(["pkexec", "shutdown", "-h", "now"])
+
+    def on_reboot(self, widget):
+        if self.show_confirmation_dialog("Are you sure you want to reboot?"):
+            subprocess.run(["pkexec", "reboot"])
+
+    def on_logout(self, widget):
+        if self.show_confirmation_dialog("Are you sure you want to log out?"):
+            subprocess.run(["loginctl", "terminate-user", os.getlogin()])
+
+    def on_close(self, widget):
+        if os.path.exists(lock_file_path):
+            os.remove(lock_file_path)
+        Gtk.main_quit()
 
     def on_item_right_click(self, widget, event):
         if event.button == Gdk.BUTTON_SECONDARY:
@@ -587,6 +674,10 @@ class Main(Gtk.Window):
                                        buttons=Gtk.ButtonsType.OK, parent=self)
             dialog.set_resizable(False)
             dialog.set_modal(True)
+            dialog.set_halign(Gtk.Align.CENTER)
+            dialog.set_valign(Gtk.Align.CENTER)
+            dialog.set_vexpand(True)
+            dialog.set_hexpand(True)
             dialog.set_icon_from_file(faugus_png)
             dialog.run()
             dialog.destroy()
@@ -611,9 +702,15 @@ class Main(Gtk.Window):
         if self.interface_mode != "List":
             if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK:
                 if self.get_window().get_state() & Gdk.WindowState.FULLSCREEN:
+                    self.fullscreen_activated = False
                     self.unfullscreen()
+                    self.grid_corner.set_visible(False)
+                    self.grid_left.set_margin_start(0)
                 else:
+                    self.fullscreen_activated = True
                     self.fullscreen()
+                    self.grid_corner.set_visible(True)
+                    self.grid_left.set_margin_start(70)
                 return True
 
         if event.keyval == Gdk.KEY_Return:
@@ -629,6 +726,11 @@ class Main(Gtk.Window):
                 )
                 dialog.set_resizable(False)
                 dialog.set_modal(True)
+                dialog.set_halign(Gtk.Align.CENTER)
+                dialog.set_valign(Gtk.Align.CENTER)
+                dialog.set_vexpand(True)
+                dialog.set_hexpand(True)
+                dialog.fullscreen()
                 dialog.set_icon_from_file(faugus_png)
                 dialog.run()
                 dialog.destroy()
@@ -1247,7 +1349,7 @@ class Main(Gtk.Window):
                 game.banner = faugus_banner
             shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
             allocation = edit_game_dialog.entry_title.get_allocation()
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width -10), -1, True)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width - 10), -1, True)
             edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
             edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -2021,6 +2123,14 @@ class Main(Gtk.Window):
         self.load_games()
         self.entry_search.set_text("")
         self.show_all()
+        if self.fullscreen_activated:
+            self.fullscreen_activated = True
+            self.grid_corner.set_visible(True)
+            self.grid_left.set_margin_start(70)
+        else:
+            self.fullscreen_activated = False
+            self.grid_corner.set_visible(False)
+            self.grid_left.set_margin_start(0)
 
     def on_child_process_closed(self, signum, frame):
         for title, processo in list(self.processos.items()):
@@ -3252,6 +3362,8 @@ class AddGame(Gtk.Dialog):
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label1 = Gtk.Label(label="Game/App")
+        tab_label1.set_width_chars(8)
+        tab_label1.set_xalign(0.5)
         tab_box1.pack_start(tab_label1, True, True, 0)
         tab_box1.set_hexpand(True)
 
@@ -3263,6 +3375,8 @@ class AddGame(Gtk.Dialog):
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label2 = Gtk.Label(label="Tools")
+        tab_label2.set_width_chars(8)
+        tab_label2.set_xalign(0.5)
         tab_box2.pack_start(tab_label2, True, True, 0)
         tab_box2.set_hexpand(True)
 
@@ -3400,7 +3514,7 @@ class AddGame(Gtk.Dialog):
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
         allocation = self.entry_title.get_allocation()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width -10), -1, True)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 10), -1, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -3412,7 +3526,7 @@ class AddGame(Gtk.Dialog):
             self.get_banner()
         else:
             shutil.copy(faugus_banner, self.banner_path_temp)
-            allocation = self.entry_title.get_allocation()
+            allocation = self.image_banner.get_allocation()
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
             self.image_banner.set_from_pixbuf(pixbuf)
             self.image_banner2.set_from_pixbuf(pixbuf)
@@ -3507,9 +3621,15 @@ class AddGame(Gtk.Dialog):
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
 
-    def on_entry_focus_out(self, entry, event):
-        if entry.get_text().strip():
+    def on_entry_focus_out(self, entry_title, event):
+        if entry_title.get_text() != "":
             self.get_banner()
+        else:
+            shutil.copy(faugus_banner, self.banner_path_temp)
+            allocation = self.image_banner.get_allocation()
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+            self.image_banner.set_from_pixbuf(pixbuf)
+            self.image_banner2.set_from_pixbuf(pixbuf)
 
     def on_checkbox_addapp_toggled(self, checkbox):
         is_active = checkbox.get_active()
@@ -3665,9 +3785,11 @@ class AddGame(Gtk.Dialog):
             else:
                 shutil.copy(faugus_banner, self.banner_path_temp)
                 allocation = self.entry_title.get_allocation()
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
-                self.image_banner.set_from_pixbuf(pixbuf)
-                self.image_banner2.set_from_pixbuf(pixbuf)
+                width = allocation.width - 10
+                if width > 0:
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, width, -1, True)
+                    self.image_banner.set_from_pixbuf(pixbuf)
+                    self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
         self.combo_box_launcher.append_text("Windows game")
@@ -4880,7 +5002,15 @@ def run_file(file_path):
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
             f.write(f'sc-controller=False\n')
-            f.write(f'default_runner="GE-Proton"\n')
+            f.write(f'default-runner="GE-Proton"\n')
+            f.write(f'discrete-gpu=True\n')
+            f.write(f'splash-disable=False\n')
+            f.write(f'system-tray=False\n')
+            f.write(f'start-boot=False\n')
+            f.write(f'interface-mode=List\n')
+            f.write(f'start-maximized=False\n')
+            f.write(f'api-key=\n')
+            f.write(f'start-fullscreen=False\n')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
@@ -4977,7 +5107,6 @@ def main():
         if is_already_running():
             print("Faugus Launcher is already running.")
             sys.exit(0)
-        app.show_all()
         app.connect("destroy", on_app_destroy)
         Gtk.main()
     elif len(sys.argv) == 2 and sys.argv[1] == "hide":
