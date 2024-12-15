@@ -3,7 +3,7 @@
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib, GdkPixbuf
+from gi.repository import Gtk, GLib, GdkPixbuf, Gio
 from threading import Thread
 
 import atexit
@@ -435,7 +435,17 @@ def stop_scc_daemon():
     except subprocess.CalledProcessError as e:
         print(f"Failed to stop scc-daemon: {e}")
 
+def apply_dark_theme():
+    desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+    try:
+        is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+    except Exception:
+        is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
+    if is_dark_theme:
+        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+
 def main():
+    apply_dark_theme()
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message", help="The message to be processed")
     parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")

@@ -18,7 +18,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AppIndicator3
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AppIndicator3, Gio
 from PIL import Image
 
 xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
@@ -596,34 +596,19 @@ class Main(Gtk.Window):
         menu.show_all()
         menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
-    def show_confirmation_dialog(self, message):
-        dialog = Gtk.MessageDialog(
-            transient_for=self,
-            flags=0,
-            title="Faugus Launcher",
-            message_type=Gtk.MessageType.QUESTION,
-            buttons=Gtk.ButtonsType.OK_CANCEL,
-            text=message,
-        )
-        response = dialog.run()
-        dialog.destroy()
-        return response == Gtk.ResponseType.OK
-
     def on_shutdown(self, widget):
-        if self.show_confirmation_dialog("Are you sure you want to shut down?"):
-            subprocess.run(["pkexec", "shutdown", "-h", "now"])
+        subprocess.run(["pkexec", "shutdown", "-h", "now"])
 
     def on_reboot(self, widget):
-        if self.show_confirmation_dialog("Are you sure you want to reboot?"):
-            subprocess.run(["pkexec", "reboot"])
+        subprocess.run(["pkexec", "reboot"])
 
     def on_logout(self, widget):
-        if self.show_confirmation_dialog("Are you sure you want to log out?"):
-            subprocess.run(["loginctl", "terminate-user", os.getlogin()])
+        subprocess.run(["loginctl", "terminate-user", os.getlogin()])
 
     def on_close(self, widget):
         if os.path.exists(lock_file_path):
-            os.remove(lock_file_path)
+                os.remove(lock_file_path)
+
         Gtk.main_quit()
 
     def on_item_right_click(self, widget, event):
@@ -5100,8 +5085,18 @@ def convert_games_txt_to_json(txt_file_path, json_file_path):
     old_file_path = txt_file_path.replace(".txt", "-old.txt")
     os.rename(txt_file_path, old_file_path)
 
+def apply_dark_theme():
+    desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+    try:
+        is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+    except Exception:
+        is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
+    if is_dark_theme:
+        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+
 def main():
     convert_games_txt_to_json(games_txt, games_json)
+    apply_dark_theme()
     if len(sys.argv) == 1:
         app = Main()
         if is_already_running():

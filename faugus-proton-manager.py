@@ -7,7 +7,7 @@ import tarfile
 import shutil
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio
 
 GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
 STEAM_COMPATIBILITY_PATH = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
@@ -175,7 +175,17 @@ class ProtonDownloader(Gtk.Window):
     def update_button(self, button, new_label):
         button.set_label(new_label)  # Update the button label
 
+def apply_dark_theme():
+    desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+    try:
+        is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+    except Exception:
+        is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
+    if is_dark_theme:
+        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+
 # Initialize GTK application
+apply_dark_theme()
 win = ProtonDownloader()
 win.connect("destroy", Gtk.main_quit)
 win.show_all()
