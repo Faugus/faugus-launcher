@@ -100,6 +100,8 @@ class Main(Gtk.Window):
         self.start_maximized = False
         self.start_fullscreen = False
         self.fullscreen_activated = False
+        self.gamepad_navigation = False
+        self.gamepad_process = False
         self.theme = None
 
         self.game_running = None
@@ -125,7 +127,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
         self.games = []
 
@@ -155,6 +157,8 @@ class Main(Gtk.Window):
             if self.start_fullscreen:
                 self.fullscreen()
                 self.fullscreen_activated = True
+            if self.gamepad_navigation:
+                self.gamepad_process = subprocess.Popen(["faugus-gamepad"])
             self.big_interface()
         if self.interface_mode == "Banners":
             self.banner_mode = True
@@ -163,6 +167,8 @@ class Main(Gtk.Window):
             if self.start_fullscreen:
                 self.fullscreen()
                 self.fullscreen_activated = True
+            if self.gamepad_navigation:
+                self.gamepad_process = subprocess.Popen(["faugus-gamepad"])
             self.big_interface()
         if not self.interface_mode:
             self.interface_mode = "List"
@@ -575,6 +581,14 @@ class Main(Gtk.Window):
             self.grid_corner.set_visible(False)
             self.grid_left.set_margin_start(0)
 
+    def on_destroy(self, *args):
+        if self.gamepad_process:
+            self.gamepad_process.terminate()
+            self.gamepad_process.wait()
+        if os.path.exists(lock_file_path):
+            os.remove(lock_file_path)
+        Gtk.main_quit()
+
     def on_button_bye_clicked(self, widget):
         menu = Gtk.Menu()
 
@@ -759,8 +773,9 @@ class Main(Gtk.Window):
             self.interface_mode = config_dict.get('interface-mode', '').strip('"')
             self.api_key = config_dict.get('api-key', '').strip('"')
             self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
+            self.gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1043,6 +1058,7 @@ class Main(Gtk.Window):
         self.combo_box_interface = settings_dialog.combo_box_interface
         self.entry_api_key = settings_dialog.entry_api_key
         self.checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen
+        self.checkbox_gamepad_navigation = settings_dialog.checkbox_gamepad_navigation
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
@@ -1059,6 +1075,7 @@ class Main(Gtk.Window):
         combo_box_interface = self.combo_box_interface.get_active_text()
         entry_api_key = self.entry_api_key.get_text()
         checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+        checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -1076,7 +1093,7 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen)
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -1090,6 +1107,13 @@ class Main(Gtk.Window):
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.on_window_delete_event)
                     self.window_delete_event_connected = False
+
+            if checkbox_gamepad_navigation:
+                self.gamepad_process = subprocess.Popen(["faugus-gamepad"])
+            else:
+                if self.gamepad_process:
+                    self.gamepad_process.terminate()
+                    self.gamepad_process.wait()
 
             if validation_result:
                 if self.interface_mode != combo_box_interface:
@@ -2176,7 +2200,7 @@ class Main(Gtk.Window):
         dialog.run()
         dialog.destroy()
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2207,6 +2231,7 @@ class Main(Gtk.Window):
         config['start-maximized'] = checkbox_start_maximized
         config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
+        config['gamepad-navigation'] = checkbox_gamepad_navigation
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -2268,6 +2293,10 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_fullscreen.set_active(False)
         self.checkbox_start_fullscreen.connect("toggled", self.on_checkbox_toggled, "fullscreen")
         self.checkbox_start_fullscreen.set_tooltip_text("Alt+Enter toggles fullscreen")
+
+        # Create checkbox for 'Gamepad navigation' option
+        self.checkbox_gamepad_navigation = Gtk.CheckButton(label="Gamepad navigation")
+        self.checkbox_gamepad_navigation.set_active(False)
 
         # Widgets for prefix
         self.label_default_prefix = Gtk.Label(label="Default prefixes location")
@@ -2461,6 +2490,7 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.entry_api_key, 3, 0, 1, 1)
         self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 1, 1, 1)
         self.grid_big_interface.attach(self.checkbox_start_fullscreen, 3, 1, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
         self.entry_api_key.set_hexpand(True)
 
         # Attach widgets to the grid layout
@@ -2647,6 +2677,7 @@ class Settings(Gtk.Dialog):
             combo_box_interface = self.combo_box_interface.get_active_text()
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+            checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2658,7 +2689,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2755,6 +2786,7 @@ class Settings(Gtk.Dialog):
             combo_box_interface = self.combo_box_interface.get_active_text()
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+            checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2766,7 +2798,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2831,6 +2863,7 @@ class Settings(Gtk.Dialog):
             combo_box_interface = self.combo_box_interface.get_active_text()
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+            checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2842,7 +2875,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -2935,6 +2968,7 @@ class Settings(Gtk.Dialog):
             self.interface_mode = config_dict.get('interface-mode', '').strip('"')
             self.api_key = config_dict.get('api-key', '').strip('"')
             start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
+            gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
 
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.entry_default_prefix.set_text(self.default_prefix)
@@ -2958,6 +2992,7 @@ class Settings(Gtk.Dialog):
             self.checkbox_start_boot.set_active(start_boot)
             self.checkbox_start_maximized.set_active(start_maximized)
             self.checkbox_start_fullscreen.set_active(start_fullscreen)
+            self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
 
             model = self.combo_box_interface.get_model()
             index_to_activate2 = 0
@@ -2971,7 +3006,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             print("else")
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
 
 class Game:
@@ -4675,9 +4710,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -4716,6 +4751,7 @@ class CreateShortcut(Gtk.Window):
         config['start-maximized'] = checkbox_start_maximized
         config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
+        config['gamepad-navigation'] = checkbox_gamepad_navigation
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -4995,7 +5031,7 @@ def run_file(file_path):
             f.write(f'interface-mode=List\n')
             f.write(f'start-maximized=False\n')
             f.write(f'api-key=\n')
-            f.write(f'start-fullscreen=False\n')
+            f.write(f'gamepad-navigation=False\n')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
@@ -5102,7 +5138,7 @@ def main():
         if is_already_running():
             print("Faugus Launcher is already running.")
             sys.exit(0)
-        app.connect("destroy", on_app_destroy)
+        app.connect("destroy", app.on_destroy)
         Gtk.main()
     elif len(sys.argv) == 2 and sys.argv[1] == "hide":
         app = Main()
@@ -5110,7 +5146,7 @@ def main():
             print("Faugus Launcher is already running.")
             sys.exit(0)
         app.hide()
-        app.connect("destroy", on_app_destroy)
+        app.connect("destroy", app.on_destroy)
         Gtk.main()
     elif len(sys.argv) == 2:
         run_file(sys.argv[1])
@@ -5120,11 +5156,6 @@ def main():
         Gtk.main()
     else:
         print("Invalid arguments")
-
-def on_app_destroy(*args):
-    if os.path.exists(lock_file_path):
-        os.remove(lock_file_path)
-    Gtk.main_quit()
 
 if __name__ == "__main__":
     main()
