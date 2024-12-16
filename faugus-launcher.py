@@ -16,9 +16,9 @@ import requests
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
-gi.require_version('AppIndicator3', '0.1')
+gi.require_version('AyatanaAppIndicator3', '0.1')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AppIndicator3, Gio
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio
 from PIL import Image
 
 xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
@@ -175,16 +175,16 @@ class Main(Gtk.Window):
             self.small_interface()
 
         # Create the tray indicator
-        self.indicator = AppIndicator3.Indicator.new(
+        self.indicator = AyatanaAppIndicator3.Indicator.new(
             "Faugus Launcher",  # Application name
             tray_icon,         # Path to the icon
-            AppIndicator3.IndicatorCategory.APPLICATION_STATUS
+            AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS
         )
         self.indicator.set_menu(self.create_tray_menu())  # Tray menu
         self.indicator.set_title("Faugus Launcher")  # Change the tooltip text
 
         if self.system_tray:
-            self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+            self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
             self.connect("delete-event", self.on_window_delete_event)
 
         self.context_menu = Gtk.Menu()
@@ -1097,13 +1097,13 @@ class Main(Gtk.Window):
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
-                self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
                 if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.on_window_delete_event)
                     self.window_delete_event_connected = True
                 self.indicator.set_menu(self.create_tray_menu())
             else:
-                self.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.on_window_delete_event)
                     self.window_delete_event_connected = False
@@ -2694,13 +2694,13 @@ class Settings(Gtk.Dialog):
 
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
                 if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
             else:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = False
@@ -2803,13 +2803,13 @@ class Settings(Gtk.Dialog):
 
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
                 if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
             else:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = False
@@ -2880,13 +2880,13 @@ class Settings(Gtk.Dialog):
 
             self.parent.manage_autostart_file(checkbox_start_boot)
             if checkbox_system_tray:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
                 if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
                     self.connect("delete-event", self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = True
                 self.parent.indicator.set_menu(self.parent.create_tray_menu())
             else:
-                self.parent.indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE)
+                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
                 if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
                     self.disconnect_by_func(self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = False
