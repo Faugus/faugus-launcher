@@ -1118,7 +1118,7 @@ class Main(Gtk.Window):
             if validation_result:
                 if self.interface_mode != combo_box_interface:
                     dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Please restart Faugus Launcher\nto switch the interface mode.",
-                                            buttons=Gtk.ButtonsType.OK, parent=self)
+                                            buttons=Gtk.ButtonsType.OK, transient_for=settings_dialog)
                     dialog.set_resizable(False)
                     dialog.set_modal(True)
                     dialog.set_icon_from_file(faugus_png)
@@ -2245,11 +2245,10 @@ class Main(Gtk.Window):
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
         # Initialize the Settings dialog
-        super().__init__(title="Settings", parent=parent)
+        super().__init__(title="Settings", transient_for=parent, modal=True)
         self.set_resizable(False)
-        self.set_modal(True)
-        self.parent = parent
         self.set_icon_from_file(faugus_png)
+        self.parent = parent
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -2257,8 +2256,8 @@ class Settings(Gtk.Dialog):
             border-color: Red;
         }
         .paypal {
-            color: black;
-            background: white;
+            color: white;
+            background: #001C64;
         }
         .kofi {
             color: white;
