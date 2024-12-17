@@ -2313,6 +2313,9 @@ class Settings(Gtk.Dialog):
 
         self.label_default_prefix_tools = Gtk.Label(label="Default prefix tools")
         self.label_default_prefix_tools.set_halign(Gtk.Align.START)
+        self.label_default_prefix_tools.set_margin_start(10)
+        self.label_default_prefix_tools.set_margin_end(10)
+        self.label_default_prefix_tools.set_margin_top(10)
 
         # Widgets for runner
         self.label_runner = Gtk.Label(label="Default Runner")
@@ -2321,6 +2324,12 @@ class Settings(Gtk.Dialog):
 
         self.button_proton_manager = Gtk.Button(label="GE-Proton Manager")
         self.button_proton_manager.connect("clicked", self.on_button_proton_manager_clicked)
+
+        self.label_miscellaneous = Gtk.Label(label="Miscellaneous")
+        self.label_miscellaneous.set_halign(Gtk.Align.START)
+        self.label_miscellaneous.set_margin_start(10)
+        self.label_miscellaneous.set_margin_end(10)
+        self.label_miscellaneous.set_margin_top(10)
 
         # Create checkbox for 'Use discrete GPU' option
         self.checkbox_discrete_gpu = Gtk.CheckButton(label="Use discrete GPU")
@@ -2389,30 +2398,30 @@ class Settings(Gtk.Dialog):
         self.button_cancel = Gtk.Button(label="Cancel")
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
         self.button_cancel.set_size_request(150, -1)
-        self.button_cancel.set_halign(Gtk.Align.CENTER)
 
         # Button Ok
         self.button_ok = Gtk.Button(label="Ok")
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
-        self.button_ok.set_halign(Gtk.Align.CENTER)
 
         self.box = self.get_content_area()
+        self.box.set_margin_start(0)
+        self.box.set_margin_end(0)
+        self.box.set_margin_top(0)
+        self.box.set_margin_bottom(0)
 
-        grid_interface_mode = Gtk.Grid()
-        grid_interface_mode.set_row_spacing(10)
-        grid_interface_mode.set_column_spacing(10)
-        grid_interface_mode.set_margin_start(10)
-        grid_interface_mode.set_margin_end(10)
-        grid_interface_mode.set_margin_top(10)
-        grid_interface_mode.set_margin_bottom(10)
+        box_top = Gtk.Box()
+        box_bottom = Gtk.Box()
 
-        self.grid_big_interface = Gtk.Grid()
-        self.grid_big_interface.set_row_spacing(10)
-        self.grid_big_interface.set_column_spacing(10)
-        self.grid_big_interface.set_margin_start(10)
-        self.grid_big_interface.set_margin_end(10)
-        self.grid_big_interface.set_margin_bottom(10)
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        box_main = Gtk.Box()
+        box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         grid_prefix = Gtk.Grid()
         grid_prefix.set_row_spacing(10)
@@ -2422,12 +2431,13 @@ class Settings(Gtk.Dialog):
         grid_prefix.set_margin_top(10)
         grid_prefix.set_margin_bottom(10)
 
-        grid_tools_wrap = Gtk.Grid()
-        grid_tools_wrap.set_row_spacing(10)
-        grid_tools_wrap.set_column_spacing(10)
-        grid_tools_wrap.set_margin_start(10)
-        grid_tools_wrap.set_margin_end(10)
-        grid_tools_wrap.set_margin_top(10)
+        grid_runner = Gtk.Grid()
+        grid_runner.set_row_spacing(10)
+        grid_runner.set_column_spacing(10)
+        grid_runner.set_margin_start(10)
+        grid_runner.set_margin_end(10)
+        grid_runner.set_margin_top(10)
+        grid_runner.set_margin_bottom(10)
 
         grid_tools = Gtk.Grid()
         grid_tools.set_row_spacing(10)
@@ -2437,6 +2447,22 @@ class Settings(Gtk.Dialog):
         grid_tools.set_margin_top(10)
         grid_tools.set_margin_bottom(10)
 
+        grid_miscellaneous = Gtk.Grid()
+        grid_miscellaneous.set_row_spacing(10)
+        grid_miscellaneous.set_column_spacing(10)
+        grid_miscellaneous.set_margin_start(10)
+        grid_miscellaneous.set_margin_end(10)
+        grid_miscellaneous.set_margin_top(10)
+        grid_miscellaneous.set_margin_bottom(10)
+
+        grid_interface_mode = Gtk.Grid()
+        grid_interface_mode.set_row_spacing(10)
+        grid_interface_mode.set_column_spacing(10)
+        grid_interface_mode.set_margin_start(10)
+        grid_interface_mode.set_margin_end(10)
+        grid_interface_mode.set_margin_top(10)
+        grid_interface_mode.set_margin_bottom(10)
+
         grid_support = Gtk.Grid()
         grid_support.set_row_spacing(10)
         grid_support.set_column_spacing(10)
@@ -2445,55 +2471,13 @@ class Settings(Gtk.Dialog):
         grid_support.set_margin_top(10)
         grid_support.set_margin_bottom(10)
 
-        grid_buttons = Gtk.Grid()
-        grid_buttons.set_row_spacing(10)
-        grid_buttons.set_column_spacing(10)
-        grid_buttons.set_margin_start(10)
-        grid_buttons.set_margin_end(10)
-        grid_buttons.set_margin_top(10)
-        grid_buttons.set_margin_bottom(10)
+        self.grid_big_interface = Gtk.Grid()
+        self.grid_big_interface.set_row_spacing(10)
+        self.grid_big_interface.set_column_spacing(10)
+        self.grid_big_interface.set_margin_start(10)
+        self.grid_big_interface.set_margin_end(10)
+        self.grid_big_interface.set_margin_bottom(10)
 
-        grid_runner = Gtk.Grid()
-        grid_runner.set_row_spacing(10)
-        grid_runner.set_column_spacing(10)
-        grid_runner.set_margin_start(10)
-        grid_runner.set_margin_end(10)
-        grid_runner.set_margin_top(10)
-        grid_runner.set_margin_bottom(10)
-
-        grid_checkboxes = Gtk.Grid()
-        grid_checkboxes.set_row_spacing(10)
-        grid_checkboxes.set_column_spacing(10)
-        grid_checkboxes.set_margin_start(10)
-        grid_checkboxes.set_margin_end(10)
-        grid_checkboxes.set_margin_top(10)
-        grid_checkboxes.set_margin_bottom(10)
-
-        # Create a frame
-        frame = Gtk.Frame()
-        frame.set_label_align(0.5, 0.5)
-        frame.set_margin_start(10)
-        frame.set_margin_end(10)
-        frame.set_margin_top(10)
-        frame.set_margin_bottom(10)
-
-        # Add grid to frame
-        frame.add(grid_tools)
-
-        # Attach widgets to the grid layout
-        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
-        grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
-        self.combo_box_interface.set_hexpand(True)
-
-        # Attach widgets to the grid layout
-        self.grid_big_interface.attach(self.label_api_key, 0, 0, 1, 1)
-        self.grid_big_interface.attach(self.entry_api_key, 3, 0, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 3, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
-        self.entry_api_key.set_hexpand(True)
-
-        # Attach widgets to the grid layout
         grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
         grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
         self.entry_default_prefix.set_hexpand(True)
@@ -2505,14 +2489,6 @@ class Settings(Gtk.Dialog):
         self.combo_box_runner.set_hexpand(True)
         self.button_proton_manager.set_hexpand(True)
 
-        grid_checkboxes.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
-        grid_checkboxes.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
-        grid_checkboxes.attach(self.checkbox_system_tray, 0, 4, 1, 1)
-        grid_checkboxes.attach(self.checkbox_start_boot, 2, 4, 1, 1)
-        grid_checkboxes.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
-
-        grid_tools_wrap.attach(self.label_default_prefix_tools, 0, 0, 1, 1)
-
         grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
@@ -2521,17 +2497,63 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
         grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
 
+        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+
+        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
+        grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
+        self.combo_box_interface.set_hexpand(True)
+
+        self.grid_big_interface.attach(self.label_api_key, 0, 0, 1, 1)
+        self.grid_big_interface.attach(self.entry_api_key, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 2, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 3, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 4, 1, 1)
+        self.entry_api_key.set_hexpand(True)
+
         grid_support.attach(self.label_support, 0, 0, 1, 1)
         grid_support.attach(button_kofi, 0, 1, 1, 1)
         grid_support.attach(button_paypal, 1, 1, 1, 1)
-        grid_support.set_halign(Gtk.Align.CENTER)
 
-        grid_buttons.attach(self.button_cancel, 0, 0, 1, 1)
-        grid_buttons.attach(self.button_ok, 1, 0, 1, 1)
-        grid_buttons.set_halign(Gtk.Align.CENTER)
+        box_left.pack_start(grid_prefix, False, False, 0)
+        box_left.pack_start(grid_runner, False, False, 0)
+        box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
+        box_left.pack_start(grid_tools, False, False, 0)
+        box_left.pack_start(grid_support, False, False, 0)
+
+        box_right.pack_start(self.label_miscellaneous, False, False, 0)
+        box_right.pack_start(grid_miscellaneous, False, False, 0)
+        box_right.pack_start(grid_interface_mode, False, False, 0)
+        box_right.pack_start(self.grid_big_interface, False, False, 0)
+
+        box_main.pack_start(box_left, False, False, 0)
+        box_main.pack_start(box_right, False, True, 0)
+        frame.add(box_main)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        self.button_cancel.set_hexpand(True)
+        self.button_ok.set_hexpand(True)
+
+        box_bottom.pack_start(self.button_cancel, True, True, 0)
+        box_bottom.pack_start(self.button_ok, True, True, 0)
+
+        self.box.add(frame)
+        self.box.add(box_bottom)
 
         self.populate_combobox_with_runners()
         self.load_config()
+
+        self.show_all()
+        self.on_combobox_interface_changed(self.combo_box_interface)
+
+        allocation = self.combo_box_runner.get_allocation()
+        self.combo_box_interface.set_size_request(allocation.width, -1)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -2554,19 +2576,6 @@ class Settings(Gtk.Dialog):
             self.checkbox_sc_controller.set_active(False)
             self.checkbox_sc_controller.set_tooltip_text(
                 "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
-
-        self.box.add(grid_interface_mode)
-        self.box.add(self.grid_big_interface)
-        self.box.add(grid_prefix)
-        self.box.add(grid_runner)
-        self.box.add(grid_tools_wrap)
-        self.box.add(frame)
-        self.box.add(grid_checkboxes)
-        self.box.add(grid_support)
-        self.box.add(grid_buttons)
-
-        self.show_all()
-        self.on_combobox_interface_changed(self.combo_box_interface)
 
     def on_checkbox_toggled(self, checkbox, option):
         if checkbox.get_active():
@@ -3471,18 +3480,18 @@ class AddGame(Gtk.Dialog):
         page2.add(self.grid_addapp)
         page2.add(self.grid_tools)
 
-        botton_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        botton_box.set_margin_start(10)
-        botton_box.set_margin_end(10)
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
         #botton_box.set_margin_top(10)
-        botton_box.set_margin_bottom(10)
+        bottom_box.set_margin_bottom(10)
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
 
-        botton_box.pack_start(self.button_cancel, True, True, 0)
-        botton_box.pack_start(self.button_ok, True, True, 0)
+        bottom_box.pack_start(self.button_cancel, True, True, 0)
+        bottom_box.pack_start(self.button_ok, True, True, 0)
 
-        self.box.add(botton_box)
+        self.box.add(bottom_box)
 
         self.populate_combobox_with_launchers()
         self.combo_box_launcher.set_active(0)
