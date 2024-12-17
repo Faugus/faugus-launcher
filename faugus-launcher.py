@@ -2289,7 +2289,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_maximized.connect("toggled", self.on_checkbox_toggled, "maximized")
 
         # Create checkbox for 'Start fullscreen' option
-        self.checkbox_start_fullscreen = Gtk.CheckButton(label="Start fullscreen")
+        self.checkbox_start_fullscreen = Gtk.CheckButton(label="Start in fullscreen")
         self.checkbox_start_fullscreen.set_active(False)
         self.checkbox_start_fullscreen.connect("toggled", self.on_checkbox_toggled, "fullscreen")
         self.checkbox_start_fullscreen.set_tooltip_text("Alt+Enter toggles fullscreen")
@@ -2299,7 +2299,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_gamepad_navigation.set_active(False)
 
         # Widgets for prefix
-        self.label_default_prefix = Gtk.Label(label="Default prefixes location")
+        self.label_default_prefix = Gtk.Label(label="Default Prefixes Location")
         self.label_default_prefix.set_halign(Gtk.Align.START)
 
         self.entry_default_prefix = Gtk.Entry()
@@ -2311,7 +2311,7 @@ class Settings(Gtk.Dialog):
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
         self.button_search_prefix.set_size_request(50, -1)
 
-        self.label_default_prefix_tools = Gtk.Label(label="Default prefix tools")
+        self.label_default_prefix_tools = Gtk.Label(label="Default Prefix Tools")
         self.label_default_prefix_tools.set_halign(Gtk.Align.START)
         self.label_default_prefix_tools.set_margin_start(10)
         self.label_default_prefix_tools.set_margin_end(10)
@@ -2336,7 +2336,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_discrete_gpu.set_active(False)
 
         # Create checkbox for 'Close after launch' option
-        self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running")
+        self.checkbox_close_after_launch = Gtk.CheckButton(label="Close when running a game/app")
         self.checkbox_close_after_launch.set_active(False)
 
         # Create checkbox for 'System tray' option
@@ -2379,16 +2379,16 @@ class Settings(Gtk.Dialog):
         self.checkbox_sc_controller.set_tooltip_text(
             "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
 
-        self.label_support = Gtk.Label(label="Support the project")
+        self.label_support = Gtk.Label(label="Support the Project")
         self.label_support.set_halign(Gtk.Align.START)
 
-        button_kofi = Gtk.Button(label="Buy me a Coffee")
+        button_kofi = Gtk.Button(label="Ko-fi")
         button_kofi.set_size_request(150, -1)
         button_kofi.connect("clicked", self.on_button_kofi_clicked)
         button_kofi.get_style_context().add_class("kofi")
         button_kofi.set_halign(Gtk.Align.CENTER)
 
-        button_paypal = Gtk.Button(label="PayPal Donation")
+        button_paypal = Gtk.Button(label="PayPal")
         button_paypal.set_size_request(150, -1)
         button_paypal.connect("clicked", self.on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
@@ -3321,7 +3321,7 @@ class AddGame(Gtk.Dialog):
         self.button_run.set_tooltip_text("Run a file inside the prefix")
 
         # Button for creating shortcut
-        self.checkbox_shortcut = Gtk.CheckButton(label="Create Shortcut")
+        self.checkbox_shortcut = Gtk.CheckButton(label="Shortcut")
 
         # Button for selection shortcut icon
         self.button_shortcut_icon = Gtk.Button()
@@ -3821,8 +3821,8 @@ class AddGame(Gtk.Dialog):
                     self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
-        self.combo_box_launcher.append_text("Windows game")
-        self.combo_box_launcher.append_text("Linux game")
+        self.combo_box_launcher.append_text("Windows Game")
+        self.combo_box_launcher.append_text("Linux Game")
         self.combo_box_launcher.append_text("Battle.net")
         self.combo_box_launcher.append_text("EA App")
         self.combo_box_launcher.append_text("Epic Games")
