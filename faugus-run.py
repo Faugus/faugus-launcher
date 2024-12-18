@@ -41,18 +41,54 @@ class FaugusRun:
         self.splash_disable = None
 
     def show_error_dialog(self, protonpath):
-        dialog = Gtk.MessageDialog(
-            title="Error",
-            flags=0,
-            message_type=Gtk.MessageType.ERROR,
-            buttons=Gtk.ButtonsType.CLOSE,
-            text=f"{protonpath} was not found",
-        )
+        dialog = Gtk.Dialog(title="Faugus Launcher")
+        dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        dialog.format_secondary_text("Please install it or use another Proton version.")
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        #dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(f"{protonpath} was not found.")
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label()
+        label2.set_label("Please install it or use another Proton version.")
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label="Ok")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label2, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
         dialog.run()
         dialog.destroy()
-        sys.exit(1)
+        Gtk.main_quit()
+        sys.exit()
 
     def start_process(self, command):
 
@@ -66,6 +102,7 @@ class FaugusRun:
         if protonpath and protonpath != "GE-Proton":
             protonpath_path = f'{share_dir}/Steam/compatibilitytools.d/{protonpath}'
             if not os.path.isdir(protonpath_path):
+                self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
 
         if self.default_runner == "UMU-Proton Latest":

@@ -669,17 +669,7 @@ class Main(Gtk.Window):
         if title not in self.processos:
             self.on_button_play_clicked(item)
         else:
-            dialog = Gtk.MessageDialog(title=title, text=f"'{title}' is already running.",
-                                       buttons=Gtk.ButtonsType.OK, parent=self)
-            dialog.set_resizable(False)
-            dialog.set_modal(True)
-            dialog.set_halign(Gtk.Align.CENTER)
-            dialog.set_valign(Gtk.Align.CENTER)
-            dialog.set_vexpand(True)
-            dialog.set_hexpand(True)
-            dialog.set_icon_from_file(faugus_png)
-            dialog.run()
-            dialog.destroy()
+            self.running_dialog(title)
 
     def on_key_press_event(self, widget, event):
         selected_children = self.flowbox.get_selected_children()
@@ -717,22 +707,7 @@ class Main(Gtk.Window):
                 widget = self.button_play
                 self.on_button_play_clicked(selected_child)
             else:
-                dialog = Gtk.MessageDialog(
-                    title=title,
-                    text=f"'{title}' is already running.",
-                    buttons=Gtk.ButtonsType.OK,
-                    parent=self
-                )
-                dialog.set_resizable(False)
-                dialog.set_modal(True)
-                dialog.set_halign(Gtk.Align.CENTER)
-                dialog.set_valign(Gtk.Align.CENTER)
-                dialog.set_vexpand(True)
-                dialog.set_hexpand(True)
-                dialog.fullscreen()
-                dialog.set_icon_from_file(faugus_png)
-                dialog.run()
-                dialog.destroy()
+                self.running_dialog(title)
         elif event.keyval == Gdk.KEY_Delete:
             self.on_button_delete_clicked(selected_child)
 
@@ -753,6 +728,49 @@ class Main(Gtk.Window):
             return True
 
         return False
+
+    def running_dialog(self, title):
+        dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        #dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(f'{title} is already running.')
+        label.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label="Ok")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def load_config(self):
         config_file = config_file_dir
@@ -1117,11 +1135,50 @@ class Main(Gtk.Window):
 
             if validation_result:
                 if self.interface_mode != combo_box_interface:
-                    dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Please restart Faugus Launcher\nto switch the interface mode.",
-                                            buttons=Gtk.ButtonsType.OK, transient_for=settings_dialog)
+                    dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=settings_dialog, modal=True)
                     dialog.set_resizable(False)
-                    dialog.set_modal(True)
                     dialog.set_icon_from_file(faugus_png)
+                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
+                    #dialog.fullscreen()
+
+                    label = Gtk.Label()
+                    label.set_label("Please restart Faugus Launcher")
+                    label.set_halign(Gtk.Align.CENTER)
+
+                    label2 = Gtk.Label()
+                    label2.set_label("to switch the interface mode.")
+                    label2.set_halign(Gtk.Align.CENTER)
+
+                    button_yes = Gtk.Button(label="Ok")
+                    button_yes.set_size_request(150, -1)
+                    button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+
+                    content_area = dialog.get_content_area()
+                    content_area.set_border_width(0)
+                    content_area.set_halign(Gtk.Align.CENTER)
+                    content_area.set_valign(Gtk.Align.CENTER)
+                    content_area.set_vexpand(True)
+                    content_area.set_hexpand(True)
+
+                    box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                    box_top.set_margin_start(20)
+                    box_top.set_margin_end(20)
+                    box_top.set_margin_top(20)
+                    box_top.set_margin_bottom(20)
+
+                    box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                    box_bottom.set_margin_start(10)
+                    box_bottom.set_margin_end(10)
+                    box_bottom.set_margin_bottom(10)
+
+                    box_top.pack_start(label, True, True, 0)
+                    box_top.pack_start(label2, True, True, 0)
+                    box_bottom.pack_start(button_yes, True, True, 0)
+
+                    content_area.add(box_top)
+                    content_area.add(box_bottom)
+
+                    dialog.show_all()
                     dialog.run()
                     dialog.destroy()
 
@@ -1357,8 +1414,8 @@ class Main(Gtk.Window):
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
             shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
-            allocation = edit_game_dialog.entry_title.get_allocation()
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width - 10), -1, True)
+            allocation = edit_game_dialog.grid_shortcut.get_allocation()
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width - 20), -1, True)
             edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
             edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -1494,14 +1551,45 @@ class Main(Gtk.Window):
             pass  # Ignore if the file doesn't exist yet
 
     def show_warning_dialog(self, parent, title):
-        dialog = Gtk.MessageDialog(
-            transient_for=parent,
-            modal=True,
-            message_type=Gtk.MessageType.WARNING,
-            buttons=Gtk.ButtonsType.OK,
-            text=title,
-        )
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        #dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(title)
+        label.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label="Ok")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
         dialog.run()
         dialog.destroy()
 
@@ -1522,7 +1610,7 @@ class Main(Gtk.Window):
 
             if any(game.title == title for game in self.games):
                 # Display an error message and prevent the dialog from closing
-                self.show_warning_dialog(add_game_dialog, f"{title} already exists")
+                self.show_warning_dialog(add_game_dialog, f"{title} already exists.")
                 return True
 
             path = add_game_dialog.entry_path.get_text()
@@ -1620,7 +1708,7 @@ class Main(Gtk.Window):
                     raise
 
             if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
-                self.show_warning_dialog(add_game_dialog, "No internet connection")
+                self.show_warning_dialog(add_game_dialog, "No internet connection.")
                 return True
             else:
                 if add_game_dialog.combo_box_launcher.get_active() == 2:
@@ -2192,14 +2280,6 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def show_warning_message(self, message):
-        # Show a warning message dialog
-        dialog = Gtk.MessageDialog(transient_for=self, flags=0, message_type=Gtk.MessageType.WARNING,
-                                   buttons=Gtk.ButtonsType.OK, text=message, )
-        dialog.set_icon_from_file(faugus_png)
-        dialog.run()
-        dialog.destroy()
-
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
@@ -2408,9 +2488,6 @@ class Settings(Gtk.Dialog):
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
-
-        box_top = Gtk.Box()
-        box_bottom = Gtk.Box()
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -2713,12 +2790,14 @@ class Settings(Gtk.Dialog):
                     self.disconnect_by_func(self.parent.on_window_delete_event)
                     self.parent.window_delete_event_connected = False
 
-            dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
-                                        action=Gtk.FileChooserAction.OPEN)
-            dialog.set_current_folder(os.path.expanduser("~/"))
-            dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            dialog = Gtk.Dialog(title="Select a file to run inside the prefix", parent=self, flags=0)
+            dialog.set_size_request(720, 720)
+            #dialog.fullscreen()
 
-            # Windows files filter
+            filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+            filechooser.set_current_folder(os.path.expanduser("~/"))
+            filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
             windows_filter = Gtk.FileFilter()
             windows_filter.set_name("Windows files")
             windows_filter.add_pattern("*.exe")
@@ -2726,19 +2805,59 @@ class Settings(Gtk.Dialog):
             windows_filter.add_pattern("*.bat")
             windows_filter.add_pattern("*.lnk")
             windows_filter.add_pattern("*.reg")
-            dialog.add_filter(windows_filter)
 
-            # All files filter
             all_files_filter = Gtk.FileFilter()
             all_files_filter.set_name("All files")
             all_files_filter.add_pattern("*")
-            dialog.add_filter(all_files_filter)
 
+            filter_combobox = Gtk.ComboBoxText()
+            filter_combobox.append("windows", "Windows files")
+            filter_combobox.append("all", "All files")
+            filter_combobox.set_active(0)
+            filter_combobox.set_size_request(150, -1)
+
+            def on_filter_changed(combobox):
+                active_id = combobox.get_active_id()
+                if active_id == "windows":
+                    filechooser.set_filter(windows_filter)
+                elif active_id == "all":
+                    filechooser.set_filter(all_files_filter)
+
+            filter_combobox.connect("changed", on_filter_changed)
+            filechooser.set_filter(windows_filter)
+
+            button_open = Gtk.Button.new_with_label("Open")
+            button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+            button_open.set_size_request(150, -1)
+
+            button_cancel = Gtk.Button.new_with_label("Cancel")
+            button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+            button_cancel.set_size_request(150, -1)
+
+            button_grid = Gtk.Grid()
+            button_grid.set_row_spacing(10)
+            button_grid.set_column_spacing(10)
+            button_grid.set_margin_start(10)
+            button_grid.set_margin_end(10)
+            button_grid.set_margin_top(10)
+            button_grid.set_margin_bottom(10)
+            button_grid.attach(button_open, 1, 1, 1, 1)
+            button_grid.attach(button_cancel, 0, 1, 1, 1)
+            button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+            button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            button_box.pack_end(button_grid, False, False, 0)
+
+            dialog.vbox.pack_start(filechooser, True, True, 0)
+            dialog.vbox.pack_start(button_box, False, False, 0)
+
+            dialog.show_all()
             response = dialog.run()
+
             if response == Gtk.ResponseType.OK:
 
                 command_parts = []
-                file_run = dialog.get_filename()
+                file_run = filechooser.get_filename()
                 if not file_run.endswith(".reg"):
                     if file_run:
                         command_parts.append(f'GAMEID=default')
@@ -2942,15 +3061,38 @@ class Settings(Gtk.Dialog):
         webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
-        # Handle the click event of the search button to select the game's .exe
-        dialog = Gtk.FileChooserDialog(title="Select a prefix location", parent=self,
-                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
-        dialog.set_current_folder(os.path.expanduser(self.default_prefix))
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select a prefix location", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
+        filechooser.set_current_folder(os.path.expanduser(self.default_prefix))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        button_box.set_margin_start(10)
+        button_box.set_margin_end(10)
+        button_box.set_margin_top(10)
+        button_box.set_margin_bottom(10)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+        button_box.pack_end(button_open, False, False, 0)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+        button_box.pack_end(button_cancel, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            self.entry_default_prefix.set_text(dialog.get_filename())
+            self.entry_default_prefix.set_text(filechooser.get_filename())
 
         dialog.destroy()
 
@@ -3038,53 +3180,55 @@ class Game:
 
 class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix):
-        # Initialize the ConfirmationDialog
-        Gtk.Dialog.__init__(self, title=f"Delete {title}", parent=parent, modal=True)
-        self.set_icon_from_file(faugus_png)
-
-        # Configure dialog properties
+        super().__init__(title=f"Delete {title}", transient_for=parent, modal=True)
         self.set_resizable(False)
+        self.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
+        #self.fullscreen()
 
-        # Create a grid layout for the dialog content area
-        grid = Gtk.Grid()
-        grid.set_row_spacing(20)
-        grid.set_column_spacing(10)
-        grid.set_margin_start(10)
-        grid.set_margin_end(10)
-        grid.set_margin_top(10)
-        grid.set_margin_bottom(10)
-
-        # Add grid to dialog's content area
-        content_area = self.get_content_area()
-        content_area.set_border_width(0)
-        content_area.add(grid)
-
-        # Create a label
         label = Gtk.Label()
         label.set_label(f"Are you sure you want to delete {title}?")
         label.set_halign(Gtk.Align.CENTER)
-        grid.attach(label, 0, 0, 2, 1)
 
-        # Create "No" button
-        button_no = Gtk.Button(label="Cancel")
+        button_no = Gtk.Button(label="No")
         button_no.set_size_request(150, -1)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
-        grid.attach(button_no, 0, 2, 1, 1)
 
-        # Create "Yes" button
-        button_yes = Gtk.Button(label="Confirm")
+        button_yes = Gtk.Button(label="Yes")
         button_yes.set_size_request(150, -1)
         button_yes.connect("clicked", lambda x: self.response(Gtk.ResponseType.YES))
-        grid.attach(button_yes, 1, 2, 1, 1)
 
-        # Create a checkbox to optionally remove the prefix
         self.checkbox = Gtk.CheckButton(label="Also remove the prefix")
         self.checkbox.set_halign(Gtk.Align.CENTER)
 
-        if os.path.basename(prefix) != "default":
-            grid.attach(self.checkbox, 0, 1, 2, 1)
+        content_area = self.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
 
-        # Display all widgets
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        if os.path.basename(prefix) != "default":
+            box_top.pack_start(self.checkbox, True, True, 0)
+
+        box_bottom.pack_start(button_no, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
         self.show_all()
 
     def get_remove_prefix_state(self):
@@ -3218,7 +3362,6 @@ class AddGame(Gtk.Dialog):
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.combo_box_launcher = Gtk.ComboBoxText()
-        self.combo_box_launcher.connect("changed", self.on_combobox_changed)
 
         # Widgets for title
         self.label_title = Gtk.Label(label="Title")
@@ -3494,6 +3637,8 @@ class AddGame(Gtk.Dialog):
 
         self.populate_combobox_with_launchers()
         self.combo_box_launcher.set_active(0)
+        self.combo_box_launcher.connect("changed", self.on_combobox_changed)
+
         self.populate_combobox_with_runners()
 
         model = self.combo_box_runner.get_model()
@@ -3541,8 +3686,8 @@ class AddGame(Gtk.Dialog):
         if interface_mode != "Banners":
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
-        allocation = self.entry_title.get_allocation()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 10), -1, True)
+        allocation = self.grid_shortcut.get_allocation()
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 20), -1, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -3560,24 +3705,55 @@ class AddGame(Gtk.Dialog):
             self.image_banner2.set_from_pixbuf(pixbuf)
 
     def on_load_file(self, widget):
-        dialog = Gtk.FileChooserDialog(title="Select an image for the banner", action=Gtk.FileChooserAction.OPEN)
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select an image for the banner", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Add a filter to limit selection to .ico files
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
-        filter_ico.add_mime_type("image/*")  # Other image formats
-        dialog.add_filter(filter_ico)
+        filter_ico.add_mime_type("image/*")
 
-        # Set the initial directory to the icon directory
-        dialog.set_current_folder(os.path.expanduser("~/"))
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("image", "Image files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
 
-        # Connect signal to update preview widget when file selection changes
-        dialog.connect("update-preview", self.update_preview)
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
 
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        filechooser.connect("update-preview", self.update_preview)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            file_path = dialog.get_filename()
+            file_path = filechooser.get_filename()
             shutil.copy(file_path, self.banner_path_temp)
             self.update_image_banner()
 
@@ -3632,11 +3808,50 @@ class AddGame(Gtk.Dialog):
                 GLib.idle_add(self.update_image_banner)
 
             except requests.exceptions.RequestException as e:
-                dialog = Gtk.MessageDialog(title="Faugus Launcher", text="Error downloading the banner from SteamDBGrid.\nCheck the API Key and the internet connection.",
-                                            buttons=Gtk.ButtonsType.OK, parent=self)
+                dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
                 dialog.set_resizable(False)
-                dialog.set_modal(True)
                 dialog.set_icon_from_file(faugus_png)
+                subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                #dialog.fullscreen()
+
+                label = Gtk.Label()
+                label.set_label("Error downloading the banner from SteamDBGrid.")
+                label.set_halign(Gtk.Align.CENTER)
+
+                label2 = Gtk.Label()
+                label2.set_label("Check the API Key and the internet connection.")
+                label2.set_halign(Gtk.Align.CENTER)
+
+                button_yes = Gtk.Button(label="Ok")
+                button_yes.set_size_request(150, -1)
+                button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+
+                content_area = dialog.get_content_area()
+                content_area.set_border_width(0)
+                content_area.set_halign(Gtk.Align.CENTER)
+                content_area.set_valign(Gtk.Align.CENTER)
+                content_area.set_vexpand(True)
+                content_area.set_hexpand(True)
+
+                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                box_top.set_margin_start(20)
+                box_top.set_margin_end(20)
+                box_top.set_margin_top(20)
+                box_top.set_margin_bottom(20)
+
+                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                box_bottom.set_margin_start(10)
+                box_bottom.set_margin_end(10)
+                box_bottom.set_margin_bottom(10)
+
+                box_top.pack_start(label, True, True, 0)
+                box_top.pack_start(label2, True, True, 0)
+                box_bottom.pack_start(button_yes, True, True, 0)
+
+                content_area.add(box_top)
+                content_area.add(box_bottom)
+
+                dialog.show_all()
                 dialog.run()
                 dialog.destroy()
 
@@ -3665,15 +3880,14 @@ class AddGame(Gtk.Dialog):
         self.button_search_addapp.set_sensitive(is_active)
 
     def on_button_search_addapp_clicked(self, widget):
-        # Handle the click event of the search button to select the game's .exe
-        dialog = Gtk.FileChooserDialog(title="Select the additional application", parent=self, action=Gtk.FileChooserAction.OPEN)
-        if not self.entry_path.get_text():
-            dialog.set_current_folder(os.path.expanduser("~/"))
-        else:
-            dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select an additional application", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Windows files filter
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         windows_filter = Gtk.FileFilter()
         windows_filter.set_name("Windows files")
         windows_filter.add_pattern("*.exe")
@@ -3681,17 +3895,57 @@ class AddGame(Gtk.Dialog):
         windows_filter.add_pattern("*.bat")
         windows_filter.add_pattern("*.lnk")
         windows_filter.add_pattern("*.reg")
-        dialog.add_filter(windows_filter)
 
-        # All files filter
         all_files_filter = Gtk.FileFilter()
         all_files_filter.set_name("All files")
         all_files_filter.add_pattern("*")
-        dialog.add_filter(all_files_filter)
 
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("windows", "Windows files")
+        filter_combobox.append("all", "All files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
+
+        def on_filter_changed(combobox):
+            active_id = combobox.get_active_id()
+            if active_id == "windows":
+                filechooser.set_filter(windows_filter)
+            elif active_id == "all":
+                filechooser.set_filter(all_files_filter)
+
+        filter_combobox.connect("changed", on_filter_changed)
+        filechooser.set_filter(windows_filter)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            self.entry_addapp.set_text(dialog.get_filename())
+            self.entry_addapp.set_text(filechooser.get_filename())
 
         dialog.destroy()
 
@@ -3812,12 +4066,20 @@ class AddGame(Gtk.Dialog):
                 self.get_banner()
             else:
                 shutil.copy(faugus_banner, self.banner_path_temp)
-                allocation = self.entry_title.get_allocation()
-                width = allocation.width - 10
-                if width > 0:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, width, -1, True)
+                allocation = self.image_banner.get_allocation()
+
+                if active_index ==1:
+                    self.grid_shortcut.set_size_request(allocation.width, -1)
+                    allocation2 = self.grid_shortcut.get_allocation()
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation2.width, -1, True)
                     self.image_banner.set_from_pixbuf(pixbuf)
                     self.image_banner2.set_from_pixbuf(pixbuf)
+                else:
+                    width = allocation.width
+                    if width > 0:
+                        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, width, -1, True)
+                        self.image_banner.set_from_pixbuf(pixbuf)
+                        self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
         self.combo_box_launcher.append_text("Windows Game")
@@ -3899,12 +4161,14 @@ class AddGame(Gtk.Dialog):
             self.set_sensitive(True)
             return
 
-        dialog = Gtk.FileChooserDialog(title="Select a file to run inside the prefix",
-                                       action=Gtk.FileChooserAction.OPEN)
-        dialog.set_current_folder(os.path.expanduser("~/"))
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select a file to run inside the prefix", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Windows files filter
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         windows_filter = Gtk.FileFilter()
         windows_filter.set_name("Windows files")
         windows_filter.add_pattern("*.exe")
@@ -3912,13 +4176,53 @@ class AddGame(Gtk.Dialog):
         windows_filter.add_pattern("*.bat")
         windows_filter.add_pattern("*.lnk")
         windows_filter.add_pattern("*.reg")
-        dialog.add_filter(windows_filter)
 
-        # All files filter
         all_files_filter = Gtk.FileFilter()
         all_files_filter.set_name("All files")
         all_files_filter.add_pattern("*")
-        dialog.add_filter(all_files_filter)
+
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("windows", "Windows files")
+        filter_combobox.append("all", "All files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
+
+        def on_filter_changed(combobox):
+            active_id = combobox.get_active_id()
+            if active_id == "windows":
+                filechooser.set_filter(windows_filter)
+            elif active_id == "all":
+                filechooser.set_filter(all_files_filter)
+
+        filter_combobox.connect("changed", on_filter_changed)
+        filechooser.set_filter(windows_filter)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -3940,7 +4244,7 @@ class AddGame(Gtk.Dialog):
 
             # Add command parts if they are not empty
 
-            file_run = dialog.get_filename()
+            file_run = filechooser.get_filename()
             if not file_run.endswith(".reg"):
                 if prefix:
                     command_parts.append(f'WINEPREFIX={prefix}')
@@ -4036,25 +4340,56 @@ class AddGame(Gtk.Dialog):
         except Exception as e:
             print(f"An error occurred: {e}")
 
-        # Open file dialog to select .ico file
-        dialog = Gtk.FileChooserDialog(title="Select an icon for the shortcut", action=Gtk.FileChooserAction.OPEN)
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Add a filter to limit selection to .ico files
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
-        filter_ico.add_mime_type("image/*")  # Other image formats
-        dialog.add_filter(filter_ico)
+        filter_ico.add_mime_type("image/*")
 
-        # Set the initial directory to the icon directory
-        dialog.set_current_folder(self.icon_directory)
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("image", "Image files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
 
-        # Connect signal to update preview widget when file selection changes
-        dialog.connect("update-preview", self.update_preview)
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
 
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        filechooser.set_current_folder(self.icon_directory)
+        filechooser.connect("update-preview", self.update_preview)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            file_path = dialog.get_filename()
+            file_path = filechooser.get_filename()
             # Move and rename the icon file
             shutil.copy(file_path, self.icon_temp)
 
@@ -4262,16 +4597,15 @@ class AddGame(Gtk.Dialog):
         command_thread.start()
 
     def on_button_search_clicked(self, widget):
-        # Handle the click event of the search button to select the game's .exe
-        dialog = Gtk.FileChooserDialog(title="Select the game's .exe", parent=self, action=Gtk.FileChooserAction.OPEN)
-        if not self.entry_path.get_text():
-            dialog.set_current_folder(os.path.expanduser("~/"))
-        else:
-            dialog.set_current_folder(os.path.dirname(self.entry_path.get_text()))
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select the game's .exe", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
+
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
 
         if self.combo_box_launcher.get_active() != 1:
-            # Windows files filter
             windows_filter = Gtk.FileFilter()
             windows_filter.set_name("Windows files")
             windows_filter.add_pattern("*.exe")
@@ -4279,17 +4613,63 @@ class AddGame(Gtk.Dialog):
             windows_filter.add_pattern("*.bat")
             windows_filter.add_pattern("*.lnk")
             windows_filter.add_pattern("*.reg")
-            dialog.add_filter(windows_filter)
 
-        # All files filter
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name("All files")
-        all_files_filter.add_pattern("*")
-        dialog.add_filter(all_files_filter)
+            all_files_filter = Gtk.FileFilter()
+            all_files_filter.set_name("All files")
+            all_files_filter.add_pattern("*")
+
+            filter_combobox = Gtk.ComboBoxText()
+            filter_combobox.append("windows", "Windows files")
+            filter_combobox.append("all", "All files")
+            filter_combobox.set_active(0)
+            filter_combobox.set_size_request(150, -1)
+
+            def on_filter_changed(combobox):
+                active_id = combobox.get_active_id()
+                if active_id == "windows":
+                    filechooser.set_filter(windows_filter)
+                elif active_id == "all":
+                    filechooser.set_filter(all_files_filter)
+
+            filter_combobox.connect("changed", on_filter_changed)
+            filechooser.set_filter(windows_filter)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        if self.combo_box_launcher.get_active() != 1:
+            button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
+
+        if not self.entry_path.get_text():
+            filechooser.set_current_folder(os.path.expanduser("~/"))
+        else:
+            filechooser.set_current_folder(os.path.dirname(self.entry_path.get_text()))
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            path = dialog.get_filename()
+            path = filechooser.get_filename()
 
             if not os.path.exists(self.icon_directory):
                 os.makedirs(self.icon_directory)
@@ -4326,7 +4706,7 @@ class AddGame(Gtk.Dialog):
             except Exception as e:
                 print(f"An error occurred: {e}")
 
-            self.entry_path.set_text(dialog.get_filename())
+            self.entry_path.set_text(filechooser.get_filename())
 
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
@@ -4334,18 +4714,43 @@ class AddGame(Gtk.Dialog):
         dialog.destroy()
 
     def on_button_search_prefix_clicked(self, widget):
-        dialog = Gtk.FileChooserDialog(title="Select a prefix location", parent=self,
-                                       action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog = Gtk.Dialog(title="Select a prefix location", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
+
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
+        filechooser.set_current_folder(os.path.expanduser(self.default_prefix))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        button_box.set_margin_start(10)
+        button_box.set_margin_end(10)
+        button_box.set_margin_top(10)
+        button_box.set_margin_bottom(10)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+        button_box.pack_end(button_open, False, False, 0)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+        button_box.pack_end(button_cancel, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
 
         if not self.entry_prefix.get_text():
-            dialog.set_current_folder(os.path.expanduser(self.default_prefix))
+            filechooser.set_current_folder(os.path.expanduser(self.default_prefix))
         else:
-            dialog.set_current_folder(self.entry_prefix.get_text())
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            filechooser.set_current_folder(self.entry_prefix.get_text())
 
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            new_prefix = dialog.get_filename()
+            new_prefix = filechooser.get_filename()
             self.default_prefix = new_prefix
             #self.entry_title.emit("changed")
             self.entry_prefix.set_text(self.default_prefix)
@@ -4453,6 +4858,7 @@ class CreateShortcut(Gtk.Window):
         self.entry_game_arguments.set_tooltip_text("e.g.: -d3d11 -fullscreen")
 
         self.label_addapp = Gtk.Label(label="Additional Application")
+        self.label_addapp.set_halign(Gtk.Align.START)
         self.entry_addapp = Gtk.Entry()
         self.entry_addapp.set_tooltip_text("/path/to/the/app")
         self.button_search_addapp = Gtk.Button()
@@ -4461,6 +4867,7 @@ class CreateShortcut(Gtk.Window):
         self.button_search_addapp.set_size_request(50, -1)
 
         self.button_shortcut_icon = Gtk.Button()
+        self.button_shortcut_icon.set_size_request(120, -1)
         self.button_shortcut_icon.set_tooltip_text("Select an icon for the shortcut")
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
@@ -4476,14 +4883,12 @@ class CreateShortcut(Gtk.Window):
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
-        self.button_cancel.set_size_request(120, -1)
-        self.button_cancel.set_halign(Gtk.Align.CENTER)
+        self.button_cancel.set_size_request(150, -1)
 
         # Button Ok
         self.button_ok = Gtk.Button(label="Ok")
         self.button_ok.connect("clicked", self.on_ok_clicked)
-        self.button_ok.set_size_request(120, -1)
-        self.button_ok.set_halign(Gtk.Align.CENTER)
+        self.button_ok.set_size_request(150, -1)
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -4494,87 +4899,124 @@ class CreateShortcut(Gtk.Window):
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        # Create the Grids
-        self.grid1 = Gtk.Grid()
-        self.grid1.set_row_spacing(10)
-        self.grid1.set_column_spacing(10)
-        self.grid1.set_margin_start(10)
-        self.grid1.set_margin_end(10)
-        self.grid1.set_margin_top(10)
-        self.grid1.set_margin_bottom(10)
-        self.grid1.set_valign(Gtk.Align.CENTER)
+        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.box.set_margin_start(0)
+        self.box.set_margin_end(0)
+        self.box.set_margin_top(0)
+        self.box.set_margin_bottom(0)
 
-        self.grid2 = Gtk.Grid()
-        self.grid2.set_row_spacing(10)
-        self.grid2.set_column_spacing(10)
-        self.grid2.set_margin_start(10)
-        self.grid2.set_margin_end(10)
-        self.grid2.set_margin_top(10)
-        self.grid2.set_margin_bottom(10)
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
 
-        self.grid3 = Gtk.Grid()
-        self.grid3.set_row_spacing(10)
-        self.grid3.set_column_spacing(10)
-        self.grid3.set_margin_start(10)
-        self.grid3.set_margin_end(10)
-        self.grid3.set_margin_top(10)
-        self.grid3.set_margin_bottom(10)
-        self.grid3.set_valign(Gtk.Align.CENTER)
-        self.grid3.set_halign(Gtk.Align.END)
+        self.grid_title = Gtk.Grid()
+        self.grid_title.set_row_spacing(10)
+        self.grid_title.set_column_spacing(10)
+        self.grid_title.set_margin_start(10)
+        self.grid_title.set_margin_end(10)
+        self.grid_title.set_margin_top(10)
 
-        self.grid4 = Gtk.Grid()
-        self.grid4.set_row_spacing(10)
-        self.grid4.set_column_spacing(10)
-        self.grid4.set_margin_start(10)
-        self.grid4.set_margin_end(10)
-        self.grid4.set_margin_top(10)
-        self.grid4.set_margin_bottom(10)
+        self.grid_protonfix = Gtk.Grid()
+        self.grid_protonfix.set_row_spacing(10)
+        self.grid_protonfix.set_column_spacing(10)
+        self.grid_protonfix.set_margin_start(10)
+        self.grid_protonfix.set_margin_end(10)
+        self.grid_protonfix.set_margin_top(10)
 
+        self.grid_launch_arguments = Gtk.Grid()
+        self.grid_launch_arguments.set_row_spacing(10)
+        self.grid_launch_arguments.set_column_spacing(10)
+        self.grid_launch_arguments.set_margin_start(10)
+        self.grid_launch_arguments.set_margin_end(10)
+        self.grid_launch_arguments.set_margin_top(10)
+
+        self.grid_game_arguments = Gtk.Grid()
+        self.grid_game_arguments.set_row_spacing(10)
+        self.grid_game_arguments.set_column_spacing(10)
+        self.grid_game_arguments.set_margin_start(10)
+        self.grid_game_arguments.set_margin_end(10)
+        self.grid_game_arguments.set_margin_top(10)
+
+        self.grid_addapp = Gtk.Grid()
+        self.grid_addapp.set_row_spacing(10)
+        self.grid_addapp.set_column_spacing(10)
+        self.grid_addapp.set_margin_start(10)
+        self.grid_addapp.set_margin_end(10)
+        self.grid_addapp.set_margin_top(10)
+
+        self.grid_title.attach(self.label_title, 0, 0, 4, 1)
+        self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
         self.entry_title.set_hexpand(True)
-        self.entry_title.set_valign(Gtk.Align.CENTER)
-        self.grid1.attach(self.label_title, 0, 0, 1, 1)
-        self.grid1.attach(self.entry_title, 0, 1, 4, 1)
 
-        self.grid1.attach(self.label_protonfix, 0, 2, 1, 1)
-        self.grid1.attach(self.entry_protonfix, 0, 3, 3, 1)
+        self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
+        self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
         self.entry_protonfix.set_hexpand(True)
-        self.grid1.attach(self.button_search_protonfix, 3, 3, 1, 1)
-        self.grid1.attach(self.label_launch_arguments, 0, 4, 1, 1)
-        self.grid1.attach(self.entry_launch_arguments, 0, 5, 4, 1)
+        self.grid_protonfix.attach(self.button_search_protonfix, 3, 1, 1, 1)
+
+        self.grid_launch_arguments.attach(self.label_launch_arguments, 0, 0, 4, 1)
+        self.grid_launch_arguments.attach(self.entry_launch_arguments, 0, 1, 4, 1)
         self.entry_launch_arguments.set_hexpand(True)
 
-        self.grid1.attach(self.label_game_arguments, 0, 6, 1, 1)
-        self.grid1.attach(self.entry_game_arguments, 0, 7, 4, 1)
+        self.grid_game_arguments.attach(self.label_game_arguments, 0, 0, 4, 1)
+        self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        self.grid1.attach(self.label_addapp, 0, 8, 1, 1)
-        self.grid1.attach(self.entry_addapp, 0, 9, 3, 1)
+        self.grid_addapp.attach(self.label_addapp, 0, 0, 1, 1)
+        self.grid_addapp.attach(self.entry_addapp, 0, 1, 3, 1)
         self.entry_addapp.set_hexpand(True)
-        self.grid1.attach(self.button_search_addapp, 3, 9, 1, 1)
+        self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
 
-        self.grid2.attach(self.checkbox_mangohud, 0, 0, 1, 1)
-        self.grid2.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        self.grid2.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
+        self.grid_tools = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        self.grid_tools.set_row_spacing(10)
+        self.grid_tools.set_column_spacing(10)
+        self.grid_tools.set_margin_start(10)
+        self.grid_tools.set_margin_end(10)
+        self.grid_tools.set_margin_top(10)
+        self.grid_tools.set_margin_bottom(10)
 
-        self.grid3.attach(self.button_shortcut_icon, 0, 0, 1, 1)
+        self.grid_shortcut_icon = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        self.grid_shortcut_icon.set_row_spacing(10)
+        self.grid_shortcut_icon.set_column_spacing(10)
+        self.grid_shortcut_icon.set_margin_start(10)
+        self.grid_shortcut_icon.set_margin_end(10)
+        self.grid_shortcut_icon.set_margin_top(10)
+        self.grid_shortcut_icon.set_margin_bottom(10)
 
-        self.grid4.attach(self.button_cancel, 0, 0, 1, 1)
-        self.grid4.attach(self.button_ok, 1, 0, 1, 1)
+        self.grid_tools.add(self.checkbox_mangohud)
+        self.grid_tools.add(self.checkbox_gamemode)
+        self.grid_tools.add(self.checkbox_sc_controller)
 
-        # Create a main grid to hold the grids
-        self.main_grid = Gtk.Grid()
+        self.grid_shortcut_icon.add(self.button_shortcut_icon)
+        self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
-        # Attach grid1 and grid2 to the main grid in the same row
-        self.main_grid.attach(self.grid1, 0, 0, 2, 1)
-        self.main_grid.attach(self.grid2, 0, 1, 2, 1)
-        self.main_grid.attach(self.grid3, 1, 1, 1, 1)
+        self.box_tools = Gtk.Box()
+        self.box_tools.pack_start(self.grid_tools, False, False, 0)
+        self.box_tools.pack_end(self.grid_shortcut_icon, False, False, 0)
 
-        # Attach grid3 to the main grid in the next row
-        self.main_grid.attach(self.grid4, 0, 2, 2, 1)
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        #botton_box.set_margin_top(10)
+        bottom_box.set_margin_bottom(10)
+
+        self.button_cancel.set_hexpand(True)
+        self.button_ok.set_hexpand(True)
+
+        bottom_box.pack_start(self.button_cancel, True, True, 0)
+        bottom_box.pack_start(self.button_ok, True, True, 0)
+
+        self.main_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        self.main_grid.add(self.grid_title)
+        self.main_grid.add(self.grid_protonfix)
+        self.main_grid.add(self.grid_launch_arguments)
+        self.main_grid.add(self.grid_game_arguments)
+        self.main_grid.add(self.grid_addapp)
+        self.main_grid.add(self.box_tools)
 
         self.load_config()
 
-        # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
@@ -4596,8 +5038,10 @@ class CreateShortcut(Gtk.Window):
             self.checkbox_sc_controller.set_tooltip_text(
                 "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
-        # Add the main grid to the window
-        self.add(self.main_grid)
+        frame.add(self.main_grid)
+        self.box.add(frame)
+        self.box.add(bottom_box)
+        self.add(self.box)
 
         # Handle the click event of the Create Shortcut button
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game_title)
@@ -4645,12 +5089,14 @@ class CreateShortcut(Gtk.Window):
         self.connect("destroy", Gtk.main_quit)
 
     def on_button_search_addapp_clicked(self, widget):
-        # Handle the click event of the search button to select the game's .exe
-        dialog = Gtk.FileChooserDialog(title="Select the additional application", parent=self, action=Gtk.FileChooserAction.OPEN)
-        dialog.set_current_folder(os.path.dirname(self.file_path))
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select an additional application", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Windows files filter
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         windows_filter = Gtk.FileFilter()
         windows_filter.set_name("Windows files")
         windows_filter.add_pattern("*.exe")
@@ -4658,15 +5104,55 @@ class CreateShortcut(Gtk.Window):
         windows_filter.add_pattern("*.bat")
         windows_filter.add_pattern("*.lnk")
         windows_filter.add_pattern("*.reg")
-        dialog.add_filter(windows_filter)
 
-        # All files filter
         all_files_filter = Gtk.FileFilter()
         all_files_filter.set_name("All files")
         all_files_filter.add_pattern("*")
-        dialog.add_filter(all_files_filter)
 
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("windows", "Windows files")
+        filter_combobox.append("all", "All files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
+
+        def on_filter_changed(combobox):
+            active_id = combobox.get_active_id()
+            if active_id == "windows":
+                filechooser.set_filter(windows_filter)
+            elif active_id == "all":
+                filechooser.set_filter(all_files_filter)
+
+        filter_combobox.connect("changed", on_filter_changed)
+        filechooser.set_filter(windows_filter)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
             self.entry_addapp.set_text(dialog.get_filename())
 
@@ -4930,25 +5416,56 @@ class CreateShortcut(Gtk.Window):
         except Exception as e:
             print(f"An error occurred: {e}")
 
-        # Open file dialog to select .ico file
-        dialog = Gtk.FileChooserDialog(title="Select an icon for the shortcut", action=Gtk.FileChooserAction.OPEN)
-        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        #dialog.fullscreen()
 
-        # Add a filter to limit selection to .ico files
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
-        filter_ico.add_mime_type("image/*")  # Other image formats
-        dialog.add_filter(filter_ico)
+        filter_ico.add_mime_type("image/*")
 
-        # Set the initial directory to the icon directory
-        dialog.set_current_folder(self.icon_directory)
+        filter_combobox = Gtk.ComboBoxText()
+        filter_combobox.append("image", "Image files")
+        filter_combobox.set_active(0)
+        filter_combobox.set_size_request(150, -1)
 
-        # Connect signal to update preview widget when file selection changes
-        dialog.connect("update-preview", self.update_preview)
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
 
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+        button_grid.attach(filter_combobox, 1, 0, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        filechooser.set_current_folder(self.icon_directory)
+        filechooser.connect("update-preview", self.update_preview)
+
+        dialog.show_all()
         response = dialog.run()
+
         if response == Gtk.ResponseType.OK:
-            file_path = dialog.get_filename()
+            file_path = filechooser.get_filename()
             # Move and rename the icon file
             shutil.copy(file_path, self.icon_temp)
 
