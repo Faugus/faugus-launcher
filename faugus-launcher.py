@@ -206,8 +206,20 @@ class Main(Gtk.Window):
 
         self.game_running2 = False
 
+        self.connect("focus-in-event", self.on_focus_in)
+        self.connect("focus-out-event", self.on_focus_out)
+
         # Set signal handler for child process termination
         signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+
+    def on_focus_in(self, widget, event):
+        if self.gamepad_navigation and not self.gamepad_process:
+            self.gamepad_process = subprocess.Popen(["faugus-gamepad"])
+
+    def on_focus_out(self, widget, event):
+        if self.gamepad_process:
+            self.gamepad_process.terminate()
+            self.gamepad_process = None
 
     def check_theme(self):
         settings = Gtk.Settings.get_default()
