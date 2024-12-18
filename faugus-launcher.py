@@ -2232,14 +2232,15 @@ class Main(Gtk.Window):
         self.load_games()
         self.entry_search.set_text("")
         self.show_all()
-        if self.fullscreen_activated:
-            self.fullscreen_activated = True
-            self.grid_corner.set_visible(True)
-            self.grid_left.set_margin_start(70)
-        else:
-            self.fullscreen_activated = False
-            self.grid_corner.set_visible(False)
-            self.grid_left.set_margin_start(0)
+        if self.interface_mode != "List":
+            if self.fullscreen_activated:
+                self.fullscreen_activated = True
+                self.grid_corner.set_visible(True)
+                self.grid_left.set_margin_start(70)
+            else:
+                self.fullscreen_activated = False
+                self.grid_corner.set_visible(False)
+                self.grid_left.set_margin_start(0)
 
     def on_child_process_closed(self, signum, frame):
         for title, processo in list(self.processos.items()):
