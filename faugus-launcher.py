@@ -2782,7 +2782,7 @@ class Settings(Gtk.Dialog):
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
-                    if os.path.isdir(entry_path) and entry != "UMU-Latest":
+                    if os.path.isdir(entry_path) and entry != "UMU-Latest" and entry != "LegacyRuntime":
                         versions.append(entry)
 
                 # Sort versions in descending order
@@ -4193,7 +4193,7 @@ class AddGame(Gtk.Dialog):
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
-                    if os.path.isdir(entry_path) and entry != "UMU-Latest":
+                    if os.path.isdir(entry_path) and entry != "UMU-Latest" and entry != "LegacyRuntime":
                         versions.append(entry)
 
                 # Sort versions in descending order
