@@ -54,6 +54,8 @@ faugus_temp = os.path.expanduser('~/faugus_temp')
 lock_file_path = f"{faugus_launcher_share_dir}/faugus_launcher.lock"
 lock_file = None
 
+faugus_session = False
+
 
 if not os.path.exists(faugus_launcher_share_dir):
     os.makedirs(faugus_launcher_share_dir)
@@ -95,6 +97,9 @@ class Main(Gtk.Window):
         # Initialize the main window with title and default size
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_icon_from_file(faugus_png)
+
+        if faugus_session:
+            self.fullscreen()
 
         self.banner_mode = False
         self.start_maximized = False
@@ -584,7 +589,7 @@ class Main(Gtk.Window):
 
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
-        if self.start_fullscreen:
+        if self.start_fullscreen or faugus_session:
             self.fullscreen_activated = True
             self.grid_corner.set_visible(True)
             self.grid_left.set_margin_start(70)
@@ -616,7 +621,8 @@ class Main(Gtk.Window):
 
         menu.append(shutdown_item)
         menu.append(reboot_item)
-        menu.append(logout_item)
+        if not faugus_session:
+            menu.append(logout_item)
         menu.append(close_item)
 
         menu.show_all()
@@ -701,7 +707,7 @@ class Main(Gtk.Window):
                 selected_child.grab_focus()
 
         if self.interface_mode != "List":
-            if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK:
+            if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK and not faugus_session:
                 if self.get_window().get_state() & Gdk.WindowState.FULLSCREEN:
                     self.fullscreen_activated = False
                     self.unfullscreen()
@@ -746,7 +752,8 @@ class Main(Gtk.Window):
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         label = Gtk.Label()
         label.set_label(f'{title} is already running.')
@@ -1151,7 +1158,8 @@ class Main(Gtk.Window):
                     dialog.set_resizable(False)
                     dialog.set_icon_from_file(faugus_png)
                     subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
-                    #dialog.fullscreen()
+                    if faugus_session:
+                        dialog.fullscreen()
 
                     label = Gtk.Label()
                     label.set_label("Please restart Faugus Launcher")
@@ -1327,12 +1335,15 @@ class Main(Gtk.Window):
                     os.remove(lock_file_path)
 
             # Launch the game with subprocess
-            if self.load_close_onlaunch():
+            if self.load_close_onlaunch() and not faugus_session:
                 subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
-                                 stderr=subprocess.DEVNULL, cwd=game_directory)
+                                stderr=subprocess.DEVNULL, cwd=game_directory)
                 sys.exit()
             else:
-                processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+                if faugus_session:
+                    processo = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"], cwd=game_directory)
+                else:
+                    processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
                 self.processos[title] = processo
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
@@ -1567,7 +1578,8 @@ class Main(Gtk.Window):
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         label = Gtk.Label()
         label.set_label(title)
@@ -2233,7 +2245,7 @@ class Main(Gtk.Window):
         self.entry_search.set_text("")
         self.show_all()
         if self.interface_mode != "List":
-            if self.fullscreen_activated:
+            if self.fullscreen_activated or faugus_session:
                 self.fullscreen_activated = True
                 self.grid_corner.set_visible(True)
                 self.grid_left.set_margin_start(70)
@@ -2342,6 +2354,9 @@ class Settings(Gtk.Dialog):
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         self.parent = parent
+
+        if faugus_session:
+            self.fullscreen()
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -2501,6 +2516,10 @@ class Settings(Gtk.Dialog):
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
+        self.box.set_halign(Gtk.Align.CENTER)
+        self.box.set_valign(Gtk.Align.CENTER)
+        self.box.set_vexpand(True)
+        self.box.set_hexpand(True)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -2701,7 +2720,10 @@ class Settings(Gtk.Dialog):
 
         proton_manager = faugus_proton_manager
         def run_command():
-            process = subprocess.Popen([sys.executable, proton_manager])
+            if faugus_session:
+                process = subprocess.Popen([sys.executable, proton_manager, "session"])
+            else:
+                process = subprocess.Popen([sys.executable, proton_manager])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent.set_sensitive, True)
@@ -2805,7 +2827,8 @@ class Settings(Gtk.Dialog):
 
             dialog = Gtk.Dialog(title="Select a file to run inside the prefix", parent=self, flags=0)
             dialog.set_size_request(720, 720)
-            #dialog.fullscreen()
+            if faugus_session:
+                dialog.fullscreen()
 
             filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
             filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -2893,7 +2916,10 @@ class Settings(Gtk.Dialog):
                 faugus_run_path = faugus_run
 
                 def run_command():
-                    process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                    if faugus_session:
+                        process = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"])
+                    else:
+                        process = subprocess.Popen([sys.executable, faugus_run_path, command])
                     process.wait()
                     GLib.idle_add(self.set_sensitive, True)
                     GLib.idle_add(self.parent.set_sensitive, True)
@@ -2975,7 +3001,10 @@ class Settings(Gtk.Dialog):
             faugus_run_path = faugus_run
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                if faugus_session:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"])
+                else:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent.set_sensitive, True)
@@ -3053,7 +3082,10 @@ class Settings(Gtk.Dialog):
             faugus_run_path = faugus_run
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+                if faugus_session:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks", "session"])
+                else:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent.set_sensitive, True)
@@ -3076,7 +3108,8 @@ class Settings(Gtk.Dialog):
     def on_button_search_prefix_clicked(self, widget):
         dialog = Gtk.Dialog(title="Select a prefix location", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
         filechooser.set_current_folder(os.path.expanduser(self.default_prefix))
@@ -3197,7 +3230,9 @@ class ConfirmationDialog(Gtk.Dialog):
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
-        #self.fullscreen()
+        print(faugus_session)
+        if faugus_session:
+            self.fullscreen()
 
         label = Gtk.Label()
         label.set_label(f"Are you sure you want to delete {title}?")
@@ -3260,6 +3295,10 @@ class AddGame(Gtk.Dialog):
         self.api_key = api_key
         self.interface_mode = interface_mode
 
+        if faugus_session:
+
+            self.fullscreen()
+
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(banners_dir):
@@ -3282,6 +3321,12 @@ class AddGame(Gtk.Dialog):
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
+        self.content_area = self.get_content_area()
+        self.content_area.set_border_width(0)
+        self.content_area.set_halign(Gtk.Align.CENTER)
+        self.content_area.set_valign(Gtk.Align.CENTER)
+        self.content_area.set_vexpand(True)
+        self.content_area.set_hexpand(True)
 
         grid_page1 = Gtk.Grid()
         grid_page2 = Gtk.Grid()
@@ -3720,7 +3765,8 @@ class AddGame(Gtk.Dialog):
     def on_load_file(self, widget):
         dialog = Gtk.Dialog(title="Select an image for the banner", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -3825,7 +3871,8 @@ class AddGame(Gtk.Dialog):
                 dialog.set_resizable(False)
                 dialog.set_icon_from_file(faugus_png)
                 subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
-                #dialog.fullscreen()
+                if faugus_session:
+                    dialog.fullscreen()
 
                 label = Gtk.Label()
                 label.set_label("Error downloading the banner from SteamDBGrid.")
@@ -3895,7 +3942,8 @@ class AddGame(Gtk.Dialog):
     def on_button_search_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title="Select an additional application", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -4176,7 +4224,8 @@ class AddGame(Gtk.Dialog):
 
         dialog = Gtk.Dialog(title="Select a file to run inside the prefix", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -4284,7 +4333,10 @@ class AddGame(Gtk.Dialog):
             faugus_run_path = faugus_run
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                if faugus_session:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"])
+                else:
+                    process = subprocess.Popen([sys.executable, faugus_run_path, command])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -4355,7 +4407,8 @@ class AddGame(Gtk.Dialog):
 
         dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -4540,7 +4593,10 @@ class AddGame(Gtk.Dialog):
         faugus_run_path = faugus_run
 
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command])
+            if faugus_session:
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"])
+            else:
+                process = subprocess.Popen([sys.executable, faugus_run_path, command])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -4595,7 +4651,10 @@ class AddGame(Gtk.Dialog):
         faugus_run_path = faugus_run
 
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+            if faugus_session:
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks", "session"])
+            else:
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -4612,7 +4671,8 @@ class AddGame(Gtk.Dialog):
     def on_button_search_clicked(self, widget):
         dialog = Gtk.Dialog(title="Select the game's .exe", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -4729,7 +4789,8 @@ class AddGame(Gtk.Dialog):
     def on_button_search_prefix_clicked(self, widget):
         dialog = Gtk.Dialog(title="Select a prefix location", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
         filechooser.set_current_folder(os.path.expanduser(self.default_prefix))
@@ -5104,7 +5165,8 @@ class CreateShortcut(Gtk.Window):
     def on_button_search_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title="Select an additional application", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -5431,7 +5493,8 @@ class CreateShortcut(Gtk.Window):
 
         dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
         dialog.set_size_request(720, 720)
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
         filechooser.set_current_folder(os.path.expanduser("~/"))
@@ -5668,9 +5731,45 @@ def apply_dark_theme():
     if is_dark_theme:
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
+def ensure_session_ini():
+    session_file = os.path.join(faugus_launcher_dir, "session.ini")
+    os.makedirs(faugus_launcher_dir, exist_ok=True)
+
+    if not os.path.exists(session_file):
+        default_content = """\
+# Screen's resolution
+SCREEN_WIDTH=1920
+SCREEN_HEIGHT=1080
+
+# Game's resolution
+INTERNAL_WIDTH=1280
+INTERNAL_HEIGHT=720
+
+# Refresh rate
+REFRESH_RATE=60
+
+# Output order preference. "DP-0, DP-1, DP-2"
+PREFER_OUTPUT=
+
+# Adaptive Sync (VRR). Set 1 to enable
+ADAPTIVE_SYNC=
+
+# HDR. Set 1 to enable
+HDR=
+"""
+        with open(session_file, "w") as f:
+            f.write(default_content)
+
 def main():
+    global faugus_session
+
+    # Ensure session.ini exists
+    ensure_session_ini()
+
+    # Your existing setup
     convert_games_txt_to_json(games_txt, games_json)
     apply_dark_theme()
+
     if len(sys.argv) == 1:
         app = Main()
         if is_already_running():
@@ -5684,6 +5783,15 @@ def main():
             print("Faugus Launcher is already running.")
             sys.exit(0)
         app.hide()
+        app.connect("destroy", app.on_destroy)
+        Gtk.main()
+    elif len(sys.argv) == 2 and sys.argv[1] == "session":
+        faugus_session = True
+        print("Session mode activated")
+        app = Main()
+        if is_already_running():
+            print("Faugus Launcher is already running.")
+            sys.exit(0)
         app.connect("destroy", app.on_destroy)
         Gtk.main()
     elif len(sys.argv) == 2:

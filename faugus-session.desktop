@@ -1,0 +1,6 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Faugus Launcher
+Comment=Runs Faugus Launcher with Gamescope
+Exec=/usr/bin/faugus-session
+Type=Application

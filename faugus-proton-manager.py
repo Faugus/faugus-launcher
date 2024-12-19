@@ -5,6 +5,7 @@ import gi
 import os
 import tarfile
 import shutil
+import sys
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gio
@@ -14,27 +15,47 @@ STEAM_COMPATIBILITY_PATH = os.path.expanduser("~/.local/share/Steam/compatibilit
 
 faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
 
-class ProtonDownloader(Gtk.Window):
+faugus_session = False
+
+if "session" in sys.argv:
+    faugus_session = True
+
+class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
         super().__init__(title="Faugus GE-Proton Manager")
         self.set_resizable(False)
         self.set_modal(True)
         self.set_icon_from_file(faugus_png)
+        if faugus_session:
+            self.fullscreen()
 
-        self.set_border_width(10)
-        self.set_default_size(400, 395)
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
 
-        vbox = Gtk.VBox(spacing=5)
-        self.add(vbox)
+        self.content_area = self.get_content_area()
+        self.content_area.set_border_width(0)
+        self.content_area.set_halign(Gtk.Align.CENTER)
+        self.content_area.set_valign(Gtk.Align.CENTER)
+        self.content_area.set_vexpand(True)
+        self.content_area.set_hexpand(True)
+        self.content_area.add(frame)
 
         # Scrolled window to hold the Grid
         self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_vexpand(True)
-        vbox.pack_start(self.scrolled_window, True, True, 0)
+        self.scrolled_window.set_size_request(400, 400)
+        self.scrolled_window.set_margin_start(10)
+        self.scrolled_window.set_margin_end(10)
+        self.scrolled_window.set_margin_top(10)
+        self.scrolled_window.set_margin_bottom(10)
 
         # Grid for releases
         self.grid = Gtk.Grid()
         self.scrolled_window.add(self.grid)
+
+        frame.add(self.scrolled_window)
 
         # Set row and column spacing
         self.grid.set_row_spacing(5)

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+FAUGUS_LAUNCHER_DIR="$CONFIG_DIR/faugus-launcher"
+SESSION_FILE="$FAUGUS_LAUNCHER_DIR/session.ini"
+
+SCREEN_WIDTH=$(grep -i "SCREEN_WIDTH" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+SCREEN_HEIGHT=$(grep -i "SCREEN_HEIGHT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+INTERNAL_WIDTH=$(grep -i "INTERNAL_WIDTH" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+INTERNAL_HEIGHT=$(grep -i "INTERNAL_HEIGHT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+REFRESH_RATE=$(grep -i "REFRESH_RATE" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+ADAPTIVE_SYNC=$(grep -i "ADAPTIVE_SYNC" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+HDR=$(grep -i "HDR" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+PREFER_OUTPUT=$(grep -i "PREFER_OUTPUT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+
+GAMESCOPE_PARAMS=""
+
+if [ -n "$SCREEN_WIDTH" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS -W $SCREEN_WIDTH"
+fi
+
+if [ -n "$SCREEN_HEIGHT" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS -H $SCREEN_HEIGHT"
+fi
+
+if [ -n "$INTERNAL_WIDTH" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS -w $INTERNAL_WIDTH"
+fi
+
+if [ -n "$INTERNAL_HEIGHT" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS -h $INTERNAL_HEIGHT"
+fi
+
+if [ -n "$REFRESH_RATE" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS -r $REFRESH_RATE"
+fi
+
+if [ -n "$PREFER_OUTPUT" ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --prefer-output $PREFER_OUTPUT"
+fi
+
+if [ "$ADAPTIVE_SYNC" == 1 ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --adaptive-sync"
+fi
+
+if [ "$HDR" == 1 ]; then
+    GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --hdr-enabled"
+fi
+
+gamescope $GAMESCOPE_PARAMS -- faugus-launcher session

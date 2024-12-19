@@ -27,6 +27,7 @@ def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
 
+faugus_session = False
 
 class FaugusRun:
     def __init__(self, message):
@@ -45,7 +46,8 @@ class FaugusRun:
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
-        #dialog.fullscreen()
+        if faugus_session:
+            dialog.fullscreen()
 
         label = Gtk.Label()
         label.set_label(f"{protonpath} was not found.")
@@ -258,6 +260,10 @@ class FaugusRun:
         self.warning_dialog.set_resizable(False)
         self.warning_dialog.set_default_size(280, -1)
         self.warning_dialog.set_icon_from_file(faugus_png)
+
+        print(faugus_session)
+        if faugus_session:
+            self.warning_dialog.fullscreen()
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -483,12 +489,17 @@ def apply_dark_theme():
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def main():
+    global faugus_session
     apply_dark_theme()
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message", help="The message to be processed")
-    parser.add_argument("command", nargs='?', default=None, help="The command to be executed (optional)")
+    parser.add_argument("command", nargs='?', default=None)
+    parser.add_argument("session", nargs='?', default=None)
 
     args = parser.parse_args()
+
+    if args.session == "session":
+        faugus_session = True
 
     sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
     if sc_controller_installed:
