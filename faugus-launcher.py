@@ -112,6 +112,7 @@ class Main(Gtk.Window):
         self.game_running = None
         self.system_tray = False
         self.start_boot = False
+        self.current_prefix = None
 
         self.games = []
         self.processos = {}
@@ -205,6 +206,10 @@ class Main(Gtk.Window):
         menu_item_delete = Gtk.MenuItem(label="Delete")
         menu_item_delete.connect("activate", self.on_context_menu_delete)
         self.context_menu.append(menu_item_delete)
+
+        self.menu_item_prefix = Gtk.MenuItem(label="Open prefix location")
+        self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
+        self.context_menu.append(self.menu_item_prefix)
 
         self.context_menu.show_all()
         self.flowbox.connect("button-press-event", self.on_item_right_click)
@@ -648,6 +653,22 @@ class Main(Gtk.Window):
             item = self.get_item_at_event(event)
             if item:
                 self.flowbox.select_child(item)
+
+                selected_children = self.flowbox.get_selected_children()
+                selected_child = selected_children[0]
+                hbox = selected_child.get_child()
+                game_label = hbox.get_children()[1]
+                title = game_label.get_text()
+
+                game = next((j for j in self.games if j.title == title), None)
+
+                if os.path.isdir(game.prefix):
+                    self.menu_item_prefix.set_sensitive(True)
+                    self.current_prefix = game.prefix
+                else:
+                    self.menu_item_prefix.set_sensitive(False)
+                    self.current_prefix = None
+
                 self.context_menu.popup_at_pointer(event)
 
     def on_context_menu_play(self, menu_item):
@@ -661,6 +682,10 @@ class Main(Gtk.Window):
     def on_context_menu_delete(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
         self.on_button_delete_clicked(selected_item)
+
+    def on_context_menu_prefix(self, menu_item):
+        selected_item = self.flowbox.get_selected_children()[0]
+        subprocess.run(["xdg-open", self.current_prefix], check=True)
 
     def on_item_release_event(self, widget, event):
         if event.button == Gdk.BUTTON_PRIMARY:
