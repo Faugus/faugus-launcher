@@ -172,8 +172,8 @@ class FaugusRun:
             bufsize=1
         )
 
-        GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output_components)
-        GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output_components)
+        #GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output_components)
+        #GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output_components)
         self.process.wait()
 
     def on_output_components(self, source, condition):
@@ -261,7 +261,6 @@ class FaugusRun:
         self.warning_dialog.set_default_size(280, -1)
         self.warning_dialog.set_icon_from_file(faugus_png)
 
-        print(faugus_session)
         if faugus_session:
             self.warning_dialog.fullscreen()
 
