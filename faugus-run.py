@@ -145,9 +145,19 @@ class FaugusRun:
         print(self.message)
 
         if "UMU_NO_PROTON" not in self.message:
-            self.components_run()
-        self.process = subprocess.Popen(["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"], stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE, text=True)
+            self.process = subprocess.Popen(
+                ["/bin/bash", "-c", f"{faugus_components}; {discrete_gpu} {eac_dir} {be_dir} {self.message}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+        else:
+            self.process = subprocess.Popen(
+                ["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
@@ -164,25 +174,6 @@ class FaugusRun:
 
         ld_preload_paths = [path for path in lib_paths if os.path.exists(path)]
         self.ld_preload = ":".join(ld_preload_paths)
-
-    def components_run(self):
-        self.process = subprocess.Popen(
-            [faugus_components],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
-        )
-
-        #GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output_components)
-        #GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output_components)
-        self.process.wait()
-
-    def on_output_components(self, source, condition):
-        if line := source.readline():
-            clean_line = line.strip()
-            self.check_game_output(clean_line)
-        return True
 
     def load_config(self):
         config_file = config_file_dir
