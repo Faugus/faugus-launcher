@@ -139,6 +139,8 @@ class FaugusRun:
                     if "umu" not in game_id:
                         self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
                     break
+        if "proton-cachyos" in self.message or "proton-ge-custom" in self.message:
+            self.message = f'UMU_NO_RUNTIME=1 {self.message}'
 
         print(self.message)
 
@@ -418,30 +420,47 @@ class FaugusRun:
                 dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
                 dialog.set_resizable(False)
                 dialog.set_icon_from_file(faugus_png)
+                subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
+                if faugus_session:
+                    dialog.fullscreen()
 
-                self.grid = Gtk.Grid()
-                self.grid.set_row_spacing(20)
-                self.grid.set_column_spacing(0)
-                self.grid.set_margin_start(10)
-                self.grid.set_margin_end(10)
-                self.grid.set_margin_top(10)
-                self.grid.set_margin_bottom(10)
+                label = Gtk.Label()
+                label.set_label(f"The keys and values were successfully added to the registry.")
+                label.set_halign(Gtk.Align.CENTER)
 
-                self.label = Gtk.Label(label="The keys and values were successfully added to the registry.")
+                button_yes = Gtk.Button(label="Ok")
+                button_yes.set_size_request(150, -1)
+                button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
-                self.button_ok = Gtk.Button(label="Ok")
-                self.button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
-                self.button_ok.set_size_request(150, -1)
-                self.button_ok.set_halign(Gtk.Align.CENTER)
+                content_area = dialog.get_content_area()
+                content_area.set_border_width(0)
+                content_area.set_halign(Gtk.Align.CENTER)
+                content_area.set_valign(Gtk.Align.CENTER)
+                content_area.set_vexpand(True)
+                content_area.set_hexpand(True)
 
-                self.grid.attach(self.label, 0, 0, 1, 1)
-                self.grid.attach(self.button_ok, 0, 1, 1, 1)
+                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                box_top.set_margin_start(20)
+                box_top.set_margin_end(20)
+                box_top.set_margin_top(20)
+                box_top.set_margin_bottom(20)
 
-                dialog.get_content_area().add(self.grid)
+                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                box_bottom.set_margin_start(10)
+                box_bottom.set_margin_end(10)
+                box_bottom.set_margin_bottom(10)
+
+                box_top.pack_start(label, True, True, 0)
+                box_bottom.pack_start(button_yes, True, True, 0)
+
+                content_area.add(box_top)
+                content_area.add(box_bottom)
 
                 dialog.show_all()
                 dialog.run()
                 dialog.destroy()
+                Gtk.main_quit()
+                sys.exit()
 
     def on_process_exit(self, pid, condition):
         if self.process.poll() is not None:
