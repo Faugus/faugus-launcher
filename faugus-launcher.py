@@ -1322,7 +1322,7 @@ class Main(Gtk.Window):
             if sc_controller:
                 command_parts.append(sc_controller)
             if prefix:
-                command_parts.append(f'WINEPREFIX={prefix}')
+                command_parts.append(f'WINEPREFIX="{prefix}"')
             if protonfix:
                 command_parts.append(f'GAMEID={protonfix}')
             else:
@@ -1959,13 +1959,13 @@ class Main(Gtk.Window):
                 command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
             elif launcher == "ea":
                 self.label_download2.set_text("Please close the login window and wait...")
-                command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
             elif launcher == "epic":
                 self.label_download2.set_text("")
-                command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
+                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
             elif launcher == "ubisoft":
                 self.label_download2.set_text("")
-                command = f"WINEPREFIX={prefix} GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
             self.bar_download.set_visible(False)
             self.label_download2.set_visible(True)
             processo = subprocess.Popen([sys.executable, faugus_run, command])
@@ -2125,7 +2125,7 @@ class Main(Gtk.Window):
         if sc_controller:
             command_parts.append(sc_controller)
         if prefix:
-            command_parts.append(f'WINEPREFIX={prefix}')
+            command_parts.append(f"WINEPREFIX='{prefix}'")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         else:
@@ -2427,7 +2427,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_fullscreen.set_tooltip_text("Alt+Enter toggles fullscreen")
 
         # Create checkbox for 'Gamepad navigation' option
-        self.checkbox_gamepad_navigation = Gtk.CheckButton(label="Gamepad navigation")
+        self.checkbox_gamepad_navigation = Gtk.CheckButton(label="Gamepad navigation (experimental)")
         self.checkbox_gamepad_navigation.set_active(False)
 
         # Widgets for prefix
@@ -4334,7 +4334,7 @@ class AddGame(Gtk.Dialog):
             file_run = filechooser.get_filename()
             if not file_run.endswith(".reg"):
                 if prefix:
-                    command_parts.append(f'WINEPREFIX={prefix}')
+                    command_parts.append(f'WINEPREFIX="{prefix}"')
                 if title_formatted:
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
@@ -4342,7 +4342,7 @@ class AddGame(Gtk.Dialog):
                 command_parts.append(f'"{umu_run}" "{file_run}"')
             else:
                 if prefix:
-                    command_parts.append(f'WINEPREFIX={prefix}')
+                    command_parts.append(f'WINEPREFIX="{prefix}"')
                 if title_formatted:
                     command_parts.append(f'GAMEID={title_formatted}')
                 if runner:
@@ -4599,7 +4599,7 @@ class AddGame(Gtk.Dialog):
         # Add command parts if they are not empty
 
         if prefix:
-            command_parts.append(f'WINEPREFIX={prefix}')
+            command_parts.append(f'WINEPREFIX="{prefix}"')
         if title_formatted:
             command_parts.append(f'GAMEID={title_formatted}')
         if runner:
@@ -4657,7 +4657,7 @@ class AddGame(Gtk.Dialog):
         # Add command parts if they are not empty
 
         if prefix:
-            command_parts.append(f'WINEPREFIX={prefix}')
+            command_parts.append(f'WINEPREFIX="{prefix}"')
         command_parts.append(f'GAMEID=winetricks-gui')
         command_parts.append(f'STORE=none')
         if runner:
@@ -5689,7 +5689,7 @@ def run_file(file_path):
             command_parts.append(mangohud)
         if sc_controller_enabled and sc_controller:
             command_parts.append(sc_controller)
-    command_parts.append(os.path.expanduser(f"WINEPREFIX={default_prefix}/default"))
+    command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append('GAMEID=default')
     if default_runner:
         command_parts.append(f'PROTONPATH={default_runner}')

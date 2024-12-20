@@ -123,11 +123,11 @@ class FaugusRun:
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
                 if "PROTONPATH" not in self.message:
-                    self.message = f'WINEPREFIX={self.default_prefix}/default PROTONPATH={self.default_runner} {self.message}'
+                    self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
                 else:
-                    self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
+                    self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
             else:
-                self.message = f'WINEPREFIX={self.default_prefix}/default {self.message}'
+                self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
         if "gamemoderun" in self.message:
             self.set_ld_preload()
             self.message = f'LD_PRELOAD={self.ld_preload} {self.message}'
