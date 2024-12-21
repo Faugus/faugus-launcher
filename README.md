@@ -46,11 +46,6 @@ sudo rm -r ~/faugus-launcher
 sudo apt -y install mangohud
 sudo apt -y install gamemode
 ```
-ATTENTION: If you get the following message when trying to run something
-```
-pressure-vessel-wrap[2264]: E: Child process exited with code 1: bwrap: setting up uid map: Permission denied
-```
-It's the AppArmor preventing umu-launcher from working properly. <a href='https://gist.github.com/Faugus/8d3caa3ce93eb1ff90409f3c3dbabe0f' target='_blank'>FIX
 
 ### Flatpak (EXPERIMENTAL)
 Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.2.5/faugus-launcher-0.2.5-1.flatpak">faugus-launcher-0.2.5-1.flatpak</a> and run:
@@ -104,22 +99,8 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/a6d30723-6120-4c75-9f13-d183696f8b3f/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/449b3b01-2fd0-47c7-b5b1-eb2759fd5139/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/857b5bbb-c8bf-4a4e-aeab-517c193cc04c/><br>
+<img src=https://github.com/user-attachments/assets/2a7dfc31-1f79-48b7-bba6-dbb28006de68/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/4b250388-b6df-4af0-982f-9da9f06dc1af/><br>
 ### Create shortcut from .exe
 <img src=https://github.com/user-attachments/assets/f5a65466-b610-42e4-831e-ab3b696c6ab5/><br>
-
-## Light theme
-### Main window
-<img src=https://github.com/user-attachments/assets/5954722d-63d2-4626-a7e3-81c24b488b94/><br><br>
-<img src=https://github.com/user-attachments/assets/b5193602-ffca-4e13-bb14-a586cc680689/><br><br>
-<img src=https://github.com/user-attachments/assets/44f576c4-b51e-481c-aa39-d7d60ba83c69/><br>
-### Add/Edit game
-<img src=https://github.com/user-attachments/assets/f940c1f9-a207-42a8-a690-3c1a7497cb0e/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/10862bfa-cf8e-45b3-a174-4e1475891e56/><br>
-### Settings
-<img src=https://github.com/user-attachments/assets/f076fc73-2cbf-438d-98a7-c200224292dc/><br>
-### GE-Proton Manager
-<img src=https://github.com/user-attachments/assets/1e38d572-d1df-48fd-bafb-26310c1c9932/><br>
-### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/3f22a1ca-e47c-443d-94f1-d669fd069240/>
