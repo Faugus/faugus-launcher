@@ -101,6 +101,6 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 ### Settings
 <img src=https://github.com/user-attachments/assets/2a7dfc31-1f79-48b7-bba6-dbb28006de68/><br>
 ### GE-Proton Manager
-<img src=https://github.com/user-attachments/assets/4b250388-b6df-4af0-982f-9da9f06dc1af/><br>
+<img src=https://github.com/user-attachments/assets/c46f90ac-7713-46bf-8795-33d3917fb48e/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/f5a65466-b610-42e4-831e-ab3b696c6ab5/><br>
+<img src=https://github.com/user-attachments/assets/828aac17-6aa5-4d29-a908-dbbc8a5604d5/><br>
