@@ -5254,7 +5254,7 @@ class CreateShortcut(Gtk.Window):
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            self.entry_addapp.set_text(dialog.get_filename())
+            self.entry_addapp.set_text(filechooser.get_filename())
 
         dialog.destroy()
 
