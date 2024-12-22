@@ -47,6 +47,22 @@ sudo apt -y install mangohud
 sudo apt -y install gamemode
 ```
 
+### openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
+```
+# Tumbleweed
+sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Tumbleweed/ home:Rabbit95
+sudo zypper --gpg-auto-import-keys install -y faugus-launcher
+```
+```
+# Leap 15.5
+sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Leap_15.5/ home:Rabbit95
+sudo zypper --gpg-auto-import-keys install -y faugus-launcher
+```
+```
+# Optional tools
+sudo zypper install -y mangohud
+```
+
 ### Flatpak (EXPERIMENTAL)
 Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.2.5/faugus-launcher-0.2.5-2.flatpak">faugus-launcher-0.2.5-2.flatpak</a> and run:
 ```
