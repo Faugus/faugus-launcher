@@ -26,7 +26,6 @@ sudo dnf -y install faugus-launcher
 # Optional tools
 sudo dnf -y install mangohud
 sudo dnf -y install gamemode
-sudo dnf -y install sc-controller
 ```
 
 ### Debian-based distributions
