@@ -1725,7 +1725,7 @@ class Main(Gtk.Window):
                         return False
                     raise
 
-            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
+            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0 and add_game_dialog.combo_box_launcher.get_active() != 1:
                 self.show_warning_dialog(add_game_dialog, "No internet connection.")
                 return True
             else:
