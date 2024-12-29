@@ -5779,16 +5779,29 @@ PREFER_OUTPUT=
 ADAPTIVE_SYNC=
 
 # HDR. Set 1 to enable
-HDR=
+HDR_SUPPORT=
 """
         with open(session_file, "w") as f:
             f.write(default_content)
+
+def update_hdr_setting():
+    session_file = os.path.join(faugus_launcher_dir, "session.ini")
+
+    if os.path.exists(session_file):
+        with open(session_file, "r+") as f:
+            content = f.read()
+            updated_content = content.replace("HDR=", "HDR_SUPPORT=")
+            if content != updated_content:
+                f.seek(0)
+                f.write(updated_content)
+                f.truncate()
 
 def main():
     global faugus_session
 
     # Ensure session.ini exists
     ensure_session_ini()
+    update_hdr_setting()
 
     # Your existing setup
     convert_games_txt_to_json(games_txt, games_json)

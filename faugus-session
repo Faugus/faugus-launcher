@@ -10,7 +10,7 @@ INTERNAL_WIDTH=$(grep -i "INTERNAL_WIDTH" "$SESSION_FILE" | cut -d'=' -f2 | xarg
 INTERNAL_HEIGHT=$(grep -i "INTERNAL_HEIGHT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
 REFRESH_RATE=$(grep -i "REFRESH_RATE" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
 ADAPTIVE_SYNC=$(grep -i "ADAPTIVE_SYNC" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-HDR=$(grep -i "HDR" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+HDR_SUPPORT=$(grep -i "HDR_SUPPORT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
 PREFER_OUTPUT=$(grep -i "PREFER_OUTPUT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
 
 GAMESCOPE_PARAMS=""
@@ -43,7 +43,7 @@ if [ "$ADAPTIVE_SYNC" == 1 ]; then
     GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --adaptive-sync"
 fi
 
-if [ "$HDR" == 1 ]; then
+if [ "$HDR_SUPPORT" == 1 ]; then
     GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --hdr-enabled"
 fi
 
