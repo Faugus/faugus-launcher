@@ -1705,39 +1705,8 @@ class Main(Gtk.Window):
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
-            game_info = {
-                "title": title,
-                "path": path,
-                "prefix": prefix,
-                "launch_arguments": launch_arguments,
-                "game_arguments": game_arguments,
-                "mangohud": mangohud,
-                "gamemode": gamemode,
-                "sc_controller": sc_controller,
-                "protonfix": protonfix,
-                "runner": runner,
-                "addapp_checkbox": addapp_checkbox,
-                "addapp": addapp,
-                "addapp_bat": addapp_bat,
-                "banner": banner,
-            }
-
-            games = []
-            if os.path.exists("games.json"):
-                try:
-                    with open("games.json", "r", encoding="utf-8") as file:
-                        games = json.load(file)
-                except json.JSONDecodeError as e:
-                    print(f"Error reading the JSON file: {e}")
-
-            games.append(game_info)
-
-            with open("games.json", "w", encoding="utf-8") as file:
-                json.dump(games, file, ensure_ascii=False, indent=4)
-
             # Create Game object and update UI
             game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
-            self.games.append(game)
 
             # Determine the state of the shortcut checkbox
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
@@ -1775,6 +1744,38 @@ class Main(Gtk.Window):
                 if add_game_dialog.combo_box_launcher.get_active() == 5:
                     add_game_dialog.destroy()
                     self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+
+            game_info = {
+                "title": title,
+                "path": path,
+                "prefix": prefix,
+                "launch_arguments": launch_arguments,
+                "game_arguments": game_arguments,
+                "mangohud": mangohud,
+                "gamemode": gamemode,
+                "sc_controller": sc_controller,
+                "protonfix": protonfix,
+                "runner": runner,
+                "addapp_checkbox": addapp_checkbox,
+                "addapp": addapp,
+                "addapp_bat": addapp_bat,
+                "banner": banner,
+            }
+
+            games = []
+            if os.path.exists("games.json"):
+                try:
+                    with open("games.json", "r", encoding="utf-8") as file:
+                        games = json.load(file)
+                except json.JSONDecodeError as e:
+                    print(f"Error reading the JSON file: {e}")
+
+            games.append(game_info)
+
+            with open("games.json", "w", encoding="utf-8") as file:
+                json.dump(games, file, ensure_ascii=False, indent=4)
+
+            self.games.append(game)
 
             if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
@@ -2142,7 +2143,6 @@ class Main(Gtk.Window):
 
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
-        print(addapp)
         if addapp == "addapp_enabled":
             command_parts.append(f"'{addapp_bat}'")
         elif path:
@@ -3226,7 +3226,6 @@ class Settings(Gtk.Dialog):
             self.entry_api_key.set_text(self.api_key)
         else:
             # Save default configuration if file does not exist
-            print("else")
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
 
