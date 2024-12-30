@@ -1725,25 +1725,26 @@ class Main(Gtk.Window):
                         return False
                     raise
 
-            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0 and add_game_dialog.combo_box_launcher.get_active() != 1:
-                self.show_warning_dialog(add_game_dialog, "No internet connection.")
-                return True
-            else:
-                if add_game_dialog.combo_box_launcher.get_active() == 2:
-                    add_game_dialog.destroy()
-                    self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+            if add_game_dialog.combo_box_launcher.get_active() != 0 and add_game_dialog.combo_box_launcher.get_active() != 1:
+                if not check_internet_connection():
+                    self.show_warning_dialog(add_game_dialog, "No internet connection.")
+                    return True
+                else:
+                    if add_game_dialog.combo_box_launcher.get_active() == 2:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-                if add_game_dialog.combo_box_launcher.get_active() == 3:
-                    add_game_dialog.destroy()
-                    self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+                    if add_game_dialog.combo_box_launcher.get_active() == 3:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-                if add_game_dialog.combo_box_launcher.get_active() == 4:
-                    add_game_dialog.destroy()
-                    self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+                    if add_game_dialog.combo_box_launcher.get_active() == 4:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
-                if add_game_dialog.combo_box_launcher.get_active() == 5:
-                    add_game_dialog.destroy()
-                    self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+                    if add_game_dialog.combo_box_launcher.get_active() == 5:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
             game_info = {
                 "title": title,
