@@ -1705,47 +1705,6 @@ class Main(Gtk.Window):
             sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
-            # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
-
-            # Determine the state of the shortcut checkbox
-            shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
-
-            icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
-            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
-
-            def check_internet_connection():
-                try:
-                    socket.create_connection(("8.8.8.8", 53), timeout=5)
-                    return True
-                except socket.gaierror:
-                    return False
-                except OSError as e:
-                    if e.errno == 101:
-                        return False
-                    raise
-
-            if add_game_dialog.combo_box_launcher.get_active() != 0 and add_game_dialog.combo_box_launcher.get_active() != 1:
-                if not check_internet_connection():
-                    self.show_warning_dialog(add_game_dialog, "No internet connection.")
-                    return True
-                else:
-                    if add_game_dialog.combo_box_launcher.get_active() == 2:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combo_box_launcher.get_active() == 3:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combo_box_launcher.get_active() == 4:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combo_box_launcher.get_active() == 5:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
-
             game_info = {
                 "title": title,
                 "path": path,
@@ -1776,7 +1735,46 @@ class Main(Gtk.Window):
             with open("games.json", "w", encoding="utf-8") as file:
                 json.dump(games, file, ensure_ascii=False, indent=4)
 
+            # Create Game object and update UI
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
             self.games.append(game)
+
+            # Determine the state of the shortcut checkbox
+            shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
+
+            icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
+            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
+
+            def check_internet_connection():
+                try:
+                    socket.create_connection(("8.8.8.8", 53), timeout=5)
+                    return True
+                except socket.gaierror:
+                    return False
+                except OSError as e:
+                    if e.errno == 101:
+                        return False
+                    raise
+
+            if not check_internet_connection() and add_game_dialog.combo_box_launcher.get_active() != 0:
+                self.show_warning_dialog(add_game_dialog, "No internet connection.")
+                return True
+            else:
+                if add_game_dialog.combo_box_launcher.get_active() == 2:
+                    add_game_dialog.destroy()
+                    self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 3:
+                    add_game_dialog.destroy()
+                    self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 4:
+                    add_game_dialog.destroy()
+                    self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
+
+                if add_game_dialog.combo_box_launcher.get_active() == 5:
+                    add_game_dialog.destroy()
+                    self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state, icon_temp, icon_final)
 
             if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
@@ -1911,6 +1909,15 @@ class Main(Gtk.Window):
             self.box_main.remove(self.box_launcher)
             self.box_launcher.destroy()
             self.box_main.show_all()
+            if self.interface_mode != "List":
+                if self.fullscreen_activated or faugus_session:
+                    self.fullscreen_activated = True
+                    self.grid_corner.set_visible(True)
+                    self.grid_left.set_margin_start(70)
+                else:
+                    self.fullscreen_activated = False
+                    self.grid_corner.set_visible(False)
+                    self.grid_left.set_margin_start(0)
 
             return False
 
@@ -1978,23 +1985,23 @@ class Main(Gtk.Window):
         return file_path
 
     def select_game_by_title(self, title):
-        # Seleciona um item do FlowBox com base no título
+        # Selects an item from the FlowBox based on the title
         for child in self.flowbox.get_children():
-            hbox = child.get_children()[0]  # O primeiro item é o hbox que contém o label
-            game_label = hbox.get_children()[1]  # O segundo item é o label do título
+            hbox = child.get_children()[0]  # The first item is the hbox containing the label
+            game_label = hbox.get_children()[1]  # The second item is the title label
             if game_label.get_text() == title:
-                # Seleciona o child no FlowBox
+                # Selects the child in the FlowBox
                 self.flowbox.select_child(child)
                 break
 
-        # Atualiza a interface dos botões
+        # Updates the interface of the buttons
         self.button_edit.set_sensitive(True)
         self.button_delete.set_sensitive(True)
         self.button_play.set_sensitive(True)
         self.button_play.set_image(
             Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
-        # Chama o método de seleção do item para garantir que os botões estejam atualizados
+        # Calls the item selection method to ensure the buttons are updated
         self.on_item_selected(self.flowbox, child)
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
@@ -2144,6 +2151,7 @@ class Main(Gtk.Window):
 
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
+        print(addapp)
         if addapp == "addapp_enabled":
             command_parts.append(f"'{addapp_bat}'")
         elif path:
@@ -3227,6 +3235,7 @@ class Settings(Gtk.Dialog):
             self.entry_api_key.set_text(self.api_key)
         else:
             # Save default configuration if file does not exist
+            print("else")
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
 
 
@@ -5254,7 +5263,7 @@ class CreateShortcut(Gtk.Window):
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            self.entry_addapp.set_text(filechooser.get_filename())
+            self.entry_addapp.set_text(dialog.get_filename())
 
         dialog.destroy()
 
@@ -5780,29 +5789,16 @@ PREFER_OUTPUT=
 ADAPTIVE_SYNC=
 
 # HDR. Set 1 to enable
-HDR_SUPPORT=
+HDR=
 """
         with open(session_file, "w") as f:
             f.write(default_content)
-
-def update_hdr_setting():
-    session_file = os.path.join(faugus_launcher_dir, "session.ini")
-
-    if os.path.exists(session_file):
-        with open(session_file, "r+") as f:
-            content = f.read()
-            updated_content = content.replace("HDR=", "HDR_SUPPORT=")
-            if content != updated_content:
-                f.seek(0)
-                f.write(updated_content)
-                f.truncate()
 
 def main():
     global faugus_session
 
     # Ensure session.ini exists
     ensure_session_ini()
-    update_hdr_setting()
 
     # Your existing setup
     convert_games_txt_to_json(games_txt, games_json)
