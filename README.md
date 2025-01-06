@@ -8,7 +8,7 @@ A simple and lightweight app for running Windows games using [UMU-Launcher](http
 # Installation
 ### Arch-based distributions (AUR)
 ```
-yay -S --noconfirm faugus-launcher-git
+yay -S --noconfirm faugus-launcher
 ```
 ```
 # Optional tools
