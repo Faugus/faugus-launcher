@@ -20,6 +20,7 @@ gi.require_version('AyatanaAppIndicator3', '0.1')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio
 from PIL import Image
+from filelock import FileLock, Timeout
 
 xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
 data_dirs = xdg_data_dirs.split(':')
@@ -51,8 +52,8 @@ latest_games = f'{faugus_launcher_dir}/latest-games.txt'
 faugus_launcher_share_dir = f"{share_dir}/faugus-launcher"
 faugus_temp = os.path.expanduser('~/faugus_temp')
 
-lock_file_path = f"{faugus_launcher_share_dir}/faugus_launcher.lock"
-lock_file = None
+lock_file_path = f"{faugus_launcher_share_dir}/faugus-launcher.lock"
+lock = FileLock(lock_file_path)
 
 faugus_session = False
 
@@ -61,20 +62,11 @@ if not os.path.exists(faugus_launcher_share_dir):
     os.makedirs(faugus_launcher_share_dir)
 
 def is_already_running():
-    current_pid = str(os.getpid())
-
-    if os.path.exists(lock_file_path):
-        with open(lock_file_path, 'r') as lock_file:
-            lock_pid = lock_file.read().strip()
-            try:
-                os.kill(int(lock_pid), 0)
-                return True
-            except OSError:
-                pass
-
-    with open(lock_file_path, 'w') as lock_file:
-        lock_file.write(current_pid)
-    return False
+    try:
+        lock.acquire(timeout=1)
+        return False
+    except Timeout:
+        return True
 
 def get_desktop_dir():
     try:
@@ -607,8 +599,8 @@ class Main(Gtk.Window):
         if self.gamepad_process:
             self.gamepad_process.terminate()
             self.gamepad_process.wait()
-        if os.path.exists(lock_file_path):
-            os.remove(lock_file_path)
+        if lock.is_locked:
+            lock.release()
         Gtk.main_quit()
 
     def on_button_bye_clicked(self, widget):
@@ -643,9 +635,8 @@ class Main(Gtk.Window):
         subprocess.run(["loginctl", "terminate-user", os.getlogin()])
 
     def on_close(self, widget):
-        if os.path.exists(lock_file_path):
-                os.remove(lock_file_path)
-
+        if lock.is_locked:
+            lock.release()
         Gtk.main_quit()
 
     def on_item_right_click(self, widget, event):
@@ -898,10 +889,8 @@ class Main(Gtk.Window):
         self.present()
 
     def on_quit_activate(self, widget):
-        if os.path.exists(lock_file_path):
-                os.remove(lock_file_path)
-
-        # Quit the application
+        if lock.is_locked:
+            lock.release()
         Gtk.main_quit()
 
     def load_games(self):
@@ -1356,8 +1345,8 @@ class Main(Gtk.Window):
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
-            if os.path.exists(lock_file_path):
-                    os.remove(lock_file_path)
+            if lock.is_locked:
+                lock.release()
 
             # Launch the game with subprocess
             if self.load_close_onlaunch() and not faugus_session:
