@@ -54,8 +54,8 @@ sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/op
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 ```
-# Leap 15.5
-sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Leap_15.5/ home:Rabbit95
+# Slowroll
+sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 ```
