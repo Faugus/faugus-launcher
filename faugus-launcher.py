@@ -3404,7 +3404,6 @@ class DuplicateDialog(Gtk.Dialog):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
         if faugus_session:
             dialog.fullscreen()
 
