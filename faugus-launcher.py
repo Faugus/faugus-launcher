@@ -705,7 +705,7 @@ class Main(Gtk.Window):
                 new_title = duplicate_dialog.entry_title.get_text()
 
                 if any(new_title == game.title for game in self.games):
-                    self.show_warning_dialog(duplicate_dialog, f"{title} already exists.")
+                    duplicate_dialog.show_warning_dialog(duplicate_dialog, f"{title} already exists.")
                 else:
                     title_formatted_old = re.sub(r'[^a-zA-Z0-9\s]', '', title)
                     title_formatted_old = title_formatted_old.replace(' ', '-')
@@ -3357,7 +3357,6 @@ class DuplicateDialog(Gtk.Dialog):
         super().__init__(title=f"Duplicate {title}", transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
         if faugus_session:
             self.fullscreen()
 
@@ -3407,6 +3406,7 @@ class DuplicateDialog(Gtk.Dialog):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
         if faugus_session:
             dialog.fullscreen()
 
