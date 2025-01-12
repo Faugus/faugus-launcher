@@ -723,8 +723,11 @@ class Main(Gtk.Window):
                     new_icon = f"{icons_dir}/{title_formatted}.ico"
                     new_banner = os.path.join(os.path.dirname(banner), f"{title_formatted}.png")
 
-                    shutil.copy(icon, new_icon)
-                    shutil.copy(banner, new_banner)
+                    if os.path.exists(icon):
+                        shutil.copy(icon, new_icon)
+
+                    if os.path.exists(banner):
+                        shutil.copy(banner, new_banner)
 
                     game.banner = new_banner
 
