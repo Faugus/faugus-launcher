@@ -199,6 +199,10 @@ class Main(Gtk.Window):
         menu_item_delete.connect("activate", self.on_context_menu_delete)
         self.context_menu.append(menu_item_delete)
 
+        menu_item_duplicate = Gtk.MenuItem(label="Duplicate")
+        menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
+        self.context_menu.append(menu_item_duplicate)
+
         self.menu_item_prefix = Gtk.MenuItem(label="Open prefix location")
         self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
         self.context_menu.append(self.menu_item_prefix)
@@ -674,9 +678,99 @@ class Main(Gtk.Window):
         selected_item = self.flowbox.get_selected_children()[0]
         self.on_button_delete_clicked(selected_item)
 
+    def on_context_menu_duplicate(self, menu_item):
+        selected_item = self.flowbox.get_selected_children()[0]
+        self.on_duplicate_clicked(selected_item)
+
     def on_context_menu_prefix(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
         subprocess.run(["xdg-open", self.current_prefix], check=True)
+
+    def on_duplicate_clicked(self, widget):
+        selected_children = self.flowbox.get_selected_children()
+        selected_child = selected_children[0]
+        hbox = selected_child.get_child()
+        game_label = hbox.get_children()[1]
+        title = game_label.get_text()
+
+        # Display duplicate dialog
+        duplicate_dialog = DuplicateDialog(self, title)
+
+        game = next((g for g in self.games if g.title == title), None)
+
+        while True:
+            response = duplicate_dialog.run()
+
+            if response == Gtk.ResponseType.OK:
+                new_title = duplicate_dialog.entry_title.get_text()
+
+                if any(new_title == game.title for game in self.games):
+                    self.show_warning_dialog(duplicate_dialog, f"{title} already exists.")
+                else:
+                    title_formatted_old = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+                    title_formatted_old = title_formatted_old.replace(' ', '-')
+                    title_formatted_old = '-'.join(title_formatted_old.lower().split())
+
+                    icon = f"{icons_dir}/{title_formatted_old}.ico"
+                    banner = game.banner
+
+                    game.title = new_title
+
+                    title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+                    title_formatted = title_formatted.replace(' ', '-')
+                    title_formatted = '-'.join(title_formatted.lower().split())
+
+                    new_icon = f"{icons_dir}/{title_formatted}.ico"
+                    new_banner = os.path.join(os.path.dirname(banner), f"{title_formatted}.png")
+
+                    shutil.copy(icon, new_icon)
+                    shutil.copy(banner, new_banner)
+
+                    game.banner = new_banner
+
+                    game_info = {
+                        "title": game.title,
+                        "path": game.path,
+                        "prefix": game.prefix,
+                        "launch_arguments": game.launch_arguments,
+                        "game_arguments": game.game_arguments,
+                        "mangohud": game.mangohud,
+                        "gamemode": game.gamemode,
+                        "sc_controller": game.sc_controller,
+                        "protonfix": game.protonfix,
+                        "runner": game.runner,
+                        "addapp_checkbox": game.addapp_checkbox,
+                        "addapp": game.addapp,
+                        "addapp_bat": game.addapp_bat,
+                        "banner": game.banner,
+                    }
+
+                    games = []
+                    if os.path.exists("games.json"):
+                        try:
+                            with open("games.json", "r", encoding="utf-8") as file:
+                                games = json.load(file)
+                        except json.JSONDecodeError as e:
+                            print(f"Error reading the JSON file: {e}")
+
+                    games.append(game_info)
+
+                    with open("games.json", "w", encoding="utf-8") as file:
+                        json.dump(games, file, ensure_ascii=False, indent=4)
+
+                    self.games.append(game)
+                    self.add_item_list(game)
+                    self.update_list()
+
+                    # Select the added game
+                    self.select_game_by_title(new_title)
+
+                    break
+
+            else:
+                break
+
+        duplicate_dialog.destroy()
 
     def on_item_release_event(self, widget, event):
         if event.button == Gdk.BUTTON_PRIMARY:
@@ -886,6 +980,15 @@ class Main(Gtk.Window):
     def restore_window(self, widget):
         # Restore the window when clicking the tray icon
         self.show_all()
+        if self.interface_mode != "List":
+            if self.fullscreen_activated or faugus_session:
+                self.fullscreen_activated = True
+                self.grid_corner.set_visible(True)
+                self.grid_left.set_margin_start(70)
+            else:
+                self.fullscreen_activated = False
+                self.grid_corner.set_visible(False)
+                self.grid_left.set_margin_start(0)
         self.present()
 
     def on_quit_activate(self, widget):
@@ -3246,6 +3349,100 @@ class Game:
         self.addapp_bat = addapp_bat
         self.banner = banner
 
+class DuplicateDialog(Gtk.Dialog):
+    def __init__(self, parent, title):
+        super().__init__(title=f"Duplicate {title}", transient_for=parent, modal=True)
+        self.set_resizable(False)
+        self.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
+        if faugus_session:
+            self.fullscreen()
+
+        label_title = Gtk.Label(label="Title")
+        label_title.set_halign(Gtk.Align.START)
+        self.entry_title = Gtk.Entry()
+        self.entry_title.set_tooltip_text("Game Title")
+
+        button_cancel = Gtk.Button(label="Cancel")
+        button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_ok = Gtk.Button(label="Ok")
+        button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
+        button_ok.set_size_request(150, -1)
+
+        content_area = self.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(10)
+        box_top.set_margin_end(10)
+        box_top.set_margin_top(10)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label_title, True, True, 0)
+        box_top.pack_start(self.entry_title, True, True, 0)
+
+        box_bottom.pack_start(button_cancel, True, True, 0)
+        box_bottom.pack_start(button_ok, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        self.show_all()
+
+    def show_warning_dialog(self, parent, title):
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        if faugus_session:
+            dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(title)
+        label.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label="Ok")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog.destroy())
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
 class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix):
@@ -3253,7 +3450,6 @@ class ConfirmationDialog(Gtk.Dialog):
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
-        print(faugus_session)
         if faugus_session:
             self.fullscreen()
 
