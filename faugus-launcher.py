@@ -146,6 +146,30 @@ class Main(Gtk.Window):
         )
         self.check_theme()
 
+        self.context_menu = Gtk.Menu()
+
+        self.menu_item_play = Gtk.MenuItem(label="Play")
+        self.menu_item_play.connect("activate", self.on_context_menu_play)
+        self.context_menu.append(self.menu_item_play)
+
+        self.menu_item_edit = Gtk.MenuItem(label="Edit")
+        self.menu_item_edit.connect("activate", self.on_context_menu_edit)
+        self.context_menu.append(self.menu_item_edit)
+
+        self.menu_item_delete = Gtk.MenuItem(label="Delete")
+        self.menu_item_delete.connect("activate", self.on_context_menu_delete)
+        self.context_menu.append(self.menu_item_delete)
+
+        menu_item_duplicate = Gtk.MenuItem(label="Duplicate")
+        menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
+        self.context_menu.append(menu_item_duplicate)
+
+        self.menu_item_prefix = Gtk.MenuItem(label="Open prefix location")
+        self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
+        self.context_menu.append(self.menu_item_prefix)
+
+        self.context_menu.show_all()
+
         self.load_config()
         if self.interface_mode == "List":
             self.small_interface()
@@ -172,6 +196,8 @@ class Main(Gtk.Window):
             self.interface_mode = "List"
             self.small_interface()
 
+        self.flowbox.connect("button-press-event", self.on_item_right_click)
+
         # Create the tray indicator
         self.indicator = AyatanaAppIndicator3.Indicator.new(
             "Faugus Launcher",  # Application name
@@ -184,31 +210,6 @@ class Main(Gtk.Window):
         if self.system_tray:
             self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
             self.connect("delete-event", self.on_window_delete_event)
-
-        self.context_menu = Gtk.Menu()
-
-        menu_item_play = Gtk.MenuItem(label="Play")
-        menu_item_play.connect("activate", self.on_context_menu_play)
-        self.context_menu.append(menu_item_play)
-
-        menu_item_edit = Gtk.MenuItem(label="Edit")
-        menu_item_edit.connect("activate", self.on_context_menu_edit)
-        self.context_menu.append(menu_item_edit)
-
-        menu_item_delete = Gtk.MenuItem(label="Delete")
-        menu_item_delete.connect("activate", self.on_context_menu_delete)
-        self.context_menu.append(menu_item_delete)
-
-        menu_item_duplicate = Gtk.MenuItem(label="Duplicate")
-        menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
-        self.context_menu.append(menu_item_duplicate)
-
-        self.menu_item_prefix = Gtk.MenuItem(label="Open prefix location")
-        self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
-        self.context_menu.append(self.menu_item_prefix)
-
-        self.context_menu.show_all()
-        self.flowbox.connect("button-press-event", self.on_item_right_click)
 
         self.game_running2 = False
 
@@ -238,15 +239,13 @@ class Main(Gtk.Window):
             self.theme = "hbox-light-background"
 
     def small_interface(self):
-        self.set_default_size(400, 620)
+        self.set_default_size(-1, 610)
         self.set_resizable(False)
         self.big_interface_active = False
 
         # Create main box and its components
         self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box_top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_bottom = Gtk.Box()
 
         # Create buttons for adding, editing, and deleting games
@@ -256,7 +255,7 @@ class Main(Gtk.Window):
         self.button_add.set_size_request(50, 50)
         self.button_add.set_margin_top(10)
         self.button_add.set_margin_start(10)
-        self.button_add.set_margin_end(10)
+        self.button_add.set_margin_bottom(10)
 
         label_add = Gtk.Label(label="New")
         label_add.set_margin_start(0)
@@ -265,38 +264,6 @@ class Main(Gtk.Window):
         label_add.set_margin_bottom(0)
 
         self.button_add.add(label_add)
-
-        self.button_edit = Gtk.Button()
-        self.button_edit.connect("clicked", self.on_button_edit_clicked)
-        self.button_edit.set_can_focus(False)
-        self.button_edit.set_size_request(50, 50)
-        self.button_edit.set_margin_top(10)
-        self.button_edit.set_margin_start(10)
-        self.button_edit.set_margin_end(10)
-
-        label_edit = Gtk.Label(label="Edit")
-        label_edit.set_margin_start(0)
-        label_edit.set_margin_end(0)
-        label_edit.set_margin_top(0)
-        label_edit.set_margin_bottom(0)
-
-        self.button_edit.add(label_edit)
-
-        self.button_delete = Gtk.Button()
-        self.button_delete.connect("clicked", self.on_button_delete_clicked)
-        self.button_delete.set_can_focus(False)
-        self.button_delete.set_size_request(50, 50)
-        self.button_delete.set_margin_top(10)
-        self.button_delete.set_margin_start(10)
-        self.button_delete.set_margin_end(10)
-
-        label_delete = Gtk.Label(label="Del")
-        label_delete.set_margin_start(0)
-        label_delete.set_margin_end(0)
-        label_delete.set_margin_top(0)
-        label_delete.set_margin_bottom(0)
-
-        self.button_delete.add(label_delete)
 
         # Create button for killing processes
         button_kill = Gtk.Button()
@@ -330,7 +297,7 @@ class Main(Gtk.Window):
         self.button_play = Gtk.Button()
         self.button_play.connect("clicked", self.on_button_play_clicked)
         self.button_play.set_can_focus(False)
-        self.button_play.set_size_request(150, 50)
+        self.button_play.set_size_request(50, 50)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         self.button_play.set_margin_top(10)
         self.button_play.set_margin_end(10)
@@ -340,7 +307,7 @@ class Main(Gtk.Window):
         self.entry_search.set_placeholder_text("Search...")
         self.entry_search.connect("changed", self.on_search_changed)
 
-        self.entry_search.set_size_request(-1, 50)
+        self.entry_search.set_size_request(170, 50)
         self.entry_search.set_margin_top(10)
         self.entry_search.set_margin_start(10)
         self.entry_search.set_margin_bottom(10)
@@ -349,6 +316,7 @@ class Main(Gtk.Window):
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll_box.set_margin_start(10)
         scroll_box.set_margin_top(10)
         scroll_box.set_margin_end(10)
 
@@ -358,22 +326,16 @@ class Main(Gtk.Window):
         self.flowbox.set_valign(Gtk.Align.START)
         self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
+        self.flowbox.set_halign(Gtk.Align.FILL)
 
         scroll_box.add(self.flowbox)
         self.load_games()
 
         # Pack left and scrolled box into the top box
-        self.box_top.pack_start(box_left, False, True, 0)
-        self.box_top.pack_start(box_right, True, True, 0)
-
-        # Pack buttons into the left box
-        box_left.pack_start(self.button_add, False, False, 0)
-        box_left.pack_start(self.button_edit, False, False, 0)
-        box_left.pack_start(self.button_delete, False, False, 0)
-
-        box_right.pack_start(scroll_box, True, True, 0)
+        self.box_top.pack_start(scroll_box, True, True, 0)
 
         # Pack buttons and other components into the bottom box
+        self.box_bottom.pack_start(self.button_add, False, False, 0)
         self.box_bottom.pack_start(button_settings, False, False, 0)
         self.box_bottom.pack_start(self.entry_search, True, True, 0)
         self.box_bottom.pack_end(self.button_play, False, False, 0)
@@ -384,8 +346,9 @@ class Main(Gtk.Window):
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
 
-        self.button_edit.set_sensitive(False)
-        self.button_delete.set_sensitive(False)
+        self.menu_item_edit.set_sensitive(False)
+        self.menu_item_delete.set_sensitive(False)
+        self.menu_item_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
         if self.flowbox.get_children():
@@ -422,46 +385,12 @@ class Main(Gtk.Window):
 
         self.button_add.add(label_add)
 
-        self.button_edit = Gtk.Button()
-        self.button_edit.connect("clicked", self.on_button_edit_clicked)
-        self.button_edit.set_can_focus(False)
-        self.button_edit.set_size_request(50, 50)
-        self.button_edit.set_margin_top(10)
-        self.button_edit.set_margin_start(10)
-        self.button_edit.set_margin_bottom(10)
-
-        label_edit = Gtk.Label(label="Edit")
-        label_edit.set_margin_start(0)
-        label_edit.set_margin_end(0)
-        label_edit.set_margin_top(0)
-        label_edit.set_margin_bottom(0)
-
-        self.button_edit.add(label_edit)
-
-        self.button_delete = Gtk.Button()
-        self.button_delete.connect("clicked", self.on_button_delete_clicked)
-        self.button_delete.set_can_focus(False)
-        self.button_delete.set_size_request(50, 50)
-        self.button_delete.set_margin_top(10)
-        self.button_delete.set_margin_start(10)
-        self.button_delete.set_margin_end(10)
-        self.button_delete.set_margin_bottom(10)
-
-        label_delete = Gtk.Label(label="Del")
-        label_delete.set_margin_start(0)
-        label_delete.set_margin_end(0)
-        label_delete.set_margin_top(0)
-        label_delete.set_margin_bottom(0)
-
-        self.button_delete.add(label_delete)
-
         # Create button for killing processes
         button_kill = Gtk.Button()
         button_kill.connect("clicked", self.on_button_kill_clicked)
         button_kill.set_can_focus(False)
         button_kill.set_tooltip_text("Force close all running games")
         button_kill.set_size_request(50, 50)
-        button_kill.set_margin_start(10)
         button_kill.set_margin_top(10)
         button_kill.set_margin_bottom(10)
 
@@ -518,9 +447,9 @@ class Main(Gtk.Window):
 
         self.entry_search.set_size_request(170, 50)
         self.entry_search.set_margin_top(10)
-        self.entry_search.set_margin_start(20)
+        self.entry_search.set_margin_start(10)
         self.entry_search.set_margin_bottom(10)
-        self.entry_search.set_margin_end(20)
+        self.entry_search.set_margin_end(10)
 
         self.grid_left = Gtk.Grid()
         self.grid_left.get_style_context().add_class(self.theme)
@@ -528,8 +457,7 @@ class Main(Gtk.Window):
         self.grid_left.set_halign(Gtk.Align.END)
 
         self.grid_left.add(self.button_add)
-        self.grid_left.add(self.button_edit)
-        self.grid_left.add(self.button_delete)
+        self.grid_left.add(button_settings)
 
         grid_middle = Gtk.Grid()
         grid_middle.get_style_context().add_class(self.theme)
@@ -541,7 +469,6 @@ class Main(Gtk.Window):
         grid_right.set_hexpand(True)
         grid_right.set_halign(Gtk.Align.START)
 
-        grid_right.add(button_settings)
         grid_right.add(button_kill)
         grid_right.add(self.button_play)
 
@@ -580,8 +507,9 @@ class Main(Gtk.Window):
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
 
-        self.button_edit.set_sensitive(False)
-        self.button_delete.set_sensitive(False)
+        self.menu_item_edit.set_sensitive(False)
+        self.menu_item_delete.set_sensitive(False)
+        self.menu_item_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
         if self.flowbox.get_children():
@@ -1040,13 +968,11 @@ class Main(Gtk.Window):
 
         if self.interface_mode == "List":
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            hbox.set_size_request(400, -1)
         if self.interface_mode == "Blocks":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             hbox.set_size_request(300, 200)
         if self.interface_mode == "Banners":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            #hbox.set_size_request(200, 300)
 
         hbox.get_style_context().add_class(self.theme)
 
@@ -1085,6 +1011,10 @@ class Main(Gtk.Window):
             game_label.set_margin_bottom(10)
             hbox.pack_start(image, False, False, 0)
             hbox.pack_start(game_label, False, False, 0)
+            self.flowbox_child.set_size_request(300,-1)
+            self.flowbox.set_homogeneous(True)
+            self.flowbox_child.set_valign(Gtk.Align.START)
+            self.flowbox_child.set_halign(Gtk.Align.FILL)
         if self.interface_mode == "Blocks":
             scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(game_icon)
@@ -1093,6 +1023,8 @@ class Main(Gtk.Window):
             hbox.pack_start(game_label, True, True, 0)
             game_label.set_margin_end(20)
             game_label.set_margin_start(20)
+            self.flowbox_child.set_valign(Gtk.Align.START)
+            self.flowbox_child.set_halign(Gtk.Align.START)
         if self.interface_mode == "Banners":
             image2 = Gtk.Image()
             game_label.set_size_request(-1, 50)
@@ -1102,6 +1034,8 @@ class Main(Gtk.Window):
             self.flowbox_child.set_margin_end(10)
             self.flowbox_child.set_margin_top(10)
             self.flowbox_child.set_margin_bottom(10)
+            self.flowbox_child.set_valign(Gtk.Align.START)
+            self.flowbox_child.set_halign(Gtk.Align.START)
             if game.banner == "" or not os.path.isfile(game.banner):
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(faugus_banner, 230, 345, False)
             else:
@@ -1112,9 +1046,6 @@ class Main(Gtk.Window):
 
         self.flowbox_child.add(hbox)
         self.flowbox.add(self.flowbox_child)
-
-        self.flowbox_child.set_valign(Gtk.Align.START)
-        self.flowbox_child.set_halign(Gtk.Align.START)
 
     def on_search_changed(self, entry):
         search_text = entry.get_text().lower()
@@ -1144,20 +1075,23 @@ class Main(Gtk.Window):
             game_label = label_children[1]
             title = game_label.get_text()
 
-            self.button_edit.set_sensitive(True)
-            self.button_delete.set_sensitive(True)
+            self.menu_item_edit.set_sensitive(True)
+            self.menu_item_delete.set_sensitive(True)
 
             if title in self.processos:
+                self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
             else:
+                self.menu_item_play.set_sensitive(True)
                 self.button_play.set_sensitive(True)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         else:
-            self.button_edit.set_sensitive(False)
-            self.button_delete.set_sensitive(False)
+            self.menu_item_edit.set_sensitive(False)
+            self.menu_item_delete.set_sensitive(False)
+            self.menu_item_play.set_sensitive(False)
             self.button_play.set_sensitive(False)
 
 
@@ -1168,21 +1102,24 @@ class Main(Gtk.Window):
             game_label = hbox.get_children()[1]
             title = game_label.get_text()
 
-            self.button_edit.set_sensitive(True)
-            self.button_delete.set_sensitive(True)
+            self.menu_item_edit.set_sensitive(False)
+            self.menu_item_delete.set_sensitive(False)
 
             if title in self.processos:
+                self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
             else:
+                self.menu_item_play.set_sensitive(True)
                 self.button_play.set_sensitive(True)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         else:
             # Disable buttons if no row is selected
-            self.button_edit.set_sensitive(False)
-            self.button_delete.set_sensitive(False)
+            self.menu_item_edit.set_sensitive(False)
+            self.menu_item_delete.set_sensitive(False)
+            self.menu_item_play.set_sensitive(False)
             self.button_play.set_sensitive(False)
 
     def load_close_onlaunch(self):
@@ -1465,6 +1402,7 @@ class Main(Gtk.Window):
                 else:
                     processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
                 self.processos[title] = processo
+                self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
@@ -1661,8 +1599,9 @@ class Main(Gtk.Window):
                 self.save_games()
                 self.update_list()
 
-                self.button_edit.set_sensitive(False)
-                self.button_delete.set_sensitive(False)
+                self.menu_item_edit.set_sensitive(False)
+                self.menu_item_delete.set_sensitive(False)
+                self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
 
                 # Remove the game from the latest-games file if it exists
@@ -2092,8 +2031,9 @@ class Main(Gtk.Window):
                 break
 
         # Updates the interface of the buttons
-        self.button_edit.set_sensitive(True)
-        self.button_delete.set_sensitive(True)
+        self.menu_item_edit.set_sensitive(True)
+        self.menu_item_delete.set_sensitive(True)
+        self.menu_item_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
         self.button_play.set_image(
             Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
@@ -2403,10 +2343,12 @@ class Main(Gtk.Window):
                     selected_title = game_label.get_text()
 
                     if selected_title not in self.processos:
+                        self.menu_item_play.set_sensitive(True)
                         self.button_play.set_sensitive(True)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
                     else:
+                        self.menu_item_play.set_sensitive(False)
                         self.button_play.set_sensitive(False)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
