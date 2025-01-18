@@ -109,9 +109,9 @@ https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-85
 # Screenshots
 ## Dark theme
 ### Main window
-<img src=https://github.com/user-attachments/assets/72b6790e-ce02-4405-aa3d-fa2b3720107c/><br><br>
-<img src=https://github.com/user-attachments/assets/958cd1cb-2917-421e-a28a-0cdca0d60c85/><br><br>
-<img src=https://github.com/user-attachments/assets/3578ef62-fb00-4147-8978-5c2bcb8e7099/><br>
+<img src=https://github.com/user-attachments/assets/6f6fdd3e-857d-4aa2-b7b2-0238bc39125a/><br><br>
+<img src=https://github.com/user-attachments/assets/eb988923-4f0c-4c89-97fb-f9106c90620d/><br><br>
+<img src=https://github.com/user-attachments/assets/19b42740-92fa-4fae-befc-13296c97d029/><br>
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/a6d30723-6120-4c75-9f13-d183696f8b3f/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/449b3b01-2fd0-47c7-b5b1-eb2759fd5139/><br>
 ### Settings
