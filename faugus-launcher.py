@@ -30,6 +30,7 @@ faugus_banner = '/usr/share/faugus-launcher/faugus-banner.png'
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
+logs_dir = f'{faugus_launcher_dir}/logs'
 icons_dir = f'{faugus_launcher_dir}/icons'
 banners_dir = f'{faugus_launcher_dir}/banners'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
@@ -125,7 +126,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
 
         self.games = []
 
@@ -167,6 +168,10 @@ class Main(Gtk.Window):
         self.menu_item_prefix = Gtk.MenuItem(label="Open prefix location")
         self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
         self.context_menu.append(self.menu_item_prefix)
+
+        self.menu_show_logs = Gtk.MenuItem(label="Show logs")
+        self.menu_show_logs.connect("activate", self.on_context_show_logs)
+        self.context_menu.append(self.menu_show_logs)
 
         self.context_menu.show_all()
 
@@ -585,6 +590,23 @@ class Main(Gtk.Window):
 
                 game = next((j for j in self.games if j.title == title), None)
 
+                title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+                title_formatted = title_formatted.replace(' ', '-')
+                title_formatted = '-'.join(title_formatted.lower().split())
+
+                self.log_file_path = f"{logs_dir}/{title_formatted}/steam-0.log"
+                self.umu_log_file_path = f"{logs_dir}/{title_formatted}/umu.log"
+
+                if self.enable_logging:
+                    self.menu_show_logs.set_visible(True)
+                    if os.path.exists(self.log_file_path):
+                        self.menu_show_logs.set_sensitive(True)
+                        self.current_title = title
+                    else:
+                        self.menu_show_logs.set_sensitive(False)
+                else:
+                    self.menu_show_logs.set_visible(False)
+
                 if os.path.isdir(game.prefix):
                     self.menu_item_prefix.set_sensitive(True)
                     self.current_prefix = game.prefix
@@ -613,6 +635,105 @@ class Main(Gtk.Window):
     def on_context_menu_prefix(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
         subprocess.run(["xdg-open", self.current_prefix], check=True)
+
+    def on_context_show_logs(self, menu_item):
+        selected_item = self.flowbox.get_selected_children()[0]
+        self.on_show_logs_clicked(selected_item)
+
+    def on_show_logs_clicked(self, widget):
+        dialog = Gtk.Dialog(title=f"{self.current_title} Logs", parent=self, modal=True)
+        dialog.set_icon_from_file(faugus_png)
+        dialog.set_default_size(1280, 720)
+        if faugus_session:
+            dialog.fullscreen()
+
+        scrolled_window1 = Gtk.ScrolledWindow()
+        scrolled_window1.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        text_view1 = Gtk.TextView()
+        text_view1.set_editable(False)
+        text_buffer1 = text_view1.get_buffer()
+        with open(self.log_file_path, "r") as log_file:
+            text_buffer1.set_text(log_file.read())
+        scrolled_window1.add(text_view1)
+
+        scrolled_window2 = Gtk.ScrolledWindow()
+        scrolled_window2.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        text_view2 = Gtk.TextView()
+        text_view2.set_editable(False)
+        text_buffer2 = text_view2.get_buffer()
+        with open(self.umu_log_file_path, "r") as log_file:
+            text_buffer2.set_text(log_file.read())
+        scrolled_window2.add(text_view2)
+
+        def copy_to_clipboard(button):
+            current_page = notebook.get_current_page()
+            if current_page == 0:  # Tab 1: Proton
+                start_iter, end_iter = text_buffer1.get_bounds()
+                text_to_copy = text_buffer1.get_text(start_iter, end_iter, False)
+            elif current_page == 1:  # Tab 2: UMU-Launcher
+                start_iter, end_iter = text_buffer2.get_bounds()
+                text_to_copy = text_buffer2.get_text(start_iter, end_iter, False)
+            else:
+                text_to_copy = ""
+
+            clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+            clipboard.set_text(text_to_copy, -1)
+            clipboard.store()
+
+        def open_location(button):
+            subprocess.run(["xdg-open", os.path.dirname(self.log_file_path)], check=True)
+
+        button_copy_clipboard = Gtk.Button(label="Copy to clipboard")
+        button_copy_clipboard.set_size_request(150, -1)
+        button_copy_clipboard.connect("clicked", copy_to_clipboard)
+
+        button_open_location = Gtk.Button(label="Open file location")
+        button_open_location.set_size_request(150, -1)
+        button_open_location.connect("clicked", open_location)
+
+        notebook = Gtk.Notebook()
+        notebook.set_margin_start(10)
+        notebook.set_margin_end(10)
+        notebook.set_margin_top(10)
+        notebook.set_margin_bottom(10)
+        notebook.set_halign(Gtk.Align.FILL)
+        notebook.set_valign(Gtk.Align.FILL)
+        notebook.set_vexpand(True)
+        notebook.set_hexpand(True)
+
+        tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label1 = Gtk.Label(label="Proton")
+        tab_label1.set_width_chars(15)
+        tab_label1.set_xalign(0.5)
+        tab_box1.pack_start(tab_label1, True, True, 0)
+        tab_box1.set_hexpand(True)
+
+        tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label2 = Gtk.Label(label="UMU-Launcher")
+        tab_label2.set_width_chars(15)
+        tab_label2.set_xalign(0.5)
+        tab_box2.pack_start(tab_label2, True, True, 0)
+        tab_box2.set_hexpand(True)
+
+        notebook.append_page(scrolled_window1, tab_box1)
+        notebook.append_page(scrolled_window2, tab_box2)
+
+        content_area = dialog.get_content_area()
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        box_bottom.pack_start(button_copy_clipboard, True, True, 0)
+        box_bottom.pack_start(button_open_location, True, True, 0)
+
+        content_area.add(notebook)
+        content_area.add(box_bottom)
+
+        tab_box1.show_all()
+        tab_box2.show_all()
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def on_duplicate_clicked(self, widget):
         selected_children = self.flowbox.get_selected_children()
@@ -852,8 +973,9 @@ class Main(Gtk.Window):
             self.api_key = config_dict.get('api-key', '').strip('"')
             self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             self.gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
+            self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1153,6 +1275,7 @@ class Main(Gtk.Window):
         self.entry_api_key = settings_dialog.entry_api_key
         self.checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen
         self.checkbox_gamepad_navigation = settings_dialog.checkbox_gamepad_navigation
+        self.checkbox_enable_logging = settings_dialog.checkbox_enable_logging
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
@@ -1170,6 +1293,7 @@ class Main(Gtk.Window):
         entry_api_key = self.entry_api_key.get_text()
         checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
         checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
+        checkbox_enable_logging = self.checkbox_enable_logging.get_active()
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -1187,7 +1311,7 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -2377,7 +2501,7 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2409,6 +2533,7 @@ class Main(Gtk.Window):
         config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
+        config['enable-logging'] = checkbox_enable_logging
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -2531,6 +2656,10 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label="Disable splash window")
         self.checkbox_splash_disable.set_active(False)
+
+        # Create checkbox for 'Enable logging' option
+        self.checkbox_enable_logging = Gtk.CheckButton(label="Enable logging")
+        self.checkbox_enable_logging.set_active(False)
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -2682,6 +2811,7 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
@@ -2870,6 +3000,7 @@ class Settings(Gtk.Dialog):
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
+            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -2881,7 +3012,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3025,6 +3156,7 @@ class Settings(Gtk.Dialog):
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
+            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3036,7 +3168,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3105,6 +3237,7 @@ class Settings(Gtk.Dialog):
             entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
+            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3116,7 +3249,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3237,6 +3370,7 @@ class Settings(Gtk.Dialog):
             self.api_key = config_dict.get('api-key', '').strip('"')
             start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
+            enable_logging = config_dict.get('enable-logging', 'False') == 'True'
 
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.entry_default_prefix.set_text(self.default_prefix)
@@ -3261,6 +3395,7 @@ class Settings(Gtk.Dialog):
             self.checkbox_start_maximized.set_active(start_maximized)
             self.checkbox_start_fullscreen.set_active(start_fullscreen)
             self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
+            self.checkbox_enable_logging.set_active(enable_logging)
 
             model = self.combo_box_interface.get_model()
             index_to_activate2 = 0
@@ -3273,7 +3408,7 @@ class Settings(Gtk.Dialog):
             self.entry_api_key.set_text(self.api_key)
         else:
             # Save default configuration if file does not exist
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
 
 
 class Game:
@@ -5442,9 +5577,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -5484,6 +5619,7 @@ class CreateShortcut(Gtk.Window):
         config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
+        config['enable-logging'] = checkbox_enable_logging
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:

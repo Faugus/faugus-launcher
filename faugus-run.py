@@ -17,6 +17,7 @@ config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
 faugus_components = "/usr/bin/faugus-components"
 prefixes_dir = f'{faugus_launcher_dir}/prefixes'
+logs_dir = f'{faugus_launcher_dir}/logs'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
@@ -144,7 +145,11 @@ class FaugusRun:
 
         print(self.message)
 
+        self.game_title = re.search(r'WINEPREFIX="[^"]*/([^"/]+)"', self.message).group(1)
+
         if "UMU_NO_PROTON" not in self.message:
+            if self.enable_logging:
+                self.message = f'UMU_LOG=1 PROTON_LOG_DIR={logs_dir}/{self.game_title} PROTON_LOG=1 {self.message}'
             self.process = subprocess.Popen(
                 ["/bin/bash", "-c", f"{faugus_components}; {discrete_gpu} {eac_dir} {be_dir} {self.message}"],
                 stdout=subprocess.PIPE,
@@ -192,11 +197,12 @@ class FaugusRun:
             self.splash_disable = config_dict.get('splash-disable', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
+            self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -231,6 +237,7 @@ class FaugusRun:
         config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
+        config['enable-logging'] = checkbox_enable_logging
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
@@ -324,17 +331,35 @@ class FaugusRun:
         self.log_window.show_all()
 
     def on_output(self, source, condition):
+        if self.enable_logging:
+            log_dir = f"{logs_dir}/{self.game_title}"
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+
+            if not hasattr(self, "_log_file_cleaned"):
+                with open(f"{log_dir}/umu.log", "w") as log_file:
+                    log_file.write("")
+                self._log_file_cleaned = True
+
         if line := source.readline():
             clean_line = remove_ansi_escape(line).strip()
+
+            if self.enable_logging:
+                with open(f"{log_dir}/umu.log", "a") as log_file:
+                    log_file.write(clean_line + "\n")
+                    log_file.flush()
+
             self.check_game_output(clean_line)
+
             if "libgamemode.so.0" in clean_line or "libgamemodeauto.so.0" in clean_line or "libgamemode.so" in clean_line:
                 return True
+
             if "winetricks" in self.message:
                 self.append_to_text_view(clean_line)
             else:
                 print(line, end='')
-        return True
 
+        return True
 
     def check_game_output(self, clean_line):
         if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line:
@@ -373,7 +398,7 @@ class FaugusRun:
             self.label2.set_text("Steam Runtime is up to date")
 
 
-        if "fsync: up and running." in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
+        if "fsync: up and running." in clean_line or "Command exited with status: 0" in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
