@@ -145,7 +145,8 @@ class FaugusRun:
 
         print(self.message)
 
-        self.game_title = re.search(r'WINEPREFIX="[^"]*/([^"/]+)"', self.message).group(1)
+        match = re.search(r"WINEPREFIX=['\"]([^'\"]+)", self.message)
+        self.game_title = match.group(1).split("/")[-1]
 
         if "UMU_NO_PROTON" not in self.message:
             if self.enable_logging:
