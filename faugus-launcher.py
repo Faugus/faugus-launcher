@@ -788,7 +788,7 @@ class Main(Gtk.Window):
                         "game_arguments": game.game_arguments,
                         "mangohud": game.mangohud,
                         "gamemode": game.gamemode,
-                        "sc_controller": game.sc_controller,
+                        "prefer_sdl": game.prefer_sdl,
                         "protonfix": game.protonfix,
                         "runner": game.runner,
                         "addapp_checkbox": game.addapp_checkbox,
@@ -1063,7 +1063,7 @@ class Main(Gtk.Window):
                     game_arguments = game_data.get("game_arguments", "")
                     mangohud = game_data.get("mangohud", "")
                     gamemode = game_data.get("gamemode", "")
-                    sc_controller = game_data.get("sc_controller", "")
+                    prefer_sdl = game_data.get("prefer_sdl", "")
                     protonfix = game_data.get("protonfix", "")
                     runner = game_data.get("runner", "")
                     addapp_checkbox = game_data.get("addapp_checkbox", "")
@@ -1072,7 +1072,7 @@ class Main(Gtk.Window):
                     banner = game_data.get("banner", "")
 
                     game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode,
-                                sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
+                                prefer_sdl, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -1279,7 +1279,7 @@ class Main(Gtk.Window):
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
-        self.checkbox_sc_controller = settings_dialog.checkbox_sc_controller
+        self.checkbox_prefer_sdl = settings_dialog.checkbox_prefer_sdl
         self.combo_box_runner = settings_dialog.combo_box_runner
 
         checkbox_state = self.checkbox_close_after_launch.get_active()
@@ -1297,7 +1297,7 @@ class Main(Gtk.Window):
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
-        sc_controller_state = self.checkbox_sc_controller.get_active()
+        prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
         default_runner = self.combo_box_runner.get_active_text()
 
         if default_runner == "UMU-Proton Latest":
@@ -1311,7 +1311,7 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -1457,7 +1457,7 @@ class Main(Gtk.Window):
             prefix = game.prefix
             game_arguments = game.game_arguments
             mangohud = game.mangohud
-            sc_controller = game.sc_controller
+            prefer_sdl = game.prefer_sdl
             protonfix = game.protonfix
             runner = game.runner
             addapp_checkbox = game.addapp_checkbox
@@ -1475,8 +1475,8 @@ class Main(Gtk.Window):
             # Add command parts if they are not empty
             if mangohud:
                 command_parts.append(mangohud)
-            if sc_controller:
-                command_parts.append(sc_controller)
+            if prefer_sdl:
+                command_parts.append(prefer_sdl)
             if prefix:
                 command_parts.append(f'WINEPREFIX="{prefix}"')
             if protonfix:
@@ -1638,13 +1638,10 @@ class Main(Gtk.Window):
                 else:
                     edit_game_dialog.checkbox_gamemode.set_active(False)
 
-            sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-                "/usr/local/bin/sc-controller")
-            if sc_controller_enabled:
-                if game.sc_controller == "SC_CONTROLLER=1":
-                    edit_game_dialog.checkbox_sc_controller.set_active(True)
-                else:
-                    edit_game_dialog.checkbox_sc_controller.set_active(False)
+            if game.prefer_sdl == "PROTON_PREFER_SDL=1":
+                edit_game_dialog.checkbox_prefer_sdl.set_active(True)
+            else:
+                edit_game_dialog.checkbox_prefer_sdl.set_active(False)
 
             if game.addapp_checkbox == "addapp_enabled":
                 edit_game_dialog.checkbox_addapp.set_active(True)
@@ -1860,11 +1857,11 @@ class Main(Gtk.Window):
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
-            sc_controller = "SC_CONTROLLER=1" if add_game_dialog.checkbox_sc_controller.get_active() else ""
+            prefer_sdl = "PROTON_PREFER_SDL=1" if add_game_dialog.checkbox_prefer_sdl.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, prefer_sdl, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
 
             # Determine the state of the shortcut checkbox
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
@@ -1912,7 +1909,7 @@ class Main(Gtk.Window):
                 "game_arguments": game_arguments,
                 "mangohud": mangohud,
                 "gamemode": gamemode,
-                "sc_controller": sc_controller,
+                "prefer_sdl": prefer_sdl,
                 "protonfix": protonfix,
                 "runner": runner,
                 "addapp_checkbox": addapp_checkbox,
@@ -2179,7 +2176,7 @@ class Main(Gtk.Window):
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
-            game.sc_controller = edit_game_dialog.checkbox_sc_controller.get_active()
+            game.prefer_sdl = edit_game_dialog.checkbox_prefer_sdl.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combo_box_runner.get_active_text()
             game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
@@ -2275,7 +2272,7 @@ class Main(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
-        sc_controller = "SC_CONTROLLER=1" if game.sc_controller else ""
+        prefer_sdl = "PROTON_PREFER_SDL=1" if game.prefer_sdl else ""
         addapp = "addapp_enabled" if game.addapp_checkbox else ""
 
         # Check if the icon file exists
@@ -2292,8 +2289,8 @@ class Main(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
-        if sc_controller:
-            command_parts.append(sc_controller)
+        if prefer_sdl:
+            command_parts.append(prefer_sdl)
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
         if protonfix:
@@ -2488,7 +2485,7 @@ class Main(Gtk.Window):
                 "game_arguments": game.game_arguments,
                 "mangohud": "MANGOHUD=1" if game.mangohud else "",
                 "gamemode": "gamemoderun" if game.gamemode else "",
-                "sc_controller": "SC_CONTROLLER=1" if game.sc_controller else "",
+                "prefer_sdl": "PROTON_PREFER_SDL=1" if game.prefer_sdl else "",
                 "protonfix": game.protonfix,
                 "runner": game.runner,
                 "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
@@ -2501,7 +2498,7 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2522,7 +2519,7 @@ class Main(Gtk.Window):
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['sc-controller'] = sc_controller_state
+        config['prefer-sdl'] = prefer_sdl_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
@@ -2683,9 +2680,9 @@ class Settings(Gtk.Dialog):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
-        self.checkbox_sc_controller.set_tooltip_text(
-            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
+        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
+        self.checkbox_prefer_sdl.set_tooltip_text(
+            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
 
         self.label_support = Gtk.Label(label="Support the Project")
         self.label_support.set_halign(Gtk.Align.START)
@@ -2801,7 +2798,7 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid_tools.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
+        grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
         grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
         grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
         grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
@@ -2878,14 +2875,6 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
-
-        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-            "/usr/local/bin/sc-controller")
-        if not self.sc_controller_enabled:
-            self.checkbox_sc_controller.set_sensitive(False)
-            self.checkbox_sc_controller.set_active(False)
-            self.checkbox_sc_controller.set_tooltip_text(
-                "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
     def on_checkbox_toggled(self, checkbox, option):
         if checkbox.get_active():
@@ -3004,7 +2993,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            sc_controller_state = self.checkbox_sc_controller.get_active()
+            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3012,7 +3001,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3160,7 +3149,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            sc_controller_state = self.checkbox_sc_controller.get_active()
+            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3168,7 +3157,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3241,7 +3230,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            sc_controller_state = self.checkbox_sc_controller.get_active()
+            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3249,7 +3238,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3359,7 +3348,7 @@ class Settings(Gtk.Dialog):
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
-            sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+            prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
             discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             splash_disable = config_dict.get('splash-disable', 'False') == 'True'
@@ -3376,7 +3365,7 @@ class Settings(Gtk.Dialog):
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_sc_controller.set_active(sc_controller)
+            self.checkbox_prefer_sdl.set_active(prefer_sdl)
 
             if self.default_runner == "":
                 self.default_runner = "UMU-Proton Latest"
@@ -3412,7 +3401,7 @@ class Settings(Gtk.Dialog):
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, sc_controller, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner):
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, prefer_sdl, protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
@@ -3421,7 +3410,7 @@ class Game:
         self.mangohud = mangohud  # Boolean indicating whether Mangohud is enabled
         self.gamemode = gamemode  # Boolean indicating whether Gamemode is enabled
         self.prefix = prefix  # Prefix for Wine games
-        self.sc_controller = sc_controller  # Boolean indicating whether SC Controller is enabled
+        self.prefer_sdl = prefer_sdl
         self.protonfix = protonfix
         self.runner = runner
         self.addapp_checkbox = addapp_checkbox
@@ -3798,9 +3787,9 @@ class AddGame(Gtk.Dialog):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
-        self.checkbox_sc_controller.set_tooltip_text(
-            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
+        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
+        self.checkbox_prefer_sdl.set_tooltip_text(
+            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -3966,8 +3955,8 @@ class AddGame(Gtk.Dialog):
         self.checkbox_mangohud.set_hexpand(True)
         self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.checkbox_gamemode.set_hexpand(True)
-        self.grid_tools.attach(self.checkbox_sc_controller, 0, 2, 1, 1)
-        self.checkbox_sc_controller.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
+        self.checkbox_prefer_sdl.set_hexpand(True)
         self.grid_tools.attach(self.button_winetricks, 2, 0, 1, 1)
         self.grid_tools.attach(self.button_winecfg, 2, 1, 1, 1)
         self.grid_tools.attach(self.button_run, 2, 2, 1, 1)
@@ -4024,14 +4013,6 @@ class AddGame(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
-
-        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-            "/usr/local/bin/sc-controller")
-        if not self.sc_controller_enabled:
-            self.checkbox_sc_controller.set_sensitive(False)
-            self.checkbox_sc_controller.set_active(False)
-            self.checkbox_sc_controller.set_tooltip_text(
-                "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
@@ -5248,9 +5229,9 @@ class CreateShortcut(Gtk.Window):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_sc_controller = Gtk.CheckButton(label="SC Controller")
-        self.checkbox_sc_controller.set_tooltip_text(
-            "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile.")
+        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
+        self.checkbox_prefer_sdl.set_tooltip_text(
+            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
@@ -5358,7 +5339,7 @@ class CreateShortcut(Gtk.Window):
 
         self.grid_tools.add(self.checkbox_mangohud)
         self.grid_tools.add(self.checkbox_gamemode)
-        self.grid_tools.add(self.checkbox_sc_controller)
+        self.grid_tools.add(self.checkbox_prefer_sdl)
 
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
@@ -5401,14 +5382,6 @@ class CreateShortcut(Gtk.Window):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
-
-        self.sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-            "/usr/local/bin/sc-controller")
-        if not self.sc_controller_enabled:
-            self.checkbox_sc_controller.set_sensitive(False)
-            self.checkbox_sc_controller.set_active(False)
-            self.checkbox_sc_controller.set_tooltip_text(
-                "Emulates a Xbox controller if the game doesn't support yours. Put the profile at ~/.config/faugus-launcher/controller.sccprofile. NOT INSTALLED.")
 
         frame.add(self.main_grid)
         self.box.add(frame)
@@ -5568,18 +5541,18 @@ class CreateShortcut(Gtk.Window):
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
-            sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+            prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
 
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_sc_controller.set_active(sc_controller)
+            self.checkbox_prefer_sdl.set_active(prefer_sdl)
 
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -5608,7 +5581,7 @@ class CreateShortcut(Gtk.Window):
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['sc-controller'] = sc_controller_state
+        config['prefer-sdl'] = prefer_sdl_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
@@ -5674,7 +5647,7 @@ class CreateShortcut(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
         gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
-        sc_controller = "SC_CONTROLLER=1" if self.checkbox_sc_controller.get_active() else ""
+        prefer_sdl = "PROTON_PREFER_SDL=1" if self.checkbox_prefer_sdl.get_active() else ""
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
@@ -5684,8 +5657,8 @@ class CreateShortcut(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
-        if sc_controller:
-            command_parts.append(sc_controller)
+        if prefer_sdl:
+            command_parts.append(prefer_sdl)
 
         #command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
 
@@ -5902,7 +5875,7 @@ def run_file(file_path):
         default_prefix = config_dict.get('default-prefix', '').strip('"')
         mangohud = config_dict.get('mangohud', 'False') == 'True'
         gamemode = config_dict.get('gamemode', 'False') == 'True'
-        sc_controller = config_dict.get('sc-controller', 'False') == 'True'
+        prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
         default_runner = config_dict.get('default-runner', '').strip('"')
     else:
         # Define the configuration path
@@ -5914,7 +5887,7 @@ def run_file(file_path):
         default_prefix = prefixes_dir
         mangohud = 'False'
         gamemode = 'False'
-        sc_controller = 'False'
+        prefer_sdl = 'False'
         default_runner = 'GE-Proton'
 
         with open(config_file, 'w') as f:
@@ -5922,7 +5895,7 @@ def run_file(file_path):
             f.write(f'default-prefix="{default_prefix}"\n')
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
-            f.write(f'sc-controller=False\n')
+            f.write(f'prefer-sdl=False\n')
             f.write(f'default-runner="GE-Proton"\n')
             f.write(f'discrete-gpu=True\n')
             f.write(f'splash-disable=False\n')
@@ -5936,7 +5909,7 @@ def run_file(file_path):
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
         gamemode = "gamemoderun" if gamemode else ""
-        sc_controller = "SC_CONTROLLER=1" if sc_controller else ""
+        prefer_sdl = "PROTON_PREFER_SDL=1" if prefer_sdl else ""
 
     # Get the directory of the file
     file_dir = os.path.dirname(os.path.abspath(file_path))
@@ -5948,7 +5921,6 @@ def run_file(file_path):
     if not file_path.endswith(".reg"):
         mangohud_enabled = os.path.exists(mangohud_dir)
         gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        sc_controller_enabled = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
 
     if default_runner == "UMU-Proton Latest":
         default_runner = ""
@@ -5961,8 +5933,8 @@ def run_file(file_path):
         # Add command parts if they are not empty
         if mangohud_enabled and mangohud:
             command_parts.append(mangohud)
-        if sc_controller_enabled and sc_controller:
-            command_parts.append(sc_controller)
+        if prefer_sdl:
+            command_parts.append(prefer_sdl)
     command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append('GAMEID=default')
     if default_runner:
@@ -6005,7 +5977,7 @@ def convert_games_txt_to_json(txt_file_path, json_file_path):
                 "game_arguments": fields[4],
                 "mangohud": fields[5],
                 "gamemode": fields[6],
-                "sc_controller": fields[7],
+                "prefer_sdl": fields[7],
                 "protonfix": fields[8],
                 "runner": fields[9],
                 "addapp_checkbox": fields[10],

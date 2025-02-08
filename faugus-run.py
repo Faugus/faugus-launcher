@@ -95,12 +95,6 @@ class FaugusRun:
 
     def start_process(self, command):
 
-        sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists(
-            "/usr/local/bin/sc-controller")
-        if sc_controller_installed:
-            if "SC_CONTROLLER=1" in self.message:
-                self.start_scc_daemon()
-
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
         if protonpath and protonpath != "GE-Proton":
             protonpath_path = f'{share_dir}/Steam/compatibilitytools.d/{protonpath}'
@@ -203,7 +197,7 @@ class FaugusRun:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, sc_controller_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -227,7 +221,7 @@ class FaugusRun:
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['sc-controller'] = sc_controller_state
+        config['prefer-sdl'] = prefer_sdl_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
@@ -535,11 +529,6 @@ def main():
 
     if args.session == "session":
         faugus_session = True
-
-    sc_controller_installed = os.path.exists("/usr/bin/sc-controller") or os.path.exists("/usr/local/bin/sc-controller")
-    if sc_controller_installed:
-        if "SC_CONTROLLER=1" in args.message:
-            atexit.register(stop_scc_daemon)
 
     handle_command(args.message, args.command)
 
