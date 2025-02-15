@@ -371,7 +371,7 @@ class FaugusRun:
             self.label.set_text("Downloading GE-Proton...")
         if "Downloading UMU-Proton" in clean_line:
             self.label.set_text("Downloading UMU-Proton...")
-        if "Downloading latest steamrt sniper" in clean_line:
+        if "Downloading steamrt3 (latest)" in clean_line:
             self.label2.set_text("Downloading Steam Runtime...")
         if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
             self.label2.set_text("Extracting Steam Runtime...")
@@ -383,7 +383,7 @@ class FaugusRun:
             self.label.set_text("GE-Proton is up to date")
         if "UMU-Proton is up to date" in clean_line:
             self.label.set_text("UMU-Proton is up to date")
-        if "steamrt is up to date" in clean_line:
+        if "steamrt3 is up to date" in clean_line:
             self.label2.set_text("Steam Runtime is up to date")
         if "->" in clean_line and "GE-Proton" in clean_line:
             self.label.set_text("GE-Proton is up to date")
