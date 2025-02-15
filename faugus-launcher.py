@@ -2585,6 +2585,8 @@ class Settings(Gtk.Dialog):
         self.label_api_key.set_markup('<a href="https://www.steamgriddb.com/profile/preferences/api">SteamGridDB API Key</a>')
         self.label_api_key.connect("activate-link", self.on_link_clicked)
         self.entry_api_key = Gtk.Entry()
+        self.entry_api_key.set_has_tooltip(True)
+        self.entry_api_key.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Create checkbox for 'Start maximized' option
         self.checkbox_start_maximized = Gtk.CheckButton(label="Start maximized")
@@ -2607,6 +2609,8 @@ class Settings(Gtk.Dialog):
 
         self.entry_default_prefix = Gtk.Entry()
         self.entry_default_prefix.set_tooltip_text("/path/to/the/prefix")
+        self.entry_default_prefix.set_has_tooltip(True)
+        self.entry_default_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
         self.entry_default_prefix.connect("changed", self.on_entry_changed, self.entry_default_prefix)
 
         self.button_search_prefix = Gtk.Button()
@@ -2877,6 +2881,14 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
+
+    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
+        current_text = widget.get_text()
+        if current_text.strip():
+            tooltip.set_text(current_text)
+        else:
+            tooltip.set_text(widget.get_tooltip_text())
+        return True
 
     def on_checkbox_toggled(self, checkbox, option):
         if checkbox.get_active():
@@ -3718,6 +3730,8 @@ class AddGame(Gtk.Dialog):
         if interface_mode == "Banners":
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text("Game Title")
+        self.entry_title.set_has_tooltip(True)
+        self.entry_title.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Widgets for path
         self.label_path = Gtk.Label(label="Path")
@@ -3727,6 +3741,8 @@ class AddGame(Gtk.Dialog):
         if file_path:
             self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text("/path/to/the/exe")
+        self.entry_path.set_has_tooltip(True)
+        self.entry_path.connect("query-tooltip", self.on_entry_query_tooltip)
         self.button_search = Gtk.Button()
         self.button_search.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search.connect("clicked", self.on_button_search_clicked)
@@ -3738,6 +3754,8 @@ class AddGame(Gtk.Dialog):
         self.entry_prefix = Gtk.Entry()
         self.entry_prefix.connect("changed", self.on_entry_changed, self.entry_prefix)
         self.entry_prefix.set_tooltip_text("/path/to/the/prefix")
+        self.entry_prefix.set_has_tooltip(True)
+        self.entry_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
@@ -3753,6 +3771,8 @@ class AddGame(Gtk.Dialog):
         self.label_protonfix.set_halign(Gtk.Align.START)
         self.entry_protonfix = Gtk.Entry()
         self.entry_protonfix.set_tooltip_text("UMU ID")
+        self.entry_protonfix.set_has_tooltip(True)
+        self.entry_protonfix.connect("query-tooltip", self.on_entry_query_tooltip)
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
@@ -3763,12 +3783,16 @@ class AddGame(Gtk.Dialog):
         self.label_launch_arguments.set_halign(Gtk.Align.START)
         self.entry_launch_arguments = Gtk.Entry()
         self.entry_launch_arguments.set_tooltip_text("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440")
+        self.entry_launch_arguments.set_has_tooltip(True)
+        self.entry_launch_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Widgets for game arguments
         self.label_game_arguments = Gtk.Label(label="Game Arguments")
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text("e.g.: -d3d11 -fullscreen")
+        self.entry_game_arguments.set_has_tooltip(True)
+        self.entry_game_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Widgets for extra executable
         self.checkbox_addapp = Gtk.CheckButton(label="Additional Application")
@@ -3776,6 +3800,8 @@ class AddGame(Gtk.Dialog):
         self.checkbox_addapp.connect("toggled", self.on_checkbox_addapp_toggled)
         self.entry_addapp = Gtk.Entry()
         self.entry_addapp.set_tooltip_text("/path/to/the/app")
+        self.entry_addapp.set_has_tooltip(True)
+        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
         self.entry_addapp.set_sensitive(False)
         self.button_search_addapp = Gtk.Button()
         self.button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -4029,6 +4055,14 @@ class AddGame(Gtk.Dialog):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 20), -1, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
+        current_text = widget.get_text()
+        if current_text.strip():
+            tooltip.set_text(current_text)
+        else:
+            tooltip.set_text(widget.get_tooltip_text())
+        return True
 
     def on_image_clicked(self, widget, event):
         self.menu.popup_at_pointer(event)
