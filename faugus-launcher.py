@@ -1477,8 +1477,9 @@ class Main(Gtk.Window):
                 command_parts.append(mangohud)
             if prefer_sdl:
                 command_parts.append(prefer_sdl)
-            if prefix:
-                command_parts.append(f'WINEPREFIX="{prefix}"')
+            if runner != "Linux-Native":
+                if prefix:
+                    command_parts.append(f'WINEPREFIX="{prefix}"')
             if protonfix:
                 command_parts.append(f'GAMEID={protonfix}')
             else:
@@ -2291,8 +2292,9 @@ class Main(Gtk.Window):
             command_parts.append(mangohud)
         if prefer_sdl:
             command_parts.append(prefer_sdl)
-        if prefix:
-            command_parts.append(f"WINEPREFIX='{prefix}'")
+        if runner != "Linux-Native":
+            if prefix:
+                command_parts.append(f"WINEPREFIX='{prefix}'")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         else:
