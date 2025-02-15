@@ -14,7 +14,6 @@ yay -S --noconfirm faugus-launcher
 # Optional tools
 sudo pacman -S --noconfirm mangohud
 sudo pacman -S --noconfirm gamemode
-yay -S --noconfirm sc-controller
 ```
 
 ### Fedora-based distributions (Copr)
@@ -26,18 +25,35 @@ sudo dnf -y install faugus-launcher
 # Optional tools
 sudo dnf -y install mangohud
 sudo dnf -y install gamemode
-sudo dnf -y install sc-controller
 ```
 
-### Debian-based distributions
+### Ubuntu / Mint / KDE Neon
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.11/faugus-launcher_1.2.11-1_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.6/python3-umu-launcher_1.1.4-1_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.2.6/umu-launcher_1.1.4-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher_1.3.1-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/python3-umu-launcher_1.2.3-1_amd64_ubuntu-noble.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/umu-launcher_1.2.3-1_all_ubuntu-noble.deb
+sudo apt install -y ~/faugus-launcher/*.deb
+sudo rm -r ~/faugus-launcher
+```
+```
+# Optional tools
+sudo apt -y install mangohud
+sudo apt -y install gamemode
+```
+
+### Debian 12
+```
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install -y wget
+mkdir -p ~/faugus-launcher
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher_1.3.1-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/python3-umu-launcher_1.2.3-1_amd64_debian-12.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/umu-launcher_1.2.3-1_all_debian-12.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -64,10 +80,10 @@ sudo zypper install -y mangohud
 ```
 
 ### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.2.11/faugus-launcher-0.2.11-1.flatpak">faugus-launcher-0.2.11-1.flatpak</a> and run:
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher-0.3.1-1.flatpak">faugus-launcher-0.3.1-1.flatpak</a> and run:
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install faugus-launcher-0.2.11-1.flatpak
+flatpak install faugus-launcher-0.3.1-1.flatpak
 ```
 ```
 # Optional tools
@@ -98,13 +114,6 @@ For Application Launchers
 ```
 ~/.local/share/applications/
 ```
-
-### Using SC Controller with Faugus Launcher
-Save the SC Controller profile at
-```
-~/.config/faugus-launcher/controller.sccprofile
-```
-https://github.com/Faugus/faugus-launcher/assets/112667550/04f4f009-4b5a-4642-857f-21e3eb666074
 
 # Screenshots
 ### Main window
