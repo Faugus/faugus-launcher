@@ -128,4 +128,4 @@ For Application Launchers
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/c46f90ac-7713-46bf-8795-33d3917fb48e/><br>
 ### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/828aac17-6aa5-4d29-a908-dbbc8a5604d5/><br>
+<img src=https://github.com/user-attachments/assets/cdc7cdf6-a67c-4405-b94f-566e0a20f5e6/><br>
