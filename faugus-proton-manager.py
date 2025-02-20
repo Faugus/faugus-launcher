@@ -43,6 +43,12 @@ class ProtonDownloader(Gtk.Dialog):
         self.content_area.set_hexpand(True)
         self.content_area.add(frame)
 
+        self.progress_bar = Gtk.ProgressBar()
+        self.progress_bar.set_margin_start(10)
+        self.progress_bar.set_margin_end(10)
+        self.progress_bar.set_margin_bottom(10)
+        self.content_area.add(self.progress_bar)
+
         # Scrolled window to hold the Grid
         self.scrolled_window = Gtk.ScrolledWindow()
         self.scrolled_window.set_size_request(400, 400)
@@ -64,9 +70,10 @@ class ProtonDownloader(Gtk.Dialog):
         # Fetch and populate releases in the Grid
         self.releases = []
         self.get_releases()
+        self.show_all()
+        self.progress_bar.set_visible(False)
 
     def filter_releases(self):
-        # Filter releases up to "GE-Proton7-1"
         filtered_releases = []
         for release in self.releases:
             filtered_releases.append(release)
@@ -75,7 +82,6 @@ class ProtonDownloader(Gtk.Dialog):
         return filtered_releases
 
     def get_releases(self):
-        # Fetch all releases using pagination
         page = 1
         while True:
             response = requests.get(GITHUB_API_URL, params={"page": page, "per_page": 100})
@@ -89,41 +95,47 @@ class ProtonDownloader(Gtk.Dialog):
                 print("Error fetching releases:", response.status_code)
                 break
 
-        # Filter the releases
         self.releases = self.filter_releases()
 
-        # Add filtered releases to the Grid in the correct order
         for release in self.releases:
             self.add_release_to_grid(release)
 
     def add_release_to_grid(self, release):
-        row_index = len(self.grid.get_children()) // 2  # Calculate row index based on number of rows
+        row_index = len(self.grid.get_children()) // 2
 
         label = Gtk.Label(label=release["tag_name"], xalign=0)
-        label.set_halign(Gtk.Align.START)  # Align label to the start
-        label.set_hexpand(True)  # Allow label to expand
-        self.grid.attach(label, 0, row_index, 1, 1)  # Column 0 for the label
+        label.set_halign(Gtk.Align.START)
+        label.set_hexpand(True)
+        self.grid.attach(label, 0, row_index, 1, 1)
 
-        # Check if the release is already installed
         version_path = os.path.join(STEAM_COMPATIBILITY_PATH, release["tag_name"])
         button = Gtk.Button(label="Remove" if os.path.exists(version_path) else "Download")
         button.connect("clicked", self.on_button_clicked, release)
-        button.set_size_request(120, -1)  # Set a fixed width for the button
+        button.set_size_request(120, -1)
 
-        self.grid.attach(button, 1, row_index, 1, 1)  # Column 1 for the button
+        self.grid.attach(button, 1, row_index, 1, 1)
 
     def on_button_clicked(self, widget, release):
         version_path = os.path.join(STEAM_COMPATIBILITY_PATH, release["tag_name"])
 
         if os.path.exists(version_path):
-            # Remove the release
             self.on_remove_clicked(widget, release)
         else:
-            # Download the release
+            self.progress_bar.set_visible(True)
             self.on_download_clicked(widget, release)
 
+    def disable_all_buttons(self):
+        for child in self.grid.get_children():
+            if isinstance(child, Gtk.Button):
+                child.set_sensitive(False)
+
+    def enable_all_buttons(self):
+        for child in self.grid.get_children():
+            if isinstance(child, Gtk.Button):
+                child.set_sensitive(True)
+
     def on_download_clicked(self, widget, release):
-        # Find the first tar.gz asset to download
+        self.disable_all_buttons()
         for asset in release["assets"]:
             if asset["name"].endswith(".tar.gz"):
                 download_url = asset["browser_download_url"]
@@ -131,54 +143,57 @@ class ProtonDownloader(Gtk.Dialog):
                 break
 
     def download_and_extract(self, url, filename, tag_name, button):
-        button.set_label("Downloading...")
-        button.set_sensitive(False)  # Disable the button during download
+        dialog = Gtk.Dialog(title="Downloading", parent=self, modal=True)
+        dialog.set_resizable(False)
 
-        # Ensure the directory exists
+        button.set_label("Downloading...")
+        button.set_sensitive(False)
+
         if not os.path.exists(STEAM_COMPATIBILITY_PATH):
             os.makedirs(STEAM_COMPATIBILITY_PATH)
-            print(f"Created directory: {STEAM_COMPATIBILITY_PATH}")
 
-        # Download the tar.gz file
-        print(f"Downloading {filename}...")
         response = requests.get(url, stream=True)
-        tar_file_path = os.path.join(os.getcwd(), filename)  # Save in the current working directory
+        total_size = int(response.headers.get("content-length", 0))
+        downloaded_size = 0
+
+        tar_file_path = os.path.join(os.getcwd(), filename)
         with open(tar_file_path, "wb") as file:
             for data in response.iter_content(1024):
                 file.write(data)
-                # Update the interface to show "Downloading..."
+                downloaded_size += len(data)
+                progress = downloaded_size / total_size
+                self.progress_bar.set_fraction(progress)
+                self.progress_bar.set_text(f"{int(progress * 100)}%")
                 Gtk.main_iteration_do(False)
 
-        print(f"Downloaded {filename}")
+        dialog.destroy()
 
-        # Call the function to extract the file
         self.extract_tar_and_update_button(tar_file_path, tag_name, button)
 
     def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
         button.set_label("Extracting...")
         Gtk.main_iteration_do(False)
 
-        # Now we extract directly to the STEAM_COMPATIBILITY_PATH
-        self.extract_tar(tar_file_path, STEAM_COMPATIBILITY_PATH)
+        self.extract_tar(tar_file_path, STEAM_COMPATIBILITY_PATH, self.progress_bar)
 
-        # Remove the tar.gz after extraction
         os.remove(tar_file_path)
-        print(f"Removed {tar_file_path}")
 
-        # Update the button to "Remove"
         self.update_button(button, "Remove")
+        self.progress_bar.set_visible(False)
+        self.enable_all_buttons()
         button.set_sensitive(True)
 
-    def extract_tar(self, tar_file_path, extract_to):
-        print(f"Extracting {tar_file_path} to {extract_to}...")
+    def extract_tar(self, tar_file_path, extract_to, progress_bar):
         try:
             with tarfile.open(tar_file_path, "r:gz") as tar:
-                members = tar.getmembers()  # Get the members for extraction
-                for member in members:
+                members = tar.getmembers()
+                total_members = len(members)
+                for index, member in enumerate(members, start=1):
                     tar.extract(member, path=extract_to)
-                    # Update the interface to ensure the button text is displayed
+                    progress = index / total_members
+                    progress_bar.set_fraction(progress)
+                    progress_bar.set_text(f"Extracting... {int(progress * 100)}%")
                     Gtk.main_iteration_do(False)
-            print("Extraction completed successfully.")
         except Exception as e:
             print(f"Failed to extract {tar_file_path}: {e}")
 
@@ -187,14 +202,12 @@ class ProtonDownloader(Gtk.Dialog):
         if os.path.exists(version_path):
             try:
                 shutil.rmtree(version_path)
-                print(f"Removed {version_path}")
-                # Update button to "Download"
                 self.update_button(widget, "Download")
             except Exception as e:
                 print(f"Failed to remove {version_path}: {e}")
 
     def update_button(self, button, new_label):
-        button.set_label(new_label)  # Update the button label
+        button.set_label(new_label)
 
 def apply_dark_theme():
     desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
@@ -205,9 +218,7 @@ def apply_dark_theme():
     if is_dark_theme:
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
-# Initialize GTK application
 apply_dark_theme()
 win = ProtonDownloader()
 win.connect("destroy", Gtk.main_quit)
-win.show_all()
 Gtk.main()
