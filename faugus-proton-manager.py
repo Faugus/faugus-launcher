@@ -43,6 +43,12 @@ class ProtonDownloader(Gtk.Dialog):
         self.content_area.set_hexpand(True)
         self.content_area.add(frame)
 
+        self.progress_label = Gtk.Label(label="")
+        self.progress_label.set_margin_start(10)
+        self.progress_label.set_margin_end(10)
+        self.progress_label.set_margin_bottom(10)
+        self.content_area.add(self.progress_label)
+
         self.progress_bar = Gtk.ProgressBar()
         self.progress_bar.set_margin_start(10)
         self.progress_bar.set_margin_end(10)
@@ -72,6 +78,7 @@ class ProtonDownloader(Gtk.Dialog):
         self.get_releases()
         self.show_all()
         self.progress_bar.set_visible(False)
+        self.progress_label.set_visible(False)
 
     def filter_releases(self):
         filtered_releases = []
@@ -122,6 +129,7 @@ class ProtonDownloader(Gtk.Dialog):
             self.on_remove_clicked(widget, release)
         else:
             self.progress_bar.set_visible(True)
+            self.progress_label.set_visible(True)
             self.on_download_clicked(widget, release)
 
     def disable_all_buttons(self):
@@ -147,6 +155,7 @@ class ProtonDownloader(Gtk.Dialog):
         dialog.set_resizable(False)
 
         button.set_label("Downloading...")
+        self.progress_label.set_text(f"Downloading {tag_name}...")
         button.set_sensitive(False)
 
         if not os.path.exists(STEAM_COMPATIBILITY_PATH):
@@ -172,6 +181,7 @@ class ProtonDownloader(Gtk.Dialog):
 
     def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
         button.set_label("Extracting...")
+        self.progress_label.set_text(f"Extracting {tag_name}...")
         Gtk.main_iteration_do(False)
 
         self.extract_tar(tar_file_path, STEAM_COMPATIBILITY_PATH, self.progress_bar)
@@ -180,6 +190,7 @@ class ProtonDownloader(Gtk.Dialog):
 
         self.update_button(button, "Remove")
         self.progress_bar.set_visible(False)
+        self.progress_label.set_visible(False)
         self.enable_all_buttons()
         button.set_sensitive(True)
 
