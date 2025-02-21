@@ -33,9 +33,9 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher_1.3.1-1_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/python3-umu-launcher_1.2.3-1_amd64_ubuntu-noble.deb
-wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/umu-launcher_1.2.3-1_all_ubuntu-noble.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.2/faugus-launcher_1.3.2-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/python3-umu-launcher_1.2.5-1_amd64_ubuntu-noble.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/umu-launcher_1.2.5-1_all_ubuntu-noble.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -51,9 +51,27 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher_1.3.1-1_amd64.deb
-wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/python3-umu-launcher_1.2.3-1_amd64_debian-12.deb
-wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.3/umu-launcher_1.2.3-1_all_debian-12.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.2/faugus-launcher_1.3.2-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/python3-umu-launcher_1.2.5-1_amd64_debian-12.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/umu-launcher_1.2.5-1_all_debian-12.deb
+sudo apt install -y ~/faugus-launcher/*.deb
+sudo rm -r ~/faugus-launcher
+```
+```
+# Optional tools
+sudo apt -y install mangohud
+sudo apt -y install gamemode
+```
+
+### Debian 13
+```
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install -y wget
+mkdir -p ~/faugus-launcher
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.2/faugus-launcher_1.3.2-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/python3-umu-launcher_1.2.5-1_amd64_debian-13.deb
+wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.5/umu-launcher_1.2.5-1_all_debian-13.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -80,10 +98,10 @@ sudo zypper install -y mangohud
 ```
 
 ### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.3.1/faugus-launcher-0.3.1-1.flatpak">faugus-launcher-0.3.1-1.flatpak</a> and run:
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.3.2/faugus-launcher-0.3.2-1.flatpak">faugus-launcher-0.3.2-1.flatpak</a> and run:
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install faugus-launcher-0.3.1-1.flatpak
+flatpak install faugus-launcher-0.3.2-1.flatpak
 ```
 ```
 # Optional tools
