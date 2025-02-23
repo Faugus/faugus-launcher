@@ -26,6 +26,7 @@ xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
 data_dirs = xdg_data_dirs.split(':')
 share_dir_system = data_dirs[-1]
 faugus_banner = '/usr/share/faugus-launcher/faugus-banner.png'
+faugus_notification = '/usr/share/faugus-launcher/faugus-notification.ogg'
 
 config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
 faugus_launcher_dir = f'{config_dir}/faugus-launcher'
@@ -913,7 +914,7 @@ class Main(Gtk.Window):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
         if faugus_session:
             dialog.fullscreen()
 
@@ -1713,7 +1714,7 @@ class Main(Gtk.Window):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
         if faugus_session:
             dialog.fullscreen()
 
@@ -3441,7 +3442,7 @@ class DuplicateDialog(Gtk.Dialog):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
         if faugus_session:
             dialog.fullscreen()
 
@@ -3486,7 +3487,7 @@ class ConfirmationDialog(Gtk.Dialog):
         super().__init__(title=f"Delete {title}", transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-warning"])
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
         if faugus_session:
             self.fullscreen()
 
@@ -4110,7 +4111,7 @@ class AddGame(Gtk.Dialog):
                     dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
-                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
                     if faugus_session:
                         dialog_image.fullscreen()
 
@@ -4217,7 +4218,7 @@ class AddGame(Gtk.Dialog):
                 dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
                 dialog.set_resizable(False)
                 dialog.set_icon_from_file(faugus_png)
-                subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
                 if faugus_session:
                     dialog.fullscreen()
 
@@ -4831,7 +4832,7 @@ class AddGame(Gtk.Dialog):
                     dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
-                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
                     if faugus_session:
                         dialog_image.fullscreen()
 
@@ -5978,7 +5979,7 @@ class CreateShortcut(Gtk.Window):
                     dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
-                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
                     if faugus_session:
                         dialog_image.fullscreen()
 
