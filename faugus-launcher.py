@@ -4107,7 +4107,7 @@ class AddGame(Gtk.Dialog):
             if response == Gtk.ResponseType.OK:
                 file_path = filechooser.get_filename()
                 if not file_path or not is_valid_image(file_path):
-                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
                     subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
@@ -4828,7 +4828,7 @@ class AddGame(Gtk.Dialog):
             if response == Gtk.ResponseType.OK:
                 file_path = filechooser.get_filename()
                 if not file_path or not is_valid_image(file_path):
-                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
                     subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
@@ -5975,7 +5975,7 @@ class CreateShortcut(Gtk.Window):
             if response == Gtk.ResponseType.OK:
                 file_path = filechooser.get_filename()
                 if not file_path or not is_valid_image(file_path):
-                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=dialog, modal=True)
                     dialog_image.set_resizable(False)
                     dialog_image.set_icon_from_file(faugus_png)
                     subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
