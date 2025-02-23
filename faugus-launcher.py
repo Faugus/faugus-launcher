@@ -4033,6 +4033,27 @@ class AddGame(Gtk.Dialog):
             self.image_banner2.set_from_pixbuf(pixbuf)
 
     def on_load_file(self, widget):
+        self.set_sensitive(False)
+
+        def show_error_message(message):
+            error_dialog = Gtk.MessageDialog(
+                parent=dialog,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text=message
+            )
+            error_dialog.set_title("Invalid Image")
+            error_dialog.run()
+            error_dialog.destroy()
+
+        def is_valid_image(file_path):
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+                return pixbuf is not None
+            except Exception:
+                return False
+
         dialog = Gtk.Dialog(title="Select an image for the banner", parent=self, flags=0)
         dialog.set_size_request(720, 720)
         if faugus_session:
@@ -4045,6 +4066,7 @@ class AddGame(Gtk.Dialog):
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
         filter_ico.add_mime_type("image/*")
+        filechooser.set_filter(filter_ico)
 
         filter_combobox = Gtk.ComboBoxText()
         filter_combobox.append("image", "Image files")
@@ -4052,12 +4074,12 @@ class AddGame(Gtk.Dialog):
         filter_combobox.set_size_request(150, -1)
 
         button_open = Gtk.Button.new_with_label("Open")
-        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
         button_open.set_size_request(150, -1)
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
         button_cancel = Gtk.Button.new_with_label("Cancel")
-        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
         button_cancel.set_size_request(150, -1)
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
 
         button_grid = Gtk.Grid()
         button_grid.set_row_spacing(10)
@@ -4079,14 +4101,69 @@ class AddGame(Gtk.Dialog):
         filechooser.connect("update-preview", self.update_preview)
 
         dialog.show_all()
-        response = dialog.run()
 
-        if response == Gtk.ResponseType.OK:
-            file_path = filechooser.get_filename()
-            shutil.copy(file_path, self.banner_path_temp)
-            self.update_image_banner()
+        while True:
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_path = filechooser.get_filename()
+                if not file_path or not is_valid_image(file_path):
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image.set_resizable(False)
+                    dialog_image.set_icon_from_file(faugus_png)
+                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    if faugus_session:
+                        dialog_image.fullscreen()
+
+                    label = Gtk.Label()
+                    label.set_label("The selected file is not a valid image.")
+                    label.set_halign(Gtk.Align.CENTER)
+
+                    label2 = Gtk.Label()
+                    label2.set_label("Please choose another one.")
+                    label2.set_halign(Gtk.Align.CENTER)
+
+                    button_yes = Gtk.Button(label="Ok")
+                    button_yes.set_size_request(150, -1)
+                    button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+
+                    content_area = dialog_image.get_content_area()
+                    content_area.set_border_width(0)
+                    content_area.set_halign(Gtk.Align.CENTER)
+                    content_area.set_valign(Gtk.Align.CENTER)
+                    content_area.set_vexpand(True)
+                    content_area.set_hexpand(True)
+
+                    box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                    box_top.set_margin_start(20)
+                    box_top.set_margin_end(20)
+                    box_top.set_margin_top(20)
+                    box_top.set_margin_bottom(20)
+
+                    box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                    box_bottom.set_margin_start(10)
+                    box_bottom.set_margin_end(10)
+                    box_bottom.set_margin_bottom(10)
+
+                    box_top.pack_start(label, True, True, 0)
+                    box_top.pack_start(label2, True, True, 0)
+                    box_bottom.pack_start(button_yes, True, True, 0)
+
+                    content_area.add(box_top)
+                    content_area.add(box_bottom)
+
+                    dialog_image.show_all()
+                    dialog_image.run()
+                    dialog_image.destroy()
+                    continue
+                else:
+                    shutil.copy(file_path, self.banner_path_temp)
+                    self.update_image_banner()
+                    break
+            else:
+                break
 
         dialog.destroy()
+        self.set_sensitive(True)
 
     def get_banner(self):
         def fetch_banner():
@@ -4660,11 +4737,9 @@ class AddGame(Gtk.Dialog):
             os.makedirs(self.icon_directory)
 
         try:
-            # Attempt to extract the icon
             command = f'icoextract "{path}" "{self.icon_extracted}"'
             result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-            # Check if there was an error in executing the command
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
@@ -4672,7 +4747,6 @@ class AddGame(Gtk.Dialog):
                 else:
                     print(f"Error extracting icon: {result.stderr}")
             else:
-                # Convert the extracted icon to PNG
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
                 if os.path.isfile(self.icon_extracted):
@@ -4680,6 +4754,25 @@ class AddGame(Gtk.Dialog):
 
         except Exception as e:
             print(f"An error occurred: {e}")
+
+        def show_error_message(message):
+            error_dialog = Gtk.MessageDialog(
+                parent=dialog,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text=message
+            )
+            error_dialog.set_title("Invalid Image")
+            error_dialog.run()
+            error_dialog.destroy()
+
+        def is_valid_image(file_path):
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+                return pixbuf is not None
+            except Exception:
+                return False
 
         dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
         dialog.set_size_request(720, 720)
@@ -4693,6 +4786,7 @@ class AddGame(Gtk.Dialog):
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
         filter_ico.add_mime_type("image/*")
+        filechooser.set_filter(filter_ico)
 
         filter_combobox = Gtk.ComboBoxText()
         filter_combobox.append("image", "Image files")
@@ -4700,12 +4794,12 @@ class AddGame(Gtk.Dialog):
         filter_combobox.set_size_request(150, -1)
 
         button_open = Gtk.Button.new_with_label("Open")
-        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
         button_open.set_size_request(150, -1)
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
         button_cancel = Gtk.Button.new_with_label("Cancel")
-        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
         button_cancel.set_size_request(150, -1)
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
 
         button_grid = Gtk.Grid()
         button_grid.set_row_spacing(10)
@@ -4728,21 +4822,71 @@ class AddGame(Gtk.Dialog):
         filechooser.connect("update-preview", self.update_preview)
 
         dialog.show_all()
-        response = dialog.run()
 
-        if response == Gtk.ResponseType.OK:
-            file_path = filechooser.get_filename()
-            # Move and rename the icon file
-            shutil.copy(file_path, self.icon_temp)
+        while True:
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_path = filechooser.get_filename()
+                if not file_path or not is_valid_image(file_path):
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image.set_resizable(False)
+                    dialog_image.set_icon_from_file(faugus_png)
+                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    if faugus_session:
+                        dialog_image.fullscreen()
 
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
+                    label = Gtk.Label()
+                    label.set_label("The selected file is not a valid image.")
+                    label.set_halign(Gtk.Align.CENTER)
 
-            self.button_shortcut_icon.set_image(image)
+                    label2 = Gtk.Label()
+                    label2.set_label("Please choose another one.")
+                    label2.set_halign(Gtk.Align.CENTER)
 
-        # Delete the folder after the icon is moved
+                    button_yes = Gtk.Button(label="Ok")
+                    button_yes.set_size_request(150, -1)
+                    button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+
+                    content_area = dialog_image.get_content_area()
+                    content_area.set_border_width(0)
+                    content_area.set_halign(Gtk.Align.CENTER)
+                    content_area.set_valign(Gtk.Align.CENTER)
+                    content_area.set_vexpand(True)
+                    content_area.set_hexpand(True)
+
+                    box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                    box_top.set_margin_start(20)
+                    box_top.set_margin_end(20)
+                    box_top.set_margin_top(20)
+                    box_top.set_margin_bottom(20)
+
+                    box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                    box_bottom.set_margin_start(10)
+                    box_bottom.set_margin_end(10)
+                    box_bottom.set_margin_bottom(10)
+
+                    box_top.pack_start(label, True, True, 0)
+                    box_top.pack_start(label2, True, True, 0)
+                    box_bottom.pack_start(button_yes, True, True, 0)
+
+                    content_area.add(box_top)
+                    content_area.add(box_bottom)
+
+                    dialog_image.show_all()
+                    dialog_image.run()
+                    dialog_image.destroy()
+                    continue
+                else:
+                    shutil.copy(file_path, self.icon_temp)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+                    scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+                    image = Gtk.Image.new_from_file(self.icon_temp)
+                    image.set_from_pixbuf(scaled_pixbuf)
+                    self.button_shortcut_icon.set_image(image)
+                    break
+            else:
+                break
+
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
         dialog.destroy()
@@ -5732,6 +5876,7 @@ class CreateShortcut(Gtk.Window):
         return image
 
     def on_button_shortcut_icon_clicked(self, widget):
+        self.set_sensitive(False)
 
         path = self.file_path
 
@@ -5739,11 +5884,9 @@ class CreateShortcut(Gtk.Window):
             os.makedirs(self.icon_directory)
 
         try:
-            # Attempt to extract the icon
             command = f'icoextract "{path}" "{self.icon_extracted}"'
             result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-            # Check if there was an error in executing the command
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
@@ -5751,7 +5894,6 @@ class CreateShortcut(Gtk.Window):
                 else:
                     print(f"Error extracting icon: {result.stderr}")
             else:
-                # Convert the extracted icon to PNG
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
                 if os.path.isfile(self.icon_extracted):
@@ -5759,6 +5901,25 @@ class CreateShortcut(Gtk.Window):
 
         except Exception as e:
             print(f"An error occurred: {e}")
+
+        def show_error_message(message):
+            error_dialog = Gtk.MessageDialog(
+                parent=dialog,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text=message
+            )
+            error_dialog.set_title("Invalid Image")
+            error_dialog.run()
+            error_dialog.destroy()
+
+        def is_valid_image(file_path):
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+                return pixbuf is not None
+            except Exception:
+                return False
 
         dialog = Gtk.Dialog(title="Select an icon for the shortcut", parent=self, flags=0)
         dialog.set_size_request(720, 720)
@@ -5772,6 +5933,7 @@ class CreateShortcut(Gtk.Window):
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name("Image files")
         filter_ico.add_mime_type("image/*")
+        filechooser.set_filter(filter_ico)
 
         filter_combobox = Gtk.ComboBoxText()
         filter_combobox.append("image", "Image files")
@@ -5779,12 +5941,12 @@ class CreateShortcut(Gtk.Window):
         filter_combobox.set_size_request(150, -1)
 
         button_open = Gtk.Button.new_with_label("Open")
-        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
         button_open.set_size_request(150, -1)
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
         button_cancel = Gtk.Button.new_with_label("Cancel")
-        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
         button_cancel.set_size_request(150, -1)
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
 
         button_grid = Gtk.Grid()
         button_grid.set_row_spacing(10)
@@ -5807,21 +5969,71 @@ class CreateShortcut(Gtk.Window):
         filechooser.connect("update-preview", self.update_preview)
 
         dialog.show_all()
-        response = dialog.run()
 
-        if response == Gtk.ResponseType.OK:
-            file_path = filechooser.get_filename()
-            # Move and rename the icon file
-            shutil.copy(file_path, self.icon_temp)
+        while True:
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_path = filechooser.get_filename()
+                if not file_path or not is_valid_image(file_path):
+                    dialog_image = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                    dialog_image.set_resizable(False)
+                    dialog_image.set_icon_from_file(faugus_png)
+                    subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+                    if faugus_session:
+                        dialog_image.fullscreen()
 
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
+                    label = Gtk.Label()
+                    label.set_label("The selected file is not a valid image.")
+                    label.set_halign(Gtk.Align.CENTER)
 
-            self.button_shortcut_icon.set_image(image)
+                    label2 = Gtk.Label()
+                    label2.set_label("Please choose another one.")
+                    label2.set_halign(Gtk.Align.CENTER)
 
-        # Delete the folder after the icon is moved
+                    button_yes = Gtk.Button(label="Ok")
+                    button_yes.set_size_request(150, -1)
+                    button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+
+                    content_area = dialog_image.get_content_area()
+                    content_area.set_border_width(0)
+                    content_area.set_halign(Gtk.Align.CENTER)
+                    content_area.set_valign(Gtk.Align.CENTER)
+                    content_area.set_vexpand(True)
+                    content_area.set_hexpand(True)
+
+                    box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                    box_top.set_margin_start(20)
+                    box_top.set_margin_end(20)
+                    box_top.set_margin_top(20)
+                    box_top.set_margin_bottom(20)
+
+                    box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                    box_bottom.set_margin_start(10)
+                    box_bottom.set_margin_end(10)
+                    box_bottom.set_margin_bottom(10)
+
+                    box_top.pack_start(label, True, True, 0)
+                    box_top.pack_start(label2, True, True, 0)
+                    box_bottom.pack_start(button_yes, True, True, 0)
+
+                    content_area.add(box_top)
+                    content_area.add(box_bottom)
+
+                    dialog_image.show_all()
+                    dialog_image.run()
+                    dialog_image.destroy()
+                    continue
+                else:
+                    shutil.copy(file_path, self.icon_temp)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+                    scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+                    image = Gtk.Image.new_from_file(self.icon_temp)
+                    image.set_from_pixbuf(scaled_pixbuf)
+                    self.button_shortcut_icon.set_image(image)
+                    break
+            else:
+                break
+
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
         dialog.destroy()
