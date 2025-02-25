@@ -1590,7 +1590,7 @@ class Main(Gtk.Window):
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
             shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
-            allocation = edit_game_dialog.grid_shortcut.get_allocation()
+            allocation = edit_game_dialog.box_shortcut.get_allocation()
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width - 20), -1, True)
             edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
             edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
@@ -4222,7 +4222,7 @@ class AddGame(Gtk.Dialog):
         if interface_mode != "Banners":
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
-        allocation = self.grid_shortcut.get_allocation()
+        allocation = self.box_shortcut.get_allocation()
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 20), -1, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
@@ -4714,8 +4714,8 @@ class AddGame(Gtk.Dialog):
                 allocation = self.image_banner.get_allocation()
 
                 if active_index ==1:
-                    self.grid_shortcut.set_size_request(allocation.width, -1)
-                    allocation2 = self.grid_shortcut.get_allocation()
+                    self.box_shortcut.set_size_request(allocation.width, -1)
+                    allocation2 = self.box_shortcut.get_allocation()
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation2.width, -1, True)
                     self.image_banner.set_from_pixbuf(pixbuf)
                     self.image_banner2.set_from_pixbuf(pixbuf)
