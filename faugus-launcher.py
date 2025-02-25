@@ -13,6 +13,7 @@ import socket
 import urllib.request
 import json
 import requests
+import vdf
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -59,6 +60,17 @@ lock = FileLock(lock_file_path)
 
 faugus_session = False
 
+steam_userdata_path = f'{share_dir}/Steam/userdata'
+
+def detect_steam_id():
+    if os.path.exists(steam_userdata_path):
+        steam_ids = [f for f in os.listdir(steam_userdata_path) if os.path.isdir(os.path.join(steam_userdata_path, f))]
+        if steam_ids:
+            return steam_ids[0]
+    return None
+
+steam_id = detect_steam_id()
+steam_shortcuts_path = f'{steam_userdata_path}/' + '{}/config/shortcuts.vdf'.format(steam_id)
 
 if not os.path.exists(faugus_launcher_share_dir):
     os.makedirs(faugus_launcher_share_dir)
@@ -116,6 +128,8 @@ class Main(Gtk.Window):
         self.double_click_time_threshold = 500
 
         self.flowbox_child = None
+
+        self.updated_steam_id = None
 
         # Define the configuration path
         config_path = faugus_launcher_dir
@@ -1605,6 +1619,17 @@ class Main(Gtk.Window):
             else:
                 edit_game_dialog.checkbox_addapp.set_active(False)
 
+            self.updated_steam_id = detect_steam_id()
+            if self.updated_steam_id is not None:
+                if self.check_steam_shortcut(title):
+                    edit_game_dialog.checkbox_steam_shortcut.set_active(True)
+                else:
+                    edit_game_dialog.checkbox_steam_shortcut.set_active(False)
+            else:
+                edit_game_dialog.checkbox_steam_shortcut.set_active(False)
+                edit_game_dialog.checkbox_steam_shortcut.set_sensitive(False)
+                edit_game_dialog.checkbox_steam_shortcut.set_tooltip_text("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND.")
+
             edit_game_dialog.check_existing_shortcut()
 
             image = self.set_image_shortcut_icon(game.title, edit_game_dialog.icons_path, edit_game_dialog.icon_temp)
@@ -1620,6 +1645,20 @@ class Main(Gtk.Window):
                 edit_game_dialog.button_run.set_tooltip_text(f'{game.title} is running. Please close it first.')
 
             edit_game_dialog.show()
+
+    def check_steam_shortcut(self, title):
+        if os.path.exists(steam_shortcuts_path):
+            try:
+                with open(steam_shortcuts_path, 'rb') as f:
+                    shortcuts = vdf.binary_load(f)
+                for game in shortcuts["shortcuts"].values():
+                    if game["AppName"] == title:
+                        return True
+                return False
+            except SyntaxError:
+                return False
+        else:
+            return False
 
     def set_image_shortcut_icon(self, title, icons_path, icon_temp):
 
@@ -1671,6 +1710,7 @@ class Main(Gtk.Window):
 
                 # Remove the shortcut
                 self.remove_shortcut(game)
+                self.remove_steam_shortcut(title)
                 self.remove_banner(game)
 
                 self.games.remove(game)
@@ -1691,6 +1731,20 @@ class Main(Gtk.Window):
 
             confirmation_dialog.destroy()
 
+    def remove_steam_shortcut(self, title):
+        if os.path.exists(steam_shortcuts_path):
+            try:
+                with open(steam_shortcuts_path, 'rb') as f:
+                    shortcuts = vdf.binary_load(f)
+
+                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if game["AppName"] == title]
+                for app_id in to_remove:
+                    del shortcuts["shortcuts"][app_id]
+
+                with open(steam_shortcuts_path, 'wb') as f:
+                    vdf.binary_dump(shortcuts, f)
+            except SyntaxError:
+                pass
 
     def remove_game_from_latest_games(self, title):
         try:
@@ -1822,6 +1876,7 @@ class Main(Gtk.Window):
 
             # Determine the state of the shortcut checkbox
             shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
+            steam_shortcut_state = add_game_dialog.checkbox_steam_shortcut.get_active()
 
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
@@ -1893,6 +1948,7 @@ class Main(Gtk.Window):
             if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
                 if addapp_checkbox == "addapp_enabled":
                     with open(addapp_bat, "w") as bat_file:
@@ -2176,9 +2232,11 @@ class Main(Gtk.Window):
 
             # Determine the state of the shortcut checkbox
             shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
+            steam_shortcut_state = edit_game_dialog.checkbox_steam_shortcut.get_active()
 
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
             if game.addapp_checkbox == True:
                 with open(game.addapp_bat, "w") as bat_file:
@@ -2307,6 +2365,141 @@ class Main(Gtk.Window):
         # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copy(applications_shortcut_path, desktop_shortcut_path)
+
+    def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
+        def add_game_to_steam(title, game_directory, icon, command):
+            # Load existing shortcuts
+            shortcuts = load_shortcuts(title)
+            remove_shortcuts(shortcuts, title)
+
+            # Generate a new ID for the game
+            new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys()] or [0]) + 1
+
+            # Add the new game
+            shortcuts["shortcuts"][str(new_app_id)] = {
+                "appid": new_app_id,
+                "AppName": title,
+                "Exe": f'"{faugus_run}"',
+                "StartDir": game_directory,
+                "icon": icon,
+                "ShortcutPath": "",
+                "LaunchOptions": f'"{command}"',
+                "IsHidden": 0,
+                "AllowDesktopConfig": 1,
+                "AllowOverlay": 1,
+                "OpenVR": 0,
+                "Devkit": 0,
+                "DevkitGameID": "",
+                "LastPlayTime": 0,
+                "FlatpakAppID": "",
+            }
+
+            # Save shortcuts back to the file
+            save_shortcuts(shortcuts)
+
+        def remove_shortcuts(shortcuts, title):
+            # Find and remove existing shortcuts with the same title
+            to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if game["AppName"] == title]
+            for app_id in to_remove:
+                del shortcuts["shortcuts"][app_id]
+            save_shortcuts(shortcuts)
+
+        def load_shortcuts(title):
+            # Check if the file exists
+            if os.path.exists(steam_shortcuts_path):
+                try:
+                    # Attempt to load existing shortcuts
+                    with open(steam_shortcuts_path, 'rb') as f:
+                        return vdf.binary_load(f)
+                except SyntaxError:
+                    # If the file is corrupted, create a new one
+                    return {"shortcuts": {}}
+            else:
+                # If the file does not exist, create a new one
+                return {"shortcuts": {}}
+
+        def save_shortcuts(shortcuts):
+            # Save shortcuts back to the file
+            with open(steam_shortcuts_path, 'wb') as f:
+                vdf.binary_dump(shortcuts, f)
+
+        # Check if the shortcut checkbox is checked
+        if not steam_shortcut_state:
+            # Remove existing shortcut if it exists
+            shortcuts = load_shortcuts(game.title)
+            remove_shortcuts(shortcuts, game.title)
+            if os.path.isfile(os.path.expanduser(icon_temp)):
+                os.rename(os.path.expanduser(icon_temp), icon_final)
+            return
+
+        if os.path.isfile(os.path.expanduser(icon_temp)):
+            os.rename(os.path.expanduser(icon_temp), icon_final)
+
+        # Handle the click event of the Create Shortcut button
+        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
+        title_formatted = title_formatted.replace(' ', '-')
+        title_formatted = '-'.join(title_formatted.lower().split())
+
+        prefix = game.prefix
+        path = game.path
+        launch_arguments = game.launch_arguments
+        game_arguments = game.game_arguments
+        protonfix = game.protonfix
+        runner = game.runner
+        addapp_checkbox = game.addapp_checkbox
+        addapp_bat = game.addapp_bat
+
+        mangohud = "MANGOHUD=1" if game.mangohud else ""
+        gamemode = "gamemoderun" if game.gamemode else ""
+        prefer_sdl = "PROTON_PREFER_SDL=1" if game.prefer_sdl else ""
+        addapp = "addapp_enabled" if game.addapp_checkbox else ""
+
+        # Check if the icon file exists
+        icons_path = icons_dir
+        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
+        if not os.path.exists(new_icon_path):
+            new_icon_path = faugus_png
+
+        # Get the directory containing the executable
+        game_directory = os.path.dirname(path)
+
+        command_parts = []
+
+        # Add command parts if they are not empty
+        if mangohud:
+            command_parts.append(mangohud)
+        if prefer_sdl:
+            command_parts.append(prefer_sdl)
+        if runner != "Linux-Native":
+            if prefix:
+                command_parts.append(f"WINEPREFIX='{prefix}'")
+        if protonfix:
+            command_parts.append(f'GAMEID={protonfix}')
+        else:
+            command_parts.append(f'GAMEID={title_formatted}')
+        if runner:
+            if runner == "Linux-Native":
+                command_parts.append('UMU_NO_PROTON=1')
+            else:
+                command_parts.append(f'PROTONPATH={runner}')
+        if gamemode:
+            command_parts.append(gamemode)
+        if launch_arguments:
+            command_parts.append(launch_arguments)
+
+        # Add the fixed command and remaining arguments
+        command_parts.append(f"'{umu_run}'")
+        if addapp == "addapp_enabled":
+            command_parts.append(f"'{addapp_bat}'")
+        elif path:
+            command_parts.append(f"'{path}'")
+        if game_arguments:
+            command_parts.append(f"{game_arguments}")
+
+        # Join all parts into a single command
+        command = ' '.join(command_parts)
+
+        add_game_to_steam(game.title, game_directory, new_icon_path, command)
 
     def update_preview(self, dialog):
         if file_path := dialog.get_preview_filename():
@@ -3551,6 +3744,7 @@ class AddGame(Gtk.Dialog):
         self.set_icon_from_file(faugus_png)
         self.api_key = api_key
         self.interface_mode = interface_mode
+        self.updated_steam_id = None
 
         if faugus_session:
 
@@ -3623,13 +3817,21 @@ class AddGame(Gtk.Dialog):
         self.grid_runner.set_margin_end(10)
         self.grid_runner.set_margin_top(10)
 
-        self.grid_shortcut = Gtk.Grid()
+        self.grid_shortcut = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
         self.grid_shortcut.set_row_spacing(10)
         self.grid_shortcut.set_column_spacing(10)
         self.grid_shortcut.set_margin_start(10)
         self.grid_shortcut.set_margin_end(10)
         self.grid_shortcut.set_margin_top(10)
         self.grid_shortcut.set_margin_bottom(10)
+
+        self.grid_shortcut_icon = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        self.grid_shortcut_icon.set_row_spacing(10)
+        self.grid_shortcut_icon.set_column_spacing(10)
+        self.grid_shortcut_icon.set_margin_start(10)
+        self.grid_shortcut_icon.set_margin_end(10)
+        self.grid_shortcut_icon.set_margin_top(10)
+        self.grid_shortcut_icon.set_margin_bottom(10)
 
         self.grid_protonfix = Gtk.Grid()
         self.grid_protonfix.set_row_spacing(10)
@@ -3793,6 +3995,9 @@ class AddGame(Gtk.Dialog):
 
         # Button for creating shortcut
         self.checkbox_shortcut = Gtk.CheckButton(label="Shortcut")
+        self.checkbox_shortcut.set_tooltip_text("Add or remove a shortcut from the Desktop and the Application Launcher.")
+        self.checkbox_steam_shortcut = Gtk.CheckButton(label="Steam Shortcut")
+        self.checkbox_steam_shortcut.set_tooltip_text("Add or remove a shortcut from Steam. Steam needs to be restarted.")
 
         # Button for selection shortcut icon
         self.button_shortcut_icon = Gtk.Button()
@@ -3906,16 +4111,21 @@ class AddGame(Gtk.Dialog):
         self.grid_runner.attach(self.combo_box_runner, 0, 1, 1, 1)
         self.combo_box_runner.set_hexpand(True)
 
-        self.grid_shortcut.attach(self.button_shortcut_icon, 2, 0, 1, 1)
-        self.grid_shortcut.attach(self.checkbox_shortcut, 0, 0, 1, 1)
-        self.checkbox_shortcut.set_hexpand(True)
+        self.grid_shortcut.add(self.checkbox_shortcut)
+        self.grid_shortcut.add(self.checkbox_steam_shortcut)
+        self.grid_shortcut_icon.add(self.button_shortcut_icon)
+        self.grid_shortcut.set_valign(Gtk.Align.CENTER)
+
+        self.box_shortcut = Gtk.Box()
+        self.box_shortcut.pack_start(self.grid_shortcut, False, False, 0)
+        self.box_shortcut.pack_end(self.grid_shortcut_icon, False, False, 0)
 
         page1.add(self.grid_launcher)
         page1.add(self.grid_title)
         page1.add(self.grid_path)
         page1.add(self.grid_prefix)
         page1.add(self.grid_runner)
-        page1.add(self.grid_shortcut)
+        page1.add(self.box_shortcut)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
@@ -3998,6 +4208,11 @@ class AddGame(Gtk.Dialog):
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
 
+        self.updated_steam_id = detect_steam_id()
+        if not self.updated_steam_id:
+            edit_game_dialog.checkbox_steam_shortcut.set_sensitive(False)
+            edit_game_dialog.checkbox_steam_shortcut.set_tooltip_text("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND.")
+
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
@@ -4011,6 +4226,21 @@ class AddGame(Gtk.Dialog):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 20), -1, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def check_steam_shortcut(self, title):
+        if os.path.exists(steam_shortcuts_path):
+            try:
+                with open(steam_shortcuts_path, 'rb') as f:
+                    shortcuts = vdf.binary_load(f)
+                for game in shortcuts["shortcuts"].values():
+                    if game["AppName"] == title:
+                        return True
+                return False
+            except SyntaxError:
+                return False
+        else:
+            return False
+
 
     def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         current_text = widget.get_text()
