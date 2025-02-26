@@ -19,7 +19,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('AyatanaAppIndicator3', '0.1')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio, Pango
 from PIL import Image
 from filelock import FileLock, Timeout
 
@@ -141,7 +141,7 @@ class Main(Gtk.Window):
 
         config_file = config_file_dir
         if not os.path.exists(config_file):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
+            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
 
         self.games = []
 
@@ -985,12 +985,11 @@ class Main(Gtk.Window):
             self.start_boot = config_dict.get('start-boot', 'False') == 'True'
             self.start_maximized = config_dict.get('start-maximized', 'False') == 'True'
             self.interface_mode = config_dict.get('interface-mode', '').strip('"')
-            self.api_key = config_dict.get('api-key', '').strip('"')
             self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             self.gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1287,7 +1286,6 @@ class Main(Gtk.Window):
         self.checkbox_start_maximized = settings_dialog.checkbox_start_maximized
         self.entry_default_prefix = settings_dialog.entry_default_prefix
         self.combo_box_interface = settings_dialog.combo_box_interface
-        self.entry_api_key = settings_dialog.entry_api_key
         self.checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen
         self.checkbox_gamepad_navigation = settings_dialog.checkbox_gamepad_navigation
         self.checkbox_enable_logging = settings_dialog.checkbox_enable_logging
@@ -1305,7 +1303,6 @@ class Main(Gtk.Window):
         checkbox_start_maximized = self.checkbox_start_maximized.get_active()
         default_prefix = self.entry_default_prefix.get_text()
         combo_box_interface = self.combo_box_interface.get_active_text()
-        entry_api_key = self.entry_api_key.get_text()
         checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
         checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
@@ -1322,11 +1319,11 @@ class Main(Gtk.Window):
 
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
-            validation_result = self.validate_settings_fields(settings_dialog, default_prefix, entry_api_key)
+            validation_result = self.validate_settings_fields(settings_dialog, default_prefix)
             if not validation_result:
                 return
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -1359,16 +1356,13 @@ class Main(Gtk.Window):
         else:
             settings_dialog.destroy()
 
-    def validate_settings_fields(self, settings_dialog, default_prefix, entry_api_key):
+    def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
-        settings_dialog.entry_api_key.get_style_context().remove_class("entry")
 
         if settings_dialog.combo_box_interface.get_active_text() == "Banners":
-            if not default_prefix or not entry_api_key:
+            if not default_prefix:
                 if not default_prefix:
                     settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
-                if not entry_api_key:
-                    settings_dialog.entry_api_key.get_style_context().add_class("entry")
                 return False
             return True
         elif not default_prefix:
@@ -1536,7 +1530,7 @@ class Main(Gtk.Window):
     def on_button_add_clicked(self, widget):
         file_path=""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.game_running2, file_path, self.api_key, self.interface_mode)
+        add_game_dialog = AddGame(self, self.game_running2, file_path, self.interface_mode)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
@@ -1555,7 +1549,7 @@ class Main(Gtk.Window):
                 self.game_running2 = True
             else:
                 self.game_running2 = False
-            edit_game_dialog = AddGame(self, self.game_running2, file_path, self.api_key, self.interface_mode)
+            edit_game_dialog = AddGame(self, self.game_running2, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model = edit_game_dialog.combo_box_runner.get_model()
@@ -2413,10 +2407,11 @@ class Main(Gtk.Window):
 
         def remove_shortcuts(shortcuts, title):
             # Find and remove existing shortcuts with the same title
-            to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if game["AppName"] == title]
-            for app_id in to_remove:
-                del shortcuts["shortcuts"][app_id]
-            save_shortcuts(shortcuts)
+            if os.path.exists(steam_shortcuts_path):
+                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if game["AppName"] == title]
+                for app_id in to_remove:
+                    del shortcuts["shortcuts"][app_id]
+                save_shortcuts(shortcuts)
 
         def load_shortcuts(title):
             # Check if the file exists
@@ -2663,7 +2658,7 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2692,7 +2687,6 @@ class Main(Gtk.Window):
         config['start-boot'] = checkbox_start_boot
         config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_maximized
-        config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
@@ -2742,14 +2736,6 @@ class Settings(Gtk.Dialog):
         self.combo_box_interface.append_text("List")
         self.combo_box_interface.append_text("Blocks")
         self.combo_box_interface.append_text("Banners")
-
-        self.label_api_key = Gtk.Label(label="SteamGridDB API Key")
-        self.label_api_key.set_halign(Gtk.Align.START)
-        self.label_api_key.set_markup('<a href="https://www.steamgriddb.com/profile/preferences/api">SteamGridDB API Key</a>')
-        self.label_api_key.connect("activate-link", self.on_link_clicked)
-        self.entry_api_key = Gtk.Entry()
-        self.entry_api_key.set_has_tooltip(True)
-        self.entry_api_key.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Create checkbox for 'Start maximized' option
         self.checkbox_start_maximized = Gtk.CheckButton(label="Start maximized")
@@ -2983,12 +2969,9 @@ class Settings(Gtk.Dialog):
         grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
         self.combo_box_interface.set_hexpand(True)
 
-        self.grid_big_interface.attach(self.label_api_key, 0, 0, 1, 1)
-        self.grid_big_interface.attach(self.entry_api_key, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 2, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 3, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 4, 1, 1)
-        self.entry_api_key.set_hexpand(True)
+        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 0, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
 
         grid_support.attach(self.label_support, 0, 0, 1, 1)
         grid_support.attach(button_kofi, 0, 1, 1, 1)
@@ -3069,12 +3052,8 @@ class Settings(Gtk.Dialog):
             self.grid_big_interface.set_visible(False)
         if active_index == 1:
             self.grid_big_interface.set_visible(True)
-            self.label_api_key.set_visible(False)
-            self.entry_api_key.set_visible(False)
         if active_index == 2:
             self.grid_big_interface.set_visible(True)
-            self.label_api_key.set_visible(True)
-            self.entry_api_key.set_visible(True)
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
@@ -3147,6 +3126,10 @@ class Settings(Gtk.Dialog):
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
 
+        cell_renderer = self.combo_box_runner.get_cells()[0]
+        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+        cell_renderer.set_property("max-width-chars", 20)
+
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
             entry.get_style_context().remove_class("entry")
@@ -3163,7 +3146,6 @@ class Settings(Gtk.Dialog):
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
-            entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
@@ -3178,7 +3160,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3319,7 +3301,6 @@ class Settings(Gtk.Dialog):
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
-            entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
@@ -3334,7 +3315,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3400,7 +3381,6 @@ class Settings(Gtk.Dialog):
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
-            entry_api_key = self.entry_api_key.get_text()
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
@@ -3415,7 +3395,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3533,7 +3513,6 @@ class Settings(Gtk.Dialog):
             start_boot = config_dict.get('start-boot', 'False') == 'True'
             start_maximized = config_dict.get('start-maximized', 'False') == 'True'
             self.interface_mode = config_dict.get('interface-mode', '').strip('"')
-            self.api_key = config_dict.get('api-key', '').strip('"')
             start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
             enable_logging = config_dict.get('enable-logging', 'False') == 'True'
@@ -3571,10 +3550,9 @@ class Settings(Gtk.Dialog):
                     break
 
             self.combo_box_interface.set_active(index_to_activate2)
-            self.entry_api_key.set_text(self.api_key)
         else:
             # Save default configuration if file does not exist
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
+            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
 
 
 class Game:
@@ -3749,14 +3727,13 @@ class ConfirmationDialog(Gtk.Dialog):
 
 
 class AddGame(Gtk.Dialog):
-    def __init__(self, parent, game_running2, file_path, api_key, interface_mode):
+    def __init__(self, parent, game_running2, file_path, interface_mode):
         # Initialize the AddGame dialog
         super().__init__(title="New Game/App", parent=parent)
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
         self.set_icon_from_file(faugus_png)
-        self.api_key = api_key
         self.interface_mode = interface_mode
         self.updated_steam_id = None
 
@@ -4224,8 +4201,8 @@ class AddGame(Gtk.Dialog):
 
         self.updated_steam_id = detect_steam_id()
         if not self.updated_steam_id:
-            edit_game_dialog.checkbox_steam_shortcut.set_sensitive(False)
-            edit_game_dialog.checkbox_steam_shortcut.set_tooltip_text("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND.")
+            self.checkbox_steam_shortcut.set_sensitive(False)
+            self.checkbox_steam_shortcut.set_tooltip_text("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND.")
 
         # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
@@ -4412,100 +4389,23 @@ class AddGame(Gtk.Dialog):
 
     def get_banner(self):
         def fetch_banner():
-            title = self.entry_title.get_text()
+            game_name = self.entry_title.get_text().strip()
+            if not game_name:
+                return
+
+            api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
             try:
-                # Request SteamGridDB API
-                headers = {"Authorization": f"Bearer {self.api_key}"}
-                response = requests.get(f"https://www.steamgriddb.com/api/v2/search/autocomplete/{title}", headers=headers)
+                response = requests.get(api_url)
                 response.raise_for_status()
-                data = response.json()
-
-                # Check if any game was found
-                if not data["data"]:
-                    print(f"No game found with the title: {title}")
-                    return
-
-                # Get the ID of the first game found
-                game_id = data["data"][0]["id"]
-
-                # Fetch images for the game with 2:3 filter (Steam Vertical)
-                params = {"dimensions": "600x900"}  # Adjust for the desired format
-                images_response = requests.get(
-                    f"https://www.steamgriddb.com/api/v2/grids/game/{game_id}",
-                    headers=headers,
-                    params=params
-                )
-                images_response.raise_for_status()
-                images_data = images_response.json()
-
-                # Select the first available image
-                if not images_data["data"]:
-                    print("No image found for this game.")
-                    return
-
-                image_url = images_data["data"][0]["url"]
-
-                # Download and save the image
-                image_response = requests.get(image_url)
-                image_response.raise_for_status()
-
-                # Check if the banners directory exists, otherwise create it
-                os.makedirs(banners_dir, exist_ok=True)
+                image_url = response.text.strip('"')
 
                 with open(self.banner_path_temp, "wb") as image_file:
-                    image_file.write(image_response.content)
+                    image_file.write(requests.get(image_url).content)
 
-                # Display the image in Gtk.Image on the main thread
                 GLib.idle_add(self.update_image_banner)
 
-            except requests.exceptions.RequestException as e:
-                dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
-                dialog.set_resizable(False)
-                dialog.set_icon_from_file(faugus_png)
-                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-                if faugus_session:
-                    dialog.fullscreen()
-
-                label = Gtk.Label()
-                label.set_label("Error downloading the banner from SteamDBGrid.")
-                label.set_halign(Gtk.Align.CENTER)
-
-                label2 = Gtk.Label()
-                label2.set_label("Check the API Key and the internet connection.")
-                label2.set_halign(Gtk.Align.CENTER)
-
-                button_yes = Gtk.Button(label="Ok")
-                button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
-
-                content_area = dialog.get_content_area()
-                content_area.set_border_width(0)
-                content_area.set_halign(Gtk.Align.CENTER)
-                content_area.set_valign(Gtk.Align.CENTER)
-                content_area.set_vexpand(True)
-                content_area.set_hexpand(True)
-
-                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-                box_top.set_margin_start(20)
-                box_top.set_margin_end(20)
-                box_top.set_margin_top(20)
-                box_top.set_margin_bottom(20)
-
-                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                box_bottom.set_margin_start(10)
-                box_bottom.set_margin_end(10)
-                box_bottom.set_margin_bottom(10)
-
-                box_top.pack_start(label, True, True, 0)
-                box_top.pack_start(label2, True, True, 0)
-                box_bottom.pack_start(button_yes, True, True, 0)
-
-                content_area.add(box_top)
-                content_area.add(box_bottom)
-
-                dialog.show_all()
-                dialog.run()
-                dialog.destroy()
+            except requests.RequestException as e:
+                print("Erro ao buscar o banner:", e)
 
         # Start the thread
         threading.Thread(target=fetch_banner, daemon=True).start()
@@ -4787,6 +4687,10 @@ class AddGame(Gtk.Dialog):
 
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
+
+        cell_renderer = self.combo_box_runner.get_cells()[0]
+        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+        cell_renderer.set_property("max-width-chars", 20)
 
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
@@ -5936,9 +5840,9 @@ class CreateShortcut(Gtk.Window):
 
         else:
             # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, entry_api_key, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -5975,7 +5879,6 @@ class CreateShortcut(Gtk.Window):
         config['start-boot'] = checkbox_start_boot
         config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_maximized
-        config['api-key'] = entry_api_key
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
@@ -6357,7 +6260,6 @@ def run_file(file_path):
             f.write(f'start-boot=False\n')
             f.write(f'interface-mode=List\n')
             f.write(f'start-maximized=False\n')
-            f.write(f'api-key=\n')
             f.write(f'gamepad-navigation=False\n')
 
     if not file_path.endswith(".reg"):
