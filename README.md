@@ -107,7 +107,12 @@ flatpak install faugus-launcher-0.3.4-1.flatpak
 # Optional tools
 flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
 ```
-ATTENTION: Gamescope is not working yet!
+Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
+```
+sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
+sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/org.faugus.faugus_launcher/config/faugus-launcher/
+```
+Gamescope doesn't work.
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
