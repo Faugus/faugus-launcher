@@ -144,10 +144,9 @@ For Application Launchers
 <img src=https://github.com/user-attachments/assets/eb988923-4f0c-4c89-97fb-f9106c90620d/><br><br>
 <img src=https://github.com/user-attachments/assets/19b42740-92fa-4fae-befc-13296c97d029/><br>
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/93a69aa1-6248-42ec-8191-cbf297cc525f/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/cd929bf9-4a6b-461e-9aa6-0e701da679c4/><br>
+<img src=https://github.com/user-attachments/assets/89c41b52-ec4e-4f00-99ea-22d5c462e19b/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/cd929bf9-4a6b-461e-9aa6-0e701da679c4/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/ce53a552-50d5-4e8b-88b2-c67ab41b2007/><br>
-
+<img src=https://github.com/user-attachments/assets/584c176b-efb6-4590-bd08-956ad600da92/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/c46f90ac-7713-46bf-8795-33d3917fb48e/><br>
 ### Create shortcut from .exe
