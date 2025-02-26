@@ -2370,29 +2370,43 @@ class Main(Gtk.Window):
         def add_game_to_steam(title, game_directory, icon, command):
             # Load existing shortcuts
             shortcuts = load_shortcuts(title)
-            remove_shortcuts(shortcuts, title)
 
-            # Generate a new ID for the game
-            new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys()] or [0]) + 1
+            # Check if the game already exists
+            existing_app_id = None
+            for app_id, game_info in shortcuts["shortcuts"].items():
+                if game_info["AppName"] == title:
+                    existing_app_id = app_id
+                    break
 
-            # Add the new game
-            shortcuts["shortcuts"][str(new_app_id)] = {
-                "appid": new_app_id,
-                "AppName": title,
-                "Exe": f'"{faugus_run}"',
-                "StartDir": game_directory,
-                "icon": icon,
-                "ShortcutPath": "",
-                "LaunchOptions": f'"{command}"',
-                "IsHidden": 0,
-                "AllowDesktopConfig": 1,
-                "AllowOverlay": 1,
-                "OpenVR": 0,
-                "Devkit": 0,
-                "DevkitGameID": "",
-                "LastPlayTime": 0,
-                "FlatpakAppID": "",
-            }
+            if existing_app_id:
+                # Update only the necessary fields without replacing the entire entry
+                game_info = shortcuts["shortcuts"][existing_app_id]
+                game_info["Exe"] = f'"{faugus_run}"'
+                game_info["StartDir"] = game_directory
+                game_info["icon"] = icon
+                game_info["LaunchOptions"] = f'"{command}"'
+            else:
+                # Generate a new ID for the game
+                new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys()] or [0]) + 1
+
+                # Add the new game
+                shortcuts["shortcuts"][str(new_app_id)] = {
+                    "appid": new_app_id,
+                    "AppName": title,
+                    "Exe": f'"{faugus_run}"',
+                    "StartDir": game_directory,
+                    "icon": icon,
+                    "ShortcutPath": "",
+                    "LaunchOptions": f'"{command}"',
+                    "IsHidden": 0,
+                    "AllowDesktopConfig": 1,
+                    "AllowOverlay": 1,
+                    "OpenVR": 0,
+                    "Devkit": 0,
+                    "DevkitGameID": "",
+                    "LastPlayTime": 0,
+                    "FlatpakAppID": "",
+                }
 
             # Save shortcuts back to the file
             save_shortcuts(shortcuts)
