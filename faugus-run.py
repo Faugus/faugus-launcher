@@ -21,6 +21,7 @@ logs_dir = f'{faugus_launcher_dir}/logs'
 config_file_dir = f'{faugus_launcher_dir}/config.ini'
 share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
+faugus_notification = '/usr/share/faugus-launcher/faugus-notification.ogg'
 eac_dir = f'PROTON_EAC_RUNTIME={faugus_launcher_dir}/components/eac'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={faugus_launcher_dir}/components/be'
 
@@ -46,7 +47,7 @@ class FaugusRun:
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-i", "dialog-error"])
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
         if faugus_session:
             dialog.fullscreen()
 
@@ -391,9 +392,12 @@ class FaugusRun:
         if "mtree is OK" in clean_line:
             self.label2.set_text("Steam Runtime is up to date")
 
-
-        if "fsync: up and running." in clean_line or "Command exited with status: 0" in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
-            GLib.timeout_add_seconds(0, self.close_warning_dialog)
+        if "UMU_NO_PROTON" in self.message:
+            if "steamrt3 is up to date" in clean_line or "mtree is OK" in clean_line:
+                GLib.timeout_add_seconds(0, self.close_warning_dialog)
+        else:
+            if "fsync: up and running." in clean_line or "Command exited with status: 0" in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
+                GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
