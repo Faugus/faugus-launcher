@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Faugus Create Shortcut
-Exec=faugus-launcher %f shortcut
+Exec=faugus-launcher --shortcut %f
 MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
 Icon=faugus-launcher
 Categories=Utility;

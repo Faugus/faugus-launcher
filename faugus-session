@@ -47,4 +47,4 @@ if [ "$HDR_SUPPORT" == 1 ]; then
     GAMESCOPE_PARAMS="$GAMESCOPE_PARAMS --hdr-enabled"
 fi
 
-gamescope $GAMESCOPE_PARAMS -- faugus-launcher session
+gamescope $GAMESCOPE_PARAMS -- faugus-launcher --session

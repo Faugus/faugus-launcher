@@ -56,7 +56,7 @@ faugus_launcher_share_dir = f"{share_dir}/faugus-launcher"
 faugus_temp = os.path.expanduser('~/faugus_temp')
 
 lock_file_path = f"{faugus_launcher_share_dir}/faugus-launcher.lock"
-lock = FileLock(lock_file_path)
+lock = FileLock(lock_file_path, timeout=0)
 
 faugus_session = False
 
@@ -74,13 +74,6 @@ steam_shortcuts_path = f'{steam_userdata_path}/' + '{}/config/shortcuts.vdf'.for
 
 if not os.path.exists(faugus_launcher_share_dir):
     os.makedirs(faugus_launcher_share_dir)
-
-def is_already_running():
-    try:
-        lock.acquire(timeout=1)
-        return False
-    except Timeout:
-        return True
 
 def get_desktop_dir():
     try:
@@ -103,9 +96,6 @@ class Main(Gtk.Window):
         # Initialize the main window with title and default size
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_icon_from_file(faugus_png)
-
-        if faugus_session:
-            self.fullscreen()
 
         self.banner_mode = False
         self.start_maximized = False
@@ -191,6 +181,9 @@ class Main(Gtk.Window):
         self.context_menu.show_all()
 
         self.load_config()
+        if faugus_session:
+            self.fullscreen()
+            self.interface_mode = "Banners"
         if self.interface_mode == "List":
             self.small_interface()
         if self.interface_mode == "Blocks":
@@ -1386,7 +1379,7 @@ class Main(Gtk.Window):
                 with open(autostart_path, "w") as f:
                     f.write("""[Desktop Entry]
     Categories=Utility;
-    Exec=faugus-launcher %f hide
+    Exec=faugus-launcher --hide
     Icon=faugus-launcher
     MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
     Name=Faugus Launcher
@@ -3738,7 +3731,6 @@ class AddGame(Gtk.Dialog):
         self.updated_steam_id = None
 
         if faugus_session:
-
             self.fullscreen()
 
         self.icon_directory = f"{icons_dir}/icon_temp/"
@@ -6402,46 +6394,45 @@ def update_hdr_setting():
 def main():
     global faugus_session
 
-    # Ensure session.ini exists
     ensure_session_ini()
     update_hdr_setting()
-
-    # Your existing setup
     convert_games_txt_to_json(games_txt, games_json)
     apply_dark_theme()
 
     if len(sys.argv) == 1:
         app = Main()
-        if is_already_running():
-            print("Faugus Launcher is already running.")
-            sys.exit(0)
         app.connect("destroy", app.on_destroy)
         Gtk.main()
-    elif len(sys.argv) == 2 and sys.argv[1] == "hide":
-        app = Main()
-        if is_already_running():
-            print("Faugus Launcher is already running.")
-            sys.exit(0)
-        app.hide()
-        app.connect("destroy", app.on_destroy)
-        Gtk.main()
-    elif len(sys.argv) == 2 and sys.argv[1] == "session":
-        faugus_session = True
-        print("Session mode activated")
-        app = Main()
-        if is_already_running():
-            print("Faugus Launcher is already running.")
-            sys.exit(0)
-        app.connect("destroy", app.on_destroy)
-        Gtk.main()
+
     elif len(sys.argv) == 2:
-        run_file(sys.argv[1])
-    elif len(sys.argv) == 3 and sys.argv[2] == "shortcut":
-        app = CreateShortcut(sys.argv[1])
+        if sys.argv[1] == "--hide":
+            app = Main()
+            app.hide()
+            app.connect("destroy", app.on_destroy)
+            Gtk.main()
+        elif sys.argv[1] == "--session":
+            faugus_session = True
+            print("Session mode activated")
+            app = Main()
+            app.connect("destroy", app.on_destroy)
+            Gtk.main()
+
+    elif len(sys.argv) == 3 and sys.argv[1] == "--shortcut":
+        app = CreateShortcut(sys.argv[2])
         app.show_all()
         Gtk.main()
+
     else:
         print("Invalid arguments")
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 2 and sys.argv[1] != "--hide" and sys.argv[1] != "--session":
+        run_file(sys.argv[1])
+    elif len(sys.argv) == 3 and sys.argv[1] == "--shortcut":
+        main()
+    else:
+        try:
+            with lock:
+                main()
+        except Timeout:
+            print("Faugus Launcher is already running.")
