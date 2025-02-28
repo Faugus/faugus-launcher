@@ -4508,6 +4508,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
+            self.checkbox_prefer_sdl.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
@@ -4523,6 +4524,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(False)
             self.grid_protonfix.set_visible(False)
             self.grid_addapp.set_visible(False)
+            self.checkbox_prefer_sdl.set_visible(False)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
@@ -4539,6 +4541,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
+            self.checkbox_prefer_sdl.set_visible(True)
 
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -4560,6 +4563,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
+            self.checkbox_prefer_sdl.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -4581,6 +4585,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
+            self.checkbox_prefer_sdl.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -4602,6 +4607,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
+            self.checkbox_prefer_sdl.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
