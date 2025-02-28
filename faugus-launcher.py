@@ -1018,12 +1018,13 @@ class Main(Gtk.Window):
 
     def on_game_selected(self, widget, game_name):
         # Find the game in the FlowBox by name and select it
+        self.flowbox.unselect_all()
         for child in self.flowbox.get_children():
             hbox = child.get_children()[0]  # Assuming HBox structure
             game_label = hbox.get_children()[1]  # The label should be the second item in HBox
             if game_label.get_text() == game_name:
                 # Select this item in FlowBox
-                child.set_state_flags(Gtk.StateFlags.SELECTED, True)
+                self.flowbox.select_child(child)
                 break
 
         # Call the function to run the selected game
