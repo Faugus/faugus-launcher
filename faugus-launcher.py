@@ -1471,9 +1471,6 @@ class Main(Gtk.Window):
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
-            if lock.is_locked:
-                lock.release()
-
             # Launch the game with subprocess
             if self.load_close_onlaunch() and not faugus_session:
                 subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
