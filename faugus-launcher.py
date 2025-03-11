@@ -2444,7 +2444,9 @@ class Main(Gtk.Window):
                 return {"shortcuts": {}}
 
         def save_shortcuts(shortcuts):
-            # Save shortcuts back to the file
+            if not os.path.exists(steam_shortcuts_path):
+                open(steam_shortcuts_path, 'wb').close()
+
             with open(steam_shortcuts_path, 'wb') as f:
                 vdf.binary_dump(shortcuts, f)
 
