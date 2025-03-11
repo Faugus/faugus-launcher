@@ -1749,7 +1749,7 @@ class Main(Gtk.Window):
                 with open(steam_shortcuts_path, 'rb') as f:
                     shortcuts = vdf.binary_load(f)
 
-                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if game["AppName"] == title]
+                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if isinstance(game, dict) and "AppName" in game and game["AppName"] == title]
                 for app_id in to_remove:
                     del shortcuts["shortcuts"][app_id]
 
