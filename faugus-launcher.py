@@ -1664,13 +1664,12 @@ class Main(Gtk.Window):
                 with open(steam_shortcuts_path, 'rb') as f:
                     shortcuts = vdf.binary_load(f)
                 for game in shortcuts["shortcuts"].values():
-                    if game["AppName"] == title:
+                    if isinstance(game, dict) and "AppName" in game and game["AppName"] == title:
                         return True
                 return False
             except SyntaxError:
                 return False
-        else:
-            return False
+        return False
 
     def set_image_shortcut_icon(self, title, icons_path, icon_temp):
 
@@ -2384,7 +2383,7 @@ class Main(Gtk.Window):
             # Check if the game already exists
             existing_app_id = None
             for app_id, game_info in shortcuts["shortcuts"].items():
-                if game_info["AppName"] == title:
+                if isinstance(game_info, dict) and "AppName" in game_info and game_info["AppName"] == title:
                     existing_app_id = app_id
                     break
 
@@ -2397,7 +2396,7 @@ class Main(Gtk.Window):
                 game_info["LaunchOptions"] = f'"{command}"'
             else:
                 # Generate a new ID for the game
-                new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys()] or [0]) + 1
+                new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
 
                 # Add the new game
                 shortcuts["shortcuts"][str(new_app_id)] = {
@@ -4391,14 +4390,12 @@ class AddGame(Gtk.Dialog):
                 with open(steam_shortcuts_path, 'rb') as f:
                     shortcuts = vdf.binary_load(f)
                 for game in shortcuts["shortcuts"].values():
-                    if game["AppName"] == title:
+                    if isinstance(game, dict) and "AppName" in game and game["AppName"] == title:
                         return True
                 return False
             except SyntaxError:
                 return False
-        else:
-            return False
-
+        return False
 
     def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         current_text = widget.get_text()
