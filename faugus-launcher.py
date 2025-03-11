@@ -121,6 +121,9 @@ class Main(Gtk.Window):
 
         self.updated_steam_id = None
 
+        if faugus_session:
+            self.fullscreen()
+
         # Define the configuration path
         config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
@@ -181,9 +184,7 @@ class Main(Gtk.Window):
         self.context_menu.show_all()
 
         self.load_config()
-        if faugus_session:
-            self.fullscreen()
-            self.interface_mode = "Banners"
+
         if self.interface_mode == "List":
             self.small_interface()
         if self.interface_mode == "Blocks":
@@ -981,6 +982,8 @@ class Main(Gtk.Window):
             self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             self.gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
+            if faugus_session:
+                self.interface_mode = "Banners"
         else:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
 
@@ -1317,6 +1320,9 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
+            if faugus_session:
+                self.save_session_config(settings_dialog)
+
             self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
             self.manage_autostart_file(checkbox_start_boot)
 
@@ -1339,16 +1345,37 @@ class Main(Gtk.Window):
                     self.gamepad_process.terminate()
                     self.gamepad_process.wait()
 
-            if validation_result:
-                if self.interface_mode != combo_box_interface:
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
+            if not faugus_session:
+                if validation_result:
+                    if self.interface_mode != combo_box_interface:
+                        subprocess.Popen([sys.executable, __file__])
+                        self.destroy()
 
             self.load_config()
             settings_dialog.destroy()
 
         else:
             settings_dialog.destroy()
+
+    def save_session_config(self, settings_dialog):
+
+        config_path = os.path.join(faugus_launcher_dir, "session.ini")
+        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+
+        config = {
+            'SCREEN_WIDTH': settings_dialog.entry_screen_resolution_w.get_text(),
+            'SCREEN_HEIGHT': settings_dialog.entry_screen_resolution_h.get_text(),
+            'INTERNAL_WIDTH': settings_dialog.entry_game_resolution_w.get_text(),
+            'INTERNAL_HEIGHT': settings_dialog.entry_game_resolution_h.get_text(),
+            'REFRESH_RATE': settings_dialog.entry_refresh_rate.get_text(),
+            'PREFER_OUTPUT': settings_dialog.entry_prefer_output.get_text(),
+            'ADAPTIVE_SYNC': "1" if settings_dialog.checkbox_adaptive_sync.get_active() else "0",
+            'HDR_SUPPORT': "1" if settings_dialog.checkbox_hdr.get_active() else "0"
+        }
+
+        with open(config_path, "w") as file:
+            for key, value in config.items():
+                file.write(f"{key}={value}\n")
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
@@ -2202,8 +2229,6 @@ class Main(Gtk.Window):
                     game.banner = banner
                 except subprocess.CalledProcessError as e:
                     print(f"Error resizing banner: {e}")
-            else:
-                game.banner = ""
 
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
@@ -2930,80 +2955,203 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.set_margin_end(10)
         self.grid_big_interface.set_margin_bottom(10)
 
-        grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
-        grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
-        self.entry_default_prefix.set_hexpand(True)
-        grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
+        if faugus_session:
+            grid_gamescope_settings = Gtk.Grid()
+            grid_gamescope_settings.set_row_spacing(10)
+            grid_gamescope_settings.set_column_spacing(10)
+            grid_gamescope_settings.set_margin_start(10)
+            grid_gamescope_settings.set_margin_end(10)
+            grid_gamescope_settings.set_margin_top(10)
+            grid_gamescope_settings.set_margin_bottom(10)
 
-        grid_runner.attach(self.label_runner, 0, 6, 1, 1)
-        grid_runner.attach(self.combo_box_runner, 0, 7, 1, 1)
-        grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
-        self.combo_box_runner.set_hexpand(True)
-        self.button_proton_manager.set_hexpand(True)
+            label_gamescope_settings = Gtk.Label(label="Gamescope Settings")
+            label_gamescope_settings.set_halign(Gtk.Align.START)
 
-        grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
-        self.checkbox_mangohud.set_hexpand(True)
-        grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
-        grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
-        grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
-        grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
+            label_gamescope_restart = Gtk.Label(label="* Restart to apply Gamescope Settings.")
+            label_gamescope_restart.set_halign(Gtk.Align.START)
+            label_gamescope_restart.set_margin_top(10)
 
-        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
+            label_screen_resolution = Gtk.Label(label="Screen Resolution")
+            label_screen_resolution.set_halign(Gtk.Align.START)
+            box_screen_resolution = Gtk.Box()
+            self.entry_screen_resolution_w = Gtk.Entry()
+            self.entry_screen_resolution_w.set_width_chars(5)
+            self.entry_screen_resolution_h = Gtk.Entry()
+            self.entry_screen_resolution_h.set_width_chars(5)
+            label_screen_resolution_x = Gtk.Label(label="X")
+            label_screen_resolution_x.set_margin_start(5)
+            label_screen_resolution_x.set_margin_end(5)
+            box_screen_resolution.add(self.entry_screen_resolution_w)
+            box_screen_resolution.add(label_screen_resolution_x)
+            box_screen_resolution.add(self.entry_screen_resolution_h)
 
-        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
-        grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
-        self.combo_box_interface.set_hexpand(True)
+            label_game_resolution = Gtk.Label(label="Game Resolution")
+            label_game_resolution.set_halign(Gtk.Align.START)
+            box_game_resolution = Gtk.Box()
+            self.entry_game_resolution_w = Gtk.Entry()
+            self.entry_game_resolution_w.set_width_chars(5)
+            self.entry_game_resolution_h = Gtk.Entry()
+            self.entry_game_resolution_h.set_width_chars(5)
+            label_game_resolution_x = Gtk.Label(label="X")
+            label_game_resolution_x.set_margin_start(5)
+            label_game_resolution_x.set_margin_end(5)
+            box_game_resolution.add(self.entry_game_resolution_w)
+            box_game_resolution.add(label_game_resolution_x)
+            box_game_resolution.add(self.entry_game_resolution_h)
 
-        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 0, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
+            label_refresh_rate = Gtk.Label(label="Refresh Rate")
+            label_refresh_rate.set_halign(Gtk.Align.START)
+            self.entry_refresh_rate = Gtk.Entry()
+            self.entry_refresh_rate.set_width_chars(5)
 
-        grid_support.attach(self.label_support, 0, 0, 1, 1)
-        grid_support.attach(button_kofi, 0, 1, 1, 1)
-        grid_support.attach(button_paypal, 1, 1, 1, 1)
+            label_prefer_output = Gtk.Label(label="Prefer Output")
+            label_prefer_output.set_halign(Gtk.Align.START)
+            self.entry_prefer_output = Gtk.Entry()
+            self.entry_prefer_output.set_width_chars(5)
 
-        box_left.pack_start(grid_prefix, False, False, 0)
-        box_left.pack_start(grid_runner, False, False, 0)
-        box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
-        box_left.pack_start(grid_tools, False, False, 0)
-        box_left.pack_start(grid_support, False, False, 0)
+            self.checkbox_adaptive_sync = Gtk.CheckButton(label="Adaptive Sync")
+            self.checkbox_adaptive_sync.set_halign(Gtk.Align.START)
 
-        box_right.pack_start(self.label_miscellaneous, False, False, 0)
-        box_right.pack_start(grid_miscellaneous, False, False, 0)
-        box_right.pack_start(grid_interface_mode, False, False, 0)
-        box_right.pack_start(self.grid_big_interface, False, False, 0)
+            self.checkbox_hdr = Gtk.CheckButton(label="HDR")
+            self.checkbox_hdr.set_halign(Gtk.Align.START)
 
-        box_main.pack_start(box_left, False, False, 0)
-        box_main.pack_start(box_right, False, True, 0)
-        frame.add(box_main)
+            grid_gamescope_settings.attach(label_gamescope_settings, 0, 0, 2, 1)
+            grid_gamescope_settings.attach(label_screen_resolution, 0, 1, 1, 1)
+            grid_gamescope_settings.attach(box_screen_resolution, 1, 1, 1, 1)
+            grid_gamescope_settings.attach(label_game_resolution, 0, 2, 1, 1)
+            grid_gamescope_settings.attach(box_game_resolution, 1, 2, 1, 1)
+            grid_gamescope_settings.attach(label_refresh_rate, 0, 3, 1, 1)
+            grid_gamescope_settings.attach(self.entry_refresh_rate, 1, 3, 1, 1)
+            grid_gamescope_settings.attach(label_prefer_output, 0, 4, 1, 1)
+            grid_gamescope_settings.attach(self.entry_prefer_output, 1, 4, 1, 1)
+            grid_gamescope_settings.attach(self.checkbox_adaptive_sync, 0, 5, 1, 1)
+            grid_gamescope_settings.attach(self.checkbox_hdr, 1, 5, 1, 1)
+            grid_gamescope_settings.attach(label_gamescope_restart, 0, 6, 2, 1)
 
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-        self.button_cancel.set_hexpand(True)
-        self.button_ok.set_hexpand(True)
+            grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
+            grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
+            self.entry_default_prefix.set_hexpand(True)
+            grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
-        box_bottom.pack_start(self.button_cancel, True, True, 0)
-        box_bottom.pack_start(self.button_ok, True, True, 0)
+            grid_runner.attach(self.label_runner, 0, 6, 1, 1)
+            grid_runner.attach(self.combo_box_runner, 0, 7, 1, 1)
+            grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
+            self.combo_box_runner.set_hexpand(True)
+            self.button_proton_manager.set_hexpand(True)
 
-        self.box.add(frame)
-        self.box.add(box_bottom)
+            grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 4, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
 
-        self.populate_combobox_with_runners()
-        self.load_config()
+            box_left.pack_start(grid_prefix, False, False, 0)
+            box_left.pack_start(grid_runner, False, False, 0)
+            box_left.pack_start(self.label_miscellaneous, False, False, 0)
+            box_left.pack_start(grid_miscellaneous, False, False, 0)
 
-        self.show_all()
-        self.on_combobox_interface_changed(self.combo_box_interface)
+            box_right.pack_start(grid_gamescope_settings, False, False, 0)
 
-        allocation = self.combo_box_runner.get_allocation()
-        self.combo_box_interface.set_size_request(allocation.width, -1)
+            box_main.pack_start(box_left, False, False, 0)
+            box_main.pack_start(box_right, False, True, 0)
+            frame.add(box_main)
+
+            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            box_bottom.set_margin_start(10)
+            box_bottom.set_margin_end(10)
+            box_bottom.set_margin_bottom(10)
+            self.button_cancel.set_hexpand(True)
+            self.button_ok.set_hexpand(True)
+
+            box_bottom.pack_start(self.button_cancel, True, True, 0)
+            box_bottom.pack_start(self.button_ok, True, True, 0)
+
+            self.box.add(frame)
+            self.box.add(box_bottom)
+
+            self.populate_combobox_with_runners()
+            self.load_config()
+            self.load_session_config()
+
+            self.show_all()
+
+            allocation = grid_runner.get_allocation()
+            grid_gamescope_settings.set_size_request(allocation.width, -1)
+
+        else:
+            grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
+            grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
+            self.entry_default_prefix.set_hexpand(True)
+            grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
+
+            grid_runner.attach(self.label_runner, 0, 6, 1, 1)
+            grid_runner.attach(self.combo_box_runner, 0, 7, 1, 1)
+            grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
+            self.combo_box_runner.set_hexpand(True)
+            self.button_proton_manager.set_hexpand(True)
+
+            grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
+            self.checkbox_mangohud.set_hexpand(True)
+            grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
+            grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
+            grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
+            grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
+            grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
+
+            grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
+
+            grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
+            grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
+            self.combo_box_interface.set_hexpand(True)
+
+            self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 0, 1, 1)
+            self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 1, 1, 1)
+            self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
+
+            grid_support.attach(self.label_support, 0, 0, 1, 1)
+            grid_support.attach(button_kofi, 0, 1, 1, 1)
+            grid_support.attach(button_paypal, 1, 1, 1, 1)
+
+            box_left.pack_start(grid_prefix, False, False, 0)
+            box_left.pack_start(grid_runner, False, False, 0)
+            box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
+            box_left.pack_start(grid_tools, False, False, 0)
+            box_left.pack_start(grid_support, False, False, 0)
+
+            box_right.pack_start(self.label_miscellaneous, False, False, 0)
+            box_right.pack_start(grid_miscellaneous, False, False, 0)
+            box_right.pack_start(grid_interface_mode, False, False, 0)
+            box_right.pack_start(self.grid_big_interface, False, False, 0)
+
+            box_main.pack_start(box_left, False, False, 0)
+            box_main.pack_start(box_right, False, True, 0)
+            frame.add(box_main)
+
+            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            box_bottom.set_margin_start(10)
+            box_bottom.set_margin_end(10)
+            box_bottom.set_margin_bottom(10)
+            self.button_cancel.set_hexpand(True)
+            self.button_ok.set_hexpand(True)
+
+            box_bottom.pack_start(self.button_cancel, True, True, 0)
+            box_bottom.pack_start(self.button_ok, True, True, 0)
+
+            self.box.add(frame)
+            self.box.add(box_bottom)
+
+            self.populate_combobox_with_runners()
+            self.load_config()
+
+            self.show_all()
+            self.on_combobox_interface_changed(self.combo_box_interface)
+
+            allocation = self.combo_box_runner.get_allocation()
+            self.combo_box_interface.set_size_request(allocation.width, -1)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -3018,6 +3166,31 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance. NOT INSTALLED.")
+
+    def load_session_config(self):
+        config_path = os.path.join(faugus_launcher_dir, "session.ini")
+        if not os.path.exists(config_path):
+            return
+
+        config = {}
+        with open(config_path, "r") as file:
+            for line in file:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    key, value = line.split("=", 1)
+                    config[key.strip()] = value.strip()
+
+        self.entry_screen_resolution_w.set_text(config.get('SCREEN_WIDTH', ""))
+        self.entry_screen_resolution_h.set_text(config.get('SCREEN_HEIGHT', ""))
+
+        self.entry_game_resolution_w.set_text(config.get('INTERNAL_WIDTH', ""))
+        self.entry_game_resolution_h.set_text(config.get('INTERNAL_HEIGHT', ""))
+
+        self.entry_refresh_rate.set_text(config.get('REFRESH_RATE', ""))
+        self.entry_prefer_output.set_text(config.get('PREFER_OUTPUT', ""))
+
+        self.checkbox_adaptive_sync.set_active(config.get('ADAPTIVE_SYNC', "0") == "1")
+        self.checkbox_hdr.set_active(config.get('HDR_SUPPORT', "0") == "1")
 
     def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         current_text = widget.get_text()
@@ -3541,6 +3714,8 @@ class Settings(Gtk.Dialog):
                     break
 
             self.combo_box_interface.set_active(index_to_activate2)
+            if faugus_session:
+                self.interface_mode = "Banners"
         else:
             # Save default configuration if file does not exist
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
