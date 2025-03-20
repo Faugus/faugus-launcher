@@ -27,7 +27,7 @@ sudo dnf -y install mangohud
 sudo dnf -y install gamemode
 ```
 
-### Bazzite
+### Bazzite (Copr)
 ```
 sudo tee /etc/yum.repos.d/faugus-launcher.repo > /dev/null <<EOF
 [faugus-launcher]
