@@ -60,6 +60,7 @@ lock_file_path = f"{faugus_launcher_share_dir}/faugus-launcher.lock"
 lock = FileLock(lock_file_path, timeout=0)
 
 faugus_session = False
+faugus_backup = False
 
 steam_userdata_path = f'{share_dir}/Steam/userdata'
 
@@ -1327,7 +1328,9 @@ class Main(Gtk.Window):
                     if self.interface_mode != combo_box_interface:
                         subprocess.Popen([sys.executable, __file__])
                         self.destroy()
-
+                    if faugus_backup:
+                        subprocess.Popen([sys.executable, __file__])
+                        self.destroy()
             self.load_config()
             settings_dialog.destroy()
 
@@ -2874,6 +2877,19 @@ class Settings(Gtk.Dialog):
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
 
+        self.label_settings = Gtk.Label(label="Backup/Restore Settings")
+        self.label_settings.set_halign(Gtk.Align.START)
+
+        # Button Backup
+        button_backup = Gtk.Button(label="Backup")
+        button_backup.connect("clicked", self.on_button_backup_clicked)
+        button_backup.set_size_request(150, -1)
+
+        # Button Restore
+        button_restore = Gtk.Button(label="Restore")
+        button_restore.connect("clicked", self.on_button_restore_clicked)
+        button_restore.set_size_request(150, -1)
+
         self.box = self.get_content_area()
         self.box.set_margin_start(0)
         self.box.set_margin_end(0)
@@ -2941,6 +2957,14 @@ class Settings(Gtk.Dialog):
         grid_support.set_margin_end(10)
         grid_support.set_margin_top(10)
         grid_support.set_margin_bottom(10)
+
+        grid_backup = Gtk.Grid()
+        grid_backup.set_row_spacing(10)
+        grid_backup.set_column_spacing(10)
+        grid_backup.set_margin_start(10)
+        grid_backup.set_margin_end(10)
+        grid_backup.set_margin_top(10)
+        grid_backup.set_margin_bottom(10)
 
         self.grid_big_interface = Gtk.Grid()
         self.grid_big_interface.set_row_spacing(10)
@@ -3022,6 +3046,10 @@ class Settings(Gtk.Dialog):
             grid_gamescope_settings.attach(self.checkbox_hdr, 1, 5, 1, 1)
             grid_gamescope_settings.attach(label_gamescope_restart, 0, 6, 2, 1)
 
+            grid_backup.attach(self.label_settings, 0, 0, 1, 1)
+            grid_backup.attach(button_backup, 0, 1, 1, 1)
+            grid_backup.attach(button_restore, 1, 1, 1, 1)
+
             grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
             grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
             self.entry_default_prefix.set_hexpand(True)
@@ -3044,6 +3072,7 @@ class Settings(Gtk.Dialog):
             box_left.pack_start(grid_miscellaneous, False, False, 0)
 
             box_right.pack_start(grid_gamescope_settings, False, False, 0)
+            box_right.pack_end(grid_backup, False, False, 0)
 
             box_main.pack_start(box_left, False, False, 0)
             box_main.pack_start(box_right, False, True, 0)
@@ -3068,8 +3097,8 @@ class Settings(Gtk.Dialog):
 
             self.show_all()
 
-            allocation = grid_runner.get_allocation()
-            grid_gamescope_settings.set_size_request(allocation.width, -1)
+            allocation = grid_backup.get_allocation()
+            self.button_proton_manager.set_size_request(allocation.width, -1)
 
         else:
             grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
@@ -3102,6 +3131,10 @@ class Settings(Gtk.Dialog):
             grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
             self.combo_box_interface.set_hexpand(True)
 
+            grid_backup.attach(self.label_settings, 0, 0, 1, 1)
+            grid_backup.attach(button_backup, 0, 1, 1, 1)
+            grid_backup.attach(button_restore, 1, 1, 1, 1)
+
             self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 0, 1, 1)
             self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 1, 1, 1)
             self.grid_big_interface.attach(self.checkbox_gamepad_navigation, 0, 2, 1, 1)
@@ -3114,12 +3147,13 @@ class Settings(Gtk.Dialog):
             box_left.pack_start(grid_runner, False, False, 0)
             box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
             box_left.pack_start(grid_tools, False, False, 0)
-            box_left.pack_start(grid_support, False, False, 0)
+            box_left.pack_end(grid_support, False, False, 0)
 
             box_right.pack_start(self.label_miscellaneous, False, False, 0)
             box_right.pack_start(grid_miscellaneous, False, False, 0)
             box_right.pack_start(grid_interface_mode, False, False, 0)
             box_right.pack_start(self.grid_big_interface, False, False, 0)
+            box_right.pack_end(grid_backup, False, False, 0)
 
             box_main.pack_start(box_left, False, False, 0)
             box_main.pack_start(box_right, False, True, 0)
@@ -3144,7 +3178,7 @@ class Settings(Gtk.Dialog):
             self.show_all()
             self.on_combobox_interface_changed(self.combo_box_interface)
 
-            allocation = self.combo_box_runner.get_allocation()
+            allocation = self.button_proton_manager.get_allocation()
             self.combo_box_interface.set_size_request(allocation.width, -1)
 
         # Check if optional features are available and enable/disable accordingly
@@ -3634,6 +3668,257 @@ class Settings(Gtk.Dialog):
 
             command_thread = threading.Thread(target=run_command)
             command_thread.start()
+
+    def on_button_backup_clicked(self, widget):
+        self.show_warning_dialog(self, "Prefixes and runners will not be backed up!")
+
+        items = [
+            "banners",
+            "icons",
+            "config.ini",
+            "games.json",
+            "latest-games.txt",
+            "session.ini"
+        ]
+
+        temp_dir = os.path.join(faugus_launcher_dir, "temp-backup")
+        os.makedirs(temp_dir, exist_ok=True)
+
+        for item in items:
+            src = os.path.join(faugus_launcher_dir, item)
+            dst = os.path.join(temp_dir, item)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            elif os.path.isfile(src):
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy2(src, dst)
+
+        marker_path = os.path.join(temp_dir, ".faugus_marker")
+        with open(marker_path, "w") as f:
+            f.write("faugus-launcher-backup")
+
+        zip_path = os.path.join(faugus_launcher_dir, "faugus-launcher-backup")
+        shutil.make_archive(zip_path, 'zip', temp_dir)
+
+        shutil.rmtree(temp_dir)
+
+        dialog = Gtk.Dialog(title="Save the backup file as...", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        if faugus_session:
+            dialog.fullscreen()
+
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SAVE)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.set_current_name("faugus-launcher-backup.zip")
+
+        button_open = Gtk.Button.new_with_label("Save")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            dest = filechooser.get_filename()
+            shutil.copy2(zip_path + ".zip", dest)
+
+        dialog.destroy()
+        os.remove(zip_path + ".zip")
+
+    def on_button_restore_clicked(self, widget):
+        dialog = Gtk.Dialog(title="Select a backup file to restore", parent=self, flags=0)
+        dialog.set_size_request(720, 720)
+        if faugus_session:
+            dialog.fullscreen()
+
+        filechooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.OPEN)
+        filechooser.set_current_folder(os.path.expanduser("~/"))
+        filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
+
+        zip_filter = Gtk.FileFilter()
+        zip_filter.set_name("ZIP files")
+        zip_filter.add_pattern("*.zip")
+
+        filechooser.set_filter(zip_filter)
+
+        button_open = Gtk.Button.new_with_label("Open")
+        button_open.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+        button_open.set_size_request(150, -1)
+
+        button_cancel = Gtk.Button.new_with_label("Cancel")
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_size_request(150, -1)
+
+        button_grid = Gtk.Grid()
+        button_grid.set_row_spacing(10)
+        button_grid.set_column_spacing(10)
+        button_grid.set_margin_start(10)
+        button_grid.set_margin_end(10)
+        button_grid.set_margin_top(10)
+        button_grid.set_margin_bottom(10)
+        button_grid.attach(button_open, 1, 1, 1, 1)
+        button_grid.attach(button_cancel, 0, 1, 1, 1)
+
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(button_grid, False, False, 0)
+
+        dialog.vbox.pack_start(filechooser, True, True, 0)
+        dialog.vbox.pack_start(button_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            zip_file = filechooser.get_filename()
+            temp_dir = os.path.join(faugus_launcher_dir, "temp-restore")
+
+            shutil.unpack_archive(zip_file, temp_dir, 'zip')
+
+            marker_path = os.path.join(temp_dir, ".faugus_marker")
+            if not os.path.exists(marker_path):
+                shutil.rmtree(temp_dir)
+                dialog.destroy()
+                self.show_warning_dialog(self, "This is not a valid Faugus Launcher backup file.")
+                return
+
+            if self.show_warning_dialog2(self, "Are you sure you want to overwrite the settings?"):
+                for item in os.listdir(temp_dir):
+                    if item == ".faugus_marker":
+                        continue
+                    src = os.path.join(temp_dir, item)
+                    dst = os.path.join(faugus_launcher_dir, item)
+
+                    if os.path.isdir(dst):
+                        shutil.rmtree(dst)
+                    elif os.path.isfile(dst):
+                        os.remove(dst)
+
+                    if os.path.isdir(src):
+                        shutil.copytree(src, dst)
+                    elif os.path.isfile(src):
+                        shutil.copy2(src, dst)
+
+                shutil.rmtree(temp_dir)
+                global faugus_backup
+                faugus_backup = True
+                self.response(Gtk.ResponseType.OK)
+
+        dialog.destroy()
+
+    def show_warning_dialog(self, parent, title):
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        if faugus_session:
+            dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(title)
+        label.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label="Ok")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog.destroy())
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+
+    def show_warning_dialog2(self, parent, title):
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        if faugus_session:
+            dialog.fullscreen()
+
+        label = Gtk.Label()
+        label.set_label(title)
+        label.set_halign(Gtk.Align.CENTER)
+
+        button_no = Gtk.Button(label="No")
+        button_no.set_size_request(150, -1)
+        button_no.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_yes = Gtk.Button(label="Yes")
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_bottom.pack_start(button_no, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        response = dialog.run()
+        dialog.destroy()
+
+        return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
