@@ -14,6 +14,7 @@ import urllib.request
 import json
 import requests
 import vdf
+import psutil
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -589,6 +590,7 @@ class Main(Gtk.Window):
         if event.button == Gdk.BUTTON_SECONDARY:
             item = self.get_item_at_event(event)
             if item:
+                self.flowbox.emit('child-activated', item)
                 self.flowbox.select_child(item)
 
                 selected_children = self.flowbox.get_selected_children()
@@ -615,6 +617,11 @@ class Main(Gtk.Window):
                         self.menu_show_logs.set_sensitive(False)
                 else:
                     self.menu_show_logs.set_visible(False)
+
+                if title in self.processos:
+                    self.menu_item_play.get_child().set_text("Stop")
+                else:
+                    self.menu_item_play.get_child().set_text("Play")
 
                 if os.path.isdir(game.prefix):
                     self.menu_item_prefix.set_sensitive(True)
@@ -1212,8 +1219,6 @@ class Main(Gtk.Window):
             self.menu_item_delete.set_sensitive(True)
 
             if title in self.processos:
-                self.menu_item_play.set_sensitive(False)
-                self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
             else:
@@ -1222,34 +1227,6 @@ class Main(Gtk.Window):
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
         else:
-            self.menu_item_edit.set_sensitive(False)
-            self.menu_item_delete.set_sensitive(False)
-            self.menu_item_play.set_sensitive(False)
-            self.button_play.set_sensitive(False)
-
-
-    def update_button_sensitivity(self, row):
-        # Enable buttons based on the selected row
-        if row:
-            hbox = row.get_child()
-            game_label = hbox.get_children()[1]
-            title = game_label.get_text()
-
-            self.menu_item_edit.set_sensitive(False)
-            self.menu_item_delete.set_sensitive(False)
-
-            if title in self.processos:
-                self.menu_item_play.set_sensitive(False)
-                self.button_play.set_sensitive(False)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-            else:
-                self.menu_item_play.set_sensitive(True)
-                self.button_play.set_sensitive(True)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-        else:
-            # Disable buttons if no row is selected
             self.menu_item_edit.set_sensitive(False)
             self.menu_item_delete.set_sensitive(False)
             self.menu_item_play.set_sensitive(False)
@@ -1419,14 +1396,21 @@ class Main(Gtk.Window):
                 os.remove(autostart_path)
 
     def on_button_play_clicked(self, widget):
-        #if not (listbox_row := self.game_list.get_selected_row()):
-        #    return
 
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
         hbox = selected_child.get_child()
         game_label = hbox.get_children()[1]
         title = game_label.get_text()
+
+        image = self.button_play.get_image()
+        if isinstance(image, Gtk.Image) and image.get_storage_type() == Gtk.ImageType.ICON_NAME:
+            icon_name, _ = image.get_icon_name()
+            if icon_name == "media-playback-stop-symbolic":
+                if title in self.processos:
+                    _, pid = self.processos[title]
+                    os.kill(pid, signal.SIGKILL)
+                return
 
         # Find the selected game object
         game = next((j for j in self.games if j.title == title), None)
@@ -1505,14 +1489,34 @@ class Main(Gtk.Window):
                 sys.exit()
             else:
                 if faugus_session:
-                    processo = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"], cwd=game_directory)
+                    self.processo = subprocess.Popen([sys.executable, faugus_run_path, command, "", "session"], cwd=game_directory)
                 else:
-                    processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
-                self.processos[title] = processo
+                    self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+
+                GLib.timeout_add(1000, lambda: self.find_pid(path, title))
+
+    def find_pid(self, path, title):
+        parent = psutil.Process(self.processo.pid)
+        children = parent.children(recursive=True)
+
+        filename = os.path.basename(path)
+        filename_without_ext = os.path.splitext(filename)[0].lower()
+
+        for child in children:
+            child_name = os.path.splitext(child.name())[0].lower()
+
+            if (child_name in filename_without_ext) or (filename_without_ext in child_name):
+                self.processos[title] = (self.processo, child.pid)
+                self.menu_item_play.set_sensitive(True)
+                self.button_play.set_sensitive(True)
+                return False
+
+        return True
 
     def update_latest_games_file(self, title):
         # Read the existing games from the file, if it exists
@@ -1695,9 +1699,6 @@ class Main(Gtk.Window):
         return image
 
     def on_button_delete_clicked(self, widget):
-        #if not (listbox_row := self.game_list.get_selected_row()):
-        #    return
-
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
         hbox = selected_child.get_child()
@@ -1710,14 +1711,21 @@ class Main(Gtk.Window):
             response = confirmation_dialog.run()
 
             if response == Gtk.ResponseType.YES:
+                if title in self.processos:
+                    _, pid = self.processos[title]
+                    os.kill(pid, signal.SIGKILL)
                 # Remove game and associated files if required
                 if confirmation_dialog.get_remove_prefix_state():
                     game_prefix = game.prefix
                     prefix_path = os.path.expanduser(game_prefix)
-                    try:
-                        shutil.rmtree(prefix_path)
-                    except FileNotFoundError:
-                        pass
+                    while True:
+                        try:
+                            shutil.rmtree(prefix_path)
+                            break
+                        except FileNotFoundError:
+                            break
+                        except OSError:
+                            continue
 
                 # Remove the shortcut
                 self.remove_shortcut(game)
@@ -1727,11 +1735,6 @@ class Main(Gtk.Window):
                 self.games.remove(game)
                 self.save_games()
                 self.update_list()
-
-                self.menu_item_edit.set_sensitive(False)
-                self.menu_item_delete.set_sensitive(False)
-                self.menu_item_play.set_sensitive(False)
-                self.button_play.set_sensitive(False)
 
                 # Remove the game from the latest-games file if it exists
                 self.remove_game_from_latest_games(title)
@@ -2175,14 +2178,6 @@ class Main(Gtk.Window):
                 self.flowbox.select_child(child)
                 break
 
-        # Updates the interface of the buttons
-        self.menu_item_edit.set_sensitive(True)
-        self.menu_item_delete.set_sensitive(True)
-        self.menu_item_play.set_sensitive(True)
-        self.button_play.set_sensitive(True)
-        self.button_play.set_image(
-            Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-
         # Calls the item selection method to ensure the buttons are updated
         self.on_item_selected(self.flowbox, child)
 
@@ -2623,7 +2618,7 @@ class Main(Gtk.Window):
                 self.grid_left.set_margin_start(0)
 
     def on_child_process_closed(self, signum, frame):
-        for title, processo in list(self.processos.items()):
+        for title, (processo, pid) in list(self.processos.items()):
             retcode = processo.poll()
             if retcode is not None:
                 del self.processos[title]
@@ -2641,12 +2636,10 @@ class Main(Gtk.Window):
                     selected_title = game_label.get_text()
 
                     if selected_title not in self.processos:
-                        self.menu_item_play.set_sensitive(True)
                         self.button_play.set_sensitive(True)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
                     else:
-                        self.menu_item_play.set_sensitive(False)
                         self.button_play.set_sensitive(False)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
