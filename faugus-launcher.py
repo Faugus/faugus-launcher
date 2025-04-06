@@ -3221,29 +3221,56 @@ class Settings(Gtk.Dialog):
             self.checkbox_start_boot.set_sensitive(True)
 
     def on_button_proton_manager_clicked(self, widget):
-        self.set_sensitive(False)
+        if self.entry_default_prefix.get_text() == "":
+            self.entry_default_prefix.get_style_context().add_class("entry")
+        else:
+            checkbox_state = self.checkbox_close_after_launch.get_active()
+            default_prefix = self.entry_default_prefix.get_text()
+            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+            checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_system_tray = self.checkbox_system_tray.get_active()
+            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+            combo_box_interface = self.combo_box_interface.get_active_text()
+            checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+            checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
+            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
 
-        proton_manager = faugus_proton_manager
-        def run_command():
-            if faugus_session:
-                process = subprocess.Popen([sys.executable, proton_manager, "session"])
-            else:
-                process = subprocess.Popen([sys.executable, proton_manager])
-            process.wait()
-            GLib.idle_add(self.set_sensitive, True)
-            GLib.idle_add(self.parent.set_sensitive, True)
-            GLib.idle_add(self.blocking_window.destroy)
+            mangohud_state = self.checkbox_mangohud.get_active()
+            gamemode_state = self.checkbox_gamemode.get_active()
+            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+            default_runner = self.combo_box_runner.get_active_text()
 
-            GLib.idle_add(lambda: self.combo_box_runner.remove_all())
-            GLib.idle_add(self.populate_combobox_with_runners)
+            if default_runner == "UMU-Proton Latest":
+                default_runner = ""
+            if default_runner == "GE-Proton Latest (default)":
+                default_runner = "GE-Proton"
 
-        self.blocking_window = Gtk.Window()
-        self.blocking_window.set_transient_for(self.parent)
-        self.blocking_window.set_decorated(False)
-        self.blocking_window.set_modal(True)
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+            self.set_sensitive(False)
 
-        command_thread = threading.Thread(target=run_command)
-        command_thread.start()
+            proton_manager = faugus_proton_manager
+            def run_command():
+                if faugus_session:
+                    process = subprocess.Popen([sys.executable, proton_manager, "session"])
+                else:
+                    process = subprocess.Popen([sys.executable, proton_manager])
+                process.wait()
+                GLib.idle_add(self.set_sensitive, True)
+                GLib.idle_add(self.parent.set_sensitive, True)
+                GLib.idle_add(self.blocking_window.destroy)
+
+                GLib.idle_add(lambda: self.combo_box_runner.remove_all())
+                GLib.idle_add(self.populate_combobox_with_runners)
+                GLib.idle_add(lambda: self.load_config())
+
+            self.blocking_window = Gtk.Window()
+            self.blocking_window.set_transient_for(self.parent)
+            self.blocking_window.set_decorated(False)
+            self.blocking_window.set_modal(True)
+
+            command_thread = threading.Thread(target=run_command)
+            command_thread.start()
 
     def populate_combobox_with_runners(self):
         # List of default entries
