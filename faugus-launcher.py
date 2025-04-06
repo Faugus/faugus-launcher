@@ -2856,16 +2856,12 @@ class Settings(Gtk.Dialog):
         self.label_support.set_halign(Gtk.Align.START)
 
         button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.set_size_request(150, -1)
         button_kofi.connect("clicked", self.on_button_kofi_clicked)
         button_kofi.get_style_context().add_class("kofi")
-        button_kofi.set_halign(Gtk.Align.CENTER)
 
         button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.set_size_request(150, -1)
         button_paypal.connect("clicked", self.on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
-        button_paypal.set_halign(Gtk.Align.CENTER)
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
@@ -2883,12 +2879,10 @@ class Settings(Gtk.Dialog):
         # Button Backup
         button_backup = Gtk.Button(label="Backup")
         button_backup.connect("clicked", self.on_button_backup_clicked)
-        button_backup.set_size_request(150, -1)
 
         # Button Restore
         button_restore = Gtk.Button(label="Restore")
         button_restore.connect("clicked", self.on_button_restore_clicked)
-        button_restore.set_size_request(150, -1)
 
         self.box = self.get_content_area()
         self.box.set_margin_start(0)
@@ -2906,7 +2900,9 @@ class Settings(Gtk.Dialog):
         frame.set_margin_top(10)
         frame.set_margin_bottom(10)
 
-        box_main = Gtk.Box()
+        box_main = Gtk.Grid()
+        box_main.set_column_homogeneous(True)
+        box_main.set_column_spacing(10)
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
@@ -2951,6 +2947,7 @@ class Settings(Gtk.Dialog):
         grid_interface_mode.set_margin_bottom(10)
 
         grid_support = Gtk.Grid()
+        grid_support.set_column_homogeneous(True)
         grid_support.set_row_spacing(10)
         grid_support.set_column_spacing(10)
         grid_support.set_margin_start(10)
@@ -2959,6 +2956,7 @@ class Settings(Gtk.Dialog):
         grid_support.set_margin_bottom(10)
 
         grid_backup = Gtk.Grid()
+        grid_backup.set_column_homogeneous(True)
         grid_backup.set_row_spacing(10)
         grid_backup.set_column_spacing(10)
         grid_backup.set_margin_start(10)
@@ -3074,8 +3072,10 @@ class Settings(Gtk.Dialog):
             box_right.pack_start(grid_gamescope_settings, False, False, 0)
             box_right.pack_end(grid_backup, False, False, 0)
 
-            box_main.pack_start(box_left, False, False, 0)
-            box_main.pack_start(box_right, False, True, 0)
+            box_main.attach(box_left, 0, 0, 1, 1)
+            box_main.attach(box_right, 1, 0, 1, 1)
+            box_left.set_hexpand(True)
+            box_right.set_hexpand(True)
             frame.add(box_main)
 
             box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -3096,9 +3096,6 @@ class Settings(Gtk.Dialog):
             self.load_session_config()
 
             self.show_all()
-
-            allocation = grid_backup.get_allocation()
-            self.button_proton_manager.set_size_request(allocation.width, -1)
 
         else:
             grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
@@ -3155,8 +3152,10 @@ class Settings(Gtk.Dialog):
             box_right.pack_start(self.grid_big_interface, False, False, 0)
             box_right.pack_end(grid_backup, False, False, 0)
 
-            box_main.pack_start(box_left, False, False, 0)
-            box_main.pack_start(box_right, False, True, 0)
+            box_main.attach(box_left, 0, 0, 1, 1)
+            box_main.attach(box_right, 1, 0, 1, 1)
+            box_left.set_hexpand(True)
+            box_right.set_hexpand(True)
             frame.add(box_main)
 
             box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -3177,9 +3176,6 @@ class Settings(Gtk.Dialog):
 
             self.show_all()
             self.on_combobox_interface_changed(self.combo_box_interface)
-
-            allocation = self.button_proton_manager.get_allocation()
-            self.combo_box_interface.set_size_request(allocation.width, -1)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
