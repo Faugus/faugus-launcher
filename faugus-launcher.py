@@ -6787,43 +6787,6 @@ def run_file(file_path):
     # Run the command in the directory of the file
     subprocess.run([faugus_run_path, command], cwd=file_dir)
 
-def convert_games_txt_to_json(txt_file_path, json_file_path):
-    if not os.path.exists(txt_file_path):
-        return
-
-    games = []
-
-    with open(txt_file_path, 'r', encoding='utf-8') as txt_file:
-        for line in txt_file:
-            fields = line.strip().split(';')
-
-            while len(fields) < 13:
-                fields.append("")
-
-            game = {
-                "title": fields[0],
-                "path": fields[1],
-                "prefix": fields[2],
-                "launch_arguments": fields[3],
-                "game_arguments": fields[4],
-                "mangohud": fields[5],
-                "gamemode": fields[6],
-                "prefer_sdl": fields[7],
-                "protonfix": fields[8],
-                "runner": fields[9],
-                "addapp_checkbox": fields[10],
-                "addapp": fields[11],
-                "addapp_bat": fields[12],
-            }
-
-            games.append(game)
-
-    with open(json_file_path, 'w', encoding='utf-8') as json_file:
-        json.dump(games, json_file, ensure_ascii=False, indent=4)
-
-    old_file_path = txt_file_path.replace(".txt", "-old.txt")
-    os.rename(txt_file_path, old_file_path)
-
 def apply_dark_theme():
     desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
     try:
@@ -6862,24 +6825,10 @@ HDR_SUPPORT=
         with open(session_file, "w") as f:
             f.write(default_content)
 
-def update_hdr_setting():
-    session_file = os.path.join(faugus_launcher_dir, "session.ini")
-
-    if os.path.exists(session_file):
-        with open(session_file, "r+") as f:
-            content = f.read()
-            updated_content = content.replace("HDR=", "HDR_SUPPORT=")
-            if content != updated_content:
-                f.seek(0)
-                f.write(updated_content)
-                f.truncate()
-
 def main():
     global faugus_session
 
     ensure_session_ini()
-    update_hdr_setting()
-    convert_games_txt_to_json(games_txt, games_json)
     apply_dark_theme()
 
     if len(sys.argv) == 1:
