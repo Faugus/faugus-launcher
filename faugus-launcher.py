@@ -4494,12 +4494,16 @@ class AddGame(Gtk.Dialog):
         self.image_banner = Gtk.Image()
         self.image_banner.set_margin_top(10)
         self.image_banner.set_margin_bottom(10)
+        self.image_banner.set_margin_start(10)
+        self.image_banner.set_margin_end(10)
         self.image_banner.set_vexpand(True)
         self.image_banner.set_valign(Gtk.Align.CENTER)
 
         self.image_banner2 = Gtk.Image()
         self.image_banner2.set_margin_top(10)
         self.image_banner2.set_margin_bottom(10)
+        self.image_banner2.set_margin_start(10)
+        self.image_banner2.set_margin_end(10)
         self.image_banner2.set_vexpand(True)
         self.image_banner2.set_valign(Gtk.Align.CENTER)
 
