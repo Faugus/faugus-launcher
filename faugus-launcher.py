@@ -1609,8 +1609,7 @@ class Main(Gtk.Window):
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
             shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
-            allocation = edit_game_dialog.box_shortcut.get_allocation()
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, (allocation.width - 20), -1, True)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 260, 390, True)
             edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
             edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -4238,7 +4237,11 @@ class AddGame(Gtk.Dialog):
         self.content_area.set_hexpand(True)
 
         grid_page1 = Gtk.Grid()
+        grid_page1.set_column_homogeneous(True)
+        grid_page1.set_column_spacing(10)
         grid_page2 = Gtk.Grid()
+        grid_page2.set_column_homogeneous(True)
+        grid_page2.set_column_spacing(10)
 
         self.grid_launcher = Gtk.Grid()
         self.grid_launcher.set_row_spacing(10)
@@ -4489,14 +4492,12 @@ class AddGame(Gtk.Dialog):
         self.box.add(self.notebook)
 
         self.image_banner = Gtk.Image()
-        self.image_banner.set_margin_end(10)
         self.image_banner.set_margin_top(10)
         self.image_banner.set_margin_bottom(10)
         self.image_banner.set_vexpand(True)
         self.image_banner.set_valign(Gtk.Align.CENTER)
 
         self.image_banner2 = Gtk.Image()
-        self.image_banner2.set_margin_end(10)
         self.image_banner2.set_margin_top(10)
         self.image_banner2.set_margin_bottom(10)
         self.image_banner2.set_vexpand(True)
@@ -4530,8 +4531,10 @@ class AddGame(Gtk.Dialog):
         tab_box1.pack_start(tab_label1, True, True, 0)
         tab_box1.set_hexpand(True)
 
-        grid_page1.add(page1)
-        grid_page1.add(event_box)
+        grid_page1.attach(page1, 0, 0, 1, 1)
+        grid_page1.attach(event_box, 1, 0, 1, 1)
+        page1.set_hexpand(True)
+        event_box.set_hexpand(True)
 
         self.notebook.append_page(grid_page1, tab_box1)
 
@@ -4543,8 +4546,10 @@ class AddGame(Gtk.Dialog):
         tab_box2.pack_start(tab_label2, True, True, 0)
         tab_box2.set_hexpand(True)
 
-        grid_page2.add(page2)
-        grid_page2.add(event_box2)
+        grid_page2.attach(page2, 0, 0, 1, 1)
+        grid_page2.attach(event_box2, 1, 0, 1, 1)
+        page2.set_hexpand(True)
+        event_box2.set_hexpand(True)
 
         self.notebook.append_page(grid_page2, tab_box2)
 
@@ -4622,7 +4627,6 @@ class AddGame(Gtk.Dialog):
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         bottom_box.set_margin_start(10)
         bottom_box.set_margin_end(10)
-        #botton_box.set_margin_top(10)
         bottom_box.set_margin_bottom(10)
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
@@ -4680,8 +4684,7 @@ class AddGame(Gtk.Dialog):
         if interface_mode != "Banners":
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
-        allocation = self.box_shortcut.get_allocation()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, (allocation.width - 20), -1, True)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -4714,8 +4717,7 @@ class AddGame(Gtk.Dialog):
             self.get_banner()
         else:
             shutil.copy(faugus_banner, self.banner_path_temp)
-            allocation = self.image_banner.get_allocation()
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
             self.image_banner.set_from_pixbuf(pixbuf)
             self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -4876,8 +4878,7 @@ class AddGame(Gtk.Dialog):
         threading.Thread(target=fetch_banner, daemon=True).start()
 
     def update_image_banner(self):
-        allocation = self.image_banner.get_allocation()
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -4886,8 +4887,7 @@ class AddGame(Gtk.Dialog):
             self.get_banner()
         else:
             shutil.copy(faugus_banner, self.banner_path_temp)
-            allocation = self.image_banner.get_allocation()
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation.width, -1, True)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
             self.image_banner.set_from_pixbuf(pixbuf)
             self.image_banner2.set_from_pixbuf(pixbuf)
 
@@ -5096,20 +5096,9 @@ class AddGame(Gtk.Dialog):
                 self.get_banner()
             else:
                 shutil.copy(faugus_banner, self.banner_path_temp)
-                allocation = self.image_banner.get_allocation()
-
-                if active_index ==1:
-                    self.box_shortcut.set_size_request(allocation.width, -1)
-                    allocation2 = self.box_shortcut.get_allocation()
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, allocation2.width, -1, True)
-                    self.image_banner.set_from_pixbuf(pixbuf)
-                    self.image_banner2.set_from_pixbuf(pixbuf)
-                else:
-                    width = allocation.width
-                    if width > 0:
-                        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, width, -1, True)
-                        self.image_banner.set_from_pixbuf(pixbuf)
-                        self.image_banner2.set_from_pixbuf(pixbuf)
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
+                self.image_banner.set_from_pixbuf(pixbuf)
+                self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
         self.combo_box_launcher.append_text("Windows Game")
