@@ -69,7 +69,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.7/faugus-launcher_1.3.7-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.4.1/faugus-launcher_1.4.1-1_amd64.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_debian-12.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_debian-12.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -87,7 +87,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.3.7/faugus-launcher_1.3.7-1_amd64.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.4.1/faugus-launcher_1.4.1-1_amd64.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_debian-13.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_debian-13.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -114,23 +114,6 @@ sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 # Optional tools
 sudo zypper install -y mangohud
 ```
-
-### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.3.7/faugus-launcher-0.3.7-1.flatpak">faugus-launcher-0.3.7-1.flatpak</a> and run:
-```
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install faugus-launcher-0.3.7-1.flatpak
-```
-```
-# Optional tools
-flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
-```
-Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
-```
-sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
-sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/org.faugus.faugus_launcher/config/faugus-launcher/
-```
-Gamescope doesn't work.
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
@@ -164,7 +147,7 @@ For Application Launchers
 ### Add/Edit game
 <img src=https://github.com/user-attachments/assets/89c41b52-ec4e-4f00-99ea-22d5c462e19b/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/cd929bf9-4a6b-461e-9aa6-0e701da679c4/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/584c176b-efb6-4590-bd08-956ad600da92/><br>
+<img src=https://github.com/user-attachments/assets/f511e810-6006-4ce9-b028-f0f66beca3b5/><br>
 ### GE-Proton Manager
 <img src=https://github.com/user-attachments/assets/c46f90ac-7713-46bf-8795-33d3917fb48e/><br>
 ### Create shortcut from .exe
