@@ -4536,7 +4536,8 @@ class AddGame(Gtk.Dialog):
         tab_box1.set_hexpand(True)
 
         grid_page1.attach(page1, 0, 0, 1, 1)
-        grid_page1.attach(event_box, 1, 0, 1, 1)
+        if interface_mode == "Banners":
+            grid_page1.attach(event_box, 1, 0, 1, 1)
         page1.set_hexpand(True)
         event_box.set_hexpand(True)
 
@@ -4551,7 +4552,8 @@ class AddGame(Gtk.Dialog):
         tab_box2.set_hexpand(True)
 
         grid_page2.attach(page2, 0, 0, 1, 1)
-        grid_page2.attach(event_box2, 1, 0, 1, 1)
+        if interface_mode == "Banners":
+            grid_page2.attach(event_box2, 1, 0, 1, 1)
         page2.set_hexpand(True)
         event_box2.set_hexpand(True)
 
