@@ -1399,7 +1399,6 @@ class Main(Gtk.Window):
                 os.remove(autostart_path)
 
     def on_button_play_clicked(self, widget):
-
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
         hbox = selected_child.get_child()
@@ -1411,9 +1410,13 @@ class Main(Gtk.Window):
             icon_name, _ = image.get_icon_name()
             if icon_name == "media-playback-stop-symbolic":
                 if title in self.processos:
-                    _, pid = self.processos[title]
-                    os.kill(pid, signal.SIGKILL)
-                return
+                    _, pids = self.processos[title]
+                    for pid in pids:
+                        try:
+                            os.kill(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+                    return
 
         # Find the selected game object
         game = next((j for j in self.games if j.title == title), None)
@@ -1501,25 +1504,39 @@ class Main(Gtk.Window):
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
 
-                GLib.timeout_add(1000, lambda: self.find_pid(path, title))
+                GLib.timeout_add(1000, lambda: self.find_pid(game))
 
-    def find_pid(self, path, title):
+    def find_pid(self, game):
         parent = psutil.Process(self.processo.pid)
         children = parent.children(recursive=True)
 
-        filename = os.path.basename(path)
-        filename_without_ext = os.path.splitext(filename)[0].lower()
+        targets = []
+
+        if game.addapp_checkbox:
+            with open(game.addapp_bat, 'r') as f:
+                for line in f:
+                    match = re.search(r'"(z:/.+?\.exe)"', line, re.IGNORECASE)
+                    if match:
+                        exe_path = os.path.basename(match.group(1)).lower()
+                        exe_name = os.path.splitext(exe_path)[0]
+                        targets.append(exe_name)
+        else:
+            filename = os.path.basename(game.path)
+            filename_without_ext = os.path.splitext(filename)[0].lower()
+            targets.append(filename_without_ext)
 
         for child in children:
-            child_name = os.path.splitext(child.name())[0].lower()
+            try:
+                child_name = os.path.splitext(child.name())[0].lower()
+                for target in targets:
+                    if (child_name in target) or (target in child_name):
+                        self.processos.setdefault(game.title, (self.processo, []))[1].append(child.pid)
+                        self.menu_item_play.set_sensitive(True)
+                        self.button_play.set_sensitive(True)
+            except psutil.NoSuchProcess:
+                continue
 
-            if (child_name in filename_without_ext) or (filename_without_ext in child_name):
-                self.processos[title] = (self.processo, child.pid)
-                self.menu_item_play.set_sensitive(True)
-                self.button_play.set_sensitive(True)
-                return False
-
-        return True
+        return game.title not in self.processos
 
     def update_latest_games_file(self, title):
         # Read the existing games from the file, if it exists
