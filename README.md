@@ -29,19 +29,9 @@ sudo dnf -y install gamemode
 
 ### Bazzite (Copr)
 ```
-sudo tee /etc/yum.repos.d/faugus-launcher.repo > /dev/null <<EOF
-[faugus-launcher]
-name=Copr repo for faugus-launcher owned by faugus
-baseurl=https://download.copr.fedorainfracloud.org/results/faugus/faugus-launcher/fedora-$releasever-$basearch/
-type=rpm-md
-skip_if_unavailable=True
-gpgcheck=1
-gpgkey=https://download.copr.fedorainfracloud.org/results/faugus/faugus-launcher/pubkey.gpg
-repo_gpgcheck=0
-enabled=1
-enabled_metadata=1
-EOF
+sudo dnf5 copr enable faugus/faugus-launcher
 sudo rpm-ostree install faugus-launcher
+sudo reboot
 ```
 Restart your system.
 
