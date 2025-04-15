@@ -1434,15 +1434,19 @@ class Main(Gtk.Window):
 
         if title in processos:
             data = processos[title]
-            pids = [data.get("main")] + data.get("children", [])
-            for pid in pids:
-                try:
-                    os.kill(pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-            del processos[title]
-            self.save_processes_to_file(processos)
-            self.on_item_selected(self.flowbox, selected_child)
+            pid = data.get("main")
+            if pid:
+                parent = psutil.Process(pid)
+                children = parent.children(recursive=True)
+
+                for child in children:
+                    child.terminate()
+
+                parent.terminate()
+
+                del processos[title]
+                self.save_processes_to_file(processos)
+                self.on_item_selected(self.flowbox, selected_child)
             return
 
         # Find the selected game object
