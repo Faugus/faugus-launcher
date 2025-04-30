@@ -16,6 +16,7 @@ import gi
 import psutil
 import requests
 import vdf
+import tarfile
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -2261,41 +2262,100 @@ class Main(Gtk.Window):
             except Exception as e:
                 GLib.idle_add(self.show_warning_dialog, self, f"Error during download: {e}")
 
-        def on_download_complete():
-            self.label_download.set_text(f"Installing {title}...")
-            if launcher == "battle":
-                self.label_download2.set_text("Please close the login window and press:")
-                self.button_finish_install.set_visible(True)
-                command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
-            elif launcher == "ea":
-                self.label_download2.set_text("Please close the login window and wait...")
-                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
-            # elif launcher == "epic":
-            #     self.label_download2.set_text("")
-            #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
-            elif launcher == "epic":
-                self.label_download2.set_text("Extracting files...")
-                install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
-                os.makedirs(install_path, exist_ok=True)
-                command = f"tar -xzf '{file_path}' -C '{install_path}'"
-                command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
-            elif launcher == "ubisoft":
-                self.label_download2.set_text("")
-                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
-            self.bar_download.set_visible(False)
-            self.label_download2.set_visible(True)
-            if launcher == "epic":
-                processo = subprocess.Popen(command, shell=True)
-                processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
-                GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
-                GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
-            else:
-                processo = subprocess.Popen([sys.executable, faugus_run, command])
-                GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
+    def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
+                            icon_temp, icon_final):
+            urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
+                # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+                "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.tar.gz",
+                "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"}
 
-        threading.Thread(target=start_download).start()
+            # file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
+            file_name = {"ea": "EAappInstaller.exe", "epic": "epic.tar.gz",
+                "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe"}
 
-        return file_path
+            if launcher not in urls:
+                return None
+
+            os.makedirs(faugus_temp, exist_ok=True)
+            file_path = os.path.join(faugus_temp, file_name[launcher])
+
+            def report_progress(block_num, block_size, total_size):
+                if total_size > 0:
+                    downloaded = block_num * block_size
+                    percent = min(downloaded / total_size, 1.0)
+                    GLib.idle_add(self.bar_download.set_fraction, percent)
+                    GLib.idle_add(self.bar_download.set_text, f"{int(percent * 100)}%")
+
+            def start_download():
+                try:
+                    urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
+                    GLib.idle_add(self.bar_download.set_fraction, 1.0)
+                    GLib.idle_add(self.bar_download.set_text, "Download complete")
+                    GLib.idle_add(on_download_complete)
+                except Exception as e:
+                    GLib.idle_add(self.show_warning_dialog, self, f"Error during download: {e}")
+
+            def on_download_complete():
+                self.label_download.set_text(f"Installing {title}...")
+                if launcher == "battle":
+                    self.label_download2.set_text("Please close the login window and press:")
+                    self.button_finish_install.set_visible(True)
+                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                elif launcher == "ea":
+                    self.label_download2.set_text("Please close the login window and wait...")
+                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                # elif launcher == "epic":
+                #     self.label_download2.set_text("")
+                #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
+                elif launcher == "epic":
+                    install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
+                    os.makedirs(install_path, exist_ok=True)
+                    self.extract_epic_launcher(file_path, install_path, runner, prefix, umu_run, title_formatted,
+                                            game, shortcut_state, icon_temp, icon_final, title)
+                    return
+
+                elif launcher == "ubisoft":
+                    self.label_download2.set_text("")
+                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+
+                self.bar_download.set_visible(False)
+                self.label_download2.set_visible(True)
+                if launcher != "epic":
+                    processo = subprocess.Popen([sys.executable, faugus_run, command])
+                    GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
+
+            threading.Thread(target=start_download).start()
+
+            return file_path
+
+    def extract_epic_launcher(self, file_path, install_path, runner, prefix, umu_run, title_formatted,
+                            game, shortcut_state, icon_temp, icon_final, title):
+        def extract():
+            try:
+                with tarfile.open(file_path, "r:gz") as tar:
+                    members = tar.getmembers()
+                    total = len(members)
+                    for i, member in enumerate(members):
+                        tar.extract(member, path=install_path)
+                        percent = min(i / total, 1.0)
+                        GLib.idle_add(self.bar_download.set_fraction, percent)
+                        GLib.idle_add(self.bar_download.set_text, f"Extracting... {int(percent * 100)}%")
+                GLib.idle_add(self.bar_download.set_fraction, 1.0)
+                GLib.idle_add(self.bar_download.set_text, "Extraction complete")
+                GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted,
+                            game, shortcut_state, icon_temp, icon_final, title)
+            except Exception as e:
+                GLib.idle_add(self.show_warning_dialog, self, f"Error during extraction: {e}")
+
+        threading.Thread(target=extract).start()
+
+    def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted,
+                            game, shortcut_state, icon_temp, icon_final, title):
+        self.bar_download.set_visible(False)
+        command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
+        processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
+        GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
 
     def select_game_by_title(self, title):
         # Selects an item from the FlowBox based on the title
