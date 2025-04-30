@@ -2230,11 +2230,13 @@ class Main(Gtk.Window):
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
                           icon_temp, icon_final):
         urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-            "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+            # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+            "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.tar.gz",
             "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
             "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"}
 
-        file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
+        # file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
+        file_name = {"ea": "EAappInstaller.exe", "epic": "epic.tar.gz",
             "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe"}
 
         if launcher not in urls:
@@ -2268,9 +2270,14 @@ class Main(Gtk.Window):
             elif launcher == "ea":
                 self.label_download2.set_text("Please close the login window and wait...")
                 command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+            # elif launcher == "epic":
+            #     self.label_download2.set_text("")
+            #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
             elif launcher == "epic":
-                self.label_download2.set_text("")
-                command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
+                self.label_download2.set_text("Extracting files...")
+                install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
+                os.makedirs(install_path, exist_ok=True)
+                command = f"tar -xzf '{file_path}' -C '{install_path}'"
             elif launcher == "ubisoft":
                 self.label_download2.set_text("")
                 command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
