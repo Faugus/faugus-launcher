@@ -2278,13 +2278,20 @@ class Main(Gtk.Window):
                 install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
                 os.makedirs(install_path, exist_ok=True)
                 command = f"tar -xzf '{file_path}' -C '{install_path}'"
+                command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
             elif launcher == "ubisoft":
                 self.label_download2.set_text("")
                 command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
             self.bar_download.set_visible(False)
             self.label_download2.set_visible(True)
-            processo = subprocess.Popen([sys.executable, faugus_run, command])
-            GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
+            if launcher == "epic":
+                processo = subprocess.Popen(command, shell=True)
+                processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
+                GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
+                GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
+            else:
+                processo = subprocess.Popen([sys.executable, faugus_run, command])
+                GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
 
         threading.Thread(target=start_download).start()
 
