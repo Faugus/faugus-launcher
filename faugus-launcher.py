@@ -145,7 +145,7 @@ class Main(Gtk.Window):
         config_file = config_file_dir
         if not os.path.exists(config_file):
             self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
-                             "False", "List", "False", "False", "False", "False")
+                             "False", "List", "False", "False", "False", "False", "False", "False")
 
         self.games = []
 
@@ -1008,11 +1008,13 @@ class Main(Gtk.Window):
             self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             self.gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
+            self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
+            self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
             if faugus_session:
                 self.interface_mode = "Banners"
         else:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False")
+                             "List", "False", "False", "False", "False", "False", "False")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1289,6 +1291,8 @@ class Main(Gtk.Window):
         self.checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen
         self.checkbox_gamepad_navigation = settings_dialog.checkbox_gamepad_navigation
         self.checkbox_enable_logging = settings_dialog.checkbox_enable_logging
+        self.checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver
+        self.checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
@@ -1306,6 +1310,8 @@ class Main(Gtk.Window):
         checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
         checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+        checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+        checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -1329,7 +1335,7 @@ class Main(Gtk.Window):
             self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
                              default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                              checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
-                             checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging)
+                             checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -2851,7 +2857,7 @@ class Main(Gtk.Window):
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_gamepad_navigation, checkbox_enable_logging):
+                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2883,6 +2889,8 @@ class Main(Gtk.Window):
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
+        config['wayland-driver'] = checkbox_wayland_driver
+        config['enable-hdr'] = checkbox_enable_hdr
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -3006,6 +3014,15 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Enable logging' option
         self.checkbox_enable_logging = Gtk.CheckButton(label="Enable logging")
         self.checkbox_enable_logging.set_active(False)
+
+        self.checkbox_wayland_driver = Gtk.CheckButton(label="Use Wayland driver (experimental)")
+        self.checkbox_wayland_driver.set_active(False)
+        self.checkbox_wayland_driver.set_tooltip_text("Only works with GE-Proton10-1 or superior and on a Wayland session.")
+        self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
+
+        self.checkbox_enable_hdr = Gtk.CheckButton(label="Enable HDR (experimental)")
+        self.checkbox_enable_hdr.set_active(False)
+        self.checkbox_enable_hdr.set_tooltip_text("Only works with GE-Proton10-1 or superior and on a Wayland session. VK HDR Layer is needed.")
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -3243,7 +3260,8 @@ class Settings(Gtk.Dialog):
             grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
             grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
             grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 4, 1, 1)
-            grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 5, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 6, 1, 1)
 
             box_left.pack_start(grid_prefix, False, False, 0)
             box_left.pack_start(grid_runner, False, False, 0)
@@ -3304,6 +3322,8 @@ class Settings(Gtk.Dialog):
             grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
             grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
             grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
+            grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
 
             grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
             grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
@@ -3431,6 +3451,13 @@ class Settings(Gtk.Dialog):
         else:
             self.checkbox_start_boot.set_sensitive(True)
 
+    def on_checkbox_wayland_driver_toggled(self, widget):
+        if not widget.get_active():
+            self.checkbox_enable_hdr.set_active(False)
+            self.checkbox_enable_hdr.set_sensitive(False)
+        else:
+            self.checkbox_enable_hdr.set_sensitive(True)
+
     def on_button_proton_manager_clicked(self, widget):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
@@ -3446,6 +3473,8 @@ class Settings(Gtk.Dialog):
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3461,7 +3490,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
             self.set_sensitive(False)
 
             proton_manager = faugus_proton_manager
@@ -3550,6 +3579,8 @@ class Settings(Gtk.Dialog):
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3565,7 +3596,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3709,6 +3740,8 @@ class Settings(Gtk.Dialog):
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3724,7 +3757,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3793,6 +3826,8 @@ class Settings(Gtk.Dialog):
             checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
             checkbox_gamepad_navigation = self.checkbox_gamepad_navigation.get_active()
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3808,7 +3843,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -4173,6 +4208,8 @@ class Settings(Gtk.Dialog):
             start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
             gamepad_navigation = config_dict.get('gamepad-navigation', 'False') == 'True'
             enable_logging = config_dict.get('enable-logging', 'False') == 'True'
+            wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
+            enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
 
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.entry_default_prefix.set_text(self.default_prefix)
@@ -4198,6 +4235,8 @@ class Settings(Gtk.Dialog):
             self.checkbox_start_fullscreen.set_active(start_fullscreen)
             self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
             self.checkbox_enable_logging.set_active(enable_logging)
+            self.checkbox_wayland_driver.set_active(wayland_driver)
+            self.checkbox_enable_hdr.set_active(enable_hdr)
 
             model = self.combo_box_interface.get_model()
             index_to_activate2 = 0
@@ -4212,7 +4251,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False",
-                                    "False", "List", "False", "False", "False", "False")
+                                    "False", "List", "False", "False", "False", "False", "False", "False")
 
 
 class Game:
@@ -6500,12 +6539,12 @@ class CreateShortcut(Gtk.Window):
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False")
+                             "List", "False", "False", "False", "False", "False", "False")
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_gamepad_navigation, checkbox_enable_logging):
+                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -6545,6 +6584,8 @@ class CreateShortcut(Gtk.Window):
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
+        config['wayland-driver'] = checkbox_wayland_driver
+        config['enable-hdr'] = checkbox_enable_hdr
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:

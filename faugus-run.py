@@ -135,8 +135,13 @@ class FaugusRun:
                     if "umu" not in game_id:
                         self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
                     break
-        if "proton-cachyos" in self.message or "proton-ge-custom" in self.message:
+        if "proton-ge-custom" in self.message:
             self.message = f'UMU_NO_RUNTIME=1 {self.message}'
+
+        if self.wayland_driver:
+            self.message = f'PROTON_ENABLE_WAYLAND=1 {self.message}'
+            if self.enable_hdr:
+                self.message = f'PROTON_ENABLE_HDR=1 {self.message}'
 
         print(self.message)
 
@@ -194,11 +199,13 @@ class FaugusRun:
             self.default_runner = config_dict.get('default-runner', '')
             self.default_prefix = config_dict.get('default-prefix', '')
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
+            self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
+            self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -233,6 +240,8 @@ class FaugusRun:
         config['start-fullscreen'] = checkbox_start_fullscreen
         config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
+        config['wayland-driver'] = checkbox_wayland_driver
+        config['enable-hdr'] = checkbox_enable_hdr
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
