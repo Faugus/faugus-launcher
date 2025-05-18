@@ -11,7 +11,6 @@ import sys
 import threading
 import urllib.request
 import webbrowser
-
 import gi
 import psutil
 import requests
@@ -121,7 +120,7 @@ class Main(Gtk.Window):
         self.current_prefix = None
 
         self.games = []
-        self.processos = {}
+        self.play_button_locked = False
 
         self.last_click_time = 0
         self.last_clicked_item = None
@@ -146,8 +145,6 @@ class Main(Gtk.Window):
         if not os.path.exists(config_file):
             self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
                              "False", "List", "False", "False", "False", "False", "False", "False")
-
-        self.games = []
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
@@ -240,6 +237,48 @@ class Main(Gtk.Window):
 
         GLib.timeout_add_seconds(1, self.check_running_processes)
 
+    def check_running_processes(self):
+        processos = self.load_processes_from_file()
+
+        updated = False
+        to_remove = []
+
+        for title, data in processos.items():
+            pid_main = data.get("main")
+
+            try:
+                proc = psutil.Process(pid_main)
+                if proc.status() == psutil.STATUS_ZOMBIE:
+                    to_remove.append(title)
+            except psutil.NoSuchProcess:
+                to_remove.append(title)
+            except Exception as e:
+                to_remove.append(title)
+
+        for title in to_remove:
+            del processos[title]
+            updated = True
+
+        if updated:
+            with open(running_games, "w") as f:
+                json.dump(processos, f, indent=2)
+
+        selected_child = None
+        for child in self.flowbox.get_children():
+            if child.get_state_flags() & Gtk.StateFlags.SELECTED:
+                selected_child = child
+                break
+
+        if selected_child:
+            hbox = selected_child.get_children()[0]
+            game_label = hbox.get_children()[1]
+            selected_title = game_label.get_text()
+
+            if self.play_button_locked == False:
+                self.on_item_selected(self.flowbox, selected_child)
+
+        return True
+
     def load_processes_from_file(self):
         if os.path.exists(running_games):
             try:
@@ -248,11 +287,6 @@ class Main(Gtk.Window):
             except json.JSONDecodeError:
                 return {}
         return {}
-
-    def save_processes_to_file(self, processos):
-        os.makedirs(os.path.dirname(running_games), exist_ok=True)
-        with open(running_games, "w") as f:
-            json.dump(processos, f, indent=2)
 
     def on_focus_in(self, widget, event):
         if self.gamepad_navigation and not self.gamepad_process:
@@ -1247,6 +1281,8 @@ class Main(Gtk.Window):
 
             processos = self.load_processes_from_file()
             if title in processos:
+                self.menu_item_play.set_sensitive(True)
+                self.button_play.set_sensitive(True)
                 self.button_play.set_image(
                     Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
             else:
@@ -1438,6 +1474,7 @@ class Main(Gtk.Window):
         title = game_label.get_text()
 
         processos = self.load_processes_from_file()
+        self.play_button_locked = True
 
         if title in processos:
             data = processos[title]
@@ -1451,9 +1488,7 @@ class Main(Gtk.Window):
 
                 parent.terminate()
 
-                del processos[title]
-                self.save_processes_to_file(processos)
-                self.on_item_selected(self.flowbox, selected_child)
+                self.play_button_locked = False
             return
 
         # Find the selected game object
@@ -1560,66 +1595,39 @@ class Main(Gtk.Window):
                 GLib.timeout_add(1000, check_pid_periodically)
 
     def find_pid(self, game):
-        parent = psutil.Process(self.processo.pid)
-        children = parent.children(recursive=True)
+        try:
+            parent = psutil.Process(self.processo.pid)
+            all_descendants = parent.children(recursive=True)
+        except psutil.NoSuchProcess:
+            return False
 
-        targets = []
-
-        if game.addapp_checkbox:
-            with open(game.addapp_bat, 'r') as f:
-                for line in f:
-                    match = re.search(r'"(z:/.+?\.exe)"', line, re.IGNORECASE)
-                    if match:
-                        exe_path = os.path.basename(match.group(1)).lower()
-                        exe_name = os.path.splitext(exe_path)[0]
-                        targets.append(exe_name)
-        else:
-            filename = os.path.basename(game.path)
-            filename_without_ext = os.path.splitext(filename)[0].lower()
-            targets.append(filename_without_ext)
-
-        found = {}  # {target_name: pid}
         umu_run_pid = None
 
-        for child in children:
+        for proc in all_descendants:
             try:
-                child_name = os.path.splitext(child.name())[0].lower()
-
-                # Detect umu-run and save as main PID
-                if child_name == "umu-run":
-                    umu_run_pid = child.pid
-                    self.save_process_to_file(game.title, umu_run_pid)
-
-                # Detect target processes
-                for target in targets:
-                    if target in child_name or child_name in target:
-                        if target not in found:
-                            found[target] = child.pid
-                            self.save_process_to_file(game.title, umu_run_pid or self.processo.pid, child.pid)
-
+                name = os.path.splitext(proc.name())[0].lower()
+                if name == "umu-run":
+                    umu_run_pid = proc.pid
+                    break
             except psutil.NoSuchProcess:
                 continue
 
         if umu_run_pid:
-            if len(found) == len(targets):
-                # All processes found
-                self.menu_item_play.set_sensitive(True)
-                self.button_play.set_sensitive(True)
-                self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-                return True
-            else:
-                # umu-run found but missing children
-                self.button_play.set_sensitive(False)
-                return False
-        else:
-            # umu-run not found
+            self.save_process_to_file(game.title, umu_run_pid)
+
             self.menu_item_play.set_sensitive(True)
             self.button_play.set_sensitive(True)
-            self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-            return False  # Changed from True to False to prevent premature exit
+            self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+            self.play_button_locked = False
+            return True
 
+        self.menu_item_play.set_sensitive(True)
+        self.button_play.set_sensitive(True)
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
 
-    def save_process_to_file(self, title, processo_pid, child_pid=None):
+        return False
+
+    def save_process_to_file(self, title, processo_pid, _unused=None):
         os.makedirs(os.path.dirname(running_games), exist_ok=True)
 
         try:
@@ -1628,15 +1636,7 @@ class Main(Gtk.Window):
         except (FileNotFoundError, json.JSONDecodeError):
             processos = {}
 
-        if title not in processos:
-            processos[title] = {"main": processo_pid, "children": []}
-        else:
-            processos[title]["main"] = processo_pid
-            if "children" not in processos[title]:
-                processos[title]["children"] = []
-
-        if child_pid is not None and child_pid not in processos[title]["children"]:
-            processos[title]["children"].append(child_pid)
+        processos[title] = {"main": processo_pid}
 
         with open(running_games, "w") as f:
             json.dump(processos, f, indent=2)
@@ -2235,40 +2235,6 @@ class Main(Gtk.Window):
         return True
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                          icon_temp, icon_final):
-        urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-            # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
-            "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.tar.gz",
-            "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
-            "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"}
-
-        # file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
-        file_name = {"ea": "EAappInstaller.exe", "epic": "epic.tar.gz",
-            "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe"}
-
-        if launcher not in urls:
-            return None
-
-        os.makedirs(faugus_temp, exist_ok=True)
-        file_path = os.path.join(faugus_temp, file_name[launcher])
-
-        def report_progress(block_num, block_size, total_size):
-            if total_size > 0:
-                downloaded = block_num * block_size
-                percent = min(downloaded / total_size, 1.0)
-                GLib.idle_add(self.bar_download.set_fraction, percent)
-                GLib.idle_add(self.bar_download.set_text, f"{int(percent * 100)}%")
-
-        def start_download():
-            try:
-                urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
-                GLib.idle_add(self.bar_download.set_fraction, 1.0)
-                GLib.idle_add(self.bar_download.set_text, "Download complete")
-                GLib.idle_add(on_download_complete)
-            except Exception as e:
-                GLib.idle_add(self.show_warning_dialog, self, f"Error during download: {e}")
-
-    def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
                             icon_temp, icon_final):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
@@ -2359,6 +2325,7 @@ class Main(Gtk.Window):
     def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted,
                             game, shortcut_state, icon_temp, icon_final, title):
         self.bar_download.set_visible(False)
+        self.label_download2.set_text("Please close the login window and wait...")
         command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
         processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
         GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
@@ -2790,55 +2757,6 @@ class Main(Gtk.Window):
                 self.fullscreen_activated = False
                 self.grid_corner.set_visible(False)
                 self.grid_left.set_margin_start(0)
-
-    def check_running_processes(self):
-        processos = self.load_processes_from_file()
-
-        updated = False
-        to_remove = []
-
-        for title, data in processos.items():
-            pid_main = data.get("main")
-
-            try:
-                proc = psutil.Process(pid_main)
-                if proc.status() == psutil.STATUS_ZOMBIE:
-                    to_remove.append(title)
-                    self.button_play.set_sensitive(True)
-                    self.button_play.set_image(
-                        Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-            except psutil.NoSuchProcess:
-                to_remove.append(title)
-                self.button_play.set_sensitive(True)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
-            except Exception as e:
-                to_remove.append(title)
-
-        for title in to_remove:
-            del processos[title]
-            updated = True
-
-        if updated:
-            with open(running_games, "w") as f:
-                json.dump(processos, f, indent=2)
-
-        selected_child = None
-        for child in self.flowbox.get_children():
-            if child.get_state_flags() & Gtk.StateFlags.SELECTED:
-                selected_child = child
-                break
-
-        if selected_child:
-            hbox = selected_child.get_children()[0]
-            game_label = hbox.get_children()[1]
-            selected_title = game_label.get_text()
-
-            if selected_title in processos:
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
-
-        return True
 
     def save_games(self):
         games_data = []
@@ -5261,6 +5179,7 @@ class AddGame(Gtk.Dialog):
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
+            self.entry_game_arguments.set_text("--in-process-gpu")
 
             shutil.copy(battle_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
@@ -5306,7 +5225,7 @@ class AddGame(Gtk.Dialog):
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe")
+                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
 
             shutil.copy(epic_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
