@@ -2935,12 +2935,12 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label="Use Wayland driver (experimental)")
         self.checkbox_wayland_driver.set_active(False)
-        self.checkbox_wayland_driver.set_tooltip_text("Only works with GE-Proton10-1 or superior and on a Wayland session.")
+        self.checkbox_wayland_driver.set_tooltip_text("Only works with GE-Proton10-1 or superior.")
         self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
 
         self.checkbox_enable_hdr = Gtk.CheckButton(label="Enable HDR (experimental)")
         self.checkbox_enable_hdr.set_active(False)
-        self.checkbox_enable_hdr.set_tooltip_text("Only works with GE-Proton10-1 or superior and on a Wayland session. VK HDR Layer is needed.")
+        self.checkbox_enable_hdr.set_tooltip_text("Only works with GE-Proton10-1 or superior.")
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -5179,7 +5179,6 @@ class AddGame(Gtk.Dialog):
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
-            self.entry_game_arguments.set_text("--in-process-gpu")
 
             shutil.copy(battle_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
