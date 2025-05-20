@@ -844,10 +844,10 @@ class Main(Gtk.Window):
                     new_banner = f"{banners_dir}/{title_formatted}.png"
 
                     if os.path.exists(icon):
-                        shutil.copy(icon, new_icon)
+                        shutil.copyfile(icon, new_icon)
 
                     if os.path.exists(banner):
-                        shutil.copy(banner, new_banner)
+                        shutil.copyfile(banner, new_banner)
 
                     game.banner = new_banner
 
@@ -1729,7 +1729,7 @@ class Main(Gtk.Window):
 
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
-            shutil.copy(game.banner, edit_game_dialog.banner_path_temp)
+            shutil.copyfile(game.banner, edit_game_dialog.banner_path_temp)
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 260, 390, True)
             edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
             edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
@@ -1810,7 +1810,7 @@ class Main(Gtk.Window):
         icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
 
         if os.path.exists(icon_path):
-            shutil.copy(icon_path, icon_temp)
+            shutil.copyfile(icon_path, icon_temp)
         if not os.path.exists(icon_path):
             icon_temp = faugus_png
 
@@ -2523,7 +2523,7 @@ class Main(Gtk.Window):
 
         # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
-        shutil.copy(applications_shortcut_path, desktop_shortcut_path)
+        shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
         def add_game_to_steam(title, game_directory, icon, command):
@@ -3828,10 +3828,10 @@ class Settings(Gtk.Dialog):
             src = os.path.join(faugus_launcher_dir, item)
             dst = os.path.join(temp_dir, item)
             if os.path.isdir(src):
-                shutil.copytree(src, dst, dirs_exist_ok=True)
+                shutil.copyfiletree(src, dst, dirs_exist_ok=True)
             elif os.path.isfile(src):
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.copy2(src, dst)
+                shutil.copyfile2(src, dst)
 
         marker_path = os.path.join(temp_dir, ".faugus_marker")
         with open(marker_path, "w") as f:
@@ -3880,7 +3880,7 @@ class Settings(Gtk.Dialog):
 
         if response == Gtk.ResponseType.OK:
             dest = filechooser.get_filename()
-            shutil.copy2(zip_path + ".zip", dest)
+            shutil.copyfile2(zip_path + ".zip", dest)
 
         dialog.destroy()
         os.remove(zip_path + ".zip")
@@ -3954,9 +3954,9 @@ class Settings(Gtk.Dialog):
                         os.remove(dst)
 
                     if os.path.isdir(src):
-                        shutil.copytree(src, dst)
+                        shutil.copyfiletree(src, dst)
                     elif os.path.isfile(src):
-                        shutil.copy2(src, dst)
+                        shutil.copyfile2(src, dst)
 
                 shutil.rmtree(temp_dir)
                 global faugus_backup
@@ -4366,7 +4366,7 @@ class AddGame(Gtk.Dialog):
             os.makedirs(banners_dir)
 
         self.banner_path_temp = os.path.join(banners_dir, "banner_temp.png")
-        shutil.copy(faugus_banner, self.banner_path_temp)
+        shutil.copyfile(faugus_banner, self.banner_path_temp)
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(self.icon_directory):
@@ -4881,7 +4881,7 @@ class AddGame(Gtk.Dialog):
         if self.entry_title.get_text() != "":
             self.get_banner()
         else:
-            shutil.copy(faugus_banner, self.banner_path_temp)
+            shutil.copyfile(faugus_banner, self.banner_path_temp)
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
             self.image_banner.set_from_pixbuf(pixbuf)
             self.image_banner2.set_from_pixbuf(pixbuf)
@@ -5005,7 +5005,7 @@ class AddGame(Gtk.Dialog):
                     dialog_image.destroy()
                     continue
                 else:
-                    shutil.copy(file_path, self.banner_path_temp)
+                    shutil.copyfile(file_path, self.banner_path_temp)
                     self.update_image_banner()
                     break
             else:
@@ -5046,7 +5046,7 @@ class AddGame(Gtk.Dialog):
         if entry_title.get_text() != "":
             self.get_banner()
         else:
-            shutil.copy(faugus_banner, self.banner_path_temp)
+            shutil.copyfile(faugus_banner, self.banner_path_temp)
             pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
             self.image_banner.set_from_pixbuf(pixbuf)
             self.image_banner2.set_from_pixbuf(pixbuf)
@@ -5180,7 +5180,7 @@ class AddGame(Gtk.Dialog):
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
 
-            shutil.copy(battle_icon, os.path.expanduser(self.icon_temp))
+            shutil.copyfile(battle_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(self.icon_temp)
@@ -5203,7 +5203,7 @@ class AddGame(Gtk.Dialog):
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
 
-            shutil.copy(ea_icon, os.path.expanduser(self.icon_temp))
+            shutil.copyfile(ea_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(self.icon_temp)
@@ -5226,7 +5226,7 @@ class AddGame(Gtk.Dialog):
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
 
-            shutil.copy(epic_icon, os.path.expanduser(self.icon_temp))
+            shutil.copyfile(epic_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(self.icon_temp)
@@ -5249,7 +5249,7 @@ class AddGame(Gtk.Dialog):
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
 
-            shutil.copy(ubisoft_icon, os.path.expanduser(self.icon_temp))
+            shutil.copyfile(ubisoft_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(self.icon_temp)
@@ -5259,7 +5259,7 @@ class AddGame(Gtk.Dialog):
             if self.entry_title.get_text() != "":
                 self.get_banner()
             else:
-                shutil.copy(faugus_banner, self.banner_path_temp)
+                shutil.copyfile(faugus_banner, self.banner_path_temp)
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
                 self.image_banner.set_from_pixbuf(pixbuf)
                 self.image_banner2.set_from_pixbuf(pixbuf)
@@ -5485,7 +5485,7 @@ class AddGame(Gtk.Dialog):
     def set_image_shortcut_icon(self):
 
         image_path = faugus_png
-        shutil.copy(image_path, self.icon_temp)
+        shutil.copyfile(image_path, self.icon_temp)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5644,7 +5644,7 @@ class AddGame(Gtk.Dialog):
                     dialog_image.destroy()
                     continue
                 else:
-                    shutil.copy(file_path, self.icon_temp)
+                    shutil.copyfile(file_path, self.icon_temp)
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
                     scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
                     image = Gtk.Image.new_from_file(self.icon_temp)
@@ -6622,7 +6622,7 @@ class CreateShortcut(Gtk.Window):
 
         # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
-        shutil.copy(applications_shortcut_path, desktop_shortcut_path)
+        shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
 
         if os.path.isfile(self.icon_temp):
             os.remove(self.icon_temp)
@@ -6787,7 +6787,7 @@ class CreateShortcut(Gtk.Window):
                     dialog_image.destroy()
                     continue
                 else:
-                    shutil.copy(file_path, self.icon_temp)
+                    shutil.copyfile(file_path, self.icon_temp)
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
                     scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
                     image = Gtk.Image.new_from_file(self.icon_temp)
