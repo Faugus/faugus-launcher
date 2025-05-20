@@ -853,7 +853,7 @@ class Main(Gtk.Window):
 
                     game_info = {"title": game.title, "path": game.path, "prefix": game.prefix,
                         "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
-                        "mangohud": game.mangohud, "gamemode": game.gamemode, "prefer_sdl": game.prefer_sdl,
+                        "mangohud": game.mangohud, "gamemode": game.gamemode, "disable_hidraw": game.disable_hidraw,
                         "protonfix": game.protonfix, "runner": game.runner, "addapp_checkbox": game.addapp_checkbox,
                         "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, }
 
@@ -1142,7 +1142,7 @@ class Main(Gtk.Window):
                     game_arguments = game_data.get("game_arguments", "")
                     mangohud = game_data.get("mangohud", "")
                     gamemode = game_data.get("gamemode", "")
-                    prefer_sdl = game_data.get("prefer_sdl", "")
+                    disable_hidraw = game_data.get("disable_hidraw", "")
                     protonfix = game_data.get("protonfix", "")
                     runner = game_data.get("runner", "")
                     addapp_checkbox = game_data.get("addapp_checkbox", "")
@@ -1150,7 +1150,7 @@ class Main(Gtk.Window):
                     addapp_bat = game_data.get("addapp_bat", "")
                     banner = game_data.get("banner", "")
 
-                    game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, prefer_sdl,
+                    game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
                                 protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
                     self.games.append(game)
 
@@ -1332,7 +1332,7 @@ class Main(Gtk.Window):
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
-        self.checkbox_prefer_sdl = settings_dialog.checkbox_prefer_sdl
+        self.checkbox_disable_hidraw = settings_dialog.checkbox_disable_hidraw
         self.combo_box_runner = settings_dialog.combo_box_runner
 
         checkbox_state = self.checkbox_close_after_launch.get_active()
@@ -1351,7 +1351,7 @@ class Main(Gtk.Window):
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
-        prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+        disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
         default_runner = self.combo_box_runner.get_active_text()
 
         if default_runner == "UMU-Proton Latest":
@@ -1368,7 +1368,7 @@ class Main(Gtk.Window):
             if faugus_session:
                 self.save_session_config(settings_dialog)
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                              default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                              checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
                              checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
@@ -1505,7 +1505,7 @@ class Main(Gtk.Window):
             prefix = game.prefix
             game_arguments = game.game_arguments
             mangohud = game.mangohud
-            prefer_sdl = game.prefer_sdl
+            disable_hidraw = game.disable_hidraw
             protonfix = game.protonfix
             runner = game.runner
             addapp_checkbox = game.addapp_checkbox
@@ -1522,8 +1522,8 @@ class Main(Gtk.Window):
             # Add command parts if they are not empty
             if mangohud:
                 command_parts.append(mangohud)
-            if prefer_sdl:
-                command_parts.append(prefer_sdl)
+            if disable_hidraw:
+                command_parts.append(disable_hidraw)
             if runner != "Linux-Native":
                 if prefix:
                     command_parts.append(f'WINEPREFIX="{prefix}"')
@@ -1748,10 +1748,10 @@ class Main(Gtk.Window):
                 else:
                     edit_game_dialog.checkbox_gamemode.set_active(False)
 
-            if game.prefer_sdl == "PROTON_PREFER_SDL=1":
-                edit_game_dialog.checkbox_prefer_sdl.set_active(True)
+            if game.disable_hidraw == "PROTON_DISABLE_HIDRAW=1":
+                edit_game_dialog.checkbox_disable_hidraw.set_active(True)
             else:
-                edit_game_dialog.checkbox_prefer_sdl.set_active(False)
+                edit_game_dialog.checkbox_disable_hidraw.set_active(False)
 
             if game.addapp_checkbox == "addapp_enabled":
                 edit_game_dialog.checkbox_addapp.set_active(True)
@@ -2012,11 +2012,11 @@ class Main(Gtk.Window):
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
-            prefer_sdl = "PROTON_PREFER_SDL=1" if add_game_dialog.checkbox_prefer_sdl.get_active() else ""
+            disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, prefer_sdl,
+            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
                         protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner)
 
             # Determine the state of the shortcut checkbox
@@ -2063,7 +2063,7 @@ class Main(Gtk.Window):
                                              icon_temp, icon_final)
 
             game_info = {"title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
-                "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "prefer_sdl": prefer_sdl,
+                "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
                 "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
                 "addapp_bat": addapp_bat, "banner": banner, }
 
@@ -2357,7 +2357,7 @@ class Main(Gtk.Window):
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
-            game.prefer_sdl = edit_game_dialog.checkbox_prefer_sdl.get_active()
+            game.disable_hidraw = edit_game_dialog.checkbox_disable_hidraw.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combo_box_runner.get_active_text()
             game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
@@ -2447,7 +2447,7 @@ class Main(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
-        prefer_sdl = "PROTON_PREFER_SDL=1" if game.prefer_sdl else ""
+        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else ""
         addapp = "addapp_enabled" if game.addapp_checkbox else ""
 
         # Check if the icon file exists
@@ -2463,8 +2463,8 @@ class Main(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
-        if prefer_sdl:
-            command_parts.append(prefer_sdl)
+        if disable_hidraw:
+            command_parts.append(disable_hidraw)
         if runner != "Linux-Native":
             if prefix:
                 command_parts.append(f"WINEPREFIX='{prefix}'")
@@ -2614,7 +2614,7 @@ class Main(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if game.mangohud else ""
         gamemode = "gamemoderun" if game.gamemode else ""
-        prefer_sdl = "PROTON_PREFER_SDL=1" if game.prefer_sdl else ""
+        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else ""
         addapp = "addapp_enabled" if game.addapp_checkbox else ""
 
         # Check if the icon file exists
@@ -2630,8 +2630,8 @@ class Main(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
-        if prefer_sdl:
-            command_parts.append(prefer_sdl)
+        if disable_hidraw:
+            command_parts.append(disable_hidraw)
         if runner != "Linux-Native":
             if prefix:
                 command_parts.append(f"WINEPREFIX='{prefix}'")
@@ -2764,7 +2764,7 @@ class Main(Gtk.Window):
             game_info = {"title": game.title, "path": game.path, "prefix": game.prefix,
                 "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
                 "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
-                "prefer_sdl": "PROTON_PREFER_SDL=1" if game.prefer_sdl else "", "protonfix": game.protonfix,
+                "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
                 "runner": game.runner, "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
                 "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, }
             games_data.append(game_info)
@@ -2772,7 +2772,7 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
                     checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
@@ -2796,7 +2796,7 @@ class Main(Gtk.Window):
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['prefer-sdl'] = prefer_sdl_state
+        config['disable-hidraw'] = disable_hidraw_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
@@ -2964,9 +2964,9 @@ class Settings(Gtk.Dialog):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
-        self.checkbox_prefer_sdl.set_tooltip_text(
-            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
+        self.checkbox_disable_hidraw = Gtk.CheckButton(label="Disable Hidraw")
+        self.checkbox_disable_hidraw.set_tooltip_text(
+            "May fix controller issues with some games. Only works with GE-Proton10-3 or superior.")
 
         self.label_support = Gtk.Label(label="Support the Project")
         self.label_support.set_halign(Gtk.Align.START)
@@ -3229,7 +3229,7 @@ class Settings(Gtk.Dialog):
             grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
             self.checkbox_mangohud.set_hexpand(True)
             grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-            grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
+            grid_tools.attach(self.checkbox_disable_hidraw, 0, 2, 1, 1)
             grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
             grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
             grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
@@ -3396,7 +3396,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3404,7 +3404,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
@@ -3502,7 +3502,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3510,7 +3510,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
@@ -3663,7 +3663,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3671,7 +3671,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
@@ -3749,7 +3749,7 @@ class Settings(Gtk.Dialog):
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
-            prefer_sdl_state = self.checkbox_prefer_sdl.get_active()
+            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
             default_runner = self.combo_box_runner.get_active_text()
 
             if default_runner == "UMU-Proton Latest":
@@ -3757,7 +3757,7 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
@@ -4115,7 +4115,7 @@ class Settings(Gtk.Dialog):
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
-            prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
+            disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
             discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             splash_disable = config_dict.get('splash-disable', 'False') == 'True'
@@ -4133,7 +4133,7 @@ class Settings(Gtk.Dialog):
             self.entry_default_prefix.set_text(self.default_prefix)
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_prefer_sdl.set_active(prefer_sdl)
+            self.checkbox_disable_hidraw.set_active(disable_hidraw)
 
             if self.default_runner == "":
                 self.default_runner = "UMU-Proton Latest"
@@ -4173,7 +4173,7 @@ class Settings(Gtk.Dialog):
 
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, prefer_sdl, protonfix,
+    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
                  runner, addapp_checkbox, addapp, addapp_bat, banner):
         # Initialize a Game object with various attributes
         self.title = title  # Title of the game
@@ -4183,7 +4183,7 @@ class Game:
         self.mangohud = mangohud  # Boolean indicating whether Mangohud is enabled
         self.gamemode = gamemode  # Boolean indicating whether Gamemode is enabled
         self.prefix = prefix  # Prefix for Wine games
-        self.prefer_sdl = prefer_sdl
+        self.disable_hidraw = disable_hidraw
         self.protonfix = protonfix
         self.runner = runner
         self.addapp_checkbox = addapp_checkbox
@@ -4590,9 +4590,9 @@ class AddGame(Gtk.Dialog):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
-        self.checkbox_prefer_sdl.set_tooltip_text(
-            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
+        self.checkbox_disable_hidraw = Gtk.CheckButton(label="Disable Hidraw")
+        self.checkbox_disable_hidraw.set_tooltip_text(
+            "May fix controller issues with some games. Only works with GE-Proton10-3 or superior.")
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -4776,8 +4776,8 @@ class AddGame(Gtk.Dialog):
         self.checkbox_mangohud.set_hexpand(True)
         self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.checkbox_gamemode.set_hexpand(True)
-        self.grid_tools.attach(self.checkbox_prefer_sdl, 0, 2, 1, 1)
-        self.checkbox_prefer_sdl.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_disable_hidraw, 0, 2, 1, 1)
+        self.checkbox_disable_hidraw.set_hexpand(True)
         self.grid_tools.attach(self.button_winetricks, 2, 0, 1, 1)
         self.grid_tools.attach(self.button_winecfg, 2, 1, 1, 1)
         self.grid_tools.attach(self.button_run, 2, 2, 1, 1)
@@ -5140,7 +5140,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
-            self.checkbox_prefer_sdl.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
@@ -5156,7 +5156,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(False)
             self.grid_protonfix.set_visible(False)
             self.grid_addapp.set_visible(False)
-            self.checkbox_prefer_sdl.set_visible(False)
+            self.checkbox_disable_hidraw.set_visible(False)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text("")
@@ -5173,7 +5173,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
-            self.checkbox_prefer_sdl.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -5196,7 +5196,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
-            self.checkbox_prefer_sdl.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -5219,7 +5219,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
-            self.checkbox_prefer_sdl.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -5242,7 +5242,7 @@ class AddGame(Gtk.Dialog):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
-            self.checkbox_prefer_sdl.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combo_box_launcher.get_active_text())
@@ -6139,9 +6139,9 @@ class CreateShortcut(Gtk.Window):
             "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.")
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text("Tweaks your system to improve performance.")
-        self.checkbox_prefer_sdl = Gtk.CheckButton(label="Prefer SDL")
-        self.checkbox_prefer_sdl.set_tooltip_text(
-            "Prefer SDL over Hidraw. May fix controller issues with some games. Only works with GE-Proton9-24 or superior.")
+        self.checkbox_disable_hidraw = Gtk.CheckButton(label="Disable Hidraw")
+        self.checkbox_disable_hidraw.set_tooltip_text(
+            "May fix controller issues with some games. Only works with GE-Proton10-3 or superior.")
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label="Cancel")
@@ -6250,7 +6250,7 @@ class CreateShortcut(Gtk.Window):
 
         self.grid_tools.add(self.checkbox_mangohud)
         self.grid_tools.add(self.checkbox_gamemode)
-        self.grid_tools.add(self.checkbox_prefer_sdl)
+        self.grid_tools.add(self.checkbox_disable_hidraw)
 
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
@@ -6447,19 +6447,19 @@ class CreateShortcut(Gtk.Window):
 
             mangohud = config_dict.get('mangohud', 'False') == 'True'
             gamemode = config_dict.get('gamemode', 'False') == 'True'
-            prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
+            disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
             self.default_runner = config_dict.get('default-runner', '').strip('"')
 
             self.checkbox_mangohud.set_active(mangohud)
             self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_prefer_sdl.set_active(prefer_sdl)
+            self.checkbox_disable_hidraw.set_active(disable_hidraw)
 
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
                              "List", "False", "False", "False", "False", "False", "False")
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state,
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
                     checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
@@ -6491,7 +6491,7 @@ class CreateShortcut(Gtk.Window):
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['prefer-sdl'] = prefer_sdl_state
+        config['disable-hidraw'] = disable_hidraw_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
@@ -6556,7 +6556,7 @@ class CreateShortcut(Gtk.Window):
 
         mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
         gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
-        prefer_sdl = "PROTON_PREFER_SDL=1" if self.checkbox_prefer_sdl.get_active() else ""
+        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if self.checkbox_disable_hidraw.get_active() else ""
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
@@ -6566,8 +6566,8 @@ class CreateShortcut(Gtk.Window):
         # Add command parts if they are not empty
         if mangohud:
             command_parts.append(mangohud)
-        if prefer_sdl:
-            command_parts.append(prefer_sdl)
+        if disable_hidraw:
+            command_parts.append(disable_hidraw)
 
         # command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
 
@@ -6848,7 +6848,7 @@ def run_file(file_path):
         default_prefix = config_dict.get('default-prefix', '').strip('"')
         mangohud = config_dict.get('mangohud', 'False') == 'True'
         gamemode = config_dict.get('gamemode', 'False') == 'True'
-        prefer_sdl = config_dict.get('prefer-sdl', 'False') == 'True'
+        disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
         default_runner = config_dict.get('default-runner', '').strip('"')
     else:
         # Define the configuration path
@@ -6860,7 +6860,7 @@ def run_file(file_path):
         default_prefix = prefixes_dir
         mangohud = 'False'
         gamemode = 'False'
-        prefer_sdl = 'False'
+        disable_hidraw = 'False'
         default_runner = 'GE-Proton'
 
         with open(config_file, 'w') as f:
@@ -6868,7 +6868,7 @@ def run_file(file_path):
             f.write(f'default-prefix="{default_prefix}"\n')
             f.write(f'mangohud=False\n')
             f.write(f'gamemode=False\n')
-            f.write(f'prefer-sdl=False\n')
+            f.write(f'disable-hidraw=False\n')
             f.write(f'default-runner="GE-Proton"\n')
             f.write(f'discrete-gpu=True\n')
             f.write(f'splash-disable=False\n')
@@ -6881,7 +6881,7 @@ def run_file(file_path):
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
         gamemode = "gamemoderun" if gamemode else ""
-        prefer_sdl = "PROTON_PREFER_SDL=1" if prefer_sdl else ""
+        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if disable_hidraw else ""
 
     # Get the directory of the file
     file_dir = os.path.dirname(os.path.abspath(file_path))
@@ -6904,8 +6904,8 @@ def run_file(file_path):
         # Add command parts if they are not empty
         if mangohud_enabled and mangohud:
             command_parts.append(mangohud)
-        if prefer_sdl:
-            command_parts.append(prefer_sdl)
+        if disable_hidraw:
+            command_parts.append(disable_hidraw)
     command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append('GAMEID=default')
     if default_runner:

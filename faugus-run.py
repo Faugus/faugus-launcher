@@ -205,7 +205,7 @@ class FaugusRun:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, prefer_sdl_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -229,7 +229,7 @@ class FaugusRun:
         config['default-prefix'] = default_prefix
         config['mangohud'] = mangohud_state
         config['gamemode'] = gamemode_state
-        config['prefer-sdl'] = prefer_sdl_state
+        config['disable-hidraw'] = disable_hidraw_state
         config['default-runner'] = default_runner
         config['discrete-gpu'] = checkbox_discrete_gpu_state
         config['splash-disable'] = checkbox_splash_disable
