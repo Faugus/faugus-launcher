@@ -3828,10 +3828,10 @@ class Settings(Gtk.Dialog):
             src = os.path.join(faugus_launcher_dir, item)
             dst = os.path.join(temp_dir, item)
             if os.path.isdir(src):
-                shutil.copyfiletree(src, dst, dirs_exist_ok=True)
+                shutil.copytree(src, dst, dirs_exist_ok=True)
             elif os.path.isfile(src):
                 os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.copyfile2(src, dst)
+                shutil.copy2(src, dst)
 
         marker_path = os.path.join(temp_dir, ".faugus_marker")
         with open(marker_path, "w") as f:
@@ -3880,7 +3880,7 @@ class Settings(Gtk.Dialog):
 
         if response == Gtk.ResponseType.OK:
             dest = filechooser.get_filename()
-            shutil.copyfile2(zip_path + ".zip", dest)
+            shutil.copy2(zip_path + ".zip", dest)
 
         dialog.destroy()
         os.remove(zip_path + ".zip")
@@ -3954,9 +3954,9 @@ class Settings(Gtk.Dialog):
                         os.remove(dst)
 
                     if os.path.isdir(src):
-                        shutil.copyfiletree(src, dst)
+                        shutil.copytree(src, dst)
                     elif os.path.isfile(src):
-                        shutil.copyfile2(src, dst)
+                        shutil.copy2(src, dst)
 
                 shutil.rmtree(temp_dir)
                 global faugus_backup
