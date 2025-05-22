@@ -39,7 +39,7 @@ class PathManager:
             binary_path = Path(path) / binary_name
             if binary_path.exists():
                 return str(binary_path)
-        return f'/usr/bin/{binary_name}'  # Fallback
+        return f'/usr/bin/{binary_name}'
 
     @staticmethod
     def get_icon(icon_name):
@@ -51,7 +51,20 @@ class PathManager:
         for path in icon_paths:
             if Path(path).exists():
                 return path
-        return icon_paths[-1]  # Fallback
+        return icon_paths[-1]
+
+    @staticmethod
+    def find_library(lib_name):
+        lib_paths = [
+            Path("/usr/lib") / lib_name,
+            Path("/usr/lib32") / lib_name,
+            Path("/usr/lib/x86_64-linux-gnu") / lib_name,
+            Path("/usr/lib64") / lib_name
+        ]
+        for path in lib_paths:
+            if path.exists():
+                return str(path)
+        return None
 
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
@@ -135,18 +148,12 @@ class FaugusRun:
         sys.exit()
 
     def start_process(self, command):
-
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
         if protonpath and protonpath != "GE-Proton":
-            protonpath_path = f'{share_dir}/Steam/compatibilitytools.d/{protonpath}'
-            if not os.path.isdir(protonpath_path):
+            protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
+            if not protonpath_path.is_dir():
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
-
-        if self.default_runner == "UMU-Proton Latest":
-            self.default_runner = ""
-        if self.default_runner == "GE-Proton Latest (default)":
-            self.default_runner = "GE-Proton"
 
         discrete_gpu = "DRI_PRIME=1"
         if not self.discrete_gpu:
@@ -192,14 +199,14 @@ class FaugusRun:
             if self.enable_logging:
                 self.message = f'UMU_LOG=1 PROTON_LOG_DIR={logs_dir}/{self.game_title} PROTON_LOG=1 {self.message}'
             self.process = subprocess.Popen(
-                ["/bin/bash", "-c", f"{faugus_components}; {discrete_gpu} {eac_dir} {be_dir} {self.message}"],
+                [PathManager.find_binary("bash"), "-c", f"{faugus_components}; {discrete_gpu} {eac_dir} {be_dir} {self.message}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
         else:
             self.process = subprocess.Popen(
-                ["/bin/bash", "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"],
+                [PathManager.find_binary("bash"), "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
@@ -212,13 +219,11 @@ class FaugusRun:
 
     def set_ld_preload(self):
         lib_paths = [
-            "/usr/lib/libgamemode.so.0",
-            "/usr/lib32/libgamemode.so.0",
-            "/usr/lib/x86_64-linux-gnu/libgamemode.so.0",
-            "/usr/lib64/libgamemode.so.0"
+            PathManager.find_library('libgamemode.so.0'),
+            PathManager.find_library('libgamemodeauto.so.0')
         ]
 
-        ld_preload_paths = [path for path in lib_paths if os.path.exists(path)]
+        ld_preload_paths = [path for path in lib_paths if path]
         self.ld_preload = ":".join(ld_preload_paths)
 
     def load_config(self):
@@ -289,13 +294,6 @@ class FaugusRun:
                     f.write(f'{key}="{value}"\n')
                 else:
                     f.write(f'{key}={value}\n')
-
-    def start_scc_daemon(self):
-        working_directory = faugus_launcher_dir
-        try:
-            subprocess.run(["scc-daemon", "controller.sccprofile", "start"], check=True, cwd=working_directory)
-        except subprocess.CalledProcessError as e:
-            print(f"Failed to start scc-daemon: {e}")
 
     def show_warning_dialog(self):
         self.load_config()
@@ -553,12 +551,6 @@ def handle_command(message, command=None):
 
     process_thread.join()
     sys.exit(0)
-
-def stop_scc_daemon():
-    try:
-        subprocess.run(["scc-daemon", "stop"], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to stop scc-daemon: {e}")
 
 def apply_dark_theme():
     desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
