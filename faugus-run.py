@@ -155,6 +155,11 @@ class FaugusRun:
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
 
+        if self.default_runner == "UMU-Proton Latest":
+            self.default_runner = ""
+        if self.default_runner == "GE-Proton Latest (default)":
+            self.default_runner = "GE-Proton"
+
         discrete_gpu = "DRI_PRIME=1"
         if not self.discrete_gpu:
             discrete_gpu = "DRI_PRIME=0"
