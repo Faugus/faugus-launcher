@@ -16,6 +16,7 @@ import psutil
 import requests
 import vdf
 import tarfile
+from pathlib import Path
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -25,80 +26,111 @@ from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio, 
 from PIL import Image
 from filelock import FileLock, Timeout
 
-xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share')
-data_dirs = xdg_data_dirs.split(':')
-share_dir_system = data_dirs[-1]
-faugus_banner = '/usr/share/faugus-launcher/faugus-banner.png'
-faugus_notification = '/usr/share/faugus-launcher/faugus-notification.ogg'
+class PathManager:
+    @staticmethod
+    def system_data(*relative_paths):
+        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
+        for data_dir in xdg_data_dirs:
+            path = Path(data_dir).joinpath(*relative_paths)
+            if path.exists():
+                return str(path)
+        return str(Path(xdg_data_dirs[0]).joinpath(*relative_paths))
 
-config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
-faugus_launcher_dir = f'{config_dir}/faugus-launcher'
-prefixes_dir = f'{faugus_launcher_dir}/prefixes'
-logs_dir = f'{faugus_launcher_dir}/logs'
-icons_dir = f'{faugus_launcher_dir}/icons'
-banners_dir = f'{faugus_launcher_dir}/banners'
-config_file_dir = f'{faugus_launcher_dir}/config.ini'
-share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
-app_dir = f'{share_dir}/applications'
-faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
-tray_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
-epic_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-epic-games.png"
-battle_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-battlenet.png"
-ubisoft_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-ubisoft-connect.png"
-ea_icon = "/usr/share/icons/hicolor/256x256/apps/faugus-ea.png"
-faugus_run = "/usr/bin/faugus-run"
-faugus_proton_manager = "/usr/bin/faugus-proton-manager"
-umu_run = "/usr/bin/umu-run"
-mangohud_dir = "/usr/bin/mangohud"
-gamemoderun = "/usr/bin/gamemoderun"
-games_txt = f'{faugus_launcher_dir}/games.txt'
-games_json = f'{faugus_launcher_dir}/games.json'
-latest_games = f'{faugus_launcher_dir}/latest-games.txt'
-faugus_launcher_share_dir = f"{share_dir}/faugus-launcher"
-faugus_temp = os.path.expanduser('~/faugus_temp')
-running_games = f"{faugus_launcher_share_dir}/running_games.json"
+    @staticmethod
+    def user_data(*relative_paths):
+        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+        return str(xdg_data_home.joinpath(*relative_paths))
 
-lock_file_path = f"{faugus_launcher_share_dir}/faugus-launcher.lock"
+    @staticmethod
+    def user_config(*relative_paths):
+        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+        return str(xdg_config_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def find_binary(binary_name):
+        paths = os.getenv('PATH', '').split(':')
+        for path in paths:
+            binary_path = Path(path) / binary_name
+            if binary_path.exists():
+                return str(binary_path)
+        return f'/usr/bin/{binary_name}'  # Fallback
+
+    @staticmethod
+    def get_icon(icon_name):
+        icon_paths = [
+            PathManager.user_data('icons', icon_name),
+            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
+            PathManager.system_data('icons', icon_name)
+        ]
+        for path in icon_paths:
+            if Path(path).exists():
+                return path
+        return icon_paths[-1]  # Fallback
+
+faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
+faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
+
+faugus_launcher_dir = PathManager.user_config('faugus-launcher')
+prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
+logs_dir = PathManager.user_config('faugus-launcher/logs')
+icons_dir = PathManager.user_config('faugus-launcher/icons')
+banners_dir = PathManager.user_config('faugus-launcher/banners')
+config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+
+share_dir = PathManager.user_data()
+app_dir = PathManager.user_data('applications')
+
+faugus_png = PathManager.get_icon('faugus-launcher.png')
+tray_icon = PathManager.get_icon('faugus-launcher.png')
+epic_icon = PathManager.get_icon('faugus-epic-games.png')
+battle_icon = PathManager.get_icon('faugus-battlenet.png')
+ubisoft_icon = PathManager.get_icon('faugus-ubisoft-connect.png')
+ea_icon = PathManager.get_icon('faugus-ea.png')
+
+faugus_run = PathManager.find_binary('faugus-run')
+faugus_proton_manager = PathManager.find_binary('faugus-proton-manager')
+umu_run = PathManager.find_binary('umu-run')
+mangohud_dir = PathManager.find_binary('mangohud')
+gamemoderun = PathManager.find_binary('gamemoderun')
+
+games_txt = PathManager.user_config('faugus-launcher/games.txt')
+games_json = PathManager.user_config('faugus-launcher/games.json')
+latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
+faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
+faugus_temp = str(Path.home() / 'faugus_temp')
+running_games = PathManager.user_data('faugus-launcher/running_games.json')
+
+lock_file_path = PathManager.user_data('faugus-launcher/faugus-launcher.lock')
 lock = FileLock(lock_file_path, timeout=0)
 
 faugus_session = False
 faugus_backup = False
 
-steam_userdata_path = f'{share_dir}/Steam/userdata'
-
+steam_userdata_path = PathManager.user_data('Steam/userdata')
 
 def detect_steam_id():
     if os.path.exists(steam_userdata_path):
-        steam_ids = [f for f in os.listdir(steam_userdata_path) if os.path.isdir(os.path.join(steam_userdata_path, f))]
+        steam_ids = [f for f in os.listdir(steam_userdata_path)
+                   if os.path.isdir(os.path.join(steam_userdata_path, f))]
         if steam_ids:
             return steam_ids[0]
     return None
 
-
 steam_id = detect_steam_id()
-steam_shortcuts_path = f'{steam_userdata_path}/' + '{}/config/shortcuts.vdf'.format(steam_id)
+steam_shortcuts_path = PathManager.user_data(f'Steam/userdata/{steam_id}/config/shortcuts.vdf') if steam_id else None
 
-if not os.path.exists(faugus_launcher_share_dir):
-    os.makedirs(faugus_launcher_share_dir)
-
+os.makedirs(faugus_launcher_share_dir, exist_ok=True)
+os.makedirs(faugus_launcher_dir, exist_ok=True)
 
 def get_desktop_dir():
     try:
-        # Run the command and capture its output
         desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
         return desktop_dir
-    except FileNotFoundError:
-        print("xdg-user-dir not found; falling back to ~/Desktop")
-        # xdg-user-dir is not installed, fallback to ~/Desktop
-        return os.path.expanduser('~/Desktop')
-    except subprocess.CalledProcessError:
-        print("Error running xdg-user-dir; falling back to ~/Desktop")
-        # xdg-user-dir command failed for some other reason
-        return os.path.expanduser('~/Desktop')
-
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        print("xdg-user-dir not found or failed; falling back to ~/Desktop")
+        return str(Path.home() / 'Desktop')
 
 desktop_dir = get_desktop_dir()
-
 
 class Main(Gtk.Window):
     def __init__(self):

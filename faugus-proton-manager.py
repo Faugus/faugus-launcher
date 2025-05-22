@@ -6,14 +6,47 @@ import os
 import tarfile
 import shutil
 import sys
+from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gio
 
-GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-STEAM_COMPATIBILITY_PATH = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+class PathManager:
+    @staticmethod
+    def system_data(*relative_paths):
+        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
+        for data_dir in xdg_data_dirs:
+            path = Path(data_dir).joinpath(*relative_paths)
+            if path.exists():
+                return str(path)
+        return str(Path(xdg_data_dirs[0]).joinpath(*relative_paths))
 
-faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
+    @staticmethod
+    def user_data(*relative_paths):
+        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+        return str(xdg_data_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def user_config(*relative_paths):
+        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+        return str(xdg_config_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def get_icon(icon_name):
+        icon_paths = [
+            PathManager.user_data('icons', icon_name),
+            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
+            PathManager.system_data('icons', icon_name)
+        ]
+        for path in icon_paths:
+            if Path(path).exists():
+                return path
+        return icon_paths[-1]  # Fallback
+
+GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
+STEAM_COMPATIBILITY_PATH = PathManager.user_data("Steam/compatibilitytools.d")
+
+faugus_png = PathManager.get_icon('faugus-launcher.png')
 
 faugus_session = False
 

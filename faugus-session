@@ -4,14 +4,18 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 FAUGUS_LAUNCHER_DIR="$CONFIG_DIR/faugus-launcher"
 SESSION_FILE="$FAUGUS_LAUNCHER_DIR/session.ini"
 
-SCREEN_WIDTH=$(grep -i "SCREEN_WIDTH" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-SCREEN_HEIGHT=$(grep -i "SCREEN_HEIGHT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-INTERNAL_WIDTH=$(grep -i "INTERNAL_WIDTH" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-INTERNAL_HEIGHT=$(grep -i "INTERNAL_HEIGHT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-REFRESH_RATE=$(grep -i "REFRESH_RATE" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-ADAPTIVE_SYNC=$(grep -i "ADAPTIVE_SYNC" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-HDR_SUPPORT=$(grep -i "HDR_SUPPORT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
-PREFER_OUTPUT=$(grep -i "PREFER_OUTPUT" "$SESSION_FILE" | cut -d'=' -f2 | xargs)
+get_session_value() {
+    grep -i -m 1 "^[[:space:]]*${1}[[:space:]]*=" "$SESSION_FILE" | cut -d'=' -f2- | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/[[:space:]]*#.*$//'
+}
+
+SCREEN_WIDTH=$(get_session_value "SCREEN_WIDTH")
+SCREEN_HEIGHT=$(get_session_value "SCREEN_HEIGHT")
+INTERNAL_WIDTH=$(get_session_value "INTERNAL_WIDTH")
+INTERNAL_HEIGHT=$(get_session_value "INTERNAL_HEIGHT")
+REFRESH_RATE=$(get_session_value "REFRESH_RATE")
+ADAPTIVE_SYNC=$(get_session_value "ADAPTIVE_SYNC")
+HDR_SUPPORT=$(get_session_value "HDR_SUPPORT")
+PREFER_OUTPUT=$(get_session_value "PREFER_OUTPUT")
 
 GAMESCOPE_PARAMS=""
 

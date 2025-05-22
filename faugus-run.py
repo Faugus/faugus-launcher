@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import gi
-
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, GdkPixbuf, Gio
 from threading import Thread
-
+from pathlib import Path
 import atexit
 import sys
 import subprocess
@@ -13,17 +12,58 @@ import argparse
 import re
 import os
 
-config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
-faugus_launcher_dir = f'{config_dir}/faugus-launcher'
-faugus_components = "/usr/bin/faugus-components"
-prefixes_dir = f'{faugus_launcher_dir}/prefixes'
-logs_dir = f'{faugus_launcher_dir}/logs'
-config_file_dir = f'{faugus_launcher_dir}/config.ini'
-share_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
-faugus_png = "/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png"
-faugus_notification = '/usr/share/faugus-launcher/faugus-notification.ogg'
-eac_dir = f'PROTON_EAC_RUNTIME={faugus_launcher_dir}/components/eac'
-be_dir = f'PROTON_BATTLEYE_RUNTIME={faugus_launcher_dir}/components/be'
+class PathManager:
+    @staticmethod
+    def system_data(*relative_paths):
+        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
+        for data_dir in xdg_data_dirs:
+            path = Path(data_dir).joinpath(*relative_paths)
+            if path.exists():
+                return str(path)
+        return str(Path(xdg_data_dirs[0]).joinpath(*relative_paths))
+
+    @staticmethod
+    def user_data(*relative_paths):
+        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+        return str(xdg_data_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def user_config(*relative_paths):
+        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+        return str(xdg_config_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def find_binary(binary_name):
+        paths = os.getenv('PATH', '').split(':')
+        for path in paths:
+            binary_path = Path(path) / binary_name
+            if binary_path.exists():
+                return str(binary_path)
+        return f'/usr/bin/{binary_name}'  # Fallback
+
+    @staticmethod
+    def get_icon(icon_name):
+        icon_paths = [
+            PathManager.user_data('icons', icon_name),
+            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
+            PathManager.system_data('icons', icon_name)
+        ]
+        for path in icon_paths:
+            if Path(path).exists():
+                return path
+        return icon_paths[-1]  # Fallback
+
+faugus_launcher_dir = PathManager.user_config('faugus-launcher')
+faugus_components = PathManager.find_binary('faugus-components')
+prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
+logs_dir = PathManager.user_config('faugus-launcher/logs')
+config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+share_dir = PathManager.user_data()
+faugus_png = PathManager.get_icon('faugus-launcher.png')
+faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
+
+eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'
+be_dir = f'PROTON_BATTLEYE_RUNTIME={PathManager.user_config("faugus-launcher/components/be")}'
 
 def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
