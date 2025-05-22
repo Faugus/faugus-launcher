@@ -2273,13 +2273,13 @@ class Main(Gtk.Window):
                 if launcher == "battle":
                     self.label_download2.set_text("Please close the login window and press:")
                     self.button_finish_install.set_visible(True)
-                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text("Please close the login window and wait...")
-                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 # elif launcher == "epic":
                 #     self.label_download2.set_text("")
-                #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} msiexec /i '{file_path}' /passive"
+                #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "epic":
                     install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
                     os.makedirs(install_path, exist_ok=True)
@@ -2289,7 +2289,10 @@ class Main(Gtk.Window):
 
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{file_path}' /S"
+                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+
+                if runner:
+                    command = f"PROTONPATH={runner} {command}"
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
@@ -2326,7 +2329,9 @@ class Main(Gtk.Window):
                             game, shortcut_state, icon_temp, icon_final, title):
         self.bar_download.set_visible(False)
         self.label_download2.set_text("Please close the login window and wait...")
-        command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} PROTONPATH={runner} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
+        command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
+        if runner:
+            command2 = f"PROTONPATH={runner} {command2}"
         processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
         GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
 
