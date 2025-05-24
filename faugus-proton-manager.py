@@ -6,6 +6,8 @@ import os
 import tarfile
 import shutil
 import sys
+import gettext
+import locale
 from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
@@ -53,9 +55,25 @@ faugus_session = False
 if "session" in sys.argv:
     faugus_session = True
 
+LOCALE_DIR = (
+    PathManager.system_data('locale')
+    if os.path.isdir(PathManager.system_data('locale'))
+    else os.path.join(os.path.dirname(__file__), 'locale')
+)
+
+locale.setlocale(locale.LC_ALL, '')
+lang = locale.getdefaultlocale()[0]
+
+try:
+    translation = gettext.translation('faugus-proton-manager', localedir=LOCALE_DIR, languages=[lang])
+    translation.install()
+    _ = translation.gettext
+except FileNotFoundError:
+    _ = gettext.gettext
+
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
-        super().__init__(title="Faugus GE-Proton Manager")
+        super().__init__(title=_("Faugus GE-Proton Manager"))
         self.set_resizable(False)
         self.set_modal(True)
         self.set_icon_from_file(faugus_png)
@@ -117,7 +135,7 @@ class ProtonDownloader(Gtk.Dialog):
         filtered_releases = []
         for release in self.releases:
             filtered_releases.append(release)
-            if release["tag_name"] == "GE-Proton7-1":
+            if release["tag_name"] == "GE-Proton8-1":
                 break
         return filtered_releases
 
@@ -132,7 +150,7 @@ class ProtonDownloader(Gtk.Dialog):
                 self.releases.extend(releases)
                 page += 1
             else:
-                print("Error fetching releases:", response.status_code)
+                print(_("Error fetching releases:"), response.status_code)
                 break
 
         self.releases = self.filter_releases()
@@ -149,7 +167,7 @@ class ProtonDownloader(Gtk.Dialog):
         self.grid.attach(label, 0, row_index, 1, 1)
 
         version_path = os.path.join(STEAM_COMPATIBILITY_PATH, release["tag_name"])
-        button = Gtk.Button(label="Remove" if os.path.exists(version_path) else "Download")
+        button = Gtk.Button(label=_("Remove") if os.path.exists(version_path) else _("Download"))
         button.connect("clicked", self.on_button_clicked, release)
         button.set_size_request(120, -1)
 
@@ -184,11 +202,11 @@ class ProtonDownloader(Gtk.Dialog):
                 break
 
     def download_and_extract(self, url, filename, tag_name, button):
-        dialog = Gtk.Dialog(title="Downloading", parent=self, modal=True)
+        dialog = Gtk.Dialog(title=_("Downloading"), parent=self, modal=True)
         dialog.set_resizable(False)
 
-        button.set_label("Downloading...")
-        self.progress_label.set_text(f"Downloading {tag_name}...")
+        button.set_label(_("Downloading..."))
+        self.progress_label.set_text(_("Downloading {tag}...").format(tag=tag_name))
         button.set_sensitive(False)
 
         if not os.path.exists(STEAM_COMPATIBILITY_PATH):
@@ -213,15 +231,15 @@ class ProtonDownloader(Gtk.Dialog):
         self.extract_tar_and_update_button(tar_file_path, tag_name, button)
 
     def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
-        button.set_label("Extracting...")
-        self.progress_label.set_text(f"Extracting {tag_name}...")
+        button.set_label(_("Extracting..."))
+        self.progress_label.set_text(_("Extracting {tag}...").format(tag=tag_name))
         Gtk.main_iteration_do(False)
 
         self.extract_tar(tar_file_path, STEAM_COMPATIBILITY_PATH, self.progress_bar)
 
         os.remove(tar_file_path)
 
-        self.update_button(button, "Remove")
+        self.update_button(button, _("Remove"))
         self.progress_bar.set_visible(False)
         self.progress_label.set_visible(False)
         self.enable_all_buttons()
@@ -236,19 +254,19 @@ class ProtonDownloader(Gtk.Dialog):
                     tar.extract(member, path=extract_to)
                     progress = index / total_members
                     progress_bar.set_fraction(progress)
-                    progress_bar.set_text(f"Extracting... {int(progress * 100)}%")
+                    progress_bar.set_text(_("Extracting... {percent}%").format(percent=int(progress * 100)))
                     Gtk.main_iteration_do(False)
         except Exception as e:
-            print(f"Failed to extract {tar_file_path}: {e}")
+            print(_("Failed to extract {tar_file_path}: {error}").format(tar_file_path=tar_file_path, error=e))
 
     def on_remove_clicked(self, widget, release):
         version_path = os.path.join(STEAM_COMPATIBILITY_PATH, release["tag_name"])
         if os.path.exists(version_path):
             try:
                 shutil.rmtree(version_path)
-                self.update_button(widget, "Download")
+                self.update_button(widget, _("Download"))
             except Exception as e:
-                print(f"Failed to remove {version_path}: {e}")
+                print(_("Failed to remove {version_path}: {error}").format(version_path=version_path, error=e))
 
     def update_button(self, button, new_label):
         button.set_label(new_label)

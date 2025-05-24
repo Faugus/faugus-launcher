@@ -11,6 +11,8 @@ import subprocess
 import argparse
 import re
 import os
+import gettext
+import locale
 
 class PathManager:
     @staticmethod
@@ -84,6 +86,22 @@ def remove_ansi_escape(text):
 
 faugus_session = False
 
+LOCALE_DIR = (
+    PathManager.system_data('locale')
+    if os.path.isdir(PathManager.system_data('locale'))
+    else os.path.join(os.path.dirname(__file__), 'locale')
+)
+
+locale.setlocale(locale.LC_ALL, '')
+lang = locale.getdefaultlocale()[0]
+
+try:
+    translation = gettext.translation('faugus-run', localedir=LOCALE_DIR, languages=[lang])
+    translation.install()
+    _ = translation.gettext
+except FileNotFoundError:
+    _ = gettext.gettext
+
 class FaugusRun:
     def __init__(self, message):
         self.message = message
@@ -105,14 +123,14 @@ class FaugusRun:
             dialog.fullscreen()
 
         label = Gtk.Label()
-        label.set_label(f"{protonpath} was not found.")
+        label.set_label(_("{path} was not found.").format(path=protonpath))
         label.set_halign(Gtk.Align.CENTER)
 
         label2 = Gtk.Label()
-        label2.set_label("Please install it or use another Proton version.")
+        label2.set_label(_("Please install it or use another Proton version."))
         label2.set_halign(Gtk.Align.CENTER)
 
-        button_yes = Gtk.Button(label="Ok")
+        button_yes = Gtk.Button(label=_("Ok"))
         button_yes.set_size_request(150, -1)
         button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
@@ -341,7 +359,7 @@ class FaugusRun:
             else:
                 protonpath = "Using UMU-Proton Latest"
         else:
-            protonpath = f"Using {protonpath}"
+            protonpath = _("Using {path}").format(path=protonpath)
         print(protonpath)
 
         self.label = Gtk.Label(label=protonpath)
@@ -411,38 +429,36 @@ class FaugusRun:
     def check_game_output(self, clean_line):
         if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line:
             self.warning_dialog.show_all()
-
         if "Updating BattlEye..." in clean_line:
-            self.label.set_text("Updating BattlEye...")
+            self.label.set_text(_("Updating BattlEye..."))
         if "Updating Easy Anti-Cheat..." in clean_line:
-            self.label.set_text("Updating Easy Anti-Cheat...")
+            self.label.set_text(_("Updating Easy Anti-Cheat..."))
         if "Components are up to date." in clean_line:
-            self.label.set_text("Components are up to date")
-
+            self.label.set_text(_("Components are up to date"))
         if "Downloading GE-Proton" in clean_line:
-            self.label.set_text("Downloading GE-Proton...")
+            self.label.set_text(_("Downloading GE-Proton..."))
         if "Downloading UMU-Proton" in clean_line:
-            self.label.set_text("Downloading UMU-Proton...")
+            self.label.set_text(_("Downloading UMU-Proton..."))
         if "Downloading steamrt3 (latest)" in clean_line:
-            self.label2.set_text("Downloading Steam Runtime...")
+            self.label2.set_text(_("Downloading Steam Runtime..."))
         if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-            self.label2.set_text("Extracting Steam Runtime...")
+            self.label2.set_text(_("Extracting Steam Runtime..."))
         if "Extracting GE-Proton" in clean_line:
-            self.label.set_text("Extracting GE-Proton...")
+            self.label.set_text(_("Extracting GE-Proton..."))
         if "Extracting UMU-Proton" in clean_line:
-            self.label.set_text("Extracting UMU-Proton...")
+            self.label.set_text(_("Extracting UMU-Proton..."))
         if "GE-Proton is up to date" in clean_line:
-            self.label.set_text("GE-Proton is up to date")
+            self.label.set_text(_("GE-Proton is up to date"))
         if "UMU-Proton is up to date" in clean_line:
-            self.label.set_text("UMU-Proton is up to date")
+            self.label.set_text(_("UMU-Proton is up to date"))
         if "steamrt3 is up to date" in clean_line:
-            self.label2.set_text("Steam Runtime is up to date")
+            self.label2.set_text(_("Steam Runtime is up to date"))
         if "->" in clean_line and "GE-Proton" in clean_line:
-            self.label.set_text("GE-Proton is up to date")
+            self.label.set_text(_("GE-Proton is up to date"))
         if "->" in clean_line and "UMU-Proton" in clean_line:
-            self.label.set_text("UMU-Proton is up to date")
+            self.label.set_text(_("UMU-Proton is up to date"))
         if "mtree is OK" in clean_line:
-            self.label2.set_text("Steam Runtime is up to date")
+            self.label2.set_text(_("Steam Runtime is up to date"))
 
         if "UMU_NO_PROTON" in self.message:
             if "steamrt3 is up to date" in clean_line or "mtree is OK" in clean_line:
@@ -491,10 +507,10 @@ class FaugusRun:
                     dialog.fullscreen()
 
                 label = Gtk.Label()
-                label.set_label(f"The keys and values were successfully added to the registry.")
+                label.set_label(_("The keys and values were successfully added to the registry."))
                 label.set_halign(Gtk.Align.CENTER)
 
-                button_yes = Gtk.Button(label="Ok")
+                button_yes = Gtk.Button(label=_("Ok"))
                 button_yes.set_size_request(150, -1)
                 button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
@@ -570,7 +586,7 @@ def main():
     global faugus_session
     apply_dark_theme()
     parser = argparse.ArgumentParser(description="Faugus Run")
-    parser.add_argument("message", help="The message to be processed")
+    parser.add_argument("message")
     parser.add_argument("command", nargs='?', default=None)
     parser.add_argument("session", nargs='?', default=None)
 
