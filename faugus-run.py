@@ -208,7 +208,8 @@ class FaugusRun:
                     if "umu" not in game_id:
                         self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
                     break
-        if "proton-ge-custom" in self.message:
+
+        if "proton-cachyos" in self.message and "slr" in self.message:
             self.message = f'UMU_NO_RUNTIME=1 {self.message}'
 
         if self.wayland_driver:
