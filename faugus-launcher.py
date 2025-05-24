@@ -140,16 +140,6 @@ LOCALE_DIR = (
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
 
-locale.setlocale(locale.LC_ALL, '')
-lang = locale.getdefaultlocale()[0]
-
-try:
-    translation = gettext.translation('faugus-launcher', localedir=LOCALE_DIR, languages=[lang])
-    translation.install()
-    _ = translation.gettext
-except FileNotFoundError:
-    _ = gettext.gettext
-
 class Main(Gtk.Window):
     def __init__(self):
         # Initialize the main window with title and default size
@@ -194,7 +184,7 @@ class Main(Gtk.Window):
         config_file = config_file_dir
         if not os.path.exists(config_file):
             self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
-                             "False", "List", "False", "False", "False", "False", "False", "False")
+                             "False", "List", "False", "False", "False", "False", "False", "False", "")
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
@@ -211,6 +201,9 @@ class Main(Gtk.Window):
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         self.check_theme()
+
+        self.load_config()
+        self.apply_translation(self.language)
 
         self.context_menu = Gtk.Menu()
 
@@ -239,8 +232,6 @@ class Main(Gtk.Window):
         self.context_menu.append(self.menu_show_logs)
 
         self.context_menu.show_all()
-
-        self.load_config()
 
         if self.interface_mode == "List":
             self.small_interface()
@@ -286,6 +277,19 @@ class Main(Gtk.Window):
         self.connect("focus-out-event", self.on_focus_out)
 
         GLib.timeout_add_seconds(1, self.check_running_processes)
+
+    def apply_translation(self, language_code):
+        try:
+            translation = gettext.translation(
+                'faugus-launcher',
+                localedir=LOCALE_DIR,
+                languages=[language_code]
+            )
+            translation.install()
+            globals()['_'] = translation.gettext
+        except FileNotFoundError:
+            gettext.install('faugus-launcher', localedir=LOCALE_DIR)
+            globals()['_'] = gettext.gettext
 
     def check_running_processes(self):
         processos = self.load_processes_from_file()
@@ -1094,11 +1098,12 @@ class Main(Gtk.Window):
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
             self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
             self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
+            self.language = config_dict.get('language', '')
             if faugus_session:
                 self.interface_mode = "Banners"
         else:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False")
+                             "List", "False", "False", "False", "False", "False", "False", "")
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1379,6 +1384,7 @@ class Main(Gtk.Window):
         self.checkbox_enable_logging = settings_dialog.checkbox_enable_logging
         self.checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver
         self.checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr
+        self.combo_box_language = settings_dialog.combo_box_language
 
         self.checkbox_mangohud = settings_dialog.checkbox_mangohud
         self.checkbox_gamemode = settings_dialog.checkbox_gamemode
@@ -1398,6 +1404,8 @@ class Main(Gtk.Window):
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
         checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+        combo_box_language = self.combo_box_language.get_active_text()
+        language = settings_dialog.lang_codes.get(combo_box_language, "")
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -1421,7 +1429,7 @@ class Main(Gtk.Window):
             self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                              default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                              checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
-                             checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
+                             checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -1449,6 +1457,9 @@ class Main(Gtk.Window):
                         subprocess.Popen([sys.executable, __file__])
                         self.destroy()
                     if faugus_backup:
+                        subprocess.Popen([sys.executable, __file__])
+                        self.destroy()
+                    if self.language != language:
                         subprocess.Popen([sys.executable, __file__])
                         self.destroy()
             self.load_config()
@@ -2830,7 +2841,7 @@ class Main(Gtk.Window):
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
+                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
         # Path to the configuration file
         config_file = os.path.join(self.working_directory, 'config.ini')
 
@@ -2864,6 +2875,7 @@ class Main(Gtk.Window):
         config['enable-logging'] = checkbox_enable_logging
         config['wayland-driver'] = checkbox_wayland_driver
         config['enable-hdr'] = checkbox_enable_hdr
+        config['language'] = language
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:
@@ -2902,6 +2914,33 @@ class Settings(Gtk.Dialog):
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        self.LANG_NAMES = {
+            "ar": "Arabic",
+            "de": "German",
+            "el": "Greek",
+            "es": "Spanish",
+            "fa": "Persian",
+            "fi": "Finnish",
+            "fr": "French",
+            "hr": "Croatian",
+            "it": "Italian",
+            "ka": "Georgian",
+            "ko": "Korean",
+            "nb": "Norwegian (Bokmål)",
+            "nl": "Dutch",
+            "pl": "Polish",
+            "pt_BR": "Portuguese (Brazil)",
+            "ru": "Russian",
+            "tr": "Turkish",
+            "zh_CN": "Chinese (Simplified)",
+        }
+        self.lang_codes = {}
+
+        # Widgets for Interface mode
+        self.label_language = Gtk.Label(label=_("Language"))
+        self.label_language.set_halign(Gtk.Align.START)
+        self.combo_box_language = Gtk.ComboBoxText()
 
         # Widgets for Interface mode
         self.label_interface = Gtk.Label(label=_("Interface Mode"))
@@ -3082,6 +3121,14 @@ class Settings(Gtk.Dialog):
         box_main.set_column_spacing(10)
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        grid_language = Gtk.Grid()
+        grid_language.set_row_spacing(10)
+        grid_language.set_column_spacing(10)
+        grid_language.set_margin_start(10)
+        grid_language.set_margin_end(10)
+        grid_language.set_margin_top(10)
+        grid_language.set_margin_bottom(10)
 
         grid_prefix = Gtk.Grid()
         grid_prefix.set_row_spacing(10)
@@ -3276,6 +3323,10 @@ class Settings(Gtk.Dialog):
             self.show_all()
 
         else:
+            grid_language.attach(self.label_language, 0, 0, 1, 1)
+            grid_language.attach(self.combo_box_language, 0, 1, 1, 1)
+            self.combo_box_language.set_hexpand(True)
+
             grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
             grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
             self.entry_default_prefix.set_hexpand(True)
@@ -3318,6 +3369,7 @@ class Settings(Gtk.Dialog):
             grid_support.attach(button_kofi, 0, 1, 1, 1)
             grid_support.attach(button_paypal, 1, 1, 1, 1)
 
+            box_left.pack_start(grid_language, False, False, 0)
             box_left.pack_start(grid_prefix, False, False, 0)
             box_left.pack_start(grid_runner, False, False, 0)
             box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
@@ -3352,6 +3404,7 @@ class Settings(Gtk.Dialog):
             self.box.add(box_bottom)
 
             self.populate_combobox_with_runners()
+            self.populate_languages()
             self.load_config()
 
             self.show_all()
@@ -3370,6 +3423,22 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
+    def populate_languages(self):
+        self.combo_box_language.remove_all()
+        self.combo_box_language.append_text("English")
+
+        if not os.path.isdir(LOCALE_DIR):
+            return
+
+        for lang in sorted(os.listdir(LOCALE_DIR)):
+            mo_file = os.path.join(LOCALE_DIR, lang, "LC_MESSAGES", "faugus-launcher.mo")
+            if os.path.isfile(mo_file):
+                lang_name = self.LANG_NAMES.get(lang, lang)
+                self.combo_box_language.append_text(lang_name)
+                self.lang_codes[lang_name] = lang
+
+        self.combo_box_language.set_active(0)
 
     def load_session_config(self):
         config_path = os.path.join(faugus_launcher_dir, "session.ini")
@@ -3454,6 +3523,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            combo_box_language = self.combo_box_language.get_active_text()
+            language = self.lang_codes.get(combo_box_language, "")
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3469,7 +3540,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
 
             proton_manager = faugus_proton_manager
@@ -3560,6 +3631,7 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            language = settings_dialog.lang_codes.get(combo_box_language, "")
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3575,7 +3647,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3721,6 +3793,7 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            language = settings_dialog.lang_codes.get(combo_box_language, "")
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3736,7 +3809,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3807,6 +3880,7 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            language = settings_dialog.lang_codes.get(combo_box_language, "")
 
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
@@ -3822,7 +3896,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -4189,6 +4263,7 @@ class Settings(Gtk.Dialog):
             enable_logging = config_dict.get('enable-logging', 'False') == 'True'
             wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
             enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
+            self.language = config_dict.get('language', '')
 
             self.checkbox_close_after_launch.set_active(close_on_launch)
             self.entry_default_prefix.set_text(self.default_prefix)
@@ -4218,19 +4293,35 @@ class Settings(Gtk.Dialog):
             self.checkbox_enable_hdr.set_active(enable_hdr)
 
             model = self.combo_box_interface.get_model()
-            index_to_activate2 = 0
+            index_to_activate = 0
             for i, row in enumerate(model):
                 if row[0] == self.interface_mode:
-                    index_to_activate2 = i
+                    index_to_activate = i
                     break
 
-            self.combo_box_interface.set_active(index_to_activate2)
+            self.combo_box_interface.set_active(index_to_activate)
+
+            model = self.combo_box_language.get_model()
+            index_to_activate = 0
+
+            if self.language == "":
+                self.combo_box_language.set_active(index_to_activate)
+            else:
+                for i, row in enumerate(model):
+                    lang_name = row[0]
+                    lang_code = self.lang_codes.get(lang_name, "")
+                    if lang_code == self.language:
+                        index_to_activate = i
+                        break
+
+                self.combo_box_language.set_active(index_to_activate)
+
             if faugus_session:
                 self.interface_mode = "Banners"
         else:
             # Save default configuration if file does not exist
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False",
-                                    "False", "List", "False", "False", "False", "False", "False", "False")
+                                    "False", "List", "False", "False", "False", "False", "False", "False", "")
 
 
 class Game:
@@ -6518,12 +6609,12 @@ class CreateShortcut(Gtk.Window):
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False")
+                             "List", "False", "False", "False", "False", "False", "False", "")
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
+                    checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
         # Path to the configuration file
         config_file = config_file_dir
 
@@ -6565,6 +6656,7 @@ class CreateShortcut(Gtk.Window):
         config['enable-logging'] = checkbox_enable_logging
         config['wayland-driver'] = checkbox_wayland_driver
         config['enable-hdr'] = checkbox_enable_hdr
+        config['language'] = language
 
         # Write configurations back to the file
         with open(config_file, 'w') as f:

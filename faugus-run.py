@@ -92,16 +92,6 @@ LOCALE_DIR = (
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
 
-locale.setlocale(locale.LC_ALL, '')
-lang = locale.getdefaultlocale()[0]
-
-try:
-    translation = gettext.translation('faugus-run', localedir=LOCALE_DIR, languages=[lang])
-    translation.install()
-    _ = translation.gettext
-except FileNotFoundError:
-    _ = gettext.gettext
-
 class FaugusRun:
     def __init__(self, message):
         self.message = message
@@ -164,6 +154,19 @@ class FaugusRun:
         dialog.destroy()
         Gtk.main_quit()
         sys.exit()
+
+    def apply_translation(self, language_code):
+        try:
+            translation = gettext.translation(
+                'faugus-run',
+                localedir=LOCALE_DIR,
+                languages=[language_code]
+            )
+            translation.install()
+            globals()['_'] = translation.gettext
+        except FileNotFoundError:
+            gettext.install('faugus-run', localedir=LOCALE_DIR)
+            globals()['_'] = gettext.gettext
 
     def start_process(self, command):
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
@@ -269,11 +272,12 @@ class FaugusRun:
             self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
             self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
             self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
+            self.language = config_dict.get('language', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", "")
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -310,6 +314,7 @@ class FaugusRun:
         config['enable-logging'] = checkbox_enable_logging
         config['wayland-driver'] = checkbox_wayland_driver
         config['enable-hdr'] = checkbox_enable_hdr
+        config['language'] = language
 
         with open(config_file, 'w') as f:
             for key, value in config.items():
@@ -320,6 +325,8 @@ class FaugusRun:
 
     def show_warning_dialog(self):
         self.load_config()
+        self.apply_translation(self.language)
+        print(self.language)
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)

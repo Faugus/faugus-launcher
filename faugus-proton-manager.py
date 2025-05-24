@@ -49,6 +49,7 @@ GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/
 STEAM_COMPATIBILITY_PATH = PathManager.user_data("Steam/compatibilitytools.d")
 
 faugus_png = PathManager.get_icon('faugus-launcher.png')
+config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 
 faugus_session = False
 
@@ -61,18 +62,10 @@ LOCALE_DIR = (
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
 
-locale.setlocale(locale.LC_ALL, '')
-lang = locale.getdefaultlocale()[0]
-
-try:
-    translation = gettext.translation('faugus-proton-manager', localedir=LOCALE_DIR, languages=[lang])
-    translation.install()
-    _ = translation.gettext
-except FileNotFoundError:
-    _ = gettext.gettext
-
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
+        self.load_config()
+        self.apply_translation(self.language)
         super().__init__(title=_("Faugus GE-Proton Manager"))
         self.set_resizable(False)
         self.set_modal(True)
@@ -130,6 +123,85 @@ class ProtonDownloader(Gtk.Dialog):
         self.show_all()
         self.progress_bar.set_visible(False)
         self.progress_label.set_visible(False)
+
+
+
+    def apply_translation(self, language_code):
+        try:
+            translation = gettext.translation(
+                'faugus-proton-manager',
+                localedir=LOCALE_DIR,
+                languages=[language_code]
+            )
+            translation.install()
+            globals()['_'] = translation.gettext
+        except FileNotFoundError:
+            gettext.install('faugus-proton-manager', localedir=LOCALE_DIR)
+            globals()['_'] = gettext.gettext
+
+    def load_config(self):
+        config_file = config_file_dir
+
+        if os.path.isfile(config_file):
+            with open(config_file, 'r') as f:
+                config_dict = {}
+                for line in f.read().splitlines():
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"')
+                        config_dict[key] = value
+
+            self.language = config_dict.get('language', '')
+        else:
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", "")
+            self.default_runner = "GE-Proton"
+
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
+        config_file = config_file_dir
+
+        config_path = faugus_launcher_dir
+        if not os.path.exists(config_path):
+            os.makedirs(config_path)
+
+        default_prefix = prefixes_dir
+        self.default_prefix = prefixes_dir
+
+        default_runner = (f'"{default_runner}"')
+
+        config = {}
+
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                for line in f:
+                    key, value = line.strip().split('=', 1)
+                    config[key] = value.strip('"')
+
+        config['close-onlaunch'] = checkbox_state
+        config['default-prefix'] = default_prefix
+        config['mangohud'] = mangohud_state
+        config['gamemode'] = gamemode_state
+        config['disable-hidraw'] = disable_hidraw_state
+        config['default-runner'] = default_runner
+        config['discrete-gpu'] = checkbox_discrete_gpu_state
+        config['splash-disable'] = checkbox_splash_disable
+        config['system-tray'] = checkbox_system_tray
+        config['start-boot'] = checkbox_start_boot
+        config['interface-mode'] = combo_box_interface
+        config['start-maximized'] = checkbox_start_maximized
+        config['start-fullscreen'] = checkbox_start_fullscreen
+        config['gamepad-navigation'] = checkbox_gamepad_navigation
+        config['enable-logging'] = checkbox_enable_logging
+        config['wayland-driver'] = checkbox_wayland_driver
+        config['enable-hdr'] = checkbox_enable_hdr
+        config['language'] = language
+
+        with open(config_file, 'w') as f:
+            for key, value in config.items():
+                if key == 'default-prefix':
+                    f.write(f'{key}="{value}"\n')
+                else:
+                    f.write(f'{key}={value}\n')
 
     def filter_releases(self):
         filtered_releases = []
