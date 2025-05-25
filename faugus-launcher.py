@@ -139,6 +139,8 @@ LOCALE_DIR = (
     if os.path.isdir(PathManager.system_data('locale'))
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
+locale.setlocale(locale.LC_ALL, '')
+lang = locale.getlocale()[0]
 
 class Main(Gtk.Window):
     def __init__(self):
@@ -184,7 +186,7 @@ class Main(Gtk.Window):
         config_file = config_file_dir
         if not os.path.exists(config_file):
             self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
-                             "False", "List", "False", "False", "False", "False", "False", "False", "")
+                             "False", "List", "False", "False", "False", "False", "False", "False", lang)
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
@@ -1103,7 +1105,7 @@ class Main(Gtk.Window):
                 self.interface_mode = "Banners"
         else:
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False", "")
+                             "List", "False", "False", "False", "False", "False", "False", lang)
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -4324,7 +4326,7 @@ class Settings(Gtk.Dialog):
         else:
             # Save default configuration if file does not exist
             self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False",
-                                    "False", "List", "False", "False", "False", "False", "False", "False", "")
+                                    "False", "List", "False", "False", "False", "False", "False", "False", lang)
 
 
 class Game:
@@ -6612,7 +6614,7 @@ class CreateShortcut(Gtk.Window):
         else:
             # Save default configuration if file does not exist
             self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False", "")
+                             "List", "False", "False", "False", "False", "False", "False", lang)
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,

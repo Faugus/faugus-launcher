@@ -62,6 +62,9 @@ LOCALE_DIR = (
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
 
+locale.setlocale(locale.LC_ALL, '')
+lang = locale.getlocale()[0]
+
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
         self.load_config()
@@ -154,7 +157,7 @@ class ProtonDownloader(Gtk.Dialog):
 
             self.language = config_dict.get('language', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", "")
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", lang)
             self.default_runner = "GE-Proton"
 
     def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
