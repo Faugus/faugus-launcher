@@ -1,0 +1,89 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-23 20:50-0300\n"
+"PO-Revision-Date: 2025-05-25 10:40+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: /usr/bin/faugus-run:126
+#, python-brace-format
+msgid "{path} was not found."
+msgstr "{path} wurde nicht gefunden."
+
+#: /usr/bin/faugus-run:130
+msgid "Please install it or use another Proton version."
+msgstr "Bitte installieren Sie es oder verwenden Sie eine andere Proton-Version."
+
+#: /usr/bin/faugus-run:133 /usr/bin/faugus-run:513
+msgid "Ok"
+msgstr "Ok"
+
+#: /usr/bin/faugus-run:362
+#, python-brace-format
+msgid "Using {path}"
+msgstr "Mit {path}"
+
+#: /usr/bin/faugus-run:433
+msgid "Updating BattlEye..."
+msgstr "Aktualisiere BattleEye..."
+
+#: /usr/bin/faugus-run:435
+msgid "Updating Easy Anti-Cheat..."
+msgstr "Aktualisiere Easy Anti-Cheat..."
+
+#: /usr/bin/faugus-run:437
+msgid "Components are up to date"
+msgstr "Komponenten sind auf dem neuesten Stand"
+
+#: /usr/bin/faugus-run:439
+msgid "Downloading GE-Proton..."
+msgstr "GE-Proton herunterladen..."
+
+#: /usr/bin/faugus-run:441
+msgid "Downloading UMU-Proton..."
+msgstr "UMU-Proton herunterladen..."
+
+#: /usr/bin/faugus-run:443
+msgid "Downloading Steam Runtime..."
+msgstr "Steam Runtime herunterladen..."
+
+#: /usr/bin/faugus-run:445
+msgid "Extracting Steam Runtime..."
+msgstr "Steam Runtime extrahieren..."
+
+#: /usr/bin/faugus-run:447
+msgid "Extracting GE-Proton..."
+msgstr "GE-Proton extrahieren..."
+
+#: /usr/bin/faugus-run:449
+msgid "Extracting UMU-Proton..."
+msgstr "UMU-Proton extrahieren..."
+
+#: /usr/bin/faugus-run:451 /usr/bin/faugus-run:457
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton ist auf dem neuesten Stand"
+
+#: /usr/bin/faugus-run:453 /usr/bin/faugus-run:459
+msgid "UMU-Proton is up to date"
+msgstr "UMU-Proton ist auf dem neuesten Stand"
+
+#: /usr/bin/faugus-run:455 /usr/bin/faugus-run:461
+msgid "Steam Runtime is up to date"
+msgstr "Steam Runtime ist auf dem neuesten Stand"
+
+#: /usr/bin/faugus-run:510
+msgid "The keys and values were successfully added to the registry."
+msgstr "Die Schlüssel und Werte wurden erfolgreich zur Registrierung hinzugefügt."
