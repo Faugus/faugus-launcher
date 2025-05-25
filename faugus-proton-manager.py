@@ -64,11 +64,27 @@ LOCALE_DIR = (
 
 locale.setlocale(locale.LC_ALL, '')
 lang = locale.getlocale()[0]
+if os.path.exists(config_file_dir):
+    with open(config_file_dir, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('language='):
+                lang = line.split('=', 1)[1].strip()
+                break
+try:
+    translation = gettext.translation(
+        'faugus-proton-manager',
+        localedir=LOCALE_DIR,
+        languages=[lang]
+    )
+    translation.install()
+    globals()['_'] = translation.gettext
+except FileNotFoundError:
+    gettext.install('faugus-proton-manager', localedir=LOCALE_DIR)
+    globals()['_'] = gettext.gettext
 
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
-        self.load_config()
-        self.apply_translation(self.language)
         super().__init__(title=_("Faugus GE-Proton Manager"))
         self.set_resizable(False)
         self.set_modal(True)
@@ -120,27 +136,14 @@ class ProtonDownloader(Gtk.Dialog):
         self.grid.set_row_spacing(5)
         self.grid.set_column_spacing(10)
 
+        self.load_config()
+
         # Fetch and populate releases in the Grid
         self.releases = []
         self.get_releases()
         self.show_all()
         self.progress_bar.set_visible(False)
         self.progress_label.set_visible(False)
-
-
-
-    def apply_translation(self, language_code):
-        try:
-            translation = gettext.translation(
-                'faugus-proton-manager',
-                localedir=LOCALE_DIR,
-                languages=[language_code]
-            )
-            translation.install()
-            globals()['_'] = translation.gettext
-        except FileNotFoundError:
-            gettext.install('faugus-proton-manager', localedir=LOCALE_DIR)
-            globals()['_'] = gettext.gettext
 
     def load_config(self):
         config_file = config_file_dir

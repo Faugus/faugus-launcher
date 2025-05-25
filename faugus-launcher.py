@@ -139,8 +139,27 @@ LOCALE_DIR = (
     if os.path.isdir(PathManager.system_data('locale'))
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
+
 locale.setlocale(locale.LC_ALL, '')
 lang = locale.getlocale()[0]
+if os.path.exists(config_file_dir):
+    with open(config_file_dir, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('language='):
+                lang = line.split('=', 1)[1].strip()
+                break
+try:
+    translation = gettext.translation(
+        'faugus-launcher',
+        localedir=LOCALE_DIR,
+        languages=[lang]
+    )
+    translation.install()
+    globals()['_'] = translation.gettext
+except FileNotFoundError:
+    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
+    globals()['_'] = gettext.gettext
 
 class Main(Gtk.Window):
     def __init__(self):
@@ -205,7 +224,6 @@ class Main(Gtk.Window):
         self.check_theme()
 
         self.load_config()
-        self.apply_translation(self.language)
 
         self.context_menu = Gtk.Menu()
 
@@ -279,19 +297,6 @@ class Main(Gtk.Window):
         self.connect("focus-out-event", self.on_focus_out)
 
         GLib.timeout_add_seconds(1, self.check_running_processes)
-
-    def apply_translation(self, language_code):
-        try:
-            translation = gettext.translation(
-                'faugus-launcher',
-                localedir=LOCALE_DIR,
-                languages=[language_code]
-            )
-            translation.install()
-            globals()['_'] = translation.gettext
-        except FileNotFoundError:
-            gettext.install('faugus-launcher', localedir=LOCALE_DIR)
-            globals()['_'] = gettext.gettext
 
     def check_running_processes(self):
         processos = self.load_processes_from_file()
@@ -379,17 +384,10 @@ class Main(Gtk.Window):
         self.button_add.connect("clicked", self.on_button_add_clicked)
         self.button_add.set_can_focus(False)
         self.button_add.set_size_request(50, 50)
+        self.button_add.set_image(Gtk.Image.new_from_icon_name("faugus-add-symbolic", Gtk.IconSize.BUTTON))
         self.button_add.set_margin_top(10)
         self.button_add.set_margin_start(10)
         self.button_add.set_margin_bottom(10)
-
-        label_add = Gtk.Label(label="New")
-        label_add.set_margin_start(0)
-        label_add.set_margin_end(0)
-        label_add.set_margin_top(0)
-        label_add.set_margin_bottom(0)
-
-        self.button_add.add(label_add)
 
         # Create button for killing processes
         button_kill = Gtk.Button()
@@ -397,24 +395,17 @@ class Main(Gtk.Window):
         button_kill.set_can_focus(False)
         button_kill.set_tooltip_text(_("Force close all running games"))
         button_kill.set_size_request(50, 50)
+        button_kill.set_image(Gtk.Image.new_from_icon_name("faugus-kill-symbolic", Gtk.IconSize.BUTTON))
         button_kill.set_margin_top(10)
         button_kill.set_margin_end(10)
         button_kill.set_margin_bottom(10)
-
-        label_kill = Gtk.Label(label="Kill")
-        label_kill.set_margin_start(0)
-        label_kill.set_margin_end(0)
-        label_kill.set_margin_top(0)
-        label_kill.set_margin_bottom(0)
-
-        button_kill.add(label_kill)
 
         # Create button for settings
         button_settings = Gtk.Button()
         button_settings.connect("clicked", self.on_button_settings_clicked)
         button_settings.set_can_focus(False)
         button_settings.set_size_request(50, 50)
-        button_settings.set_image(Gtk.Image.new_from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON))
+        button_settings.set_image(Gtk.Image.new_from_icon_name("faugus-settings-symbolic", Gtk.IconSize.BUTTON))
         button_settings.set_margin_top(10)
         button_settings.set_margin_start(10)
         button_settings.set_margin_bottom(10)
@@ -424,7 +415,7 @@ class Main(Gtk.Window):
         self.button_play.connect("clicked", self.on_button_play_clicked)
         self.button_play.set_can_focus(False)
         self.button_play.set_size_request(50, 50)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
         self.button_play.set_margin_top(10)
         self.button_play.set_margin_end(10)
         self.button_play.set_margin_bottom(10)
@@ -499,17 +490,10 @@ class Main(Gtk.Window):
         self.button_add.connect("clicked", self.on_button_add_clicked)
         self.button_add.set_can_focus(False)
         self.button_add.set_size_request(50, 50)
+        self.button_add.set_image(Gtk.Image.new_from_icon_name("faugus-add-symbolic", Gtk.IconSize.BUTTON))
         self.button_add.set_margin_top(10)
         self.button_add.set_margin_start(10)
         self.button_add.set_margin_bottom(10)
-
-        label_add = Gtk.Label(label="New")
-        label_add.set_margin_start(0)
-        label_add.set_margin_end(0)
-        label_add.set_margin_top(0)
-        label_add.set_margin_bottom(0)
-
-        self.button_add.add(label_add)
 
         # Create button for killing processes
         button_kill = Gtk.Button()
@@ -517,41 +501,27 @@ class Main(Gtk.Window):
         button_kill.set_can_focus(False)
         button_kill.set_tooltip_text(_("Force close all running games"))
         button_kill.set_size_request(50, 50)
+        button_kill.set_image(Gtk.Image.new_from_icon_name("faugus-kill-symbolic", Gtk.IconSize.BUTTON))
         button_kill.set_margin_top(10)
         button_kill.set_margin_bottom(10)
-
-        label_kill = Gtk.Label(label="Kill")
-        label_kill.set_margin_start(0)
-        label_kill.set_margin_end(0)
-        label_kill.set_margin_top(0)
-        label_kill.set_margin_bottom(0)
-
-        button_kill.add(label_kill)
 
         # Create button for exiting
         button_bye = Gtk.Button()
         button_bye.connect("clicked", self.on_button_bye_clicked)
         button_bye.set_can_focus(False)
         button_bye.set_size_request(50, 50)
+        button_bye.set_image(Gtk.Image.new_from_icon_name("faugus-exit-symbolic", Gtk.IconSize.BUTTON))
         button_bye.set_margin_start(10)
         button_bye.set_margin_top(10)
         button_bye.set_margin_bottom(10)
         button_bye.set_margin_end(10)
-
-        label_bye = Gtk.Label(label="Bye")
-        label_bye.set_margin_start(0)
-        label_bye.set_margin_end(0)
-        label_bye.set_margin_top(0)
-        label_bye.set_margin_bottom(0)
-
-        button_bye.add(label_bye)
 
         # Create button for settings
         button_settings = Gtk.Button()
         button_settings.connect("clicked", self.on_button_settings_clicked)
         button_settings.set_can_focus(False)
         button_settings.set_size_request(50, 50)
-        button_settings.set_image(Gtk.Image.new_from_icon_name("open-menu-symbolic", Gtk.IconSize.BUTTON))
+        button_settings.set_image(Gtk.Image.new_from_icon_name("faugus-settings-symbolic", Gtk.IconSize.BUTTON))
         button_settings.set_margin_top(10)
         button_settings.set_margin_start(10)
         button_settings.set_margin_bottom(10)
@@ -561,7 +531,7 @@ class Main(Gtk.Window):
         self.button_play.connect("clicked", self.on_button_play_clicked)
         self.button_play.set_can_focus(False)
         self.button_play.set_size_request(50, 50)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
         self.button_play.set_margin_top(10)
         self.button_play.set_margin_start(10)
         self.button_play.set_margin_end(10)
@@ -1340,13 +1310,12 @@ class Main(Gtk.Window):
             if title in processos:
                 self.menu_item_play.set_sensitive(True)
                 self.button_play.set_sensitive(True)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
             else:
                 self.menu_item_play.set_sensitive(True)
                 self.button_play.set_sensitive(True)
                 self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+                    Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
         else:
             self.menu_item_edit.set_sensitive(False)
             self.menu_item_delete.set_sensitive(False)
@@ -1628,8 +1597,7 @@ class Main(Gtk.Window):
 
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
                 def check_pid_timeout():
                     if self.find_pid(game):
@@ -1647,8 +1615,7 @@ class Main(Gtk.Window):
 
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
                 def check_pid_periodically():
                     if self.find_pid(game):
@@ -1680,13 +1647,13 @@ class Main(Gtk.Window):
 
             self.menu_item_play.set_sensitive(True)
             self.button_play.set_sensitive(True)
-            self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-stop-symbolic", Gtk.IconSize.BUTTON))
+            self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
             self.play_button_locked = False
             return True
 
         self.menu_item_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("media-playback-start-symbolic", Gtk.IconSize.BUTTON))
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
 
         return False
 

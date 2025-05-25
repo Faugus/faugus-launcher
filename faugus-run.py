@@ -94,6 +94,24 @@ LOCALE_DIR = (
 
 locale.setlocale(locale.LC_ALL, '')
 lang = locale.getlocale()[0]
+if os.path.exists(config_file_dir):
+    with open(config_file_dir, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('language='):
+                lang = line.split('=', 1)[1].strip()
+                break
+try:
+    translation = gettext.translation(
+        'faugus-run',
+        localedir=LOCALE_DIR,
+        languages=[lang]
+    )
+    translation.install()
+    globals()['_'] = translation.gettext
+except FileNotFoundError:
+    gettext.install('faugus-run', localedir=LOCALE_DIR)
+    globals()['_'] = gettext.gettext
 
 class FaugusRun:
     def __init__(self, message):
@@ -157,19 +175,6 @@ class FaugusRun:
         dialog.destroy()
         Gtk.main_quit()
         sys.exit()
-
-    def apply_translation(self, language_code):
-        try:
-            translation = gettext.translation(
-                'faugus-run',
-                localedir=LOCALE_DIR,
-                languages=[language_code]
-            )
-            translation.install()
-            globals()['_'] = translation.gettext
-        except FileNotFoundError:
-            gettext.install('faugus-run', localedir=LOCALE_DIR)
-            globals()['_'] = gettext.gettext
 
     def start_process(self, command):
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
@@ -329,8 +334,6 @@ class FaugusRun:
 
     def show_warning_dialog(self):
         self.load_config()
-        self.apply_translation(self.language)
-        print(self.language)
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
