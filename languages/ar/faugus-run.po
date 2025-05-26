@@ -9,10 +9,10 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-23 20:50-0300\n"
-"PO-Revision-Date: 2025-05-26 18:29-0300\n"
-"Last-Translator: bonnietogamer\n"
+"PO-Revision-Date: 2025-05-26 18:47-0300\n"
+"Last-Translator: \n"
 "Language-Team: \n"
-"Language: sv\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,69 +21,69 @@ msgstr ""
 #: /usr/bin/faugus-run:126
 #, python-brace-format
 msgid "{path} was not found."
-msgstr "{path} hittades inte."
+msgstr "لم يتم العثور على {path}"
 
 #: /usr/bin/faugus-run:130
 msgid "Please install it or use another Proton version."
-msgstr "Vänligen installera den eller använd en annan Protonversion."
+msgstr "يرجى تثبيته أو استخدام إصدار آخر من Proton."
 
 #: /usr/bin/faugus-run:133 /usr/bin/faugus-run:513
 msgid "Ok"
-msgstr "Ok"
+msgstr "تمام"
 
 #: /usr/bin/faugus-run:362
 #, python-brace-format
 msgid "Using {path}"
-msgstr "Använder {path}"
+msgstr "يتم استخدام {path}"
 
 #: /usr/bin/faugus-run:433
 msgid "Updating BattlEye..."
-msgstr "Uppdaterar BattleEye..."
+msgstr "جارٍ تحديث BattlEye..."
 
 #: /usr/bin/faugus-run:435
 msgid "Updating Easy Anti-Cheat..."
-msgstr "Uppdaterar Easy Anti-Cheat..."
+msgstr "جارٍ تحديث Easy Anti-cheat..."
 
 #: /usr/bin/faugus-run:437
 msgid "Components are up to date"
-msgstr "Komponenterna är uppdaterade"
+msgstr "جميع المكونات محدّثة"
 
 #: /usr/bin/faugus-run:439
 msgid "Downloading GE-Proton..."
-msgstr "Laddar ner GE-Proton..."
+msgstr "جارٍ تنزيل GE-Proton..."
 
 #: /usr/bin/faugus-run:441
 msgid "Downloading UMU-Proton..."
-msgstr "Laddar ner UMU-Proton..."
+msgstr "جارٍ تنزيل UMU-Proton..."
 
 #: /usr/bin/faugus-run:443
 msgid "Downloading Steam Runtime..."
-msgstr "Laddar ner Steam Runtime..."
+msgstr "جارٍ تنزيل Steam Runtime..."
 
 #: /usr/bin/faugus-run:445
 msgid "Extracting Steam Runtime..."
-msgstr "Extraherar Steam Runtime..."
+msgstr "جارٍ استخراج Steam Runtime..."
 
 #: /usr/bin/faugus-run:447
 msgid "Extracting GE-Proton..."
-msgstr "Extraherar GE-Proton..."
+msgstr "جارٍ استخراج GE-Proton..."
 
 #: /usr/bin/faugus-run:449
 msgid "Extracting UMU-Proton..."
-msgstr "Extraherar UMU-Proton..."
+msgstr "جارٍ استخراج UMU-Proton..."
 
 #: /usr/bin/faugus-run:451 /usr/bin/faugus-run:457
 msgid "GE-Proton is up to date"
-msgstr "GE-Proton är uppdaterad"
+msgstr "GE-Proton مواكب لآخر التحديثات"
 
 #: /usr/bin/faugus-run:453 /usr/bin/faugus-run:459
 msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton är uppdaterad"
+msgstr "مواكب لآخر التحديثات. UMU-Proton"
 
 #: /usr/bin/faugus-run:455 /usr/bin/faugus-run:461
 msgid "Steam Runtime is up to date"
-msgstr "Steam Runtime är uppdaterad"
+msgstr "مواكب لآخر التحديثات Steam Runtime"
 
 #: /usr/bin/faugus-run:510
 msgid "The keys and values were successfully added to the registry."
-msgstr "Nycklarna och värdena har lagts till i registret."
+msgstr "تمت إضافة المفاتيح والقيم إلى السجل بنجاح."
