@@ -1,12 +1,13 @@
 project(
   'faugus-launcher',
   version: '1.5.8',
-  meson_version: '>=1.1.0',
+  meson_version: '>=1.2.0',
   license: 'MIT',
   license_files: 'LICENSE',
 )
 
 py = import('python').find_installation()
+fs = import('fs')
 
 subdir('assets')
 subdir('languages')
