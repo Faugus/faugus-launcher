@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-24 16:39-0300\n"
-"PO-Revision-Date: 2025-05-26 21:03+0200\n"
+"PO-Revision-Date: 2025-05-26 18:28-0300\n"
 "Last-Translator: bonnietogamer\n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -525,7 +525,7 @@ msgstr "Start Argument"
 
 #: /usr/bin/faugus-launcher:4711 /usr/bin/faugus-launcher:6268
 msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
-msgstr "Exempel: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+msgstr "exempel: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 
 #: /usr/bin/faugus-launcher:4716 /usr/bin/faugus-launcher:6270
 msgid "Game Arguments"
@@ -533,7 +533,7 @@ msgstr "Spel Argument"
 
 #: /usr/bin/faugus-launcher:4719 /usr/bin/faugus-launcher:6273
 msgid "e.g.: -d3d11 -fullscreen"
-msgstr "Exempel.: -d3d11 -fullscreen"
+msgstr "exempel.: -d3d11 -fullscreen"
 
 #: /usr/bin/faugus-launcher:4724 /usr/bin/faugus-launcher:6275
 msgid "Additional Application"
@@ -566,7 +566,7 @@ msgstr "Steam Genväg"
 
 #: /usr/bin/faugus-launcher:4771
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
-msgstr "Lägg till eller ta bort en genväg i Steam. Steam behöver startas om"
+msgstr "Lägg till eller ta bort en genväg i Steam. Steam behöver startas om."
 
 #: /usr/bin/faugus-launcher:4777 /usr/bin/faugus-launcher:5696
 #: /usr/bin/faugus-launcher:6286 /usr/bin/faugus-launcher:6840

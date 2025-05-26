@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-23 20:50-0300\n"
-"PO-Revision-Date: 2025-05-26 21:03+0200\n"
+"PO-Revision-Date: 2025-05-26 18:29-0300\n"
 "Last-Translator: bonnietogamer\n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -25,7 +25,7 @@ msgstr "{path} hittades inte."
 
 #: /usr/bin/faugus-run:130
 msgid "Please install it or use another Proton version."
-msgstr "Vänligen installera den eller använd en annan Protonversion"
+msgstr "Vänligen installera den eller använd en annan Protonversion."
 
 #: /usr/bin/faugus-run:133 /usr/bin/faugus-run:513
 msgid "Ok"
@@ -46,7 +46,7 @@ msgstr "Uppdaterar Easy Anti-Cheat..."
 
 #: /usr/bin/faugus-run:437
 msgid "Components are up to date"
-msgstr "Komponenterna är uppdaterade."
+msgstr "Komponenterna är uppdaterade"
 
 #: /usr/bin/faugus-run:439
 msgid "Downloading GE-Proton..."
