@@ -7,6 +7,7 @@ project(
 )
 
 subdir('assets')
+subdir('languages')
 
 install_data(
   'faugus-launcher.py',
