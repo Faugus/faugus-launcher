@@ -117,14 +117,15 @@ For Application Launchers
 
 # Screenshots
 ### Main window
-<img src=https://github.com/user-attachments/assets/6f6fdd3e-857d-4aa2-b7b2-0238bc39125a/><br><br>
-<img src=https://github.com/user-attachments/assets/eb988923-4f0c-4c89-97fb-f9106c90620d/><br><br>
-<img src=https://github.com/user-attachments/assets/19b42740-92fa-4fae-befc-13296c97d029/><br>
+<img src=https://github.com/user-attachments/assets/5d7285f1-9202-44d4-8161-fff89ba73d0b/><br><br>
+<img src=https://github.com/user-attachments/assets/6081b228-07b3-45e7-b44b-42bf4b7d3a54/><br><br>
+<img src=https://github.com/user-attachments/assets/c2b82cd8-83fd-47ab-8cb9-2da127799b5d/><br>
+
 ### Add/Edit game
-<img src=https://github.com/user-attachments/assets/89c41b52-ec4e-4f00-99ea-22d5c462e19b/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/cd929bf9-4a6b-461e-9aa6-0e701da679c4/><br>
+<img src=https://github.com/user-attachments/assets/4ec6edfc-b47b-4420-8b99-1d19e900c1df/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=https://github.com/user-attachments/assets/fe6a45e1-fafb-4957-aff0-111a934042c8/><br>
 ### Settings
-<img src=https://github.com/user-attachments/assets/09710da4-fa7a-4932-b26f-71e1d37ce761/><br>
+<img src=https://github.com/user-attachments/assets/e1071514-8feb-4005-b184-17b138b5804b/><br>
 ### GE-Proton Manager
-<img src=https://github.com/user-attachments/assets/c46f90ac-7713-46bf-8795-33d3917fb48e/><br>
-### Create shortcut from .exe
-<img src=https://github.com/user-attachments/assets/cdc7cdf6-a67c-4405-b94f-566e0a20f5e6/><br>
+<img src=https://github.com/user-attachments/assets/50635aa3-8f6a-4846-a4e4-8cb8f5ca05a5/><br>
+### Create shortcut from .exe file
+<img src=https://github.com/user-attachments/assets/8b824dbc-49f8-45ec-b3d0-7480d8c4be81/><br>
