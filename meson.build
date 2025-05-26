@@ -21,7 +21,6 @@ py.install_sources(
 
 install_data(
   'faugus-session',
-  install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
 )
 
