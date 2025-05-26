@@ -6,6 +6,8 @@ project(
   license_files: 'LICENSE',
 )
 
+subdir('assets')
+
 install_data(
   'faugus-launcher.py',
   'faugus-run.py',
