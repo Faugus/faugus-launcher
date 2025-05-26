@@ -36,6 +36,13 @@ classifiers = [
     "Programming Language :: Unix Shell",
 ]
 
+[project.scripts]
+faugus-launcher = "faugus_launcher:main"
+faugus-run = "faugus_run:main"
+faugus-proton-manager = "faugus_proton_manager:main"
+faugus-components = "faugus_components:main"
+faugus-gamepad = "faugus_gamepad:main"
+
 [project.urls]
 Repository = "https://github.com/Faugus/faugus-launcher"
 Issues = "https://github.com/Faugus/faugus-launcher/issues"

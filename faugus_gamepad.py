@@ -101,7 +101,10 @@ class GamepadApp:
         except Exception as e:
             print(f"Error accessing the gamepad: {e}")
 
-if __name__ == "__main__":
-    app = GamepadApp()
+def main():
+    GamepadApp()
     # Keeps the monitoring running
     threading.Event().wait()
+
+if __name__ == "__main__":
+    main()

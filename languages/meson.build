@@ -9,6 +9,6 @@ foreach lang : languages
     lang / 'faugus-launcher.mo',
     lang / 'faugus-proton-manager.mo',
     lang / 'faugus-run.mo',
-    install_dir: get_option('localedir') / lang / 'LC_MESSAGES',
+    install_dir: get_option('datadir') / 'share' / 'locale' / lang / 'LC_MESSAGES',
   )
 endforeach

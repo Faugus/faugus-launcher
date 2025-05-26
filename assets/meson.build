@@ -1,6 +1,7 @@
 install_data(
   'faugus-banner.png',
   'faugus-notification.ogg',
+  install_dir: get_option('datadir') / 'share' / meson.project_name(),
 )
 
 install_data(
@@ -9,7 +10,7 @@ install_data(
   'faugus-ea.png',
   'faugus-epic-games.png',
   'faugus-ubisoft-connect.png',
-  install_dir: get_option('datadir') / 'icons' / 'hicolor' / '256x256' / 'apps',
+  install_dir: get_option('datadir') / 'share' / 'icons' / 'hicolor' / '256x256' / 'apps',
 )
 
 install_data(
@@ -19,5 +20,5 @@ install_data(
   'faugus-play-symbolic.svg',
   'faugus-settings-symbolic.svg',
   'faugus-stop-symbolic.svg',
-  install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'actions',
+  install_dir: get_option('datadir') / 'share' / 'icons' / 'hicolor' / 'scalable' / 'actions',
 )
