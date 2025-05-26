@@ -1,0 +1,72 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-23 21:03-0300\n"
+"PO-Revision-Date: 2025-05-26 23:55+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: /usr/bin/faugus-proton-manager:76
+msgid "Faugus GE-Proton Manager"
+msgstr "Gestionnaire GE-Proton de Faugus"
+
+#: /usr/bin/faugus-proton-manager:153
+msgid "Error fetching releases:"
+msgstr "Erreur lors de la récupération des versions :"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:242
+msgid "Remove"
+msgstr "Supprimer"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:267
+msgid "Download"
+msgstr "Télécharger"
+
+#: /usr/bin/faugus-proton-manager:205
+msgid "Downloading"
+msgstr "Téléchargement en cours"
+
+#: /usr/bin/faugus-proton-manager:208
+msgid "Downloading..."
+msgstr "Téléchargement..."
+
+#: /usr/bin/faugus-proton-manager:209
+#, python-brace-format
+msgid "Downloading {tag}..."
+msgstr "Téléchargement de {tag}..."
+
+#: /usr/bin/faugus-proton-manager:234
+msgid "Extracting..."
+msgstr "Extraction..."
+
+#: /usr/bin/faugus-proton-manager:235
+#, python-brace-format
+msgid "Extracting {tag}..."
+msgstr "Extraction de {tag}..."
+
+#: /usr/bin/faugus-proton-manager:257
+#, python-brace-format
+msgid "Extracting... {percent}%"
+msgstr "Extraction... {percent}%"
+
+#: /usr/bin/faugus-proton-manager:260
+#, python-brace-format
+msgid "Failed to extract {tar_file_path}: {error}"
+msgstr "Échec de l’extraction {tar_file_path}: {error}"
+
+#: /usr/bin/faugus-proton-manager:269
+#, python-brace-format
+msgid "Failed to remove {version_path}: {error}"
+msgstr "Échec de suppression {version_path}: {error}"
