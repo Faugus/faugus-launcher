@@ -1,0 +1,72 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-23 21:03-0300\n"
+"PO-Revision-Date: 2025-05-27 00:32+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.4\n"
+
+#: /usr/bin/faugus-proton-manager:76
+msgid "Faugus GE-Proton Manager"
+msgstr "برنامج Faugus GE-Proton"
+
+#: /usr/bin/faugus-proton-manager:153
+msgid "Error fetching releases:"
+msgstr "خطأ في جلب الإصدارات:"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:242
+msgid "Remove"
+msgstr "إزالة"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:267
+msgid "Download"
+msgstr "تنزيل"
+
+#: /usr/bin/faugus-proton-manager:205
+msgid "Downloading"
+msgstr "جاري التنزيل"
+
+#: /usr/bin/faugus-proton-manager:208
+msgid "Downloading..."
+msgstr "جاري التنزيل..."
+
+#: /usr/bin/faugus-proton-manager:209
+#, python-brace-format
+msgid "Downloading {tag}..."
+msgstr "جاري تنزيل {tag}..."
+
+#: /usr/bin/faugus-proton-manager:234
+msgid "Extracting..."
+msgstr "جاري الاستخراج..."
+
+#: /usr/bin/faugus-proton-manager:235
+#, python-brace-format
+msgid "Extracting {tag}..."
+msgstr "جاري استخراج {tag}..."
+
+#: /usr/bin/faugus-proton-manager:257
+#, python-brace-format
+msgid "Extracting... {percent}%"
+msgstr "جاري الاستخراج... {percent}%"
+
+#: /usr/bin/faugus-proton-manager:260
+#, python-brace-format
+msgid "Failed to extract {tar_file_path}: {error}"
+msgstr "فشل في استخراج {tar_file_path}: {error}"
+
+#: /usr/bin/faugus-proton-manager:269
+#, python-brace-format
+msgid "Failed to remove {version_path}: {error}"
+msgstr "فشل في إزالة {version_path}: {error}"
