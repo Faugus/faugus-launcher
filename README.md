@@ -40,7 +40,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.7/faugus-launcher_1.5.7-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.8/faugus-launcher_1.5.8-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_ubuntu-noble.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_ubuntu-noble.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -58,7 +58,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.7/faugus-launcher_1.5.7-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.8/faugus-launcher_1.5.8-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_debian-13.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_debian-13.deb
 sudo apt install -y ~/faugus-launcher/*.deb
