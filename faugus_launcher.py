@@ -7170,7 +7170,7 @@ HDR_SUPPORT=
             f.write(default_content)
 
 
-def main():
+def faugus_launcher():
     global faugus_session
 
     ensure_session_ini()
@@ -7203,14 +7203,18 @@ def main():
         print(_("Invalid arguments"))
 
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) == 2 and sys.argv[1] != "--hide" and sys.argv[1] != "--session":
         run_file(sys.argv[1])
     elif len(sys.argv) == 3 and sys.argv[1] == "--shortcut":
-        main()
+        faugus_launcher()
     else:
         try:
             with lock:
-                main()
+                faugus_launcher()
         except Timeout:
             print(_("Faugus Launcher is already running."))
+
+
+if __name__ == "__main__":
+    main()
