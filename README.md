@@ -10,21 +10,11 @@ A simple and lightweight app for running Windows games using [UMU-Launcher](http
 ```
 yay -S --noconfirm faugus-launcher
 ```
-```
-# Optional tools
-sudo pacman -S --noconfirm mangohud
-sudo pacman -S --noconfirm gamemode
-```
 
 ### Fedora / Nobara (Copr)
 ```
 sudo dnf -y copr enable faugus/faugus-launcher
 sudo dnf -y install faugus-launcher
-```
-```
-# Optional tools
-sudo dnf -y install mangohud
-sudo dnf -y install gamemode
 ```
 
 ### Bazzite (Copr)
@@ -40,16 +30,11 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.8/faugus-launcher_1.5.8-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.9/faugus-launcher_1.5.9-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_ubuntu-noble.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_ubuntu-noble.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
-```
-```
-# Optional tools
-sudo apt -y install mangohud
-sudo apt -y install gamemode
 ```
 
 ### Debian 13
@@ -58,16 +43,11 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.8/faugus-launcher_1.5.8-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.5.9/faugus-launcher_1.5.9-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_debian-13.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_debian-13.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
-```
-```
-# Optional tools
-sudo apt -y install mangohud
-sudo apt -y install gamemode
 ```
 
 ### openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
@@ -80,10 +60,6 @@ sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 # Slowroll
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
-```
-```
-# Optional tools
-sudo zypper install -y mangohud
 ```
 
 # Usage
