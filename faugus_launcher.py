@@ -1202,7 +1202,6 @@ class Main(Gtk.Window):
             self.flowbox_child.set_valign(Gtk.Align.START)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
         if self.interface_mode == "Blocks":
-            self.flowbox.set_homogeneous(True)
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
             scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
