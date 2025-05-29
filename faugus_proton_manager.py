@@ -160,10 +160,10 @@ class ProtonDownloader(Gtk.Dialog):
 
             self.language = config_dict.get('language', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", lang)
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", lang)
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
