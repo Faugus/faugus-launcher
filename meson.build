@@ -17,12 +17,6 @@ py.install_sources(
   'faugus_run.py',
   'faugus_proton_manager.py',
   'faugus_components.py',
-  'faugus_gamepad.py',
-)
-
-install_data(
-  'faugus-session',
-  install_dir: get_option('bindir'),
 )
 
 install_data(
@@ -31,11 +25,6 @@ install_data(
   'faugus-run.desktop',
   'faugus-proton-manager.desktop',
   install_dir: get_option('datadir') / 'share' / 'applications',
-)
-
-install_data(
-  'faugus-session.desktop',
-  install_dir: get_option('datadir') / 'share' / 'wayland-sessions',
 )
 
 install_data(
