@@ -196,7 +196,6 @@ class ProtonDownloader(Gtk.Dialog):
         config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_maximized
         config['start-fullscreen'] = checkbox_start_fullscreen
-        config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
         config['wayland-driver'] = checkbox_wayland_driver
         config['enable-hdr'] = checkbox_enable_hdr
