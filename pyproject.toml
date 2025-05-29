@@ -6,12 +6,10 @@ requires = ["meson-python"]
 name = "faugus-launcher"
 dynamic = ["version"]
 dependencies = [
-    "evdev",
     "filelock",
     "pillow",
     "psutil",
     "PyGObject",
-    "pynput",
     "requests",
     "vdf",
 ]
@@ -41,7 +39,6 @@ faugus-launcher = "faugus_launcher:main"
 faugus-run = "faugus_run:main"
 faugus-proton-manager = "faugus_proton_manager:main"
 faugus-components = "faugus_components:main"
-faugus-gamepad = "faugus_gamepad:main"
 
 [project.urls]
 Repository = "https://github.com/Faugus/faugus-launcher"
