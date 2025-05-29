@@ -5,7 +5,6 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, GdkPixbuf, Gio
 from threading import Thread
 from pathlib import Path
-import atexit
 import sys
 import subprocess
 import argparse
@@ -84,8 +83,6 @@ def remove_ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
 
-faugus_session = False
-
 LOCALE_DIR = (
     PathManager.system_data('locale')
     if os.path.isdir(PathManager.system_data('locale'))
@@ -130,8 +127,6 @@ class FaugusRun:
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-        if faugus_session:
-            dialog.fullscreen()
 
         label = Gtk.Label()
         label.set_label(_("{path} was not found.").format(path=protonpath))
@@ -284,10 +279,10 @@ class FaugusRun:
             self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
             self.language = config_dict.get('language', '')
         else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", lang)
+            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", lang)
             self.default_runner = "GE-Proton"
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_gamepad_navigation, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
+    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
         config_file = config_file_dir
 
         config_path = faugus_launcher_dir
@@ -320,7 +315,6 @@ class FaugusRun:
         config['interface-mode'] = combo_box_interface
         config['start-maximized'] = checkbox_start_maximized
         config['start-fullscreen'] = checkbox_start_fullscreen
-        config['gamepad-navigation'] = checkbox_gamepad_navigation
         config['enable-logging'] = checkbox_enable_logging
         config['wayland-driver'] = checkbox_wayland_driver
         config['enable-hdr'] = checkbox_enable_hdr
@@ -340,9 +334,6 @@ class FaugusRun:
         self.warning_dialog.set_resizable(False)
         self.warning_dialog.set_default_size(280, -1)
         self.warning_dialog.set_icon_from_file(faugus_png)
-
-        if faugus_session:
-            self.warning_dialog.fullscreen()
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -518,8 +509,6 @@ class FaugusRun:
                 dialog.set_resizable(False)
                 dialog.set_icon_from_file(faugus_png)
                 subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
-                if faugus_session:
-                    dialog.fullscreen()
 
                 label = Gtk.Label()
                 label.set_label(_("The keys and values were successfully added to the registry."))
@@ -598,17 +587,12 @@ def apply_dark_theme():
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def main():
-    global faugus_session
     apply_dark_theme()
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message")
     parser.add_argument("command", nargs='?', default=None)
-    parser.add_argument("session", nargs='?', default=None)
 
     args = parser.parse_args()
-
-    if args.session == "session":
-        faugus_session = True
 
     handle_command(args.message, args.command)
 
