@@ -1152,12 +1152,11 @@ class Main(Gtk.Window):
 
     def add_item_list(self, game):
         # Add a game item to the list
-
         if self.interface_mode == "List":
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         if self.interface_mode == "Blocks":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            hbox.set_size_request(300, 200)
+            hbox.set_size_request(200, -1)
         if self.interface_mode == "Banners":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
@@ -1203,15 +1202,21 @@ class Main(Gtk.Window):
             self.flowbox_child.set_valign(Gtk.Align.START)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
         if self.interface_mode == "Blocks":
+            self.flowbox.set_homogeneous(True)
+            self.flowbox_child.set_hexpand(True)
+            self.flowbox_child.set_vexpand(True)
             scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(game_icon)
             image.set_from_pixbuf(scaled_pixbuf)
-            hbox.pack_start(image, True, True, 0)
-            hbox.pack_start(game_label, True, True, 0)
-            game_label.set_margin_end(20)
-            game_label.set_margin_start(20)
-            self.flowbox_child.set_valign(Gtk.Align.START)
-            self.flowbox_child.set_halign(Gtk.Align.START)
+            hbox.pack_start(image, False, False, 0)
+            hbox.pack_start(game_label, True, False, 0)
+            image.set_margin_top(10)
+            game_label.set_margin_top(10)
+            game_label.set_margin_end(10)
+            game_label.set_margin_start(10)
+            game_label.set_margin_bottom(10)
+            self.flowbox_child.set_valign(Gtk.Align.FILL)
+            self.flowbox_child.set_halign(Gtk.Align.FILL)
         if self.interface_mode == "Banners":
             image2 = Gtk.Image()
             game_label.set_size_request(-1, 50)
