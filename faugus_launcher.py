@@ -164,38 +164,31 @@ class Main(Gtk.Window):
         Gtk.Window.__init__(self, title="Faugus Launcher")
         self.set_icon_from_file(faugus_png)
 
-        self.banner_mode = False
         self.start_maximized = False
         self.start_fullscreen = False
         self.fullscreen_activated = False
-        self.theme = None
-
-        self.game_running = None
         self.system_tray = False
         self.start_boot = False
-        self.current_prefix = None
+        self.theme = None
 
+        self.current_prefix = None
         self.games = []
+        self.flowbox_child = None
         self.play_button_locked = False
+        self.updated_steam_id = None
+        self.game_running = False
 
         self.last_click_time = 0
         self.last_clicked_item = None
         self.double_click_time_threshold = 500
 
-        self.flowbox_child = None
-
-        self.updated_steam_id = None
-
-        # Define the configuration path
-        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
-        if not os.path.exists(config_path):
-            os.makedirs(config_path)
-        self.working_directory = config_path
+        if not os.path.exists(faugus_launcher_dir):
+            os.makedirs(faugus_launcher_dir)
+        self.working_directory = faugus_launcher_dir
         os.chdir(self.working_directory)
 
-        config_file = config_file_dir
-        if not os.path.exists(config_file):
+        if not os.path.exists(config_file_dir):
             self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
                              "False", "List", "False", "False", "False", "False", "False", lang)
 
@@ -213,8 +206,8 @@ class Main(Gtk.Window):
         """)
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        self.check_theme()
 
+        self.check_theme()
         self.load_config()
 
         self.context_menu = Gtk.Menu()
@@ -255,7 +248,6 @@ class Main(Gtk.Window):
                 self.fullscreen_activated = True
             self.big_interface()
         if self.interface_mode == "Banners":
-            self.banner_mode = True
             if self.start_maximized:
                 self.maximize()
             if self.start_fullscreen:
@@ -278,8 +270,6 @@ class Main(Gtk.Window):
         if self.system_tray:
             self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
             self.connect("delete-event", self.on_window_delete_event)
-
-        self.game_running2 = False
 
         GLib.timeout_add_seconds(1, self.check_running_processes)
 
@@ -1627,13 +1617,12 @@ class Main(Gtk.Window):
         kill -9 "$pid"
     done
 """, shell=True)
-        self.game_running = None
-        self.game_running2 = False
+        self.game_running = False
 
     def on_button_add_clicked(self, widget):
         file_path = ""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.game_running2, file_path, self.interface_mode)
+        add_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
@@ -1650,10 +1639,10 @@ class Main(Gtk.Window):
         if game := next((j for j in self.games if j.title == title), None):
             processos = self.load_processes_from_file()
             if game.title in processos:
-                self.game_running2 = True
+                self.game_running = True
             else:
-                self.game_running2 = False
-            edit_game_dialog = AddGame(self, self.game_running2, file_path, self.interface_mode)
+                self.game_running = False
+            edit_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model = edit_game_dialog.combo_box_runner.get_model()
@@ -1734,7 +1723,7 @@ class Main(Gtk.Window):
             edit_game_dialog.button_shortcut_icon.set_image(image)
             edit_game_dialog.entry_title.set_sensitive(False)
 
-            if self.game_running2:
+            if self.game_running:
                 edit_game_dialog.button_winecfg.set_sensitive(False)
                 edit_game_dialog.button_winecfg.set_tooltip_text(_("{title} is running. Please close it first.").format(title=game.title))
                 edit_game_dialog.button_winetricks.set_sensitive(False)
@@ -2154,7 +2143,7 @@ class Main(Gtk.Window):
         self.box_main.show_all()
         self.button_finish_install.set_visible(False)
 
-    def on_button_finish_install_clicked(self, widget):
+    def on_button_finish_install_clicked(self):
         self.on_button_kill_clicked(widget)
 
     def monitor_process(self, processo, game, shortcut_state, icon_temp, icon_final, title):
@@ -2227,8 +2216,9 @@ class Main(Gtk.Window):
             def on_download_complete():
                 self.label_download.set_text(_("Installing {title}...").format(title=title))
                 if launcher == "battle":
-                    self.label_download2.set_text(_("Please close the login window and press:"))
-                    self.button_finish_install.set_visible(True)
+                    self.label_download2.set_text(_("Please close the login window and wait..."))
+                    #self.label_download2.set_text(_("Please close the login window and press:"))
+                    #self.button_finish_install.set_visible(True)
                     command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
@@ -2682,20 +2672,6 @@ class Main(Gtk.Window):
         icon_file_path = f"{icons_dir}/{title_formatted}.ico"
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
-
-    def remove_desktop_entry(self, game):
-        # Remove the .desktop file from ~/.local/share/applications/
-        desktop_file_path = f"{app_dir}/{game.title}.desktop"
-
-        if os.path.exists(desktop_file_path):
-            os.remove(desktop_file_path)
-
-    def remove_shortcut_from_desktop(self, game):
-        # Remove the shortcut from the desktop if it exists
-        desktop_link_path = f"{desktop_dir}/{game.title}.desktop"
-
-        if os.path.exists(desktop_link_path):
-            os.remove(desktop_link_path)
 
     def update_list(self):
         # Update the game list
@@ -3289,9 +3265,6 @@ class Settings(Gtk.Dialog):
                 self.checkbox_start_fullscreen.set_active(False)
             elif option == "fullscreen":
                 self.checkbox_start_maximized.set_active(False)
-
-    def on_link_clicked(self, label, uri):
-        webbrowser.open(uri)
 
     def on_combobox_interface_changed(self, combo_box):
         active_index = combo_box.get_active()
@@ -4283,8 +4256,6 @@ class AddGame(Gtk.Dialog):
         self.set_icon_from_file(faugus_png)
         self.interface_mode = interface_mode
         self.updated_steam_id = None
-
-        self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
@@ -6335,9 +6306,8 @@ class CreateShortcut(Gtk.Window):
 
     def load_config(self):
         # Load configuration from file
-        config_file = config_file_dir
-        if os.path.isfile(config_file):
-            with open(config_file, 'r') as f:
+        if os.path.isfile(config_file_dir):
+            with open(config_file_dir, 'r') as f:
                 config_data = f.read().splitlines()
             config_dict = dict(line.split('=') for line in config_data)
             self.default_prefix = config_dict.get('default-prefix', '').strip('"')
@@ -6360,13 +6330,10 @@ class CreateShortcut(Gtk.Window):
                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                     checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
                     checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
-        # Path to the configuration file
-        config_file = config_file_dir
 
-        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
-        if not os.path.exists(config_path):
-            os.makedirs(config_path)
+        if not os.path.exists(faugus_launcher_dir):
+            os.makedirs(faugus_launcher_dir)
 
         default_prefix = prefixes_dir
         self.default_prefix = prefixes_dir
@@ -6377,8 +6344,8 @@ class CreateShortcut(Gtk.Window):
         config = {}
 
         # Read the existing configuration file
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
+        if os.path.exists(config_file_dir):
+            with open(config_file_dir, 'r') as f:
                 for line in f:
                     key, value = line.strip().split('=', 1)
                     config[key] = value.strip('"')
@@ -6403,7 +6370,7 @@ class CreateShortcut(Gtk.Window):
         config['language'] = language
 
         # Write configurations back to the file
-        with open(config_file, 'w') as f:
+        with open(config_file_dir, 'w') as f:
             for key, value in config.items():
                 if key == 'default-prefix':
                     f.write(f'{key}="{value}"\n')
@@ -6744,11 +6711,9 @@ def run_file(file_path):
         disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
         default_runner = config_dict.get('default-runner', '').strip('"')
     else:
-        # Define the configuration path
-        config_path = faugus_launcher_dir
         # Create the configuration directory if it doesn't exist
-        if not os.path.exists(config_path):
-            os.makedirs(config_path)
+        if not os.path.exists(faugus_launcher_dir):
+            os.makedirs(faugus_launcher_dir)
 
         default_prefix = prefixes_dir
         mangohud = 'False'
