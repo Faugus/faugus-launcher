@@ -4,7 +4,6 @@ import json
 import os
 import re
 import shutil
-import signal
 import socket
 import subprocess
 import sys
@@ -1868,15 +1867,15 @@ class Main(Gtk.Window):
                 processos = self.load_processes_from_file()
                 if title in processos:
                     data = processos[title]
-                    pids = [data.get("main")] + data.get("children", [])
-                    for pid in pids:
-                        try:
-                            os.kill(pid, signal.SIGKILL)
-                        except ProcessLookupError:
-                            pass
-                    del processos[title]
-                    with open(running_games, "w") as f:
-                        json.dump(processos, f, indent=2)
+                    pid = data.get("main")
+                    if pid:
+                        parent = psutil.Process(pid)
+                        children = parent.children(recursive=True)
+
+                        for child in children:
+                            child.terminate()
+
+                        parent.terminate()
 
                 # Remove game and associated files if required
                 if confirmation_dialog.get_remove_prefix_state():
