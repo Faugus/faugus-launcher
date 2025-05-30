@@ -3304,8 +3304,12 @@ class Settings(Gtk.Dialog):
             self.grid_big_interface.set_visible(False)
         if active_index == 1:
             self.grid_big_interface.set_visible(True)
+            self.checkbox_show_labels.set_visible(False)
+            self.checkbox_smaller_banners.set_visible(False)
         if active_index == 2:
             self.grid_big_interface.set_visible(True)
+            self.checkbox_show_labels.set_visible(True)
+            self.checkbox_smaller_banners.set_visible(True)
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
