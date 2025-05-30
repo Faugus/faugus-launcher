@@ -8,6 +8,7 @@ project(
 
 py = import('python').find_installation()
 fs = import('fs')
+gnome = import('gnome')
 
 subdir('assets')
 subdir('languages')
@@ -38,4 +39,8 @@ install_data(
 install_data(
   'LICENSE',
   install_dir: get_option('datadir') / 'licenses' / meson.project_name(),
+)
+
+gnome.post_install(
+  gtk_update_icon_cache: true,
 )
