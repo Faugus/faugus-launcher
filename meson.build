@@ -13,10 +13,10 @@ subdir('assets')
 subdir('languages')
 
 install_data(
-  'faugus-launcher.py',
-  'faugus-run.py',
-  'faugus-proton-manager.py',
-  'faugus-components.py',
+  'faugus_launcher.py',
+  'faugus_run.py',
+  'faugus_proton_manager.py',
+  'faugus_components.py',
   rename: [
     'faugus-launcher',
     'faugus-run',
