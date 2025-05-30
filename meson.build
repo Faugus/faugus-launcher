@@ -12,19 +12,24 @@ fs = import('fs')
 subdir('assets')
 subdir('languages')
 
-foreach file : [
-  ['faugus_launcher.py', 'faugus-launcher'],
-  ['faugus_run.py', 'faugus-run'],
-  ['faugus_proton_manager.py', 'faugus-proton-manager'],
-  ['faugus_components.py', 'faugus-components']
-]
-  install_data(
-    file[0],
-    install_dir: get_option('bindir'),
-    rename: file[1],
-    install_mode: ['rwxr-xr-x', 'root', 'root']
-  )
-endforeach
+install_data(
+  'faugus-launcher.py',
+  'faugus-run.py',
+  'faugus-proton-manager.py',
+  'faugus-components.py',
+  'faugus-gamepad.py',
+  'faugus-session',
+  rename: [
+    'faugus-launcher',
+    'faugus-run',
+    'faugus-proton-manager',
+    'faugus-components',
+    'faugus-gamepad',
+    'faugus-session',
+  ],
+  install_mode: 'rwxr-xr-x',
+  install_dir: get_option('bindir'),
+)
 
 install_data(
   'faugus-launcher.desktop',
