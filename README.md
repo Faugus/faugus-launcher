@@ -68,7 +68,6 @@ meson setup builddir --prefix=/usr
 cd builddir
 ninja
 sudo ninja install
-sudo gtk-update-icon-cache /usr/share/icons/hicolor
 ```
 Dependencies:
 ```

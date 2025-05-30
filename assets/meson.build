@@ -1,7 +1,6 @@
 install_data(
   'faugus-banner.png',
   'faugus-notification.ogg',
-  install_dir: get_option('datadir') / meson.project_name(),
 )
 
 install_data(
