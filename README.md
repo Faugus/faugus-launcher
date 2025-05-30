@@ -71,7 +71,7 @@ sudo ninja install
 ```
 Dependencies:
 ```
-gobject requests pillow filelock vdf psutil umu-launcher imagemagick icoextract libayatana-appindicator
+menson ninja gobject requests pillow filelock vdf psutil umu-launcher imagemagick icoextract libayatana-appindicator
 ```
 
 # Usage
