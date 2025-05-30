@@ -62,6 +62,19 @@ sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/op
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 
+### Build from source
+```
+meson setup builddir --prefix=/usr
+cd builddir
+ninja
+sudo ninja install
+sudo gtk-update-icon-cache /usr/share/icons/hicolor
+```
+Dependencies:
+```
+gobject requests pillow filelock vdf psutil umu-launcher imagemagick icoextract libayatana-appindicator
+```
+
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
 
