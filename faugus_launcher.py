@@ -1307,6 +1307,13 @@ class Main(Gtk.Window):
         settings_dialog.show()
 
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
+        if faugus_backup:
+            subprocess.Popen([sys.executable, __file__])
+            self.destroy()
+            self.load_config()
+            self.manage_autostart_file(self.start_boot)
+            settings_dialog.destroy()
+            return
         self.checkbox_discrete_gpu = settings_dialog.checkbox_discrete_gpu
         self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
         self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
@@ -1387,9 +1394,6 @@ class Main(Gtk.Window):
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
                 if self.smaller_banners != checkbox_smaller_banners:
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
-                if faugus_backup:
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
                 if self.language != language:
@@ -3764,6 +3768,7 @@ class Settings(Gtk.Dialog):
             command_thread.start()
 
     def on_button_backup_clicked(self, widget):
+        self.response(Gtk.ResponseType.OK)
         self.show_warning_dialog(self, _("Prefixes and runners will not be backed up!"))
 
         items = ["banners", "icons", "config.ini", "games.json", "latest-games.txt"]
@@ -3873,6 +3878,10 @@ class Settings(Gtk.Dialog):
 
         if response == Gtk.ResponseType.OK:
             zip_file = filechooser.get_filename()
+            if not os.path.isfile(zip_file):
+                dialog.destroy()
+                self.show_warning_dialog(self, _("This is not a valid Faugus Launcher backup file."))
+                return
             temp_dir = os.path.join(faugus_launcher_dir, "temp-restore")
 
             shutil.unpack_archive(zip_file, temp_dir, 'zip')
@@ -4057,7 +4066,7 @@ class Settings(Gtk.Dialog):
             discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
             splash_disable = config_dict.get('splash-disable', 'False') == 'True'
             system_tray = config_dict.get('system-tray', 'False') == 'True'
-            start_boot = config_dict.get('start-boot', 'False') == 'True'
+            self.start_boot = config_dict.get('start-boot', 'False') == 'True'
             start_maximized = config_dict.get('start-maximized', 'False') == 'True'
             self.interface_mode = config_dict.get('interface-mode', '').strip('"')
             start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
@@ -4087,7 +4096,7 @@ class Settings(Gtk.Dialog):
             self.checkbox_discrete_gpu.set_active(discrete_gpu)
             self.checkbox_splash_disable.set_active(splash_disable)
             self.checkbox_system_tray.set_active(system_tray)
-            self.checkbox_start_boot.set_active(start_boot)
+            self.checkbox_start_boot.set_active(self.start_boot)
             self.checkbox_start_maximized.set_active(start_maximized)
             self.checkbox_start_fullscreen.set_active(start_fullscreen)
             self.checkbox_show_labels.set_active(show_labels)
