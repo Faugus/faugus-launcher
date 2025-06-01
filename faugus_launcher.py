@@ -2501,6 +2501,7 @@ class Main(Gtk.Window):
         # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
+        os.chmod(desktop_shortcut_path, 0o755)
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
         def add_game_to_steam(title, game_directory, icon, command):
