@@ -121,16 +121,6 @@ steam_shortcuts_path = PathManager.user_data(f'Steam/userdata/{steam_id}/config/
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
 
-def get_desktop_dir():
-    try:
-        desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
-        return desktop_dir
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print(_("xdg-user-dir not found or failed; falling back to ~/Desktop"))
-        return str(Path.home() / 'Desktop')
-
-desktop_dir = get_desktop_dir()
-
 LOCALE_DIR = (
     PathManager.system_data('locale')
     if os.path.isdir(PathManager.system_data('locale'))
@@ -157,6 +147,16 @@ try:
 except FileNotFoundError:
     gettext.install('faugus-launcher', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
+
+def get_desktop_dir():
+    try:
+        desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
+        return desktop_dir
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        print(_("xdg-user-dir not found or failed; falling back to ~/Desktop"))
+        return str(Path.home() / 'Desktop')
+
+desktop_dir = get_desktop_dir()
 
 class Main(Gtk.Window):
     def __init__(self):
