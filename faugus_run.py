@@ -195,7 +195,8 @@ class FaugusRun:
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
                 if "PROTONPATH" not in self.message:
-                    self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
+                    if "UMU_NO_PROTON" not in self.message:
+                        self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
                 else:
                     self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
             else:
@@ -221,10 +222,9 @@ class FaugusRun:
             if self.enable_hdr:
                 self.message = f'PROTON_ENABLE_HDR=1 {self.message}'
 
-        print(self.message)
-
         match = re.search(r"WINEPREFIX=['\"]([^'\"]+)", self.message)
-        self.game_title = match.group(1).split("/")[-1]
+        if match:
+            self.game_title = match.group(1).split("/")[-1]
 
         if "UMU_NO_PROTON" not in self.message:
             if self.enable_logging:
@@ -242,6 +242,8 @@ class FaugusRun:
                 stderr=subprocess.PIPE,
                 text=True
             )
+
+        print(self.message)
 
         GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
         GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
