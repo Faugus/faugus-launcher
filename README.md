@@ -30,7 +30,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.6.1/faugus-launcher_1.6.1-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher_1.6.2-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_ubuntu-noble.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_ubuntu-noble.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -43,7 +43,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.6.1/faugus-launcher_1.6.1-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher_1.6.2-1_all.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/python3-umu-launcher_1.2.6-1_amd64_debian-13.deb
 wget -P ~/faugus-launcher https://github.com/Open-Wine-Components/umu-launcher/releases/download/1.2.6/umu-launcher_1.2.6-1_all_debian-13.deb
 sudo apt install -y ~/faugus-launcher/*.deb
@@ -61,6 +61,23 @@ sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
+
+### Flatpak (EXPERIMENTAL)
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher-0.6.2-1.flatpak">faugus-launcher-0.6.2-1.flatpak</a> and run:
+```
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install -y --user org.freedesktop.Platform.Compat.i386//24.08 org.freedesktop.Platform.GL32.default//24.08
+flatpak install -y --user faugus-launcher-0.6.2-1.flatpak
+```
+Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
+```
+sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
+sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/org.faugus.faugus_launcher/config/faugus-launcher/
+```
+Known issues:
+
+- The button Stop can't close individual games/apps due to how Flatpak handles processes. I'll have to rework the game/app monitoring in the future.
+- Gamescope doesn't work. Don't ask.
 
 ### Build from source
 ```
