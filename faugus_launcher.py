@@ -6547,6 +6547,7 @@ class CreateShortcut(Gtk.Window):
         # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
+        os.chmod(desktop_shortcut_path, 0o755)
 
         if os.path.isfile(self.icon_temp):
             os.remove(self.icon_temp)
