@@ -63,11 +63,11 @@ sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 
 ### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher-0.6.2-3.flatpak">faugus-launcher-0.6.2-3.flatpak</a> and run:
+Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher-0.6.2-4.flatpak">faugus-launcher-0.6.2-4.flatpak</a> and run:
 ```
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install -y --user org.freedesktop.Platform.Compat.i386//24.08 org.freedesktop.Platform.GL32.default//24.08
-flatpak install -y --user faugus-launcher-0.6.2-3.flatpak
+flatpak install org.freedesktop.Platform.Compat.i386//24.08 org.freedesktop.Platform.GL32.default//24.08
+flatpak install faugus-launcher-0.6.2-4.flatpak
 ```
 Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
 ```
