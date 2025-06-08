@@ -62,7 +62,11 @@ LOCALE_DIR = (
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
 
-locale.setlocale(locale.LC_ALL, '')
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
+
 lang = locale.getlocale()[0]
 if os.path.exists(config_file_dir):
     with open(config_file_dir, 'r') as f:
