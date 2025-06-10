@@ -1,0 +1,14 @@
+{
+    "name": "python3-pycairo",
+    "buildsystem": "simple",
+    "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pycairo\" --no-build-isolation"
+    ],
+    "sources": [
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/07/4a/42b26390181a7517718600fa7d98b951da20be982a50cd4afb3d46c2e603/pycairo-1.27.0.tar.gz",
+            "sha256": "5cb21e7a00a2afcafea7f14390235be33497a2cce53a98a19389492a60628430"
+        }
+    ]
+}

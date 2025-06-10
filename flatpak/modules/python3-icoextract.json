@@ -1,0 +1,19 @@
+{
+    "name": "python3-icoextract",
+    "buildsystem": "simple",
+    "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"icoextract\" --no-build-isolation"
+    ],
+    "sources": [
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/06/72/f18254001f25ba1533b191d8f1648f6f6374f2d5dcb14042be5998d07f4d/icoextract-0.1.5.tar.gz",
+            "sha256": "fd4c6758dc9136dc08e11c71f7b8b94328de32b52be52abe4df2d3994d315b27"
+        },
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/54/16/12b82f791c7f50ddec566873d5bdd245baa1491bac11d15ffb98aecc8f8b/pefile-2024.8.26-py3-none-any.whl",
+            "sha256": "76f8b485dcd3b1bb8166f1128d395fa3d87af26360c2358fb75b80019b957c6f"
+        }
+    ]
+}

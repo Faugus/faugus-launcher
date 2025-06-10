@@ -1,0 +1,16 @@
+{
+    "name": "imagemagick",
+    "buildsystem": "simple",
+    "build-commands": [
+        "./configure --prefix=/app --enable-shared --disable-static --disable-docs",
+        "make",
+        "make install"
+    ],
+    "sources": [
+        {
+            "type": "git",
+            "url": "https://github.com/ImageMagick/ImageMagick.git",
+            "tag": "7.1.1-39"
+        }
+    ]
+}
