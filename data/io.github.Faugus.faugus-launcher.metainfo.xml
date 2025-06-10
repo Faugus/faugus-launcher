@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>io.github.Faugus.faugus-launcher</id>
+  <name>Faugus Launcher</name>
+  <summary>A simple and lightweight app for running Windows games using UMU-Launcher</summary>
+  <description>
+    <p>A simple and lightweight app for running Windows games using UMU-Launcher.</p>
+  </description>
+  <developer_name>Faugus</developer_name>
+  <url type="homepage">https://github.com/Faugus/faugus-launcher</url>
+  <url type="bugtracker">https://github.com/Faugus/faugus-launcher/issues</url>
+  <project_license>MIT</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+
+  <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-list.png</image>
+      <caption xml:lang="en">Main window: List interface mode</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-blocks.png</image>
+      <caption xml:lang="en">Main window: Blocks interface mode</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-banners.png</image>
+      <caption xml:lang="en">Main window: Banners interface mode</caption>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+  </content_rating>
+
+  <releases>
+    <release version="1.6.3-1" date="2025-06-10">
+      <description>Release 1.6.3-1</description>
+    </release>
+  </releases>
+</component>
