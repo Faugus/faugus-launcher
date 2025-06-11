@@ -67,13 +67,20 @@ class PathManager:
                 return str(path)
         return None
 
+IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
 prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 share_dir = PathManager.user_data()
-faugus_png = PathManager.get_icon('faugus-launcher.png')
+
+if IS_FLATPAK:
+    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+else:
+    faugus_png = PathManager.get_icon('faugus-launcher.png')
+
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
 eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'

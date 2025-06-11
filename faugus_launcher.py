@@ -68,6 +68,8 @@ class PathManager:
                 return path
         return icon_paths[-1]  # Fallback
 
+IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
@@ -81,8 +83,13 @@ config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 share_dir = PathManager.user_data()
 app_dir = PathManager.user_data('applications')
 
-faugus_png = PathManager.get_icon('faugus-launcher.png')
-tray_icon = PathManager.get_icon('faugus-launcher.png')
+if IS_FLATPAK:
+    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    tray_icon = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+else:
+    faugus_png = PathManager.get_icon('faugus-launcher.png')
+    tray_icon = PathManager.get_icon('faugus-launcher.png')
+
 epic_icon = PathManager.get_icon('faugus-epic-games.png')
 battle_icon = PathManager.get_icon('faugus-battlenet.png')
 ubisoft_icon = PathManager.get_icon('faugus-ubisoft-connect.png')
@@ -1437,14 +1444,24 @@ class Main(Gtk.Window):
             # Create the autostart file if it does not exist
             if not os.path.exists(autostart_path):
                 with open(autostart_path, "w") as f:
-                    f.write("""[Desktop Entry]
-    Categories=Utility;
-    Exec=faugus-launcher --hide
-    Icon=faugus-launcher
-    MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
-    Name=Faugus Launcher
-    Type=Application
-    """)
+                    if IS_FLATPAK:
+                        f.write("""[Desktop Entry]
+        Categories=Utility;
+        Exec=flatpak run io.github.Faugus.faugus-launcher --hide
+        Icon=io.github.Faugus.faugus-launcher
+        MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
+        Name=Faugus Launcher
+        Type=Application
+        """)
+                    else:
+                        f.write("""[Desktop Entry]
+        Categories=Utility;
+        Exec=faugus-launcher --hide
+        Icon=faugus-launcher
+        MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
+        Name=Faugus Launcher
+        Type=Application
+        """)
         else:
             # Delete the autostart file if it exists
             if os.path.exists(autostart_path):
@@ -2476,14 +2493,24 @@ class Main(Gtk.Window):
         command = ' '.join(command_parts)
 
         # Create a .desktop file
-        desktop_file_content = f"""[Desktop Entry]
-    Name={game.title}
-    Exec={faugus_run} "{command}"
-    Icon={new_icon_path}
-    Type=Application
-    Categories=Game;
-    Path={game_directory}
-    """
+        if IS_FLATPAK:
+            desktop_file_content = f"""[Desktop Entry]
+        Name={game.title}
+        Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"
+        Icon={new_icon_path}
+        Type=Application
+        Categories=Game;
+        Path={game_directory}
+        """
+        else:
+            desktop_file_content = f"""[Desktop Entry]
+        Name={game.title}
+        Exec={faugus_run} "{command}"
+        Icon={new_icon_path}
+        Type=Application
+        Categories=Game;
+        Path={game_directory}
+        """
 
         # Check if the destination directory exists and create if it doesn't
         applications_directory = app_dir
@@ -2522,7 +2549,10 @@ class Main(Gtk.Window):
             if existing_app_id:
                 # Update only the necessary fields without replacing the entire entry
                 game_info = shortcuts["shortcuts"][existing_app_id]
-                game_info["Exe"] = f'"{faugus_run}"'
+                if IS_FLATPAK:
+                    game_info["Exe"] = f'"flatpak-spawn"'
+                else:
+                    game_info["Exe"] = f'"{faugus_run}"'
                 game_info["StartDir"] = game_directory
                 game_info["icon"] = icon
                 game_info["LaunchOptions"] = f'"{command}"'
@@ -2531,10 +2561,16 @@ class Main(Gtk.Window):
                 new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
 
                 # Add the new game
-                shortcuts["shortcuts"][str(new_app_id)] = {"appid": new_app_id, "AppName": title,
-                    "Exe": f'"{faugus_run}"', "StartDir": game_directory, "icon": icon, "ShortcutPath": "",
-                    "LaunchOptions": f'"{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
-                    "OpenVR": 0, "Devkit": 0, "DevkitGameID": "", "LastPlayTime": 0, "FlatpakAppID": "", }
+                if IS_FLATPAK:
+                    shortcuts["shortcuts"][str(new_app_id)] = {"appid": new_app_id, "AppName": title,
+                        "Exe": f'"{faugus_run}"', "StartDir": game_directory, "icon": icon, "ShortcutPath": "",
+                        "LaunchOptions": f'"{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
+                        "OpenVR": 0, "Devkit": 0, "DevkitGameID": "", "LastPlayTime": 0, "FlatpakAppID": "", }
+                else:
+                    shortcuts["shortcuts"][str(new_app_id)] = {"appid": new_app_id, "AppName": title,
+                        "Exe": f'"{faugus_run}"', "StartDir": game_directory, "icon": icon, "ShortcutPath": "",
+                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
+                        "OpenVR": 0, "Devkit": 0, "DevkitGameID": "", "LastPlayTime": 0, "FlatpakAppID": "", }
 
             # Save shortcuts back to the file
             save_shortcuts(shortcuts)
@@ -3201,7 +3237,8 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+        if not IS_FLATPAK:
+            grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
@@ -6522,14 +6559,24 @@ class CreateShortcut(Gtk.Window):
         command = ' '.join(command_parts)
 
         # Create a .desktop file
-        desktop_file_content = f"""[Desktop Entry]
-    Name={title}
-    Exec={faugus_run} "{command}"
-    Icon={new_icon_path}
-    Type=Application
-    Categories=Game;
-    Path={game_directory}
-    """
+        if IS_FLATPAK:
+            desktop_file_content = f"""[Desktop Entry]
+        Name={title}
+        Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"
+        Icon={new_icon_path}
+        Type=Application
+        Categories=Game;
+        Path={game_directory}
+        """
+        else:
+            desktop_file_content = f"""[Desktop Entry]
+        Name={title}
+        Exec={faugus_run} "{command}"
+        Icon={new_icon_path}
+        Type=Application
+        Categories=Game;
+        Path={game_directory}
+        """
 
         # Check if the destination directory exists and create if it doesn't
         applications_directory = app_dir
