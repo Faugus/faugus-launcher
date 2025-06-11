@@ -46,14 +46,15 @@ class PathManager:
         return icon_paths[-1]  # Fallback
 
 GITHUB_API_URL = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases"
-STEAM_COMPATIBILITY_PATH = PathManager.user_data("Steam/compatibilitytools.d")
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    STEAM_COMPATIBILITY_PATH = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
+    STEAM_COMPATIBILITY_PATH = PathManager.user_data("Steam/compatibilitytools.d")
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 
