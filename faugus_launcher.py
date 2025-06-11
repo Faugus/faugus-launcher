@@ -3436,7 +3436,10 @@ class Settings(Gtk.Dialog):
         self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
-        runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
+        if IS_FLATPAK:
+            runner_path = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
+        else:
+            runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
@@ -5266,7 +5269,10 @@ class AddGame(Gtk.Dialog):
         self.combo_box_runner.append_text("UMU-Proton Latest")
 
         # Path to the directory containing the folders
-        runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
+        if IS_FLATPAK:
+            runner_path = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
+        else:
+            runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
