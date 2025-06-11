@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Faugus GE-Proton Manager
+Exec=faugus-proton-manager
+Icon=io.github.Faugus.faugus-launcher
+NoDisplay=true
