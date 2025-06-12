@@ -1,0 +1,1 @@
+option('flatpak_build', type: 'boolean', value: false, description: 'Set to true when building for Flatpak')
