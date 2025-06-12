@@ -23,6 +23,7 @@ install_data(
 )
 
 install_data(
-  'io.github.Faugus.faugus-launcher.metainfo.xml',
-  install_dir: get_option('datadir') / 'metainfo'
+  'faugus-launcher.png',
+  install_dir: get_option('datadir') / 'icons' / 'hicolor' / '256x256' / 'apps',
+  rename: 'io.github.Faugus.faugus-launcher.png',
 )
