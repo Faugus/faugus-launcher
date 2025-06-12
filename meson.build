@@ -30,13 +30,6 @@ install_data(
 )
 
 install_data(
-  'faugus-shortcut.desktop',
-  'faugus-run.desktop',
-  'faugus-proton-manager.desktop',
-  install_dir: get_option('datadir') / 'applications',
-)
-
-install_data(
   'LICENSE',
   install_dir: get_option('datadir') / 'licenses' / meson.project_name(),
 )
