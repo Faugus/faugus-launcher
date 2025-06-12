@@ -21,3 +21,8 @@ install_data(
   'faugus-stop-symbolic.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'actions',
 )
+
+install_data(
+  'io.github.Faugus.faugus-launcher.metainfo.xml',
+  install_dir: get_option('datadir') / 'metainfo'
+)
