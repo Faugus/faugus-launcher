@@ -14,7 +14,34 @@ faugus_launcher_desktop = configure_file(
   }
 )
 
+faugus_proton_manager_desktop = configure_file(
+  input: 'io.github.Faugus.faugus-proton-manager.desktop.in',
+  output: 'io.github.Faugus.faugus-proton-manager.desktop',
+  configuration: {
+    'ICON': icon_name,
+  }
+)
+
+faugus_run_desktop = configure_file(
+  input: 'io.github.Faugus.faugus-run.desktop.in',
+  output: 'io.github.Faugus.faugus-run.desktop',
+  configuration: {
+    'ICON': icon_name,
+  }
+)
+
+faugus_shortcut_desktop = configure_file(
+  input: 'io.github.Faugus.faugus-shortcut.desktop.in',
+  output: 'io.github.Faugus.faugus-shortcut.desktop',
+  configuration: {
+    'ICON': icon_name,
+  }
+)
+
 install_data(
   faugus_launcher_desktop,
+  faugus_proton_manager_desktop,
+  faugus_run_desktop,
+  faugus_shortcut_desktop,
   install_dir: get_option('datadir') / 'applications'
 )
