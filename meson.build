@@ -30,7 +30,6 @@ install_data(
 )
 
 install_data(
-  'faugus-launcher.desktop',
   'faugus-shortcut.desktop',
   'faugus-run.desktop',
   'faugus-proton-manager.desktop',
