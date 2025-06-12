@@ -11,6 +11,7 @@ fs = import('fs')
 gnome = import('gnome')
 
 subdir('assets')
+subdir('data')
 subdir('languages')
 
 install_data(
