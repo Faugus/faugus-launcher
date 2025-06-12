@@ -2564,12 +2564,12 @@ class Main(Gtk.Window):
                 if IS_FLATPAK:
                     shortcuts["shortcuts"][str(new_app_id)] = {"appid": new_app_id, "AppName": title,
                         "Exe": f'"{faugus_run}"', "StartDir": game_directory, "icon": icon, "ShortcutPath": "",
-                        "LaunchOptions": f'"{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
+                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
                         "OpenVR": 0, "Devkit": 0, "DevkitGameID": "", "LastPlayTime": 0, "FlatpakAppID": "", }
                 else:
                     shortcuts["shortcuts"][str(new_app_id)] = {"appid": new_app_id, "AppName": title,
                         "Exe": f'"{faugus_run}"', "StartDir": game_directory, "icon": icon, "ShortcutPath": "",
-                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
+                        "LaunchOptions": f'"{command}"', "IsHidden": 0, "AllowDesktopConfig": 1, "AllowOverlay": 1,
                         "OpenVR": 0, "Devkit": 0, "DevkitGameID": "", "LastPlayTime": 0, "FlatpakAppID": "", }
 
             # Save shortcuts back to the file
