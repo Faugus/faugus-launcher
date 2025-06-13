@@ -85,7 +85,7 @@ app_dir = PathManager.user_data('applications')
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
-    tray_icon = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    tray_icon = 'faugus-launcher.png'
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
