@@ -51,23 +51,25 @@ sudo rm -r ~/faugus-launcher
 ```
 
 ### openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
+Tumbleweed:
 ```
-# Tumbleweed
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Tumbleweed/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
+Slowroll:
 ```
-# Slowroll
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 
-### Flatpak (EXPERIMENTAL)
-Download <a href="https://github.com/Faugus/faugus-launcher/releases/download/1.6.2/faugus-launcher-0.6.2-5.flatpak">faugus-launcher-0.6.2-5.flatpak</a> and run:
+### Flatpak
+Installation:
 ```
-flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install --user org.freedesktop.Platform.Compat.i386//24.08 org.freedesktop.Platform.GL32.default//24.08
-flatpak install --user faugus-launcher-0.6.2-5.flatpak
+flatpak install flathub io.github.Faugus.faugus-launcher
+```
+Running:
+```
+flatpak run io.github.Faugus.faugus-launcher
 ```
 Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
 ```
@@ -75,9 +77,12 @@ sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpa
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/org.faugus.faugus_launcher/config/faugus-launcher/
 ```
 Known issues:
-
-- The button Stop can't close individual games/apps due to how Flatpak handles processes. I'll have to rework the game/app monitoring in the future.
-- Gamescope doesn't work. Don't ask.
+- The button Stop won't close individual games/apps
+- Gamescope doesn't work
+- It may not use the system theme in some DEs. Workaround: give it access to GTK config files:
+```
+flatpak override --user io.github.Faugus.faugus-launcher --filesystem=xdg-config/gtk-3.0:ro
+```
 
 ### Build from source
 ```
