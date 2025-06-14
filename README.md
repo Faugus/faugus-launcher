@@ -74,7 +74,7 @@ flatpak run io.github.Faugus.faugus-launcher
 Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
 ```
 sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
-sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/org.faugus.faugus_launcher/config/faugus-launcher/
+sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 ```
 Known issues:
 - The button Stop won't close individual games/apps
