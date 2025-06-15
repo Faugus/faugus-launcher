@@ -4770,7 +4770,9 @@ class AddGame(Gtk.Dialog):
         self.combo_box_runner.set_hexpand(True)
 
         self.grid_shortcut.add(self.checkbox_shortcut)
-        self.grid_shortcut.add(self.checkbox_steam_shortcut)
+        if not IS_FLATPAK:
+            self.checkbox_steam_shortcut.set_active(False)
+            self.grid_shortcut.add(self.checkbox_steam_shortcut)
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
         self.grid_shortcut.set_valign(Gtk.Align.CENTER)
 
