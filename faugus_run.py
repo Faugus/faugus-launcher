@@ -74,11 +74,12 @@ faugus_components = PathManager.find_binary('faugus-components')
 prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-share_dir = PathManager.user_data()
 
 if IS_FLATPAK:
+    share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
 else:
+    share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
