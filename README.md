@@ -6,25 +6,25 @@ A simple and lightweight app for running Windows games using [UMU-Launcher](http
 <a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/assets/paypal.png width="155" height="35"/></a>
 
 # Installation
-### Arch-based distributions (AUR)
+## Arch-based distributions (AUR)
 ```
 yay -S --noconfirm faugus-launcher
 ```
 
-### Fedora / Nobara (Copr)
+## Fedora / Nobara (Copr)
 ```
 sudo dnf -y copr enable faugus/faugus-launcher
 sudo dnf -y install faugus-launcher
 ```
 
-### Bazzite (Copr)
+## Bazzite (Copr)
 ```
 sudo dnf5 -y copr enable faugus/faugus-launcher
 sudo rpm-ostree -y install faugus-launcher
 ```
 Restart your system.
 
-### Ubuntu / Mint / KDE Neon
+## Ubuntu / Mint / KDE Neon
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
@@ -37,7 +37,7 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
-### Debian 13
+## Debian 13
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
@@ -50,33 +50,28 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
-### openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
-Tumbleweed:
+## openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
+### Tumbleweed:
 ```
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Tumbleweed/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
-Slowroll:
+### Slowroll:
 ```
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 
-### [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
-Installation:
+## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
+### Installation:
 ```
 flatpak install flathub io.github.Faugus.faugus-launcher
 ```
-Running:
+### Running:
 ```
 flatpak run io.github.Faugus.faugus-launcher
 ```
-Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
-```
-sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
-sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
-```
-Known issues:
+### Known issues:
 - The button Stop won't close individual games/apps
 - Gamescope doesn't work
 - It may not use the system theme in some DEs. Workaround: give it access to GTK config files:
@@ -84,14 +79,14 @@ Known issues:
 flatpak override --user io.github.Faugus.faugus-launcher --filesystem=xdg-config/gtk-3.0:ro
 ```
 
-### Build from source
+## Build from source
 ```
 meson setup builddir --prefix=/usr
 cd builddir
 ninja
 sudo ninja install
 ```
-Dependencies:
+### Dependencies:
 ```
 meson ninja pygobject requests pillow filelock vdf psutil umu-launcher imagemagick icoextract libayatana-appindicator
 ```
