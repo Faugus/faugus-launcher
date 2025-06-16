@@ -2084,7 +2084,8 @@ class Main(Gtk.Window):
             if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
-                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+                if not IS_FLATPAK:
+                    self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
                 if addapp_checkbox == "addapp_enabled":
                     with open(addapp_bat, "w") as bat_file:
@@ -2402,7 +2403,8 @@ class Main(Gtk.Window):
 
             # Call add_remove_shortcut method
             self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
-            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+            if not IS_FLATPAK:
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
             if game.addapp_checkbox == True:
                 with open(game.addapp_bat, "w") as bat_file:
@@ -4771,7 +4773,6 @@ class AddGame(Gtk.Dialog):
 
         self.grid_shortcut.add(self.checkbox_shortcut)
         if not IS_FLATPAK:
-            self.checkbox_steam_shortcut.set_active(False)
             self.grid_shortcut.add(self.checkbox_steam_shortcut)
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
         self.grid_shortcut.set_valign(Gtk.Align.CENTER)
