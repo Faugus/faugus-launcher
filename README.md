@@ -71,9 +71,17 @@ flatpak install flathub io.github.Faugus.faugus-launcher
 ```
 flatpak run io.github.Faugus.faugus-launcher
 ```
-### Steam Flatpak needs permissions to run Faugus Launcher's shortcuts and to show the game's icon:
+### Steam Flatpak integration
+Allow Faugus Launcher to detect Steam users:
+```
+flatpak --user override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
+```
+Allow Steam to run Faugus Launcher's shortcuts:
 ```
 flatpak --user override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
+```
+Allow Steam to see the game's icon:
+```
 flatpak --user override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 ```
 ### Known issues:
