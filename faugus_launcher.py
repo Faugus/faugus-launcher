@@ -1368,7 +1368,7 @@ class Main(Gtk.Window):
         checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
         combo_box_language = self.combo_box_language.get_active_text()
-        language = settings_dialog.lang_codes.get(combo_box_language, "")
+        language = settings_dialog.lang_codes.get(combo_box_language, "en_US")
 
         mangohud_state = self.checkbox_mangohud.get_active()
         gamemode_state = self.checkbox_gamemode.get_active()
@@ -2900,7 +2900,7 @@ class Settings(Gtk.Dialog):
             "da": "Danish",
             "de": "German",
             "el": "Greek",
-            "en": "English",
+            "en_US": "English",
             "eo": "Esperanto",
             "es": "Spanish",
             "et": "Estonian",
