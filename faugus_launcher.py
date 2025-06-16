@@ -2560,7 +2560,7 @@ class Main(Gtk.Window):
                 game_info = shortcuts["shortcuts"][existing_app_id]
                 if IS_FLATPAK:
                     game_info["Exe"] = f'"flatpak-spawn"'
-                    game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run org.faugus.faugus_launcher "{command}"'
+                    game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
                 else:
                     game_info["Exe"] = f'"{faugus_run}"'
                     game_info["LaunchOptions"] = f'"{command}"'
@@ -2579,7 +2579,7 @@ class Main(Gtk.Window):
                         "StartDir": game_directory,
                         "icon": icon,
                         "ShortcutPath": "",
-                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run org.faugus.faugus_launcher "{command}"',
+                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
                         "IsHidden": 0,
                         "AllowDesktopConfig": 1,
                         "AllowOverlay": 1,
