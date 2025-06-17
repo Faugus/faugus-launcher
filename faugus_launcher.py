@@ -17,6 +17,7 @@ import vdf
 import tarfile
 import gettext
 import locale
+import signal
 from pathlib import Path
 
 gi.require_version('Gtk', '3.0')
@@ -200,6 +201,8 @@ class Main(Gtk.Window):
         self.last_clicked_item = None
         self.double_click_time_threshold = 500
 
+        self.processos = {}
+
         # Create the configuration directory if it doesn't exist
         if not os.path.exists(faugus_launcher_dir):
             os.makedirs(faugus_launcher_dir)
@@ -289,7 +292,39 @@ class Main(Gtk.Window):
             self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
             self.connect("delete-event", self.on_window_delete_event)
 
-        GLib.timeout_add_seconds(1, self.check_running_processes)
+        if IS_FLATPAK:
+            signal.signal(signal.SIGCHLD, self.on_child_process_closed)
+        else:
+            GLib.timeout_add_seconds(1, self.check_running_processes)
+
+    def on_child_process_closed(self, signum, frame):
+        for title, processo in list(self.processos.items()):
+            retcode = processo.poll()
+            if retcode is not None:
+                del self.processos[title]
+
+                selected_child = None
+
+                for child in self.flowbox.get_children():
+                    if child.get_state_flags() & Gtk.StateFlags.SELECTED:
+                        selected_child = child
+                        break
+
+                if selected_child:
+                    hbox = selected_child.get_children()[0]
+                    game_label = hbox.get_children()[1]
+                    selected_title = game_label.get_text()
+
+                    if selected_title not in self.processos:
+                        self.menu_item_play.set_sensitive(True)
+                        self.button_play.set_sensitive(True)
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
+                    else:
+                        self.menu_item_play.set_sensitive(False)
+                        self.button_play.set_sensitive(False)
+                        self.button_play.set_image(
+                            Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
     def check_running_processes(self):
         processos = self.load_processes_from_file()
@@ -912,11 +947,17 @@ class Main(Gtk.Window):
 
         current_focus = self.get_focus()
 
-        processos = self.load_processes_from_file()
-        if title not in processos:
-            self.on_button_play_clicked(selected_child)
+        if IS_FLATPAK:
+            if title not in self.processos:
+                self.on_button_play_clicked(item)
+            else:
+                self.running_dialog(title)
         else:
-            self.running_dialog(title)
+            processos = self.load_processes_from_file()
+            if title not in processos:
+                self.on_button_play_clicked(selected_child)
+            else:
+                self.running_dialog(title)
 
     def on_key_press_event(self, widget, event):
         selected_children = self.flowbox.get_selected_children()
@@ -949,14 +990,24 @@ class Main(Gtk.Window):
                     self.grid_left.set_margin_start(70)
                 return True
 
-        if event.keyval == Gdk.KEY_Return:
-            processos = self.load_processes_from_file()
-            if title not in processos:
-                self.on_button_play_clicked(selected_child)
-            else:
-                self.running_dialog(title)
-        elif event.keyval == Gdk.KEY_Delete:
-            self.on_button_delete_clicked(selected_child)
+        if IS_FLATPAK:
+            if event.keyval == Gdk.KEY_Return:
+                if title not in self.processos:
+                    widget = self.button_play
+                    self.on_button_play_clicked(selected_child)
+                else:
+                    self.running_dialog(title)
+            elif event.keyval == Gdk.KEY_Delete:
+                self.on_button_delete_clicked(selected_child)
+        else:
+            if event.keyval == Gdk.KEY_Return:
+                processos = self.load_processes_from_file()
+                if title not in processos:
+                    self.on_button_play_clicked(selected_child)
+                else:
+                    self.running_dialog(title)
+            elif event.keyval == Gdk.KEY_Delete:
+                self.on_button_delete_clicked(selected_child)
 
         if event.string:
             if event.string.isprintable():
@@ -1289,16 +1340,28 @@ class Main(Gtk.Window):
             self.menu_item_edit.set_sensitive(True)
             self.menu_item_delete.set_sensitive(True)
 
-            processos = self.load_processes_from_file()
-            if title in processos:
-                self.menu_item_play.set_sensitive(True)
-                self.button_play.set_sensitive(True)
-                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+            if IS_FLATPAK:
+                if title in self.processos:
+                    self.menu_item_play.set_sensitive(False)
+                    self.button_play.set_sensitive(False)
+                    self.button_play.set_image(
+                        Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+                else:
+                    self.menu_item_play.set_sensitive(True)
+                    self.button_play.set_sensitive(True)
+                    self.button_play.set_image(
+                        Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
             else:
-                self.menu_item_play.set_sensitive(True)
-                self.button_play.set_sensitive(True)
-                self.button_play.set_image(
-                    Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
+                processos = self.load_processes_from_file()
+                if title in processos:
+                    self.menu_item_play.set_sensitive(True)
+                    self.button_play.set_sensitive(True)
+                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+                else:
+                    self.menu_item_play.set_sensitive(True)
+                    self.button_play.set_sensitive(True)
+                    self.button_play.set_image(
+                        Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
         else:
             self.menu_item_edit.set_sensitive(False)
             self.menu_item_delete.set_sensitive(False)
@@ -1589,12 +1652,15 @@ class Main(Gtk.Window):
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
-                def check_pid_periodically():
-                    if self.find_pid(game):
-                        return False
-                    return True
+                if IS_FLATPAK:
+                    self.processos[title] = self.processo
+                else:
+                    def check_pid_periodically():
+                        if self.find_pid(game):
+                            return False
+                        return True
 
-                GLib.timeout_add(1000, check_pid_periodically)
+                    GLib.timeout_add(1000, check_pid_periodically)
 
     def find_pid(self, game):
         try:
