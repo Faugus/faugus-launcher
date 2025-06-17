@@ -89,7 +89,7 @@
       <description>
         <ul>
           <li>Added Dutch translation</li>
-          <li>Temporarily blocked the 'stop' button on Flatpak</li>
+          <li>Temporarily disabled the 'stop' button on Flatpak</li>
         </ul>
       </description>
     </release>
