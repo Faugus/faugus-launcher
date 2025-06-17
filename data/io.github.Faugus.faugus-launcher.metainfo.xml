@@ -85,10 +85,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.6.5-1" date="2025-06-15">
+    <release version="1.6.6-1" date="2025-06-17">
       <description>
         <ul>
           <li>Added Dutch translation</li>
+          <li>Temporarily blocked the 'stop' button on Flatpak</li>
         </ul>
       </description>
     </release>
