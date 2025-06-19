@@ -24,7 +24,7 @@ sudo rpm-ostree -y install faugus-launcher
 ```
 Restart your system.
 
-## Debian-baed distributions
+## Debian-based distributions
 ### PPA
 ```
 sudo dpkg --add-architecture i386
