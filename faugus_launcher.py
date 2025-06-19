@@ -1632,18 +1632,23 @@ class Main(Gtk.Window):
             self.update_latest_games_file(title)
 
             if self.load_close_onlaunch():
-                self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+                if IS_FLATPAK:
+                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL, cwd=game_directory)
+                    sys.exit()
+                else:
+                    self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
 
-                self.menu_item_play.set_sensitive(False)
-                self.button_play.set_sensitive(False)
-                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+                    self.menu_item_play.set_sensitive(False)
+                    self.button_play.set_sensitive(False)
+                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
-                def check_pid_timeout():
-                    if self.find_pid(game):
-                        sys.exit()
-                    return True
+                    def check_pid_timeout():
+                        if self.find_pid(game):
+                            sys.exit()
+                        return True
 
-                GLib.timeout_add(1000, check_pid_timeout)
+                    GLib.timeout_add(1000, check_pid_timeout)
 
             else:
                 self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
@@ -3337,8 +3342,7 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
-        if not IS_FLATPAK:
-            grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
