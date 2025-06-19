@@ -1674,7 +1674,7 @@ class Main(Gtk.Window):
         for proc in all_descendants:
             try:
                 name = os.path.splitext(proc.name())[0].lower()
-                if name == "umu-run":
+                if name == "umu-run" or name == "python3":
                     umu_run_pid = proc.pid
                     break
             except psutil.NoSuchProcess:
