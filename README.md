@@ -25,7 +25,7 @@ sudo rpm-ostree -y install faugus-launcher
 Restart your system.
 
 ## Debian-based distributions
-### PPA
+### PPA (Ubuntu, Mint, KDE Neon...)
 ```
 sudo dpkg --add-architecture i386
 sudo add-apt-repository -y ppa:faugus/faugus-launcher
