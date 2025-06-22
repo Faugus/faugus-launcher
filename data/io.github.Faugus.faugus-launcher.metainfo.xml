@@ -85,18 +85,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.6.7-1" date="2025-06-19">
+    <release version="1.6.8-1" date="2025-06-22">
       <description>
         <ul>
-          <li>Re-enabled the 'Close when running' option for Flatpak</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.6.6-1" date="2025-06-17">
-      <description>
-        <ul>
-          <li>Added Dutch translation</li>
-          <li>Temporarily disabled the 'stop' button on Flatpak</li>
+          <li>Reworked the config file management</li>
+          <li>Fixed Steam location for some distros</li>
+          <li>Some code cleanup</li>
         </ul>
       </description>
     </release>
