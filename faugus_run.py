@@ -68,13 +68,6 @@ class PathManager:
         return None
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
-
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-faugus_components = PathManager.find_binary('faugus-components')
-prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-
 if IS_FLATPAK:
     share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
@@ -82,14 +75,41 @@ else:
     share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
+config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+faugus_launcher_dir = PathManager.user_config('faugus-launcher')
+faugus_components = PathManager.find_binary('faugus-components')
+prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
+logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-
 eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={PathManager.user_config("faugus-launcher/components/be")}'
 
-def remove_ansi_escape(text):
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    return ansi_escape.sub('', text)
+def get_system_locale():
+    lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
+    if lang:
+        return lang.split('.')[0]
+
+    try:
+        loc = locale.getdefaultlocale()[0]
+        if loc:
+            return loc
+    except Exception:
+        pass
+
+    return 'en_US'
+
+def get_language_from_config():
+    if os.path.exists(config_file_dir):
+        with open(config_file_dir, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('language='):
+                    return line.split('=', 1)[1].strip()
+    return None
+
+lang = get_language_from_config()
+if not lang:
+    lang = get_system_locale()
 
 LOCALE_DIR = (
     PathManager.system_data('locale')
@@ -98,29 +118,73 @@ LOCALE_DIR = (
 )
 
 try:
-    locale.setlocale(locale.LC_ALL, '')
-except locale.Error:
-    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
-
-lang = locale.getlocale()[0]
-if os.path.exists(config_file_dir):
-    with open(config_file_dir, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith('language='):
-                lang = line.split('=', 1)[1].strip()
-                break
-try:
     translation = gettext.translation(
         'faugus-run',
         localedir=LOCALE_DIR,
-        languages=[lang]
+        languages=[lang] if lang else ['en_US']
     )
     translation.install()
     globals()['_'] = translation.gettext
 except FileNotFoundError:
     gettext.install('faugus-run', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
+
+class ConfigManager:
+    def __init__(self):
+        self.default_config = {
+            'close-onlaunch': 'False',
+            'default-prefix': prefixes_dir,
+            'mangohud': 'False',
+            'gamemode': 'False',
+            'disable-hidraw': 'False',
+            'default-runner': 'GE-Proton',
+            'discrete-gpu': 'False',
+            'splash-disable': 'False',
+            'system-tray': 'False',
+            'start-boot': 'False',
+            'interface-mode': 'List',
+            'start-maximized': 'False',
+            'start-fullscreen': 'False',
+            'show-labels': 'False',
+            'smaller-banners': 'False',
+            'enable-logging': 'False',
+            'wayland-driver': 'False',
+            'enable-hdr': 'False',
+            'language': lang,
+        }
+
+        self.config = {}
+        self.load_config()
+
+    def load_config(self):
+        if os.path.isfile(config_file_dir):
+            with open(config_file_dir, 'r') as f:
+                for line in f.read().splitlines():
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"')
+                        self.config[key] = value
+
+        updated = False
+        for key, default_value in self.default_config.items():
+            if key not in self.config:
+                self.config[key] = default_value
+                updated = True
+
+        if updated or not os.path.isfile(config_file_dir):
+            self.save_config()
+
+    def save_config(self):
+        if not os.path.exists(faugus_launcher_dir):
+            os.makedirs(faugus_launcher_dir)
+
+        with open(config_file_dir, 'w') as f:
+            for key, value in self.config.items():
+                if key in ['default-prefix', 'default-runner']:
+                    f.write(f'{key}="{value}"\n')
+                else:
+                    f.write(f'{key}={value}\n')
 
 class FaugusRun:
     def __init__(self, message):
@@ -129,10 +193,7 @@ class FaugusRun:
         self.warning_dialog = None
         self.log_window = None
         self.text_view = None
-        self.default_runner = None
-        self.default_prefix = None
-        self.discrete_gpu = None
-        self.splash_disable = None
+        self.load_config()
 
     def show_error_dialog(self, protonpath):
         dialog = Gtk.Dialog(title="Faugus Launcher")
@@ -272,79 +333,18 @@ class FaugusRun:
         self.ld_preload = ":".join(ld_preload_paths)
 
     def load_config(self):
-        config_file = config_file_dir
+        cfg = ConfigManager()
 
-        if os.path.isfile(config_file):
-            with open(config_file, 'r') as f:
-                config_dict = {}
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        config_dict[key] = value
-
-            self.discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
-            self.splash_disable = config_dict.get('splash-disable', 'False') == 'True'
-            self.default_runner = config_dict.get('default-runner', '')
-            self.default_prefix = config_dict.get('default-prefix', '')
-            self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
-            self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
-            self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
-            self.language = config_dict.get('language', '')
-        else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False", "List", "False", "False", "False", "False", "False", "False", "False", lang)
-            self.default_runner = "GE-Proton"
-
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state, default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray, checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
-        config_file = config_file_dir
-
-        config_path = faugus_launcher_dir
-        if not os.path.exists(config_path):
-            os.makedirs(config_path)
-
-        default_prefix = prefixes_dir
-        self.default_prefix = prefixes_dir
-
-        default_runner = (f'"{default_runner}"')
-
-        config = {}
-
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                for line in f:
-                    key, value = line.strip().split('=', 1)
-                    config[key] = value.strip('"')
-
-        config['close-onlaunch'] = checkbox_state
-        config['default-prefix'] = default_prefix
-        config['mangohud'] = mangohud_state
-        config['gamemode'] = gamemode_state
-        config['disable-hidraw'] = disable_hidraw_state
-        config['default-runner'] = default_runner
-        config['discrete-gpu'] = checkbox_discrete_gpu_state
-        config['splash-disable'] = checkbox_splash_disable
-        config['system-tray'] = checkbox_system_tray
-        config['start-boot'] = checkbox_start_boot
-        config['interface-mode'] = combo_box_interface
-        config['start-maximized'] = checkbox_start_maximized
-        config['start-fullscreen'] = checkbox_start_fullscreen
-        config['show-labels'] = checkbox_show_labels
-        config['smaller-banners'] = checkbox_smaller_banners
-        config['enable-logging'] = checkbox_enable_logging
-        config['wayland-driver'] = checkbox_wayland_driver
-        config['enable-hdr'] = checkbox_enable_hdr
-        config['language'] = language
-
-        with open(config_file, 'w') as f:
-            for key, value in config.items():
-                if key == 'default-prefix':
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
+        self.discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
+        self.splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
+        self.default_runner = cfg.config.get('default-runner', '')
+        self.default_prefix = cfg.config.get('default-prefix', '')
+        self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
+        self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
+        self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        self.language = cfg.config.get('language', '')
 
     def show_warning_dialog(self):
-        self.load_config()
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
@@ -427,6 +427,10 @@ class FaugusRun:
                 with open(f"{log_dir}/umu.log", "w") as log_file:
                     log_file.write("")
                 self._log_file_cleaned = True
+
+        def remove_ansi_escape(text):
+            ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+            return ansi_escape.sub('', text)
 
         if line := source.readline():
             clean_line = remove_ansi_escape(line).strip()
