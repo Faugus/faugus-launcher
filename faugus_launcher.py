@@ -119,14 +119,26 @@ os.makedirs(faugus_launcher_dir, exist_ok=True)
 if IS_FLATPAK:
     steam_userdata_path = os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')
 else:
-    steam_userdata_path = PathManager.user_data('Steam/userdata')
+    possible_steam_locations = [
+        Path.home() / '.local' / 'share' / 'Steam' / 'userdata',
+        Path.home() / '.steam' / 'steam' / 'userdata',
+        Path.home() / '.steam' / 'root' / 'userdata'
+    ]
+
+    steam_userdata_path = None
+    for location in possible_steam_locations:
+        if location.exists():
+            steam_userdata_path = location
+            break
 
 def detect_steam_id():
-    if os.path.exists(steam_userdata_path):
-        steam_ids = [f for f in os.listdir(steam_userdata_path)
-                   if os.path.isdir(os.path.join(steam_userdata_path, f))]
-        if steam_ids:
-            return steam_ids[0]
+    if steam_userdata_path:
+        try:
+            steam_ids = [f for f in os.listdir(steam_userdata_path)
+                       if os.path.isdir(os.path.join(steam_userdata_path, f)) and f.isdigit()]
+            return steam_ids[0] if steam_ids else None
+        except (FileNotFoundError, PermissionError):
+            return None
     return None
 
 steam_id = detect_steam_id()
@@ -134,7 +146,7 @@ steam_id = detect_steam_id()
 if IS_FLATPAK:
     steam_shortcuts_path = f'{steam_userdata_path}/' + '{}/config/shortcuts.vdf'.format(steam_id)
 else:
-    steam_shortcuts_path = PathManager.user_data(f'Steam/userdata/{steam_id}/config/shortcuts.vdf') if steam_id else ""
+    steam_shortcuts_path = str(steam_userdata_path / steam_id / 'config' / 'shortcuts.vdf') if steam_id else ""
 
 def get_desktop_dir():
     try:
