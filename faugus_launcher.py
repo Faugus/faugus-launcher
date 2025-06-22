@@ -3518,7 +3518,7 @@ class Settings(Gtk.Dialog):
                 default_runner = "GE-Proton"
 
             config = ConfigManager()
-            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3628,7 +3628,7 @@ class Settings(Gtk.Dialog):
                 default_runner = "GE-Proton"
 
             config = ConfigManager()
-            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3788,7 +3788,7 @@ class Settings(Gtk.Dialog):
                 default_runner = "GE-Proton"
 
             config = ConfigManager()
-            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3875,7 +3875,7 @@ class Settings(Gtk.Dialog):
                 default_runner = "GE-Proton"
 
             config = ConfigManager()
-            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
