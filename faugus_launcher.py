@@ -1553,23 +1553,25 @@ class Main(Gtk.Window):
             if not os.path.exists(autostart_path):
                 with open(autostart_path, "w") as f:
                     if IS_FLATPAK:
-                        f.write("""[Desktop Entry]
-        Categories=Utility;
-        Exec=flatpak run io.github.Faugus.faugus-launcher --hide
-        Icon=io.github.Faugus.faugus-launcher
-        MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
-        Name=Faugus Launcher
-        Type=Application
-        """)
+                        f.write(
+                            "[Desktop Entry]\n"
+                            "Categories=Utility;\n"
+                            "Exec=flatpak run io.github.Faugus.faugus-launcher --hide\n"
+                            "Icon=io.github.Faugus.faugus-launcher\n"
+                            "MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit\n"
+                            "Name=Faugus Launcher\n"
+                            "Type=Application\n"
+                        )
                     else:
-                        f.write("""[Desktop Entry]
-        Categories=Utility;
-        Exec=faugus-launcher --hide
-        Icon=faugus-launcher
-        MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
-        Name=Faugus Launcher
-        Type=Application
-        """)
+                        f.write(
+                            "[Desktop Entry]\n"
+                            "Categories=Utility;\n"
+                            "Exec=faugus-launcher --hide\n"
+                            "Icon=faugus-launcher\n"
+                            "MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit\n"
+                            "Name=Faugus Launcher\n"
+                            "Type=Application\n"
+                        )
         else:
             # Delete the autostart file if it exists
             if os.path.exists(autostart_path):
@@ -2610,23 +2612,25 @@ class Main(Gtk.Window):
 
         # Create a .desktop file
         if IS_FLATPAK:
-            desktop_file_content = f"""[Desktop Entry]
-        Name={game.title}
-        Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"
-        Icon={new_icon_path}
-        Type=Application
-        Categories=Game;
-        Path={game_directory}
-        """
+            desktop_file_content = (
+                f"[Desktop Entry]\n"
+                f"Name={game.title}\n"
+                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher \"{command}\"\n"
+                f"Icon={new_icon_path}\n"
+                f"Type=Application\n"
+                f"Categories=Game;\n"
+                f"Path={game_directory}\n"
+            )
         else:
-            desktop_file_content = f"""[Desktop Entry]
-        Name={game.title}
-        Exec={faugus_run} "{command}"
-        Icon={new_icon_path}
-        Type=Application
-        Categories=Game;
-        Path={game_directory}
-        """
+            desktop_file_content = (
+                f"[Desktop Entry]\n"
+                f"Name={game.title}\n"
+                f"Exec={faugus_run} \"{command}\"\n"
+                f"Icon={new_icon_path}\n"
+                f"Type=Application\n"
+                f"Categories=Game;\n"
+                f"Path={game_directory}\n"
+            )
 
         # Check if the destination directory exists and create if it doesn't
         applications_directory = app_dir
@@ -6569,23 +6573,25 @@ class CreateShortcut(Gtk.Window):
 
         # Create a .desktop file
         if IS_FLATPAK:
-            desktop_file_content = f"""[Desktop Entry]
-        Name={title}
-        Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"
-        Icon={new_icon_path}
-        Type=Application
-        Categories=Game;
-        Path={game_directory}
-        """
+            desktop_file_content = (
+                f"[Desktop Entry]\n"
+                f"Name={title}\n"
+                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher \"{command}\"\n"
+                f"Icon={new_icon_path}\n"
+                f"Type=Application\n"
+                f"Categories=Game;\n"
+                f"Path={game_directory}\n"
+            )
         else:
-            desktop_file_content = f"""[Desktop Entry]
-        Name={title}
-        Exec={faugus_run} "{command}"
-        Icon={new_icon_path}
-        Type=Application
-        Categories=Game;
-        Path={game_directory}
-        """
+            desktop_file_content = (
+                f"[Desktop Entry]\n"
+                f"Name={title}\n"
+                f"Exec={faugus_run} \"{command}\"\n"
+                f"Icon={new_icon_path}\n"
+                f"Type=Application\n"
+                f"Categories=Game;\n"
+                f"Path={game_directory}\n"
+            )
 
         # Check if the destination directory exists and create if it doesn't
         applications_directory = app_dir
