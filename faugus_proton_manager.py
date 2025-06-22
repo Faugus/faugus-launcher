@@ -94,14 +94,14 @@ LOCALE_DIR = (
 
 try:
     translation = gettext.translation(
-        'faugus-run',
+        'faugus-proton-manager',
         localedir=LOCALE_DIR,
         languages=[lang] if lang else ['en_US']
     )
     translation.install()
     globals()['_'] = translation.gettext
 except FileNotFoundError:
-    gettext.install('faugus-run', localedir=LOCALE_DIR)
+    gettext.install('faugus-proton-manager', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
 
 class ConfigManager:
