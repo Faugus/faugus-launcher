@@ -1453,48 +1453,27 @@ class Main(Gtk.Window):
             self.manage_autostart_file(self.start_boot)
             settings_dialog.destroy()
             return
-        self.checkbox_discrete_gpu = settings_dialog.checkbox_discrete_gpu
-        self.checkbox_close_after_launch = settings_dialog.checkbox_close_after_launch
-        self.checkbox_splash_disable = settings_dialog.checkbox_splash_disable
-        self.checkbox_system_tray = settings_dialog.checkbox_system_tray
-        self.checkbox_start_boot = settings_dialog.checkbox_start_boot
-        self.checkbox_start_maximized = settings_dialog.checkbox_start_maximized
-        self.entry_default_prefix = settings_dialog.entry_default_prefix
-        self.combo_box_interface = settings_dialog.combo_box_interface
-        self.checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen
-        self.checkbox_show_labels = settings_dialog.checkbox_show_labels
-        self.checkbox_smaller_banners = settings_dialog.checkbox_smaller_banners
-        self.checkbox_enable_logging = settings_dialog.checkbox_enable_logging
-        self.checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver
-        self.checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr
-        self.combo_box_language = settings_dialog.combo_box_language
 
-        self.checkbox_mangohud = settings_dialog.checkbox_mangohud
-        self.checkbox_gamemode = settings_dialog.checkbox_gamemode
-        self.checkbox_disable_hidraw = settings_dialog.checkbox_disable_hidraw
-        self.combo_box_runner = settings_dialog.combo_box_runner
-
-        checkbox_state = self.checkbox_close_after_launch.get_active()
-        checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-        checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-        checkbox_system_tray = self.checkbox_system_tray.get_active()
-        checkbox_start_boot = self.checkbox_start_boot.get_active()
-        checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-        default_prefix = self.entry_default_prefix.get_text()
-        combo_box_interface = self.combo_box_interface.get_active_text()
-        checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-        checkbox_show_labels = self.checkbox_show_labels.get_active()
-        checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-        checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-        checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-        checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-        combo_box_language = self.combo_box_language.get_active_text()
+        combo_box_language = settings_dialog.combo_box_language.get_active_text()
         language = settings_dialog.lang_codes.get(combo_box_language, "en_US")
-
-        mangohud_state = self.checkbox_mangohud.get_active()
-        gamemode_state = self.checkbox_gamemode.get_active()
-        disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
-        default_runner = self.combo_box_runner.get_active_text()
+        checkbox_discrete_gpu_state = settings_dialog.checkbox_discrete_gpu.get_active()
+        checkbox_state = settings_dialog.checkbox_close_after_launch.get_active()
+        checkbox_splash_disable = settings_dialog.checkbox_splash_disable.get_active()
+        checkbox_system_tray = settings_dialog.checkbox_system_tray.get_active()
+        checkbox_start_boot = settings_dialog.checkbox_start_boot.get_active()
+        checkbox_start_maximized = settings_dialog.checkbox_start_maximized.get_active()
+        default_prefix = settings_dialog.entry_default_prefix.get_text()
+        combo_box_interface = settings_dialog.combo_box_interface.get_active_text()
+        checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen.get_active()
+        checkbox_show_labels = settings_dialog.checkbox_show_labels.get_active()
+        checkbox_smaller_banners = settings_dialog.checkbox_smaller_banners.get_active()
+        checkbox_enable_logging = settings_dialog.checkbox_enable_logging.get_active()
+        checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver.get_active()
+        checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr.get_active()
+        mangohud_state = settings_dialog.checkbox_mangohud.get_active()
+        gamemode_state = settings_dialog.checkbox_gamemode.get_active()
+        disable_hidraw_state = settings_dialog.checkbox_disable_hidraw.get_active()
+        default_runner = settings_dialog.combo_box_runner.get_active_text()
 
         if default_runner == "UMU-Proton Latest":
             default_runner = ""
@@ -1508,11 +1487,10 @@ class Main(Gtk.Window):
                 return
 
             config = ConfigManager()
-
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                             default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
-                             checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
-                             checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
+                                    checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
+                                    checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -3490,6 +3468,8 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            combo_box_language = self.combo_box_language.get_active_text()
+            language = self.lang_codes.get(combo_box_language, "en_US")
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
@@ -3504,9 +3484,6 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "")
-
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3600,6 +3577,8 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            combo_box_language = self.combo_box_language.get_active_text()
+            language = self.lang_codes.get(combo_box_language, "en_US")
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
@@ -3614,9 +3593,6 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "")
-
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3760,6 +3736,8 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            combo_box_language = self.combo_box_language.get_active_text()
+            language = self.lang_codes.get(combo_box_language, "en_US")
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
@@ -3774,9 +3752,6 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "")
-
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3847,6 +3822,8 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            combo_box_language = self.combo_box_language.get_active_text()
+            language = self.lang_codes.get(combo_box_language, "en_US")
             checkbox_state = self.checkbox_close_after_launch.get_active()
             default_prefix = self.entry_default_prefix.get_text()
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
@@ -3861,9 +3838,6 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "")
-
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
