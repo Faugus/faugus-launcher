@@ -113,6 +113,9 @@ lock = FileLock(lock_file_path, timeout=0)
 
 faugus_backup = False
 
+os.makedirs(faugus_launcher_share_dir, exist_ok=True)
+os.makedirs(faugus_launcher_dir, exist_ok=True)
+
 if IS_FLATPAK:
     steam_userdata_path = os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')
 else:
@@ -133,40 +136,6 @@ if IS_FLATPAK:
 else:
     steam_shortcuts_path = PathManager.user_data(f'Steam/userdata/{steam_id}/config/shortcuts.vdf') if steam_id else ""
 
-os.makedirs(faugus_launcher_share_dir, exist_ok=True)
-os.makedirs(faugus_launcher_dir, exist_ok=True)
-
-LOCALE_DIR = (
-    PathManager.system_data('locale')
-    if os.path.isdir(PathManager.system_data('locale'))
-    else os.path.join(os.path.dirname(__file__), 'locale')
-)
-
-try:
-    locale.setlocale(locale.LC_ALL, '')
-except locale.Error:
-    locale.setlocale(locale.LC_ALL, 'C.UTF-8')
-
-lang = locale.getlocale()[0]
-if os.path.exists(config_file_dir):
-    with open(config_file_dir, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith('language='):
-                lang = line.split('=', 1)[1].strip()
-                break
-try:
-    translation = gettext.translation(
-        'faugus-launcher',
-        localedir=LOCALE_DIR,
-        languages=[lang]
-    )
-    translation.install()
-    globals()['_'] = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
-    globals()['_'] = gettext.gettext
-
 def get_desktop_dir():
     try:
         desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
@@ -176,6 +145,114 @@ def get_desktop_dir():
         return str(Path.home() / 'Desktop')
 
 desktop_dir = get_desktop_dir()
+
+def get_system_locale():
+    lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
+    if lang:
+        return lang.split('.')[0]
+
+    try:
+        loc = locale.getdefaultlocale()[0]
+        if loc:
+            return loc
+    except Exception:
+        pass
+
+    return 'en_US'
+
+def get_language_from_config():
+    if os.path.exists(config_file_dir):
+        with open(config_file_dir, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('language='):
+                    return line.split('=', 1)[1].strip()
+    return None
+
+lang = get_language_from_config()
+if not lang:
+    lang = get_system_locale()
+
+LOCALE_DIR = (
+    PathManager.system_data('locale')
+    if os.path.isdir(PathManager.system_data('locale'))
+    else os.path.join(os.path.dirname(__file__), 'locale')
+)
+
+try:
+    translation = gettext.translation(
+        'faugus-launcher',
+        localedir=LOCALE_DIR,
+        languages=[lang] if lang else ['en_US']
+    )
+    translation.install()
+    globals()['_'] = translation.gettext
+except FileNotFoundError:
+    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
+    globals()['_'] = gettext.gettext
+
+class ConfigManager:
+    def __init__(self):
+        self.default_config = {
+            'close-onlaunch': 'False',
+            'default-prefix': prefixes_dir,
+            'mangohud': 'False',
+            'gamemode': 'False',
+            'disable-hidraw': 'False',
+            'default-runner': 'GE-Proton',
+            'discrete-gpu': 'False',
+            'splash-disable': 'False',
+            'system-tray': 'False',
+            'start-boot': 'False',
+            'interface-mode': 'List',
+            'start-maximized': 'False',
+            'start-fullscreen': 'False',
+            'show-labels': 'False',
+            'smaller-banners': 'False',
+            'enable-logging': 'False',
+            'wayland-driver': 'False',
+            'enable-hdr': 'False',
+            'language': lang,
+        }
+
+        self.config = {}
+        self.load_config()
+
+    def load_config(self):
+        if os.path.isfile(config_file_dir):
+            with open(config_file_dir, 'r') as f:
+                for line in f.read().splitlines():
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip().strip('"')
+                        self.config[key] = value
+
+        updated = False
+        for key, default_value in self.default_config.items():
+            if key not in self.config:
+                self.config[key] = default_value
+                updated = True
+
+        if updated or not os.path.isfile(config_file_dir):
+            self.save_config()
+
+    def save_config(self):
+        if not os.path.exists(faugus_launcher_dir):
+            os.makedirs(faugus_launcher_dir)
+
+        with open(config_file_dir, 'w') as f:
+            for key, value in self.config.items():
+                if key in ['default-prefix', 'default-runner']:
+                    f.write(f'{key}="{value}"\n')
+                else:
+                    f.write(f'{key}={value}\n')
+
+    def save_with_values(self, *args):
+        keys = list(self.default_config.keys())
+        for key, value in zip(keys, args):
+            self.config[key] = str(value)
+        self.save_config()
 
 class Main(Gtk.Window):
     def __init__(self):
@@ -203,15 +280,8 @@ class Main(Gtk.Window):
 
         self.processos = {}
 
-        # Create the configuration directory if it doesn't exist
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
         self.working_directory = faugus_launcher_dir
         os.chdir(self.working_directory)
-
-        if not os.path.exists(config_file_dir):
-            self.save_config("False", prefixes_dir, "False", "False", "False", "GE-Proton", "True", "False", "False",
-                             "False", "List", "False", "False", "False", "False", "False", "False", "False", lang)
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
@@ -1070,32 +1140,20 @@ class Main(Gtk.Window):
         dialog.destroy()
 
     def load_config(self):
-        config_file = config_file_dir
+        cfg = ConfigManager()
 
-        if os.path.isfile(config_file):
-            with open(config_file, 'r') as f:
-                config_dict = {}
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        config_dict[key] = value
-
-            self.system_tray = config_dict.get('system-tray', 'False') == 'True'
-            self.start_boot = config_dict.get('start-boot', 'False') == 'True'
-            self.start_maximized = config_dict.get('start-maximized', 'False') == 'True'
-            self.interface_mode = config_dict.get('interface-mode', '').strip('"')
-            self.start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
-            self.show_labels = config_dict.get('show-labels', 'False') == 'True'
-            self.smaller_banners = config_dict.get('smaller-banners', 'False') == 'True'
-            self.enable_logging = config_dict.get('enable-logging', 'False') == 'True'
-            self.wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
-            self.enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
-            self.language = config_dict.get('language', '')
-        else:
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False", "False", lang)
+        self.system_tray = cfg.config.get('system-tray', 'False') == 'True'
+        self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
+        self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
+        self.start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
+        self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
+        self.start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
+        self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
+        self.smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
+        self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
+        self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
+        self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        self.language = cfg.config.get('language', '')
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1368,18 +1426,6 @@ class Main(Gtk.Window):
             self.menu_item_play.set_sensitive(False)
             self.button_play.set_sensitive(False)
 
-    def load_close_onlaunch(self):
-        config_file = config_file_dir
-        close_onlaunch = False
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                config_data = f.read().splitlines()
-            config_dict = dict(line.split('=') for line in config_data)
-            close_onlaunch_value = config_dict.get('close-onlaunch', '').strip('"')
-            if close_onlaunch_value.lower() == 'true':
-                close_onlaunch = True
-        return close_onlaunch
-
     def on_button_settings_clicked(self, widget):
         # Handle add button click event
         settings_dialog = Settings(self)
@@ -1449,7 +1495,9 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
-            self.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config = ConfigManager()
+
+            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                              default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                              checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
                              checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
@@ -1631,7 +1679,7 @@ class Main(Gtk.Window):
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
-            if self.load_close_onlaunch():
+            if self.close_on_launch:
                 if IS_FLATPAK:
                     subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, cwd=game_directory)
@@ -2881,55 +2929,6 @@ class Main(Gtk.Window):
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(games_data, file, ensure_ascii=False, indent=4)
 
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
-                    checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
-        # Path to the configuration file
-        config_file = os.path.join(self.working_directory, 'config.ini')
-
-        # Dictionary to store existing configurations
-        config = {}
-
-        # Read the existing configuration file
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                for line in f:
-                    key, value = line.strip().split('=', 1)
-                    config[key] = value.strip('"')
-
-        default_runner = (f'"{default_runner}"')
-
-        # Update configurations with new values
-        config['close-onlaunch'] = checkbox_state
-        config['default-prefix'] = default_prefix
-        config['mangohud'] = mangohud_state
-        config['gamemode'] = gamemode_state
-        config['disable-hidraw'] = disable_hidraw_state
-        config['default-runner'] = default_runner
-        config['discrete-gpu'] = checkbox_discrete_gpu_state
-        config['splash-disable'] = checkbox_splash_disable
-        config['system-tray'] = checkbox_system_tray
-        config['start-boot'] = checkbox_start_boot
-        config['interface-mode'] = combo_box_interface
-        config['start-maximized'] = checkbox_start_maximized
-        config['start-fullscreen'] = checkbox_start_fullscreen
-        config['show-labels'] = checkbox_show_labels
-        config['smaller-banners'] = checkbox_smaller_banners
-        config['enable-logging'] = checkbox_enable_logging
-        config['wayland-driver'] = checkbox_wayland_driver
-        config['enable-hdr'] = checkbox_enable_hdr
-        config['language'] = language
-
-        # Write configurations back to the file
-        with open(config_file, 'w') as f:
-            for key, value in config.items():
-                if key == 'default-prefix':
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
-
-
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
         # Initialize the Settings dialog
@@ -3506,7 +3505,8 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config = ConfigManager()
+            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3615,7 +3615,8 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config = ConfigManager()
+            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3774,7 +3775,8 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config = ConfigManager()
+            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -3860,7 +3862,8 @@ class Settings(Gtk.Dialog):
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
 
-            self.parent.save_config(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+            config = ConfigManager()
+            config.update_and_save(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
@@ -4199,90 +4202,79 @@ class Settings(Gtk.Dialog):
         dialog.destroy()
 
     def load_config(self):
-        # Load configuration from file
-        config_file = os.path.join(self.parent.working_directory, 'config.ini')
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                config_data = f.read().splitlines()
-            config_dict = dict(line.split('=') for line in config_data)
+        cfg = ConfigManager()
 
-            close_on_launch = config_dict.get('close-onlaunch', 'False') == 'True'
-            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
-            mangohud = config_dict.get('mangohud', 'False') == 'True'
-            gamemode = config_dict.get('gamemode', 'False') == 'True'
-            disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
-            self.default_runner = config_dict.get('default-runner', '').strip('"')
-            discrete_gpu = config_dict.get('discrete-gpu', 'False') == 'True'
-            splash_disable = config_dict.get('splash-disable', 'False') == 'True'
-            system_tray = config_dict.get('system-tray', 'False') == 'True'
-            self.start_boot = config_dict.get('start-boot', 'False') == 'True'
-            start_maximized = config_dict.get('start-maximized', 'False') == 'True'
-            self.interface_mode = config_dict.get('interface-mode', '').strip('"')
-            start_fullscreen = config_dict.get('start-fullscreen', 'False') == 'True'
-            show_labels = config_dict.get('show-labels', 'False') == 'True'
-            smaller_banners = config_dict.get('smaller-banners', 'False') == 'True'
-            enable_logging = config_dict.get('enable-logging', 'False') == 'True'
-            wayland_driver = config_dict.get('wayland-driver', 'False') == 'True'
-            enable_hdr = config_dict.get('enable-hdr', 'False') == 'True'
-            self.language = config_dict.get('language', '')
+        close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
+        self.default_prefix = cfg.config.get('default-prefix', '').strip('"')
+        mangohud = cfg.config.get('mangohud', 'False') == 'True'
+        gamemode = cfg.config.get('gamemode', 'False') == 'True'
+        disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+        self.default_runner = cfg.config.get('default-runner', '').strip('"')
+        discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
+        splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
+        system_tray = cfg.config.get('system-tray', 'False') == 'True'
+        self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
+        start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
+        self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
+        start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
+        show_labels = cfg.config.get('show-labels', 'False') == 'True'
+        smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
+        enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
+        wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
+        enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        self.language = cfg.config.get('language', '')
 
-            self.checkbox_close_after_launch.set_active(close_on_launch)
-            self.entry_default_prefix.set_text(self.default_prefix)
-            self.checkbox_mangohud.set_active(mangohud)
-            self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_disable_hidraw.set_active(disable_hidraw)
+        self.checkbox_close_after_launch.set_active(close_on_launch)
+        self.entry_default_prefix.set_text(self.default_prefix)
+        self.checkbox_mangohud.set_active(mangohud)
+        self.checkbox_gamemode.set_active(gamemode)
+        self.checkbox_disable_hidraw.set_active(disable_hidraw)
 
-            if self.default_runner == "":
-                self.default_runner = "UMU-Proton Latest"
-            model = self.combo_box_runner.get_model()
-            index_to_activate = 0
-            for i, row in enumerate(model):
-                if row[0] == self.default_runner:
-                    index_to_activate = i
-                    break
+        if self.default_runner == "":
+            self.default_runner = "UMU-Proton Latest"
+        model = self.combo_box_runner.get_model()
+        index_to_activate = 0
+        for i, row in enumerate(model):
+            if row[0] == self.default_runner:
+                index_to_activate = i
+                break
 
-            self.combo_box_runner.set_active(index_to_activate)
-            self.checkbox_discrete_gpu.set_active(discrete_gpu)
-            self.checkbox_splash_disable.set_active(splash_disable)
-            self.checkbox_system_tray.set_active(system_tray)
-            self.checkbox_start_boot.set_active(self.start_boot)
-            self.checkbox_start_maximized.set_active(start_maximized)
-            self.checkbox_start_fullscreen.set_active(start_fullscreen)
-            self.checkbox_show_labels.set_active(show_labels)
-            self.checkbox_smaller_banners.set_active(smaller_banners)
-            self.checkbox_enable_logging.set_active(enable_logging)
-            self.checkbox_wayland_driver.set_active(wayland_driver)
-            self.checkbox_enable_hdr.set_active(enable_hdr)
+        self.combo_box_runner.set_active(index_to_activate)
+        self.checkbox_discrete_gpu.set_active(discrete_gpu)
+        self.checkbox_splash_disable.set_active(splash_disable)
+        self.checkbox_system_tray.set_active(system_tray)
+        self.checkbox_start_boot.set_active(self.start_boot)
+        self.checkbox_start_maximized.set_active(start_maximized)
+        self.checkbox_start_fullscreen.set_active(start_fullscreen)
+        self.checkbox_show_labels.set_active(show_labels)
+        self.checkbox_smaller_banners.set_active(smaller_banners)
+        self.checkbox_enable_logging.set_active(enable_logging)
+        self.checkbox_wayland_driver.set_active(wayland_driver)
+        self.checkbox_enable_hdr.set_active(enable_hdr)
 
-            model = self.combo_box_interface.get_model()
-            index_to_activate = 0
-            for i, row in enumerate(model):
-                if row[0] == self.interface_mode:
-                    index_to_activate = i
-                    break
+        model = self.combo_box_interface.get_model()
+        index_to_activate = 0
+        for i, row in enumerate(model):
+            if row[0] == self.interface_mode:
+                index_to_activate = i
+                break
 
-            self.combo_box_interface.set_active(index_to_activate)
+        self.combo_box_interface.set_active(index_to_activate)
 
-            model = self.combo_box_language.get_model()
-            index_to_activate = 0
+        model = self.combo_box_language.get_model()
+        index_to_activate = 0
 
-            if self.language == "":
-                self.combo_box_language.set_active(index_to_activate)
-            else:
-                for i, row in enumerate(model):
-                    lang_name = row[0]
-                    lang_code = self.lang_codes.get(lang_name, "")
-                    if lang_code == self.language:
-                        index_to_activate = i
-                        break
-
-                self.combo_box_language.set_active(index_to_activate)
-
+        if self.language == "":
+            self.combo_box_language.set_active(index_to_activate)
         else:
-            # Save default configuration if file does not exist
-            self.parent.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False",
-                                    "False", "List", "False", "False", "False", "False", "False", "False", "False", lang)
+            for i, row in enumerate(model):
+                lang_name = row[0]
+                lang_code = self.lang_codes.get(lang_name, "")
+                if lang_code == self.language:
+                    index_to_activate = i
+                    break
 
+            self.combo_box_language.set_active(index_to_activate)
 
 class Game:
     def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
@@ -4735,11 +4727,9 @@ class AddGame(Gtk.Dialog):
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
 
-        # Event handlers
-        self.default_prefix = self.load_default_prefix()
-        self.entry_title.connect("changed", self.update_prefix_entry)
+        self.load_config()
 
-        self.default_runner = self.load_default_runner()
+        self.entry_title.connect("changed", self.update_prefix_entry)
 
         self.notebook = Gtk.Notebook()
         self.notebook.set_margin_start(10)
@@ -5417,25 +5407,11 @@ class AddGame(Gtk.Dialog):
         if entry.get_text():
             entry.get_style_context().remove_class("entry")
 
-    def load_default_prefix(self):
-        config_file = config_file_dir
-        default_prefix = ""
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                config_data = f.read().splitlines()
-            config_dict = dict(line.split('=') for line in config_data)
-            default_prefix = config_dict.get('default-prefix', '').strip('"')
-        return default_prefix
+    def load_config(self):
+        cfg = ConfigManager()
 
-    def load_default_runner(self):
-        config_file = config_file_dir
-        default_runner = ""
-        if os.path.exists(config_file):
-            with open(config_file, 'r') as f:
-                config_data = f.read().splitlines()
-            config_dict = dict(line.split('=') for line in config_data)
-            default_runner = config_dict.get('default-runner', '').strip('"')
-        return default_runner
+        self.default_runner = cfg.config.get('default-runner', '')
+        self.default_prefix = cfg.config.get('default-prefix', '')
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
@@ -5819,7 +5795,6 @@ class AddGame(Gtk.Dialog):
         title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', entry.get_text())
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
-        self.default_prefix = self.load_default_prefix()
         prefix = os.path.expanduser(self.default_prefix) + "/" + title_formatted
         self.entry_prefix.set_text(prefix)
 
@@ -6514,79 +6489,17 @@ class CreateShortcut(Gtk.Window):
         webbrowser.open("https://umu.openwinecomponents.org/")
 
     def load_config(self):
-        # Load configuration from file
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                config_data = f.read().splitlines()
-            config_dict = dict(line.split('=') for line in config_data)
-            self.default_prefix = config_dict.get('default-prefix', '').strip('"')
+        cfg = ConfigManager()
 
-            mangohud = config_dict.get('mangohud', 'False') == 'True'
-            gamemode = config_dict.get('gamemode', 'False') == 'True'
-            disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
-            self.default_runner = config_dict.get('default-runner', '').strip('"')
+        self.default_prefix = cfg.config.get('default-prefix', '').strip('"')
+        mangohud = cfg.config.get('mangohud', 'False') == 'True'
+        gamemode = cfg.config.get('gamemode', 'False') == 'True'
+        disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+        self.default_runner = cfg.config.get('default-runner', '').strip('"')
 
-            self.checkbox_mangohud.set_active(mangohud)
-            self.checkbox_gamemode.set_active(gamemode)
-            self.checkbox_disable_hidraw.set_active(disable_hidraw)
-
-        else:
-            # Save default configuration if file does not exist
-            self.save_config(False, '', "False", "False", "False", "GE-Proton", "True", "False", "False", "False",
-                             "List", "False", "False", "False", "False", "False", "False", "False", lang)
-
-    def save_config(self, checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
-                    checkbox_start_boot, combo_box_interface, checkbox_start_maximized, checkbox_start_fullscreen,
-                    checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language):
-
-        # Create the configuration directory if it doesn't exist
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        default_prefix = prefixes_dir
-        self.default_prefix = prefixes_dir
-
-        default_runner = (f'"{default_runner}"')
-
-        # Dictionary to store existing configurations
-        config = {}
-
-        # Read the existing configuration file
-        if os.path.exists(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f:
-                    key, value = line.strip().split('=', 1)
-                    config[key] = value.strip('"')
-
-        # Update configurations with new values
-        config['close-onlaunch'] = checkbox_state
-        config['default-prefix'] = default_prefix
-        config['mangohud'] = mangohud_state
-        config['gamemode'] = gamemode_state
-        config['disable-hidraw'] = disable_hidraw_state
-        config['default-runner'] = default_runner
-        config['discrete-gpu'] = checkbox_discrete_gpu_state
-        config['splash-disable'] = checkbox_splash_disable
-        config['system-tray'] = checkbox_system_tray
-        config['start-boot'] = checkbox_start_boot
-        config['interface-mode'] = combo_box_interface
-        config['start-maximized'] = checkbox_start_maximized
-        config['start-fullscreen'] = checkbox_start_fullscreen
-        config['show-labels'] = checkbox_show_labels
-        config['smaller-banners'] = checkbox_smaller_banners
-        config['enable-logging'] = checkbox_enable_logging
-        config['wayland-driver'] = checkbox_wayland_driver
-        config['enable-hdr'] = checkbox_enable_hdr
-        config['language'] = language
-
-        # Write configurations back to the file
-        with open(config_file_dir, 'w') as f:
-            for key, value in config.items():
-                if key == 'default-prefix':
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
+        self.checkbox_mangohud.set_active(mangohud)
+        self.checkbox_gamemode.set_active(gamemode)
+        self.checkbox_disable_hidraw.set_active(disable_hidraw)
 
     def on_cancel_clicked(self, widget):
         if os.path.isfile(self.icon_temp):
@@ -6922,40 +6835,13 @@ class CreateShortcut(Gtk.Window):
 
 
 def run_file(file_path):
-    config_file = config_file_dir
-    if os.path.exists(config_file):
-        with open(config_file, 'r') as f:
-            config_data = f.read().splitlines()
-        config_dict = dict(line.split('=') for line in config_data)
-        default_prefix = config_dict.get('default-prefix', '').strip('"')
-        mangohud = config_dict.get('mangohud', 'False') == 'True'
-        gamemode = config_dict.get('gamemode', 'False') == 'True'
-        disable_hidraw = config_dict.get('disable-hidraw', 'False') == 'True'
-        default_runner = config_dict.get('default-runner', '').strip('"')
-    else:
-        # Create the configuration directory if it doesn't exist
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
+    cfg = ConfigManager()
 
-        default_prefix = prefixes_dir
-        mangohud = 'False'
-        gamemode = 'False'
-        disable_hidraw = 'False'
-        default_runner = 'GE-Proton'
-
-        with open(config_file, 'w') as f:
-            f.write(f'close-onlaunch=False\n')
-            f.write(f'default-prefix="{default_prefix}"\n')
-            f.write(f'mangohud=False\n')
-            f.write(f'gamemode=False\n')
-            f.write(f'disable-hidraw=False\n')
-            f.write(f'default-runner="GE-Proton"\n')
-            f.write(f'discrete-gpu=True\n')
-            f.write(f'splash-disable=False\n')
-            f.write(f'system-tray=False\n')
-            f.write(f'start-boot=False\n')
-            f.write(f'interface-mode=List\n')
-            f.write(f'start-maximized=False\n')
+    default_prefix = cfg.config.get('default-prefix', '').strip('"')
+    mangohud = cfg.config.get('mangohud', 'False') == 'True'
+    gamemode = cfg.config.get('gamemode', 'False') == 'True'
+    disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+    default_runner = cfg.config.get('default-runner', '').strip('"')
 
     if not file_path.endswith(".reg"):
         mangohud = "MANGOHUD=1" if mangohud else ""
