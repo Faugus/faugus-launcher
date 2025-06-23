@@ -67,7 +67,7 @@ flatpak run io.github.Faugus.faugus-launcher
 ### Steam Flatpak integration
 Allow Faugus Launcher to detect Steam users:
 ```
-flatpak --user override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
+flatpak --user override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/
 ```
 Allow Steam to run Faugus Launcher's shortcuts:
 ```
