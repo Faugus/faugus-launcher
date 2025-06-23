@@ -85,12 +85,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.6.8-1" date="2025-06-22">
+    <release version="1.6.9-1" date="2025-06-23">
       <description>
         <ul>
-          <li>Reworked the config file management</li>
-          <li>Fixed Steam location for some distros</li>
-          <li>Some code cleanup</li>
+          <li>Fixed Steam detection for SteamOS</li>
+          <li>Create shortcut from .exe file is now available for Flatpak</li>
         </ul>
       </description>
     </release>
