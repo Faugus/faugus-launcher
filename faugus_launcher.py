@@ -116,26 +116,28 @@ faugus_backup = False
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
 
-if IS_FLATPAK:
-    steam_userdata_path = os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')
-else:
-    possible_steam_locations = [
-        Path.home() / '.local' / 'share' / 'Steam' / 'userdata',
-        Path.home() / '.steam' / 'steam' / 'userdata',
-        Path.home() / '.steam' / 'root' / 'userdata'
-    ]
+possible_steam_locations = [
+    Path.home() / '.local' / 'share' / 'Steam' / 'userdata',
+    Path.home() / '.steam' / 'steam' / 'userdata',
+    Path.home() / '.steam' / 'root' / 'userdata',
+    os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')  # Flatpak
+]
 
-    steam_userdata_path = None
-    for location in possible_steam_locations:
-        if location.exists():
-            steam_userdata_path = location
-            break
+steam_userdata_path = None
+IS_STEAM_FLATPAK = False
+
+for location in possible_steam_locations:
+    if Path(location).exists():
+        steam_userdata_path = location
+        if str(location).startswith(str(Path.home() / '.var' / 'app' / 'com.valvesoftware.Steam')):
+            IS_STEAM_FLATPAK = True
+        break
 
 def detect_steam_id():
     if steam_userdata_path:
         try:
             steam_ids = [f for f in os.listdir(steam_userdata_path)
-                       if os.path.isdir(os.path.join(steam_userdata_path, f)) and f.isdigit()]
+                         if os.path.isdir(os.path.join(steam_userdata_path, f)) and f.isdigit()]
             return steam_ids[0] if steam_ids else None
         except (FileNotFoundError, PermissionError):
             return None
@@ -143,10 +145,7 @@ def detect_steam_id():
 
 steam_id = detect_steam_id()
 
-if IS_FLATPAK:
-    steam_shortcuts_path = f'{steam_userdata_path}/' + '{}/config/shortcuts.vdf'.format(steam_id)
-else:
-    steam_shortcuts_path = str(steam_userdata_path / steam_id / 'config' / 'shortcuts.vdf') if steam_id else ""
+steam_shortcuts_path = f'{steam_userdata_path}/{steam_id}/config/shortcuts.vdf' if steam_id else ""
 
 def get_desktop_dir():
     try:
@@ -2670,8 +2669,12 @@ class Main(Gtk.Window):
                 # Update only the necessary fields without replacing the entire entry
                 game_info = shortcuts["shortcuts"][existing_app_id]
                 if IS_FLATPAK:
-                    game_info["Exe"] = f'"flatpak-spawn"'
-                    game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
+                    if IS_STEAM_FLATPAK:
+                        game_info["Exe"] = f'"flatpak-spawn"'
+                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
+                    else:
+                        game_info["Exe"] = f'"flatpak"'
+                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
                 else:
                     game_info["Exe"] = f'"{faugus_run}"'
                     game_info["LaunchOptions"] = f'"{command}"'
@@ -2683,23 +2686,42 @@ class Main(Gtk.Window):
 
                 # Add the new game
                 if IS_FLATPAK:
-                    shortcuts["shortcuts"][str(new_app_id)] = {
-                        "appid": new_app_id,
-                        "AppName": title,
-                        "Exe": f'"flatpak-spawn"',
-                        "StartDir": game_directory,
-                        "icon": icon,
-                        "ShortcutPath": "",
-                        "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
-                        "IsHidden": 0,
-                        "AllowDesktopConfig": 1,
-                        "AllowOverlay": 1,
-                        "OpenVR": 0,
-                        "Devkit": 0,
-                        "DevkitGameID": "",
-                        "LastPlayTime": 0,
-                        "FlatpakAppID": "",
-                    }
+                    if IS_STEAM_FLATPAK:
+                        shortcuts["shortcuts"][str(new_app_id)] = {
+                            "appid": new_app_id,
+                            "AppName": title,
+                            "Exe": f'"flatpak-spawn"',
+                            "StartDir": game_directory,
+                            "icon": icon,
+                            "ShortcutPath": "",
+                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
+                            "IsHidden": 0,
+                            "AllowDesktopConfig": 1,
+                            "AllowOverlay": 1,
+                            "OpenVR": 0,
+                            "Devkit": 0,
+                            "DevkitGameID": "",
+                            "LastPlayTime": 0,
+                            "FlatpakAppID": "",
+                        }
+                    else:
+                        shortcuts["shortcuts"][str(new_app_id)] = {
+                            "appid": new_app_id,
+                            "AppName": title,
+                            "Exe": f'"flatpak"',
+                            "StartDir": game_directory,
+                            "icon": icon,
+                            "ShortcutPath": "",
+                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
+                            "IsHidden": 0,
+                            "AllowDesktopConfig": 1,
+                            "AllowOverlay": 1,
+                            "OpenVR": 0,
+                            "Devkit": 0,
+                            "DevkitGameID": "",
+                            "LastPlayTime": 0,
+                            "FlatpakAppID": "",
+                        }
                 else:
                     shortcuts["shortcuts"][str(new_app_id)] = {
                         "appid": new_app_id,
