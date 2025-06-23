@@ -2614,7 +2614,7 @@ class Main(Gtk.Window):
             desktop_file_content = (
                 f"[Desktop Entry]\n"
                 f"Name={game.title}\n"
-                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher \"{command}\"\n"
+                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher '{command}'\n"
                 f"Icon={new_icon_path}\n"
                 f"Type=Application\n"
                 f"Categories=Game;\n"
@@ -2624,7 +2624,7 @@ class Main(Gtk.Window):
             desktop_file_content = (
                 f"[Desktop Entry]\n"
                 f"Name={game.title}\n"
-                f"Exec={faugus_run} \"{command}\"\n"
+                f"Exec={faugus_run} '{command}'\n"
                 f"Icon={new_icon_path}\n"
                 f"Type=Application\n"
                 f"Categories=Game;\n"
@@ -6598,7 +6598,7 @@ class CreateShortcut(Gtk.Window):
             desktop_file_content = (
                 f"[Desktop Entry]\n"
                 f"Name={title}\n"
-                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher \"{command}\"\n"
+                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher '{command}'\n"
                 f"Icon={new_icon_path}\n"
                 f"Type=Application\n"
                 f"Categories=Game;\n"
@@ -6608,7 +6608,7 @@ class CreateShortcut(Gtk.Window):
             desktop_file_content = (
                 f"[Desktop Entry]\n"
                 f"Name={title}\n"
-                f"Exec={faugus_run} \"{command}\"\n"
+                f"Exec={faugus_run} '{command}'\n"
                 f"Icon={new_icon_path}\n"
                 f"Type=Application\n"
                 f"Categories=Game;\n"
