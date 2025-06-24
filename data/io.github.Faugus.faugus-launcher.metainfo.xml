@@ -37,6 +37,7 @@
     <ul>
       <li>The 'stop' button won't close games.</li>
       <li>Gamescope doesn't work.</li>
+      <li>Ubisoft Connect doesn't work.</li>
       <li>It may not use the system theme in some DEs. See the workaround on GitHub.</li>
     </ul>
   </description>
@@ -85,11 +86,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.6.9-1" date="2025-06-23">
+    <release version="1.7.1-1" date="2025-06-24">
       <description>
         <ul>
-          <li>Fixed Steam detection for SteamOS</li>
-          <li>Create shortcut from .exe file is now available for Flatpak</li>
+          <li>Fixed shortcuts not working properly</li>
+          <li>Changed the default prefixes location</li>
         </ul>
       </description>
     </release>
