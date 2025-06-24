@@ -38,7 +38,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.6.9/faugus-launcher_1.6.9-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.7.1/faugus-launcher_1.7.1-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -103,7 +103,7 @@ meson ninja pygobject requests pillow filelock vdf psutil umu-launcher imagemagi
 # Information
 ### Default prefixes location
 ```
-~/.config/faugus-launcher/prefixes/
+~/Faugus/
 ```
 
 ### Runners location
