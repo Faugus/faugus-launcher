@@ -78,7 +78,7 @@ else:
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
-prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
+prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'

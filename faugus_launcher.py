@@ -75,7 +75,7 @@ faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = PathManager.user_config('faugus-launcher/prefixes')
+prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
@@ -2612,23 +2612,23 @@ class Main(Gtk.Window):
         # Create a .desktop file
         if IS_FLATPAK:
             desktop_file_content = (
-                f"[Desktop Entry]\n"
-                f"Name={game.title}\n"
-                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher '{command}'\n"
-                f"Icon={new_icon_path}\n"
-                f"Type=Application\n"
-                f"Categories=Game;\n"
-                f"Path={game_directory}\n"
+                f'[Desktop Entry]\n'
+                f'Name={game.title}\n'
+                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
             )
         else:
             desktop_file_content = (
-                f"[Desktop Entry]\n"
-                f"Name={game.title}\n"
-                f"Exec={faugus_run} '{command}'\n"
-                f"Icon={new_icon_path}\n"
-                f"Type=Application\n"
-                f"Categories=Game;\n"
-                f"Path={game_directory}\n"
+                f'[Desktop Entry]\n'
+                f'Name={game.title}\n'
+                f'Exec={faugus_run} "{command}"\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
             )
 
         # Check if the destination directory exists and create if it doesn't
@@ -6596,23 +6596,23 @@ class CreateShortcut(Gtk.Window):
         # Create a .desktop file
         if IS_FLATPAK:
             desktop_file_content = (
-                f"[Desktop Entry]\n"
-                f"Name={title}\n"
-                f"Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher '{command}'\n"
-                f"Icon={new_icon_path}\n"
-                f"Type=Application\n"
-                f"Categories=Game;\n"
-                f"Path={game_directory}\n"
+                f'[Desktop Entry]\n'
+                f'Name={title}\n'
+                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
             )
         else:
             desktop_file_content = (
-                f"[Desktop Entry]\n"
-                f"Name={title}\n"
-                f"Exec={faugus_run} '{command}'\n"
-                f"Icon={new_icon_path}\n"
-                f"Type=Application\n"
-                f"Categories=Game;\n"
-                f"Path={game_directory}\n"
+                f'[Desktop Entry]\n'
+                f'Name={title}\n'
+                f'Exec={faugus_run} "{command}"\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
             )
 
         # Check if the destination directory exists and create if it doesn't
