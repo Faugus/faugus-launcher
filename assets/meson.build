@@ -19,7 +19,7 @@ install_data(
   'faugus-play-symbolic.svg',
   'faugus-settings-symbolic.svg',
   'faugus-stop-symbolic.svg',
-  'faugus-launcher-symbolic.svg',
+  'faugus-mono-symbolic.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'actions',
 )
 
