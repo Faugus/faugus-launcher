@@ -5,7 +5,6 @@ install_data(
 
 install_data(
   'faugus-launcher.png',
-  'faugus-mono.svg',
   'faugus-battlenet.png',
   'faugus-ea.png',
   'faugus-epic-games.png',
@@ -20,6 +19,7 @@ install_data(
   'faugus-play-symbolic.svg',
   'faugus-settings-symbolic.svg',
   'faugus-stop-symbolic.svg',
+  'faugus-mono.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'actions',
 )
 
