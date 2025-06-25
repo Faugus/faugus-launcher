@@ -83,10 +83,17 @@ config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 
 share_dir = PathManager.user_data()
 app_dir = PathManager.user_data('applications')
+faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
     tray_icon = 'io.github.Faugus.faugus-launcher'
+
+    mono_dest = Path(os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg'))
+    mono_dest.parent.mkdir(parents=True, exist_ok=True)
+    if not mono_dest.exists():
+        shutil.copy(faugus_mono_icon, mono_dest)
+    faugus_mono_icon = os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg')
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
@@ -215,6 +222,7 @@ class ConfigManager:
             'splash-disable': 'False',
             'system-tray': 'False',
             'start-boot': 'False',
+            'mono-icon': 'False',
             'interface-mode': 'List',
             'start-maximized': 'False',
             'start-fullscreen': 'False',
@@ -276,6 +284,7 @@ class Main(Gtk.Window):
         self.fullscreen_activated = False
         self.system_tray = False
         self.start_boot = False
+        self.mono_icon = False
         self.theme = None
 
         self.current_prefix = None
@@ -363,11 +372,16 @@ class Main(Gtk.Window):
         self.flowbox.connect("button-press-event", self.on_item_right_click)
 
         # Create the tray indicator
-        self.indicator = AyatanaAppIndicator3.Indicator.new("Faugus Launcher",  # Application name
-            tray_icon,  # Path to the icon
-            AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS)
-        self.indicator.set_menu(self.create_tray_menu())  # Tray menu
-        self.indicator.set_title("Faugus Launcher")  # Change the tooltip text
+        if self.mono_icon:
+            self.indicator = AyatanaAppIndicator3.Indicator.new("Faugus Launcher",
+                faugus_mono_icon,
+                AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        else:
+            self.indicator = AyatanaAppIndicator3.Indicator.new("Faugus Launcher",
+                tray_icon,  # Path to the icon
+                AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.indicator.set_menu(self.create_tray_menu())
+        self.indicator.set_title("Faugus Launcher")
 
         if self.system_tray:
             self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
@@ -1155,6 +1169,7 @@ class Main(Gtk.Window):
 
         self.system_tray = cfg.config.get('system-tray', 'False') == 'True'
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
+        self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
         self.start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
@@ -1460,6 +1475,7 @@ class Main(Gtk.Window):
         checkbox_splash_disable = settings_dialog.checkbox_splash_disable.get_active()
         checkbox_system_tray = settings_dialog.checkbox_system_tray.get_active()
         checkbox_start_boot = settings_dialog.checkbox_start_boot.get_active()
+        checkbox_mono_icon = settings_dialog.checkbox_mono_icon.get_active()
         checkbox_start_maximized = settings_dialog.checkbox_start_maximized.get_active()
         default_prefix = settings_dialog.entry_default_prefix.get_text()
         combo_box_interface = settings_dialog.combo_box_interface.get_active_text()
@@ -1488,7 +1504,7 @@ class Main(Gtk.Window):
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
-                                    checkbox_start_boot, combo_box_interface, checkbox_start_maximized,
+                                    checkbox_start_boot, checkbox_mono_icon, combo_box_interface, checkbox_start_maximized,
                                     checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.manage_autostart_file(checkbox_start_boot)
 
@@ -1515,6 +1531,9 @@ class Main(Gtk.Window):
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
                 if self.language != language:
+                    subprocess.Popen([sys.executable, __file__])
+                    self.destroy()
+                if self.mono_icon != checkbox_mono_icon:
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
             self.load_config()
@@ -3154,6 +3173,10 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_boot.set_active(False)
         self.checkbox_start_boot.set_sensitive(False)
 
+        self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
+        self.checkbox_mono_icon.set_active(False)
+        self.checkbox_mono_icon.set_sensitive(False)
+
         # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label=_("Disable splash window"))
         self.checkbox_splash_disable.set_active(False)
@@ -3357,10 +3380,11 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
@@ -3480,8 +3504,11 @@ class Settings(Gtk.Dialog):
         if not widget.get_active():
             self.checkbox_start_boot.set_active(False)
             self.checkbox_start_boot.set_sensitive(False)
+            self.checkbox_mono_icon.set_active(False)
+            self.checkbox_mono_icon.set_sensitive(False)
         else:
             self.checkbox_start_boot.set_sensitive(True)
+            self.checkbox_mono_icon.set_sensitive(True)
 
     def on_checkbox_wayland_driver_toggled(self, widget):
         if not widget.get_active():
@@ -3501,6 +3528,7 @@ class Settings(Gtk.Dialog):
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
@@ -3523,7 +3551,7 @@ class Settings(Gtk.Dialog):
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, combo_box_interface,
+                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
                                     checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
@@ -3610,6 +3638,7 @@ class Settings(Gtk.Dialog):
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
@@ -3632,7 +3661,7 @@ class Settings(Gtk.Dialog):
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, combo_box_interface,
+                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
                                     checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
@@ -3769,6 +3798,7 @@ class Settings(Gtk.Dialog):
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
@@ -3791,7 +3821,7 @@ class Settings(Gtk.Dialog):
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, combo_box_interface,
+                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
                                     checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
@@ -3855,6 +3885,7 @@ class Settings(Gtk.Dialog):
             checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
             checkbox_splash_disable = self.checkbox_splash_disable.get_active()
             checkbox_start_boot = self.checkbox_start_boot.get_active()
+            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
             checkbox_system_tray = self.checkbox_system_tray.get_active()
             checkbox_start_maximized = self.checkbox_start_maximized.get_active()
             combo_box_interface = self.combo_box_interface.get_active_text()
@@ -3877,7 +3908,7 @@ class Settings(Gtk.Dialog):
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, combo_box_interface,
+                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
                                     checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
             self.set_sensitive(False)
@@ -4226,6 +4257,7 @@ class Settings(Gtk.Dialog):
         splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
         system_tray = cfg.config.get('system-tray', 'False') == 'True'
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
+        self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
@@ -4256,6 +4288,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_splash_disable.set_active(splash_disable)
         self.checkbox_system_tray.set_active(system_tray)
         self.checkbox_start_boot.set_active(self.start_boot)
+        self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_start_maximized.set_active(start_maximized)
         self.checkbox_start_fullscreen.set_active(start_fullscreen)
         self.checkbox_show_labels.set_active(show_labels)

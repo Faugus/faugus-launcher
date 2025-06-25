@@ -117,6 +117,7 @@ class ConfigManager:
             'splash-disable': 'False',
             'system-tray': 'False',
             'start-boot': 'False',
+            'mono-icon': 'False',
             'interface-mode': 'List',
             'start-maximized': 'False',
             'start-fullscreen': 'False',
