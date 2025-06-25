@@ -5,7 +5,7 @@ install_data(
 
 install_data(
   'faugus-launcher.png',
-  'faugus-launcher-mono.svg',
+  'faugus-mono.svg',
   'faugus-battlenet.png',
   'faugus-ea.png',
   'faugus-epic-games.png',
