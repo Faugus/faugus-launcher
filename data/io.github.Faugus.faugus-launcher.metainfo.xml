@@ -53,35 +53,35 @@
   <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-blocks.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/main-blocks.png</image>
       <caption>Main window: Blocks interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/16e612a/screenshots/main-banners.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/main-banners.png</image>
       <caption>Main window: Banners interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/fc64f48/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/fc64f48/screenshots/add-tools.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/add-tools.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/fc64f48/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/fc64f48/screenshots/proton-manager.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/proton-manager.png</image>
       <caption>GE-Proton Manager</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/fc64f48/screenshots/shortcut-file.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/shortcut-file.png</image>
       <caption>Create shortcut from .exe file</caption>
     </screenshot>
   </screenshots>
