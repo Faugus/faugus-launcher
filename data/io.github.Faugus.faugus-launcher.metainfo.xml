@@ -86,11 +86,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.1-1" date="2025-06-24">
+    <release version="1.7.2-1" date="2025-06-26">
       <description>
         <ul>
-          <li>Fixed shortcuts not working properly</li>
-          <li>Changed the default prefixes location</li>
+          <li>Added support to Proton-EM</li>
+          <li>Added support to system tray monochrome icon</li>
         </ul>
       </description>
     </release>
