@@ -18,6 +18,7 @@ sudo dnf -y install faugus-launcher
 ```
 
 ## Bazzite (Copr)
+[Flatpak](#flatpak) is the preferred app format for Bazzite. Use of rpm-ostree is heavily discouraged.
 ```
 sudo dnf5 -y copr enable faugus/faugus-launcher
 sudo rpm-ostree -y install faugus-launcher
@@ -55,6 +56,7 @@ sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/op
 sudo zypper --gpg-auto-import-keys install -y faugus-launcher
 ```
 
+<a id="flatpak"></a>
 ## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
 ### Installation:
 ```
