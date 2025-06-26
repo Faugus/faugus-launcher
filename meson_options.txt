@@ -1,1 +1,2 @@
 option('flatpak_build', type: 'boolean', value: false, description: 'Set to true when building for Flatpak')
+option('use_license_files', type: 'boolean', value: true, description: 'Include license_files in project()')
