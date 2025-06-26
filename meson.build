@@ -1,6 +1,6 @@
 project(
   'faugus-launcher',
-  version: '1.7.1',
+  version: '1.7.2',
   meson_version: '>=1.2.0',
   license: 'MIT',
   license_files: 'LICENSE',
@@ -19,11 +19,13 @@ install_data(
   'faugus_run.py',
   'faugus_proton_manager.py',
   'faugus_components.py',
+  'faugus_proton_downloader.py',
   rename: [
     'faugus-launcher',
     'faugus-run',
     'faugus-proton-manager',
     'faugus-components',
+    'faugus-proton-downloader',
   ],
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
