@@ -5,6 +5,7 @@
   <developer_name>Faugus</developer_name>
   <summary>A simple and lightweight app for running games using UMU-Launcher</summary>
   <url type="homepage">https://github.com/Faugus/faugus-launcher</url>
+  <url type="donation">https://ko-fi.com/faugus</url>
   <url type="bugtracker">https://github.com/Faugus/faugus-launcher/issues</url>
   <project_license>MIT</project_license>
   <metadata_license>CC0-1.0</metadata_license>
