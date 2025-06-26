@@ -31,6 +31,16 @@ install_data(
   install_dir: get_option('bindir'),
 )
 
+if not get_option('flatpak_build')
+  install_data(
+    'faugus-launcher.desktop',
+    'faugus-shortcut.desktop',
+    'faugus-run.desktop',
+    'faugus-proton-manager.desktop',
+    install_dir: get_option('datadir') / 'applications',
+  )
+endif
+
 install_data(
   'LICENSE',
   install_dir: get_option('datadir') / 'licenses' / meson.project_name(),
