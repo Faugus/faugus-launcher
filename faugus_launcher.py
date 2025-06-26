@@ -290,7 +290,6 @@ class Main(Gtk.Window):
         self.current_prefix = None
         self.games = []
         self.flowbox_child = None
-        self.play_button_locked = False
         self.updated_steam_id = None
         self.game_running = False
 
@@ -299,6 +298,7 @@ class Main(Gtk.Window):
         self.double_click_time_threshold = 500
 
         self.processos = {}
+        self.button_locked = {}
 
         self.working_directory = faugus_launcher_dir
         os.chdir(self.working_directory)
@@ -442,6 +442,8 @@ class Main(Gtk.Window):
         for title in to_remove:
             del processos[title]
             updated = True
+            if title in self.button_locked:
+                del self.button_locked[title]
 
         if updated:
             with open(running_games, "w") as f:
@@ -458,8 +460,7 @@ class Main(Gtk.Window):
             game_label = hbox.get_children()[1]
             selected_title = game_label.get_text()
 
-            if self.play_button_locked == False:
-                self.on_item_selected(self.flowbox, selected_child)
+            self.on_item_selected(self.flowbox, selected_child)
 
         return True
 
@@ -1437,7 +1438,11 @@ class Main(Gtk.Window):
                         Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
             else:
                 processos = self.load_processes_from_file()
-                if title in processos:
+                if title in self.button_locked:
+                    self.menu_item_play.set_sensitive(False)
+                    self.button_play.set_sensitive(False)
+                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+                elif title in processos:
                     self.menu_item_play.set_sensitive(True)
                     self.button_play.set_sensitive(True)
                     self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
@@ -1446,6 +1451,7 @@ class Main(Gtk.Window):
                     self.button_play.set_sensitive(True)
                     self.button_play.set_image(
                         Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
+
         else:
             self.menu_item_edit.set_sensitive(False)
             self.menu_item_delete.set_sensitive(False)
@@ -1494,6 +1500,8 @@ class Main(Gtk.Window):
             default_runner = ""
         if default_runner == "GE-Proton Latest (default)":
             default_runner = "GE-Proton"
+        if default_runner == "Proton-EM Latest":
+            default_runner = "Proton-EM"
 
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
@@ -1603,21 +1611,22 @@ class Main(Gtk.Window):
         title = game_label.get_text()
 
         processos = self.load_processes_from_file()
-        self.play_button_locked = True
+        self.button_locked[title] = True
 
         if title in processos:
             data = processos[title]
-            pid = data.get("main")
-            if pid:
-                parent = psutil.Process(pid)
-                children = parent.children(recursive=True)
 
-                for child in children:
-                    child.terminate()
+            for key in ("umu", "main"):
+                pid = data.get(key)
+                if pid:
+                    try:
+                        proc = psutil.Process(pid)
+                        for child in proc.children(recursive=True):
+                            child.terminate()
+                        proc.terminate()
+                    except psutil.NoSuchProcess:
+                        continue
 
-                parent.terminate()
-
-                self.play_button_locked = False
             return
 
         # Find the selected game object
@@ -1727,6 +1736,7 @@ class Main(Gtk.Window):
 
     def find_pid(self, game):
         try:
+            # faugus-run é o processo main, que é um python3
             parent = psutil.Process(self.processo.pid)
             all_descendants = parent.children(recursive=True)
         except psutil.NoSuchProcess:
@@ -1737,28 +1747,28 @@ class Main(Gtk.Window):
         for proc in all_descendants:
             try:
                 name = os.path.splitext(proc.name())[0].lower()
-                if name == "umu-run" or name == "python3":
+                if name == "umu-run":
                     umu_run_pid = proc.pid
                     break
             except psutil.NoSuchProcess:
                 continue
 
-        if umu_run_pid:
-            self.save_process_to_file(game.title, umu_run_pid)
-
-            self.menu_item_play.set_sensitive(True)
-            self.button_play.set_sensitive(True)
-            self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-            self.play_button_locked = False
-            return True
+        # Salva apenas o processo python3 (main) e o umu-run (se existir)
+        self.save_process_to_file(
+            game.title,
+            main_pid=self.processo.pid,
+            umu_pid=umu_run_pid
+        )
 
         self.menu_item_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+        if game.title in self.button_locked:
+            del self.button_locked[game.title]
 
-        return False
+        return True
 
-    def save_process_to_file(self, title, processo_pid, _unused=None):
+    def save_process_to_file(self, title, main_pid, umu_pid=None):
         os.makedirs(os.path.dirname(running_games), exist_ok=True)
 
         try:
@@ -1767,7 +1777,10 @@ class Main(Gtk.Window):
         except (FileNotFoundError, json.JSONDecodeError):
             processos = {}
 
-        processos[title] = {"main": processo_pid}
+        processos[title] = {
+            "main": main_pid,
+            "umu": umu_pid
+        }
 
         with open(running_games, "w") as f:
             json.dump(processos, f, indent=2)
@@ -1801,6 +1814,7 @@ class Main(Gtk.Window):
     done
 """, shell=True)
         self.game_running = False
+        self.button_locked.clear()
 
     def on_button_add_clicked(self, widget):
         file_path = ""
@@ -1836,6 +1850,8 @@ class Main(Gtk.Window):
                 game_runner = "GE-Proton Latest (default)"
             if game.runner == "":
                 game_runner = "UMU-Proton Latest"
+            if game.runner == "Proton-EM":
+                game_runner = "Proton-EM Latest"
             if game_runner == "Linux-Native":
                 edit_game_dialog.combo_box_launcher.set_active(1)
 
@@ -2134,6 +2150,8 @@ class Main(Gtk.Window):
                 runner = ""
             if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
+            if runner == "Proton-EM Latest":
+                runner = "Proton-EM"
             if add_game_dialog.combo_box_launcher.get_active() == 1:
                 runner = "Linux-Native"
 
@@ -2519,6 +2537,8 @@ class Main(Gtk.Window):
                 game.runner = ""
             if game.runner == "GE-Proton Latest (default)":
                 game.runner = "GE-Proton"
+            if game.runner == "Proton-EM Latest":
+                game.runner = "Proton-EM"
             if edit_game_dialog.combo_box_launcher.get_active() == 1:
                 game.runner = "Linux-Native"
 
@@ -3146,7 +3166,7 @@ class Settings(Gtk.Dialog):
         self.label_runner.set_halign(Gtk.Align.START)
         self.combo_box_runner = Gtk.ComboBoxText()
 
-        self.button_proton_manager = Gtk.Button(label=_("GE-Proton Manager"))
+        self.button_proton_manager = Gtk.Button(label=_("Proton Manager"))
         self.button_proton_manager.connect("clicked", self.on_button_proton_manager_clicked)
 
         self.label_miscellaneous = Gtk.Label(label=_("Miscellaneous"))
@@ -3547,6 +3567,8 @@ class Settings(Gtk.Dialog):
                 default_runner = ""
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
+            if default_runner == "Proton-EM Latest":
+                default_runner = "Proton-EM"
 
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
@@ -3581,6 +3603,7 @@ class Settings(Gtk.Dialog):
         # List of default entries
         self.combo_box_runner.append_text("GE-Proton Latest (default)")
         self.combo_box_runner.append_text("UMU-Proton Latest")
+        self.combo_box_runner.append_text("Proton-EM Latest")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -3657,6 +3680,8 @@ class Settings(Gtk.Dialog):
                 default_runner = ""
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
+            if default_runner == "Proton-EM Latest":
+                default_runner = "Proton-EM"
 
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
@@ -3817,6 +3842,8 @@ class Settings(Gtk.Dialog):
                 default_runner = ""
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
+            if default_runner == "Proton-EM Latest":
+                default_runner = "Proton-EM"
 
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
@@ -3904,6 +3931,8 @@ class Settings(Gtk.Dialog):
                 default_runner = ""
             if default_runner == "GE-Proton Latest (default)":
                 default_runner = "GE-Proton"
+            if default_runner == "Proton-EM Latest":
+                default_runner = "Proton-EM"
 
             config = ConfigManager()
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
@@ -4949,6 +4978,8 @@ class AddGame(Gtk.Dialog):
             self.default_runner = "UMU-Proton Latest"
         if self.default_runner == "GE-Proton":
             self.default_runner = "GE-Proton Latest (default)"
+        if self.default_runner == "Proton-EM":
+            self.default_runner = "Proton-EM Latest"
 
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
@@ -5406,6 +5437,7 @@ class AddGame(Gtk.Dialog):
         # List of default entries
         self.combo_box_runner.append_text("GE-Proton Latest (default)")
         self.combo_box_runner.append_text("UMU-Proton Latest")
+        self.combo_box_runner.append_text("Proton-EM Latest")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -5543,6 +5575,8 @@ class AddGame(Gtk.Dialog):
                 runner = ""
             if runner == "GE-Proton Latest (default)":
                 runner = "GE-Proton"
+            if runner == "Proton-EM Latest":
+                runner = "Proton-EM"
 
             command_parts = []
 
@@ -5864,6 +5898,8 @@ class AddGame(Gtk.Dialog):
             runner = ""
         if runner == "GE-Proton Latest (default)":
             runner = "GE-Proton"
+        if runner == "Proton-EM Latest":
+            runner = "Proton-EM"
 
         command_parts = []
 
@@ -5919,6 +5955,8 @@ class AddGame(Gtk.Dialog):
             runner = ""
         if runner == "GE-Proton Latest (default)":
             runner = "GE-Proton"
+        if runner == "Proton-EM Latest":
+            runner = "Proton-EM"
 
         command_parts = []
 
@@ -6909,6 +6947,8 @@ def run_file(file_path):
         default_runner = ""
     if default_runner == "GE-Proton Latest (default)":
         default_runner = "GE-Proton"
+    if default_runner == "Proton-EM Latest":
+        default_runner = "Proton-EM"
 
     command_parts = []
 

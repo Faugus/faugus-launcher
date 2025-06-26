@@ -78,6 +78,7 @@ else:
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
+faugus_proton_downloader = PathManager.find_binary('faugus-proton-downloader')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
@@ -245,9 +246,29 @@ class FaugusRun:
         Gtk.main_quit()
         sys.exit()
 
+    def update_protonpath(self, message):
+        compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+
+        versions = [
+            d for d in os.listdir(compatibility_dir)
+            if os.path.isdir(os.path.join(compatibility_dir, d)) and d.startswith("proton-EM-")
+        ]
+
+        if not versions:
+            return message
+
+        versions.sort(key=lambda v: [int(x) for x in re.findall(r'\d+', v)], reverse=True)
+        latest_version = versions[0]
+        updated_message = re.sub(r'PROTONPATH=Proton-EM\b', f'PROTONPATH={latest_version}', message)
+        return updated_message
+
+    def update_test(self):
+        if "Proton-EM" in self.message:
+            self.message = self.update_protonpath(self.message)
+
     def start_process(self, command):
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
-        if protonpath and protonpath != "GE-Proton":
+        if protonpath and protonpath != "GE-Proton" and protonpath != "Proton-EM":
             protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
             if not protonpath_path.is_dir():
                 self.close_warning_dialog()
@@ -257,14 +278,16 @@ class FaugusRun:
             self.default_runner = ""
         if self.default_runner == "GE-Proton Latest (default)":
             self.default_runner = "GE-Proton"
+        if self.default_runner == "Proton-EM Latest":
+            self.default_runner = "Proton-EM"
 
-        discrete_gpu = "DRI_PRIME=1"
+        self.discrete_gpu = "DRI_PRIME=1"
         if not self.discrete_gpu:
-            discrete_gpu = "DRI_PRIME=0"
+            self.discrete_gpu = "DRI_PRIME=0"
         if self.discrete_gpu:
-            discrete_gpu = "DRI_PRIME=1"
+            self.discrete_gpu = "DRI_PRIME=1"
         if self.discrete_gpu == None:
-            discrete_gpu = "DRI_PRIME=1"
+            self.discrete_gpu = "DRI_PRIME=1"
 
         if "WINEPREFIX" not in self.message:
             if self.default_runner:
@@ -300,29 +323,83 @@ class FaugusRun:
         if match:
             self.game_title = match.group(1).split("/")[-1]
 
-        if "UMU_NO_PROTON" not in self.message:
+        self.run_processes_sequentially()
+
+    def run_processes_sequentially(self):
+        if "UMU_NO_PROTON" not in self.message and "Proton-EM" in self.message:
             if self.enable_logging:
                 self.message = f'UMU_LOG=1 PROTON_LOG_DIR={logs_dir}/{self.game_title} PROTON_LOG=1 {self.message}'
+
             self.process = subprocess.Popen(
-                [PathManager.find_binary("bash"), "-c", f"{faugus_components}; {discrete_gpu} {eac_dir} {be_dir} {self.message}"],
+                [PathManager.find_binary("bash"), "-c", f"{faugus_proton_downloader}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                bufsize=8192,
                 text=True
+            )
+
+            self.stdout_watch_id = GLib.io_add_watch(
+                self.process.stdout,
+                GLib.PRIORITY_LOW,
+                GLib.IO_IN,
+                self.on_output
+            )
+            self.stderr_watch_id = GLib.io_add_watch(
+                self.process.stderr,
+                GLib.PRIORITY_LOW,
+                GLib.IO_IN,
+                self.on_output
+            )
+
+            GLib.child_watch_add(
+                GLib.PRIORITY_DEFAULT,
+                self.process.pid,
+                self.on_proton_downloader_finished
             )
         else:
-            self.process = subprocess.Popen(
-                [PathManager.find_binary("bash"), "-c", f"{discrete_gpu} {eac_dir} {be_dir} {self.message}"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            self.execute_final_command()
 
-        print(self.message)
+    def on_proton_downloader_finished(self, pid, status):
+        if hasattr(self, 'stdout_watch_id'):
+            GLib.source_remove(self.stdout_watch_id)
+        if hasattr(self, 'stderr_watch_id'):
+            GLib.source_remove(self.stderr_watch_id)
+        self.update_test()
 
-        GLib.io_add_watch(self.process.stdout, GLib.IO_IN, self.on_output)
-        GLib.io_add_watch(self.process.stderr, GLib.IO_IN, self.on_output)
+        self.execute_final_command()
 
-        GLib.child_watch_add(self.process.pid, self.on_process_exit)
+    def execute_final_command(self):
+        if "UMU_NO_PROTON" not in self.message:
+            cmd = f"{faugus_components}; {self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+        else:
+            cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+
+        self.process = subprocess.Popen(
+            [PathManager.find_binary("bash"), "-c", cmd],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=8192,
+            text=True
+        )
+
+        self.stdout_watch_id = GLib.io_add_watch(
+            self.process.stdout,
+            GLib.PRIORITY_LOW,
+            GLib.IO_IN,
+            self.on_output
+        )
+        self.stderr_watch_id = GLib.io_add_watch(
+            self.process.stderr,
+            GLib.PRIORITY_LOW,
+            GLib.IO_IN,
+            self.on_output
+        )
+
+        GLib.child_watch_add(
+            GLib.PRIORITY_DEFAULT,
+            self.process.pid,
+            self.on_process_exit
+        )
 
     def set_ld_preload(self):
         lib_paths = [
@@ -486,6 +563,12 @@ class FaugusRun:
             self.label.set_text(_("UMU-Proton is up to date"))
         if "mtree is OK" in clean_line:
             self.label2.set_text(_("Steam Runtime is up to date"))
+        if "Downloading proton-EM" in clean_line:
+            self.label.set_text(_("Downloading Proton-EM..."))
+        if "Extracting archive" in clean_line:
+            self.label.set_text(_("Extracting Proton-EM..."))
+        if "Proton installed successfully" in clean_line:
+            self.label.set_text(_("Proton-EM is up to date"))
 
         if "UMU_NO_PROTON" in self.message:
             if "steamrt3 is up to date" in clean_line or "mtree is OK" in clean_line:
