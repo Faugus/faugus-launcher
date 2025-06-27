@@ -38,7 +38,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.7.2/faugus-launcher_1.7.2-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.7.3/faugus-launcher_1.7.3-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -80,10 +80,8 @@ flatpak --user override com.valvesoftware.Steam --filesystem=~/.var/app/io.githu
 ### Known issues:
 - The 'stop' button won't close games/apps
 - Gamescope doesn't work
-- It may not use the system theme in some DEs. Workaround: give it access to GTK config files:
-```
-flatpak --user override io.github.Faugus.faugus-launcher --filesystem=xdg-config/gtk-3.0:ro
-```
+- Ubisoft Connect doesn't work
+- It may not use the system theme in some DEs
 
 ## Build from source
 ```
