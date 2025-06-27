@@ -87,11 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.2-1" date="2025-06-26">
+    <release version="1.7.3-1" date="2025-06-27">
       <description>
         <ul>
-          <li>Added support to Proton-EM</li>
-          <li>Added support to system tray monochrome icon</li>
+          <li>Removed duplicated app launcher icon with the new build< system/li>
+          <li>Workaround for dark theme on Flatpak</li>
         </ul>
       </description>
     </release>
