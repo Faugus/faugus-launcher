@@ -90,7 +90,7 @@
     <release version="1.7.3-1" date="2025-06-27">
       <description>
         <ul>
-          <li>Removed duplicated app launcher icon with the new build< system</li>
+          <li>Removed duplicated app launcher icon with the new build system</li>
           <li>Workaround for dark theme on Flatpak</li>
         </ul>
       </description>
