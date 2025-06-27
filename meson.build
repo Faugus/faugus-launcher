@@ -11,8 +11,10 @@ fs = import('fs')
 gnome = import('gnome')
 
 subdir('assets')
-subdir('data')
 subdir('languages')
+if get_option('flatpak_build')
+  subdir('data')
+endif
 
 install_data(
   'faugus_launcher.py',
