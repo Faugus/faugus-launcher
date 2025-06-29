@@ -326,10 +326,11 @@ class FaugusRun:
         self.run_processes_sequentially()
 
     def run_processes_sequentially(self):
-        if "UMU_NO_PROTON" not in self.message and "Proton-EM" in self.message:
+        if "UMU_NO_PROTON" not in self.message:
             if self.enable_logging:
                 self.message = f'UMU_LOG=1 PROTON_LOG_DIR={logs_dir}/{self.game_title} PROTON_LOG=1 {self.message}'
 
+        if "Proton-EM" in self.message:
             self.process = subprocess.Popen(
                 [PathManager.find_binary("bash"), "-c", f"{faugus_proton_downloader}"],
                 stdout=subprocess.PIPE,
