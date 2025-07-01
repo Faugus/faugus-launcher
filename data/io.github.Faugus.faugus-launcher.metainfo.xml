@@ -89,7 +89,7 @@
     <release version="1.7.4-1" date="2025-06-30">
       <description>
         <ul>
-          <li>Fixed logging</li>
+          <li>Fixed broken logs caused by the new Proton-EM download feature</li>
           <li>Fixed Ubisoft Connect and other launchers on Flatpak</li>
         </ul>
       </description>
