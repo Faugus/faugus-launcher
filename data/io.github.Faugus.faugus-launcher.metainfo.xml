@@ -38,7 +38,6 @@
     <ul>
       <li>The 'stop' button won't close games.</li>
       <li>Gamescope doesn't work.</li>
-      <li>Ubisoft Connect doesn't work.</li>
       <li>It may not use the system theme in some DEs. See the workaround on GitHub.</li>
     </ul>
   </description>
@@ -87,11 +86,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.3-1" date="2025-06-27">
+    <release version="1.7.4-1" date="2025-06-30">
       <description>
         <ul>
-          <li>Removed duplicated app launcher icon with the new build system</li>
-          <li>Workaround for dark theme on Flatpak</li>
+          <li>Fixed logging</li>
+          <li>Fixed Ubisoft Connect and other launchers on Flatpak</li>
         </ul>
       </description>
     </release>
