@@ -30,7 +30,7 @@
       <li>Feral GameMode: Tweaks your system to improve performance.</li>
       <li>Disable Hidraw: May fix controller issues with some games.</li>
       <li>Additional Application: An additional application to run with the game, like Cheat Engine, Trainers, Mods...</li>
-      <li>GE-Proton Manager: Download/remove GE-Proton builds.</li>
+      <li>Proton Manager: Download/remove GE-Proton and Proton-EM builds.</li>
       <li>Wine Wayland Driver Support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
