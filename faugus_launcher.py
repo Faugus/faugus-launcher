@@ -4305,6 +4305,10 @@ class Settings(Gtk.Dialog):
 
         if self.default_runner == "":
             self.default_runner = "UMU-Proton Latest"
+        if self.default_runner == "GE-Proton":
+            self.default_runner = "GE-Proton Latest (default)"
+        if self.default_runner == "Proton-EM":
+            self.default_runner = "Proton-EM Latest"
         model = self.combo_box_runner.get_model()
         index_to_activate = 0
         for i, row in enumerate(model):
