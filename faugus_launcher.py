@@ -159,7 +159,7 @@ def get_desktop_dir():
         desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
         return desktop_dir
     except (FileNotFoundError, subprocess.CalledProcessError):
-        print(_("xdg-user-dir not found or failed; falling back to ~/Desktop"))
+        print("xdg-user-dir not found or failed; falling back to ~/Desktop")
         return str(Path.home() / 'Desktop')
 
 desktop_dir = get_desktop_dir()
@@ -992,7 +992,7 @@ class Main(Gtk.Window):
                             with open("games.json", "r", encoding="utf-8") as file:
                                 games = json.load(file)
                         except json.JSONDecodeError as e:
-                            print(_("Error reading the JSON file: {error}").format(error=e))
+                            print("Error reading the JSON file: {error}").format(error=e)
 
                     games.append(game_info)
 
@@ -1294,7 +1294,7 @@ class Main(Gtk.Window):
         except FileNotFoundError:
             pass
         except json.JSONDecodeError as e:
-            print(_("Error reading the JSON file: {error}").format(error=e))
+            print("Error reading the JSON file: {error}").format(error=e)
 
     def add_item_list(self, game):
         # Add a game item to the list
@@ -2142,7 +2142,7 @@ class Main(Gtk.Window):
                     command_magick = shutil.which("magick") or shutil.which("convert")
                     subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
                 except subprocess.CalledProcessError as e:
-                    print(_("Error resizing banner: {error}").format(error=e))
+                    print("Error resizing banner: {error}").format(error=e)
             else:
                 banner = ""
 
@@ -2219,7 +2219,7 @@ class Main(Gtk.Window):
                     with open("games.json", "r", encoding="utf-8") as file:
                         games = json.load(file)
                 except json.JSONDecodeError as e:
-                    print(_("Error reading the JSON file: {error}").format(error=e))
+                    print("Error reading the JSON file: {error}").format(error=e)
 
             games.append(game_info)
 
@@ -2351,7 +2351,7 @@ class Main(Gtk.Window):
         retcode = processo.poll()
 
         if retcode is not None:
-            print(_("{title} installed.").format(title=title))
+            print("{title} installed.").format(title=title)
 
             if os.path.exists(faugus_temp):
                 shutil.rmtree(faugus_temp)
@@ -2531,7 +2531,7 @@ class Main(Gtk.Window):
                     subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
                     game.banner = banner
                 except subprocess.CalledProcessError as e:
-                    print(_("Error resizing banner: {error}").format(error=e))
+                    print("Error resizing banner: {error}").format(error=e)
 
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
@@ -3637,7 +3637,7 @@ class Settings(Gtk.Dialog):
                     self.combo_box_runner.append_text(version)
 
         except Exception as e:
-            print(_("Error accessing the directory: {error}").format(error=e))
+            print("Error accessing the directory: {error}").format(error=e)
 
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
@@ -5199,7 +5199,7 @@ class AddGame(Gtk.Dialog):
                 GLib.idle_add(self.update_image_banner)
 
             except requests.RequestException as e:
-                print(_("Error fetching the banner: {error}").format(error=e))
+                print("Error fetching the banner: {error}").format(error=e)
 
         # Start the thread
         threading.Thread(target=fetch_banner, daemon=True).start()
@@ -5475,7 +5475,7 @@ class AddGame(Gtk.Dialog):
                     self.combo_box_runner.append_text(version)
 
         except Exception as e:
-            print(_("Error accessing the directory: {error}").format(error=e))
+            print("Error accessing the directory: {error}").format(error=e)
 
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
@@ -5666,10 +5666,10 @@ class AddGame(Gtk.Dialog):
 
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                    print(_("The file does not contain icons."))
+                    print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(_("Error extracting icon: {error}").format(error=result.stderr))
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
@@ -5677,7 +5677,7 @@ class AddGame(Gtk.Dialog):
                     os.remove(self.icon_extracted)
 
         except Exception as e:
-            print(_("An error occurred: {error}").format(error=e))
+            print("An error occurred: {error}").format(error=e)
 
         def show_error_message(message):
             error_dialog = Gtk.MessageDialog(parent=dialog, flags=0, message_type=Gtk.MessageType.ERROR,
@@ -5826,7 +5826,7 @@ class AddGame(Gtk.Dialog):
                                 largest_resolution = (width, height)
                                 largest_image = file_path
                     except IOError:
-                        print(_("Unable to open {file}").format(file=file_path))
+                        print("Unable to open {file}").format(file=file_path)
 
         return largest_image
 
@@ -6085,10 +6085,10 @@ class AddGame(Gtk.Dialog):
                 # Check if there was an error in executing the command
                 if result.returncode != 0:
                     if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print(_("The file does not contain icons."))
+                        print("The file does not contain icons.")
                         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                     else:
-                        print(_("Error extracting icon: {error}").format(error=result.stderr))
+                        print("Error extracting icon: {error}").format(error=result.stderr)
                 else:
                     # Convert the extracted icon to PNG
                     command_magick = shutil.which("magick") or shutil.which("convert")
@@ -6107,7 +6107,7 @@ class AddGame(Gtk.Dialog):
                     self.button_shortcut_icon.set_image(image)
 
             except Exception as e:
-                print(_("An error occurred: {error}").format(error=e))
+                print("An error occurred: {error}").format(error=e)
 
             self.entry_path.set_text(filechooser.get_filename())
 
@@ -6451,10 +6451,10 @@ class CreateShortcut(Gtk.Window):
             # Check if there was an error in executing the command
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                    print(_("The file does not contain icons."))
+                    print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(_("Error extracting icon: {error}").format(error=result.stderr))
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 # Convert the extracted icon to PNG
                 command_magick = shutil.which("magick") or shutil.which("convert")
@@ -6473,7 +6473,7 @@ class CreateShortcut(Gtk.Window):
                 self.button_shortcut_icon.set_image(image)
 
         except Exception as e:
-            print(_("An error occurred: {error}").format(error=e))
+            print("An error occurred: {error}").format(error=e)
 
         shutil.rmtree(self.icon_directory)
 
@@ -6568,7 +6568,7 @@ class CreateShortcut(Gtk.Window):
                                 largest_resolution = (width, height)
                                 largest_image = file_path
                     except IOError:
-                        print(_("Unable to open {file}").format(file=file_path))
+                        print("Unable to open {file}").format(file=file_path)
 
         return largest_image
 
@@ -6745,10 +6745,10 @@ class CreateShortcut(Gtk.Window):
 
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                    print(_("The file does not contain icons."))
+                    print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(_("Error extracting icon: {error}").format(error=result.stderr))
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
@@ -6756,7 +6756,7 @@ class CreateShortcut(Gtk.Window):
                     os.remove(self.icon_extracted)
 
         except Exception as e:
-            print(_("An error occurred: {error}").format(error=e))
+            print("An error occurred: {error}").format(error=e)
 
         def show_error_message(message):
             error_dialog = Gtk.MessageDialog(parent=dialog, flags=0, message_type=Gtk.MessageType.ERROR,
@@ -7028,7 +7028,7 @@ def faugus_launcher():
         Gtk.main()
 
     else:
-        print(_("Invalid arguments"))
+        print("Invalid arguments")
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] != "--hide":
@@ -7040,7 +7040,7 @@ def main():
             with lock:
                 faugus_launcher()
         except Timeout:
-            print(_("Faugus Launcher is already running."))
+            print("Faugus Launcher is already running.")
 
 if __name__ == "__main__":
     main()
