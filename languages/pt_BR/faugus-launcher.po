@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-03 13:47-0300\n"
-"PO-Revision-Date: 2025-07-03 13:51-0300\n"
+"POT-Creation-Date: 2025-07-04 10:30-0300\n"
+"PO-Revision-Date: 2025-07-04 10:37-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -270,8 +270,8 @@ msgid "Use Wayland driver (experimental)"
 msgstr "Usar driver do Wayland (experimental)"
 
 #: /usr/bin/faugus-launcher:3210 /usr/bin/faugus-launcher:3215
-msgid "Only works with GE-Proton10-1 or superior."
-msgstr "Só funciona com o GE-Proton10-1 ou superior."
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "Só funciona com o GE-Proton10 ou Proton-EM-10."
 
 #: /usr/bin/faugus-launcher:3213
 msgid "Enable HDR (experimental)"
@@ -306,11 +306,11 @@ msgstr "Desativar Hidraw"
 #: /usr/bin/faugus-launcher:3241 /usr/bin/faugus-launcher:4766
 #: /usr/bin/faugus-launcher:6285
 msgid ""
-"May fix controller issues with some games. Only works with GE-Proton10-3 or "
-"superior."
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
 msgstr ""
 "Pode corrigir problemas com controle em alguns jogos. Só funciona com o GE-"
-"Proton10-3 ou superior."
+"Proton10 ou Proton-EM-10."
 
 #: /usr/bin/faugus-launcher:3243
 msgid "Support the Project"
