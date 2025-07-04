@@ -86,11 +86,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.4-1" date="2025-06-30">
+    <release version="1.7.5-1" date="2025-07-04">
       <description>
         <ul>
-          <li>Fixed broken logs caused by the new Proton-EM download feature</li>
-          <li>Fixed Ubisoft Connect and other launchers on Flatpak</li>
+          <li>Removed uneeded strings translation</li>
+          <li>Fixed Proton-EM not persisting as a default runner</li>
+          <li>Added Proton-EM to features tooltips</li>
         </ul>
       </description>
     </release>
