@@ -3207,12 +3207,12 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Use Wayland driver (experimental)"))
         self.checkbox_wayland_driver.set_active(False)
-        self.checkbox_wayland_driver.set_tooltip_text(_("Only works with GE-Proton10-1 or superior."))
+        self.checkbox_wayland_driver.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
         self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
 
         self.checkbox_enable_hdr = Gtk.CheckButton(label=_("Enable HDR (experimental)"))
         self.checkbox_enable_hdr.set_active(False)
-        self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10-1 or superior."))
+        self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -3238,7 +3238,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10-3 or superior."))
+            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
 
         self.label_support = Gtk.Label(label=_("Support the Project"))
         self.label_support.set_halign(Gtk.Align.START)
@@ -4763,7 +4763,7 @@ class AddGame(Gtk.Dialog):
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10-3 or superior."))
+            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -6282,7 +6282,7 @@ class CreateShortcut(Gtk.Window):
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10-3 or superior."))
+            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label=_("Cancel"))
