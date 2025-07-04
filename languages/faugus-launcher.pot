@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-03 13:47-0300\n"
+"POT-Creation-Date: 2025-07-04 10:30-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -267,7 +267,7 @@ msgid "Use Wayland driver (experimental)"
 msgstr ""
 
 #: /usr/bin/faugus-launcher:3210 /usr/bin/faugus-launcher:3215
-msgid "Only works with GE-Proton10-1 or superior."
+msgid "Only works with GE-Proton10 or Proton-EM-10."
 msgstr ""
 
 #: /usr/bin/faugus-launcher:3213
@@ -301,8 +301,8 @@ msgstr ""
 #: /usr/bin/faugus-launcher:3241 /usr/bin/faugus-launcher:4766
 #: /usr/bin/faugus-launcher:6285
 msgid ""
-"May fix controller issues with some games. Only works with GE-Proton10-3 or "
-"superior."
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
 msgstr ""
 
 #: /usr/bin/faugus-launcher:3243
