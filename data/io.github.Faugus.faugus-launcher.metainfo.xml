@@ -38,7 +38,7 @@
     <ul>
       <li>The 'stop' button won't close games.</li>
       <li>Gamescope doesn't work.</li>
-      <li>It may not use the system theme in some DEs. See the workaround on GitHub.</li>
+      <li>It may not use the system theme in some DEs.</li>
     </ul>
   </description>
   <categories>
@@ -78,7 +78,7 @@
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/proton-manager.png</image>
-      <caption>GE-Proton Manager</caption>
+      <caption>Proton Manager</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/shortcut-file.png</image>
@@ -86,12 +86,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.5-1" date="2025-07-04">
+    <release version="1.7.6-1" date="2025-07-05">
       <description>
         <ul>
-          <li>Removed uneeded strings translation</li>
-          <li>Fixed Proton-EM not persisting as a default runner</li>
-          <li>Added Proton-EM to features tooltips</li>
+          <li>Updated umu-launcher to version 1.2.7</li>
         </ul>
       </description>
     </release>
