@@ -2351,7 +2351,7 @@ class Main(Gtk.Window):
         retcode = processo.poll()
 
         if retcode is not None:
-            print("{title} installed.").format(title=title)
+            print(f"{title} installed.")
 
             if os.path.exists(faugus_temp):
                 shutil.rmtree(faugus_temp)
