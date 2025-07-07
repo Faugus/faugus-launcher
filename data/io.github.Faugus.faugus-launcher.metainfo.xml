@@ -28,10 +28,10 @@
       <li>Winecfg: Wine's graphical interface to configure Windows versions, libraries, drivers, and integrations.</li>
       <li>MangoHud: Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.</li>
       <li>Feral GameMode: Tweaks your system to improve performance.</li>
-      <li>Disable Hidraw: May fix controller issues with some games.</li>
+      <li>Disable Hidraw: May fix controller issues in some games.</li>
       <li>Additional Application: An additional application to run with the game, like Cheat Engine, Trainers, Mods...</li>
-      <li>Proton Manager: Download/remove GE-Proton and Proton-EM builds.</li>
-      <li>Wine Wayland Driver Support (Experimental).</li>
+      <li>Proton Manager: Download/Remove GE-Proton and Proton-EM builds.</li>
+      <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
     <p>Known issues with Flatpak:</p>
@@ -86,10 +86,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.6-1" date="2025-07-05">
+    <release version="1.7.7-1" date="2025-07-07">
       <description>
         <ul>
-          <li>Updated umu-launcher to version 1.2.7</li>
+          <li>Fixed broken launchers installation</li>
         </ul>
       </description>
     </release>
