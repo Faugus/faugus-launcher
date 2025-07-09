@@ -204,7 +204,7 @@ class FaugusRun:
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_("{path} was not found.").format(path=protonpath))
+        label.set_label(_(f"{protonpath} was not found."))
         label.set_halign(Gtk.Align.CENTER)
 
         label2 = Gtk.Label()
@@ -460,7 +460,7 @@ class FaugusRun:
             else:
                 protonpath = "Using UMU-Proton Latest"
         else:
-            protonpath = _("Using {path}").format(path=protonpath)
+            protonpath = _(f"Using {protonpath}")
         print(protonpath)
 
         self.label = Gtk.Label(label=protonpath)

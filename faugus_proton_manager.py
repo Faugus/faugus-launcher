@@ -351,7 +351,7 @@ class ProtonDownloader(Gtk.Dialog):
     def download_and_extract(self, url, filename, tag_name, button):
         button.set_label(_("Downloading..."))
         display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
-        self.progress_label.set_text(_("Downloading {tag}...").format(tag=display_tag_name))
+        self.progress_label.set_text(_(f"Downloading {display_tag_name}..."))
         button.set_sensitive(False)
 
         if not os.path.exists(STEAM_COMPATIBILITY_PATH):
@@ -376,7 +376,7 @@ class ProtonDownloader(Gtk.Dialog):
     def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
         button.set_label(_("Extracting..."))
         display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
-        self.progress_label.set_text(_("Extracting {tag}...").format(tag=display_tag_name))
+        self.progress_label.set_text(_(f"Extracting {display_tag_name}..."))
         Gtk.main_iteration_do(False)
 
         mode = 'r:xz' if tar_file_path.endswith('.tar.xz') else 'r:gz'
