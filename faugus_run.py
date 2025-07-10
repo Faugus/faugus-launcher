@@ -85,6 +85,9 @@ faugus_notification = PathManager.system_data('faugus-launcher/faugus-notificati
 eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={PathManager.user_config("faugus-launcher/components/be")}'
 
+compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+os.makedirs(compatibility_dir, exist_ok=True)
+
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
     if lang:
@@ -204,7 +207,7 @@ class FaugusRun:
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_(f"{protonpath} was not found."))
+        label.set_label(_("{path} was not found.").format(path=protonpath))
         label.set_halign(Gtk.Align.CENTER)
 
         label2 = Gtk.Label()
@@ -247,7 +250,6 @@ class FaugusRun:
         sys.exit()
 
     def update_protonpath(self, message):
-        compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 
         versions = [
             d for d in os.listdir(compatibility_dir)
@@ -460,7 +462,7 @@ class FaugusRun:
             else:
                 protonpath = "Using UMU-Proton Latest"
         else:
-            protonpath = _(f"Using {protonpath}")
+            protonpath = _("Using {path}").format(path=protonpath)
         print(protonpath)
 
         self.label = Gtk.Label(label=protonpath)
