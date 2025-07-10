@@ -86,10 +86,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.7-1" date="2025-07-07">
+    <release version="1.7.8-1" date="2025-07-10">
       <description>
         <ul>
-          <li>Fixed broken launchers installation</li>
+          <li>Removed format strings cause it was causing problems in some systems</li>
+          <li>Fixed an error when using Proton-EM in a fresh installation</li>
+          <li>Added support to NTsync for Proton-EM</li>
+          <li>Added support to WOW64 for Proton-EM</li>
         </ul>
       </description>
     </release>
