@@ -91,8 +91,8 @@
         <ul>
           <li>Removed format strings cause it was causing problems in some systems</li>
           <li>Fixed an error when using Proton-EM in a fresh installation</li>
-          <li>Added support to NTsync (experimental) for Proton-EM</li>
-          <li>Added support to WOW64 (experimental) for Proton-EM</li>
+          <li>Added NTsync support (experimental) for Proton-EM</li>
+          <li>Added WOW64 support (experimental) for Proton-EM</li>
         </ul>
       </description>
     </release>
