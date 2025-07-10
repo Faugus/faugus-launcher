@@ -231,6 +231,8 @@ class ConfigManager:
             'enable-logging': 'False',
             'wayland-driver': 'False',
             'enable-hdr': 'False',
+            'enable-ntsync': 'False',
+            'enable-wow64': 'False',
             'language': lang,
         }
 
@@ -843,7 +845,7 @@ class Main(Gtk.Window):
         self.on_show_logs_clicked(selected_item)
 
     def on_show_logs_clicked(self, widget):
-        dialog = Gtk.Dialog(title=_(f"{self.current_title} Logs"), parent=self, modal=True)
+        dialog = Gtk.Dialog(title=_("{} Logs").format(self.current_title), parent=self, modal=True)
         dialog.set_icon_from_file(faugus_png)
         dialog.set_default_size(1280, 720)
 
@@ -954,7 +956,7 @@ class Main(Gtk.Window):
                 new_title = duplicate_dialog.entry_title.get_text()
 
                 if any(new_title == game.title for game in self.games):
-                    duplicate_dialog.show_warning_dialog(duplicate_dialog, _(f"{title} already exists."))
+                    duplicate_dialog.show_warning_dialog(duplicate_dialog, _("{title} already exists.").format(title=title))
                 else:
                     title_formatted_old = re.sub(r'[^a-zA-Z0-9\s]', '', title)
                     title_formatted_old = title_formatted_old.replace(' ', '-')
@@ -992,7 +994,7 @@ class Main(Gtk.Window):
                             with open("games.json", "r", encoding="utf-8") as file:
                                 games = json.load(file)
                         except json.JSONDecodeError as e:
-                            print(f"Error reading the JSON file: {e}")
+                            print("Error reading the JSON file: {error}").format(error=e)
 
                     games.append(game_info)
 
@@ -1130,7 +1132,7 @@ class Main(Gtk.Window):
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_(f"{title} is already running."))
+        label.set_label(_("{title} is already running.").format(title=title))
         label.set_halign(Gtk.Align.CENTER)
 
         button_yes = Gtk.Button(label=_("Ok"))
@@ -1180,6 +1182,8 @@ class Main(Gtk.Window):
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        self.enable_ntsync = cfg.config.get('enable-ntsync', 'False') == 'True'
+        self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
 
     def create_tray_menu(self):
@@ -1294,7 +1298,7 @@ class Main(Gtk.Window):
         except FileNotFoundError:
             pass
         except json.JSONDecodeError as e:
-            print(f"Error reading the JSON file: {e}")
+            print("Error reading the JSON file: {error}").format(error=e)
 
     def add_item_list(self, game):
         # Add a game item to the list
@@ -1491,6 +1495,8 @@ class Main(Gtk.Window):
         checkbox_enable_logging = settings_dialog.checkbox_enable_logging.get_active()
         checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr.get_active()
+        checkbox_enable_ntsync = settings_dialog.checkbox_enable_ntsync.get_active()
+        checkbox_enable_wow64 = settings_dialog.checkbox_enable_wow64.get_active()
         mangohud_state = settings_dialog.checkbox_mangohud.get_active()
         gamemode_state = settings_dialog.checkbox_gamemode.get_active()
         disable_hidraw_state = settings_dialog.checkbox_disable_hidraw.get_active()
@@ -1513,7 +1519,7 @@ class Main(Gtk.Window):
             config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
                                     checkbox_start_boot, checkbox_mono_icon, combo_box_interface, checkbox_start_maximized,
-                                    checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
             self.manage_autostart_file(checkbox_start_boot)
 
             if checkbox_system_tray:
@@ -1868,7 +1874,7 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
-            edit_game_dialog.set_title(_(f"Edit {game.title}"))
+            edit_game_dialog.set_title(_("Edit {title}").format(title=game.title))
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
             edit_game_dialog.entry_addapp.set_text(game.addapp)
             edit_game_dialog.grid_launcher.set_visible(False)
@@ -1924,11 +1930,11 @@ class Main(Gtk.Window):
 
             if self.game_running:
                 edit_game_dialog.button_winecfg.set_sensitive(False)
-                edit_game_dialog.button_winecfg.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_winecfg.set_tooltip_text(_("{title} is running. Please close it first.").format(title=game.title))
                 edit_game_dialog.button_winetricks.set_sensitive(False)
-                edit_game_dialog.button_winetricks.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_winetricks.set_tooltip_text(_("{title} is running. Please close it first.").format(title=game.title))
                 edit_game_dialog.button_run.set_sensitive(False)
-                edit_game_dialog.button_run.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_run.set_tooltip_text(_("{title} is running. Please close it first.").format(title=game.title))
 
             edit_game_dialog.show()
 
@@ -2118,7 +2124,7 @@ class Main(Gtk.Window):
 
             if any(game.title == title for game in self.games):
                 # Display an error message and prevent the dialog from closing
-                self.show_warning_dialog(add_game_dialog, _(f"{title} already exists."))
+                self.show_warning_dialog(add_game_dialog, _("{title} already exists.").format(title=title))
                 return True
 
             path = add_game_dialog.entry_path.get_text()
@@ -2142,7 +2148,7 @@ class Main(Gtk.Window):
                     command_magick = shutil.which("magick") or shutil.which("convert")
                     subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
                 except subprocess.CalledProcessError as e:
-                    print(f"Error resizing banner: {e}")
+                    print("Error resizing banner: {error}").format(error=e)
             else:
                 banner = ""
 
@@ -2219,7 +2225,7 @@ class Main(Gtk.Window):
                     with open("games.json", "r", encoding="utf-8") as file:
                         games = json.load(file)
                 except json.JSONDecodeError as e:
-                    print(f"Error reading the JSON file: {e}")
+                    print("Error reading the JSON file: {error}").format(error=e)
 
             games.append(game_info)
 
@@ -2279,7 +2285,7 @@ class Main(Gtk.Window):
         self.label_download.set_margin_start(20)
         self.label_download.set_margin_end(20)
         self.label_download.set_margin_bottom(20)
-        self.label_download.set_text(_(f"Installing {title}..."))
+        self.label_download.set_text(_("Installing {title}...").format(title=title))
         self.label_download.set_size_request(256, -1)
 
         self.label_download2 = Gtk.Label()
@@ -2412,10 +2418,10 @@ class Main(Gtk.Window):
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
                     GLib.idle_add(on_download_complete)
                 except Exception as e:
-                    GLib.idle_add(self.show_warning_dialog, self, _(f"Error during download: {e}"))
+                    GLib.idle_add(self.show_warning_dialog, self, _("Error during download: {error}").format(error=e))
 
             def on_download_complete():
-                self.label_download.set_text(_(f"Installing {title}..."))
+                self.label_download.set_text(_("Installing {title}...").format(title=title))
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
                     #self.label_download2.set_text(_("Please close the login window and press:"))
@@ -2462,13 +2468,13 @@ class Main(Gtk.Window):
                         tar.extract(member, path=install_path)
                         percent = min(i / total, 1.0)
                         GLib.idle_add(self.bar_download.set_fraction, percent)
-                        GLib.idle_add(self.bar_download.set_text, _(f"Extracting... {int(percent * 100)}%"))
+                        GLib.idle_add(self.bar_download.set_text, _("Extracting... {percent}%").format(percent=int(percent * 100)))
                 GLib.idle_add(self.bar_download.set_fraction, 1.0)
                 GLib.idle_add(self.bar_download.set_text, _("Extraction complete"))
                 GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted,
                             game, shortcut_state, icon_temp, icon_final, title)
             except Exception as e:
-                GLib.idle_add(self.show_warning_dialog, self, _(f"Error during extraction: {e}"))
+                GLib.idle_add(self.show_warning_dialog, self, _("Error during extraction: {error}").format(error=e))
 
         threading.Thread(target=extract).start()
 
@@ -2531,7 +2537,7 @@ class Main(Gtk.Window):
                     subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
                     game.banner = banner
                 except subprocess.CalledProcessError as e:
-                    print(f"Error resizing banner: {e}")
+                    print("Error resizing banner: {error}").format(error=e)
 
             if game.runner == "UMU-Proton Latest":
                 game.runner = ""
@@ -3214,6 +3220,14 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_hdr.set_active(False)
         self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
 
+        self.checkbox_enable_ntsync = Gtk.CheckButton(label=_("Enable NTsync (experimental)"))
+        self.checkbox_enable_ntsync.set_active(False)
+        self.checkbox_enable_ntsync.set_tooltip_text(_("Only works with Proton-EM-10-24 or superior."))
+
+        self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
+        self.checkbox_enable_wow64.set_active(False)
+        self.checkbox_enable_wow64.set_tooltip_text(_("Only works with Proton-EM-10-24 or superior."))
+
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
         self.button_winetricks_default.connect("clicked", self.on_button_winetricks_default_clicked)
@@ -3405,6 +3419,8 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_ntsync, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
@@ -3558,6 +3574,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
+            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3575,7 +3593,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
             self.set_sensitive(False)
 
             proton_manager = faugus_proton_manager
@@ -3637,7 +3655,7 @@ class Settings(Gtk.Dialog):
                     self.combo_box_runner.append_text(version)
 
         except Exception as e:
-            print(f"Error accessing the directory: {e}")
+            print("Error accessing the directory: {error}").format(error=e)
 
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
@@ -3671,6 +3689,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
+            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3688,7 +3708,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3833,6 +3853,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
+            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3850,7 +3872,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -3922,6 +3944,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging = self.checkbox_enable_logging.get_active()
             checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
             checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
+            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
             mangohud_state = self.checkbox_mangohud.get_active()
             gamemode_state = self.checkbox_gamemode.get_active()
             disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
@@ -3939,7 +3963,7 @@ class Settings(Gtk.Dialog):
                                     default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
                                     checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
                                     checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, language)
+                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
             self.set_sensitive(False)
 
             self.parent.manage_autostart_file(checkbox_start_boot)
@@ -4295,6 +4319,8 @@ class Settings(Gtk.Dialog):
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        enable_ntsync = cfg.config.get('enable-ntsync', 'False') == 'True'
+        enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
@@ -4329,6 +4355,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_logging.set_active(enable_logging)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_hdr.set_active(enable_hdr)
+        self.checkbox_enable_ntsync.set_active(enable_ntsync)
+        self.checkbox_enable_wow64.set_active(enable_wow64)
 
         model = self.combo_box_interface.get_model()
         index_to_activate = 0
@@ -4376,7 +4404,7 @@ class Game:
 
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
-        super().__init__(title=_(f"Duplicate {title}"), transient_for=parent, modal=True)
+        super().__init__(title=_("Duplicate {title}").format(title=title), transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
 
@@ -4467,13 +4495,13 @@ class DuplicateDialog(Gtk.Dialog):
 
 class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix):
-        super().__init__(title=_(f"Delete {title}"), transient_for=parent, modal=True)
+        super().__init__(title=_("Delete {title}").format(title=title), transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_(f"Are you sure you want to delete {title}?"))
+        label.set_label(_("Are you sure you want to delete {title}?").format(title=title))
         label.set_halign(Gtk.Align.CENTER)
 
         button_no = Gtk.Button(label=_("No"))
@@ -5199,7 +5227,7 @@ class AddGame(Gtk.Dialog):
                 GLib.idle_add(self.update_image_banner)
 
             except requests.RequestException as e:
-                print(f"Error fetching the banner: {e}")
+                print("Error fetching the banner: {error}").format(error=e)
 
         # Start the thread
         threading.Thread(target=fetch_banner, daemon=True).start()
@@ -5475,7 +5503,7 @@ class AddGame(Gtk.Dialog):
                     self.combo_box_runner.append_text(version)
 
         except Exception as e:
-            print(f"Error accessing the directory: {e}")
+            print("Error accessing the directory: {error}").format(error=e)
 
         # Set the active item, if desired
         self.combo_box_runner.set_active(0)
@@ -5669,7 +5697,7 @@ class AddGame(Gtk.Dialog):
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(f"Error extracting icon: {result.stderr}")
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
@@ -5677,7 +5705,7 @@ class AddGame(Gtk.Dialog):
                     os.remove(self.icon_extracted)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print("An error occurred: {error}").format(error=e)
 
         def show_error_message(message):
             error_dialog = Gtk.MessageDialog(parent=dialog, flags=0, message_type=Gtk.MessageType.ERROR,
@@ -5826,7 +5854,7 @@ class AddGame(Gtk.Dialog):
                                 largest_resolution = (width, height)
                                 largest_image = file_path
                     except IOError:
-                        print(f"Unable to open {file_path}")
+                        print("Unable to open {file}").format(file=file_path)
 
         return largest_image
 
@@ -6088,7 +6116,7 @@ class AddGame(Gtk.Dialog):
                         print("The file does not contain icons.")
                         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                     else:
-                        print(f"Error extracting icon: {result.stderr}")
+                        print("Error extracting icon: {error}").format(error=result.stderr)
                 else:
                     # Convert the extracted icon to PNG
                     command_magick = shutil.which("magick") or shutil.which("convert")
@@ -6107,7 +6135,7 @@ class AddGame(Gtk.Dialog):
                     self.button_shortcut_icon.set_image(image)
 
             except Exception as e:
-                print(f"An error occurred: {e}")
+                print("An error occurred: {error}").format(error=e)
 
             self.entry_path.set_text(filechooser.get_filename())
 
@@ -6454,7 +6482,7 @@ class CreateShortcut(Gtk.Window):
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(f"Error extracting icon: {result.stderr}")
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 # Convert the extracted icon to PNG
                 command_magick = shutil.which("magick") or shutil.which("convert")
@@ -6473,7 +6501,7 @@ class CreateShortcut(Gtk.Window):
                 self.button_shortcut_icon.set_image(image)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print("An error occurred: {error}").format(error=e)
 
         shutil.rmtree(self.icon_directory)
 
@@ -6568,7 +6596,7 @@ class CreateShortcut(Gtk.Window):
                                 largest_resolution = (width, height)
                                 largest_image = file_path
                     except IOError:
-                        print(f"Unable to open {file_path}")
+                        print("Unable to open {file}").format(file=file_path)
 
         return largest_image
 
@@ -6748,7 +6776,7 @@ class CreateShortcut(Gtk.Window):
                     print("The file does not contain icons.")
                     self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
                 else:
-                    print(f"Error extracting icon: {result.stderr}")
+                    print("Error extracting icon: {error}").format(error=result.stderr)
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
                 os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
@@ -6756,7 +6784,7 @@ class CreateShortcut(Gtk.Window):
                     os.remove(self.icon_extracted)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print("An error occurred: {error}").format(error=e)
 
         def show_error_message(message):
             error_dialog = Gtk.MessageDialog(parent=dialog, flags=0, message_type=Gtk.MessageType.ERROR,

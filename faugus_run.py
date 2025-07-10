@@ -155,6 +155,8 @@ class ConfigManager:
             'enable-logging': 'False',
             'wayland-driver': 'False',
             'enable-hdr': 'False',
+            'enable-ntsync': 'False',
+            'enable-wow64': 'False',
             'language': lang,
         }
 
@@ -320,6 +322,10 @@ class FaugusRun:
             self.message = f'PROTON_ENABLE_WAYLAND=1 {self.message}'
             if self.enable_hdr:
                 self.message = f'PROTON_ENABLE_HDR=1 {self.message}'
+        if self.enable_ntsync:
+            self.message = f'PROTON_USE_NTSYNC=1 {self.message}'
+        if self.enable_wow64:
+            self.message = f'PROTON_USE_WOW64=1 {self.message}'
 
         match = re.search(r"WINEPREFIX=['\"]([^'\"]+)", self.message)
         if match:
@@ -423,6 +429,8 @@ class FaugusRun:
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
+        self.enable_ntsync = cfg.config.get('enable-ntsync', 'False') == 'True'
+        self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
 
     def show_warning_dialog(self):
