@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-26 11:46-0300\n"
-"PO-Revision-Date: 2025-06-26 17:44-0300\n"
+"POT-Creation-Date: 2025-07-11 19:52-0300\n"
+"PO-Revision-Date: 2025-07-11 19:53-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -35,18 +35,26 @@ msgid "Downloading..."
 msgstr "Baixando..."
 
 #: /usr/bin/faugus-proton-manager:354
-#, python-brace-format
-msgid "Downloading {tag}..."
-msgstr "Baixando {tag}..."
+#, python-format
+msgid "Downloading %s..."
+msgstr "Baixando %s..."
 
 #: /usr/bin/faugus-proton-manager:377
 msgid "Extracting..."
 msgstr "Extraindo..."
 
 #: /usr/bin/faugus-proton-manager:379
+#, python-format
+msgid "Extracting %s..."
+msgstr "Extraindo %s..."
+
 #, python-brace-format
-msgid "Extracting {tag}..."
-msgstr "Extraindo {tag}..."
+#~ msgid "Downloading {tag}..."
+#~ msgstr "Baixando {tag}..."
+
+#, python-brace-format
+#~ msgid "Extracting {tag}..."
+#~ msgstr "Extraindo {tag}..."
 
 #~ msgid "Error fetching releases:"
 #~ msgstr "Erro ao buscar versões:"
