@@ -845,7 +845,7 @@ class Main(Gtk.Window):
         self.on_show_logs_clicked(selected_item)
 
     def on_show_logs_clicked(self, widget):
-        dialog = Gtk.Dialog(title=_(f"{self.current_title} Logs"), parent=self, modal=True)
+        dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self, modal=True)
         dialog.set_icon_from_file(faugus_png)
         dialog.set_default_size(1280, 720)
 
@@ -956,7 +956,7 @@ class Main(Gtk.Window):
                 new_title = duplicate_dialog.entry_title.get_text()
 
                 if any(new_title == game.title for game in self.games):
-                    duplicate_dialog.show_warning_dialog(duplicate_dialog, _(f"{title} already exists."))
+                    duplicate_dialog.show_warning_dialog(duplicate_dialog, _("%s already exists.") % title)
                 else:
                     title_formatted_old = re.sub(r'[^a-zA-Z0-9\s]', '', title)
                     title_formatted_old = title_formatted_old.replace(' ', '-')
@@ -1132,7 +1132,7 @@ class Main(Gtk.Window):
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_(f"{title} is already running."))
+        label.set_label(_("%s is already running.") % title)
         label.set_halign(Gtk.Align.CENTER)
 
         button_yes = Gtk.Button(label=_("Ok"))
@@ -1874,7 +1874,7 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.entry_launch_arguments.set_text(game.launch_arguments)
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
-            edit_game_dialog.set_title(_(f"Edit {game.title}"))
+            edit_game_dialog.set_title(_("Edit %s") % game.title)
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
             edit_game_dialog.entry_addapp.set_text(game.addapp)
             edit_game_dialog.grid_launcher.set_visible(False)
@@ -1930,11 +1930,11 @@ class Main(Gtk.Window):
 
             if self.game_running:
                 edit_game_dialog.button_winecfg.set_sensitive(False)
-                edit_game_dialog.button_winecfg.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_winecfg.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
                 edit_game_dialog.button_winetricks.set_sensitive(False)
-                edit_game_dialog.button_winetricks.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
                 edit_game_dialog.button_run.set_sensitive(False)
-                edit_game_dialog.button_run.set_tooltip_text(_(f"{game.title} is running. Please close it first."))
+                edit_game_dialog.button_run.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
             edit_game_dialog.show()
 
@@ -2124,7 +2124,7 @@ class Main(Gtk.Window):
 
             if any(game.title == title for game in self.games):
                 # Display an error message and prevent the dialog from closing
-                self.show_warning_dialog(add_game_dialog, _(f"{title} already exists."))
+                self.show_warning_dialog(add_game_dialog, _("%s already exists.") % title)
                 return True
 
             path = add_game_dialog.entry_path.get_text()
@@ -2285,7 +2285,7 @@ class Main(Gtk.Window):
         self.label_download.set_margin_start(20)
         self.label_download.set_margin_end(20)
         self.label_download.set_margin_bottom(20)
-        self.label_download.set_text(_(f"Installing {title}..."))
+        self.label_download.set_text(_("Installing %s...") % title)
         self.label_download.set_size_request(256, -1)
 
         self.label_download2 = Gtk.Label()
@@ -2418,10 +2418,10 @@ class Main(Gtk.Window):
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
                     GLib.idle_add(on_download_complete)
                 except Exception as e:
-                    GLib.idle_add(self.show_warning_dialog, self, _(f"Error during download: {e}"))
+                    GLib.idle_add(self.show_warning_dialog, self, _("Error during download: %s") % e)
 
             def on_download_complete():
-                self.label_download.set_text(_(f"Installing {title}..."))
+                self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
                     #self.label_download2.set_text(_("Please close the login window and press:"))
@@ -2468,13 +2468,13 @@ class Main(Gtk.Window):
                         tar.extract(member, path=install_path)
                         percent = min(i / total, 1.0)
                         GLib.idle_add(self.bar_download.set_fraction, percent)
-                        GLib.idle_add(self.bar_download.set_text, _(f"Extracting... {int(percent * 100)}%"))
+                        GLib.idle_add(self.bar_download.set_text, _("Extracting... %d%%") % int(percent * 100))
                 GLib.idle_add(self.bar_download.set_fraction, 1.0)
                 GLib.idle_add(self.bar_download.set_text, _("Extraction complete"))
                 GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted,
                             game, shortcut_state, icon_temp, icon_final, title)
             except Exception as e:
-                GLib.idle_add(self.show_warning_dialog, self, _(f"Error during extraction: {e}"))
+                GLib.idle_add(self.show_warning_dialog, self, _("Error during extraction: %s") % e)
 
         threading.Thread(target=extract).start()
 
@@ -4404,7 +4404,7 @@ class Game:
 
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
-        super().__init__(title=_(f"Duplicate {title}"), transient_for=parent, modal=True)
+        super().__init__(title=_("Duplicate %s") % title, transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
 
@@ -4495,13 +4495,13 @@ class DuplicateDialog(Gtk.Dialog):
 
 class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix):
-        super().__init__(title=_(f"Delete {title}"), transient_for=parent, modal=True)
+        super().__init__(title=_("Delete %s") % title, transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
-        label.set_label(_(f"Are you sure you want to delete {title}?"))
+        label.set_label(_("Are you sure you want to delete %s?") % title)
         label.set_halign(Gtk.Align.CENTER)
 
         button_no = Gtk.Button(label=_("No"))
