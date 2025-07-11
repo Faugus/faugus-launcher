@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-10 15:36-0300\n"
-"PO-Revision-Date: 2025-07-10 15:46-0300\n"
+"POT-Creation-Date: 2025-07-11 19:35-0300\n"
+"PO-Revision-Date: 2025-07-11 19:37-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -67,8 +67,9 @@ msgid "Stop"
 msgstr "Parar"
 
 #: /usr/bin/faugus-launcher:848
-msgid "{} Logs"
-msgstr "{} Logs"
+#, python-format
+msgid "%s Logs"
+msgstr "%s Logs"
 
 #: /usr/bin/faugus-launcher:888
 msgid "Copy to clipboard"
@@ -79,14 +80,14 @@ msgid "Open file location"
 msgstr "Abrir local do arquivo"
 
 #: /usr/bin/faugus-launcher:959 /usr/bin/faugus-launcher:2127
-#, python-brace-format
-msgid "{title} already exists."
-msgstr "{title} já existe."
+#, python-format
+msgid "%s already exists."
+msgstr "%s já existe."
 
 #: /usr/bin/faugus-launcher:1135
-#, python-brace-format
-msgid "{title} is already running."
-msgstr "{title} já está em execução."
+#, python-format
+msgid "%s is already running."
+msgstr "%s já está em execução."
 
 #: /usr/bin/faugus-launcher:1138 /usr/bin/faugus-launcher:2078
 #: /usr/bin/faugus-launcher:3277 /usr/bin/faugus-launcher:4178
@@ -106,9 +107,9 @@ msgid "Quit"
 msgstr "Sair"
 
 #: /usr/bin/faugus-launcher:1877
-#, python-brace-format
-msgid "Edit {title}"
-msgstr "Editar {title}"
+#, python-format
+msgid "Edit %s"
+msgstr "Editar %s"
 
 #: /usr/bin/faugus-launcher:1923 /usr/bin/faugus-launcher:5040
 msgid ""
@@ -120,18 +121,18 @@ msgstr ""
 
 #: /usr/bin/faugus-launcher:1933 /usr/bin/faugus-launcher:1935
 #: /usr/bin/faugus-launcher:1937
-#, python-brace-format
-msgid "{title} is running. Please close it first."
-msgstr "{title} está em execução. Por favor feche-o primeiro."
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s está em execução. Por favor feche-o primeiro."
 
 #: /usr/bin/faugus-launcher:2194
 msgid "No internet connection."
 msgstr "Sem conexão com a internet."
 
 #: /usr/bin/faugus-launcher:2288 /usr/bin/faugus-launcher:2424
-#, python-brace-format
-msgid "Installing {title}..."
-msgstr "Instalando {title}..."
+#, python-format
+msgid "Installing %s..."
+msgstr "Instalando %s..."
 
 #: /usr/bin/faugus-launcher:2299
 msgid "Finish installation"
@@ -158,9 +159,9 @@ msgid "Download complete"
 msgstr "Download finalizado"
 
 #: /usr/bin/faugus-launcher:2421
-#, python-brace-format
-msgid "Error during download: {error}"
-msgstr "Erro ao baixar: {error}"
+#, python-format
+msgid "Error during download: %s"
+msgstr "Erro ao baixar: %s"
 
 #: /usr/bin/faugus-launcher:2426 /usr/bin/faugus-launcher:2431
 #: /usr/bin/faugus-launcher:2484
@@ -168,18 +169,18 @@ msgid "Please close the login window and wait..."
 msgstr "Por favor feche a janela de login e aguarde..."
 
 #: /usr/bin/faugus-launcher:2471
-#, python-brace-format
-msgid "Extracting... {percent}%"
-msgstr "Extraindo... {percent}%"
+#, python-format
+msgid "Extracting... %d%%"
+msgstr "Extraindo... %d%%"
 
 #: /usr/bin/faugus-launcher:2473
 msgid "Extraction complete"
 msgstr "Extração finalizada"
 
 #: /usr/bin/faugus-launcher:2477
-#, python-brace-format
-msgid "Error during extraction: {error}"
-msgstr "Erro ao extrair: {error}"
+#, python-format
+msgid "Error during extraction: %s"
+msgstr "Erro ao extrair: %s"
 
 #: /usr/bin/faugus-launcher:2996
 msgid "Settings"
@@ -282,8 +283,10 @@ msgid "Enable NTsync (experimental)"
 msgstr "Ativar NTsync (experimental)"
 
 #: /usr/bin/faugus-launcher:3225 /usr/bin/faugus-launcher:3229
-msgid "Only works with Proton-EM-10-24 or superior."
-msgstr "Só funciona com o Proton-EM-10-24 ou superior."
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"Só funciona com o GE-Proton10-9 ou superior e Proton-EM-10-24 ou superior."
 
 #: /usr/bin/faugus-launcher:3227
 msgid "Enable WOW64 (experimental)"
@@ -431,9 +434,9 @@ msgid "Select a prefix location"
 msgstr "Selecione um local para o prefixo"
 
 #: /usr/bin/faugus-launcher:4407
-#, python-brace-format
-msgid "Duplicate {title}"
-msgstr "Duplicar {title}"
+#, python-format
+msgid "Duplicate %s"
+msgstr "Duplicar %s"
 
 #: /usr/bin/faugus-launcher:4411 /usr/bin/faugus-launcher:4698
 #: /usr/bin/faugus-launcher:6266
@@ -446,14 +449,14 @@ msgid "Game Title"
 msgstr "Título do Jogo"
 
 #: /usr/bin/faugus-launcher:4498
-#, python-brace-format
-msgid "Delete {title}"
-msgstr "Excluir {title}"
+#, python-format
+msgid "Delete %s"
+msgstr "Excluir %s"
 
 #: /usr/bin/faugus-launcher:4504
-#, python-brace-format
-msgid "Are you sure you want to delete {title}?"
-msgstr "Tem certeza que deseja excluir {title}?"
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "Tem certeza que deseja excluir %s?"
 
 #: /usr/bin/faugus-launcher:4515
 msgid "Also remove the prefix"
@@ -590,6 +593,18 @@ msgstr "Jogo do Linux"
 #: /usr/bin/faugus-launcher:6032
 msgid "Select the game's .exe"
 msgstr "Selecione o .exe do jogo"
+
+#, python-brace-format
+#~ msgid "Edit {title}"
+#~ msgstr "Editar {title}"
+
+#, python-brace-format
+#~ msgid "Duplicate {title}"
+#~ msgstr "Duplicar {title}"
+
+#, python-brace-format
+#~ msgid "Delete {title}"
+#~ msgstr "Excluir {title}"
 
 #~ msgid "xdg-user-dir not found or failed; falling back to ~/Desktop"
 #~ msgstr "xdg-user-dir não encontrado ou falhou; voltando para ~/Desktop"
