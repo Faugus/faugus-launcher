@@ -3222,11 +3222,11 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_enable_ntsync = Gtk.CheckButton(label=_("Enable NTsync (experimental)"))
         self.checkbox_enable_ntsync.set_active(False)
-        self.checkbox_enable_ntsync.set_tooltip_text(_("Only works with Proton-EM-10-24 or superior."))
+        self.checkbox_enable_ntsync.set_tooltip_text(_("Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."))
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
         self.checkbox_enable_wow64.set_active(False)
-        self.checkbox_enable_wow64.set_tooltip_text(_("Only works with Proton-EM-10-24 or superior."))
+        self.checkbox_enable_wow64.set_tooltip_text(_("Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."))
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
