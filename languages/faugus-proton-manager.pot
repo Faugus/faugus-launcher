@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-26 11:46-0300\n"
+"POT-Creation-Date: 2025-07-11 19:52-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,8 +34,8 @@ msgid "Downloading..."
 msgstr ""
 
 #: /usr/bin/faugus-proton-manager:354
-#, python-brace-format
-msgid "Downloading {tag}..."
+#, python-format
+msgid "Downloading %s..."
 msgstr ""
 
 #: /usr/bin/faugus-proton-manager:377
@@ -43,6 +43,6 @@ msgid "Extracting..."
 msgstr ""
 
 #: /usr/bin/faugus-proton-manager:379
-#, python-brace-format
-msgid "Extracting {tag}..."
+#, python-format
+msgid "Extracting %s..."
 msgstr ""
