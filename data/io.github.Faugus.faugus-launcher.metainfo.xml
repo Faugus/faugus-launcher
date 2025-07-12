@@ -86,13 +86,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.8-1" date="2025-07-10">
+    <release version="1.7.9-1" date="2025-07-11">
       <description>
         <ul>
+          <li>Updated umu-launcher to 1.2.9</li>
+          <li>Steam Deck Gaming Mode now runs the games properly</li>
           <li>Removed format strings cause it was causing problems in some systems</li>
-          <li>Fixed an error when using Proton-EM in a fresh installation</li>
-          <li>Added NTsync support (experimental) for Proton-EM</li>
-          <li>Added WOW64 support (experimental) for Proton-EM</li>
+          <li>Added GE-Proton to NTsync and WOW64 tooltips</li>
+          <li>Fixed some strings weren't being translated</li>
+          <li>Proton Manager now shows the Extracting bar properly</li>
         </ul>
       </description>
     </release>
