@@ -1478,76 +1478,32 @@ class Main(Gtk.Window):
             settings_dialog.destroy()
             return
 
-        combo_box_language = settings_dialog.combo_box_language.get_active_text()
-        language = settings_dialog.lang_codes.get(combo_box_language, "en_US")
-        checkbox_discrete_gpu_state = settings_dialog.checkbox_discrete_gpu.get_active()
-        checkbox_state = settings_dialog.checkbox_close_after_launch.get_active()
-        checkbox_splash_disable = settings_dialog.checkbox_splash_disable.get_active()
-        checkbox_system_tray = settings_dialog.checkbox_system_tray.get_active()
-        checkbox_start_boot = settings_dialog.checkbox_start_boot.get_active()
-        checkbox_mono_icon = settings_dialog.checkbox_mono_icon.get_active()
-        checkbox_start_maximized = settings_dialog.checkbox_start_maximized.get_active()
-        default_prefix = settings_dialog.entry_default_prefix.get_text()
-        combo_box_interface = settings_dialog.combo_box_interface.get_active_text()
-        checkbox_start_fullscreen = settings_dialog.checkbox_start_fullscreen.get_active()
-        checkbox_show_labels = settings_dialog.checkbox_show_labels.get_active()
-        checkbox_smaller_banners = settings_dialog.checkbox_smaller_banners.get_active()
-        checkbox_enable_logging = settings_dialog.checkbox_enable_logging.get_active()
-        checkbox_wayland_driver = settings_dialog.checkbox_wayland_driver.get_active()
-        checkbox_enable_hdr = settings_dialog.checkbox_enable_hdr.get_active()
-        checkbox_enable_ntsync = settings_dialog.checkbox_enable_ntsync.get_active()
-        checkbox_enable_wow64 = settings_dialog.checkbox_enable_wow64.get_active()
-        mangohud_state = settings_dialog.checkbox_mangohud.get_active()
-        gamemode_state = settings_dialog.checkbox_gamemode.get_active()
-        disable_hidraw_state = settings_dialog.checkbox_disable_hidraw.get_active()
-        default_runner = settings_dialog.combo_box_runner.get_active_text()
-
-        if default_runner == "UMU-Proton Latest":
-            default_runner = ""
-        if default_runner == "GE-Proton Latest (default)":
-            default_runner = "GE-Proton"
-        if default_runner == "Proton-EM Latest":
-            default_runner = "Proton-EM"
-
         # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
+            default_prefix = settings_dialog.entry_default_prefix.get_text()
             validation_result = self.validate_settings_fields(settings_dialog, default_prefix)
             if not validation_result:
                 return
 
-            config = ConfigManager()
-            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable, checkbox_system_tray,
-                                    checkbox_start_boot, checkbox_mono_icon, combo_box_interface, checkbox_start_maximized,
-                                    checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners, checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
-            self.manage_autostart_file(checkbox_start_boot)
-
-            if checkbox_system_tray:
-                self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                    self.connect("delete-event", self.on_window_delete_event)
-                    self.window_delete_event_connected = True
-                self.indicator.set_menu(self.create_tray_menu())
-            else:
-                self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                    self.disconnect_by_func(self.on_window_delete_event)
-                    self.window_delete_event_connected = False
+            settings_dialog.update_config_file()
+            self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active())
+            settings_dialog.update_system_tray()
 
             if validation_result:
-                if self.interface_mode != combo_box_interface:
+                combobox_language = settings_dialog.combobox_language.get_active_text()
+                if self.interface_mode != settings_dialog.combobox_interface.get_active_text():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
-                if self.show_labels != checkbox_show_labels:
+                if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
-                if self.smaller_banners != checkbox_smaller_banners:
+                if self.smaller_banners != settings_dialog.checkbox_smaller_banners.get_active():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
-                if self.language != language:
+                if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
-                if self.mono_icon != checkbox_mono_icon:
+                if self.mono_icon != settings_dialog.checkbox_mono_icon.get_active():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
             self.load_config()
@@ -1559,7 +1515,7 @@ class Main(Gtk.Window):
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
 
-        if settings_dialog.combo_box_interface.get_active_text() == "Banners":
+        if settings_dialog.combobox_interface.get_active_text() == "Banners":
             if not default_prefix:
                 if not default_prefix:
                     settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
@@ -1848,7 +1804,7 @@ class Main(Gtk.Window):
             edit_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
-            model = edit_game_dialog.combo_box_runner.get_model()
+            model = edit_game_dialog.combobox_runner.get_model()
             index_to_activate = 0
             game_runner = game.runner
 
@@ -1859,7 +1815,7 @@ class Main(Gtk.Window):
             if game.runner == "Proton-EM":
                 game_runner = "Proton-EM Latest"
             if game_runner == "Linux-Native":
-                edit_game_dialog.combo_box_launcher.set_active(1)
+                edit_game_dialog.combobox_launcher.set_active(1)
 
             for i, row in enumerate(model):
                 if row[0] == game_runner:
@@ -1868,7 +1824,7 @@ class Main(Gtk.Window):
             if not game_runner:
                 index_to_activate = 1
 
-            edit_game_dialog.combo_box_runner.set_active(index_to_activate)
+            edit_game_dialog.combobox_runner.set_active(index_to_activate)
             edit_game_dialog.entry_title.set_text(game.title)
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
@@ -2117,10 +2073,10 @@ class Main(Gtk.Window):
             # Proceed with adding the game
             # Get game information from dialog fields
             prefix = add_game_dialog.entry_prefix.get_text()
-            if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
+            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
                 title = add_game_dialog.entry_title.get_text()
             else:
-                title = add_game_dialog.combo_box_launcher.get_active_text()
+                title = add_game_dialog.combobox_launcher.get_active_text()
 
             if any(game.title == title for game in self.games):
                 # Display an error message and prevent the dialog from closing
@@ -2131,7 +2087,7 @@ class Main(Gtk.Window):
             launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
-            runner = add_game_dialog.combo_box_runner.get_active_text()
+            runner = add_game_dialog.combobox_runner.get_active_text()
             addapp = add_game_dialog.entry_addapp.get_text()
 
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
@@ -2158,7 +2114,7 @@ class Main(Gtk.Window):
                 runner = "GE-Proton"
             if runner == "Proton-EM Latest":
                 runner = "Proton-EM"
-            if add_game_dialog.combo_box_launcher.get_active() == 1:
+            if add_game_dialog.combobox_launcher.get_active() == 1:
                 runner = "Linux-Native"
 
             # Determine mangohud and gamemode status
@@ -2189,27 +2145,27 @@ class Main(Gtk.Window):
                         return False
                     raise
 
-            if add_game_dialog.combo_box_launcher.get_active() != 0 and add_game_dialog.combo_box_launcher.get_active() != 1:
+            if add_game_dialog.combobox_launcher.get_active() != 0 and add_game_dialog.combobox_launcher.get_active() != 1:
                 if not check_internet_connection():
                     self.show_warning_dialog(add_game_dialog, _("No internet connection."))
                     return True
                 else:
-                    if add_game_dialog.combo_box_launcher.get_active() == 2:
+                    if add_game_dialog.combobox_launcher.get_active() == 2:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state,
                                              icon_temp, icon_final)
 
-                    if add_game_dialog.combo_box_launcher.get_active() == 3:
+                    if add_game_dialog.combobox_launcher.get_active() == 3:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state,
                                              icon_temp, icon_final)
 
-                    if add_game_dialog.combo_box_launcher.get_active() == 4:
+                    if add_game_dialog.combobox_launcher.get_active() == 4:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state,
                                              icon_temp, icon_final)
 
-                    if add_game_dialog.combo_box_launcher.get_active() == 5:
+                    if add_game_dialog.combobox_launcher.get_active() == 5:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state,
                                              icon_temp, icon_final)
@@ -2234,7 +2190,7 @@ class Main(Gtk.Window):
 
             self.games.append(game)
 
-            if add_game_dialog.combo_box_launcher.get_active() == 0 or add_game_dialog.combo_box_launcher.get_active() == 1:
+            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
@@ -2517,7 +2473,7 @@ class Main(Gtk.Window):
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.disable_hidraw = edit_game_dialog.checkbox_disable_hidraw.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
-            game.runner = edit_game_dialog.combo_box_runner.get_active_text()
+            game.runner = edit_game_dialog.combobox_runner.get_active_text()
             game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
             game.addapp = edit_game_dialog.entry_addapp.get_text()
 
@@ -2545,7 +2501,7 @@ class Main(Gtk.Window):
                 game.runner = "GE-Proton"
             if game.runner == "Proton-EM Latest":
                 game.runner = "Proton-EM"
-            if edit_game_dialog.combo_box_launcher.get_active() == 1:
+            if edit_game_dialog.combobox_launcher.get_active() == 1:
                 game.runner = "Linux-Native"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
@@ -3118,16 +3074,16 @@ class Settings(Gtk.Dialog):
         # Widgets for Interface mode
         self.label_language = Gtk.Label(label=_("Language"))
         self.label_language.set_halign(Gtk.Align.START)
-        self.combo_box_language = Gtk.ComboBoxText()
+        self.combobox_language = Gtk.ComboBoxText()
 
         # Widgets for Interface mode
         self.label_interface = Gtk.Label(label=_("Interface Mode"))
         self.label_interface.set_halign(Gtk.Align.START)
-        self.combo_box_interface = Gtk.ComboBoxText()
-        self.combo_box_interface.connect("changed", self.on_combobox_interface_changed)
-        self.combo_box_interface.append_text("List")
-        self.combo_box_interface.append_text("Blocks")
-        self.combo_box_interface.append_text("Banners")
+        self.combobox_interface = Gtk.ComboBoxText()
+        self.combobox_interface.connect("changed", self.on_combobox_interface_changed)
+        self.combobox_interface.append_text("List")
+        self.combobox_interface.append_text("Blocks")
+        self.combobox_interface.append_text("Banners")
 
         # Create checkbox for 'Start maximized' option
         self.checkbox_start_maximized = Gtk.CheckButton(label=_("Start maximized"))
@@ -3170,7 +3126,7 @@ class Settings(Gtk.Dialog):
         # Widgets for runner
         self.label_runner = Gtk.Label(label=_("Default Runner"))
         self.label_runner.set_halign(Gtk.Align.START)
-        self.combo_box_runner = Gtk.ComboBoxText()
+        self.combobox_runner = Gtk.ComboBoxText()
 
         self.button_proton_manager = Gtk.Button(label=_("Proton Manager"))
         self.button_proton_manager.connect("clicked", self.on_button_proton_manager_clicked)
@@ -3388,8 +3344,8 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.set_margin_bottom(10)
 
         grid_language.attach(self.label_language, 0, 0, 1, 1)
-        grid_language.attach(self.combo_box_language, 0, 1, 1, 1)
-        self.combo_box_language.set_hexpand(True)
+        grid_language.attach(self.combobox_language, 0, 1, 1, 1)
+        self.combobox_language.set_hexpand(True)
 
         grid_prefix.attach(self.label_default_prefix, 0, 0, 1, 1)
         grid_prefix.attach(self.entry_default_prefix, 0, 1, 3, 1)
@@ -3397,9 +3353,9 @@ class Settings(Gtk.Dialog):
         grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
         grid_runner.attach(self.label_runner, 0, 6, 1, 1)
-        grid_runner.attach(self.combo_box_runner, 0, 7, 1, 1)
+        grid_runner.attach(self.combobox_runner, 0, 7, 1, 1)
         grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
-        self.combo_box_runner.set_hexpand(True)
+        self.combobox_runner.set_hexpand(True)
         self.button_proton_manager.set_hexpand(True)
 
         grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
@@ -3423,8 +3379,8 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
-        grid_interface_mode.attach(self.combo_box_interface, 0, 1, 1, 1)
-        self.combo_box_interface.set_hexpand(True)
+        grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
+        self.combobox_interface.set_hexpand(True)
 
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
@@ -3476,7 +3432,7 @@ class Settings(Gtk.Dialog):
         self.load_config()
 
         self.show_all()
-        self.on_combobox_interface_changed(self.combo_box_interface)
+        self.on_combobox_interface_changed(self.combobox_interface)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -3493,8 +3449,8 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
 
     def populate_languages(self):
-        self.combo_box_language.remove_all()
-        self.combo_box_language.append_text("English")
+        self.combobox_language.remove_all()
+        self.combobox_language.append_text("English")
 
         if not os.path.isdir(LOCALE_DIR):
             return
@@ -3503,10 +3459,10 @@ class Settings(Gtk.Dialog):
             mo_file = os.path.join(LOCALE_DIR, lang, "LC_MESSAGES", "faugus-launcher.mo")
             if os.path.isfile(mo_file):
                 lang_name = self.LANG_NAMES.get(lang, lang)
-                self.combo_box_language.append_text(lang_name)
+                self.combobox_language.append_text(lang_name)
                 self.lang_codes[lang_name] = lang
 
-        self.combo_box_language.set_active(0)
+        self.combobox_language.set_active(0)
 
     def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         current_text = widget.get_text()
@@ -3523,8 +3479,8 @@ class Settings(Gtk.Dialog):
             elif option == "fullscreen":
                 self.checkbox_start_maximized.set_active(False)
 
-    def on_combobox_interface_changed(self, combo_box):
-        active_index = combo_box.get_active()
+    def on_combobox_interface_changed(self, combobox):
+        active_index = combobox.get_active()
         if active_index == 0:
             self.grid_big_interface.set_visible(False)
         if active_index == 1:
@@ -3555,9 +3511,9 @@ class Settings(Gtk.Dialog):
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combo_box_runner.append_text("GE-Proton Latest (default)")
-        self.combo_box_runner.append_text("UMU-Proton Latest")
-        self.combo_box_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("GE-Proton Latest (default)")
+        self.combobox_runner.append_text("UMU-Proton Latest")
+        self.combobox_runner.append_text("Proton-EM Latest")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -3588,15 +3544,15 @@ class Settings(Gtk.Dialog):
 
                 # Add sorted versions to ComboBox
                 for version in versions:
-                    self.combo_box_runner.append_text(version)
+                    self.combobox_runner.append_text(version)
 
         except Exception as e:
             print(f"Error accessing the directory: {e}")
 
         # Set the active item, if desired
-        self.combo_box_runner.set_active(0)
+        self.combobox_runner.set_active(0)
 
-        cell_renderer = self.combo_box_runner.get_cells()[0]
+        cell_renderer = self.combobox_runner.get_cells()[0]
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
 
@@ -3605,40 +3561,61 @@ class Settings(Gtk.Dialog):
             entry.get_style_context().remove_class("entry")
 
     def update_config_file(self):
-        combo_box_language = self.combo_box_language.get_active_text()
-        language = self.lang_codes.get(combo_box_language, "en_US")
-        checkbox_state = self.checkbox_close_after_launch.get_active()
-        default_prefix = self.entry_default_prefix.get_text()
+        combobox_language = self.combobox_language.get_active_text()
+        entry_default_prefix = self.entry_default_prefix.get_text()
+        combobox_default_runner = self.get_default_runner()
+        checkbox_mangohud = self.checkbox_mangohud.get_active()
+        checkbox_gamemode = self.checkbox_gamemode.get_active()
+        checkbox_disable_hidraw = self.checkbox_disable_hidraw.get_active()
         checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
         checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+        checkbox_system_tray = self.checkbox_system_tray.get_active()
         checkbox_start_boot = self.checkbox_start_boot.get_active()
         checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-        checkbox_system_tray = self.checkbox_system_tray.get_active()
-        checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-        combo_box_interface = self.combo_box_interface.get_active_text()
-        checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-        checkbox_show_labels = self.checkbox_show_labels.get_active()
-        checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
+        checkbox_close_after_launcher = self.checkbox_close_after_launch.get_active()
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
         checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
         checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
         checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-        mangohud_state = self.checkbox_mangohud.get_active()
-        gamemode_state = self.checkbox_gamemode.get_active()
-        disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
+        combobox_interface = self.combobox_interface.get_active_text()
+        checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+        checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+        checkbox_show_labels = self.checkbox_show_labels.get_active()
+        checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
 
-        default_runner = self.get_default_runner()
+        language = self.lang_codes.get(combobox_language, "en_US")
+
         config = ConfigManager()
-        config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
-                                checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
+        config.save_with_values(
+            checkbox_close_after_launcher,
+            entry_default_prefix,
+            checkbox_mangohud,
+            checkbox_gamemode,
+            checkbox_disable_hidraw,
+            combobox_default_runner,
+            checkbox_discrete_gpu_state,
+            checkbox_splash_disable,
+            checkbox_system_tray,
+            checkbox_start_boot,
+            checkbox_mono_icon,
+            combobox_interface,
+            checkbox_start_maximized,
+            checkbox_start_fullscreen,
+            checkbox_show_labels,
+            checkbox_smaller_banners,
+            checkbox_enable_logging,
+            checkbox_wayland_driver,
+            checkbox_enable_hdr,
+            checkbox_enable_ntsync,
+            checkbox_enable_wow64,
+            language
+        )
+
         self.set_sensitive(False)
 
     def get_default_runner(self):
-        default_runner = self.combo_box_runner.get_active_text()
+        default_runner = self.combobox_runner.get_active_text()
 
         if default_runner == "UMU-Proton Latest":
             default_runner = ""
@@ -3678,7 +3655,7 @@ class Settings(Gtk.Dialog):
                 GLib.idle_add(self.parent.set_sensitive, True)
                 GLib.idle_add(self.blocking_window.destroy)
 
-                GLib.idle_add(lambda: self.combo_box_runner.remove_all())
+                GLib.idle_add(lambda: self.combobox_runner.remove_all())
                 GLib.idle_add(self.populate_combobox_with_runners)
                 GLib.idle_add(lambda: self.load_config())
 
@@ -4211,14 +4188,14 @@ class Settings(Gtk.Dialog):
             self.default_runner = "GE-Proton Latest (default)"
         if self.default_runner == "Proton-EM":
             self.default_runner = "Proton-EM Latest"
-        model = self.combo_box_runner.get_model()
+        model = self.combobox_runner.get_model()
         index_to_activate = 0
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
                 index_to_activate = i
                 break
 
-        self.combo_box_runner.set_active(index_to_activate)
+        self.combobox_runner.set_active(index_to_activate)
         self.checkbox_discrete_gpu.set_active(discrete_gpu)
         self.checkbox_splash_disable.set_active(splash_disable)
         self.checkbox_system_tray.set_active(system_tray)
@@ -4234,20 +4211,20 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_ntsync.set_active(enable_ntsync)
         self.checkbox_enable_wow64.set_active(enable_wow64)
 
-        model = self.combo_box_interface.get_model()
+        model = self.combobox_interface.get_model()
         index_to_activate = 0
         for i, row in enumerate(model):
             if row[0] == self.interface_mode:
                 index_to_activate = i
                 break
 
-        self.combo_box_interface.set_active(index_to_activate)
+        self.combobox_interface.set_active(index_to_activate)
 
-        model = self.combo_box_language.get_model()
+        model = self.combobox_language.get_model()
         index_to_activate = 0
 
         if self.language == "":
-            self.combo_box_language.set_active(index_to_activate)
+            self.combobox_language.set_active(index_to_activate)
         else:
             for i, row in enumerate(model):
                 lang_name = row[0]
@@ -4256,7 +4233,7 @@ class Settings(Gtk.Dialog):
                     index_to_activate = i
                     break
 
-            self.combo_box_language.set_active(index_to_activate)
+            self.combobox_language.set_active(index_to_activate)
 
 class Game:
     def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
@@ -4568,7 +4545,7 @@ class AddGame(Gtk.Dialog):
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.combo_box_launcher = Gtk.ComboBoxText()
+        self.combobox_launcher = Gtk.ComboBoxText()
 
         # Widgets for title
         self.label_title = Gtk.Label(label=_("Title"))
@@ -4612,7 +4589,7 @@ class AddGame(Gtk.Dialog):
         # Widgets for runner
         self.label_runner = Gtk.Label(label=_("Runner"))
         self.label_runner.set_halign(Gtk.Align.START)
-        self.combo_box_runner = Gtk.ComboBoxText()
+        self.combobox_runner = Gtk.ComboBoxText()
 
         # Widgets for protonfix
         self.label_protonfix = Gtk.Label(label="Protonfix")
@@ -4790,8 +4767,8 @@ class AddGame(Gtk.Dialog):
 
         self.notebook.append_page(grid_page2, tab_box2)
 
-        self.grid_launcher.attach(self.combo_box_launcher, 0, 0, 4, 1)
-        self.combo_box_launcher.set_hexpand(True)
+        self.grid_launcher.attach(self.combobox_launcher, 0, 0, 4, 1)
+        self.combobox_launcher.set_hexpand(True)
 
         self.grid_title.attach(self.label_title, 0, 0, 4, 1)
         self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
@@ -4808,8 +4785,8 @@ class AddGame(Gtk.Dialog):
         self.grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
         self.grid_runner.attach(self.label_runner, 0, 0, 1, 1)
-        self.grid_runner.attach(self.combo_box_runner, 0, 1, 1, 1)
-        self.combo_box_runner.set_hexpand(True)
+        self.grid_runner.attach(self.combobox_runner, 0, 1, 1, 1)
+        self.combobox_runner.set_hexpand(True)
 
         self.grid_shortcut.add(self.checkbox_shortcut)
         self.grid_shortcut.add(self.checkbox_steam_shortcut)
@@ -4874,12 +4851,12 @@ class AddGame(Gtk.Dialog):
         self.box.add(bottom_box)
 
         self.populate_combobox_with_launchers()
-        self.combo_box_launcher.set_active(0)
-        self.combo_box_launcher.connect("changed", self.on_combobox_changed)
+        self.combobox_launcher.set_active(0)
+        self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
         self.populate_combobox_with_runners()
 
-        model = self.combo_box_runner.get_model()
+        model = self.combobox_runner.get_model()
         index_to_activate = 0
 
         if self.default_runner == "":
@@ -4893,7 +4870,7 @@ class AddGame(Gtk.Dialog):
             if row[0] == self.default_runner:
                 index_to_activate = i
                 break
-        self.combo_box_runner.set_active(index_to_activate)
+        self.combobox_runner.set_active(index_to_activate)
 
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -5196,8 +5173,8 @@ class AddGame(Gtk.Dialog):
 
         dialog.destroy()
 
-    def on_combobox_changed(self, combo_box):
-        active_index = combo_box.get_active()
+    def on_combobox_changed(self, combobox):
+        active_index = combobox.get_active()
 
         if active_index == 0:
             self.grid_title.set_visible(True)
@@ -5245,7 +5222,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
-            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
 
@@ -5268,7 +5245,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
-            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
 
@@ -5291,7 +5268,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
-            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
 
@@ -5314,7 +5291,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
 
             self.entry_launch_arguments.set_text("")
-            self.entry_title.set_text(self.combo_box_launcher.get_active_text())
+            self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
 
@@ -5334,18 +5311,18 @@ class AddGame(Gtk.Dialog):
                 self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
-        self.combo_box_launcher.append_text(_("Windows Game"))
-        self.combo_box_launcher.append_text(_("Linux Game"))
-        self.combo_box_launcher.append_text("Battle.net")
-        self.combo_box_launcher.append_text("EA App")
-        self.combo_box_launcher.append_text("Epic Games")
-        self.combo_box_launcher.append_text("Ubisoft Connect")  # self.combo_box_launcher.append_text("HoYoPlay")
+        self.combobox_launcher.append_text(_("Windows Game"))
+        self.combobox_launcher.append_text(_("Linux Game"))
+        self.combobox_launcher.append_text("Battle.net")
+        self.combobox_launcher.append_text("EA App")
+        self.combobox_launcher.append_text("Epic Games")
+        self.combobox_launcher.append_text("Ubisoft Connect")  # self.combobox_launcher.append_text("HoYoPlay")
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combo_box_runner.append_text("GE-Proton Latest (default)")
-        self.combo_box_runner.append_text("UMU-Proton Latest")
-        self.combo_box_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("GE-Proton Latest (default)")
+        self.combobox_runner.append_text("UMU-Proton Latest")
+        self.combobox_runner.append_text("Proton-EM Latest")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -5376,15 +5353,15 @@ class AddGame(Gtk.Dialog):
 
                 # Add sorted versions to ComboBox
                 for version in versions:
-                    self.combo_box_runner.append_text(version)
+                    self.combobox_runner.append_text(version)
 
         except Exception as e:
             print(f"Error accessing the directory: {e}")
 
         # Set the active item, if desired
-        self.combo_box_runner.set_active(0)
+        self.combobox_runner.set_active(0)
 
-        cell_renderer = self.combo_box_runner.get_cells()[0]
+        cell_renderer = self.combobox_runner.get_cells()[0]
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
 
@@ -5477,7 +5454,7 @@ class AddGame(Gtk.Dialog):
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
 
-            runner = self.combo_box_runner.get_active_text()
+            runner = self.combobox_runner.get_active_text()
 
             if runner == "UMU-Proton Latest":
                 runner = ""
@@ -5800,7 +5777,7 @@ class AddGame(Gtk.Dialog):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        runner = self.combo_box_runner.get_active_text()
+        runner = self.combobox_runner.get_active_text()
 
         if runner == "UMU-Proton Latest":
             runner = ""
@@ -5857,7 +5834,7 @@ class AddGame(Gtk.Dialog):
 
         prefix = self.entry_prefix.get_text()
 
-        runner = self.combo_box_runner.get_active_text()
+        runner = self.combobox_runner.get_active_text()
 
         if runner == "UMU-Proton Latest":
             runner = ""
@@ -5912,7 +5889,7 @@ class AddGame(Gtk.Dialog):
         filechooser.set_current_folder(os.path.expanduser("~/"))
         filechooser.connect("file-activated", lambda widget: dialog.response(Gtk.ResponseType.OK))
 
-        if self.combo_box_launcher.get_active() != 1:
+        if self.combobox_launcher.get_active() != 1:
             windows_filter = Gtk.FileFilter()
             windows_filter.set_name(_("Windows files"))
             windows_filter.add_pattern("*.exe")
@@ -5958,7 +5935,7 @@ class AddGame(Gtk.Dialog):
         button_grid.set_margin_bottom(10)
         button_grid.attach(button_open, 1, 1, 1, 1)
         button_grid.attach(button_cancel, 0, 1, 1, 1)
-        if self.combo_box_launcher.get_active() != 1:
+        if self.combobox_launcher.get_active() != 1:
             button_grid.attach(filter_combobox, 1, 0, 1, 1)
 
         button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
