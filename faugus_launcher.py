@@ -3553,70 +3553,6 @@ class Settings(Gtk.Dialog):
         else:
             self.checkbox_enable_hdr.set_sensitive(True)
 
-    def on_button_proton_manager_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "en_US")
-            checkbox_state = self.checkbox_close_after_launch.get_active()
-            default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-            checkbox_start_boot = self.checkbox_start_boot.get_active()
-            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-            checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-            combo_box_interface = self.combo_box_interface.get_active_text()
-            checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-            checkbox_show_labels = self.checkbox_show_labels.get_active()
-            checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
-            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-            mangohud_state = self.checkbox_mangohud.get_active()
-            gamemode_state = self.checkbox_gamemode.get_active()
-            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
-            default_runner = self.combo_box_runner.get_active_text()
-
-            if default_runner == "UMU-Proton Latest":
-                default_runner = ""
-            if default_runner == "GE-Proton Latest (default)":
-                default_runner = "GE-Proton"
-            if default_runner == "Proton-EM Latest":
-                default_runner = "Proton-EM"
-
-            config = ConfigManager()
-            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
-                                    checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
-            self.set_sensitive(False)
-
-            proton_manager = faugus_proton_manager
-
-            def run_command():
-                process = subprocess.Popen([sys.executable, proton_manager])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-                GLib.idle_add(lambda: self.combo_box_runner.remove_all())
-                GLib.idle_add(self.populate_combobox_with_runners)
-                GLib.idle_add(lambda: self.load_config())
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
-
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combo_box_runner.append_text("GE-Proton Latest (default)")
@@ -3668,61 +3604,185 @@ class Settings(Gtk.Dialog):
         if entry.get_text():
             entry.get_style_context().remove_class("entry")
 
+    def update_config_file(self):
+        combo_box_language = self.combo_box_language.get_active_text()
+        language = self.lang_codes.get(combo_box_language, "en_US")
+        checkbox_state = self.checkbox_close_after_launch.get_active()
+        default_prefix = self.entry_default_prefix.get_text()
+        checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
+        checkbox_splash_disable = self.checkbox_splash_disable.get_active()
+        checkbox_start_boot = self.checkbox_start_boot.get_active()
+        checkbox_mono_icon = self.checkbox_mono_icon.get_active()
+        checkbox_system_tray = self.checkbox_system_tray.get_active()
+        checkbox_start_maximized = self.checkbox_start_maximized.get_active()
+        combo_box_interface = self.combo_box_interface.get_active_text()
+        checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
+        checkbox_show_labels = self.checkbox_show_labels.get_active()
+        checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
+        checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+        checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
+        checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
+        checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
+        checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
+        mangohud_state = self.checkbox_mangohud.get_active()
+        gamemode_state = self.checkbox_gamemode.get_active()
+        disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
+
+        default_runner = self.get_default_runner()
+        config = ConfigManager()
+        config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
+                                default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
+                                checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
+                                checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
+                                checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
+        self.set_sensitive(False)
+
+    def get_default_runner(self):
+        default_runner = self.combo_box_runner.get_active_text()
+
+        if default_runner == "UMU-Proton Latest":
+            default_runner = ""
+        if default_runner == "GE-Proton Latest (default)":
+            default_runner = "GE-Proton"
+        if default_runner == "Proton-EM Latest":
+            default_runner = "Proton-EM"
+        return default_runner
+
+    def update_system_tray(self):
+        checkbox_system_tray = self.checkbox_system_tray.get_active()
+
+        if checkbox_system_tray:
+            self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
+            if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
+                self.connect("delete-event", self.parent.on_window_delete_event)
+                self.parent.window_delete_event_connected = True
+            self.parent.indicator.set_menu(self.parent.create_tray_menu())
+        else:
+            self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
+            if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
+                self.disconnect_by_func(self.parent.on_window_delete_event)
+                self.parent.window_delete_event_connected = False
+
+    def on_button_proton_manager_clicked(self, widget):
+        if self.entry_default_prefix.get_text() == "":
+            self.entry_default_prefix.get_style_context().add_class("entry")
+        else:
+            self.update_config_file()
+            proton_manager = faugus_proton_manager
+            self.update_system_tray()
+
+            def run_command():
+                process = subprocess.Popen([sys.executable, proton_manager])
+                process.wait()
+                GLib.idle_add(self.set_sensitive, True)
+                GLib.idle_add(self.parent.set_sensitive, True)
+                GLib.idle_add(self.blocking_window.destroy)
+
+                GLib.idle_add(lambda: self.combo_box_runner.remove_all())
+                GLib.idle_add(self.populate_combobox_with_runners)
+                GLib.idle_add(lambda: self.load_config())
+
+            self.blocking_window = Gtk.Window()
+            self.blocking_window.set_transient_for(self.parent)
+            self.blocking_window.set_decorated(False)
+            self.blocking_window.set_modal(True)
+
+            command_thread = threading.Thread(target=run_command)
+            command_thread.start()
+
+    def on_button_winetricks_default_clicked(self, widget):
+        if self.entry_default_prefix.get_text() == "":
+            self.entry_default_prefix.get_style_context().add_class("entry")
+        else:
+            self.update_config_file()
+            self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
+            default_runner = self.get_default_runner()
+            self.update_system_tray()
+            command_parts = []
+
+            # Add command parts if they are not empty
+            command_parts.append(f'GAMEID=winetricks-gui')
+            command_parts.append(f'STORE=none')
+            if default_runner:
+                command_parts.append(f'PROTONPATH={default_runner}')
+
+            # Add the fixed command and remaining arguments
+            command_parts.append(f'"{umu_run}"')
+            command_parts.append('""')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
+
+            print(command)
+
+            # faugus-run path
+            faugus_run_path = faugus_run
+
+            def run_command():
+                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+                process.wait()
+                GLib.idle_add(self.set_sensitive, True)
+                GLib.idle_add(self.parent.set_sensitive, True)
+                GLib.idle_add(self.blocking_window.destroy)
+
+            self.blocking_window = Gtk.Window()
+            self.blocking_window.set_transient_for(self.parent)
+            self.blocking_window.set_decorated(False)
+            self.blocking_window.set_modal(True)
+
+            command_thread = threading.Thread(target=run_command)
+            command_thread.start()
+
+    def on_button_winecfg_default_clicked(self, widget):
+        if self.entry_default_prefix.get_text() == "":
+            self.entry_default_prefix.get_style_context().add_class("entry")
+        else:
+            self.update_config_file()
+            self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
+            default_runner = self.get_default_runner()
+            self.update_system_tray()
+            command_parts = []
+
+            # Add command parts if they are not empty
+            command_parts.append(f'GAMEID=default')
+            if default_runner:
+                command_parts.append(f'PROTONPATH={default_runner}')
+
+            # Add the fixed command and remaining arguments
+            command_parts.append(f'"{umu_run}"')
+            command_parts.append('"winecfg"')
+
+            # Join all parts into a single command
+            command = ' '.join(command_parts)
+
+            print(command)
+
+            # faugus-run path
+            faugus_run_path = faugus_run
+
+            def run_command():
+                process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                process.wait()
+                GLib.idle_add(self.set_sensitive, True)
+                GLib.idle_add(self.parent.set_sensitive, True)
+                GLib.idle_add(self.blocking_window.destroy)
+
+            self.blocking_window = Gtk.Window()
+            self.blocking_window.set_transient_for(self.parent)
+            self.blocking_window.set_decorated(False)
+            self.blocking_window.set_modal(True)
+
+            command_thread = threading.Thread(target=run_command)
+            command_thread.start()
+
     def on_button_run_default_clicked(self, widget):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "en_US")
-            checkbox_state = self.checkbox_close_after_launch.get_active()
-            default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-            checkbox_start_boot = self.checkbox_start_boot.get_active()
-            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-            checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-            combo_box_interface = self.combo_box_interface.get_active_text()
-            checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-            checkbox_show_labels = self.checkbox_show_labels.get_active()
-            checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
-            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-            mangohud_state = self.checkbox_mangohud.get_active()
-            gamemode_state = self.checkbox_gamemode.get_active()
-            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
-            default_runner = self.combo_box_runner.get_active_text()
-
-            if default_runner == "UMU-Proton Latest":
-                default_runner = ""
-            if default_runner == "GE-Proton Latest (default)":
-                default_runner = "GE-Proton"
-            if default_runner == "Proton-EM Latest":
-                default_runner = "Proton-EM"
-
-            config = ConfigManager()
-            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
-                                    checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
-            self.set_sensitive(False)
-
-            self.parent.manage_autostart_file(checkbox_start_boot)
-            if checkbox_system_tray:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                    self.connect("delete-event", self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = True
-                self.parent.indicator.set_menu(self.parent.create_tray_menu())
-            else:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                    self.disconnect_by_func(self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = False
+            self.update_config_file()
+            self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
+            default_runner = self.get_default_runner()
+            self.update_system_tray()
 
             dialog = Gtk.Dialog(title=_("Select a file to run inside the prefix"), parent=self, flags=0)
             dialog.set_size_request(720, 720)
@@ -3830,190 +3890,6 @@ class Settings(Gtk.Dialog):
             else:
                 self.set_sensitive(True)
             dialog.destroy()
-
-    def on_button_winecfg_default_clicked(self, widget):
-
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "en_US")
-            checkbox_state = self.checkbox_close_after_launch.get_active()
-            default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-            checkbox_start_boot = self.checkbox_start_boot.get_active()
-            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-            checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-            combo_box_interface = self.combo_box_interface.get_active_text()
-            checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-            checkbox_show_labels = self.checkbox_show_labels.get_active()
-            checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
-            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-            mangohud_state = self.checkbox_mangohud.get_active()
-            gamemode_state = self.checkbox_gamemode.get_active()
-            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
-            default_runner = self.combo_box_runner.get_active_text()
-
-            if default_runner == "UMU-Proton Latest":
-                default_runner = ""
-            if default_runner == "GE-Proton Latest (default)":
-                default_runner = "GE-Proton"
-            if default_runner == "Proton-EM Latest":
-                default_runner = "Proton-EM"
-
-            config = ConfigManager()
-            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
-                                    checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
-            self.set_sensitive(False)
-
-            self.parent.manage_autostart_file(checkbox_start_boot)
-            if checkbox_system_tray:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                    self.connect("delete-event", self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = True
-                self.parent.indicator.set_menu(self.parent.create_tray_menu())
-            else:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                    self.disconnect_by_func(self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = False
-
-            command_parts = []
-
-            # Add command parts if they are not empty
-
-            command_parts.append(f'GAMEID=default')
-            if default_runner:
-                command_parts.append(f'PROTONPATH={default_runner}')
-
-            # Add the fixed command and remaining arguments
-            command_parts.append(f'"{umu_run}"')
-            command_parts.append('"winecfg"')
-
-            # Join all parts into a single command
-            command = ' '.join(command_parts)
-
-            print(command)
-
-            # faugus-run path
-            faugus_run_path = faugus_run
-
-            def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
-
-    def on_button_winetricks_default_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            combo_box_language = self.combo_box_language.get_active_text()
-            language = self.lang_codes.get(combo_box_language, "en_US")
-            checkbox_state = self.checkbox_close_after_launch.get_active()
-            default_prefix = self.entry_default_prefix.get_text()
-            checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-            checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-            checkbox_start_boot = self.checkbox_start_boot.get_active()
-            checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-            checkbox_system_tray = self.checkbox_system_tray.get_active()
-            checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-            combo_box_interface = self.combo_box_interface.get_active_text()
-            checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-            checkbox_show_labels = self.checkbox_show_labels.get_active()
-            checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-            checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-            checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-            checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-            checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
-            checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-            mangohud_state = self.checkbox_mangohud.get_active()
-            gamemode_state = self.checkbox_gamemode.get_active()
-            disable_hidraw_state = self.checkbox_disable_hidraw.get_active()
-            default_runner = self.combo_box_runner.get_active_text()
-
-            if default_runner == "UMU-Proton Latest":
-                default_runner = ""
-            if default_runner == "GE-Proton Latest (default)":
-                default_runner = "GE-Proton"
-            if default_runner == "Proton-EM Latest":
-                default_runner = "Proton-EM"
-
-            config = ConfigManager()
-            config.save_with_values(checkbox_state, default_prefix, mangohud_state, gamemode_state, disable_hidraw_state,
-                                    default_runner, checkbox_discrete_gpu_state, checkbox_splash_disable,
-                                    checkbox_system_tray, checkbox_start_boot, checkbox_mono_icon, combo_box_interface,
-                                    checkbox_start_maximized, checkbox_start_fullscreen, checkbox_show_labels, checkbox_smaller_banners,
-                                    checkbox_enable_logging, checkbox_wayland_driver, checkbox_enable_hdr, checkbox_enable_ntsync, checkbox_enable_wow64, language)
-            self.set_sensitive(False)
-
-            self.parent.manage_autostart_file(checkbox_start_boot)
-            if checkbox_system_tray:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-                if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                    self.connect("delete-event", self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = True
-                self.parent.indicator.set_menu(self.parent.create_tray_menu())
-            else:
-                self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                    self.disconnect_by_func(self.parent.on_window_delete_event)
-                    self.parent.window_delete_event_connected = False
-
-            command_parts = []
-
-            # Add command parts if they are not empty
-
-            command_parts.append(f'GAMEID=winetricks-gui')
-            command_parts.append(f'STORE=none')
-            if default_runner:
-                command_parts.append(f'PROTONPATH={default_runner}')
-
-            # Add the fixed command and remaining arguments
-            command_parts.append(f'"{umu_run}"')
-            command_parts.append('""')
-
-            # Join all parts into a single command
-            command = ' '.join(command_parts)
-
-            print(command)
-
-            # faugus-run path
-            faugus_run_path = faugus_run
-
-            def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
 
     def on_button_backup_clicked(self, widget):
         self.response(Gtk.ResponseType.OK)
