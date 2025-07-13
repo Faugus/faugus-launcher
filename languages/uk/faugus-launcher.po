@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-24 16:39-0300\n"
-"PO-Revision-Date: 2025-05-27 18:35+0200\n"
+"POT-Creation-Date: 2025-07-11 19:35-0300\n"
+"PO-Revision-Date: 2025-07-13 19:52+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: uk\n"
@@ -18,113 +18,100 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: /usr/bin/faugus-launcher:132
-msgid "xdg-user-dir not found or failed; falling back to ~/Desktop"
-msgstr "xdg-user-dir не знайдено або стався збій; використовується ~/Desktop"
-
-#: /usr/bin/faugus-launcher:210 /usr/bin/faugus-launcher:734
+#: /usr/bin/faugus-launcher:328 /usr/bin/faugus-launcher:813
 msgid "Play"
 msgstr "Грати"
 
-#: /usr/bin/faugus-launcher:214
+#: /usr/bin/faugus-launcher:332
 msgid "Edit"
 msgstr "Редагувати"
 
-#: /usr/bin/faugus-launcher:218
+#: /usr/bin/faugus-launcher:336
 msgid "Delete"
 msgstr "Видалити"
 
-#: /usr/bin/faugus-launcher:222
+#: /usr/bin/faugus-launcher:340
 msgid "Duplicate"
 msgstr "Дублювати"
 
-#: /usr/bin/faugus-launcher:226
+#: /usr/bin/faugus-launcher:344
 msgid "Open prefix location"
 msgstr "Відкрити розташування префікса"
 
-#: /usr/bin/faugus-launcher:230
+#: /usr/bin/faugus-launcher:348
 msgid "Show logs"
 msgstr "Показати журнали"
 
-#: /usr/bin/faugus-launcher:396 /usr/bin/faugus-launcher:516
+#: /usr/bin/faugus-launcher:513 /usr/bin/faugus-launcher:619
 msgid "Force close all running games"
 msgstr "Примусове завершення всіх запущених ігор"
 
-#: /usr/bin/faugus-launcher:431 /usr/bin/faugus-launcher:569
+#: /usr/bin/faugus-launcher:541 /usr/bin/faugus-launcher:658
 msgid "Search..."
 msgstr "Пошук..."
 
-#: /usr/bin/faugus-launcher:665
+#: /usr/bin/faugus-launcher:751
 msgid "Shut down"
 msgstr "Завершити роботу"
 
-#: /usr/bin/faugus-launcher:666
+#: /usr/bin/faugus-launcher:752
 msgid "Reboot"
 msgstr "Перезавантажити"
 
-#: /usr/bin/faugus-launcher:667
-msgid "Log out"
-msgstr "Вийти"
-
-#: /usr/bin/faugus-launcher:668
+#: /usr/bin/faugus-launcher:753
 msgid "Close"
 msgstr "Закрити"
 
-#: /usr/bin/faugus-launcher:732
+#: /usr/bin/faugus-launcher:811
 msgid "Stop"
 msgstr "Зупинити"
 
-#: /usr/bin/faugus-launcher:769
-msgid "{} Logs"
-msgstr "{} Журнали"
+#: /usr/bin/faugus-launcher:848
+#, python-format
+msgid "%s Logs"
+msgstr "%s Журнали"
 
-#: /usr/bin/faugus-launcher:811
+#: /usr/bin/faugus-launcher:888
 msgid "Copy to clipboard"
 msgstr "Скопіювати до буфера обміну"
 
-#: /usr/bin/faugus-launcher:815
+#: /usr/bin/faugus-launcher:892
 msgid "Open file location"
 msgstr "Відкрити розташування файлу"
 
-#: /usr/bin/faugus-launcher:882 /usr/bin/faugus-launcher:2038
-#, python-brace-format
-msgid "{title} already exists."
-msgstr "{title} вже існує."
+#: /usr/bin/faugus-launcher:959 /usr/bin/faugus-launcher:2127
+#, python-format
+msgid "%s already exists."
+msgstr "%s вже існує."
 
-#: /usr/bin/faugus-launcher:920 /usr/bin/faugus-launcher:1220
-#: /usr/bin/faugus-launcher:2137
-#, python-brace-format
-msgid "Error reading the JSON file: {error}"
-msgstr "Помилка читання JSON-файлу: {error}"
+#: /usr/bin/faugus-launcher:1135
+#, python-format
+msgid "%s is already running."
+msgstr "%s вже запущено."
 
-#: /usr/bin/faugus-launcher:1044
-#, python-brace-format
-msgid "{title} is already running."
-msgstr "{title} вже запущено."
-
-#: /usr/bin/faugus-launcher:1047 /usr/bin/faugus-launcher:1989
-#: /usr/bin/faugus-launcher:3085 /usr/bin/faugus-launcher:4115
-#: /usr/bin/faugus-launcher:4364 /usr/bin/faugus-launcher:4409
-#: /usr/bin/faugus-launcher:4785 /usr/bin/faugus-launcher:5126
-#: /usr/bin/faugus-launcher:5765 /usr/bin/faugus-launcher:6304
-#: /usr/bin/faugus-launcher:6909
+#: /usr/bin/faugus-launcher:1138 /usr/bin/faugus-launcher:2078
+#: /usr/bin/faugus-launcher:3277 /usr/bin/faugus-launcher:4178
+#: /usr/bin/faugus-launcher:4420 /usr/bin/faugus-launcher:4463
+#: /usr/bin/faugus-launcher:4832 /usr/bin/faugus-launcher:5169
+#: /usr/bin/faugus-launcher:5789 /usr/bin/faugus-launcher:6321
+#: /usr/bin/faugus-launcher:6868
 msgid "Ok"
 msgstr "Гаразд"
 
-#: /usr/bin/faugus-launcher:1128
+#: /usr/bin/faugus-launcher:1209
 msgid "Open Faugus Launcher"
 msgstr "Відкрити Faugus Launcher"
 
-#: /usr/bin/faugus-launcher:1133
+#: /usr/bin/faugus-launcher:1214
 msgid "Quit"
 msgstr "Вийти"
 
-#: /usr/bin/faugus-launcher:1786
-#, python-brace-format
-msgid "Edit {title}"
-msgstr "Редагувати {title}"
+#: /usr/bin/faugus-launcher:1877
+#, python-format
+msgid "Edit %s"
+msgstr "Редагувати %s"
 
-#: /usr/bin/faugus-launcher:1832 /usr/bin/faugus-launcher:4993
+#: /usr/bin/faugus-launcher:1923 /usr/bin/faugus-launcher:5040
 msgid ""
 "Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
 "USERS FOUND."
@@ -132,262 +119,244 @@ msgstr ""
 "Додати або вилучити ярлик зі Steam. Steam потрібно перезапустити. "
 "КОРИСТУВАЧІ STEAM НЕ ЗНАЙДЕНІ."
 
-#: /usr/bin/faugus-launcher:1842 /usr/bin/faugus-launcher:1844
-#: /usr/bin/faugus-launcher:1846
-#, python-brace-format
-msgid "{title} is running. Please close it first."
-msgstr "{title} вже запущено. Будь ласка, закрийте його спершу."
+#: /usr/bin/faugus-launcher:1933 /usr/bin/faugus-launcher:1935
+#: /usr/bin/faugus-launcher:1937
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s вже запущено. Будь ласка, закрийте його спершу."
 
-#: /usr/bin/faugus-launcher:2062 /usr/bin/faugus-launcher:2448
-#, python-brace-format
-msgid "Error resizing banner: {error}"
-msgstr "Помилка зміни розміру банера: {error}"
-
-#: /usr/bin/faugus-launcher:2103
+#: /usr/bin/faugus-launcher:2194
 msgid "No internet connection."
 msgstr "Немає підключення до Інтернету."
 
-#: /usr/bin/faugus-launcher:2197 /usr/bin/faugus-launcher:2333
-#, python-brace-format
-msgid "Installing {title}..."
-msgstr "Встановлення {title}..."
+#: /usr/bin/faugus-launcher:2288 /usr/bin/faugus-launcher:2424
+#, python-format
+msgid "Installing %s..."
+msgstr "Встановлення %s..."
 
-#: /usr/bin/faugus-launcher:2208
+#: /usr/bin/faugus-launcher:2299
 msgid "Finish installation"
 msgstr "Інсталяцію завершено"
 
-#: /usr/bin/faugus-launcher:2215
+#: /usr/bin/faugus-launcher:2306
 msgid "Downloading Battle.net..."
 msgstr "Завантаження Battle.net..."
 
-#: /usr/bin/faugus-launcher:2221
+#: /usr/bin/faugus-launcher:2312
 msgid "Downloading EA App..."
 msgstr "Завантаження EA App..."
 
-#: /usr/bin/faugus-launcher:2227
+#: /usr/bin/faugus-launcher:2318
 msgid "Downloading Epic Games..."
 msgstr "Завантаження Epic Games..."
 
-#: /usr/bin/faugus-launcher:2233
+#: /usr/bin/faugus-launcher:2324
 msgid "Downloading Ubisoft Connect..."
 msgstr "Завантаження Ubisoft Connect..."
 
-#: /usr/bin/faugus-launcher:2269
-#, python-brace-format
-msgid "{title} installed."
-msgstr "{title} інстальовано."
-
-#: /usr/bin/faugus-launcher:2327
+#: /usr/bin/faugus-launcher:2418
 msgid "Download complete"
 msgstr "Завантаження завершено"
 
-#: /usr/bin/faugus-launcher:2330
-#, python-brace-format
-msgid "Error during download: {error}"
-msgstr "Помилка під час завантаження: {error}"
+#: /usr/bin/faugus-launcher:2421
+#, python-format
+msgid "Error during download: %s"
+msgstr "Помилка під час завантаження: %s"
 
-#: /usr/bin/faugus-launcher:2335
-msgid "Please close the login window and press:"
-msgstr "Будь ласка, закрийте вікно входу та натисніть:"
-
-#: /usr/bin/faugus-launcher:2339 /usr/bin/faugus-launcher:2392
+#: /usr/bin/faugus-launcher:2426 /usr/bin/faugus-launcher:2431
+#: /usr/bin/faugus-launcher:2484
 msgid "Please close the login window and wait..."
 msgstr "Будь ласка, закрийте вікно входу та зачекайте..."
 
-#: /usr/bin/faugus-launcher:2379
-#, python-brace-format
-msgid "Extracting... {percent}%"
-msgstr "Видобування... {percent}%"
+#: /usr/bin/faugus-launcher:2471
+#, python-format
+msgid "Extracting... %d%%"
+msgstr "Видобування... %d%%"
 
-#: /usr/bin/faugus-launcher:2381
+#: /usr/bin/faugus-launcher:2473
 msgid "Extraction complete"
 msgstr "Видобування завершено"
 
-#: /usr/bin/faugus-launcher:2385
-#, python-brace-format
-msgid "Error during extraction: {error}"
-msgstr "Помилка під час видобування: {error}"
+#: /usr/bin/faugus-launcher:2477
+#, python-format
+msgid "Error during extraction: %s"
+msgstr "Помилка під час видобування: %s"
 
-#: /usr/bin/faugus-launcher:2892
+#: /usr/bin/faugus-launcher:2996
 msgid "Settings"
 msgstr "Налаштування"
 
-#: /usr/bin/faugus-launcher:2941
+#: /usr/bin/faugus-launcher:3119
 msgid "Language"
 msgstr "Мова"
 
-#: /usr/bin/faugus-launcher:2946
+#: /usr/bin/faugus-launcher:3124
 msgid "Interface Mode"
 msgstr "Режим інтерфейсу"
 
-#: /usr/bin/faugus-launcher:2955
+#: /usr/bin/faugus-launcher:3133
 msgid "Start maximized"
 msgstr "Запустити розгорнутим"
 
-#: /usr/bin/faugus-launcher:2960
+#: /usr/bin/faugus-launcher:3138
 msgid "Start in fullscreen"
 msgstr "Запустити на весь екран"
 
-#: /usr/bin/faugus-launcher:2963
+#: /usr/bin/faugus-launcher:3141
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter перемикає повноекранний режим"
 
-#: /usr/bin/faugus-launcher:2966
-msgid "Gamepad navigation (experimental)"
-msgstr "Навігація за допомогою геймпада (експериментальна)"
+#: /usr/bin/faugus-launcher:3143
+msgid "Show labels"
+msgstr "Показати мітки"
 
-#: /usr/bin/faugus-launcher:2970
+#: /usr/bin/faugus-launcher:3146
+msgid "Smaller banners"
+msgstr "Менші банери"
+
+#: /usr/bin/faugus-launcher:3150
 msgid "Default Prefixes Location"
 msgstr "Типове розташування префіксів"
 
-#: /usr/bin/faugus-launcher:2974 /usr/bin/faugus-launcher:4681
+#: /usr/bin/faugus-launcher:3154 /usr/bin/faugus-launcher:4728
 msgid "/path/to/the/prefix"
 msgstr "/шлях/до/префікса"
 
-#: /usr/bin/faugus-launcher:2984
+#: /usr/bin/faugus-launcher:3164
 msgid "Default Prefix Tools"
 msgstr "Типові інструменти префікса"
 
-#: /usr/bin/faugus-launcher:2991
+#: /usr/bin/faugus-launcher:3171
 msgid "Default Runner"
 msgstr "Типовий запускник"
 
-#: /usr/bin/faugus-launcher:2995
-msgid "GE-Proton Manager"
-msgstr "GE-Proton Менеджер"
+#: /usr/bin/faugus-launcher:3175
+msgid "Proton Manager"
+msgstr "Proton Менеджер"
 
-#: /usr/bin/faugus-launcher:2998
+#: /usr/bin/faugus-launcher:3178
 msgid "Miscellaneous"
 msgstr "Різне"
 
-#: /usr/bin/faugus-launcher:3005
+#: /usr/bin/faugus-launcher:3185
 msgid "Use discrete GPU"
 msgstr "Використовувати дискретний ГП"
 
-#: /usr/bin/faugus-launcher:3009
+#: /usr/bin/faugus-launcher:3189
 msgid "Close when running a game/app"
 msgstr "Закривати під час запуску гри/програми"
 
-#: /usr/bin/faugus-launcher:3013
+#: /usr/bin/faugus-launcher:3193
 msgid "System tray icon"
 msgstr "Піктограма в системному треї"
 
-#: /usr/bin/faugus-launcher:3018
+#: /usr/bin/faugus-launcher:3198
 msgid "Start on boot"
 msgstr "Запускати під час завантаження"
 
-#: /usr/bin/faugus-launcher:3023
+#: /usr/bin/faugus-launcher:3202
+msgid "Monochrome icon"
+msgstr "Монохромна іконка"
+
+#: /usr/bin/faugus-launcher:3207
 msgid "Disable splash window"
 msgstr "Вимкнути вікно-заставку"
 
-#: /usr/bin/faugus-launcher:3027
+#: /usr/bin/faugus-launcher:3211
 msgid "Enable logging"
 msgstr "Увімкнути ведення журналів"
 
-#: /usr/bin/faugus-launcher:3030
+#: /usr/bin/faugus-launcher:3214
 msgid "Use Wayland driver (experimental)"
 msgstr "Використовувати драйвер Wayland (експериментально)"
 
-#: /usr/bin/faugus-launcher:3032 /usr/bin/faugus-launcher:3037
-msgid "Only works with GE-Proton10-1 or superior."
-msgstr "Працює лише з GE-Proton10-1 або новішою версією."
+#: /usr/bin/faugus-launcher:3216 /usr/bin/faugus-launcher:3221
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "Працює лише з GE-Proton10 або Proton-EM-10."
 
-#: /usr/bin/faugus-launcher:3035
+#: /usr/bin/faugus-launcher:3219
 msgid "Enable HDR (experimental)"
 msgstr "Увімкнути HDR (експериментально)"
 
-#: /usr/bin/faugus-launcher:3050 /usr/bin/faugus-launcher:4760
+#: /usr/bin/faugus-launcher:3223
+msgid "Enable NTsync (experimental)"
+msgstr "Увімкнути NTsync (експериментально)"
+
+#: /usr/bin/faugus-launcher:3225 /usr/bin/faugus-launcher:3229
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"Працює лише з GE-Proton10-9 або новішою версією та Proton-EM-10-24 або "
+"новішою версією."
+
+#: /usr/bin/faugus-launcher:3227
+msgid "Enable WOW64 (experimental)"
+msgstr "Увімкнути WOW64 (експериментально)"
+
+#: /usr/bin/faugus-launcher:3242 /usr/bin/faugus-launcher:4807
 msgid "Run"
 msgstr "Запустити"
 
-#: /usr/bin/faugus-launcher:3053 /usr/bin/faugus-launcher:4763
+#: /usr/bin/faugus-launcher:3245 /usr/bin/faugus-launcher:4810
 msgid "Run a file inside the prefix"
 msgstr "Запустити файл всередині префікса"
 
-#: /usr/bin/faugus-launcher:3058 /usr/bin/faugus-launcher:4742
-#: /usr/bin/faugus-launcher:6291
+#: /usr/bin/faugus-launcher:3250 /usr/bin/faugus-launcher:4789
+#: /usr/bin/faugus-launcher:6308
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 msgstr ""
 "Відображає оверлей для моніторингу FPS, температури, навантаження ЦП/ГП та "
 "іншого."
 
-#: /usr/bin/faugus-launcher:3060 /usr/bin/faugus-launcher:4744
-#: /usr/bin/faugus-launcher:6293
+#: /usr/bin/faugus-launcher:3252 /usr/bin/faugus-launcher:4791
+#: /usr/bin/faugus-launcher:6310
 msgid "Tweaks your system to improve performance."
 msgstr "Оптимізує вашу систему для покращення продуктивності."
 
-#: /usr/bin/faugus-launcher:3061 /usr/bin/faugus-launcher:4745
-#: /usr/bin/faugus-launcher:6294
+#: /usr/bin/faugus-launcher:3253 /usr/bin/faugus-launcher:4792
+#: /usr/bin/faugus-launcher:6311
 msgid "Disable Hidraw"
 msgstr "Вимкнути Hidraw"
 
-#: /usr/bin/faugus-launcher:3063 /usr/bin/faugus-launcher:4747
-#: /usr/bin/faugus-launcher:6296
+#: /usr/bin/faugus-launcher:3255 /usr/bin/faugus-launcher:4794
+#: /usr/bin/faugus-launcher:6313
 msgid ""
-"May fix controller issues with some games. Only works with GE-Proton10-3 or "
-"superior."
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
 msgstr ""
 "Може виправити проблеми з контролером у деяких іграх. Працює лише з GE-"
-"Proton10-3 або новішою версією."
+"Proton10 або Proton-EM-10."
 
-#: /usr/bin/faugus-launcher:3065
+#: /usr/bin/faugus-launcher:3257
 msgid "Support the Project"
 msgstr "Підтримати проєкт"
 
-#: /usr/bin/faugus-launcher:3080 /usr/bin/faugus-launcher:3707
-#: /usr/bin/faugus-launcher:3993 /usr/bin/faugus-launcher:4043
-#: /usr/bin/faugus-launcher:4225 /usr/bin/faugus-launcher:4360
-#: /usr/bin/faugus-launcher:4780 /usr/bin/faugus-launcher:5081
-#: /usr/bin/faugus-launcher:5253 /usr/bin/faugus-launcher:5543
-#: /usr/bin/faugus-launcher:5719 /usr/bin/faugus-launcher:6053
-#: /usr/bin/faugus-launcher:6149 /usr/bin/faugus-launcher:6299
-#: /usr/bin/faugus-launcher:6536 /usr/bin/faugus-launcher:6863
+#: /usr/bin/faugus-launcher:3272 /usr/bin/faugus-launcher:3766
+#: /usr/bin/faugus-launcher:4056 /usr/bin/faugus-launcher:4104
+#: /usr/bin/faugus-launcher:4284 /usr/bin/faugus-launcher:4416
+#: /usr/bin/faugus-launcher:4827 /usr/bin/faugus-launcher:5126
+#: /usr/bin/faugus-launcher:5294 /usr/bin/faugus-launcher:5572
+#: /usr/bin/faugus-launcher:5745 /usr/bin/faugus-launcher:6072
+#: /usr/bin/faugus-launcher:6166 /usr/bin/faugus-launcher:6316
+#: /usr/bin/faugus-launcher:6551 /usr/bin/faugus-launcher:6824
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: /usr/bin/faugus-launcher:3089
+#: /usr/bin/faugus-launcher:3281
 msgid "Backup/Restore Settings"
 msgstr "Резервне копіювання/Відновлення налаштувань"
 
-#: /usr/bin/faugus-launcher:3096
+#: /usr/bin/faugus-launcher:3288
 msgid "Backup"
 msgstr "Резервне копіювання"
 
-#: /usr/bin/faugus-launcher:3100
+#: /usr/bin/faugus-launcher:3292
 msgid "Restore"
 msgstr "Відновлення"
 
-#: /usr/bin/faugus-launcher:3207
-msgid "Gamescope Settings"
-msgstr "Налаштування Gamescope"
-
-#: /usr/bin/faugus-launcher:3210
-msgid "* Restart to apply Gamescope Settings."
-msgstr "Перезапустіть, щоб застосувати налаштування Gamescope."
-
-#: /usr/bin/faugus-launcher:3214
-msgid "Screen Resolution"
-msgstr "Роздільна здатність екрана"
-
-#: /usr/bin/faugus-launcher:3228
-msgid "Game Resolution"
-msgstr "Роздільна здатність гри"
-
-#: /usr/bin/faugus-launcher:3242
-msgid "Refresh Rate"
-msgstr "Частота оновлення"
-
-#: /usr/bin/faugus-launcher:3247
-msgid "Prefer Output"
-msgstr "Пріоритет виведення"
-
-#: /usr/bin/faugus-launcher:3252
-msgid "Adaptive Sync"
-msgstr "Адаптивна синхронізація"
-
-#: /usr/bin/faugus-launcher:3419 /usr/bin/faugus-launcher:4981
-#: /usr/bin/faugus-launcher:6441
+#: /usr/bin/faugus-launcher:3487 /usr/bin/faugus-launcher:5028
+#: /usr/bin/faugus-launcher:6458
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
@@ -395,151 +364,146 @@ msgstr ""
 "Відображає оверлей для моніторингу FPS, температури, навантаження ЦП/ГП та "
 "іншого. НЕ ВСТАНОВЛЕНО."
 
-#: /usr/bin/faugus-launcher:3425 /usr/bin/faugus-launcher:4987
-#: /usr/bin/faugus-launcher:6447
+#: /usr/bin/faugus-launcher:3493 /usr/bin/faugus-launcher:5034
+#: /usr/bin/faugus-launcher:6464
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
 msgstr "Оптимізує вашу систему для покращення продуктивності. НЕ ВСТАНОВЛЕНО."
 
-#: /usr/bin/faugus-launcher:3604 /usr/bin/faugus-launcher:5461
-#, python-brace-format
-msgid "Error accessing the directory: {error}"
-msgstr "Помилка доступу до каталогу: {error}"
-
-#: /usr/bin/faugus-launcher:3666 /usr/bin/faugus-launcher:5502
+#: /usr/bin/faugus-launcher:3727 /usr/bin/faugus-launcher:5533
 msgid "Select a file to run inside the prefix"
 msgstr "Виберіть файл для запуску всередині префікса"
 
-#: /usr/bin/faugus-launcher:3676 /usr/bin/faugus-launcher:3688
-#: /usr/bin/faugus-launcher:5222 /usr/bin/faugus-launcher:5234
-#: /usr/bin/faugus-launcher:5512 /usr/bin/faugus-launcher:5524
-#: /usr/bin/faugus-launcher:6022 /usr/bin/faugus-launcher:6034
-#: /usr/bin/faugus-launcher:6505 /usr/bin/faugus-launcher:6517
+#: /usr/bin/faugus-launcher:3735 /usr/bin/faugus-launcher:3747
+#: /usr/bin/faugus-launcher:5263 /usr/bin/faugus-launcher:5275
+#: /usr/bin/faugus-launcher:5541 /usr/bin/faugus-launcher:5553
+#: /usr/bin/faugus-launcher:6041 /usr/bin/faugus-launcher:6053
+#: /usr/bin/faugus-launcher:6520 /usr/bin/faugus-launcher:6532
 msgid "Windows files"
 msgstr "Файли Windows"
 
-#: /usr/bin/faugus-launcher:3684 /usr/bin/faugus-launcher:3689
-#: /usr/bin/faugus-launcher:5230 /usr/bin/faugus-launcher:5235
-#: /usr/bin/faugus-launcher:5520 /usr/bin/faugus-launcher:5525
-#: /usr/bin/faugus-launcher:6030 /usr/bin/faugus-launcher:6035
-#: /usr/bin/faugus-launcher:6513 /usr/bin/faugus-launcher:6518
+#: /usr/bin/faugus-launcher:3743 /usr/bin/faugus-launcher:3748
+#: /usr/bin/faugus-launcher:5271 /usr/bin/faugus-launcher:5276
+#: /usr/bin/faugus-launcher:5549 /usr/bin/faugus-launcher:5554
+#: /usr/bin/faugus-launcher:6049 /usr/bin/faugus-launcher:6054
+#: /usr/bin/faugus-launcher:6528 /usr/bin/faugus-launcher:6533
 msgid "All files"
 msgstr "Усі файли"
 
-#: /usr/bin/faugus-launcher:3703 /usr/bin/faugus-launcher:4039
-#: /usr/bin/faugus-launcher:4220 /usr/bin/faugus-launcher:5077
-#: /usr/bin/faugus-launcher:5249 /usr/bin/faugus-launcher:5539
-#: /usr/bin/faugus-launcher:5715 /usr/bin/faugus-launcher:6049
-#: /usr/bin/faugus-launcher:6144 /usr/bin/faugus-launcher:6532
-#: /usr/bin/faugus-launcher:6859
+#: /usr/bin/faugus-launcher:3762 /usr/bin/faugus-launcher:4100
+#: /usr/bin/faugus-launcher:4279 /usr/bin/faugus-launcher:5122
+#: /usr/bin/faugus-launcher:5290 /usr/bin/faugus-launcher:5568
+#: /usr/bin/faugus-launcher:5741 /usr/bin/faugus-launcher:6068
+#: /usr/bin/faugus-launcher:6161 /usr/bin/faugus-launcher:6547
+#: /usr/bin/faugus-launcher:6820
 msgid "Open"
 msgstr "Відкрити"
 
-#: /usr/bin/faugus-launcher:3955
+#: /usr/bin/faugus-launcher:4020
 msgid "Prefixes and runners will not be backed up!"
 msgstr "Префікси та запускники не будуть резервно скопійовані!"
 
-#: /usr/bin/faugus-launcher:3980
+#: /usr/bin/faugus-launcher:4045
 msgid "Save the backup file as..."
 msgstr "Зберегти файл резервної копії як..."
 
-#: /usr/bin/faugus-launcher:3989
+#: /usr/bin/faugus-launcher:4052
 msgid "Save"
 msgstr "Зберегти"
 
-#: /usr/bin/faugus-launcher:4024
+#: /usr/bin/faugus-launcher:4087
 msgid "Select a backup file to restore"
 msgstr "Виберіть файл резервної копії для відновлення"
 
-#: /usr/bin/faugus-launcher:4076
+#: /usr/bin/faugus-launcher:4131 /usr/bin/faugus-launcher:4141
 msgid "This is not a valid Faugus Launcher backup file."
 msgstr "Це не дійсний файл резервної копії Faugus Launcher."
 
-#: /usr/bin/faugus-launcher:4079
+#: /usr/bin/faugus-launcher:4144
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Ви впевнені, що хочете перезаписати налаштування?"
 
-#: /usr/bin/faugus-launcher:4159 /usr/bin/faugus-launcher:4455
+#: /usr/bin/faugus-launcher:4220 /usr/bin/faugus-launcher:4507
 msgid "No"
 msgstr "Ні"
 
-#: /usr/bin/faugus-launcher:4163 /usr/bin/faugus-launcher:4459
+#: /usr/bin/faugus-launcher:4224 /usr/bin/faugus-launcher:4511
 msgid "Yes"
 msgstr "Так"
 
-#: /usr/bin/faugus-launcher:4205 /usr/bin/faugus-launcher:6129
+#: /usr/bin/faugus-launcher:4266 /usr/bin/faugus-launcher:6148
 msgid "Select a prefix location"
 msgstr "Виберіть розташування префікса"
 
-#: /usr/bin/faugus-launcher:4349
-#, python-brace-format
-msgid "Duplicate {title}"
-msgstr "Дублювати {title}"
+#: /usr/bin/faugus-launcher:4407
+#, python-format
+msgid "Duplicate %s"
+msgstr "Дублювати %s"
 
-#: /usr/bin/faugus-launcher:4355 /usr/bin/faugus-launcher:4651
-#: /usr/bin/faugus-launcher:6249
+#: /usr/bin/faugus-launcher:4411 /usr/bin/faugus-launcher:4698
+#: /usr/bin/faugus-launcher:6266
 msgid "Title"
 msgstr "Назва"
 
-#: /usr/bin/faugus-launcher:4358 /usr/bin/faugus-launcher:4657
-#: /usr/bin/faugus-launcher:6253
+#: /usr/bin/faugus-launcher:4414 /usr/bin/faugus-launcher:4704
+#: /usr/bin/faugus-launcher:6270
 msgid "Game Title"
 msgstr "Назва гри"
 
-#: /usr/bin/faugus-launcher:4444
-#, python-brace-format
-msgid "Delete {title}"
-msgstr "Видалити {title}"
+#: /usr/bin/faugus-launcher:4498
+#, python-format
+msgid "Delete %s"
+msgstr "Видалити %s"
 
-#: /usr/bin/faugus-launcher:4452
-#, python-brace-format
-msgid "Are you sure you want to delete {title}?"
-msgstr "Ви впевнені, що хочете видалити {title}?"
+#: /usr/bin/faugus-launcher:4504
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "Ви впевнені, що хочете видалити %s?"
 
-#: /usr/bin/faugus-launcher:4463
+#: /usr/bin/faugus-launcher:4515
 msgid "Also remove the prefix"
 msgstr "Також видалити префікс"
 
-#: /usr/bin/faugus-launcher:4504
+#: /usr/bin/faugus-launcher:4556
 msgid "New Game/App"
 msgstr "Нова гра/програма"
 
-#: /usr/bin/faugus-launcher:4662
+#: /usr/bin/faugus-launcher:4709
 msgid "Path"
 msgstr "Шлях"
 
-#: /usr/bin/faugus-launcher:4668
+#: /usr/bin/faugus-launcher:4715
 msgid "/path/to/the/exe"
 msgstr "/шлях/до/exe"
 
-#: /usr/bin/faugus-launcher:4677
+#: /usr/bin/faugus-launcher:4724
 msgid "Prefix"
 msgstr "Префікс"
 
-#: /usr/bin/faugus-launcher:4690
+#: /usr/bin/faugus-launcher:4737
 msgid "Runner"
 msgstr "Запускник"
 
-#: /usr/bin/faugus-launcher:4708 /usr/bin/faugus-launcher:6265
+#: /usr/bin/faugus-launcher:4755 /usr/bin/faugus-launcher:6282
 msgid "Launch Arguments"
 msgstr "Аргументи запуску"
 
-#: /usr/bin/faugus-launcher:4711 /usr/bin/faugus-launcher:6268
+#: /usr/bin/faugus-launcher:4758 /usr/bin/faugus-launcher:6285
 msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 msgstr "наприклад: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 
-#: /usr/bin/faugus-launcher:4716 /usr/bin/faugus-launcher:6270
+#: /usr/bin/faugus-launcher:4763 /usr/bin/faugus-launcher:6287
 msgid "Game Arguments"
 msgstr "Аргументи гри"
 
-#: /usr/bin/faugus-launcher:4719 /usr/bin/faugus-launcher:6273
+#: /usr/bin/faugus-launcher:4766 /usr/bin/faugus-launcher:6290
 msgid "e.g.: -d3d11 -fullscreen"
 msgstr "наприклад: -d3d11 -fullscreen"
 
-#: /usr/bin/faugus-launcher:4724 /usr/bin/faugus-launcher:6275
+#: /usr/bin/faugus-launcher:4771 /usr/bin/faugus-launcher:6292
 msgid "Additional Application"
 msgstr "Додаткова програма"
 
-#: /usr/bin/faugus-launcher:4726
+#: /usr/bin/faugus-launcher:4773
 msgid ""
 "Additional application to run with the game, like Cheat Engine, Trainers, "
 "Mods..."
@@ -547,123 +511,174 @@ msgstr ""
 "Додаткова програма для запуску разом з грою, як-от Cheat Engine, трейнери, "
 "модифікації..."
 
-#: /usr/bin/faugus-launcher:4729 /usr/bin/faugus-launcher:6278
+#: /usr/bin/faugus-launcher:4776 /usr/bin/faugus-launcher:6295
 msgid "/path/to/the/app"
 msgstr "/шлях/до/програми"
 
-#: /usr/bin/faugus-launcher:4766
+#: /usr/bin/faugus-launcher:4813
 msgid "Shortcut"
 msgstr "Ярлик"
 
-#: /usr/bin/faugus-launcher:4768
+#: /usr/bin/faugus-launcher:4815
 msgid "Add or remove a shortcut from the Desktop and the Application Launcher."
 msgstr "Додати або видалити ярлик з Робочого столу та Засобу запуску програм."
 
-#: /usr/bin/faugus-launcher:4769
+#: /usr/bin/faugus-launcher:4816
 msgid "Steam Shortcut"
 msgstr "Ярлик Steam"
 
-#: /usr/bin/faugus-launcher:4771
+#: /usr/bin/faugus-launcher:4818
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
 msgstr "Додати або видалити ярлик зі Steam. Steam потрібно перезапустити."
 
-#: /usr/bin/faugus-launcher:4777 /usr/bin/faugus-launcher:5696
-#: /usr/bin/faugus-launcher:6286 /usr/bin/faugus-launcher:6840
+#: /usr/bin/faugus-launcher:4824 /usr/bin/faugus-launcher:5724
+#: /usr/bin/faugus-launcher:6303 /usr/bin/faugus-launcher:6803
 msgid "Select an icon for the shortcut"
 msgstr "Виберіть піктограму для ярлика"
 
-#: /usr/bin/faugus-launcher:4830
+#: /usr/bin/faugus-launcher:4875
 msgid "Refresh"
 msgstr "Оновити"
 
-#: /usr/bin/faugus-launcher:4834
+#: /usr/bin/faugus-launcher:4879
 msgid "Load from file"
 msgstr "Завантажити з файлу"
 
-#: /usr/bin/faugus-launcher:4842
+#: /usr/bin/faugus-launcher:4887
 msgid "Game/App"
 msgstr "Гра/Програма"
 
-#: /usr/bin/faugus-launcher:4858
+#: /usr/bin/faugus-launcher:4903
 msgid "Tools"
 msgstr "Інструменти"
 
-#: /usr/bin/faugus-launcher:5047 /usr/bin/faugus-launcher:5685
-#: /usr/bin/faugus-launcher:6829
+#: /usr/bin/faugus-launcher:5094 /usr/bin/faugus-launcher:5713
+#: /usr/bin/faugus-launcher:6792
 msgid "Invalid Image"
 msgstr "Недійсне зображення"
 
-#: /usr/bin/faugus-launcher:5058
+#: /usr/bin/faugus-launcher:5105
 msgid "Select an image for the banner"
 msgstr "Виберіть зображення для банера"
 
-#: /usr/bin/faugus-launcher:5068 /usr/bin/faugus-launcher:5073
-#: /usr/bin/faugus-launcher:5706 /usr/bin/faugus-launcher:5711
-#: /usr/bin/faugus-launcher:6850 /usr/bin/faugus-launcher:6855
+#: /usr/bin/faugus-launcher:5113 /usr/bin/faugus-launcher:5118
+#: /usr/bin/faugus-launcher:5732 /usr/bin/faugus-launcher:5737
+#: /usr/bin/faugus-launcher:6811 /usr/bin/faugus-launcher:6816
 msgid "Image files"
 msgstr "Файли зображень"
 
-#: /usr/bin/faugus-launcher:5119 /usr/bin/faugus-launcher:5758
-#: /usr/bin/faugus-launcher:6902
+#: /usr/bin/faugus-launcher:5162 /usr/bin/faugus-launcher:5782
+#: /usr/bin/faugus-launcher:6861
 msgid "The selected file is not a valid image."
 msgstr "Вибраний файл не є дійсним зображенням."
 
-#: /usr/bin/faugus-launcher:5123 /usr/bin/faugus-launcher:5762
-#: /usr/bin/faugus-launcher:6906
+#: /usr/bin/faugus-launcher:5166 /usr/bin/faugus-launcher:5786
+#: /usr/bin/faugus-launcher:6865
 msgid "Please choose another one."
 msgstr "Будь ласка, оберіть інший."
 
-#: /usr/bin/faugus-launcher:5187
-#, python-brace-format
-msgid "Error fetching the banner: {error}"
-msgstr "Помилка отримання банера: {error}"
-
-#: /usr/bin/faugus-launcher:5212 /usr/bin/faugus-launcher:6495
+#: /usr/bin/faugus-launcher:5255 /usr/bin/faugus-launcher:6512
 msgid "Select an additional application"
 msgstr "Виберіть додаткову програму"
 
-#: /usr/bin/faugus-launcher:5420
+#: /usr/bin/faugus-launcher:5461
 msgid "Windows Game"
 msgstr "Гра Windows"
 
-#: /usr/bin/faugus-launcher:5421
+#: /usr/bin/faugus-launcher:5462
 msgid "Linux Game"
 msgstr "Гра Linux"
 
-#: /usr/bin/faugus-launcher:5669 /usr/bin/faugus-launcher:6097
-#: /usr/bin/faugus-launcher:6465 /usr/bin/faugus-launcher:6813
-msgid "The file does not contain icons."
-msgstr "Файл не містить піктограм."
-
-#: /usr/bin/faugus-launcher:5672 /usr/bin/faugus-launcher:6100
-#: /usr/bin/faugus-launcher:6468 /usr/bin/faugus-launcher:6816
-#, python-brace-format
-msgid "Error extracting icon: {error}"
-msgstr "Помилка вилучення піктограми: {error}"
-
-#: /usr/bin/faugus-launcher:5680 /usr/bin/faugus-launcher:6119
-#: /usr/bin/faugus-launcher:6487 /usr/bin/faugus-launcher:6824
-#, python-brace-format
-msgid "An error occurred: {error}"
-msgstr "Виникла помилка: {error}"
-
-#: /usr/bin/faugus-launcher:5833 /usr/bin/faugus-launcher:6584
-#, python-brace-format
-msgid "Unable to open {file}"
-msgstr "Неможливо відкрити {file}"
-
-#: /usr/bin/faugus-launcher:6011
+#: /usr/bin/faugus-launcher:6032
 msgid "Select the game's .exe"
 msgstr "Виберіть .exe файл гри"
 
-#: /usr/bin/faugus-launcher:7143
-msgid "Session mode activated"
-msgstr "Режим сесії активовано"
+#~ msgid "xdg-user-dir not found or failed; falling back to ~/Desktop"
+#~ msgstr ""
+#~ "xdg-user-dir не знайдено або стався збій; використовується ~/Desktop"
 
-#: /usr/bin/faugus-launcher:7154
-msgid "Invalid arguments"
-msgstr "Недійсні аргументи"
+#~ msgid "Log out"
+#~ msgstr "Вийти"
 
-#: /usr/bin/faugus-launcher:7167
-msgid "Faugus Launcher is already running."
-msgstr "Faugus Launcher вже запущено."
+#, python-brace-format
+#~ msgid "Error reading the JSON file: {error}"
+#~ msgstr "Помилка читання JSON-файлу: {error}"
+
+#, python-brace-format
+#~ msgid "Edit {title}"
+#~ msgstr "Редагувати {title}"
+
+#, python-brace-format
+#~ msgid "Error resizing banner: {error}"
+#~ msgstr "Помилка зміни розміру банера: {error}"
+
+#, python-brace-format
+#~ msgid "{title} installed."
+#~ msgstr "{title} інстальовано."
+
+#~ msgid "Please close the login window and press:"
+#~ msgstr "Будь ласка, закрийте вікно входу та натисніть:"
+
+#~ msgid "Gamepad navigation (experimental)"
+#~ msgstr "Навігація за допомогою геймпада (експериментальна)"
+
+#~ msgid "Gamescope Settings"
+#~ msgstr "Налаштування Gamescope"
+
+#~ msgid "* Restart to apply Gamescope Settings."
+#~ msgstr "Перезапустіть, щоб застосувати налаштування Gamescope."
+
+#~ msgid "Screen Resolution"
+#~ msgstr "Роздільна здатність екрана"
+
+#~ msgid "Game Resolution"
+#~ msgstr "Роздільна здатність гри"
+
+#~ msgid "Refresh Rate"
+#~ msgstr "Частота оновлення"
+
+#~ msgid "Prefer Output"
+#~ msgstr "Пріоритет виведення"
+
+#~ msgid "Adaptive Sync"
+#~ msgstr "Адаптивна синхронізація"
+
+#, python-brace-format
+#~ msgid "Error accessing the directory: {error}"
+#~ msgstr "Помилка доступу до каталогу: {error}"
+
+#, python-brace-format
+#~ msgid "Duplicate {title}"
+#~ msgstr "Дублювати {title}"
+
+#, python-brace-format
+#~ msgid "Delete {title}"
+#~ msgstr "Видалити {title}"
+
+#, python-brace-format
+#~ msgid "Error fetching the banner: {error}"
+#~ msgstr "Помилка отримання банера: {error}"
+
+#~ msgid "The file does not contain icons."
+#~ msgstr "Файл не містить піктограм."
+
+#, python-brace-format
+#~ msgid "Error extracting icon: {error}"
+#~ msgstr "Помилка вилучення піктограми: {error}"
+
+#, python-brace-format
+#~ msgid "An error occurred: {error}"
+#~ msgstr "Виникла помилка: {error}"
+
+#, python-brace-format
+#~ msgid "Unable to open {file}"
+#~ msgstr "Неможливо відкрити {file}"
+
+#~ msgid "Session mode activated"
+#~ msgstr "Режим сесії активовано"
+
+#~ msgid "Invalid arguments"
+#~ msgstr "Недійсні аргументи"
+
+#~ msgid "Faugus Launcher is already running."
+#~ msgstr "Faugus Launcher вже запущено."
