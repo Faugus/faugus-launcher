@@ -142,6 +142,7 @@ class ConfigManager:
             'gamemode': 'False',
             'disable-hidraw': 'False',
             'default-runner': 'GE-Proton',
+            'lossless-location': 'False',
             'discrete-gpu': 'False',
             'splash-disable': 'False',
             'system-tray': 'False',
@@ -326,6 +327,8 @@ class FaugusRun:
             self.message = f'PROTON_USE_NTSYNC=1 {self.message}'
         if self.enable_wow64:
             self.message = f'PROTON_USE_WOW64=1 {self.message}'
+        if self.lossless_location:
+            self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
 
         match = re.search(r"WINEPREFIX=['\"]([^'\"]+)", self.message)
         if match:
@@ -425,6 +428,7 @@ class FaugusRun:
         self.discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
         self.splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
         self.default_runner = cfg.config.get('default-runner', '')
+        self.lossless_location = cfg.config.get('lossless-location', '')
         self.default_prefix = cfg.config.get('default-prefix', '')
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
