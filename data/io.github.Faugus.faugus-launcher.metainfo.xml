@@ -30,6 +30,7 @@
       <li>Feral GameMode: Tweaks your system to improve performance.</li>
       <li>Disable Hidraw: May fix controller issues in some games.</li>
       <li>Additional Application: An additional application to run with the game, like Cheat Engine, Trainers, Mods...</li>
+      <li>Lossless Scaling Frame Generation: Create fake frames to increase the framerate.</li>
       <li>Proton Manager: Download/Remove GE-Proton and Proton-EM builds.</li>
       <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
@@ -86,15 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.7.9-1" date="2025-07-11">
+    <release version="1.8.1-1" date="2025-07-16">
       <description>
         <ul>
-          <li>Updated umu-launcher to 1.2.9</li>
-          <li>Steam Deck Gaming Mode now runs the games properly</li>
-          <li>Removed format strings cause it was causing problems in some systems</li>
-          <li>Added GE-Proton to NTsync and WOW64 tooltips</li>
-          <li>Fixed some strings weren't being translated</li>
-          <li>Proton Manager now shows the Extracting bar properly</li>
+          <li>Added support to Lossless Scaling Frame Generation</li>
+          <li>Some code refactoring</li>
         </ul>
       </description>
     </release>
