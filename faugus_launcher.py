@@ -235,7 +235,7 @@ class ConfigManager:
             'default-prefix': prefixes_dir,
             'mangohud': 'False',
             'gamemode': 'False',
-            'disable-hidraw': '',
+            'disable-hidraw': 'False',
             'default-runner': 'GE-Proton',
             'lossless-location': '',
             'discrete-gpu': 'False',
