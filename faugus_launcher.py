@@ -95,7 +95,8 @@ if IS_FLATPAK:
         shutil.copy(faugus_mono_icon, mono_dest)
     faugus_mono_icon = os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg')
 
-    lsfgvk_path = "/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"
+    lsfgvk_path = Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so")
+    lsfgvk_path = lsfgvk_path if lsfgvk_path.exists() else Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
