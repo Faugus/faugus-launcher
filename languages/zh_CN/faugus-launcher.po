@@ -282,11 +282,11 @@ msgstr "仅在GE-Proton10或Proton-EM-10生效。"
 
 #: /usr/bin/faugus-launcher:3296
 msgid "Enable HDR (experimental)"
-msgstr "Use Wayland driver (experimental)"
+msgstr "启用HDR（实验性质）"
 
 #: /usr/bin/faugus-launcher:3300
 msgid "Enable NTsync (experimental)"
-msgstr "企业用工NTsync（实验性质）"
+msgstr "启用NTsync（实验性质）"
 
 #: /usr/bin/faugus-launcher:3302 /usr/bin/faugus-launcher:3306
 msgid ""
