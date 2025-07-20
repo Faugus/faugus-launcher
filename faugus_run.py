@@ -12,6 +12,7 @@ import re
 import os
 import gettext
 import locale
+import json
 
 class PathManager:
     @staticmethod
@@ -76,6 +77,7 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
 faugus_proton_downloader = PathManager.find_binary('faugus-proton-downloader')
@@ -721,15 +723,36 @@ def apply_dark_theme():
         if is_dark_theme:
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
+
+def load_shortcut(title_formatted):
+    if not os.path.exists(shorcuts_dir):
+        return None
+
+    try:
+        with open(shorcuts_dir, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get(title_formatted, {}).get("LaunchOptions")
+    except json.JSONDecodeError:
+        return None
+
 def main():
     apply_dark_theme()
+
     parser = argparse.ArgumentParser(description="Faugus Run")
     parser.add_argument("message")
     parser.add_argument("command", nargs='?', default=None)
+    parser.add_argument("--shortcut")
 
     args = parser.parse_args()
 
-    handle_command(args.message, args.command)
+    if args.shortcut:
+        launch_options = load_shortcut(args.shortcut)
+        if not launch_options:
+            return
+
+        handle_command(launch_options, None)
+    else:
+        handle_command(args.message, args.command)
 
 if __name__ == "__main__":
     main()

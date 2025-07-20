@@ -80,6 +80,7 @@ logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
 
 share_dir = PathManager.user_data()
 app_dir = PathManager.user_data('applications')
@@ -1012,7 +1013,7 @@ class Main(Gtk.Window):
 
                     game.banner = new_banner
 
-                    game_info = {"title": game.title, "path": game.path, "prefix": game.prefix,
+                    game_info = {"gameid": game.gameid, "title": game.title, "path": game.path, "prefix": game.prefix,
                         "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
                         "mangohud": game.mangohud, "gamemode": game.gamemode, "disable_hidraw": game.disable_hidraw,
                         "protonfix": game.protonfix, "runner": game.runner, "addapp_checkbox": game.addapp_checkbox,
@@ -1301,6 +1302,7 @@ class Main(Gtk.Window):
                 games_data = json.load(file)
 
                 for game_data in games_data:
+                    gameid = game_data.get("gameid", "")
                     title = game_data.get("title", "")
                     path = game_data.get("path", "")
                     prefix = game_data.get("prefix", "")
@@ -1317,7 +1319,7 @@ class Main(Gtk.Window):
                     banner = game_data.get("banner", "")
                     lossless = game_data.get("lossless", "")
 
-                    game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
+                    game = Game(gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
                                 protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless)
                     self.games.append(game)
 
@@ -1629,92 +1631,18 @@ class Main(Gtk.Window):
             title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
-
-            # Extract game launch information
-            launch_arguments = game.launch_arguments
-            path = game.path
-            prefix = game.prefix
-            game_arguments = game.game_arguments
-            mangohud = game.mangohud
-            disable_hidraw = game.disable_hidraw
-            protonfix = game.protonfix
-            runner = game.runner
-            addapp_checkbox = game.addapp_checkbox
-            addapp_bat = game.addapp_bat
-            lossless = game.lossless
-
-            gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-            gamemode = game.gamemode if gamemode_enabled else ""
-
-            # Get the directory containing the executable
-            game_directory = os.path.dirname(path)
-
-            if lossless == "Off":
-                lossless = ""
-            if lossless == "X1":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-            if lossless == "X2":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-            if lossless == "X3":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-            if lossless == "X4":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
-
-            command_parts = []
-
-            # Add command parts if they are not empty
-            if self.enable_logging:
-                command_parts.append(f'FAUGUS_LOG={title_formatted}')
-            if mangohud:
-                command_parts.append(mangohud)
-            if disable_hidraw:
-                command_parts.append(disable_hidraw)
-            if runner != "Linux-Native":
-                if prefix:
-                    command_parts.append(f'WINEPREFIX="{prefix}"')
-            if protonfix:
-                command_parts.append(f'GAMEID={protonfix}')
-            else:
-                command_parts.append(f'GAMEID={title_formatted}')
-            if runner:
-                if runner == "Linux-Native":
-                    command_parts.append('UMU_NO_PROTON=1')
-                else:
-                    command_parts.append(f'PROTONPATH={runner}')
-            if gamemode:
-                command_parts.append(gamemode)
-            if launch_arguments:
-                command_parts.append(launch_arguments)
-            if lossless:
-                command_parts.append(lossless)
-
-            # Add the fixed command and remaining arguments
-            command_parts.append(f'"{umu_run}"')
-            if addapp_checkbox == "addapp_enabled":
-                command_parts.append(f'"{addapp_bat}"')
-            elif path:
-                command_parts.append(f'"{path}"')
-            if game_arguments:
-                command_parts.append(f'{game_arguments}')
-
-
-            # Join all parts into a single command
-            command = ' '.join(command_parts)
-            print(command)
-
-            # faugus-run path
-            faugus_run_path = faugus_run
+            game_directory = os.path.dirname(game.path)
 
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
             if self.close_on_launch:
                 if IS_FLATPAK:
-                    subprocess.Popen([sys.executable, faugus_run_path, command], stdout=subprocess.DEVNULL,
+                    subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, cwd=game_directory)
                     sys.exit()
                 else:
-                    self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], cwd=game_directory)
 
                     self.menu_item_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
@@ -1728,7 +1656,7 @@ class Main(Gtk.Window):
                     GLib.timeout_add(1000, check_pid_timeout)
 
             else:
-                self.processo = subprocess.Popen([sys.executable, faugus_run_path, command], cwd=game_directory)
+                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], cwd=game_directory)
 
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
@@ -1746,7 +1674,6 @@ class Main(Gtk.Window):
 
     def find_pid(self, game):
         try:
-            # faugus-run é o processo main, que é um python3
             parent = psutil.Process(self.processo.pid)
             all_descendants = parent.children(recursive=True)
         except psutil.NoSuchProcess:
@@ -1763,7 +1690,6 @@ class Main(Gtk.Window):
             except psutil.NoSuchProcess:
                 continue
 
-        # Salva apenas o processo python3 (main) e o umu-run (se existir)
         self.save_process_to_file(
             game.title,
             main_pid=self.processo.pid,
@@ -2205,7 +2131,7 @@ class Main(Gtk.Window):
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
             # Create Game object and update UI
-            game = Game(title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
+            game = Game(title_formatted, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
                         protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless)
 
             # Determine the state of the shortcut checkbox
@@ -2251,7 +2177,7 @@ class Main(Gtk.Window):
                         self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state,
                                              icon_temp, icon_final)
 
-            game_info = {"title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
+            game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
                 "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
                 "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
                 "addapp_bat": addapp_bat, "banner": banner, "lossless": lossless, }
@@ -2564,6 +2490,7 @@ class Main(Gtk.Window):
             title_formatted = title_formatted.replace(' ', '-')
             title_formatted = '-'.join(title_formatted.lower().split())
 
+            game.gameid = title_formatted
             game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
 
             if self.interface_mode == "Banners":
@@ -2646,83 +2573,20 @@ class Main(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        prefix = game.prefix
-        path = game.path
-        launch_arguments = game.launch_arguments
-        game_arguments = game.game_arguments
-        protonfix = game.protonfix
-        runner = game.runner
-        addapp_bat = game.addapp_bat
-        lossless = game.lossless
-
-        mangohud = "MANGOHUD=1" if game.mangohud else ""
-        gamemode = "gamemoderun" if game.gamemode else ""
-        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else ""
-        addapp = "addapp_enabled" if game.addapp_checkbox else ""
-
         # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
         # Get the directory containing the executable
-        game_directory = os.path.dirname(path)
-
-        if lossless == "Off":
-            lossless = ""
-        if lossless == "X1":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-        if lossless == "X2":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-        if lossless == "X3":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-        if lossless == "X4":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
-
-        command_parts = []
-
-        # Add command parts if they are not empty
-        if mangohud:
-            command_parts.append(mangohud)
-        if disable_hidraw:
-            command_parts.append(disable_hidraw)
-        if runner != "Linux-Native":
-            if prefix:
-                command_parts.append(f"WINEPREFIX='{prefix}'")
-        if protonfix:
-            command_parts.append(f'GAMEID={protonfix}')
-        else:
-            command_parts.append(f'GAMEID={title_formatted}')
-        if runner:
-            if runner == "Linux-Native":
-                command_parts.append('UMU_NO_PROTON=1')
-            else:
-                command_parts.append(f'PROTONPATH={runner}')
-        if gamemode:
-            command_parts.append(gamemode)
-        if launch_arguments:
-            command_parts.append(launch_arguments)
-        if lossless:
-            command_parts.append(lossless)
-
-        # Add the fixed command and remaining arguments
-        command_parts.append(f"'{umu_run}'")
-        if addapp == "addapp_enabled":
-            command_parts.append(f"'{addapp_bat}'")
-        elif path:
-            command_parts.append(f"'{path}'")
-        if game_arguments:
-            command_parts.append(f"{game_arguments}")
-
-        # Join all parts into a single command
-        command = ' '.join(command_parts)
+        game_directory = os.path.dirname(game.path)
 
         # Create a .desktop file
         if IS_FLATPAK:
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"\n'
+                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher --game {title_formatted}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2732,7 +2596,7 @@ class Main(Gtk.Window):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec={faugus_run} "{command}"\n'
+                f'Exec={faugus_run} --game {title_formatted}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2762,7 +2626,7 @@ class Main(Gtk.Window):
         os.chmod(desktop_shortcut_path, 0o755)
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
-        def add_game_to_steam(title, game_directory, icon, command):
+        def add_game_to_steam(title, game_directory, icon):
             # Load existing shortcuts
             shortcuts = load_shortcuts(title)
 
@@ -2779,13 +2643,13 @@ class Main(Gtk.Window):
                 if IS_FLATPAK:
                     if IS_STEAM_FLATPAK:
                         game_info["Exe"] = f'"flatpak-spawn"'
-                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
+                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}'
                     else:
                         game_info["Exe"] = f'"flatpak"'
-                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"'
+                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}'
                 else:
                     game_info["Exe"] = f'"{faugus_run}"'
-                    game_info["LaunchOptions"] = f'"{command}"'
+                    game_info["LaunchOptions"] = f'--game {title_formatted}'
                 game_info["StartDir"] = game_directory
                 game_info["icon"] = icon
             else:
@@ -2802,7 +2666,7 @@ class Main(Gtk.Window):
                             "StartDir": game_directory,
                             "icon": icon,
                             "ShortcutPath": "",
-                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
+                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}',
                             "IsHidden": 0,
                             "AllowDesktopConfig": 1,
                             "AllowOverlay": 1,
@@ -2820,7 +2684,7 @@ class Main(Gtk.Window):
                             "StartDir": game_directory,
                             "icon": icon,
                             "ShortcutPath": "",
-                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher "{command}"',
+                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}',
                             "IsHidden": 0,
                             "AllowDesktopConfig": 1,
                             "AllowOverlay": 1,
@@ -2838,7 +2702,7 @@ class Main(Gtk.Window):
                         "StartDir": game_directory,
                         "icon": icon,
                         "ShortcutPath": "",
-                        "LaunchOptions": f'"{command}"',
+                        "LaunchOptions": f'--game {title_formatted}',
                         "IsHidden": 0,
                         "AllowDesktopConfig": 1,
                         "AllowOverlay": 1,
@@ -2899,77 +2763,15 @@ class Main(Gtk.Window):
         title_formatted = title_formatted.replace(' ', '-')
         title_formatted = '-'.join(title_formatted.lower().split())
 
-        prefix = game.prefix
-        path = game.path
-        launch_arguments = game.launch_arguments
-        game_arguments = game.game_arguments
-        protonfix = game.protonfix
-        runner = game.runner
-        addapp_bat = game.addapp_bat
-
-        mangohud = "MANGOHUD=1" if game.mangohud else ""
-        gamemode = "gamemoderun" if game.gamemode else ""
-        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else ""
-        addapp = "addapp_enabled" if game.addapp_checkbox else ""
-
         # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
         # Get the directory containing the executable
-        game_directory = os.path.dirname(path)
+        game_directory = os.path.dirname(game.path)
 
-        if game.lossless == "Off":
-            game.lossless = ""
-        if game.lossless == "X1":
-            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-        if game.lossless == "X2":
-            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-        if game.lossless == "X3":
-            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-        if game.lossless == "X4":
-            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
-
-        command_parts = []
-
-        # Add command parts if they are not empty
-        if mangohud:
-            command_parts.append(mangohud)
-        if disable_hidraw:
-            command_parts.append(disable_hidraw)
-        if runner != "Linux-Native":
-            if prefix:
-                command_parts.append(f"WINEPREFIX='{prefix}'")
-        if protonfix:
-            command_parts.append(f'GAMEID={protonfix}')
-        else:
-            command_parts.append(f'GAMEID={title_formatted}')
-        if runner:
-            if runner == "Linux-Native":
-                command_parts.append('UMU_NO_PROTON=1')
-            else:
-                command_parts.append(f'PROTONPATH={runner}')
-        if gamemode:
-            command_parts.append(gamemode)
-        if launch_arguments:
-            command_parts.append(launch_arguments)
-        if game.lossless:
-            command_parts.append(game.lossless)
-
-        # Add the fixed command and remaining arguments
-        command_parts.append(f"'{umu_run}'")
-        if addapp == "addapp_enabled":
-            command_parts.append(f"'{addapp_bat}'")
-        elif path:
-            command_parts.append(f"'{path}'")
-        if game_arguments:
-            command_parts.append(f"{game_arguments}")
-
-        # Join all parts into a single command
-        command = ' '.join(command_parts)
-
-        add_game_to_steam(game.title, game_directory, new_icon_path, command)
+        add_game_to_steam(game.title, game_directory, new_icon_path)
 
     def update_preview(self, dialog):
         if file_path := dialog.get_preview_filename():
@@ -3055,7 +2857,7 @@ class Main(Gtk.Window):
     def save_games(self):
         games_data = []
         for game in self.games:
-            game_info = {"title": game.title, "path": game.path, "prefix": game.prefix,
+            game_info = {"gameid": game.gameid, "title": game.title, "path": game.path, "prefix": game.prefix,
                 "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
                 "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
                 "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
@@ -4438,9 +4240,10 @@ class Settings(Gtk.Dialog):
             self.combobox_language.set_active(index_language)
 
 class Game:
-    def __init__(self, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
+    def __init__(self, gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
                  runner, addapp_checkbox, addapp, addapp_bat, banner, lossless):
         # Initialize a Game object with various attributes
+        self.gameid = gameid
         self.title = title  # Title of the game
         self.path = path  # Path to the game executable
         self.launch_arguments = launch_arguments  # Arguments to launch the game
