@@ -1652,13 +1652,13 @@ class Main(Gtk.Window):
             if lossless == "Off":
                 lossless = ""
             if lossless == "X1":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
             if lossless == "X2":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
             if lossless == "X3":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
             if lossless == "X4":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
             command_parts = []
 
@@ -1869,13 +1869,13 @@ class Main(Gtk.Window):
 
             if game.lossless == "":
                 game.lossless = "Off"
-            if game.lossless == "ENABLE_LSFG=1 LSFG_MULTIPLIER=1":
+            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=1":
                 game.lossless = "X1"
-            if game.lossless == "ENABLE_LSFG=1 LSFG_MULTIPLIER=2":
+            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=2":
                 game.lossless = "X2"
-            if game.lossless == "ENABLE_LSFG=1 LSFG_MULTIPLIER=3":
+            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=3":
                 game.lossless = "X3"
-            if game.lossless == "ENABLE_LSFG=1 LSFG_MULTIPLIER=4":
+            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=4":
                 game.lossless = "X4"
 
             for i, row in enumerate(model_runner):
@@ -2190,13 +2190,13 @@ class Main(Gtk.Window):
             if lossless == "Off":
                 lossless = ""
             if lossless == "X1":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
             if lossless == "X2":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
             if lossless == "X3":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
             if lossless == "X4":
-                lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
@@ -2589,13 +2589,13 @@ class Main(Gtk.Window):
             if game.lossless == "Off":
                 game.lossless = ""
             if game.lossless == "X1":
-                game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
             if game.lossless == "X2":
-                game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
             if game.lossless == "X3":
-                game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
             if game.lossless == "X4":
-                game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
@@ -2671,13 +2671,13 @@ class Main(Gtk.Window):
         if lossless == "Off":
             lossless = ""
         if lossless == "X1":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
         if lossless == "X2":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
         if lossless == "X3":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
         if lossless == "X4":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
         command_parts = []
 
@@ -2923,13 +2923,13 @@ class Main(Gtk.Window):
         if game.lossless == "Off":
             game.lossless = ""
         if game.lossless == "X1":
-            game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
         if game.lossless == "X2":
-            game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
         if game.lossless == "X3":
-            game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
         if game.lossless == "X4":
-            game.lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+            game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
         command_parts = []
 
@@ -6803,13 +6803,13 @@ class CreateShortcut(Gtk.Window):
         if lossless == "Off":
             lossless = ""
         if lossless == "X1":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=1"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
         if lossless == "X2":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=2"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
         if lossless == "X3":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=3"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
         if lossless == "X4":
-            lossless = "ENABLE_LSFG=1 LSFG_MULTIPLIER=4"
+            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
         command_parts = []
 
