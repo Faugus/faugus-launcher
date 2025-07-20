@@ -230,6 +230,12 @@ except FileNotFoundError:
     gettext.install('faugus-launcher', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
 
+def format_title(title):
+    title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+    title_formatted = title_formatted.replace(' ', '-')
+    title_formatted = '-'.join(title_formatted.lower().split())
+    return title_formatted
+
 class ConfigManager:
     def __init__(self):
         self.default_config = {
@@ -810,10 +816,7 @@ class Main(Gtk.Window):
                 title = game_label.get_text()
 
                 game = next((j for j in self.games if j.title == title), None)
-
-                title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-                title_formatted = title_formatted.replace(' ', '-')
-                title_formatted = '-'.join(title_formatted.lower().split())
+                title_formatted = format_title(title)
 
                 protonfix = game.protonfix
                 if protonfix:
@@ -997,10 +1000,7 @@ class Main(Gtk.Window):
                     banner = game.banner
 
                     game.title = new_title
-
-                    title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-                    title_formatted = title_formatted.replace(' ', '-')
-                    title_formatted = '-'.join(title_formatted.lower().split())
+                    title_formatted = format_title(game.title)
 
                     new_icon = f"{icons_dir}/{title_formatted}.ico"
                     new_banner = f"{banners_dir}/{title_formatted}.png"
@@ -1344,11 +1344,7 @@ class Main(Gtk.Window):
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         hbox.get_style_context().add_class(self.theme)
-
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(game.title)
 
         game_icon = f'{icons_dir}/{title_formatted}.ico'
         game_label = Gtk.Label.new(game.title)
@@ -1628,9 +1624,7 @@ class Main(Gtk.Window):
         game = next((j for j in self.games if j.title == title), None)
         if game:
             # Format the title for command execution
-            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-            title_formatted = title_formatted.replace(' ', '-')
-            title_formatted = '-'.join(title_formatted.lower().split())
+            title_formatted = format_title(game.title)
             game_directory = os.path.dirname(game.path)
 
             # Save the game title to the latest_games.txt file
@@ -1903,11 +1897,7 @@ class Main(Gtk.Window):
         return False
 
     def set_image_shortcut_icon(self, title, icons_path, icon_temp):
-
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(title)
 
         # Check if the icon file exists
         icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
@@ -2086,9 +2076,7 @@ class Main(Gtk.Window):
             addapp = add_game_dialog.entry_addapp.get_text()
             lossless = add_game_dialog.combobox_lossless.get_active_text()
 
-            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-            title_formatted = title_formatted.replace(' ', '-')
-            title_formatted = '-'.join(title_formatted.lower().split())
+            title_formatted = format_title(title)
 
             addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
 
@@ -2485,10 +2473,7 @@ class Main(Gtk.Window):
             game.addapp = edit_game_dialog.entry_addapp.get_text()
             game.lossless = edit_game_dialog.combobox_lossless.get_active_text()
 
-            # Handle the click event of the Create Shortcut button
-            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-            title_formatted = title_formatted.replace(' ', '-')
-            title_formatted = '-'.join(title_formatted.lower().split())
+            title_formatted = format_title(game.title)
 
             game.gameid = title_formatted
             game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
@@ -2568,10 +2553,7 @@ class Main(Gtk.Window):
         if os.path.isfile(os.path.expanduser(icon_temp)):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(game.title)
 
         # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
@@ -2758,10 +2740,7 @@ class Main(Gtk.Window):
         if os.path.isfile(os.path.expanduser(icon_temp)):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(game.title)
 
         # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
@@ -2802,9 +2781,7 @@ class Main(Gtk.Window):
             dialog.set_preview_widget_active(False)
 
     def remove_banner(self, game):
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(game.title)
 
         # Remove banner file
         banner_file_path = f"{banners_dir}/{title_formatted}.png"
@@ -2813,10 +2790,7 @@ class Main(Gtk.Window):
 
     def remove_shortcut(self, game):
         # Remove existing shortcut if it exists
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', game.title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
-
+        title_formatted = format_title(game.title)
         desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
 
         if os.path.exists(desktop_file_path):
@@ -5495,10 +5469,7 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.OK:
             title = self.entry_title.get_text()
             prefix = self.entry_prefix.get_text()
-
-            title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-            title_formatted = title_formatted.replace(' ', '-')
-            title_formatted = '-'.join(title_formatted.lower().split())
+            title_formatted = format_title(title)
 
             runner = self.combobox_runner.get_active_text()
 
@@ -5791,7 +5762,7 @@ class AddGame(Gtk.Dialog):
         if not title:
             return  # If there's no title, there's no shortcut to check
 
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title).replace(' ', '-').lower()
+        title_formatted = format_title(title)
         desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
 
         # Check if the shortcut file exists
@@ -5802,9 +5773,7 @@ class AddGame(Gtk.Dialog):
 
     def update_prefix_entry(self, entry):
         # Update the prefix entry based on the title and self.default_prefix
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', entry.get_text())
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(entry.get_text())
         prefix = os.path.expanduser(self.default_prefix) + "/" + title_formatted
         self.entry_prefix.set_text(prefix)
 
@@ -5818,10 +5787,7 @@ class AddGame(Gtk.Dialog):
 
         title = self.entry_title.get_text()
         prefix = self.entry_prefix.get_text()
-
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(title)
 
         runner = self.combobox_runner.get_active_text()
 
@@ -6569,11 +6535,7 @@ class CreateShortcut(Gtk.Window):
             return
 
         title = self.entry_title.get_text()
-
-        # Handle the click event of the Create Shortcut button
-        title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-        title_formatted = title_formatted.replace(' ', '-')
-        title_formatted = '-'.join(title_formatted.lower().split())
+        title_formatted = format_title(title)
 
         addapp = self.entry_addapp.get_text()
         addapp_bat = f"{os.path.dirname(self.file_path)}/faugus-{title_formatted}.bat"
