@@ -814,7 +814,16 @@ class Main(Gtk.Window):
                 title_formatted = title_formatted.replace(' ', '-')
                 title_formatted = '-'.join(title_formatted.lower().split())
 
-                self.log_file_path = f"{logs_dir}/{title_formatted}/steam-0.log"
+                protonfix = game.protonfix
+                if protonfix:
+                    match = re.search(r"umu-(\d+)", protonfix)
+                    if match:
+                        log_id = match.group(1)
+                    else:
+                        log_id = "0"
+                    self.log_file_path = f"{logs_dir}/{title_formatted}/steam-{log_id}.log"
+                else:
+                    self.log_file_path = f"{logs_dir}/{title_formatted}/steam-0.log"
                 self.umu_log_file_path = f"{logs_dir}/{title_formatted}/umu.log"
 
                 if self.enable_logging:
@@ -1654,6 +1663,8 @@ class Main(Gtk.Window):
             command_parts = []
 
             # Add command parts if they are not empty
+            if self.enable_logging:
+                command_parts.append(f'FAUGUS_LOG={title_formatted}')
             if mangohud:
                 command_parts.append(mangohud)
             if disable_hidraw:

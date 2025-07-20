@@ -330,7 +330,7 @@ class FaugusRun:
         if self.lossless_location:
             self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
 
-        match = re.search(r"WINEPREFIX=['\"]([^'\"]+)", self.message)
+        match = re.search(r"FAUGUS_LOG=([^\s]+)", self.message)
         if match:
             self.game_title = match.group(1).split("/")[-1]
 
