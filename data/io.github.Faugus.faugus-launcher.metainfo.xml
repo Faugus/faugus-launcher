@@ -87,11 +87,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.1-1" date="2025-07-16">
+    <release version="1.8.2-1" date="2025-07-20">
       <description>
         <ul>
-          <li>Added support to Lossless Scaling Frame Generation</li>
-          <li>Some code refactoring</li>
+          <li>Added chinese translation</li>
+          <li>Fixed logs not available when using a different prefix</li>
+          <li>Updated Lossless Scaling Frame Generation environment variable</li>
         </ul>
       </description>
     </release>
