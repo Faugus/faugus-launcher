@@ -814,21 +814,18 @@ class Main(Gtk.Window):
                 hbox = selected_child.get_child()
                 game_label = hbox.get_children()[1]
                 title = game_label.get_text()
-
                 game = next((j for j in self.games if j.title == title), None)
-                title_formatted = format_title(title)
 
-                protonfix = game.protonfix
-                if protonfix:
-                    match = re.search(r"umu-(\d+)", protonfix)
+                if game.protonfix:
+                    match = re.search(r"umu-(\d+)", game.protonfix)
                     if match:
                         log_id = match.group(1)
                     else:
                         log_id = "0"
-                    self.log_file_path = f"{logs_dir}/{title_formatted}/steam-{log_id}.log"
+                    self.log_file_path = f"{logs_dir}/{game.gameid}/steam-{log_id}.log"
                 else:
-                    self.log_file_path = f"{logs_dir}/{title_formatted}/steam-0.log"
-                self.umu_log_file_path = f"{logs_dir}/{title_formatted}/umu.log"
+                    self.log_file_path = f"{logs_dir}/{game.gameid}/steam-0.log"
+                self.umu_log_file_path = f"{logs_dir}/{game.gameid}/umu.log"
 
                 if self.enable_logging:
                     self.menu_show_logs.set_visible(True)
@@ -992,9 +989,7 @@ class Main(Gtk.Window):
                 if any(new_title == game.title for game in self.games):
                     duplicate_dialog.show_warning_dialog(duplicate_dialog, _("%s already exists.") % title)
                 else:
-                    title_formatted_old = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-                    title_formatted_old = title_formatted_old.replace(' ', '-')
-                    title_formatted_old = '-'.join(title_formatted_old.lower().split())
+                    title_formatted_old = format_title(game.title)
 
                     icon = f"{icons_dir}/{title_formatted_old}.ico"
                     banner = game.banner
@@ -1344,9 +1339,8 @@ class Main(Gtk.Window):
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         hbox.get_style_context().add_class(self.theme)
-        title_formatted = format_title(game.title)
 
-        game_icon = f'{icons_dir}/{title_formatted}.ico'
+        game_icon = f'{icons_dir}/{game.gameid}.ico'
         game_label = Gtk.Label.new(game.title)
 
         if self.interface_mode == "Blocks" or self.interface_mode == "Banners":
@@ -1624,7 +1618,6 @@ class Main(Gtk.Window):
         game = next((j for j in self.games if j.title == title), None)
         if game:
             # Format the title for command execution
-            title_formatted = format_title(game.title)
             game_directory = os.path.dirname(game.path)
 
             # Save the game title to the latest_games.txt file
@@ -1632,11 +1625,11 @@ class Main(Gtk.Window):
 
             if self.close_on_launch:
                 if IS_FLATPAK:
-                    subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], stdout=subprocess.DEVNULL,
+                    subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, cwd=game_directory)
                     sys.exit()
                 else:
-                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], cwd=game_directory)
+                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=game_directory)
 
                     self.menu_item_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
@@ -1650,7 +1643,7 @@ class Main(Gtk.Window):
                     GLib.timeout_add(1000, check_pid_timeout)
 
             else:
-                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", title_formatted], cwd=game_directory)
+                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=game_directory)
 
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
@@ -2553,10 +2546,8 @@ class Main(Gtk.Window):
         if os.path.isfile(os.path.expanduser(icon_temp)):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
-        title_formatted = format_title(game.title)
-
         # Check if the icon file exists
-        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
+        new_icon_path = f"{icons_dir}/{game.gameid}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
@@ -2568,7 +2559,7 @@ class Main(Gtk.Window):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher --game {title_formatted}\n'
+                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher --game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2578,7 +2569,7 @@ class Main(Gtk.Window):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec={faugus_run} --game {title_formatted}\n'
+                f'Exec={faugus_run} --game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2594,7 +2585,7 @@ class Main(Gtk.Window):
         if not os.path.exists(desktop_directory):
             os.makedirs(desktop_directory)
 
-        applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
+        applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
 
         with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
@@ -2603,7 +2594,7 @@ class Main(Gtk.Window):
         os.chmod(applications_shortcut_path, 0o755)
 
         # Copy the shortcut to Desktop
-        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
+        desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
         os.chmod(desktop_shortcut_path, 0o755)
 
@@ -2625,13 +2616,13 @@ class Main(Gtk.Window):
                 if IS_FLATPAK:
                     if IS_STEAM_FLATPAK:
                         game_info["Exe"] = f'"flatpak-spawn"'
-                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}'
+                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
                     else:
                         game_info["Exe"] = f'"flatpak"'
-                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}'
+                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
                 else:
                     game_info["Exe"] = f'"{faugus_run}"'
-                    game_info["LaunchOptions"] = f'--game {title_formatted}'
+                    game_info["LaunchOptions"] = f'--game {game.gameid}'
                 game_info["StartDir"] = game_directory
                 game_info["icon"] = icon
             else:
@@ -2648,7 +2639,7 @@ class Main(Gtk.Window):
                             "StartDir": game_directory,
                             "icon": icon,
                             "ShortcutPath": "",
-                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}',
+                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}',
                             "IsHidden": 0,
                             "AllowDesktopConfig": 1,
                             "AllowOverlay": 1,
@@ -2666,7 +2657,7 @@ class Main(Gtk.Window):
                             "StartDir": game_directory,
                             "icon": icon,
                             "ShortcutPath": "",
-                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {title_formatted}',
+                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}',
                             "IsHidden": 0,
                             "AllowDesktopConfig": 1,
                             "AllowOverlay": 1,
@@ -2684,7 +2675,7 @@ class Main(Gtk.Window):
                         "StartDir": game_directory,
                         "icon": icon,
                         "ShortcutPath": "",
-                        "LaunchOptions": f'--game {title_formatted}',
+                        "LaunchOptions": f'--game {game.gameid}',
                         "IsHidden": 0,
                         "AllowDesktopConfig": 1,
                         "AllowOverlay": 1,
@@ -2740,10 +2731,8 @@ class Main(Gtk.Window):
         if os.path.isfile(os.path.expanduser(icon_temp)):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
-        title_formatted = format_title(game.title)
-
         # Check if the icon file exists
-        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
+        new_icon_path = f"{icons_dir}/{game.gameid}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
@@ -2781,28 +2770,25 @@ class Main(Gtk.Window):
             dialog.set_preview_widget_active(False)
 
     def remove_banner(self, game):
-        title_formatted = format_title(game.title)
-
         # Remove banner file
-        banner_file_path = f"{banners_dir}/{title_formatted}.png"
+        banner_file_path = f"{banners_dir}/{game.gameid}.png"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
 
     def remove_shortcut(self, game):
         # Remove existing shortcut if it exists
-        title_formatted = format_title(game.title)
-        desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
+        desktop_file_path = f"{app_dir}/{game.gameid}.desktop"
 
         if os.path.exists(desktop_file_path):
             os.remove(desktop_file_path)
 
         # Remove shortcut from Desktop if exists
-        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
+        desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
         if os.path.exists(desktop_shortcut_path):
             os.remove(desktop_shortcut_path)
 
         # Remove icon file
-        icon_file_path = f"{icons_dir}/{title_formatted}.ico"
+        icon_file_path = f"{icons_dir}/{game.gameid}.ico"
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
 
@@ -6949,7 +6935,19 @@ def apply_dark_theme():
         if is_dark_theme:
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
+def update_games_file():
+    with open(games_json, "r", encoding="utf-8") as f:
+        games = json.load(f)
+
+    for game in games:
+        if not game.get("gameid"):
+            game["gameid"] = format_title(game["title"])
+
+    with open(games_json, "w", encoding="utf-8") as f:
+        json.dump(games, f, indent=4, ensure_ascii=False)
+
 def faugus_launcher():
+    update_games_file()
     apply_dark_theme()
 
     if len(sys.argv) == 1:
