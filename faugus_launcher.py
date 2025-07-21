@@ -1851,13 +1851,13 @@ class Main(Gtk.Window):
             self.updated_steam_id = detect_steam_id()
             if self.updated_steam_id is not None:
                 if self.check_steam_shortcut(title):
-                    edit_game_dialog.checkbox_steam_shortcut.set_active(True)
+                    edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
-                    edit_game_dialog.checkbox_steam_shortcut.set_active(False)
+                    edit_game_dialog.checkbox_shortcut_steam.set_active(False)
             else:
-                edit_game_dialog.checkbox_steam_shortcut.set_active(False)
-                edit_game_dialog.checkbox_steam_shortcut.set_sensitive(False)
-                edit_game_dialog.checkbox_steam_shortcut.set_tooltip_text(
+                edit_game_dialog.checkbox_shortcut_steam.set_active(False)
+                edit_game_dialog.checkbox_shortcut_steam.set_sensitive(False)
+                edit_game_dialog.checkbox_shortcut_steam.set_tooltip_text(
                     _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
 
             edit_game_dialog.check_existing_shortcut()
@@ -1948,7 +1948,7 @@ class Main(Gtk.Window):
                             continue
 
                 # Remove the shortcut
-                self.remove_shortcut(game)
+                self.remove_shortcut(game, "both")
                 self.remove_steam_shortcut(title)
                 self.remove_banner(game)
 
@@ -2116,8 +2116,9 @@ class Main(Gtk.Window):
                         protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless)
 
             # Determine the state of the shortcut checkbox
-            shortcut_state = add_game_dialog.checkbox_shortcut.get_active()
-            steam_shortcut_state = add_game_dialog.checkbox_steam_shortcut.get_active()
+            desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
+            appmenu_shortcut_state = add_game_dialog.checkbox_shortcut_appmenu.get_active()
+            steam_shortcut_state = add_game_dialog.checkbox_shortcut_steam.get_active()
 
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
@@ -2140,23 +2141,19 @@ class Main(Gtk.Window):
                 else:
                     if add_game_dialog.combobox_launcher.get_active() == 2:
                         add_game_dialog.destroy()
-                        self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                             icon_temp, icon_final)
+                        self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
                     if add_game_dialog.combobox_launcher.get_active() == 3:
                         add_game_dialog.destroy()
-                        self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                             icon_temp, icon_final)
+                        self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
                     if add_game_dialog.combobox_launcher.get_active() == 4:
                         add_game_dialog.destroy()
-                        self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                             icon_temp, icon_final)
+                        self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
                     if add_game_dialog.combobox_launcher.get_active() == 5:
                         add_game_dialog.destroy()
-                        self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                             icon_temp, icon_final)
+                        self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
             game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
                 "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
@@ -2180,7 +2177,8 @@ class Main(Gtk.Window):
 
             if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
                 # Call add_remove_shortcut method
-                self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+                self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
+                self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
                 if addapp_checkbox == "addapp_enabled":
@@ -2205,8 +2203,7 @@ class Main(Gtk.Window):
         # Ensure the dialog is destroyed when canceled
         add_game_dialog.destroy()
 
-    def launcher_screen(self, title, launcher, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                        icon_temp, icon_final):
+    def launcher_screen(self, title, launcher, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
         self.box_launcher = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_launcher.set_hexpand(True)
         self.box_launcher.set_vexpand(True)
@@ -2248,26 +2245,22 @@ class Main(Gtk.Window):
         if launcher == "2":
             image_path = battle_icon
             self.label_download.set_text(_("Downloading Battle.net..."))
-            self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                   icon_temp, icon_final)
+            self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "3":
             image_path = ea_icon
             self.label_download.set_text(_("Downloading EA App..."))
-            self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                   icon_temp, icon_final)
+            self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "4":
             image_path = epic_icon
             self.label_download.set_text(_("Downloading Epic Games..."))
-            self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                   icon_temp, icon_final)
+            self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "5":
             image_path = ubisoft_icon
             self.label_download.set_text(_("Downloading Ubisoft Connect..."))
-            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                                   icon_temp, icon_final)
+            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
         else:
             image_path = faugus_png
 
@@ -2297,7 +2290,7 @@ class Main(Gtk.Window):
     def on_button_finish_install_clicked(self):
         self.on_button_kill_clicked(widget)
 
-    def monitor_process(self, processo, game, shortcut_state, icon_temp, icon_final, title):
+    def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
         retcode = processo.poll()
 
         if retcode is not None:
@@ -2306,7 +2299,10 @@ class Main(Gtk.Window):
             if os.path.exists(faugus_temp):
                 shutil.rmtree(faugus_temp)
 
-            self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+            self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
+            self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
+            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+
             self.add_item_list(game)
             self.update_list()
             self.select_game_by_title(title)
@@ -2330,8 +2326,7 @@ class Main(Gtk.Window):
 
         return True
 
-    def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, shortcut_state,
-                            icon_temp, icon_final):
+    def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
                 "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.tar.gz",
@@ -2380,8 +2375,7 @@ class Main(Gtk.Window):
                 elif launcher == "epic":
                     install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
                     os.makedirs(install_path, exist_ok=True)
-                    self.extract_epic_launcher(file_path, install_path, runner, prefix, umu_run, title_formatted,
-                                            game, shortcut_state, icon_temp, icon_final, title)
+                    self.extract_epic_launcher(file_path, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
                     return
 
                 elif launcher == "ubisoft":
@@ -2395,14 +2389,14 @@ class Main(Gtk.Window):
                 self.label_download2.set_visible(True)
                 if launcher != "epic":
                     processo = subprocess.Popen([sys.executable, faugus_run, command])
-                    GLib.timeout_add(100, self.monitor_process, processo, game, shortcut_state, icon_temp, icon_final, title)
+                    GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
             threading.Thread(target=start_download).start()
 
             return file_path
 
     def extract_epic_launcher(self, file_path, install_path, runner, prefix, umu_run, title_formatted,
-                            game, shortcut_state, icon_temp, icon_final, title):
+                            game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title):
         def extract():
             try:
                 with tarfile.open(file_path, "r:gz") as tar:
@@ -2415,22 +2409,20 @@ class Main(Gtk.Window):
                         GLib.idle_add(self.bar_download.set_text, _("Extracting... %d%%") % int(percent * 100))
                 GLib.idle_add(self.bar_download.set_fraction, 1.0)
                 GLib.idle_add(self.bar_download.set_text, _("Extraction complete"))
-                GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted,
-                            game, shortcut_state, icon_temp, icon_final, title)
+                GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
             except Exception as e:
                 GLib.idle_add(self.show_warning_dialog, self, _("Error during extraction: %s") % e)
 
         threading.Thread(target=extract).start()
 
-    def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted,
-                            game, shortcut_state, icon_temp, icon_final, title):
+    def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title):
         self.bar_download.set_visible(False)
         self.label_download2.set_text(_("Please close the login window and wait..."))
         command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
         if runner:
             command2 = f"PROTONPATH={runner} {command2}"
         processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
-        GLib.timeout_add(100, self.monitor_process, processo2, game, shortcut_state, icon_temp, icon_final, title)
+        GLib.timeout_add(100, self.monitor_process, processo2, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
 
     def select_game_by_title(self, title):
         # Selects an item from the FlowBox based on the title
@@ -2506,11 +2498,13 @@ class Main(Gtk.Window):
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
 
             # Determine the state of the shortcut checkbox
-            shortcut_state = edit_game_dialog.checkbox_shortcut.get_active()
-            steam_shortcut_state = edit_game_dialog.checkbox_steam_shortcut.get_active()
+            desktop_shortcut_state = edit_game_dialog.checkbox_shortcut_desktop.get_active()
+            appmenu_shortcut_state = edit_game_dialog.checkbox_shortcut_appmenu.get_active()
+            steam_shortcut_state = edit_game_dialog.checkbox_shortcut_steam.get_active()
 
             # Call add_remove_shortcut method
-            self.add_shortcut(game, shortcut_state, icon_temp, icon_final)
+            self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
+            self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
             self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
             if game.addapp_checkbox == True:
@@ -2533,12 +2527,20 @@ class Main(Gtk.Window):
         os.remove(edit_game_dialog.banner_path_temp)
         edit_game_dialog.destroy()
 
-    def add_shortcut(self, game, shortcut_state, icon_temp, icon_final):
+    def add_shortcut(self, game, shortcut_state, shortcut, icon_temp, icon_final):
+        applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
+        desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
 
         # Check if the shortcut checkbox is checked
-        if not shortcut_state:
+        if shortcut == "desktop" and not shortcut_state:
             # Remove existing shortcut if it exists
-            self.remove_shortcut(game)
+            self.remove_shortcut(game, shortcut)
+            if os.path.isfile(os.path.expanduser(icon_temp)):
+                os.rename(os.path.expanduser(icon_temp), icon_final)
+            return
+        if shortcut == "appmenu" and not shortcut_state:
+            # Remove existing shortcut if it exists
+            self.remove_shortcut(game, shortcut)
             if os.path.isfile(os.path.expanduser(icon_temp)):
                 os.rename(os.path.expanduser(icon_temp), icon_final)
             return
@@ -2577,26 +2579,21 @@ class Main(Gtk.Window):
             )
 
         # Check if the destination directory exists and create if it doesn't
-        applications_directory = app_dir
-        if not os.path.exists(applications_directory):
-            os.makedirs(applications_directory)
+        if not os.path.exists(app_dir):
+            os.makedirs(app_dir)
 
-        desktop_directory = desktop_dir
-        if not os.path.exists(desktop_directory):
-            os.makedirs(desktop_directory)
+        if not os.path.exists(desktop_dir):
+            os.makedirs(desktop_dir)
 
-        applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
+        if shortcut == "appmenu":
+            with open(applications_shortcut_path, 'w') as appmenu_file:
+                appmenu_file.write(desktop_file_content)
+            os.chmod(applications_shortcut_path, 0o755)
 
-        with open(applications_shortcut_path, 'w') as desktop_file:
-            desktop_file.write(desktop_file_content)
-
-        # Make the .desktop file executable
-        os.chmod(applications_shortcut_path, 0o755)
-
-        # Copy the shortcut to Desktop
-        desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
-        shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
-        os.chmod(desktop_shortcut_path, 0o755)
+        if shortcut == "desktop":
+            with open(desktop_shortcut_path, 'w') as desktop_file:
+                desktop_file.write(desktop_file_content)
+            os.chmod(desktop_shortcut_path, 0o755)
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
         def add_game_to_steam(title, game_directory, icon):
@@ -2770,33 +2767,26 @@ class Main(Gtk.Window):
             dialog.set_preview_widget_active(False)
 
     def remove_banner(self, game):
-        # Remove banner file
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
 
-    def remove_shortcut(self, game):
-        # Remove existing shortcut if it exists
-        desktop_file_path = f"{app_dir}/{game.gameid}.desktop"
-
-        if os.path.exists(desktop_file_path):
-            os.remove(desktop_file_path)
-
-        # Remove shortcut from Desktop if exists
+    def remove_shortcut(self, game, shortcut):
+        applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
         desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
-        if os.path.exists(desktop_shortcut_path):
-            os.remove(desktop_shortcut_path)
-
-        # Remove icon file
-        icon_file_path = f"{icons_dir}/{game.gameid}.ico"
-        if os.path.exists(icon_file_path):
-            os.remove(icon_file_path)
+        if shortcut == "appmenu":
+            if os.path.exists(applications_shortcut_path):
+                os.remove(applications_shortcut_path)
+        if shortcut == "desktop":
+            if os.path.exists(desktop_shortcut_path):
+                os.remove(desktop_shortcut_path)
+        if shortcut == "both":
+            if os.path.exists(applications_shortcut_path):
+                os.remove(applications_shortcut_path)
+            if os.path.exists(desktop_shortcut_path):
+                os.remove(desktop_shortcut_path)
 
     def update_list(self):
-        # Update the game list
-        # for row in self.game_list.get_children():
-        #    self.game_list.remove(row)
-
         for child in self.flowbox.get_children():
             self.flowbox.remove(child)
 
@@ -3019,7 +3009,7 @@ class Settings(Gtk.Dialog):
         self.label_default_prefix_tools.set_margin_top(10)
 
         # Widgets for runner
-        self.label_runner = Gtk.Label(label=_("Default Runner"))
+        self.label_runner = Gtk.Label(label=_("Default Proton"))
         self.label_runner.set_halign(Gtk.Align.START)
         self.combobox_runner = Gtk.ComboBoxText()
 
@@ -4560,7 +4550,7 @@ class AddGame(Gtk.Dialog):
         self.button_search_prefix.set_size_request(50, -1)
 
         # Widgets for runner
-        self.label_runner = Gtk.Label(label=_("Runner"))
+        self.label_runner = Gtk.Label(label=_("Proton"))
         self.label_runner.set_halign(Gtk.Align.START)
         self.combobox_runner = Gtk.ComboBoxText()
 
@@ -4641,11 +4631,19 @@ class AddGame(Gtk.Dialog):
         self.button_run.set_tooltip_text(_("Run a file inside the prefix"))
 
         # Button for creating shortcut
-        self.checkbox_shortcut = Gtk.CheckButton(label=_("Shortcut"))
-        self.checkbox_shortcut.set_tooltip_text(
-            _("Add or remove a shortcut from the Desktop and the Application Launcher."))
-        self.checkbox_steam_shortcut = Gtk.CheckButton(label=_("Steam Shortcut"))
-        self.checkbox_steam_shortcut.set_tooltip_text(
+        self.label_shortcut = Gtk.Label(label=_("Shortcut"))
+        self.label_shortcut.set_margin_start(10)
+        self.label_shortcut.set_margin_end(10)
+        self.label_shortcut.set_margin_top(10)
+        self.label_shortcut.set_halign(Gtk.Align.START)
+        self.checkbox_shortcut_desktop = Gtk.CheckButton(label=_("Desktop"))
+        self.checkbox_shortcut_desktop.set_tooltip_text(
+            _("Add or remove a shortcut from the Desktop."))
+        self.checkbox_shortcut_appmenu = Gtk.CheckButton(label=_("App Menu"))
+        self.checkbox_shortcut_appmenu.set_tooltip_text(
+            _("Add or remove a shortcut from the Application Launcher."))
+        self.checkbox_shortcut_steam = Gtk.CheckButton(label=_("Steam"))
+        self.checkbox_shortcut_steam.set_tooltip_text(
             _("Add or remove a shortcut from Steam. Steam needs to be restarted."))
 
         # Button for selection shortcut icon
@@ -4745,8 +4743,9 @@ class AddGame(Gtk.Dialog):
 
         self.notebook.append_page(grid_page2, tab_box2)
 
-        self.grid_launcher.attach(self.combobox_launcher, 0, 0, 4, 1)
+        self.grid_launcher.attach(self.combobox_launcher, 1, 0, 1, 1)
         self.combobox_launcher.set_hexpand(True)
+        self.combobox_launcher.set_valign(Gtk.Align.CENTER)
 
         self.grid_title.attach(self.label_title, 0, 0, 4, 1)
         self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
@@ -4766,10 +4765,12 @@ class AddGame(Gtk.Dialog):
         self.grid_runner.attach(self.combobox_runner, 0, 1, 1, 1)
         self.combobox_runner.set_hexpand(True)
 
-        self.grid_shortcut.add(self.checkbox_shortcut)
-        self.grid_shortcut.add(self.checkbox_steam_shortcut)
+        self.label_shortcut.set_hexpand(True)
+        self.grid_shortcut.add(self.checkbox_shortcut_desktop)
+        self.grid_shortcut.add(self.checkbox_shortcut_appmenu)
+        self.grid_shortcut.add(self.checkbox_shortcut_steam)
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
-        self.grid_shortcut.set_valign(Gtk.Align.CENTER)
+        self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
         self.box_shortcut = Gtk.Box()
         self.box_shortcut.pack_start(self.grid_shortcut, False, False, 0)
@@ -4780,6 +4781,7 @@ class AddGame(Gtk.Dialog):
         page1.add(self.grid_path)
         page1.add(self.grid_prefix)
         page1.add(self.grid_runner)
+        page1.add(self.label_shortcut)
         page1.add(self.box_shortcut)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
@@ -4873,8 +4875,8 @@ class AddGame(Gtk.Dialog):
 
         self.updated_steam_id = detect_steam_id()
         if not self.updated_steam_id:
-            self.checkbox_steam_shortcut.set_sensitive(False)
-            self.checkbox_steam_shortcut.set_tooltip_text(
+            self.checkbox_shortcut_steam.set_sensitive(False)
+            self.checkbox_shortcut_steam.set_tooltip_text(
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
 
         self.lossless_location = ConfigManager().config.get('lossless-location', '')
@@ -4891,7 +4893,6 @@ class AddGame(Gtk.Dialog):
             self.combobox_lossless.set_active(0)
             self.combobox_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
 
-        # self.create_remove_shortcut(self)
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
         tab_box1.show_all()
@@ -5175,6 +5176,26 @@ class AddGame(Gtk.Dialog):
     def on_combobox_changed(self, combobox):
         active_index = combobox.get_active()
 
+        def cleanup_fields():
+            self.entry_title.set_text("")
+            self.entry_launch_arguments.set_text("")
+            self.entry_path.set_text("")
+            self.entry_prefix.set_text("")
+            self.checkbox_shortcut_desktop.set_active(False)
+            self.checkbox_shortcut_appmenu.set_active(False)
+            self.checkbox_shortcut_steam.set_active(False)
+            self.entry_protonfix.set_text("")
+            self.entry_launch_arguments.set_text("")
+            self.entry_game_arguments.set_text("")
+            self.checkbox_addapp.set_active(False)
+            self.entry_addapp.set_text("")
+            self.combobox_lossless.set_active(0)
+            self.checkbox_mangohud.set_active(False)
+            self.checkbox_gamemode.set_active(False)
+            self.checkbox_disable_hidraw.set_active(False)
+
+        cleanup_fields()
+
         if active_index == 0:
             self.grid_title.set_visible(True)
             self.grid_path.set_visible(True)
@@ -5186,11 +5207,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-
-            self.entry_launch_arguments.set_text("")
-            self.entry_title.set_text("")
-            self.entry_path.set_text("")
-
+            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         if active_index == 1:
             self.grid_title.set_visible(True)
             self.grid_path.set_visible(True)
@@ -5202,11 +5219,6 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(False)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(False)
-
-            self.entry_launch_arguments.set_text("")
-            self.entry_title.set_text("")
-            self.entry_path.set_text("")
-
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         elif active_index == 2:
             self.grid_title.set_visible(False)
@@ -5219,12 +5231,10 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
-
             shutil.copyfile(battle_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5242,12 +5252,9 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-
-            self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
-
             shutil.copyfile(ea_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5265,12 +5272,9 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-
-            self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
-
             shutil.copyfile(epic_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5288,12 +5292,9 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-
-            self.entry_launch_arguments.set_text("")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
-
             shutil.copyfile(ubisoft_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5749,13 +5750,12 @@ class AddGame(Gtk.Dialog):
             return  # If there's no title, there's no shortcut to check
 
         title_formatted = format_title(title)
-        desktop_file_path = f"{app_dir}/{title_formatted}.desktop"
-
-        # Check if the shortcut file exists
-        shortcut_exists = os.path.exists(desktop_file_path)
+        desktop_file_path = f"{desktop_dir}/{title_formatted}.desktop"
+        applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
 
         # Mark the checkbox if the shortcut exists
-        self.checkbox_shortcut.set_active(shortcut_exists)
+        self.checkbox_shortcut_desktop.set_active(os.path.exists(desktop_file_path))
+        self.checkbox_shortcut_appmenu.set_active(os.path.exists(applications_shortcut_path))
 
     def update_prefix_entry(self, entry):
         # Update the prefix entry based on the title and self.default_prefix
@@ -6936,13 +6936,13 @@ def apply_dark_theme():
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def update_games_file():
+    if not os.path.exists(games_json):
+        return
     with open(games_json, "r", encoding="utf-8") as f:
         games = json.load(f)
-
     for game in games:
         if not game.get("gameid"):
             game["gameid"] = format_title(game["title"])
-
     with open(games_json, "w", encoding="utf-8") as f:
         json.dump(games, f, indent=4, ensure_ascii=False)
 
