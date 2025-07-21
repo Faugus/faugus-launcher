@@ -4641,7 +4641,7 @@ class AddGame(Gtk.Dialog):
             _("Add or remove a shortcut from the Desktop."))
         self.checkbox_shortcut_appmenu = Gtk.CheckButton(label=_("App Menu"))
         self.checkbox_shortcut_appmenu.set_tooltip_text(
-            _("Add or remove a shortcut from the Application Launcher."))
+            _("Add or remove a shortcut from the Application Menu."))
         self.checkbox_shortcut_steam = Gtk.CheckButton(label=_("Steam"))
         self.checkbox_shortcut_steam.set_tooltip_text(
             _("Add or remove a shortcut from Steam. Steam needs to be restarted."))
