@@ -87,13 +87,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.4-1" date="2025-07-21">
+    <release version="1.8.5-1" date="2025-07-21">
       <description>
         <ul>
           <li>Reworked shortcut creation</li>
           <li>Steam shortcut can now be updated without restarting Steam</li>
           <li>Desktop/App Menu shortcut creation/deletion are now separated</li>
-          <li>Hotfix for recent change that was preventing the app to run</li>
+          <li>Hotfix for recent change that was preventing the app from running</li>
         </ul>
       </description>
     </release>
