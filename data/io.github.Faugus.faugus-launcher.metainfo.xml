@@ -87,12 +87,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.2-1" date="2025-07-20">
+    <release version="1.8.3-1" date="2025-07-21">
       <description>
         <ul>
-          <li>Added chinese translation</li>
-          <li>Fixed logs not available when using a different prefix</li>
-          <li>Updated Lossless Scaling Frame Generation environment variable</li>
+          <li>Reworked shortcut creation</li>
+          <li>Steam shortcut can now be updated without restarting Steam</li>
+          <li>Desktop/App Menu shortcut creation/deletion are now separated</li>
+          <li>Hotfix for recent change that was preventing the app to run</li>
         </ul>
       </description>
     </release>
