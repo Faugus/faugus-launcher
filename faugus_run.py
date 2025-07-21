@@ -333,9 +333,10 @@ class FaugusRun:
         if self.lossless_location:
             self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
 
-        match = re.search(r"FAUGUS_LOG=([^\s]+)", self.message)
-        if match:
-            self.game_title = match.group(1).split("/")[-1]
+        if self.enable_logging:
+            match = re.search(r"FAUGUS_LOG=([^\s]+)", self.message)
+            if match:
+                self.game_title = match.group(1).split("/")[-1]
 
         self.run_processes_sequentially()
 
@@ -725,18 +726,19 @@ def apply_dark_theme():
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def build_launch_command(game):
-    path = game["path"]
-    prefix = game["prefix"]
-    launch_arguments = game["launch_arguments"]
-    game_arguments = game["game_arguments"]
-    protonfix = game["protonfix"]
-    runner = game["runner"]
-    addapp_bat = game["addapp_bat"]
-    mangohud = game["mangohud"]
-    gamemode = game["gamemode"]
-    disable_hidraw = game["disable_hidraw"]
-    addapp_checkbox = game["addapp_checkbox"]
-    lossless = game["lossless"]
+    gameid = game.get("gameid", "")
+    path = game.get("path", "")
+    prefix = game.get("prefix", "")
+    launch_arguments = game.get("launch_arguments", "")
+    game_arguments = game.get("game_arguments", "")
+    protonfix = game.get("protonfix", "")
+    runner = game.get("runner", "")
+    addapp_bat = game.get("addapp_bat", "")
+    mangohud = game.get("mangohud", "")
+    gamemode = game.get("gamemode", "")
+    disable_hidraw = game.get("disable_hidraw", "")
+    addapp_checkbox = game.get("addapp_checkbox", "")
+    lossless = game.get("lossless", "")
 
     if lossless == "Off":
         lossless = ""
@@ -751,6 +753,8 @@ def build_launch_command(game):
 
     command_parts = []
 
+    if gameid:
+        command_parts.append(f"FAUGUS_LOG='{gameid}'")
     if mangohud:
         command_parts.append(mangohud)
     if disable_hidraw:
