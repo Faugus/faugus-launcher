@@ -77,7 +77,8 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
+games_dir = PathManager.user_config('faugus-launcher/games.json')
+umu_run = PathManager.find_binary('umu-run')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
 faugus_proton_downloader = PathManager.find_binary('faugus-proton-downloader')
@@ -723,33 +724,99 @@ def apply_dark_theme():
         if is_dark_theme:
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
+def build_launch_command(game):
+    path = game["path"]
+    prefix = game["prefix"]
+    launch_arguments = game["launch_arguments"]
+    game_arguments = game["game_arguments"]
+    protonfix = game["protonfix"]
+    runner = game["runner"]
+    addapp_bat = game["addapp_bat"]
+    mangohud = game["mangohud"]
+    gamemode = game["gamemode"]
+    disable_hidraw = game["disable_hidraw"]
+    addapp_checkbox = game["addapp_checkbox"]
+    lossless = game["lossless"]
 
-def load_shortcut(title_formatted):
-    if not os.path.exists(shorcuts_dir):
+    if lossless == "Off":
+        lossless = ""
+    elif lossless == "X1":
+        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
+    elif lossless == "X2":
+        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
+    elif lossless == "X3":
+        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
+    elif lossless == "X4":
+        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
+
+    command_parts = []
+
+    if mangohud:
+        command_parts.append(mangohud)
+    if disable_hidraw:
+        command_parts.append(disable_hidraw)
+    if runner != "Linux-Native" and prefix:
+        command_parts.append(f"WINEPREFIX='{prefix}'")
+    if protonfix:
+        command_parts.append(f"GAMEID={protonfix}")
+    else:
+        command_parts.append(f"GAMEID={game['gameid']}")
+    if runner:
+        if runner == "Linux-Native":
+            command_parts.append('UMU_NO_PROTON=1')
+        else:
+            command_parts.append(f"PROTONPATH={runner}")
+    if gamemode:
+        command_parts.append(gamemode)
+    if launch_arguments:
+        command_parts.append(launch_arguments)
+    if lossless:
+        command_parts.append(lossless)
+
+    command_parts.append(f"'{umu_run}'")
+
+    if addapp_checkbox == "addapp_enabled":
+        command_parts.append(f"'{addapp_bat}'")
+    else:
+        command_parts.append(f"'{path}'")
+
+    if game_arguments:
+        command_parts.append(game_arguments)
+
+    return " ".join(command_parts)
+
+def load_game_from_json(gameid):
+    if not os.path.exists(games_dir):
         return None
 
     try:
-        with open(shorcuts_dir, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data.get(title_formatted, {}).get("LaunchOptions")
+        with open(games_dir, "r", encoding="utf-8") as f:
+            games = json.load(f)
     except json.JSONDecodeError:
         return None
+
+    for game in games:
+        if game.get("gameid") == gameid:
+            return game
+
+    return None
 
 def main():
     apply_dark_theme()
 
-    parser = argparse.ArgumentParser(description="Faugus Run")
-    parser.add_argument("message")
+    parser = argparse.ArgumentParser(description=None)
+    parser.add_argument("message", nargs='?')
     parser.add_argument("command", nargs='?', default=None)
-    parser.add_argument("--shortcut")
+    parser.add_argument("--game")
 
     args = parser.parse_args()
 
-    if args.shortcut:
-        launch_options = load_shortcut(args.shortcut)
-        if not launch_options:
+    if args.game:
+        game = load_game_from_json(args.game)
+        if not game:
             return
 
+        launch_options = build_launch_command(game)
         handle_command(launch_options, None)
     else:
         handle_command(args.message, args.command)
