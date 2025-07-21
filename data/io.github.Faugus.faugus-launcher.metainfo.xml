@@ -87,7 +87,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.3-1" date="2025-07-21">
+    <release version="1.8.4-1" date="2025-07-21">
       <description>
         <ul>
           <li>Reworked shortcut creation</li>
