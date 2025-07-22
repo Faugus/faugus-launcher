@@ -100,7 +100,11 @@ else:
     app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
-    lsfgvk_path = Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+    lsfgvk_possible_paths = [
+        Path("/usr/lib/liblsfg-vk.so"),
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+    ]
+    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 epic_icon = PathManager.get_icon('faugus-epic-games.png')
 battle_icon = PathManager.get_icon('faugus-battlenet.png')
