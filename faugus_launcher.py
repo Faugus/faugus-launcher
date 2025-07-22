@@ -73,7 +73,6 @@ IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
@@ -81,12 +80,11 @@ icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
-
 share_dir = PathManager.user_data()
-app_dir = PathManager.user_data('applications')
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 
 if IS_FLATPAK:
+    app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
     tray_icon = 'io.github.Faugus.faugus-launcher'
 
@@ -99,6 +97,7 @@ if IS_FLATPAK:
     lsfgvk_path = Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so")
     lsfgvk_path = lsfgvk_path if lsfgvk_path.exists() else Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
 else:
+    app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
     lsfgvk_path = Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
