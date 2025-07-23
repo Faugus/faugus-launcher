@@ -87,13 +87,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.5-1" date="2025-07-21">
+    <release version="1.8.6-1" date="2025-07-23">
       <description>
         <ul>
-          <li>Reworked shortcut creation</li>
-          <li>Steam shortcut can now be updated without restarting Steam</li>
-          <li>Desktop/App Menu shortcut creation/deletion are now separated</li>
-          <li>Hotfix for recent change that was preventing the app from running</li>
+          <li>Added system location detection for Lossless Scaling Vulkan Layer</li>
+          <li>Fixed shortcut not being created on app menu on Flatpak</li>
+          <li>Fixed umu-launcher log location</li>
+          <li>Fixed Winetricks and Winecfg not running when logging is enabled</li>
         </ul>
       </description>
     </release>
