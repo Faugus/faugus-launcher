@@ -3584,6 +3584,7 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
+            command_parts.append(f'FAUGUS_LOG=default')
             command_parts.append(f'GAMEID=winetricks-gui')
             command_parts.append(f'STORE=none')
             if default_runner:
@@ -3627,6 +3628,7 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
+            command_parts.append(f'FAUGUS_LOG=default')
             command_parts.append(f'GAMEID=default')
             if default_runner:
                 command_parts.append(f'PROTONPATH={default_runner}')
@@ -3734,6 +3736,7 @@ class Settings(Gtk.Dialog):
 
                 command_parts = []
                 file_run = filechooser.get_filename()
+                command_parts.append(f'FAUGUS_LOG=default')
                 if not file_run.endswith(".reg"):
                     if file_run:
                         command_parts.append(f'GAMEID=default')
@@ -5460,7 +5463,6 @@ class AddGame(Gtk.Dialog):
             title = self.entry_title.get_text()
             prefix = self.entry_prefix.get_text()
             title_formatted = format_title(title)
-
             runner = self.combobox_runner.get_active_text()
 
             if runner == "UMU-Proton Latest":
@@ -5473,23 +5475,18 @@ class AddGame(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
-
             file_run = filechooser.get_filename()
+            if title_formatted:
+                command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
+            if prefix:
+                command_parts.append(f'WINEPREFIX="{prefix}"')
+            if title_formatted:
+                command_parts.append(f'GAMEID={title_formatted}')
+            if runner:
+                command_parts.append(f'PROTONPATH={runner}')
             if not file_run.endswith(".reg"):
-                if prefix:
-                    command_parts.append(f'WINEPREFIX="{prefix}"')
-                if title_formatted:
-                    command_parts.append(f'GAMEID={title_formatted}')
-                if runner:
-                    command_parts.append(f'PROTONPATH={runner}')
                 command_parts.append(f'"{umu_run}" "{file_run}"')
             else:
-                if prefix:
-                    command_parts.append(f'WINEPREFIX="{prefix}"')
-                if title_formatted:
-                    command_parts.append(f'GAMEID={title_formatted}')
-                if runner:
-                    command_parts.append(f'PROTONPATH={runner}')
                 command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
             # Join all parts into a single command
@@ -5777,7 +5774,6 @@ class AddGame(Gtk.Dialog):
         title = self.entry_title.get_text()
         prefix = self.entry_prefix.get_text()
         title_formatted = format_title(title)
-
         runner = self.combobox_runner.get_active_text()
 
         if runner == "UMU-Proton Latest":
@@ -5790,7 +5786,8 @@ class AddGame(Gtk.Dialog):
         command_parts = []
 
         # Add command parts if they are not empty
-
+        if title_formatted:
+            command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
         if prefix:
             command_parts.append(f'WINEPREFIX="{prefix}"')
         if title_formatted:
@@ -5833,8 +5830,9 @@ class AddGame(Gtk.Dialog):
             self.set_sensitive(True)
             return
 
+        title = self.entry_title.get_text()
         prefix = self.entry_prefix.get_text()
-
+        title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_text()
 
         if runner == "UMU-Proton Latest":
@@ -5847,7 +5845,8 @@ class AddGame(Gtk.Dialog):
         command_parts = []
 
         # Add command parts if they are not empty
-
+        if title_formatted:
+            command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
         if prefix:
             command_parts.append(f'WINEPREFIX="{prefix}"')
         command_parts.append(f'GAMEID=winetricks-gui')
