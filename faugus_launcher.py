@@ -2371,10 +2371,10 @@ class Main(Gtk.Window):
                     self.label_download2.set_text(_("Please close the login window and wait..."))
                     #self.label_download2.set_text(_("Please close the login window and press:"))
                     #self.button_finish_install.set_visible(True)
-                    command = f"WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"FAUGUS_LOG={title_formatted} WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 # elif launcher == "epic":
                 #     self.label_download2.set_text("")
                 #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
@@ -2386,7 +2386,7 @@ class Main(Gtk.Window):
 
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
 
                 if runner:
                     command = f"PROTONPATH={runner} {command}"
@@ -2424,7 +2424,7 @@ class Main(Gtk.Window):
     def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title):
         self.bar_download.set_visible(False)
         self.label_download2.set_text(_("Please close the login window and wait..."))
-        command2 = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
+        command2 = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
         if runner:
             command2 = f"PROTONPATH={runner} {command2}"
         processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
