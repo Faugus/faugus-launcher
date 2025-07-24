@@ -2334,13 +2334,11 @@ class Main(Gtk.Window):
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-                # "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
-                "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.tar.gz",
+                "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
                 "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"}
 
-            # file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
-            file_name = {"ea": "EAappInstaller.exe", "epic": "epic.tar.gz",
+            file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
                 "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe"}
 
             if launcher not in urls:
@@ -2369,21 +2367,13 @@ class Main(Gtk.Window):
                 self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    #self.label_download2.set_text(_("Please close the login window and press:"))
-                    #self.button_finish_install.set_visible(True)
                     command = f"FAUGUS_LOG={title_formatted} WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
                     command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
-                # elif launcher == "epic":
-                #     self.label_download2.set_text("")
-                #     command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "epic":
-                    install_path = os.path.join(prefix, "drive_c", "Program Files (x86)")
-                    os.makedirs(install_path, exist_ok=True)
-                    self.extract_epic_launcher(file_path, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
-                    return
-
+                    self.label_download2.set_text("")
+                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
                     command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
@@ -2393,42 +2383,12 @@ class Main(Gtk.Window):
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
-                if launcher != "epic":
-                    processo = subprocess.Popen([sys.executable, faugus_run, command])
-                    GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
+                processo = subprocess.Popen([sys.executable, faugus_run, command])
+                GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
             threading.Thread(target=start_download).start()
 
             return file_path
-
-    def extract_epic_launcher(self, file_path, install_path, runner, prefix, umu_run, title_formatted,
-                            game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title):
-        def extract():
-            try:
-                with tarfile.open(file_path, "r:gz") as tar:
-                    members = tar.getmembers()
-                    total = len(members)
-                    for i, member in enumerate(members):
-                        tar.extract(member, path=install_path)
-                        percent = min(i / total, 1.0)
-                        GLib.idle_add(self.bar_download.set_fraction, percent)
-                        GLib.idle_add(self.bar_download.set_text, _("Extracting... %d%%") % int(percent * 100))
-                GLib.idle_add(self.bar_download.set_fraction, 1.0)
-                GLib.idle_add(self.bar_download.set_text, _("Extraction complete"))
-                GLib.idle_add(self.launch_epic_launcher, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
-            except Exception as e:
-                GLib.idle_add(self.show_warning_dialog, self, _("Error during extraction: %s") % e)
-
-        threading.Thread(target=extract).start()
-
-    def launch_epic_launcher(self, install_path, runner, prefix, umu_run, title_formatted, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title):
-        self.bar_download.set_visible(False)
-        self.label_download2.set_text(_("Please close the login window and wait..."))
-        command2 = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{install_path}/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe'"
-        if runner:
-            command2 = f"PROTONPATH={runner} {command2}"
-        processo2 = subprocess.Popen([sys.executable, faugus_run, command2])
-        GLib.timeout_add(100, self.monitor_process, processo2, game, desktop_shortcut_state, appmenu_shortcut_state, icon_temp, icon_final, title)
 
     def select_game_by_title(self, title):
         # Selects an item from the FlowBox based on the title
@@ -5286,7 +5246,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
+                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe")
             shutil.copyfile(epic_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
