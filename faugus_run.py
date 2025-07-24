@@ -334,9 +334,9 @@ class FaugusRun:
             self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
 
         if self.enable_logging:
-            match = re.search(r"FAUGUS_LOG=['\"]?([^'\"]+)['\"]?", self.message)
+            match = re.search(r"FAUGUS_LOG=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", self.message)
             if match:
-                self.game_title = match.group(1).split("/")[-1]
+                self.game_title = next(g for g in match.groups() if g).split("/")[-1]
 
         self.run_processes_sequentially()
 
