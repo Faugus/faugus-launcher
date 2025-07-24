@@ -2184,10 +2184,13 @@ class Main(Gtk.Window):
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
-                if addapp_checkbox == "addapp_enabled":
-                    with open(addapp_bat, "w") as bat_file:
-                        bat_file.write(f'start "" "z:{addapp}"\n')
-                        bat_file.write(f'start "" "z:{path}"\n')
+                if game.addapp_checkbox == True:
+                    with open(game.addapp_bat, "w") as bat_file:
+                        bat_file.write(f'start "" "z:{game.addapp}"\n')
+                        if game_arguments:
+                            bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
+                        else:
+                            bat_file.write(f'start "" "z:{path}"\n')
 
                 self.add_item_list(game)
                 self.update_list()
@@ -2513,7 +2516,10 @@ class Main(Gtk.Window):
             if game.addapp_checkbox == True:
                 with open(game.addapp_bat, "w") as bat_file:
                     bat_file.write(f'start "" "z:{game.addapp}"\n')
-                    bat_file.write(f'start "" "z:{game.path}"\n')
+                    if game.game_arguments:
+                        bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
+                    else:
+                        bat_file.write(f'start "" "z:{game.path}"\n')
 
             # Save changes and update UI
             self.save_games()
