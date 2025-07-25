@@ -6851,6 +6851,7 @@ def run_file(file_path):
 
     command_parts = []
 
+    command_parts.append(f'FAUGUS_LOG=default')
     if not file_path.endswith(".reg"):
         # Add command parts if they are not empty
         if mangohud_enabled and mangohud:
