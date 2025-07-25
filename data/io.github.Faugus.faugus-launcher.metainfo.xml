@@ -74,7 +74,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/5acd229/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/08c8f06/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -87,13 +87,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.6-1" date="2025-07-23">
+    <release version="1.8.7-1" date="2025-07-25">
       <description>
         <ul>
-          <li>Added system location detection for Lossless Scaling Vulkan Layer</li>
-          <li>Fixed shortcut not being created on app menu on Flatpak</li>
-          <li>Fixed umu-launcher log location</li>
-          <li>Fixed Winetricks and Winecfg not running when logging is enabled</li>
+          <li>Removed Epic Games installer workaround cause it works again with Proton</li>
+          <li>Fixed umu-launcher log location for Winetricks and Winecfg</li>
+          <li>Fixed Game Arguments not being applied when using an Additional Application</li>
+          <li>Fixed launchers not being installed when logging is enabled</li>
+          <li>Fixed .exe file not running when logging is enabled</li>
         </ul>
       </description>
     </release>
