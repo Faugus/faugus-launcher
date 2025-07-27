@@ -79,6 +79,7 @@ logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
 share_dir = PathManager.user_data()
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
@@ -1532,6 +1533,13 @@ class Main(Gtk.Window):
                 if self.mono_icon != settings_dialog.checkbox_mono_icon.get_active():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
+
+                if hasattr(settings_dialog, "liststore"):
+                    values = [row[0] for row in settings_dialog.liststore if row[0].strip() != ""]
+                    with open(envar_dir, "w", encoding="utf-8") as f:
+                        for val in values:
+                            f.write(val + "\n")
+
             self.load_config()
             settings_dialog.destroy()
 
@@ -3102,6 +3110,31 @@ class Settings(Gtk.Dialog):
         button_restore = Gtk.Button(label=_("Restore"))
         button_restore.connect("clicked", self.on_button_restore_clicked)
 
+        self.label_envar = Gtk.Label(label=_("Global Environment Variables"))
+        self.label_envar.set_halign(Gtk.Align.START)
+
+        self.liststore = Gtk.ListStore(str)
+        self.liststore.append([""])
+
+        treeview = Gtk.TreeView(model=self.liststore)
+        treeview.set_has_tooltip(True)
+        treeview.connect("query-tooltip", self.on_query_tooltip)
+
+        renderer = Gtk.CellRendererText()
+        renderer.set_property("editable", True)
+        renderer.set_property("ellipsize", 3)
+        renderer.connect("edited", self.on_cell_edited, 0)
+
+        column = Gtk.TreeViewColumn("", renderer, text=0)
+        treeview.set_headers_visible(False)
+
+        treeview.append_column(column)
+
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scrolled_window.set_min_content_height(130)
+        scrolled_window.add(treeview)
+
         self.box = self.get_content_area()
         self.box.set_margin_start(0)
         self.box.set_margin_end(0)
@@ -3122,6 +3155,7 @@ class Settings(Gtk.Dialog):
         box_main.set_column_homogeneous(True)
         box_main.set_column_spacing(10)
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_mid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         grid_language = Gtk.Grid()
@@ -3171,6 +3205,14 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.set_margin_end(10)
         grid_miscellaneous.set_margin_top(10)
         grid_miscellaneous.set_margin_bottom(10)
+
+        grid_envar = Gtk.Grid()
+        grid_envar.set_row_spacing(10)
+        grid_envar.set_column_spacing(10)
+        grid_envar.set_margin_start(10)
+        grid_envar.set_margin_end(10)
+        grid_envar.set_margin_top(10)
+        grid_envar.set_margin_bottom(10)
 
         grid_interface_mode = Gtk.Grid()
         grid_interface_mode.set_row_spacing(10)
@@ -3251,6 +3293,10 @@ class Settings(Gtk.Dialog):
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
+        grid_envar.attach(self.label_envar, 0, 0, 1, 1)
+        grid_envar.attach(scrolled_window, 0, 1, 1, 1)
+        scrolled_window.set_hexpand(True)
+
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
 
@@ -3262,26 +3308,29 @@ class Settings(Gtk.Dialog):
         grid_support.attach(button_kofi, 0, 1, 1, 1)
         grid_support.attach(button_paypal, 1, 1, 1, 1)
 
-        box_left.pack_start(grid_language, False, False, 0)
         box_left.pack_start(grid_prefix, False, False, 0)
         box_left.pack_start(grid_runner, False, False, 0)
-        box_left.pack_start(grid_lossless, False, False, 0)
         box_left.pack_start(self.label_default_prefix_tools, False, False, 0)
         box_left.pack_start(grid_tools, False, False, 0)
-        box_left.pack_end(grid_support, False, False, 0)
-        box_left.pack_end(self.label_support, False, False, 0)
+        box_left.pack_start(grid_lossless, False, False, 0)
+        box_left.pack_end(grid_language, False, False, 0)
 
-        box_right.pack_start(self.label_miscellaneous, False, False, 0)
-        box_right.pack_start(grid_miscellaneous, False, False, 0)
+        box_mid.pack_start(self.label_miscellaneous, False, False, 0)
+        box_mid.pack_start(grid_miscellaneous, False, False, 0)
+        box_mid.pack_end(grid_support, False, False, 0)
+        box_mid.pack_end(self.label_support, False, False, 0)
+
+        box_right.pack_start(grid_envar, False, False, 0)
         box_right.pack_start(grid_interface_mode, False, False, 0)
         box_right.pack_start(self.grid_big_interface, False, False, 0)
         box_right.pack_end(grid_backup, False, False, 0)
         box_right.pack_end(self.label_settings, False, False, 0)
 
         box_main.attach(box_left, 0, 0, 1, 1)
-        box_main.attach(box_right, 1, 0, 1, 1)
+        box_main.attach(box_mid, 1, 0, 1, 1)
+        box_main.attach(box_right, 2, 0, 1, 1)
         box_left.set_hexpand(True)
-        box_right.set_hexpand(True)
+        box_mid.set_hexpand(True)
         frame.add(box_main)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -3317,6 +3366,30 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
+    def on_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
+        result = widget.get_path_at_pos(x, y)
+        if result is not None:
+            path, column, cell_x, cell_y = result
+            tree_iter = self.liststore.get_iter(path)
+            value = self.liststore.get_value(tree_iter, 0)
+            if value.strip():
+                tooltip.set_text(value)
+                return True
+        return False
+
+    def on_cell_edited(self, widget, path, text, column_index):
+        self.liststore[path][column_index] = text
+        self.adjust_rows()
+
+    def adjust_rows(self):
+        filled_rows = [row[0] for row in self.liststore if row[0].strip() != ""]
+        self.liststore.clear()
+
+        for value in filled_rows:
+            self.liststore.append([value])
+
+        self.liststore.append([""])
 
     def populate_languages(self):
         self.combobox_language.remove_all()
@@ -4160,6 +4233,21 @@ class Settings(Gtk.Dialog):
                     break
 
             self.combobox_language.set_active(index_language)
+        self.load_liststore_from_file(envar_dir)
+
+    def load_liststore_from_file(self, filename=envar_dir):
+        self.liststore.clear()
+
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                lines = [line.strip() for line in f.readlines() if line.strip()]
+        except FileNotFoundError:
+            lines = []
+
+        for line in lines:
+            self.liststore.append([line])
+
+        self.liststore.append([""])
 
 class Game:
     def __init__(self, gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,

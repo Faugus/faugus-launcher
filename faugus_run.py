@@ -77,6 +77,7 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_dir = PathManager.user_config('faugus-launcher/games.json')
 umu_run = PathManager.find_binary('umu-run')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
@@ -338,7 +339,21 @@ class FaugusRun:
             if match:
                 self.game_title = next(g for g in match.groups() if g).split("/")[-1]
 
+        self.load_env_from_file(envar_dir)
         self.run_processes_sequentially()
+
+    def load_env_from_file(self, filename=envar_dir):
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or "=" not in line:
+                        continue
+                    key, value = line.split("=", 1)
+                    key, value = key.strip(), value.strip()
+                    os.environ[key] = value
+        except FileNotFoundError:
+            pass
 
     def run_processes_sequentially(self):
         if "UMU_NO_PROTON" not in self.message:
