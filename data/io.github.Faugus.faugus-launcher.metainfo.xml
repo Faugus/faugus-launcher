@@ -74,7 +74,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/08c8f06/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/566e145/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -87,14 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.7-1" date="2025-07-25">
+    <release version="1.8.8-1" date="2025-07-27">
       <description>
         <ul>
-          <li>Removed Epic Games installer workaround cause it works again with Proton</li>
-          <li>Fixed umu-launcher log location for Winetricks and Winecfg</li>
-          <li>Fixed Game Arguments not being applied when using an Additional Application</li>
-          <li>Fixed launchers not being installed when logging is enabled</li>
-          <li>Fixed .exe file not running when logging is enabled</li>
+          <li>Proton Manager progress bar is more accurate now</li>
+          <li>Added an option to set global environment variables</li>
         </ul>
       </description>
     </release>
