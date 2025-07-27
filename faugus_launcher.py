@@ -1534,11 +1534,7 @@ class Main(Gtk.Window):
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
 
-                if hasattr(settings_dialog, "liststore"):
-                    values = [row[0] for row in settings_dialog.liststore if row[0].strip() != ""]
-                    with open(envar_dir, "w", encoding="utf-8") as f:
-                        for val in values:
-                            f.write(val + "\n")
+                settings_dialog.update_envar_file()
 
             self.load_config()
             settings_dialog.destroy()
@@ -3585,10 +3581,18 @@ class Settings(Gtk.Dialog):
                 self.disconnect_by_func(self.parent.on_window_delete_event)
                 self.parent.window_delete_event_connected = False
 
+    def update_envar_file(self):
+        if hasattr(self, "liststore"):
+            values = [row[0] for row in self.liststore if row[0].strip() != ""]
+            with open(envar_dir, "w", encoding="utf-8") as f:
+                for val in values:
+                    f.write(val + "\n")
+
     def on_button_proton_manager_clicked(self, widget):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            self.update_envar_file()
             self.update_config_file()
             proton_manager = faugus_proton_manager
             self.update_system_tray()
@@ -3616,6 +3620,7 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            self.update_envar_file()
             self.update_config_file()
             self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
             default_runner = self.get_default_runner()
@@ -3660,6 +3665,7 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            self.update_envar_file()
             self.update_config_file()
             self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
             default_runner = self.get_default_runner()
@@ -3703,6 +3709,7 @@ class Settings(Gtk.Dialog):
         if self.entry_default_prefix.get_text() == "":
             self.entry_default_prefix.get_style_context().add_class("entry")
         else:
+            self.update_envar_file()
             self.update_config_file()
             self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
             default_runner = self.get_default_runner()
