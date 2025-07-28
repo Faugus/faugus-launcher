@@ -263,7 +263,6 @@ class ConfigManager:
             'enable-logging': 'False',
             'wayland-driver': 'False',
             'enable-hdr': 'False',
-            'enable-ntsync': 'False',
             'enable-wow64': 'False',
             'language': lang,
         }
@@ -1212,7 +1211,6 @@ class Main(Gtk.Window):
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
-        self.enable_ntsync = cfg.config.get('enable-ntsync', 'False') == 'True'
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
 
@@ -3034,10 +3032,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_hdr.set_active(False)
         self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
 
-        self.checkbox_enable_ntsync = Gtk.CheckButton(label=_("Enable NTsync (experimental)"))
-        self.checkbox_enable_ntsync.set_active(False)
-        self.checkbox_enable_ntsync.set_tooltip_text(_("Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."))
-
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
         self.checkbox_enable_wow64.set_active(False)
         self.checkbox_enable_wow64.set_tooltip_text(_("Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."))
@@ -3282,8 +3276,7 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
         grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_ntsync, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3516,7 +3509,6 @@ class Settings(Gtk.Dialog):
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
         checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-        checkbox_enable_ntsync = self.checkbox_enable_ntsync.get_active()
         checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
         combobox_interface = self.combobox_interface.get_active_text()
         checkbox_start_maximized = self.checkbox_start_maximized.get_active()
@@ -3548,7 +3540,6 @@ class Settings(Gtk.Dialog):
             checkbox_enable_logging,
             checkbox_wayland_driver,
             checkbox_enable_hdr,
-            checkbox_enable_ntsync,
             checkbox_enable_wow64,
             language
         )
@@ -4170,7 +4161,6 @@ class Settings(Gtk.Dialog):
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
-        enable_ntsync = cfg.config.get('enable-ntsync', 'False') == 'True'
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
 
@@ -4214,7 +4204,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_logging.set_active(enable_logging)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_hdr.set_active(enable_hdr)
-        self.checkbox_enable_ntsync.set_active(enable_ntsync)
         self.checkbox_enable_wow64.set_active(enable_wow64)
 
         model_interface = self.combobox_interface.get_model()
