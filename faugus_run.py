@@ -604,7 +604,7 @@ class FaugusRun:
             if "steamrt3 is up to date" in clean_line or "mtree is OK" in clean_line:
                 GLib.timeout_add_seconds(0, self.close_warning_dialog)
         else:
-            if "fsync: up and running." in clean_line or "Command exited with status: 0" in clean_line or "SingleInstance" in clean_line or "Using winetricks" in clean_line:
+            if "fsync:" in clean_line or "NTSync" in clean_line or "Using winetricks" in clean_line:
                 GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
