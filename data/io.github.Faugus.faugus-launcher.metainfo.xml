@@ -74,7 +74,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/566e145/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/8be61bf/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -87,11 +87,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.8-1" date="2025-07-27">
+    <release version="1.8.9-1" date="2025-07-31">
       <description>
         <ul>
-          <li>Proton Manager progress bar is more accurate now</li>
-          <li>Added an option to set global environment variables</li>
+          <li>Removed the NTsync option cause now both GE-Proton and Proton-EM enable it by default</li>
+          <li>Now it correctly updates the envar file when running tools from Settings</li>
+          <li>Improved the splash window accuracy</li>
         </ul>
       </description>
     </release>
