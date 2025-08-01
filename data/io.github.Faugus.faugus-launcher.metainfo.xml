@@ -87,12 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.9-1" date="2025-07-31">
+    <release version="1.8.10-1" date="2025-08-01">
       <description>
         <ul>
-          <li>Removed the NTsync option cause now both GE-Proton and Proton-EM enable it by default</li>
-          <li>Now it correctly updates the envar file when running tools from Settings</li>
-          <li>Improved the splash window accuracy</li>
+          <li>Fix Epic Games installation again</li>
         </ul>
       </description>
     </release>
