@@ -87,10 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.10-1" date="2025-08-01">
+    <release version="1.8.11-1" date="2025-08-02">
       <description>
         <ul>
-          <li>Fixed Epic Games installation again</li>
+          <li>Fixed Proton Manager not opening on a fresh installation</li>
+          <li>Fixed lsfg-vk not being detected on Fedora</li>
         </ul>
       </description>
     </release>
