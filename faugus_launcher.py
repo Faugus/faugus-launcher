@@ -103,6 +103,7 @@ else:
     tray_icon = PathManager.get_icon('faugus-launcher.png')
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"),
+        Path("/usr/lib64/liblsfg-vk.so"),
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
