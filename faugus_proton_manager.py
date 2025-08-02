@@ -292,17 +292,16 @@ class ProtonDownloader(Gtk.Dialog):
         grid.attach(button, 1, row_index, 1, 1)
 
     def get_installed_path(self, tag_name):
-        if not STEAM_COMPATIBILITY_PATH.exists():
-            return None
-
         tag_lower = tag_name.lower()
-        for folder in STEAM_COMPATIBILITY_PATH.iterdir():
-            folder_name_lower = folder.name.lower()
-            if folder_name_lower.endswith(tag_lower):
-                return folder
-            if tag_lower.startswith("proton-"):
-                if folder_name_lower.endswith(tag_lower[len("proton-"):]):
+
+        if STEAM_COMPATIBILITY_PATH.exists():
+            for folder in STEAM_COMPATIBILITY_PATH.iterdir():
+                folder_name_lower = folder.name.lower()
+                if folder_name_lower.endswith(tag_lower):
                     return folder
+                if tag_lower.startswith("proton-"):
+                    if folder_name_lower.endswith(tag_lower[len("proton-"):]):
+                        return folder
 
         return STEAM_COMPATIBILITY_PATH / tag_name
 
