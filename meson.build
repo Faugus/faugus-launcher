@@ -1,6 +1,6 @@
 project(
   'faugus-launcher',
-  version: '1.8.11',
+  version: '1.8.12',
   meson_version: '>=1.2.0',
   license: 'MIT',
   license_files: 'LICENSE',
@@ -12,9 +12,7 @@ gnome = import('gnome')
 
 subdir('assets')
 subdir('languages')
-if get_option('flatpak_build')
-  subdir('data')
-endif
+subdir('data')
 
 install_data(
   'faugus_launcher.py',
