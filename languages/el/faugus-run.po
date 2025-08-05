@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-11 19:48-0300\n"
+"PO-Revision-Date: 2025-08-05 19:14+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: /usr/bin/faugus-run:212
+#, python-format
+msgid "%s was not found."
+msgstr "Το %s δεν βρέθηκε."
+
+#: /usr/bin/faugus-run:216
+msgid "Please install it or use another Proton version."
+msgstr "Παρακαλώ εγκαταστήστε το ή χρησιμοποιήστε μια άλλη έκδοση του Proton."
+
+#: /usr/bin/faugus-run:219 /usr/bin/faugus-run:632
+msgid "Ok"
+msgstr "Εντάξει"
+
+#: /usr/bin/faugus-run:473
+#, python-format
+msgid "Using %s"
+msgstr "Χρήση %s"
+
+#: /usr/bin/faugus-run:548
+msgid "Updating BattlEye..."
+msgstr "Ενημέρωση του BattlEye..."
+
+#: /usr/bin/faugus-run:550
+msgid "Updating Easy Anti-Cheat..."
+msgstr "Ενημέρωση Easy Anti-Cheat..."
+
+#: /usr/bin/faugus-run:552
+msgid "Components are up to date"
+msgstr ""
+
+#: /usr/bin/faugus-run:554
+msgid "Downloading GE-Proton..."
+msgstr "Λήψη GE-Proton..."
+
+#: /usr/bin/faugus-run:556
+msgid "Downloading UMU-Proton..."
+msgstr "Λήψη UMU-Proton..."
+
+#: /usr/bin/faugus-run:558
+msgid "Downloading Steam Runtime..."
+msgstr "Λήψη Steam Runtime..."
+
+#: /usr/bin/faugus-run:560
+msgid "Extracting Steam Runtime..."
+msgstr "Εξαγωγή Steam Runtime..."
+
+#: /usr/bin/faugus-run:562
+msgid "Extracting GE-Proton..."
+msgstr "Εξαγωγή GE-Proton..."
+
+#: /usr/bin/faugus-run:564
+msgid "Extracting UMU-Proton..."
+msgstr "Εξαγωγή UMU-Proton..."
+
+#: /usr/bin/faugus-run:566 /usr/bin/faugus-run:572
+msgid "GE-Proton is up to date"
+msgstr "Το GE-Proton είναι ενημερωμένο"
+
+#: /usr/bin/faugus-run:568 /usr/bin/faugus-run:574
+msgid "UMU-Proton is up to date"
+msgstr "Το UMU-Proton είναι ενημερωμένο"
+
+#: /usr/bin/faugus-run:570 /usr/bin/faugus-run:576
+msgid "Steam Runtime is up to date"
+msgstr "Το Steam Runtime είναι ενημερωμένο"
+
+#: /usr/bin/faugus-run:578
+msgid "Downloading Proton-EM..."
+msgstr "Λήψη Proton-EM..."
+
+#: /usr/bin/faugus-run:580
+msgid "Extracting Proton-EM..."
+msgstr "Εξαγωγή Proton-EM..."
+
+#: /usr/bin/faugus-run:582
+msgid "Proton-EM is up to date"
+msgstr "Το Proton-EM είναι ενημερωμένο"
+
+#: /usr/bin/faugus-run:629
+msgid "The keys and values were successfully added to the registry."
+msgstr "Τα κλειδιά και οι τιμές προστέθηκαν επιτυχώς στο μητρώο."
