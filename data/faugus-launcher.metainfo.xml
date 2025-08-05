@@ -65,10 +65,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.12-1" date="2025-08-04">
+    <release version="1.8.13-1" date="2025-08-04">
       <description>
         <ul>
-          <li>Added metadata for native installation</li>
+          <li>Added metadata for native installations</li>
         </ul>
       </description>
     </release>
