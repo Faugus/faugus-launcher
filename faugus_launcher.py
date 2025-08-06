@@ -115,7 +115,7 @@ ea_icon = PathManager.get_icon('faugus-ea.png')
 
 faugus_run = PathManager.find_binary('faugus-run')
 faugus_proton_manager = PathManager.find_binary('faugus-proton-manager')
-umu_run = PathManager.find_binary('umu-run')
+umu_run = PathManager.user_data('faugus-launcher/umu-run')
 mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
 

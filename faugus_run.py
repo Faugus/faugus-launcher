@@ -76,10 +76,10 @@ else:
     share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.png')
 
+umu_run = PathManager.user_data('faugus-launcher/umu-run')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_dir = PathManager.user_config('faugus-launcher/games.json')
-umu_run = PathManager.find_binary('umu-run')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_components = PathManager.find_binary('faugus-components')
 faugus_proton_downloader = PathManager.find_binary('faugus-proton-downloader')
@@ -561,8 +561,12 @@ class FaugusRun:
         return True
 
     def check_game_output(self, clean_line):
-        if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line:
+        if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line or "Updating UMU-Launcher..." in clean_line:
             self.warning_dialog.show_all()
+        if "Updating UMU-Launcher..." in clean_line:
+            self.label.set_text(_("Updating UMU-Launcher..."))
+        if "UMU-Launcher is up to date." in clean_line:
+            self.label.set_text(_("UMU-Launcher is up to date"))
         if "Updating BattlEye..." in clean_line:
             self.label.set_text(_("Updating BattlEye..."))
         if "Updating Easy Anti-Cheat..." in clean_line:
