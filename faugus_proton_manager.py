@@ -230,6 +230,8 @@ class ProtonDownloader(Gtk.Dialog):
     def fetch_releases_from_url(self, url, grid):
         page = 1
         releases = []
+        seen_tags = set()
+
         while True:
             response = requests.get(url, params={"page": page, "per_page": 100})
             if response.status_code == 200:
@@ -243,9 +245,11 @@ class ProtonDownloader(Gtk.Dialog):
 
         for release in releases:
             tag_name = release["tag_name"]
+            if tag_name in seen_tags:
+                continue  # ← Evita duplicados
+            seen_tags.add(tag_name)
 
             if "GloriousEggroll" in url:
-                # Esperado: GE-Proton8-1
                 if not tag_name.startswith("GE-Proton"):
                     continue
                 try:
@@ -257,17 +261,7 @@ class ProtonDownloader(Gtk.Dialog):
                     continue
 
             elif "Etaash-mathamsetty" in url:
-                # Esperado: EM-10.0-4
                 if not tag_name.startswith("EM-"):
-                    continue
-                try:
-                    version_str = tag_name.replace("EM-", "")
-                    part1, part2 = version_str.split("-")
-                    major, minor = map(int, part1.split("."))
-                    patch = int(part2)
-                    if (major, minor, patch) < (10, 0, 4):
-                        continue
-                except Exception:
                     continue
 
             self.add_release_to_grid(release, grid)

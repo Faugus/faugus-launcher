@@ -256,7 +256,6 @@ class FaugusRun:
         sys.exit()
 
     def update_protonpath(self, message):
-
         versions = [
             d for d in os.listdir(compatibility_dir)
             if os.path.isdir(os.path.join(compatibility_dir, d)) and d.startswith("proton-EM-")
@@ -265,7 +264,21 @@ class FaugusRun:
         if not versions:
             return message
 
-        versions.sort(key=lambda v: [int(x) for x in re.findall(r'\d+', v)], reverse=True)
+        def version_key(v):
+            version_str = v.replace("proton-EM-", "")
+
+            if version_str.isdigit():
+                return (int(version_str), "")
+
+            match = re.match(r"^(\d+)([A-Za-z]*)$", version_str)
+            if match:
+                num_part = int(match.group(1))
+                alpha_part = match.group(2)
+                return (num_part, alpha_part)
+
+            return (0, version_str)
+
+        versions.sort(key=version_key, reverse=True)
         latest_version = versions[0]
         updated_message = re.sub(r'PROTONPATH=Proton-EM\b', f'PROTONPATH={latest_version}', message)
         return updated_message
@@ -605,12 +618,16 @@ class FaugusRun:
         if "Proton installed successfully" in clean_line:
             self.label.set_text(_("Proton-EM is up to date"))
 
-        if "UMU_NO_PROTON" in self.message:
-            if "steamrt3 is up to date" in clean_line or "mtree is OK" in clean_line:
-                GLib.timeout_add_seconds(0, self.close_warning_dialog)
-        else:
-            if "fsync:" in clean_line or "NTSync" in clean_line or "Using winetricks" in clean_line:
-                GLib.timeout_add_seconds(0, self.close_warning_dialog)
+        if (
+            "fsync:" in clean_line
+            or "NTSync" in clean_line
+            or "Using winetricks" in clean_line
+            or "steamrt3 is up to date" in clean_line
+            or "Command exited with status: 0" in clean_line
+            or "SingleInstance" in clean_line
+            or "mtree is OK" in clean_line
+        ):
+            GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
