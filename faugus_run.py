@@ -328,8 +328,9 @@ class FaugusRun:
                 self.message = f'PROTON_ENABLE_HDR=1 {self.message}'
         if self.enable_wow64:
             self.message = f'PROTON_USE_WOW64=1 {self.message}'
-        if self.lossless_location:
-            self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
+        if "LSFG_LEGACY" in self.message:
+            if self.lossless_location:
+                self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
 
         if self.enable_logging:
             match = re.search(r"FAUGUS_LOG=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", self.message)
@@ -753,18 +754,20 @@ def build_launch_command(game):
     gamemode = game.get("gamemode", "")
     disable_hidraw = game.get("disable_hidraw", "")
     addapp_checkbox = game.get("addapp_checkbox", "")
-    lossless = game.get("lossless", "")
+    lossless_enabled = game.get("lossless_enabled", "")
+    lossless_multiplier = game.get("lossless_multiplier", "")
+    lossless_flow = game.get("lossless_flow", "")
+    lossless_performance = game.get("lossless_performance", "")
+    lossless_hdr = game.get("lossless_hdr", "")
 
-    if lossless == "Off":
-        lossless = ""
-    elif lossless == "X1":
-        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-    elif lossless == "X2":
-        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-    elif lossless == "X3":
-        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-    elif lossless == "X4":
-        lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
+    if lossless_performance:
+        lossless_performance = 1
+    else:
+        lossless_performance = 0
+    if lossless_hdr:
+        lossless_hdr = 1
+    else:
+        lossless_hdr = 0
 
     command_parts = []
 
@@ -789,8 +792,16 @@ def build_launch_command(game):
         command_parts.append(gamemode)
     if launch_arguments:
         command_parts.append(launch_arguments)
-    if lossless:
-        command_parts.append(lossless)
+    if lossless_enabled:
+        command_parts.append("LSFG_LEGACY=1")
+        if lossless_multiplier:
+            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}")
+        if lossless_flow:
+            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow}")
+        if lossless_performance:
+            command_parts.append(f"LSFG_PERFORMANCE_MODE={lossless_performance}")
+        if lossless_hdr:
+            command_parts.append(f"LSFG_HDR_MODE={lossless_hdr}")
 
     command_parts.append(f"'{umu_run}'")
 

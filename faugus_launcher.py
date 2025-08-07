@@ -1315,10 +1315,14 @@ class Main(Gtk.Window):
                     addapp = game_data.get("addapp", "")
                     addapp_bat = game_data.get("addapp_bat", "")
                     banner = game_data.get("banner", "")
-                    lossless = game_data.get("lossless", "")
+                    lossless_enabled = game_data.get("lossless_enabled", "")
+                    lossless_multiplier = game_data.get("lossless_multiplier", "")
+                    lossless_flow = game_data.get("lossless_flow", "")
+                    lossless_performance = game_data.get("lossless_performance", "")
+                    lossless_hdr = game_data.get("lossless_hdr", "")
 
                     game = Game(gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                                protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless)
+                                protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr)
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -1772,9 +1776,7 @@ class Main(Gtk.Window):
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model_runner = edit_game_dialog.combobox_runner.get_model()
-            model_lossless = edit_game_dialog.combobox_lossless.get_model()
             index_runner = 0
-            index_lossless = 0
             game_runner = game.runner
 
             if game.runner == "GE-Proton":
@@ -1786,17 +1788,6 @@ class Main(Gtk.Window):
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active(1)
 
-            if game.lossless == "":
-                game.lossless = "Off"
-            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=1":
-                game.lossless = "X1"
-            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=2":
-                game.lossless = "X2"
-            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=3":
-                game.lossless = "X3"
-            if game.lossless == "LSFG_LEGACY=1 LSFG_MULTIPLIER=4":
-                game.lossless = "X4"
-
             for i, row in enumerate(model_runner):
                 if row[0] == game_runner:
                     index_runner = i
@@ -1804,15 +1795,7 @@ class Main(Gtk.Window):
             if not game_runner:
                 index_runner = 1
 
-            for i, row in enumerate(model_lossless):
-                if row[0] == game.lossless:
-                    index_lossless = i
-                    break
-            if not game.lossless:
-                index_lossless = 0
-
             edit_game_dialog.combobox_runner.set_active(index_runner)
-            edit_game_dialog.combobox_lossless.set_active(index_lossless)
             edit_game_dialog.entry_title.set_text(game.title)
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
@@ -1822,6 +1805,12 @@ class Main(Gtk.Window):
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
             edit_game_dialog.entry_addapp.set_text(game.addapp)
             edit_game_dialog.grid_launcher.set_visible(False)
+
+            edit_game_dialog.lossless_enabled = game.lossless_enabled
+            edit_game_dialog.lossless_multiplier = game.lossless_multiplier
+            edit_game_dialog.lossless_flow = game.lossless_flow
+            edit_game_dialog.lossless_performance = game.lossless_performance
+            edit_game_dialog.lossless_hdr = game.lossless_hdr
 
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
@@ -2073,7 +2062,11 @@ class Main(Gtk.Window):
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combobox_runner.get_active_text()
             addapp = add_game_dialog.entry_addapp.get_text()
-            lossless = add_game_dialog.combobox_lossless.get_active_text()
+            lossless_enabled = add_game_dialog.lossless_enabled
+            lossless_multiplier = add_game_dialog.lossless_multiplier
+            lossless_flow = add_game_dialog.lossless_flow
+            lossless_performance = add_game_dialog.lossless_performance
+            lossless_hdr = add_game_dialog.lossless_hdr
 
             title_formatted = format_title(title)
 
@@ -2100,17 +2093,6 @@ class Main(Gtk.Window):
             if add_game_dialog.combobox_launcher.get_active() == 1:
                 runner = "Linux-Native"
 
-            if lossless == "Off":
-                lossless = ""
-            if lossless == "X1":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-            if lossless == "X2":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-            if lossless == "X3":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-            if lossless == "X4":
-                lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
-
             # Determine mangohud and gamemode status
             mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
@@ -2119,7 +2101,7 @@ class Main(Gtk.Window):
 
             # Create Game object and update UI
             game = Game(title_formatted, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                        protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless)
+                        protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr)
 
             # Determine the state of the shortcut checkbox
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -2164,7 +2146,7 @@ class Main(Gtk.Window):
             game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
                 "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
                 "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
-                "addapp_bat": addapp_bat, "banner": banner, "lossless": lossless, }
+                "addapp_bat": addapp_bat, "banner": banner, "lossless_enabled": lossless_enabled, "lossless_multiplier": lossless_multiplier, "lossless_flow": lossless_flow, "lossless_performance": lossless_performance, "lossless_hdr": lossless_hdr, }
 
             games = []
             if os.path.exists("games.json"):
@@ -2425,7 +2407,11 @@ class Main(Gtk.Window):
             game.runner = edit_game_dialog.combobox_runner.get_active_text()
             game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
             game.addapp = edit_game_dialog.entry_addapp.get_text()
-            game.lossless = edit_game_dialog.combobox_lossless.get_active_text()
+            game.lossless_enabled = edit_game_dialog.lossless_enabled
+            game.lossless_multiplier = edit_game_dialog.lossless_multiplier
+            game.lossless_flow = edit_game_dialog.lossless_flow
+            game.lossless_performance = edit_game_dialog.lossless_performance
+            game.lossless_hdr = edit_game_dialog.lossless_hdr
 
             title_formatted = format_title(game.title)
 
@@ -2451,17 +2437,6 @@ class Main(Gtk.Window):
                 game.runner = "Proton-EM"
             if edit_game_dialog.combobox_launcher.get_active() == 1:
                 game.runner = "Linux-Native"
-
-            if game.lossless == "Off":
-                game.lossless = ""
-            if game.lossless == "X1":
-                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-            if game.lossless == "X2":
-                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-            if game.lossless == "X3":
-                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-            if game.lossless == "X4":
-                game.lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
@@ -2784,7 +2759,7 @@ class Main(Gtk.Window):
                 "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
                 "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
                 "runner": game.runner, "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless": game.lossless, }
+                "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless_enabled": game.lossless_enabled, "lossless_multiplier": game.lossless_multiplier, "lossless_flow": game.lossless_flow, "lossless_performance": game.lossless_performance, "lossless_hdr": game.lossless_hdr, }
             games_data.append(game_info)
 
         with open("games.json", "w", encoding="utf-8") as file:
@@ -4248,16 +4223,15 @@ class Settings(Gtk.Dialog):
 
 class Game:
     def __init__(self, gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
-                 runner, addapp_checkbox, addapp, addapp_bat, banner, lossless):
-        # Initialize a Game object with various attributes
+                 runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr):
         self.gameid = gameid
-        self.title = title  # Title of the game
-        self.path = path  # Path to the game executable
-        self.launch_arguments = launch_arguments  # Arguments to launch the game
-        self.game_arguments = game_arguments  # Arguments specific to the game
-        self.mangohud = mangohud  # Boolean indicating whether Mangohud is enabled
-        self.gamemode = gamemode  # Boolean indicating whether Gamemode is enabled
-        self.prefix = prefix  # Prefix for Wine games
+        self.title = title
+        self.path = path
+        self.launch_arguments = launch_arguments
+        self.game_arguments = game_arguments
+        self.mangohud = mangohud
+        self.gamemode = gamemode
+        self.prefix = prefix
         self.disable_hidraw = disable_hidraw
         self.protonfix = protonfix
         self.runner = runner
@@ -4265,7 +4239,11 @@ class Game:
         self.addapp = addapp
         self.addapp_bat = addapp_bat
         self.banner = banner
-        self.lossless = lossless
+        self.lossless_enabled = lossless_enabled
+        self.lossless_multiplier = lossless_multiplier
+        self.lossless_flow = lossless_flow
+        self.lossless_performance = lossless_performance
+        self.lossless_hdr = lossless_hdr
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -4426,6 +4404,12 @@ class AddGame(Gtk.Dialog):
         self.set_icon_from_file(faugus_png)
         self.interface_mode = interface_mode
         self.updated_steam_id = None
+
+        self.lossless_enabled = False
+        self.lossless_multiplier = 1
+        self.lossless_flow = 100
+        self.lossless_performance = False
+        self.lossless_hdr = False
 
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
@@ -4641,9 +4625,8 @@ class AddGame(Gtk.Dialog):
         self.entry_game_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
 
         # Widgets for lossless scaling
-        self.label_lossless = Gtk.Label(label=_("Lossless Scaling Frame Generation"))
-        self.label_lossless.set_halign(Gtk.Align.START)
-        self.combobox_lossless = Gtk.ComboBoxText()
+        self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
+        self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         # Widgets for extra executable
         self.checkbox_addapp = Gtk.CheckButton(label=_("Additional Application"))
@@ -4854,9 +4837,8 @@ class AddGame(Gtk.Dialog):
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        self.grid_lossless.attach(self.label_lossless, 0, 0, 1, 1)
-        self.grid_lossless.attach(self.combobox_lossless, 0, 1, 1, 1)
-        self.combobox_lossless.set_hexpand(True)
+        self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
+        self.button_lossless.set_hexpand(True)
 
         self.grid_addapp.attach(self.checkbox_addapp, 0, 0, 1, 1)
         self.grid_addapp.attach(self.entry_addapp, 0, 1, 3, 1)
@@ -4897,8 +4879,6 @@ class AddGame(Gtk.Dialog):
         self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
         self.populate_combobox_with_runners()
-        self.populate_combobox_with_lossless()
-        self.combobox_lossless.set_active(0)
 
         model = self.combobox_runner.get_model()
         index_to_activate = 0
@@ -4940,15 +4920,13 @@ class AddGame(Gtk.Dialog):
         lossless_dll_path = find_lossless_dll()
         if os.path.exists(lsfgvk_path):
             if lossless_dll_path or os.path.exists(self.lossless_location):
-                self.combobox_lossless.set_sensitive(True)
+                self.button_lossless.set_sensitive(True)
             else:
-                self.combobox_lossless.set_sensitive(False)
-                self.combobox_lossless.set_active(0)
-                self.combobox_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings and set the location."))
+                self.button_lossless.set_sensitive(False)
+                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings and set the location."))
         else:
-            self.combobox_lossless.set_sensitive(False)
-            self.combobox_lossless.set_active(0)
-            self.combobox_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
+            self.button_lossless.set_sensitive(False)
+            self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
 
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
@@ -4961,6 +4939,115 @@ class AddGame(Gtk.Dialog):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def on_button_lossless_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+
+        enabled = val if (val := getattr(self, "lossless_enabled", False)) != "" else False
+        multiplier = val if (val := getattr(self, "lossless_multiplier", 1)) != "" else 1
+        flow = val if (val := getattr(self, "lossless_flow", 100)) != "" else 100
+        performance = val if (val := getattr(self, "lossless_performance", False)) != "" else False
+        hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
+
+        checkbox_enable = Gtk.CheckButton(label="Enable")
+        checkbox_enable.set_active(enabled)
+        checkbox_enable.set_halign(Gtk.Align.START)
+
+        label_multiplier = Gtk.Label(label=_("Multiplier"))
+        label_multiplier.set_halign(Gtk.Align.START)
+        spin_multiplier = Gtk.SpinButton()
+        spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
+        spin_multiplier.set_numeric(True)
+        spin_multiplier.set_tooltip_text(_("Multiply the FPS."))
+
+        label_flow = Gtk.Label(label=_("Flow Scale"))
+        label_flow.set_halign(Gtk.Align.START)
+        adjustment = Gtk.Adjustment(value=flow, lower=25, upper=100, step_increment=1)
+        scale_flow = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
+        scale_flow.set_digits(0)
+        scale_flow.set_hexpand(True)
+        scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
+        scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution."))
+
+        checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
+        checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality."))
+        checkbox_performance.set_active(performance)
+
+        checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
+        checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
+        checkbox_hdr.set_active(hdr)
+
+        def on_enable_toggled(cb):
+            active = cb.get_active()
+            label_multiplier.set_sensitive(active)
+            spin_multiplier.set_sensitive(active)
+            label_flow.set_sensitive(active)
+            scale_flow.set_sensitive(active)
+            checkbox_performance.set_sensitive(active)
+            checkbox_hdr.set_sensitive(active)
+
+        checkbox_enable.connect("toggled", on_enable_toggled)
+        on_enable_toggled(checkbox_enable)
+
+        grid.attach(checkbox_enable,        0, 0, 1, 1)
+        grid.attach(label_multiplier,       0, 1, 1, 1)
+        grid.attach(spin_multiplier,        0, 2, 1, 1)
+        grid.attach(label_flow,             0, 3, 1, 1)
+        grid.attach(scale_flow,             0, 4, 1, 1)
+        grid.attach(checkbox_performance,   0, 5, 1, 1)
+        grid.attach(checkbox_hdr,           0, 6, 1, 1)
+
+        frame.add(grid)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
+        button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        bottom_box.set_margin_bottom(10)
+        bottom_box.pack_start(button_cancel, True, True, 0)
+        bottom_box.pack_start(button_ok, True, True, 0)
+
+        content_area = dialog.get_content_area()
+        content_area.pack_start(frame, True, True, 0)
+        content_area.pack_start(bottom_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.lossless_enabled = checkbox_enable.get_active()
+            self.lossless_multiplier = spin_multiplier.get_value_as_int()
+            self.lossless_flow = scale_flow.get_value()
+            self.lossless_performance = checkbox_performance.get_active()
+            self.lossless_hdr = checkbox_hdr.get_active()
+
+        dialog.destroy()
+        return response
 
     def check_steam_shortcut(self, title):
         if os.path.exists(steam_shortcuts_path):
@@ -5246,10 +5333,14 @@ class AddGame(Gtk.Dialog):
             self.entry_game_arguments.set_text("")
             self.checkbox_addapp.set_active(False)
             self.entry_addapp.set_text("")
-            self.combobox_lossless.set_active(0)
             self.checkbox_mangohud.set_active(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_disable_hidraw.set_active(False)
+            self.lossless_enabled = False
+            self.lossless_multiplier = 1
+            self.lossless_flow = 100
+            self.lossless_performance = False
+            self.lossless_hdr = False
 
         cleanup_fields()
 
@@ -5366,13 +5457,6 @@ class AddGame(Gtk.Dialog):
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
                 self.image_banner.set_from_pixbuf(pixbuf)
                 self.image_banner2.set_from_pixbuf(pixbuf)
-
-    def populate_combobox_with_lossless(self):
-        self.combobox_lossless.append_text("Off")
-        self.combobox_lossless.append_text("X1")
-        self.combobox_lossless.append_text("X2")
-        self.combobox_lossless.append_text("X3")
-        self.combobox_lossless.append_text("X4")
 
     def populate_combobox_with_launchers(self):
         self.combobox_launcher.append_text(_("Windows Game"))
@@ -6167,6 +6251,12 @@ class CreateShortcut(Gtk.Window):
 
         self.default_prefix = ""
 
+        self.lossless_enabled = False
+        self.lossless_multiplier = 1
+        self.lossless_flow = 100
+        self.lossless_performance = False
+        self.lossless_hdr = False
+
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
@@ -6193,9 +6283,8 @@ class CreateShortcut(Gtk.Window):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
 
-        self.label_lossless = Gtk.Label(label=_("Lossless Scaling Frame Generation"))
-        self.label_lossless.set_halign(Gtk.Align.START)
-        self.combobox_lossless = Gtk.ComboBoxText()
+        self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
+        self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         self.label_addapp = Gtk.Label(label=_("Additional Application"))
         self.label_addapp.set_halign(Gtk.Align.START)
@@ -6316,9 +6405,8 @@ class CreateShortcut(Gtk.Window):
         self.entry_addapp.set_hexpand(True)
         self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
 
-        self.grid_lossless.attach(self.label_lossless, 0, 0, 1, 1)
-        self.grid_lossless.attach(self.combobox_lossless, 0, 1, 1, 1)
-        self.combobox_lossless.set_hexpand(True)
+        self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
+        self.button_lossless.set_hexpand(True)
 
         self.grid_tools = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
         self.grid_tools.set_row_spacing(10)
@@ -6369,7 +6457,6 @@ class CreateShortcut(Gtk.Window):
         self.main_grid.add(self.box_tools)
 
         self.load_config()
-        self.populate_combobox_with_lossless()
 
         self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
@@ -6387,21 +6474,18 @@ class CreateShortcut(Gtk.Window):
         lossless_dll_path = find_lossless_dll()
         if os.path.exists(lsfgvk_path):
             if lossless_dll_path or os.path.exists(self.lossless_location):
-                self.combobox_lossless.set_sensitive(True)
+                self.button_lossless.set_sensitive(True)
             else:
-                self.combobox_lossless.set_sensitive(False)
-                self.combobox_lossless.set_active(0)
-                self.combobox_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings and set the location."))
+                self.button_lossless.set_sensitive(False)
+                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings and set the location."))
         else:
-            self.combobox_lossless.set_sensitive(False)
-            self.combobox_lossless.set_active(0)
-            self.combobox_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
+            self.button_lossless.set_sensitive(False)
+            self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
 
         frame.add(self.main_grid)
         self.box.add(frame)
         self.box.add(bottom_box)
         self.add(self.box)
-        self.combobox_lossless.set_active(0)
 
         if not os.path.exists(self.icon_directory):
             os.makedirs(self.icon_directory)
@@ -6443,12 +6527,114 @@ class CreateShortcut(Gtk.Window):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
-    def populate_combobox_with_lossless(self):
-        self.combobox_lossless.append_text("Off")
-        self.combobox_lossless.append_text("X1")
-        self.combobox_lossless.append_text("X2")
-        self.combobox_lossless.append_text("X3")
-        self.combobox_lossless.append_text("X4")
+    def on_button_lossless_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+
+        enabled = val if (val := getattr(self, "lossless_enabled", False)) != "" else False
+        multiplier = val if (val := getattr(self, "lossless_multiplier", 1)) != "" else 1
+        flow = val if (val := getattr(self, "lossless_flow", 100)) != "" else 100
+        performance = val if (val := getattr(self, "lossless_performance", False)) != "" else False
+        hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
+
+        checkbox_enable = Gtk.CheckButton(label="Enable")
+        checkbox_enable.set_active(enabled)
+        checkbox_enable.set_halign(Gtk.Align.START)
+
+        label_multiplier = Gtk.Label(label=_("Multiplier"))
+        label_multiplier.set_halign(Gtk.Align.START)
+        spin_multiplier = Gtk.SpinButton()
+        spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
+        spin_multiplier.set_numeric(True)
+        spin_multiplier.set_tooltip_text(_("Multiply the FPS."))
+
+        label_flow = Gtk.Label(label=_("Flow Scale"))
+        label_flow.set_halign(Gtk.Align.START)
+        adjustment = Gtk.Adjustment(value=flow, lower=25, upper=100, step_increment=1)
+        scale_flow = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
+        scale_flow.set_digits(0)
+        scale_flow.set_hexpand(True)
+        scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
+        scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution."))
+
+        checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
+        checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality."))
+        checkbox_performance.set_active(performance)
+
+        checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
+        checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
+        checkbox_hdr.set_active(hdr)
+
+        def on_enable_toggled(cb):
+            active = cb.get_active()
+            label_multiplier.set_sensitive(active)
+            spin_multiplier.set_sensitive(active)
+            label_flow.set_sensitive(active)
+            scale_flow.set_sensitive(active)
+            checkbox_performance.set_sensitive(active)
+            checkbox_hdr.set_sensitive(active)
+
+        checkbox_enable.connect("toggled", on_enable_toggled)
+        on_enable_toggled(checkbox_enable)
+
+        grid.attach(checkbox_enable,        0, 0, 1, 1)
+        grid.attach(label_multiplier,       0, 1, 1, 1)
+        grid.attach(spin_multiplier,        0, 2, 1, 1)
+        grid.attach(label_flow,             0, 3, 1, 1)
+        grid.attach(scale_flow,             0, 4, 1, 1)
+        grid.attach(checkbox_performance,   0, 5, 1, 1)
+        grid.attach(checkbox_hdr,           0, 6, 1, 1)
+
+        frame.add(grid)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
+        button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        bottom_box.set_margin_bottom(10)
+        bottom_box.pack_start(button_cancel, True, True, 0)
+        bottom_box.pack_start(button_ok, True, True, 0)
+
+        content_area = dialog.get_content_area()
+        content_area.pack_start(frame, True, True, 0)
+        content_area.pack_start(bottom_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.lossless_enabled = checkbox_enable.get_active()
+            self.lossless_multiplier = spin_multiplier.get_value_as_int()
+            self.lossless_flow = scale_flow.get_value()
+            self.lossless_performance = checkbox_performance.get_active()
+            self.lossless_hdr = checkbox_hdr.get_active()
+
+        dialog.destroy()
+        return response
 
     def on_button_search_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Select an additional application"), parent=self, flags=0)
@@ -6595,7 +6781,11 @@ class CreateShortcut(Gtk.Window):
         protonfix = self.entry_protonfix.get_text()
         launch_arguments = self.entry_launch_arguments.get_text()
         game_arguments = self.entry_game_arguments.get_text()
-        lossless = self.combobox_lossless.get_active_text()
+        lossless_enabled = self.lossless_enabled
+        lossless_multiplier = self.lossless_multiplier
+        lossless_flow = self.lossless_flow
+        lossless_performance = self.lossless_performance
+        lossless_hdr = self.lossless_hdr
 
         mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
         gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
@@ -6603,17 +6793,6 @@ class CreateShortcut(Gtk.Window):
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
-
-        if lossless == "Off":
-            lossless = ""
-        if lossless == "X1":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=1"
-        if lossless == "X2":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=2"
-        if lossless == "X3":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=3"
-        if lossless == "X4":
-            lossless = "LSFG_LEGACY=1 LSFG_MULTIPLIER=4"
 
         command_parts = []
 
@@ -6634,8 +6813,16 @@ class CreateShortcut(Gtk.Window):
             command_parts.append(gamemode)
         if launch_arguments:
             command_parts.append(launch_arguments)
-        if lossless:
-            command_parts.append(lossless)
+        if lossless_enabled:
+            command_parts.append("LSFG_LEGACY=1")
+            if lossless_multiplier:
+                command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}")
+            if lossless_flow:
+                command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow}")
+            if lossless_performance:
+                command_parts.append(f"LSFG_PERFORMANCE_MODE={lossless_performance}")
+            if lossless_hdr:
+                command_parts.append(f"LSFG_HDR_MODE={lossless_hdr}")
 
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
