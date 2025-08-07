@@ -65,10 +65,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.8.13-1" date="2025-08-04">
+    <release version="1.9.1-1" date="2025-08-06">
       <description>
         <ul>
+          <li>Now correctly uses the latest Proton-EM</li>
+          <li>Now using umu-run binary for native installations</li>
           <li>Added metadata for native installations</li>
+          <li>Added a window to configure Lossless Scaling Frame Generation</li>
         </ul>
       </description>
     </release>
