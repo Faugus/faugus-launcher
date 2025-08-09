@@ -107,11 +107,6 @@ meson ninja pygobject requests pillow filelock vdf psutil umu-launcher imagemagi
 ```
 ~/.local/share/Steam/compatibilitytools.d/
 ```
-If you want to use native builds like proton-cachyos or proton-ge-custom, please symlink them to the user folder.
-```
-ln -s /usr/share/steam/compatibilitytools.d/proton-cachyos ~/.local/share/Steam/compatibilitytools.d/
-ln -s /usr/share/steam/compatibilitytools.d/proton-ge-custom ~/.local/share/Steam/compatibilitytools.d/
-```
 
 ### Shortcut locations
 For Desktop Environments that support icons on the Desktop
