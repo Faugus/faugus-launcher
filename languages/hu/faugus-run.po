@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 20:50-0300\n"
-"PO-Revision-Date: 2025-05-25 07:54+0200\n"
+"POT-Creation-Date: 2025-08-05 23:34-0300\n"
+"PO-Revision-Date: 2025-08-10 07:55+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: hu\n"
@@ -18,72 +18,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: /usr/bin/faugus-run:126
-#, python-brace-format
-msgid "{path} was not found."
-msgstr "{path} nem található."
+#: /usr/bin/faugus-run:216
+#, python-format
+msgid "%s was not found."
+msgstr "%s nem található."
 
-#: /usr/bin/faugus-run:130
+#: /usr/bin/faugus-run:220
 msgid "Please install it or use another Proton version."
 msgstr "Kérlek telepítsd, vagy használj másik Proton verziót."
 
-#: /usr/bin/faugus-run:133 /usr/bin/faugus-run:513
+#: /usr/bin/faugus-run:223 /usr/bin/faugus-run:655
 msgid "Ok"
 msgstr "Oké"
 
-#: /usr/bin/faugus-run:362
-#, python-brace-format
-msgid "Using {path}"
-msgstr "Használva {path}"
+#: /usr/bin/faugus-run:492
+#, python-format
+msgid "Using %s"
+msgstr "Használva %s"
 
-#: /usr/bin/faugus-run:433
+#: /usr/bin/faugus-run:567
+msgid "Updating UMU-Launcher..."
+msgstr "UMU-Launcher frissítése..."
+
+#: /usr/bin/faugus-run:569
+msgid "UMU-Launcher is up to date"
+msgstr "Az UMU-Launcher naprakész"
+
+#: /usr/bin/faugus-run:571
 msgid "Updating BattlEye..."
 msgstr "BattlEye frissítése..."
 
-#: /usr/bin/faugus-run:435
+#: /usr/bin/faugus-run:573
 msgid "Updating Easy Anti-Cheat..."
 msgstr "Easy Anti-Cheat frissítése..."
 
-#: /usr/bin/faugus-run:437
+#: /usr/bin/faugus-run:575
 msgid "Components are up to date"
 msgstr "Az összetevők naprakészek"
 
-#: /usr/bin/faugus-run:439
+#: /usr/bin/faugus-run:577
 msgid "Downloading GE-Proton..."
 msgstr "GE-Proton letöltése..."
 
-#: /usr/bin/faugus-run:441
+#: /usr/bin/faugus-run:579
 msgid "Downloading UMU-Proton..."
 msgstr "UMU-Proton letöltése..."
 
-#: /usr/bin/faugus-run:443
+#: /usr/bin/faugus-run:581
 msgid "Downloading Steam Runtime..."
 msgstr "Steam Runtime letöltése..."
 
-#: /usr/bin/faugus-run:445
+#: /usr/bin/faugus-run:583
 msgid "Extracting Steam Runtime..."
 msgstr "Steam Runtime kibontása..."
 
-#: /usr/bin/faugus-run:447
+#: /usr/bin/faugus-run:585
 msgid "Extracting GE-Proton..."
 msgstr "GE-Proton kibontása..."
 
-#: /usr/bin/faugus-run:449
+#: /usr/bin/faugus-run:587
 msgid "Extracting UMU-Proton..."
 msgstr "UMU-Proton kibontása..."
 
-#: /usr/bin/faugus-run:451 /usr/bin/faugus-run:457
+#: /usr/bin/faugus-run:589 /usr/bin/faugus-run:595
 msgid "GE-Proton is up to date"
 msgstr "A GE-Proton naprakész"
 
-#: /usr/bin/faugus-run:453 /usr/bin/faugus-run:459
+#: /usr/bin/faugus-run:591 /usr/bin/faugus-run:597
 msgid "UMU-Proton is up to date"
 msgstr "Az UMU-Proton naprakész"
 
-#: /usr/bin/faugus-run:455 /usr/bin/faugus-run:461
+#: /usr/bin/faugus-run:593 /usr/bin/faugus-run:599
 msgid "Steam Runtime is up to date"
 msgstr "A Steam Runtime naprakész"
 
-#: /usr/bin/faugus-run:510
+#: /usr/bin/faugus-run:601
+msgid "Downloading Proton-EM..."
+msgstr "Proton-EM letöltése..."
+
+#: /usr/bin/faugus-run:603
+msgid "Extracting Proton-EM..."
+msgstr "Proton-EM kibontása..."
+
+#: /usr/bin/faugus-run:605
+msgid "Proton-EM is up to date"
+msgstr "A Proton-EM naprakész"
+
+#: /usr/bin/faugus-run:652
 msgid "The keys and values were successfully added to the registry."
 msgstr "A kulcsokat és értékeket sikeresen hozzáadtuk a rendszerleíró adatbázishoz."
