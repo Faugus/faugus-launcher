@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-06 21:59-0300\n"
-"PO-Revision-Date: 2025-08-06 22:02-0300\n"
+"PO-Revision-Date: 2025-08-14 11:40-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -594,7 +594,7 @@ msgstr "Escala de Fluxo"
 
 #: /usr/bin/faugus-launcher:4986 /usr/bin/faugus-launcher:6573
 msgid "Lower the internal motion estimation resolution."
-msgstr "Reduza a resolução interna da estimativa de movimento."
+msgstr "Reduz a resolução interna da estimativa de movimento."
 
 #: /usr/bin/faugus-launcher:4988 /usr/bin/faugus-launcher:6575
 msgid "Performance Mode"
