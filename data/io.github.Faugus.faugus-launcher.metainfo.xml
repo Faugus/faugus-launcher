@@ -66,11 +66,11 @@
       <caption>Main window: Banners interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/b42986e/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/658a97b/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/5acd229/screenshots/add-tools.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/658a97b/screenshots/add-tools.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
@@ -87,13 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.1-1" date="2025-08-06">
+    <release version="1.9.2-1" date="2025-08-14">
       <description>
         <ul>
-          <li>Now correctly uses the latest Proton-EM</li>
-          <li>Now using umu-run binary for native installations</li>
-          <li>Added metadata for native installations</li>
-          <li>Added a window to configure Lossless Scaling Frame Generation</li>
+          <li>Fixed splash window not closing sometimes</li>
         </ul>
       </description>
     </release>
