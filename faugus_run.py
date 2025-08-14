@@ -626,6 +626,8 @@ class FaugusRun:
             or "Command exited with status: 0" in clean_line
             or "SingleInstance" in clean_line
             or "mtree is OK" in clean_line
+            or "Skipping fix execution" in clean_line
+            or "Selected GPU" in clean_line
         ):
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
