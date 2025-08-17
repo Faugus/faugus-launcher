@@ -697,7 +697,6 @@ class Main(Gtk.Window):
         self.entry_search.set_margin_end(10)
 
         self.grid_left = Gtk.Grid()
-        self.grid_left.get_style_context().add_class(self.theme)
         self.grid_left.set_hexpand(True)
         self.grid_left.set_halign(Gtk.Align.END)
 
@@ -705,12 +704,9 @@ class Main(Gtk.Window):
         self.grid_left.add(button_settings)
 
         grid_middle = Gtk.Grid()
-        grid_middle.get_style_context().add_class(self.theme)
-
         grid_middle.add(self.entry_search)
 
         grid_right = Gtk.Grid()
-        grid_right.get_style_context().add_class(self.theme)
         grid_right.set_hexpand(True)
         grid_right.set_halign(Gtk.Align.START)
 
@@ -718,7 +714,6 @@ class Main(Gtk.Window):
         grid_right.add(self.button_play)
 
         self.grid_corner = Gtk.Grid()
-        self.grid_corner.get_style_context().add_class(self.theme)
         self.grid_corner.add(button_bye)
 
         # Create scrolled window for game list
