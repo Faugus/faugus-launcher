@@ -619,15 +619,16 @@ class FaugusRun:
             self.label.set_text(_("Proton-EM is up to date"))
 
         if (
-            "fsync:" in clean_line
+            "fsync" in clean_line
             or "NTSync" in clean_line
             or "Using winetricks" in clean_line
-            or "steamrt3 is up to date" in clean_line
-            or "Command exited with status: 0" in clean_line
+            or "Selected GPU" in clean_line
+            or "Skipping fix execution" in clean_line
+            or "Executable a unix path" in clean_line
+            or "status: 0" in clean_line
+            or "PosixPath" in clean_line
             or "SingleInstance" in clean_line
             or "mtree is OK" in clean_line
-            or "Skipping fix execution" in clean_line
-            or "Selected GPU" in clean_line
         ):
             GLib.timeout_add_seconds(0, self.close_warning_dialog)
 
