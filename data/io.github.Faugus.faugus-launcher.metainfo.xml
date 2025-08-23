@@ -87,10 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.2-1" date="2025-08-14">
+    <release version="1.9.3-1" date="2025-08-23">
       <description>
         <ul>
-          <li>Fixed splash window not closing sometimes</li>
+          <li>Fixed splash window now closing too early</li>
+          <li>Added Russian translation</li>
         </ul>
       </description>
     </release>
