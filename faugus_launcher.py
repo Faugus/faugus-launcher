@@ -1816,7 +1816,7 @@ class Main(Gtk.Window):
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
-                if game.mangohud == "MANGOHUD=1":
+                if game.mangohud == "mangohud":
                     edit_game_dialog.checkbox_mangohud.set_active(True)
                 else:
                     edit_game_dialog.checkbox_mangohud.set_active(False)
@@ -2089,7 +2089,7 @@ class Main(Gtk.Window):
                 runner = "Linux-Native"
 
             # Determine mangohud and gamemode status
-            mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
+            mangohud = "mangohud" if add_game_dialog.checkbox_mangohud.get_active() else ""
             gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
             disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
@@ -2751,7 +2751,7 @@ class Main(Gtk.Window):
         for game in self.games:
             game_info = {"gameid": game.gameid, "title": game.title, "path": game.path, "prefix": game.prefix,
                 "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
-                "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
+                "mangohud": "mangohud" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
                 "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
                 "runner": game.runner, "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
                 "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless_enabled": game.lossless_enabled, "lossless_multiplier": game.lossless_multiplier, "lossless_flow": game.lossless_flow, "lossless_performance": game.lossless_performance, "lossless_hdr": game.lossless_hdr, }
@@ -6782,7 +6782,7 @@ class CreateShortcut(Gtk.Window):
         lossless_performance = self.lossless_performance
         lossless_hdr = self.lossless_hdr
 
-        mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
+        mangohud = "mangohud" if self.checkbox_mangohud.get_active() else ""
         gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
         disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if self.checkbox_disable_hidraw.get_active() else ""
 
@@ -7095,7 +7095,7 @@ def run_file(file_path):
     default_runner = cfg.config.get('default-runner', '').strip('"')
 
     if not file_path.endswith(".reg"):
-        mangohud = "MANGOHUD=1" if mangohud else ""
+        mangohud = "mangohud" if mangohud else ""
         gamemode = "gamemoderun" if gamemode else ""
         disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if disable_hidraw else ""
 
