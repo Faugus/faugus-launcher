@@ -5517,6 +5517,14 @@ class AddGame(Gtk.Dialog):
 
         self.default_runner = cfg.config.get('default-runner', '')
         self.default_prefix = cfg.config.get('default-prefix', '')
+        mangohud = cfg.config.get('mangohud', 'False') == 'True'
+        gamemode = cfg.config.get('gamemode', 'False') == 'True'
+        disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+        self.checkbox_mangohud.set_active(mangohud)
+        self.checkbox_gamemode.set_active(gamemode)
+        self.checkbox_disable_hidraw.set_active(disable_hidraw)
+        
+
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
