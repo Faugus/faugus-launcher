@@ -1,0 +1,655 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-06 21:59-0300\n"
+"PO-Revision-Date: 2025-09-09 17:19+0330\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: /usr/bin/faugus-launcher:360 /usr/bin/faugus-launcher:848
+msgid "Play"
+msgstr "باز کردن"
+
+#: /usr/bin/faugus-launcher:364
+msgid "Edit"
+msgstr "ویرایش"
+
+#: /usr/bin/faugus-launcher:368
+msgid "Delete"
+msgstr "حذف"
+
+#: /usr/bin/faugus-launcher:372
+msgid "Duplicate"
+msgstr "تکثیر"
+
+#: /usr/bin/faugus-launcher:376
+msgid "Open prefix location"
+msgstr "بازکردن محل prefix"
+
+#: /usr/bin/faugus-launcher:380
+#, fuzzy
+msgid "Show logs"
+msgstr "نمایش لاگ"
+
+#: /usr/bin/faugus-launcher:545 /usr/bin/faugus-launcher:651
+msgid "Force close all running games"
+msgstr "بستن اجباری تمام بازی های باز"
+
+#: /usr/bin/faugus-launcher:573 /usr/bin/faugus-launcher:690
+msgid "Search..."
+msgstr "جستجو..."
+
+#: /usr/bin/faugus-launcher:783
+msgid "Shut down"
+msgstr "خاموش کردن"
+
+#: /usr/bin/faugus-launcher:784
+msgid "Reboot"
+msgstr "راه اندازی مجدد"
+
+#: /usr/bin/faugus-launcher:785
+msgid "Close"
+msgstr "بستن"
+
+#: /usr/bin/faugus-launcher:846
+msgid "Stop"
+msgstr "توقف"
+
+#: /usr/bin/faugus-launcher:883
+#, python-format
+msgid "%s Logs"
+msgstr "لاگ %s"
+
+#: /usr/bin/faugus-launcher:923
+msgid "Copy to clipboard"
+msgstr "کپی به کلیپبورد"
+
+#: /usr/bin/faugus-launcher:927
+msgid "Open file location"
+msgstr "باز کردن محل فایل"
+
+#: /usr/bin/faugus-launcher:994 /usr/bin/faugus-launcher:2056
+#, python-format
+msgid "%s already exists."
+msgstr "%s از قبل وجود دارد"
+
+#: /usr/bin/faugus-launcher:1165
+#, python-format
+msgid "%s is already running."
+msgstr "%s از قبل باز است."
+
+#: /usr/bin/faugus-launcher:1168 /usr/bin/faugus-launcher:2007
+#: /usr/bin/faugus-launcher:3061 /usr/bin/faugus-launcher:3953
+#: /usr/bin/faugus-launcher:4264 /usr/bin/faugus-launcher:4307
+#: /usr/bin/faugus-launcher:4701 /usr/bin/faugus-launcher:5023
+#: /usr/bin/faugus-launcher:5166 /usr/bin/faugus-launcher:5781
+#: /usr/bin/faugus-launcher:6318 /usr/bin/faugus-launcher:6610
+#: /usr/bin/faugus-launcher:7008
+msgid "Ok"
+msgstr "باشه"
+
+#: /usr/bin/faugus-launcher:1238
+msgid "Open Faugus Launcher"
+msgstr "باز کردن Faugus Launcher"
+
+#: /usr/bin/faugus-launcher:1243
+msgid "Quit"
+msgstr "بستن"
+
+#: /usr/bin/faugus-launcher:1804
+#, python-format
+msgid "Edit %s"
+msgstr "تغییر %s"
+
+#: /usr/bin/faugus-launcher:1856 /usr/bin/faugus-launcher:4917
+msgid ""
+"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
+"USERS FOUND."
+msgstr ""
+"اضافه یا حذف کردن یک میانبر از استیم. استیم باید دوباره باز شود. هیچ کاربر "
+"استیم پیدا نشد."
+
+#: /usr/bin/faugus-launcher:1866 /usr/bin/faugus-launcher:1868
+#: /usr/bin/faugus-launcher:1870
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s باز است. لطفا اول آن رو ببندید."
+
+#: /usr/bin/faugus-launcher:2127
+msgid "No internet connection."
+msgstr "اینترنت متصل نیست."
+
+#: /usr/bin/faugus-launcher:2220 /usr/bin/faugus-launcher:2352
+#, python-format
+msgid "Installing %s..."
+msgstr "در حال نصب کردن %s..."
+
+#: /usr/bin/faugus-launcher:2231
+msgid "Finish installation"
+msgstr "پایان نصب"
+
+#: /usr/bin/faugus-launcher:2238
+msgid "Downloading Battle.net..."
+msgstr "در حال دانلود کردن Battle.net."
+
+#: /usr/bin/faugus-launcher:2243
+msgid "Downloading EA App..."
+msgstr "در حال دانلود کردن EA App..."
+
+#: /usr/bin/faugus-launcher:2248
+msgid "Downloading Epic Games..."
+msgstr "در حال دانلود کردن Epic Games..."
+
+#: /usr/bin/faugus-launcher:2253
+msgid "Downloading Ubisoft Connect..."
+msgstr "در حال دانلود کردن Ubisoft Connect."
+
+#: /usr/bin/faugus-launcher:2346
+msgid "Download complete"
+msgstr "دانلود به پایان رسید."
+
+#: /usr/bin/faugus-launcher:2349
+#, python-format
+msgid "Error during download: %s"
+msgstr "در هنگام دانلود %s مشکلی پیش آمد"
+
+#: /usr/bin/faugus-launcher:2354 /usr/bin/faugus-launcher:2357
+msgid "Please close the login window and wait..."
+msgstr "لطفا صفحه لاگین را ببندید و سپس منتظر بمانید..."
+
+#: /usr/bin/faugus-launcher:2771
+msgid "Settings"
+msgstr "تنظیمات"
+
+#: /usr/bin/faugus-launcher:2894
+msgid "Language"
+msgstr "زبان"
+
+#: /usr/bin/faugus-launcher:2899
+msgid "Interface Mode"
+msgstr "حالت رابط کاربری"
+
+#: /usr/bin/faugus-launcher:2908
+msgid "Start maximized"
+msgstr "باز شدن در حالت maximize"
+
+#: /usr/bin/faugus-launcher:2913
+msgid "Start in fullscreen"
+msgstr "باز شدن در حالت تمام صفحه"
+
+#: /usr/bin/faugus-launcher:2916
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt+Enter حالت تمام صفحه را روشن می کند"
+
+#: /usr/bin/faugus-launcher:2918
+msgid "Show labels"
+msgstr "نشان دادن برچسب اسم"
+
+#: /usr/bin/faugus-launcher:2921
+msgid "Smaller banners"
+msgstr "بنر های کوچک تر"
+
+#: /usr/bin/faugus-launcher:2925
+msgid "Default Prefixes Location"
+msgstr "محل اصلی prefix ها"
+
+#: /usr/bin/faugus-launcher:2929 /usr/bin/faugus-launcher:4585
+msgid "/path/to/the/prefix"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:2939
+msgid "Lossless Scaling Location"
+msgstr "محل فایل Lossless Scaling"
+
+#: /usr/bin/faugus-launcher:2943
+msgid "/path/to/Lossless.dll"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:2952
+msgid "Default Prefix Tools"
+msgstr "ابزار های پیش فرض Prefix"
+
+#: /usr/bin/faugus-launcher:2959
+msgid "Default Proton"
+msgstr "Proton پیشفرض"
+
+#: /usr/bin/faugus-launcher:2963
+msgid "Proton Manager"
+msgstr "مدیریت کننده Proton"
+
+#: /usr/bin/faugus-launcher:2966
+msgid "Miscellaneous"
+msgstr "متفرقه"
+
+#: /usr/bin/faugus-launcher:2973
+msgid "Use discrete GPU"
+msgstr "استفاده از گرافیک اصلی"
+
+#: /usr/bin/faugus-launcher:2977
+msgid "Close when running a game/app"
+msgstr "بسته شدن هنگام اجرای بازی/برنامه."
+
+#: /usr/bin/faugus-launcher:2981
+msgid "System tray icon"
+msgstr "نشان دادن آیکون در system tray"
+
+#: /usr/bin/faugus-launcher:2986
+msgid "Start on boot"
+msgstr "باز شدن هنگام روشن شدن"
+
+#: /usr/bin/faugus-launcher:2990
+msgid "Monochrome icon"
+msgstr "آیکون سیاه سفید"
+
+#: /usr/bin/faugus-launcher:2995
+msgid "Disable splash window"
+msgstr "غیرفعال کردن پنجره اسپلش"
+
+#: /usr/bin/faugus-launcher:2999
+msgid "Enable logging"
+msgstr "فعال کردن لاگ"
+
+#: /usr/bin/faugus-launcher:3002
+msgid "Use Wayland driver (experimental)"
+msgstr "استفاده از درایور Wayland"
+
+#: /usr/bin/faugus-launcher:3004 /usr/bin/faugus-launcher:3009
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "فقط با GE-Proton10 یا Proton-EM-10 کار می کند."
+
+#: /usr/bin/faugus-launcher:3007
+msgid "Enable HDR (experimental)"
+msgstr "فعال کردن HDR (آزمایشی)"
+
+#: /usr/bin/faugus-launcher:3011
+msgid "Enable WOW64 (experimental)"
+msgstr "فعال کردن WOW64 (آزمایشی)"
+
+#: /usr/bin/faugus-launcher:3013
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"فقط با GE-Proton10-9 یا بالاتر یا Proton-EM-10-24 یا بالاتر کار می کند."
+
+#: /usr/bin/faugus-launcher:3026 /usr/bin/faugus-launcher:4668
+msgid "Run"
+msgstr "اجرا"
+
+#: /usr/bin/faugus-launcher:3029 /usr/bin/faugus-launcher:4671
+msgid "Run a file inside the prefix"
+msgstr "اجرا کردن یک فایل در prefix."
+
+#: /usr/bin/faugus-launcher:3034 /usr/bin/faugus-launcher:4650
+#: /usr/bin/faugus-launcher:6305
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+msgstr ""
+"یک overlay برای نشان دادن FPS, دما, بار پردازنده و کارت گرافیک و... نشان می "
+"دهد."
+
+#: /usr/bin/faugus-launcher:3036 /usr/bin/faugus-launcher:4652
+#: /usr/bin/faugus-launcher:6307
+msgid "Tweaks your system to improve performance."
+msgstr "تغییراتی برای بهبود عملکرد سیستم انجام می دهد"
+
+#: /usr/bin/faugus-launcher:3037 /usr/bin/faugus-launcher:4653
+#: /usr/bin/faugus-launcher:6308
+msgid "Disable Hidraw"
+msgstr "غیر فعال کردن Hidraw."
+
+#: /usr/bin/faugus-launcher:3039 /usr/bin/faugus-launcher:4655
+#: /usr/bin/faugus-launcher:6310
+msgid ""
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
+msgstr ""
+"امکان دارد مشکلات کنترلر در بعضی بازی ها را برطرف کند. فقط با GE-Proton10 "
+"یا Proton-EM-10 کار می کند."
+
+#: /usr/bin/faugus-launcher:3041
+msgid "Support the Project"
+msgstr "حمایت کردن از پروژه"
+
+#: /usr/bin/faugus-launcher:3056 /usr/bin/faugus-launcher:3724
+#: /usr/bin/faugus-launcher:3831 /usr/bin/faugus-launcher:3879
+#: /usr/bin/faugus-launcher:4059 /usr/bin/faugus-launcher:4099
+#: /usr/bin/faugus-launcher:4260 /usr/bin/faugus-launcher:4696
+#: /usr/bin/faugus-launcher:5018 /usr/bin/faugus-launcher:5123
+#: /usr/bin/faugus-launcher:5291 /usr/bin/faugus-launcher:5573
+#: /usr/bin/faugus-launcher:5737 /usr/bin/faugus-launcher:6060
+#: /usr/bin/faugus-launcher:6154 /usr/bin/faugus-launcher:6313
+#: /usr/bin/faugus-launcher:6605 /usr/bin/faugus-launcher:6679
+#: /usr/bin/faugus-launcher:6964
+msgid "Cancel"
+msgstr "انصراف"
+
+#: /usr/bin/faugus-launcher:3065
+msgid "Backup/Restore Settings"
+msgstr "پشتیبان گیری/برگرداندن تنظیمات"
+
+#: /usr/bin/faugus-launcher:3072
+msgid "Backup"
+msgstr "پشتیبان گیری"
+
+#: /usr/bin/faugus-launcher:3076
+msgid "Restore"
+msgstr "برگرداندن"
+
+#: /usr/bin/faugus-launcher:3079
+msgid "Global Environment Variables"
+msgstr "Environment Variables های عمومی"
+
+#: /usr/bin/faugus-launcher:3327 /usr/bin/faugus-launcher:4905
+#: /usr/bin/faugus-launcher:6466
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
+"NOT INSTALLED."
+msgstr ""
+"یک overlay برای نشان دادن FPS, دما, بار پردازنده و کارت گرافیک و... نشان می "
+"دهد.    نصب نیست"
+
+#: /usr/bin/faugus-launcher:3333 /usr/bin/faugus-launcher:4911
+#: /usr/bin/faugus-launcher:6472
+msgid "Tweaks your system to improve performance. NOT INSTALLED."
+msgstr "تغییراتی برای بهبود عملکرد سیستم انجام می دهد. نصب   نیست"
+
+#: /usr/bin/faugus-launcher:3685 /usr/bin/faugus-launcher:5534
+msgid "Select a file to run inside the prefix"
+msgstr "یک فایل برای باز کردن درون prefix انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:3693 /usr/bin/faugus-launcher:3705
+#: /usr/bin/faugus-launcher:5260 /usr/bin/faugus-launcher:5272
+#: /usr/bin/faugus-launcher:5542 /usr/bin/faugus-launcher:5554
+#: /usr/bin/faugus-launcher:6029 /usr/bin/faugus-launcher:6041
+#: /usr/bin/faugus-launcher:6648 /usr/bin/faugus-launcher:6660
+msgid "Windows files"
+msgstr "فایل های ویندوز"
+
+#: /usr/bin/faugus-launcher:3701 /usr/bin/faugus-launcher:3706
+#: /usr/bin/faugus-launcher:5268 /usr/bin/faugus-launcher:5273
+#: /usr/bin/faugus-launcher:5550 /usr/bin/faugus-launcher:5555
+#: /usr/bin/faugus-launcher:6037 /usr/bin/faugus-launcher:6042
+#: /usr/bin/faugus-launcher:6656 /usr/bin/faugus-launcher:6661
+msgid "All files"
+msgstr "همه فایل ها"
+
+#: /usr/bin/faugus-launcher:3720 /usr/bin/faugus-launcher:3875
+#: /usr/bin/faugus-launcher:4054 /usr/bin/faugus-launcher:4094
+#: /usr/bin/faugus-launcher:5119 /usr/bin/faugus-launcher:5287
+#: /usr/bin/faugus-launcher:5569 /usr/bin/faugus-launcher:5733
+#: /usr/bin/faugus-launcher:6056 /usr/bin/faugus-launcher:6149
+#: /usr/bin/faugus-launcher:6675 /usr/bin/faugus-launcher:6960
+msgid "Open"
+msgstr "باز کردن"
+
+#: /usr/bin/faugus-launcher:3795
+msgid "Prefixes and runners will not be backed up!"
+msgstr "Prefix ها و باز کننده ها پشتیبان گیری نخواهند شد!"
+
+#: /usr/bin/faugus-launcher:3820
+msgid "Save the backup file as..."
+msgstr "ذخیره کردن فایل پشتیبان گیری به عنوان..."
+
+#: /usr/bin/faugus-launcher:3827
+msgid "Save"
+msgstr "ذخیره"
+
+#: /usr/bin/faugus-launcher:3862
+msgid "Select a backup file to restore"
+msgstr "یک فایل پشتیبان گیری برای برگرداندن انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:3906 /usr/bin/faugus-launcher:3916
+msgid "This is not a valid Faugus Launcher backup file."
+msgstr "فایل انتخاب شده یک فایل پشتیبان گیری سالم Faugus Launcher نیست"
+
+#: /usr/bin/faugus-launcher:3919
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "آیا اطمینان دارید می خواهید تنظیمات را جایگزین کنید؟"
+
+#: /usr/bin/faugus-launcher:3995 /usr/bin/faugus-launcher:4351
+msgid "No"
+msgstr "خیر"
+
+#: /usr/bin/faugus-launcher:3999 /usr/bin/faugus-launcher:4355
+msgid "Yes"
+msgstr "بله"
+
+#: /usr/bin/faugus-launcher:4041 /usr/bin/faugus-launcher:6136
+msgid "Select a prefix location"
+msgstr "یک مسیر prefix انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:4076
+msgid "Select the Lossless.dll file"
+msgstr "فایل Lossless.dll را انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:4251
+#, python-format
+msgid "Duplicate %s"
+msgstr "تکثیر %s"
+
+#: /usr/bin/faugus-launcher:4255 /usr/bin/faugus-launcher:4555
+#: /usr/bin/faugus-launcher:6260
+msgid "Title"
+msgstr "عنوان"
+
+#: /usr/bin/faugus-launcher:4258 /usr/bin/faugus-launcher:4561
+#: /usr/bin/faugus-launcher:6264
+msgid "Game Title"
+msgstr "عنوان بازی"
+
+#: /usr/bin/faugus-launcher:4342
+#, python-format
+msgid "Delete %s"
+msgstr "پاک کردن %s"
+
+#: /usr/bin/faugus-launcher:4348
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "آیا اطمینان دارید می خواهید %s را پاک کنید؟"
+
+#: /usr/bin/faugus-launcher:4359
+msgid "Also remove the prefix"
+msgstr "prefix را هم پاک کن."
+
+#: /usr/bin/faugus-launcher:4400
+msgid "New Game/App"
+msgstr "بازی/برنامه جدید"
+
+#: /usr/bin/faugus-launcher:4566
+msgid "Path"
+msgstr "مسیر"
+
+#: /usr/bin/faugus-launcher:4572
+msgid "/path/to/the/exe"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4581
+msgid "Prefix"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4594
+msgid "Proton"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4612 /usr/bin/faugus-launcher:6276
+msgid "Launch Arguments"
+msgstr "Argument های باز کردن"
+
+#: /usr/bin/faugus-launcher:4615 /usr/bin/faugus-launcher:6279
+msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+msgstr "مثال: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+
+#: /usr/bin/faugus-launcher:4620 /usr/bin/faugus-launcher:6281
+msgid "Game Arguments"
+msgstr "Argument های بازی"
+
+#: /usr/bin/faugus-launcher:4623 /usr/bin/faugus-launcher:6284
+msgid "e.g.: -d3d11 -fullscreen"
+msgstr "مثال: -d3d11 -fullscreen"
+
+#: /usr/bin/faugus-launcher:4628 /usr/bin/faugus-launcher:4944
+#: /usr/bin/faugus-launcher:6286 /usr/bin/faugus-launcher:6531
+msgid "Lossless Scaling Frame Generation"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4632 /usr/bin/faugus-launcher:6289
+msgid "Additional Application"
+msgstr "برنامه اضافه."
+
+#: /usr/bin/faugus-launcher:4634
+msgid ""
+"Additional application to run with the game, like Cheat Engine, Trainers, "
+"Mods..."
+msgstr ""
+"یک برنامه اضافه که به همراه بازی اجرا شود. مانند Cheat Engine, ترینر ها, "
+"ماد ها و..."
+
+#: /usr/bin/faugus-launcher:4637 /usr/bin/faugus-launcher:6292
+msgid "/path/to/the/app"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4674
+msgid "Shortcut"
+msgstr "میانبر"
+
+#: /usr/bin/faugus-launcher:4679
+msgid "Desktop"
+msgstr "دسکتاب"
+
+#: /usr/bin/faugus-launcher:4681
+msgid "Add or remove a shortcut from the Desktop."
+msgstr "اضافه یا حذف کردن یک میانبر از دسکتاب"
+
+#: /usr/bin/faugus-launcher:4682
+msgid "App Menu"
+msgstr "منو برنامه"
+
+#: /usr/bin/faugus-launcher:4684
+msgid "Add or remove a shortcut from the Application Menu."
+msgstr "اضافه یا حذف کردن یک میانبر از منو برنامه"
+
+#: /usr/bin/faugus-launcher:4685
+msgid "Steam"
+msgstr "استیم"
+
+#: /usr/bin/faugus-launcher:4687
+msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
+msgstr "اضافه یا حذف کردن یک میانبر از استیم. استیم باید دوباره اجرا شود"
+
+#: /usr/bin/faugus-launcher:4693 /usr/bin/faugus-launcher:5716
+#: /usr/bin/faugus-launcher:6300 /usr/bin/faugus-launcher:6943
+msgid "Select an icon for the shortcut"
+msgstr "یک آیکون برای میانبر انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:4744
+msgid "Refresh"
+msgstr "تازه کردن"
+
+#: /usr/bin/faugus-launcher:4748
+msgid "Load from file"
+msgstr "بارگذاری از فایل"
+
+#: /usr/bin/faugus-launcher:4756
+msgid "Game/App"
+msgstr "بازی/برنامه"
+
+#: /usr/bin/faugus-launcher:4772
+msgid "Tools"
+msgstr "ابزار ها"
+
+#: /usr/bin/faugus-launcher:4926 /usr/bin/faugus-launcher:6480
+msgid ""
+"Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
+"and set the location."
+msgstr ""
+"Lossless.dll پیدا نشد. اگر از نصب بودن آن اطمینان دارید به تنظیمات Faugus "
+"Launcher بروید و محل آن را انتخاب کنید."
+
+#: /usr/bin/faugus-launcher:4929 /usr/bin/faugus-launcher:6483
+msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
+msgstr "لایه Vulkan برای Lossless Scaling نصب نشده است."
+
+#: /usr/bin/faugus-launcher:4972 /usr/bin/faugus-launcher:6559
+msgid "Multiplier"
+msgstr "ضریب"
+
+#: /usr/bin/faugus-launcher:4977 /usr/bin/faugus-launcher:6564
+msgid "Multiply the FPS."
+msgstr "چند برابر کردن FPS"
+
+#: /usr/bin/faugus-launcher:4979 /usr/bin/faugus-launcher:6566
+msgid "Flow Scale"
+msgstr ""
+
+#: /usr/bin/faugus-launcher:4986 /usr/bin/faugus-launcher:6573
+msgid "Lower the internal motion estimation resolution."
+msgstr "وضوح برآورد حرکت داخلی را کاهش دهید"
+
+#: /usr/bin/faugus-launcher:4988 /usr/bin/faugus-launcher:6575
+msgid "Performance Mode"
+msgstr "حالت بهینه عملکرد"
+
+#: /usr/bin/faugus-launcher:4989 /usr/bin/faugus-launcher:6576
+msgid "Massively improve performance at the cost of quality."
+msgstr "به‌طور چشمگیری کارایی را به بهای کاهش کیفیت افزایش می‌دهد"
+
+#: /usr/bin/faugus-launcher:4992 /usr/bin/faugus-launcher:6579
+msgid "HDR Mode"
+msgstr "حالت HDR"
+
+#: /usr/bin/faugus-launcher:4993 /usr/bin/faugus-launcher:6580
+msgid "Enable special HDR-only behavior."
+msgstr "رفتار های خاصی را فقط برای HDR فعال می کند"
+
+#: /usr/bin/faugus-launcher:5091 /usr/bin/faugus-launcher:5705
+#: /usr/bin/faugus-launcher:6932
+msgid "Invalid Image"
+msgstr "تصویر غیرقابل قبول"
+
+#: /usr/bin/faugus-launcher:5102
+msgid "Select an image for the banner"
+msgstr "یک تصویر برای بنر انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:5110 /usr/bin/faugus-launcher:5115
+#: /usr/bin/faugus-launcher:5724 /usr/bin/faugus-launcher:5729
+#: /usr/bin/faugus-launcher:6951 /usr/bin/faugus-launcher:6956
+msgid "Image files"
+msgstr "فایل های عکس"
+
+#: /usr/bin/faugus-launcher:5159 /usr/bin/faugus-launcher:5774
+#: /usr/bin/faugus-launcher:7001
+msgid "The selected file is not a valid image."
+msgstr "فایل انتخاب شده عکس معتبر نیست"
+
+#: /usr/bin/faugus-launcher:5163 /usr/bin/faugus-launcher:5778
+#: /usr/bin/faugus-launcher:7005
+msgid "Please choose another one."
+msgstr "لطفا یک مورد دیگر انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:5252 /usr/bin/faugus-launcher:6640
+msgid "Select an additional application"
+msgstr "یک برنامه داخلی را انتخاب کنید"
+
+#: /usr/bin/faugus-launcher:5462
+msgid "Windows Game"
+msgstr "بازی ویندوز"
+
+#: /usr/bin/faugus-launcher:5463
+msgid "Linux Game"
+msgstr "بازی لینوکس"
+
+#: /usr/bin/faugus-launcher:6020
+msgid "Select the game's .exe"
+msgstr "فایل .exe بازی را انتخاب کنید"
