@@ -81,11 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.3-1" date="2025-08-23">
+    <release version="1.9.4-1" date="2025-09-11">
       <description>
         <ul>
-          <li>Fixed splash window now closing too early</li>
-          <li>Added Russian translation</li>
+          <li>Fixed Lossless Scaling Frame Generation settings.</li>
+          <li>Added Persian translation.</li>
         </ul>
       </description>
     </release>
