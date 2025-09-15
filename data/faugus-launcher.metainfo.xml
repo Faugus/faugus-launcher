@@ -81,11 +81,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.4-1" date="2025-09-11">
+    <release version="1.9.5-1" date="2025-09-14">
       <description>
         <ul>
-          <li>Fixed Lossless Scaling Frame Generation settings.</li>
-          <li>Added Persian translation.</li>
+          <li>Fixed game not running from .exe file when logging is on.</li>
         </ul>
       </description>
     </release>
