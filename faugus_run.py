@@ -349,6 +349,8 @@ class FaugusRun:
             match = re.search(r"FAUGUS_LOG=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", self.message)
             if match:
                 self.game_title = next(g for g in match.groups() if g).split("/")[-1]
+            else:
+                self.game_title = "default"
 
         self.load_env_from_file(envar_dir)
         self.run_processes_sequentially()
@@ -400,6 +402,8 @@ class FaugusRun:
             )
         else:
             self.execute_final_command()
+
+        print(self.message)
 
     def on_proton_downloader_finished(self, pid, status):
         if hasattr(self, 'stdout_watch_id'):
@@ -494,19 +498,7 @@ class FaugusRun:
         image.set_margin_bottom(20)
         grid.attach(image, 0, 0, 1, 1)
 
-        protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
-        if protonpath == "Using UMU-Proton":
-            protonpath = "UMU-Proton Latest"
-        if not protonpath:
-            if "UMU_NO_PROTON" in self.message:
-                protonpath = "Linux Native"
-            else:
-                protonpath = "Using UMU-Proton Latest"
-        else:
-            protonpath = _("Using %s") % protonpath
-        print(protonpath)
-
-        self.label = Gtk.Label(label=protonpath)
+        self.label = Gtk.Label()
         self.label.set_margin_start(20)
         self.label.set_margin_end(20)
 
