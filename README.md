@@ -67,15 +67,15 @@ flatpak run io.github.Faugus.faugus-launcher
 ### Steam Flatpak integration
 Allow Faugus Launcher to detect Steam users:
 ```
-flatpak --user override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/
+sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/
 ```
 Allow Steam to run Faugus Launcher's shortcuts:
 ```
-flatpak --user override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
+sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
 ```
 Allow Steam to see the game's icon:
 ```
-flatpak --user override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
+sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 ```
 ### Known issues:
 - The 'stop' button won't close games/apps
