@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-23 20:50-0300\n"
-"PO-Revision-Date: 2025-05-26 23:53+0100\n"
+"PO-Revision-Date: 2025-09-21 10:54+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: /usr/bin/faugus-run:126
 #, python-brace-format
 msgid "{path} was not found."
-msgstr "Le chemin{path} n’a pas été trouvé."
+msgstr "Le chemin {path} n’a pas été trouvé."
 
 #: /usr/bin/faugus-run:130
 msgid "Please install it or use another Proton version."
