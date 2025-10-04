@@ -68,7 +68,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/8be61bf/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/3ed7b6a/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -81,10 +81,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.5-1" date="2025-09-14">
+    <release version="1.9.6-1" date="2025-10-04">
       <description>
         <ul>
-          <li>Fixed game not running from .exe file when logging is on.</li>
+          <li>Fixed some framegen settings.</li>
+          <li>Added a button to clear logs.</li>
+          <li>Added a message to warn the user about huge log files.</li>
         </ul>
       </description>
     </release>
