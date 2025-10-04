@@ -3071,6 +3071,10 @@ class Settings(Gtk.Dialog):
         button_restore = Gtk.Button(label=_("Restore"))
         button_restore.connect("clicked", self.on_button_restore_clicked)
 
+        self.button_clearlogs = Gtk.Button()
+        self.update_button_label()
+        self.button_clearlogs.connect("clicked", self.on_clear_logs_clicked)
+
         self.label_envar = Gtk.Label(label=_("Global Environment Variables"))
         self.label_envar.set_halign(Gtk.Align.START)
 
@@ -3159,6 +3163,14 @@ class Settings(Gtk.Dialog):
         grid_tools.set_margin_top(10)
         grid_tools.set_margin_bottom(10)
 
+        grid_logs = Gtk.Grid()
+        grid_logs.set_row_spacing(10)
+        grid_logs.set_column_spacing(10)
+        grid_logs.set_margin_start(10)
+        grid_logs.set_margin_end(10)
+        grid_logs.set_margin_top(10)
+        grid_logs.set_margin_bottom(10)
+
         grid_miscellaneous = Gtk.Grid()
         grid_miscellaneous.set_row_spacing(10)
         grid_miscellaneous.set_column_spacing(10)
@@ -3238,16 +3250,19 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
         grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
 
+        grid_logs.attach(self.checkbox_enable_logging, 0, 0, 1, 1)
+        grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
+        self.button_clearlogs.set_hexpand(True)
+
         grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
         grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 6, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_logging, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 10, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3277,6 +3292,7 @@ class Settings(Gtk.Dialog):
 
         box_mid.pack_start(self.label_miscellaneous, False, False, 0)
         box_mid.pack_start(grid_miscellaneous, False, False, 0)
+        box_mid.pack_start(grid_logs, False, False, 0)
         box_mid.pack_end(grid_support, False, False, 0)
         box_mid.pack_end(self.label_support, False, False, 0)
 
@@ -3326,6 +3342,33 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
+    def get_dir_size(self, path):
+        total = 0
+        for dirpath, _, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                if os.path.isfile(fp):
+                    total += os.path.getsize(fp)
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if total < 1024.0:
+                return f"{total:.1f} {unit}"
+            total /= 1024.0
+        return f"{total:.1f} TB"
+
+    def update_button_label(self):
+        if os.path.exists(logs_dir):
+            size = self.get_dir_size(logs_dir)
+            self.button_clearlogs.set_label(f"Clear logs ({size})")
+            self.button_clearlogs.set_sensitive(True)
+        else:
+            self.button_clearlogs.set_label("Clear logs")
+            self.button_clearlogs.set_sensitive(False)
+
+    def on_clear_logs_clicked(self, button):
+        if os.path.exists(logs_dir):
+            shutil.rmtree(logs_dir)
+        self.update_button_label()
 
     def on_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         result = widget.get_path_at_pos(x, y)
