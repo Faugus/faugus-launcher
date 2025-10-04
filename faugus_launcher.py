@@ -3359,10 +3359,10 @@ class Settings(Gtk.Dialog):
     def update_button_label(self):
         if os.path.exists(logs_dir):
             size = self.get_dir_size(logs_dir)
-            self.button_clearlogs.set_label(f"Clear logs ({size})")
+            self.button_clearlogs.set_label(_("Clear logs (%s)") % size)
             self.button_clearlogs.set_sensitive(True)
         else:
-            self.button_clearlogs.set_label("Clear logs")
+            self.button_clearlogs.set_label(_("Clear logs"))
             self.button_clearlogs.set_sensitive(False)
 
     def on_clear_logs_clicked(self, button):
