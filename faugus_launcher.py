@@ -266,6 +266,7 @@ class ConfigManager:
             'enable-hdr': 'False',
             'enable-wow64': 'False',
             'language': lang,
+            'logging-warning': 'False',
         }
 
         self.config = {}
@@ -1510,6 +1511,11 @@ class Main(Gtk.Window):
             if not validation_result:
                 return
 
+            if not settings_dialog.logging_warning:
+                if settings_dialog.checkbox_enable_logging.get_active():
+                    self.show_warning_dialog(self, _("Proton may generate huge log files."), _("Enable logging only when debugging a problem."))
+                    settings_dialog.logging_warning = True
+
             settings_dialog.update_config_file()
             self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active())
             settings_dialog.update_system_tray()
@@ -1989,15 +1995,19 @@ class Main(Gtk.Window):
         except FileNotFoundError:
             pass  # Ignore if the file doesn't exist yet
 
-    def show_warning_dialog(self, parent, title):
+    def show_warning_dialog(self, parent, text1, text2):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
-        label = Gtk.Label()
-        label.set_label(title)
-        label.set_halign(Gtk.Align.CENTER)
+        label1 = Gtk.Label()
+        label1.set_label(text1)
+        label1.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label()
+        label2.set_label(text2)
+        label2.set_halign(Gtk.Align.CENTER)
 
         button_yes = Gtk.Button(label=_("Ok"))
         button_yes.set_size_request(150, -1)
@@ -2021,7 +2031,9 @@ class Main(Gtk.Window):
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
 
-        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label1, True, True, 0)
+        if text2:
+            box_top.pack_start(label2, True, True, 0)
         box_bottom.pack_start(button_yes, True, True, 0)
 
         content_area.add(box_top)
@@ -2048,7 +2060,7 @@ class Main(Gtk.Window):
 
             if any(game.title == title for game in self.games):
                 # Display an error message and prevent the dialog from closing
-                self.show_warning_dialog(add_game_dialog, _("%s already exists.") % title)
+                self.show_warning_dialog(add_game_dialog, _("%s already exists.") % title, "")
                 return True
 
             path = add_game_dialog.entry_path.get_text()
@@ -2119,7 +2131,7 @@ class Main(Gtk.Window):
 
             if add_game_dialog.combobox_launcher.get_active() != 0 and add_game_dialog.combobox_launcher.get_active() != 1:
                 if not check_internet_connection():
-                    self.show_warning_dialog(add_game_dialog, _("No internet connection."))
+                    self.show_warning_dialog(add_game_dialog, _("No internet connection."), "")
                     return True
                 else:
                     if add_game_dialog.combobox_launcher.get_active() == 2:
@@ -2341,7 +2353,7 @@ class Main(Gtk.Window):
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
                     GLib.idle_add(on_download_complete)
                 except Exception as e:
-                    GLib.idle_add(self.show_warning_dialog, self, _("Error during download: %s") % e)
+                    GLib.idle_add(self.show_warning_dialog, self, _("Error during download: %s") % e, "")
 
             def on_download_complete():
                 self.label_download.set_text(_("Installing %s...") % title)
@@ -2767,6 +2779,7 @@ class Settings(Gtk.Dialog):
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
         self.parent = parent
+        self.logging_warning = False
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -3359,10 +3372,10 @@ class Settings(Gtk.Dialog):
     def update_button_label(self):
         if os.path.exists(logs_dir):
             size = self.get_dir_size(logs_dir)
-            self.button_clearlogs.set_label(_("Clear logs (%s)") % size)
+            self.button_clearlogs.set_label(_("Clear Logs (%s)") % size)
             self.button_clearlogs.set_sensitive(True)
         else:
-            self.button_clearlogs.set_label(_("Clear logs"))
+            self.button_clearlogs.set_label(_("Clear Logs"))
             self.button_clearlogs.set_sensitive(False)
 
     def on_clear_logs_clicked(self, button):
@@ -3531,6 +3544,7 @@ class Settings(Gtk.Dialog):
         checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
 
         language = self.lang_codes.get(combobox_language, "en_US")
+        logging_warning = self.logging_warning
 
         config = ConfigManager()
         config.save_with_values(
@@ -3555,7 +3569,8 @@ class Settings(Gtk.Dialog):
             checkbox_wayland_driver,
             checkbox_enable_hdr,
             checkbox_enable_wow64,
-            language
+            language,
+            logging_warning
         )
 
         self.set_sensitive(False)
@@ -4177,6 +4192,7 @@ class Settings(Gtk.Dialog):
         enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
+        self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)

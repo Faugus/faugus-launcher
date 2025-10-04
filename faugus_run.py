@@ -162,6 +162,7 @@ class ConfigManager:
             'enable-hdr': 'False',
             'enable-wow64': 'False',
             'language': lang,
+            'logging-warning': 'False',
         }
 
         self.config = {}
