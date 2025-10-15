@@ -43,17 +43,8 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
-## openSUSE (Packaged by [ToRRent1812](https://github.com/ToRRent1812))
-### Tumbleweed:
-```
-sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Tumbleweed/ home:Rabbit95
-sudo zypper --gpg-auto-import-keys install -y faugus-launcher
-```
-### Slowroll:
-```
-sudo zypper addrepo https://download.opensuse.org/repositories/home:/Rabbit95/openSUSE_Slowroll/ home:Rabbit95
-sudo zypper --gpg-auto-import-keys install -y faugus-launcher
-```
+## openSUSE
+The openSUSE package will no longer be updated. Please use the Flatpak.
 
 ## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
 ### Installation:
