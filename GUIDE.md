@@ -93,10 +93,17 @@ This section of the guide will explain the basic workflow for installing games o
 
 	![Installing Microsoft Visual C++ Redistributable](./screenshots/user-guide/fl-guide-9.png)
 
-5. **All Complete! Its Time to Play Some Games:**
-	- After installing your game and taking care of the dependencies it is finally time to play. Click the "Ok" button to save changes and close the dialog. From the home screen you can see that a new entry for your game has been added. Select it and click on the play button to open the game. Enjoy!
+5. **Add the Game Executable:**
+	- After you have set up your game and handled all the dependencies it is time to locate your main game executable `.exe` file. This is the actual file that will be executed when you launch your game. Most of the times this executable is located right in the installation folder for your game. Sometimes there can be multiple `.exe` files in the installation folder, in that case you can search your game on [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) and find proper executable files.
 
-	![Our game entry is added to Faugus Launcher](./screenshots/user-guide/fl-guide-10.png)
+	- In our case, the proper executable file for the game is `PrinceOfPersia.EXE` which is located in the root of the installation folder. Go to the "Game/App" tab and under the "Path" section, click on the magnifying glass button to search for game executable. Locate to your installation folder in the Wine Prefix folder for the game from the file chooser dialog. Select the executable file and click "Open".
+
+	![Adding game executable file in the "Path"](./screenshots/user-guide/fl-guide-11.png)
+
+6. **All Complete! Its Time to Play Some Games:**
+	- After installing your game and taking care of the dependencies it is finally time to play. Click the "Ok" button to save changes and close the dialog. From the home screen you can see that a new entry for your game has been added. Select it and click on the play button at the bottom to open the game. Enjoy!
+
+	![New game entry is added to Faugus Launcher](./screenshots/user-guide/fl-guide-10.png)
 
 ## Tips
 - **Game Shortcuts:** To add shortcuts of your games to your desktop and application menu, right click on your selected game entry and click on "Edit". From the "Game/App" tab look to the bottom of the dialog and tick "Desktop" and "App Menu" checkboxes. To add the game to your Steam library as well tick the "Steam" checkbox too. You can now find the shortcuts for your game on your desktop, application and steam.
