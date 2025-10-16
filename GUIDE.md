@@ -53,7 +53,7 @@ This section of the guide will explain the basic workflow for installing games o
 	
 	- We will be using the GOG copy of the game `Prince of Persia The Sands of Time` as an example. Now, your setup files are in `~/Downloads/Games/Prince of Persia The Sands of Time [GOG]/` and `setup_prince_of_persia_-_the_sands_of_time_181_(28548).exe` is the installer for the game.
 	
-	![Folder containing game installation files](./screenshots/user-guide/fl-guide-1.png)
+![Folder containing game installation files](./screenshots/user-guide/fl-guide-1.png)
 
 2. **Download Proton-GE and Create Default Wine Prefix:**
 	- Open Faugus Launcher and you will see that we have options to "Add Games" via the plus button "+" and "Settings" via the cog-wheel button. We will not be adding new games just yet, we have to configure some things before that.
@@ -61,16 +61,16 @@ This section of the guide will explain the basic workflow for installing games o
 	![First time opening Faugus Launcher](./screenshots/user-guide/fl-guide-2.png)
 
 	- Open the settings: Under "Default Prefixes Location" you can see the default location of your Wine Prefixes for all of your games/applications. You can set it to a different location like `~/Games/` here.
-	
-	![Global settings for Faugus Launcher](./screenshots/user-guide/fl-guide-3.png)
+
+![Global settings for Faugus Launcher](./screenshots/user-guide/fl-guide-3.png)
 
 	- Under the "Default Proton" section, choose the Proton version "GE-Proton Latest" and under the "Miscellaneous" section check the box with "Use discrete GPU" if you are indeed using a discrete GPU and does not want to use the integrated GPU for the games.
 
 	- Under "Default Prefix Tools" section, click on the Winetricks button. A dialog box will appear indicating that it is downloading and installing our selected Proton version and creating an initial `default` Prefix in our Prefixes location. Wait for it to complete. If all goes well, you will see the Winetricks dialog box with various options. We do not need to tinker it, so close the dialog by clicking "Cancel".
 	
-	![Downloading latest Proton-GE and creating default Prefix](./screenshots/user-guide/fl-guide-4.png)
+![Downloading latest Proton-GE and creating default Prefix](./screenshots/user-guide/fl-guide-4.png)
 	
-	![Winetricks dialog for current Wine Prefix](./screenshots/user-guide/fl-guide-6.png)
+![Winetricks dialog for current Wine Prefix](./screenshots/user-guide/fl-guide-6.png)
 
 
 
@@ -79,7 +79,7 @@ This section of the guide will explain the basic workflow for installing games o
 
 	- Switch to the "Tools" tab at the top and click on the "Run" button located bottom-right of the dialog box. This allows you to open executable files running under the game's Wine Prefix. Locate the installer `.exe` file and open it through the file chooser dialog. In our case it is in `~/Downloads/Games/Prince of Persia The Sands of Time [GOG]/` named `setup_prince_of_persia_-_the_sands_of_time_181_(28548).exe`. Install the game by following the dialog boxes of the installer (just like you do on Windows).
 	
-	![Follow the steps to install the game in Prefix](./screenshots/user-guide/fl-guide-8.png)
+![Follow the steps to install the game in Prefix](./screenshots/user-guide/fl-guide-8.png)
 
 	- When prompted to choose the installation location for the game, choose any location under the `C:` drive (conventionally `C:/Program Files` or `C:/Program Files (x86)` is used). After installation is complete, exit the installer and DO NOT LAUNCH the game if the dialog prompts you to.
 	
@@ -91,19 +91,19 @@ This section of the guide will explain the basic workflow for installing games o
 
 	- Go to the "Tools" tab and at the right bottom you will find the "Run" button which allows you to run executable (like `.exe`, `.msi` or `.bat`) files in the Wine Prefix you have just created for your game. Click on it and a file chooser dialog box will appear for you to choose your executable file. Go to the location where installer file is located and choose it. Follow the dialog steps to install your dependencies.
 
-	![Installing Microsoft Visual C++ Redistributable](./screenshots/user-guide/fl-guide-9.png)
+![Installing Microsoft Visual C++ Redistributable](./screenshots/user-guide/fl-guide-9.png)
 
 5. **Add the Game Executable:**
 	- After you have set up your game and handled all the dependencies it is time to locate your main game executable `.exe` file. This is the actual file that will be executed when you launch your game. Most of the times this executable is located right in the installation folder for your game. Sometimes there can be multiple `.exe` files in the installation folder, in that case you can search your game on [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) and find proper executable files.
 
 	- In our case, the proper executable file for the game is `PrinceOfPersia.EXE` which is located in the root of the installation folder. Go to the "Game/App" tab and under the "Path" section, click on the magnifying glass button to search for game executable. Locate to your installation folder in the Wine Prefix folder for the game from the file chooser dialog. Select the executable file and click "Open".
 
-	![Adding game executable file in the "Path"](./screenshots/user-guide/fl-guide-11.png)
+![Adding game executable file in the "Path"](./screenshots/user-guide/fl-guide-11.png)
 
 6. **All Complete! Its Time to Play Some Games:**
 	- After installing your game and taking care of the dependencies it is finally time to play. Click the "Ok" button to save changes and close the dialog. From the home screen you can see that a new entry for your game has been added. Select it and click on the play button at the bottom to open the game. Enjoy!
 
-	![New game entry is added to Faugus Launcher](./screenshots/user-guide/fl-guide-10.png)
+![New game entry is added to Faugus Launcher](./screenshots/user-guide/fl-guide-10.png)
 
 ## Tips
 - **Game Shortcuts:** To add shortcuts of your games to your desktop and application menu, right click on your selected game entry and click on "Edit". From the "Game/App" tab look to the bottom of the dialog and tick "Desktop" and "App Menu" checkboxes. To add the game to your Steam library as well tick the "Steam" checkbox too. You can now find the shortcuts for your game on your desktop, application and steam.
