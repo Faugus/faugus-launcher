@@ -2120,14 +2120,12 @@ class Main(Gtk.Window):
 
             def check_internet_connection():
                 try:
-                    socket.create_connection(("8.8.8.8", 53), timeout=5)
+                    host = "www.google.com"
+                    socket.gethostbyname(host)
+                    socket.create_connection((host, 80), timeout=5)
                     return True
-                except socket.gaierror:
+                except (socket.gaierror, OSError):
                     return False
-                except OSError as e:
-                    if e.errno == 101:
-                        return False
-                    raise
 
             if add_game_dialog.combobox_launcher.get_active() != 0 and add_game_dialog.combobox_launcher.get_active() != 1:
                 if not check_internet_connection():
