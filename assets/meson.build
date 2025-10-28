@@ -10,6 +10,7 @@ install_data(
   'faugus-ea.png',
   'faugus-epic-games.png',
   'faugus-ubisoft-connect.png',
+  'faugus-rockstar.png',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / '256x256' / 'apps',
 )
 
