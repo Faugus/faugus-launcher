@@ -112,6 +112,7 @@ epic_icon = PathManager.get_icon('faugus-epic-games.png')
 battle_icon = PathManager.get_icon('faugus-battlenet.png')
 ubisoft_icon = PathManager.get_icon('faugus-ubisoft-connect.png')
 ea_icon = PathManager.get_icon('faugus-ea.png')
+rockstar_icon = PathManager.get_icon('faugus-rockstar.png')
 
 faugus_run = PathManager.find_binary('faugus-run')
 faugus_proton_manager = PathManager.find_binary('faugus-proton-manager')
@@ -2148,6 +2149,10 @@ class Main(Gtk.Window):
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
+                    if add_game_dialog.combobox_launcher.get_active() == 6:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "6", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+
             game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
                 "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
                 "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
@@ -2257,6 +2262,12 @@ class Main(Gtk.Window):
             image_path = ubisoft_icon
             self.label_download.set_text(_("Downloading Ubisoft Connect..."))
             self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+
+        elif launcher == "6":
+            image_path = rockstar_icon
+            self.label_download.set_text(_("Downloading Rockstar Launcher..."))
+            self.download_launcher("rockstar", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+
         else:
             image_path = faugus_png
 
@@ -2326,10 +2337,11 @@ class Main(Gtk.Window):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.msi",
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
-                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe"}
+                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
+                "rockstar": "https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe"}
 
             file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
-                "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe"}
+                "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe", "rockstar": "Rockstar-Games-Launcher.exe"}
 
             if launcher not in urls:
                 return None
@@ -2367,6 +2379,10 @@ class Main(Gtk.Window):
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
                     command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                elif launcher == "rockstar":
+                    self.label_download.set_text(_("Please don't change the installation path."))
+                    self.label_download2.set_text(_("Please close the login window and wait..."))
+                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
 
                 if runner:
                     command = f"PROTONPATH={runner} {command}"
@@ -5501,6 +5517,26 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
+        elif active_index == 6:
+            self.grid_title.set_visible(False)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(True)
+            self.grid_prefix.set_visible(True)
+            self.button_winetricks.set_visible(True)
+            self.button_winecfg.set_visible(True)
+            self.button_run.set_visible(True)
+            self.grid_protonfix.set_visible(True)
+            self.grid_addapp.set_visible(True)
+            self.checkbox_disable_hidraw.set_visible(True)
+            self.entry_title.set_text(self.combobox_launcher.get_active_text())
+            self.entry_path.set_text(
+                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe")
+            shutil.copyfile(rockstar_icon, os.path.expanduser(self.icon_temp))
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+            image = Gtk.Image.new_from_file(self.icon_temp)
+            image.set_from_pixbuf(scaled_pixbuf)
+            self.button_shortcut_icon.set_image(image)
         if self.interface_mode == "Banners":
             if self.entry_title.get_text() != "":
                 self.get_banner()
@@ -5517,6 +5553,7 @@ class AddGame(Gtk.Dialog):
         self.combobox_launcher.append_text("EA App")
         self.combobox_launcher.append_text("Epic Games")
         self.combobox_launcher.append_text("Ubisoft Connect")  # self.combobox_launcher.append_text("HoYoPlay")
+        self.combobox_launcher.append_text("Rockstar Launcher")
 
     def populate_combobox_with_runners(self):
         # List of default entries
