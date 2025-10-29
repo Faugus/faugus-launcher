@@ -2286,13 +2286,13 @@ class Main(Gtk.Window):
         grid_labels.attach(self.label_download, 0, 0, 1, 1)
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
         grid_labels.attach(self.label_download2, 0, 2, 1, 1)
-        grid_labels.attach(self.button_finish_install, 0, 3, 1, 1)
+        #grid_labels.attach(self.button_finish_install, 0, 3, 1, 1)
 
         self.box_main.add(self.box_launcher)
         self.box_main.remove(self.box_top)
         self.box_main.remove(self.box_bottom)
         self.box_main.show_all()
-        self.button_finish_install.set_visible(False)
+        #self.button_finish_install.set_visible(False)
 
     def on_button_finish_install_clicked(self):
         self.on_button_kill_clicked(widget)
@@ -2301,24 +2301,34 @@ class Main(Gtk.Window):
         retcode = processo.poll()
 
         if retcode is not None:
-            print(f"{title} installed.")
-
             if os.path.exists(faugus_temp):
                 shutil.rmtree(faugus_temp)
-
-            self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
-            self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
-
-            self.add_item_list(game)
-            self.update_list()
-            self.select_game_by_title(title)
-
             self.box_main.pack_start(self.box_top, True, True, 0)
             self.box_main.pack_end(self.box_bottom, False, True, 0)
             self.box_main.remove(self.box_launcher)
             self.box_launcher.destroy()
             self.box_main.show_all()
+
+            if os.path.exists(game.path):
+                print(f"{title} installed.")
+                self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
+                self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+                self.add_item_list(game)
+                self.update_list()
+                self.select_game_by_title(title)
+            else:
+                if os.path.exists(game.prefix):
+                    shutil.rmtree(game.prefix)
+                self.remove_shortcut(game, "both")
+                self.remove_steam_shortcut(title)
+                self.remove_banner_icon(game)
+                self.games.remove(game)
+                self.save_games()
+                self.update_list()
+                self.remove_game_from_latest_games(title)
+                self.show_warning_dialog(self, _("%s was not installed!") % title, "")
+
             if self.interface_mode != "List":
                 if self.fullscreen_activated:
                     self.fullscreen_activated = True
@@ -2328,7 +2338,6 @@ class Main(Gtk.Window):
                     self.fullscreen_activated = False
                     self.grid_corner.set_visible(False)
                     self.grid_left.set_margin_start(0)
-
             return False
 
         return True
