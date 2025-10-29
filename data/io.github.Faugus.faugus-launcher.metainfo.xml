@@ -87,14 +87,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.6-1" date="2025-10-04">
+    <release version="1.9.7-1" date="2025-10-29">
       <description>
         <ul>
-          <li>Fixed some framegen settings.</li>
-          <li>Added a button to clear logs.</li>
-          <li>Added a message to warn the user about huge log files.</li>
+          <li>Added Rockstar Launcher as an option to install</li>
+          <li>Fixed icons not being removed when deleting an entry</li>
+          <li>Added a message warning the user when a launcher fails to install</li>
+          <li>Now using a website instead of a DNS when checking the internet connection</li>
         </ul>
       </description>
     </release>
+  </releases>
   </releases>
 </component>
