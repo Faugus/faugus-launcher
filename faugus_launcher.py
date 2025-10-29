@@ -1947,7 +1947,7 @@ class Main(Gtk.Window):
                 # Remove the shortcut
                 self.remove_shortcut(game, "both")
                 self.remove_steam_shortcut(title)
-                self.remove_banner(game)
+                self.remove_banner_icon(game)
 
                 self.games.remove(game)
                 self.save_games()
@@ -2734,10 +2734,13 @@ class Main(Gtk.Window):
         else:
             dialog.set_preview_widget_active(False)
 
-    def remove_banner(self, game):
+    def remove_banner_icon(self, game):
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
+        icon_file_path = f"{icons_dir}/{game.gameid}.ico"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
+        if os.path.exists(icon_file_path):
+            os.remove(icon_file_path)
 
     def remove_shortcut(self, game, shortcut):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
