@@ -87,13 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.7-1" date="2025-10-29">
+    <release version="1.9.8-1" date="2025-10-30">
       <description>
         <ul>
-          <li>Added Rockstar Launcher as an option to install</li>
-          <li>Fixed icons not being removed when deleting an entry</li>
-          <li>Added a message warning the user when a launcher fails to install</li>
-          <li>Now using a website instead of a DNS when checking the internet connection</li>
+          <li>Hotfix: now checking the internet connection using the GitHub address</li>
+          <li>Updated Dutch translation</li>
         </ul>
       </description>
     </release>
