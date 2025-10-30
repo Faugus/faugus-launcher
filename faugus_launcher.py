@@ -2121,7 +2121,7 @@ class Main(Gtk.Window):
 
             def check_internet_connection():
                 try:
-                    host = "www.google.com"
+                    host = "www.github.com"
                     socket.gethostbyname(host)
                     socket.create_connection((host, 80), timeout=5)
                     return True
