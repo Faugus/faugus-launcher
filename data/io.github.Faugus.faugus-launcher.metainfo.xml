@@ -87,11 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.8-1" date="2025-10-30">
+    <release version="1.9.9-1" date="2025-11-01">
       <description>
         <ul>
-          <li>Hotfix: now checking the internet connection using the GitHub address</li>
-          <li>Updated Dutch translation</li>
+          <li>Hotfix: the internet connection check was not working on Flatpak</li>
         </ul>
       </description>
     </release>

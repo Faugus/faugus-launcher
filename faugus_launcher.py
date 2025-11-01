@@ -2121,11 +2121,9 @@ class Main(Gtk.Window):
 
             def check_internet_connection():
                 try:
-                    host = "www.github.com"
-                    socket.gethostbyname(host)
-                    socket.create_connection((host, 80), timeout=5)
+                    socket.gethostbyname("github.com")
                     return True
-                except (socket.gaierror, OSError):
+                except socket.gaierror:
                     return False
 
             if add_game_dialog.combobox_launcher.get_active() != 0 and add_game_dialog.combobox_launcher.get_active() != 1:
