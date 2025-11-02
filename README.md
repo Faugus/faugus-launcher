@@ -55,6 +55,11 @@ flatpak install flathub io.github.Faugus.faugus-launcher
 ```
 flatpak run io.github.Faugus.faugus-launcher
 ```
+### MangoHUD:
+Required runtime to use MangoHUD:
+```
+flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/24.08
+```
 ### Steam Flatpak integration
 Allow Faugus Launcher to detect Steam users:
 ```
