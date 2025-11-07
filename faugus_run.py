@@ -812,9 +812,9 @@ def build_launch_command(game):
         if lossless_flow:
             command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}")
         if lossless_performance:
-            command_parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance == "true" else 0}")
+            command_parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance == 'true' else 0}")
         if lossless_hdr:
-            command_parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr == "true" else 0}")
+            command_parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr == 'true' else 0}")
 
     command_parts.append(f"'{umu_run}'")
 
