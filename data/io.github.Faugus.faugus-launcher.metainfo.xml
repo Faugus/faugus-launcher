@@ -87,10 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.9.9-1" date="2025-11-01">
+    <release version="1.9.10-1" date="2025-11-07">
       <description>
         <ul>
-          <li>Hotfix: the internet connection check was not working on Flatpak</li>
+          <li>Fixed an issue that was preventing games to launch when using the deb package</li>
+          <li>Fixed an issue when installing the rpm package</li>
         </ul>
       </description>
     </release>
