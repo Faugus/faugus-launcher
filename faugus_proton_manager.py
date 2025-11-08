@@ -255,13 +255,12 @@ class ProtonDownloader(Gtk.Dialog):
         )
 
     def fetch_releases_from_url(self, url, grid):
-        headers = {"Authorization": "Y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HERE"}
         page = 1
         releases = []
         seen_tags = set()
 
         while True:
-            response = requests.get(url, headers=headers, params={"page": page, "per_page": 100})
+            response = requests.get(url, params={"page": page, "per_page": 100})
             if response.status_code == 200:
                 page_releases = response.json()
                 if not page_releases:
