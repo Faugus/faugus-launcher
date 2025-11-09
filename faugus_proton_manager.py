@@ -207,6 +207,29 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_em.show_all()
         self.notebook.append_page(scroll_em, tab_box_em)
 
+        # Tab 3: CachyOS Proton
+        self.grid_cachyos = Gtk.Grid()
+        self.grid_cachyos.set_hexpand(True)
+        self.grid_cachyos.set_row_spacing(5)
+        self.grid_cachyos.set_column_spacing(10)
+        scroll_cachyos = Gtk.ScrolledWindow()
+        scroll_cachyos.set_size_request(400, 400)
+        scroll_cachyos.set_margin_top(10)
+        scroll_cachyos.set_margin_bottom(10)
+        scroll_cachyos.set_margin_start(10)
+        scroll_cachyos.set_margin_end(10)
+        scroll_cachyos.add(self.grid_cachyos)
+
+        tab_box_cachyos = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label_cachyos = Gtk.Label(label="CachyOS Proton")
+        tab_label_cachyos.set_width_chars(15)
+        tab_label_cachyos.set_xalign(0.5)
+        tab_box_cachyos.pack_start(tab_label_cachyos, True, True, 0)
+        tab_box_cachyos.set_hexpand(True)
+        tab_box_cachyos.show_all()
+        self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
+
+
         self.load_config()
         self.get_releases()
         self.show_all()
@@ -226,6 +249,10 @@ class ProtonDownloader(Gtk.Dialog):
             "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
             self.grid_em
         )
+        self.fetch_releases_from_url(
+            "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
+            self.grid_cachyos
+        )
 
     def fetch_releases_from_url(self, url, grid):
         page = 1
@@ -241,15 +268,20 @@ class ProtonDownloader(Gtk.Dialog):
                 releases.extend(page_releases)
                 page += 1
             else:
+                print(f"Failed to fetch releases: {response.status_code} - {response.text}")
                 break
 
         for release in releases:
             tag_name = release["tag_name"]
             if tag_name in seen_tags:
-                continue  # ← Evita duplicados
+                continue
             seen_tags.add(tag_name)
 
-            if "GloriousEggroll" in url:
+            if "CachyOS" in url:
+                if not tag_name.startswith("cachyos-"):
+                    continue
+
+            elif "GloriousEggroll" in url:
                 if not tag_name.startswith("GE-Proton"):
                     continue
                 try:
@@ -266,9 +298,15 @@ class ProtonDownloader(Gtk.Dialog):
 
             self.add_release_to_grid(release, grid)
 
+
     def add_release_to_grid(self, release, grid):
         tag_name = release["tag_name"]
-        display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
+        if tag_name.startswith("cachyos-"):
+            display_tag_name = f"Proton-CachyOS-{tag_name.replace('cachyos-', '')}"
+        elif tag_name.startswith("EM-"):
+            display_tag_name = f"proton-{tag_name}"
+        else:
+            display_tag_name = tag_name
 
         row_index = len(grid.get_children()) // 2
 
