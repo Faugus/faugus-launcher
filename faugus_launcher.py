@@ -3849,7 +3849,10 @@ class Settings(Gtk.Dialog):
         with open(marker_path, "w") as f:
             f.write("faugus-launcher-backup")
 
-        zip_path = os.path.join(faugus_launcher_dir, "faugus-launcher-backup")
+        current_date = os.popen("date +%Y-%m-%d").read().strip()
+        zip_filename = f"faugus-launcher-{current_date}"
+        zip_path = os.path.join(faugus_launcher_dir, zip_filename)
+
         shutil.make_archive(zip_path, "zip", temp_dir)
         shutil.rmtree(temp_dir)
 
@@ -3861,7 +3864,8 @@ class Settings(Gtk.Dialog):
             cancel_label=_("Cancel"),
         )
 
-        filechooser.set_current_name("faugus-launcher-backup.zip")
+        filechooser.set_current_folder(os.path.expanduser("~"))
+        filechooser.set_current_name(f"{zip_filename}.zip")
 
         response = filechooser.run()
 
@@ -3872,10 +3876,13 @@ class Settings(Gtk.Dialog):
                 dest += ".zip"
 
             try:
+                if os.path.exists(dest):
+                    os.remove(dest)
+
                 shutil.copy2(zip_path + ".zip", dest)
-                print(f"Backup salvo em: {dest}")
+                print(f"Backup saved at: {dest}")
             except Exception as e:
-                print(f"Erro ao salvar backup: {e}")
+                print(f"Error saving backup: {e}")
 
         filechooser.destroy()
 
