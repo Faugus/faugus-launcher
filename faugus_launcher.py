@@ -3760,6 +3760,8 @@ class Settings(Gtk.Dialog):
         default_runner = self.get_default_runner()
         self.update_system_tray()
 
+        os.environ["GTK_USE_PORTAL"] = "1"
+
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
             transient_for=self,
@@ -5079,9 +5081,13 @@ class AddGame(Gtk.Dialog):
 
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name(_("Image files"))
-        filter_ico.add_mime_type("image/*")
+        filter_ico.add_pattern("*.png")
+        filter_ico.add_pattern("*.jpg")
+        filter_ico.add_pattern("*.jpeg")
+        filter_ico.add_pattern("*.bmp")
+        filter_ico.add_pattern("*.gif")
+        filter_ico.add_pattern("*.svg")
         filechooser.add_filter(filter_ico)
-        filechooser.set_filter(filter_ico)
 
         response = filechooser.run()
 
@@ -5618,7 +5624,12 @@ class AddGame(Gtk.Dialog):
 
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name(_("Image files"))
-        filter_ico.add_mime_type("image/*")
+        filter_ico.add_pattern("*.png")
+        filter_ico.add_pattern("*.jpg")
+        filter_ico.add_pattern("*.jpeg")
+        filter_ico.add_pattern("*.bmp")
+        filter_ico.add_pattern("*.gif")
+        filter_ico.add_pattern("*.svg")
         filechooser.add_filter(filter_ico)
 
         filechooser.set_current_folder(self.icon_directory)
@@ -6732,7 +6743,12 @@ class CreateShortcut(Gtk.Window):
 
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name(_("Image files"))
-        filter_ico.add_mime_type("image/*")
+        filter_ico.add_pattern("*.png")
+        filter_ico.add_pattern("*.jpg")
+        filter_ico.add_pattern("*.jpeg")
+        filter_ico.add_pattern("*.bmp")
+        filter_ico.add_pattern("*.gif")
+        filter_ico.add_pattern("*.svg")
         filechooser.add_filter(filter_ico)
 
         filechooser.set_current_folder(self.icon_directory)
@@ -6934,6 +6950,7 @@ def update_games_file():
         json.dump(games, f, indent=4, ensure_ascii=False)
 
 def faugus_launcher():
+    os.environ["GTK_USE_PORTAL"] = "1"
     update_games_file()
     apply_dark_theme()
 
