@@ -82,7 +82,7 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow filelock vdf psutil umu-launcher imagemagick icoextract libayatana-appindicator
+meson ninja pygobject requests pillow filelock vdf psutil imagemagick icoextract libayatana-appindicator
 ```
 
 # Usage
