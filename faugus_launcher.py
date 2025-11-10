@@ -5599,29 +5599,6 @@ class AddGame(Gtk.Dialog):
             _("Cancel")
         )
 
-        preview = Gtk.Image()
-        preview.set_size_request(128, 128)
-        filechooser.set_preview_widget(preview)
-        filechooser.set_preview_widget_active(True)
-        filechooser.set_use_preview_label(False)
-
-        def on_update_preview(file_chooser):
-            filename = file_chooser.get_preview_filename()
-            if filename and is_valid_image(filename):
-                try:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
-                    preview.set_from_pixbuf(pixbuf)
-                    file_chooser.set_preview_widget_active(True)
-                except Exception as e:
-                    print(f"Error loading preview: {e}")
-                    preview.clear()
-                    file_chooser.set_preview_widget_active(False)
-            else:
-                preview.clear()
-                file_chooser.set_preview_widget_active(False)
-
-        filechooser.connect("update-preview", on_update_preview)
-
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name(_("Image files"))
         filter_ico.add_pattern("*.png")
@@ -6717,29 +6694,6 @@ class CreateShortcut(Gtk.Window):
             _("Open"),
             _("Cancel")
         )
-
-        preview = Gtk.Image()
-        preview.set_size_request(128, 128)
-        filechooser.set_preview_widget(preview)
-        filechooser.set_preview_widget_active(True)
-        filechooser.set_use_preview_label(False)
-
-        def on_update_preview(file_chooser):
-            filename = file_chooser.get_preview_filename()
-            if filename and is_valid_image(filename):
-                try:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
-                    preview.set_from_pixbuf(pixbuf)
-                    file_chooser.set_preview_widget_active(True)
-                except Exception as e:
-                    print(f"Error loading preview: {e}")
-                    preview.clear()
-                    file_chooser.set_preview_widget_active(False)
-            else:
-                preview.clear()
-                file_chooser.set_preview_widget_active(False)
-
-        filechooser.connect("update-preview", on_update_preview)
 
         filter_ico = Gtk.FileFilter()
         filter_ico.set_name(_("Image files"))
