@@ -93,7 +93,7 @@
           <li>Fixed app store not fully recognizing Faugus Launcher system installation</li>
           <li>Replaced the filepicker with the xdg portal</li>
           <li>Backup filename now has the current date</li>
-          <li>Added support for Proton-CachyOS system package/li>
+          <li>Added support for Proton-CachyOS system package</li>
         </ul>
       </description>
     </release>
