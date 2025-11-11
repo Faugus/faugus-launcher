@@ -83,6 +83,7 @@ envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
 share_dir = PathManager.user_data()
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
+proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
@@ -2392,7 +2393,10 @@ class Main(Gtk.Window):
                     command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
 
                 if runner:
-                    command = f"PROTONPATH={runner} {command}"
+                    if runner == "Proton-CachyOS":
+                        command = f"PROTONPATH={proton_cachyos} {command}"
+                    else:
+                        command = f"PROTONPATH={runner} {command}"
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
@@ -3497,6 +3501,8 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos/"):
+            self.combobox_runner.append_text("Proton-CachyOS")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -3676,7 +3682,10 @@ class Settings(Gtk.Dialog):
             command_parts.append(f'GAMEID=winetricks-gui')
             command_parts.append(f'STORE=none')
             if default_runner:
-                command_parts.append(f'PROTONPATH={default_runner}')
+                if default_runner == "Proton-CachyOS":
+                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                else:
+                    command_parts.append(f'PROTONPATH={default_runner}')
 
             # Add the fixed command and remaining arguments
             command_parts.append(f'"{umu_run}"')
@@ -3720,7 +3729,10 @@ class Settings(Gtk.Dialog):
             command_parts.append(f'FAUGUS_LOG=default')
             command_parts.append(f'GAMEID=default')
             if default_runner:
-                command_parts.append(f'PROTONPATH={default_runner}')
+                if default_runner == "Proton-CachyOS":
+                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                else:
+                    command_parts.append(f'PROTONPATH={default_runner}')
 
             # Add the fixed command and remaining arguments
             command_parts.append(f'"{umu_run}"')
@@ -3760,8 +3772,6 @@ class Settings(Gtk.Dialog):
         default_runner = self.get_default_runner()
         self.update_system_tray()
 
-        os.environ["GTK_USE_PORTAL"] = "1"
-
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
             transient_for=self,
@@ -3789,20 +3799,27 @@ class Settings(Gtk.Dialog):
         response = filechooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            file_run = filechooser.get_filename()
-            print("Arquivo selecionado:", file_run)
-
             command_parts = []
-            command_parts.append('FAUGUS_LOG=default')
-            if file_run:
-                command_parts.append('GAMEID=default')
-            if default_runner:
-                command_parts.append(f'PROTONPATH={default_runner}')
-
-            if file_run.endswith(".reg"):
-                command_parts.append(f'"{umu_run}" regedit "{file_run}"')
-            else:
+            file_run = filechooser.get_filename()
+            command_parts.append(f'FAUGUS_LOG=default')
+            if not file_run.endswith(".reg"):
+                if file_run:
+                    command_parts.append(f'GAMEID=default')
+                if default_runner:
+                    if default_runner == "Proton-CachyOS":
+                        command_parts.append(f'PROTONPATH={proton_cachyos}')
+                    else:
+                        command_parts.append(f'PROTONPATH={default_runner}')
                 command_parts.append(f'"{umu_run}" "{file_run}"')
+            else:
+                if file_run:
+                    command_parts.append(f'GAMEID=default')
+                if default_runner:
+                    if default_runner == "Proton-CachyOS":
+                        command_parts.append(f'PROTONPATH={proton_cachyos}')
+                    else:
+                        command_parts.append(f'PROTONPATH={default_runner}')
+                command_parts.append(f'"{umu_run}" regedit "{file_run}"')
 
             command = ' '.join(command_parts)
             print(command)
@@ -5395,6 +5412,8 @@ class AddGame(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos/"):
+            self.combobox_runner.append_text("Proton-CachyOS")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -5504,8 +5523,10 @@ class AddGame(Gtk.Dialog):
             if title_formatted:
                 command_parts.append(f'GAMEID={title_formatted}')
             if runner:
-                command_parts.append(f'PROTONPATH={runner}')
-
+                if runner == "Proton-CachyOS":
+                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                else:
+                    command_parts.append(f'PROTONPATH={runner}')
             if file_run.endswith(".reg"):
                 command_parts.append(f'"{umu_run}" regedit "{file_run}"')
             else:
@@ -5775,7 +5796,10 @@ class AddGame(Gtk.Dialog):
         if title_formatted:
             command_parts.append(f'GAMEID={title_formatted}')
         if runner:
-            command_parts.append(f'PROTONPATH={runner}')
+            if runner == "Proton-CachyOS":
+                command_parts.append(f'PROTONPATH={proton_cachyos}')
+            else:
+                command_parts.append(f'PROTONPATH={runner}')
 
         # Add the fixed command and remaining arguments
         command_parts.append(f'"{umu_run}"')
@@ -5834,7 +5858,10 @@ class AddGame(Gtk.Dialog):
         command_parts.append(f'GAMEID=winetricks-gui')
         command_parts.append(f'STORE=none')
         if runner:
-            command_parts.append(f'PROTONPATH={runner}')
+            if runner == "Proton-CachyOS":
+                command_parts.append(f'PROTONPATH={proton_cachyos}')
+            else:
+                command_parts.append(f'PROTONPATH={runner}')
 
         # Add the fixed command and remaining arguments
         command_parts.append(f'"{umu_run}"')
@@ -6849,7 +6876,10 @@ def run_file(file_path):
     command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append('GAMEID=default')
     if default_runner:
-        command_parts.append(f'PROTONPATH={default_runner}')
+        if default_runner == "Proton-CachyOS":
+            command_parts.append(f'PROTONPATH={proton_cachyos}')
+        else:
+            command_parts.append(f'PROTONPATH={default_runner}')
     if not file_path.endswith(".reg"):
         if gamemode_enabled and gamemode:
             command_parts.append(gamemode)

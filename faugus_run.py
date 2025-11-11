@@ -88,6 +88,7 @@ logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'
 be_dir = f'PROTON_BATTLEYE_RUNTIME={PathManager.user_config("faugus-launcher/components/be")}'
+proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 os.makedirs(compatibility_dir, exist_ok=True)
@@ -291,10 +292,14 @@ class FaugusRun:
     def start_process(self, command):
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
         if protonpath and protonpath != "GE-Proton" and protonpath != "Proton-EM":
-            protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
-            if not protonpath_path.is_dir():
+            if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
+            else:
+                protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
+                if not protonpath_path.is_dir():
+                    self.close_warning_dialog()
+                    self.show_error_dialog(protonpath)
 
         if self.default_runner == "UMU-Proton Latest":
             self.default_runner = ""
@@ -315,7 +320,11 @@ class FaugusRun:
             if self.default_runner:
                 if "PROTONPATH" not in self.message:
                     if "UMU_NO_PROTON" not in self.message:
-                        self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
+                        if self.default_runner:
+                            if self.default_runner == "Proton-CachyOS":
+                                self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={proton_cachyos} {self.message}'
+                            else:
+                                self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
                 else:
                     self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
             else:
@@ -331,10 +340,6 @@ class FaugusRun:
                     if "umu" not in game_id:
                         self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
                     break
-
-        if "proton-cachyos" in self.message:
-            if "slr" not in self.message:
-                self.message = f'UMU_NO_RUNTIME=1 {self.message}'
 
         if self.wayland_driver:
             self.message = f'PROTON_ENABLE_WAYLAND=1 {self.message}'
@@ -799,6 +804,8 @@ def build_launch_command(game):
     if runner:
         if runner == "Linux-Native":
             command_parts.append('UMU_NO_PROTON=1')
+        if runner == "Proton-CachyOS":
+            command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
             command_parts.append(f"PROTONPATH={runner}")
     if gamemode:
