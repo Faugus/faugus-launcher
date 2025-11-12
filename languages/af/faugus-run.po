@@ -1,0 +1,109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-05 23:34-0300\n"
+"PO-Revision-Date: 2025-11-11 15:54+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: af\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-run:216
+#, python-format
+msgid "%s was not found."
+msgstr "%s was nie gevind nie."
+
+#: /usr/bin/faugus-run:220
+msgid "Please install it or use another Proton version."
+msgstr "Installeer dit asseblief of gebruik 'n ander Proton weergawe."
+
+#: /usr/bin/faugus-run:223 /usr/bin/faugus-run:655
+msgid "Ok"
+msgstr "Goed"
+
+#: /usr/bin/faugus-run:492
+#, python-format
+msgid "Using %s"
+msgstr "Met behulp van %s"
+
+#: /usr/bin/faugus-run:567
+msgid "Updating UMU-Launcher..."
+msgstr "Opdatering van UMU-Launcher..."
+
+#: /usr/bin/faugus-run:569
+msgid "UMU-Launcher is up to date"
+msgstr "UMU-Launcher is op datum"
+
+#: /usr/bin/faugus-run:571
+msgid "Updating BattlEye..."
+msgstr "Opdatering van BattlEye..."
+
+#: /usr/bin/faugus-run:573
+msgid "Updating Easy Anti-Cheat..."
+msgstr "Opdatering van Easy Anti-Cheat..."
+
+#: /usr/bin/faugus-run:575
+msgid "Components are up to date"
+msgstr "Komponente is op datum"
+
+#: /usr/bin/faugus-run:577
+msgid "Downloading GE-Proton..."
+msgstr "Besig om GE-Proton af te laai..."
+
+#: /usr/bin/faugus-run:579
+msgid "Downloading UMU-Proton..."
+msgstr "Besig om UMU-Proton af te laai..."
+
+#: /usr/bin/faugus-run:581
+msgid "Downloading Steam Runtime..."
+msgstr "Besig om Steam Runtime af te laai..."
+
+#: /usr/bin/faugus-run:583
+msgid "Extracting Steam Runtime..."
+msgstr "Besig om Steam Runtime uit te pak..."
+
+#: /usr/bin/faugus-run:585
+msgid "Extracting GE-Proton..."
+msgstr "Besig om GE-Proton uit te pak..."
+
+#: /usr/bin/faugus-run:587
+msgid "Extracting UMU-Proton..."
+msgstr "Besig om UMU-Proton uit te pak..."
+
+#: /usr/bin/faugus-run:589 /usr/bin/faugus-run:595
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton is op datum"
+
+#: /usr/bin/faugus-run:591 /usr/bin/faugus-run:597
+msgid "UMU-Proton is up to date"
+msgstr "UMU-Proton is op datum"
+
+#: /usr/bin/faugus-run:593 /usr/bin/faugus-run:599
+msgid "Steam Runtime is up to date"
+msgstr "Steam Runtime is op datum"
+
+#: /usr/bin/faugus-run:601
+msgid "Downloading Proton-EM..."
+msgstr "Besig om Proton-EM af te laai..."
+
+#: /usr/bin/faugus-run:603
+msgid "Extracting Proton-EM..."
+msgstr "Besig om Proton-EM uit te pak..."
+
+#: /usr/bin/faugus-run:605
+msgid "Proton-EM is up to date"
+msgstr "Proton-EM is up to date"
+
+#: /usr/bin/faugus-run:652
+msgid "The keys and values were successfully added to the registry."
+msgstr "Die sleutels en waardes is suksesvol by die register gevoeg."
