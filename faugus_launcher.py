@@ -3501,7 +3501,7 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
-        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos/"):
+        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
             self.combobox_runner.append_text("Proton-CachyOS")
 
         # Path to the directory containing the folders
@@ -5412,7 +5412,7 @@ class AddGame(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
-        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos/"):
+        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
             self.combobox_runner.append_text("Proton-CachyOS")
 
         # Path to the directory containing the folders

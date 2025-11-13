@@ -81,13 +81,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.10.2-1" date="2025-11-11">
+    <release version="1.10.3-1" date="2025-11-13">
       <description>
         <ul>
-          <li>Fixed app store not fully recognizing Faugus Launcher system installation</li>
-          <li>Replaced the filepicker with the xdg portal</li>
-          <li>Backup filename now has the current date</li>
-          <li>Added support for Proton-CachyOS system package</li>
+          <li>Hotfix: Proton-CachyOS was not being exposed properly</li>
         </ul>
       </description>
     </release>
