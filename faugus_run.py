@@ -295,6 +295,8 @@ class FaugusRun:
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
+            if protonpath == "Linux-Native":
+                pass
             else:
                 protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
                 if not protonpath_path.is_dir():
