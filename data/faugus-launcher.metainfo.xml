@@ -81,10 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.10.3-1" date="2025-11-13">
+    <release version="1.10.4-1" date="2025-11-13">
       <description>
         <ul>
-          <li>Hotfix: Proton-CachyOS was not being exposed properly</li>
+          <li>Proton-CachyOS was not being exposed properly</li>
+          <li>Linux native games were not launching after last update</li>
         </ul>
       </description>
     </release>
