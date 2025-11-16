@@ -797,8 +797,6 @@ def build_launch_command(game):
         command_parts.append(mangohud)
     if disable_hidraw:
         command_parts.append(disable_hidraw)
-    if runner != "Linux-Native" and prefix:
-        command_parts.append(f"WINEPREFIX='{prefix}'")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     else:
@@ -806,9 +804,11 @@ def build_launch_command(game):
     if runner:
         if runner == "Linux-Native":
             command_parts.append('UMU_NO_PROTON=1')
-        if runner == "Proton-CachyOS":
+        elif runner == "Proton-CachyOS":
+            command_parts.append(f"WINEPREFIX='{prefix}'")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
+            command_parts.append(f"WINEPREFIX='{prefix}'")
             command_parts.append(f"PROTONPATH={runner}")
     if gamemode:
         command_parts.append(gamemode)
