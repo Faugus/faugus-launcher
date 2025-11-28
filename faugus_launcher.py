@@ -5342,7 +5342,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe")
+                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
             shutil.copyfile(epic_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
@@ -5628,6 +5628,7 @@ class AddGame(Gtk.Dialog):
         filter_ico.add_pattern("*.bmp")
         filter_ico.add_pattern("*.gif")
         filter_ico.add_pattern("*.svg")
+        filter_ico.add_pattern("*.ico")
         filechooser.add_filter(filter_ico)
 
         filechooser.set_current_folder(self.icon_directory)
