@@ -6731,6 +6731,7 @@ class CreateShortcut(Gtk.Window):
         filter_ico.add_pattern("*.bmp")
         filter_ico.add_pattern("*.gif")
         filter_ico.add_pattern("*.svg")
+        filter_ico.add_pattern("*.ico")
         filechooser.add_filter(filter_ico)
 
         filechooser.set_current_folder(self.icon_directory)
