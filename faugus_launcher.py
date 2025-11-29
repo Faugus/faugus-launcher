@@ -4745,6 +4745,10 @@ class AddGame(Gtk.Dialog):
         load_item.connect("activate", self.on_load_file)
         self.menu.append(load_item)
 
+        load_url = Gtk.MenuItem(label=_("Load from URL"))
+        load_url.connect("activate", self.on_load_url)
+        self.menu.append(load_url)
+
         self.menu.show_all()
 
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -5111,55 +5115,131 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
-                dialog_image.set_resizable(False)
-                dialog_image.set_icon_from_file(faugus_png)
-                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-
-                label = Gtk.Label(label=_("The selected file is not a valid image."))
-                label.set_halign(Gtk.Align.CENTER)
-
-                label2 = Gtk.Label(label=_("Please choose another one."))
-                label2.set_halign(Gtk.Align.CENTER)
-
-                button_yes = Gtk.Button(label=_("Ok"))
-                button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
-
-                content_area = dialog_image.get_content_area()
-                content_area.set_border_width(0)
-                content_area.set_halign(Gtk.Align.CENTER)
-                content_area.set_valign(Gtk.Align.CENTER)
-                content_area.set_vexpand(True)
-                content_area.set_hexpand(True)
-
-                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-                box_top.set_margin_start(20)
-                box_top.set_margin_end(20)
-                box_top.set_margin_top(20)
-                box_top.set_margin_bottom(20)
-
-                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                box_bottom.set_margin_start(10)
-                box_bottom.set_margin_end(10)
-                box_bottom.set_margin_bottom(10)
-
-                box_top.pack_start(label, True, True, 0)
-                box_top.pack_start(label2, True, True, 0)
-                box_bottom.pack_start(button_yes, True, True, 0)
-
-                content_area.add(box_top)
-                content_area.add(box_bottom)
-
-                dialog_image.show_all()
-                dialog_image.run()
-                dialog_image.destroy()
+                self.show_invalid_image_dialog()
             else:
                 shutil.copyfile(file_path, self.banner_path_temp)
                 self.update_image_banner()
 
         filechooser.destroy()
         self.set_sensitive(True)
+
+    def on_load_url(self, widget):
+        self.set_sensitive(False)
+
+        dialog = Gtk.Dialog(
+            title=_("Enter Image URL"),
+            transient_for=self,
+            modal=True
+        )
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+
+        entry = Gtk.Entry()
+        entry.set_placeholder_text("https://example.com/banner.png")
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(120, -1)
+        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(120, -1)
+        button_cancel.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(10)
+        box_top.set_margin_end(10)
+        box_top.set_margin_top(10)
+        box_top.set_margin_bottom(10)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(entry, False, False, 0)
+
+        box_bottom.pack_start(button_cancel, True, True, 0)
+        box_bottom.pack_start(button_ok, True, True, 0)
+
+        dialog.get_content_area().add(box_top)
+        dialog.get_content_area().add(box_bottom)
+
+        dialog.show_all()
+
+        while True:
+            response = dialog.run()
+
+            if response == Gtk.ResponseType.CANCEL:
+                break
+
+            if response == Gtk.ResponseType.OK:
+                import urllib.request
+
+                url = entry.get_text().strip().replace(" ", "%20")
+                valid_exts = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg")
+
+                if not url.lower().endswith(valid_exts):
+                    self.show_invalid_image_dialog()
+                    dialog.show_all()
+                    continue
+
+                try:
+                    temp_file, headers = urllib.request.urlretrieve(url)
+                    shutil.copyfile(temp_file, self.banner_path_temp)
+                    self.update_image_banner()
+                    break
+                except Exception:
+                    self.show_invalid_image_dialog()
+                    dialog.show_all()
+                    continue
+
+        dialog.destroy()
+        self.set_sensitive(True)
+
+    def show_invalid_image_dialog(self):
+        dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
+        dialog_image.set_resizable(False)
+        dialog_image.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+
+        label = Gtk.Label(label=_("The selected file is not a valid image."))
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label(label=_("Please choose another one."))
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label=_("Ok"))
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+
+        content_area = dialog_image.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label2, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog_image.show_all()
+        dialog_image.run()
+        dialog_image.destroy()
 
     def get_banner(self):
         def fetch_banner():
