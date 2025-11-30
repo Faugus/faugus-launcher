@@ -5127,7 +5127,7 @@ class AddGame(Gtk.Dialog):
         self.set_sensitive(False)
 
         dialog = Gtk.Dialog(
-            title=_("Enter Image URL"),
+            title=_("Enter the image URL"),
             transient_for=self,
             modal=True
         )
@@ -5135,7 +5135,7 @@ class AddGame(Gtk.Dialog):
         dialog.set_icon_from_file(faugus_png)
 
         entry = Gtk.Entry()
-        entry.set_placeholder_text("https://example.com/banner.png")
+        entry.set_tooltip_text("https://example.com/banner.png")
 
         button_ok = Gtk.Button(label=_("Ok"))
         button_ok.set_size_request(120, -1)
