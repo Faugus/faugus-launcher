@@ -3042,6 +3042,7 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_enable_hdr = Gtk.CheckButton(label=_("Enable HDR (experimental)"))
         self.checkbox_enable_hdr.set_active(False)
+        self.checkbox_enable_hdr.set_sensitive(False)
         self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
