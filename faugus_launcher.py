@@ -1967,6 +1967,7 @@ class Main(Gtk.Window):
         return image
 
     def on_button_delete_clicked(self, widget):
+        self.reload_playtimes()
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
         hbox = selected_child.get_child()
@@ -2022,6 +2023,20 @@ class Main(Gtk.Window):
                     self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
 
             confirmation_dialog.destroy()
+
+    def reload_playtimes(self):
+        import json
+        try:
+            with open("games.json", "r", encoding="utf-8") as f:
+                games_data = json.load(f)
+        except FileNotFoundError:
+            return
+
+        playtime_map = {g["gameid"]: g.get("playtime", "") for g in games_data}
+
+        for game in self.games:
+            if game.gameid in playtime_map:
+                game.playtime = playtime_map[game.gameid]
 
     def remove_steam_shortcut(self, title):
         if os.path.exists(steam_shortcuts_path):
