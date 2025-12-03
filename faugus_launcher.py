@@ -1060,6 +1060,7 @@ class Main(Gtk.Window):
 
                     new_icon = f"{icons_dir}/{title_formatted}.ico"
                     new_banner = f"{banners_dir}/{title_formatted}.png"
+                    new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
 
                     if os.path.exists(icon):
                         shutil.copyfile(icon, new_icon)
@@ -1067,13 +1068,35 @@ class Main(Gtk.Window):
                     if os.path.exists(banner):
                         shutil.copyfile(banner, new_banner)
 
-                    game.banner = new_banner
+                    if os.path.exists(game.addapp_bat):
+                        shutil.copyfile(game.addapp_bat, new_addapp_bat)
 
-                    game_info = {"gameid": game.gameid, "title": game.title, "path": game.path, "prefix": game.prefix,
-                        "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
-                        "mangohud": game.mangohud, "gamemode": game.gamemode, "disable_hidraw": game.disable_hidraw,
-                        "protonfix": game.protonfix, "runner": game.runner, "addapp_checkbox": game.addapp_checkbox,
-                        "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, }
+                    game.banner = new_banner
+                    game.addapp_bat = new_addapp_bat
+
+                    game_info = {
+                        "gameid": title_formatted,
+                        "title": game.title,
+                        "path": game.path,
+                        "prefix": game.prefix,
+                        "launch_arguments": game.launch_arguments,
+                        "game_arguments": game.game_arguments,
+                        "mangohud": game.mangohud,
+                        "gamemode": game.gamemode,
+                        "disable_hidraw": game.disable_hidraw,
+                        "protonfix": game.protonfix,
+                        "runner": game.runner,
+                        "addapp_checkbox": game.addapp_checkbox,
+                        "addapp": game.addapp,
+                        "addapp_bat": game.addapp_bat,
+                        "banner": game.banner,
+                        "lossless_enabled": game.lossless_enabled,
+                        "lossless_multiplier": game.lossless_multiplier,
+                        "lossless_flow": game.lossless_flow,
+                        "lossless_performance": game.lossless_performance,
+                        "lossless_hdr": game.lossless_hdr,
+                        "playtime": game.playtime,
+                    }
 
                     games = []
                     if os.path.exists("games.json"):
@@ -2228,10 +2251,29 @@ class Main(Gtk.Window):
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "6", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-            game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
-                "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
-                "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
-                "addapp_bat": addapp_bat, "banner": banner, "lossless_enabled": lossless_enabled, "lossless_multiplier": lossless_multiplier, "lossless_flow": lossless_flow, "lossless_performance": lossless_performance, "lossless_hdr": lossless_hdr, "playtime": playtime,}
+            game_info = {
+                "gameid": title_formatted,
+                "title": title,
+                "path": path,
+                "prefix": prefix,
+                "launch_arguments": launch_arguments,
+                "game_arguments": game_arguments,
+                "mangohud": mangohud,
+                "gamemode": gamemode,
+                "disable_hidraw": disable_hidraw,
+                "protonfix": protonfix,
+                "runner": runner,
+                "addapp_checkbox": addapp_checkbox,
+                "addapp": addapp,
+                "addapp_bat": addapp_bat,
+                "banner": banner,
+                "lossless_enabled": lossless_enabled,
+                "lossless_multiplier": lossless_multiplier,
+                "lossless_flow": lossless_flow,
+                "lossless_performance": lossless_performance,
+                "lossless_hdr": lossless_hdr,
+                "playtime": playtime,
+            }
 
             games = []
             if os.path.exists("games.json"):
@@ -2865,12 +2907,29 @@ class Main(Gtk.Window):
     def save_games(self):
         games_data = []
         for game in self.games:
-            game_info = {"gameid": game.gameid, "title": game.title, "path": game.path, "prefix": game.prefix,
-                "launch_arguments": game.launch_arguments, "game_arguments": game.game_arguments,
-                "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
-                "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
-                "runner": game.runner, "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless_enabled": game.lossless_enabled, "lossless_multiplier": game.lossless_multiplier, "lossless_flow": game.lossless_flow, "lossless_performance": game.lossless_performance, "lossless_hdr": game.lossless_hdr, "playtime": game.playtime, }
+            game_info = {
+                "gameid": game.gameid,
+                "title": game.title,
+                "path": game.path,
+                "prefix": game.prefix,
+                "launch_arguments": game.launch_arguments,
+                "game_arguments": game.game_arguments,
+                "mangohud": "MANGOHUD=1" if game.mangohud else "",
+                "gamemode": "gamemoderun" if game.gamemode else "",
+                "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "",
+                "protonfix": game.protonfix,
+                "runner": game.runner,
+                "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
+                "addapp": game.addapp,
+                "addapp_bat": game.addapp_bat,
+                "banner": game.banner,
+                "lossless_enabled": game.lossless_enabled,
+                "lossless_multiplier": game.lossless_multiplier,
+                "lossless_flow": game.lossless_flow,
+                "lossless_performance": game.lossless_performance,
+                "lossless_hdr": game.lossless_hdr,
+                "playtime": game.playtime,
+            }
             games_data.append(game_info)
 
         with open("games.json", "w", encoding="utf-8") as file:
