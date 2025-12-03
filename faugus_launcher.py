@@ -2296,9 +2296,9 @@ class Main(Gtk.Window):
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
-                if game.addapp_checkbox == True:
-                    with open(game.addapp_bat, "w") as bat_file:
-                        bat_file.write(f'start "" "z:{game.addapp}"\n')
+                if addapp_checkbox == "addapp_enabled":
+                    with open(addapp_bat, "w") as bat_file:
+                        bat_file.write(f'start "" "z:{addapp}"\n')
                         if game_arguments:
                             bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
                         else:
@@ -5514,7 +5514,7 @@ class AddGame(Gtk.Dialog):
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(True)
+            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
@@ -5535,7 +5535,7 @@ class AddGame(Gtk.Dialog):
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(True)
+            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5555,7 +5555,7 @@ class AddGame(Gtk.Dialog):
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(True)
+            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5575,7 +5575,7 @@ class AddGame(Gtk.Dialog):
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(True)
+            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5595,7 +5595,7 @@ class AddGame(Gtk.Dialog):
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(True)
+            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
