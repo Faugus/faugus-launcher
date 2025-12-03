@@ -729,10 +729,6 @@ class FaugusRun:
                     for game in games:
                         if game.get("gameid") == game_id:
                             old_time = game.get("playtime", 0)
-                            try:
-                                old_time = int(old_time)
-                            except (TypeError, ValueError):
-                                old_time = 0
                             game["playtime"] = old_time + runtime
                             break
 
@@ -748,7 +744,6 @@ class FaugusRun:
             GLib.idle_add(Gtk.main_quit)
 
         return False
-
 
 def handle_command(message, command=None):
     updater = FaugusRun(message)

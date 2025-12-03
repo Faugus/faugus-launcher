@@ -1400,7 +1400,7 @@ class Main(Gtk.Window):
                     lossless_flow = game_data.get("lossless_flow", "")
                     lossless_performance = game_data.get("lossless_performance", "")
                     lossless_hdr = game_data.get("lossless_hdr", "")
-                    playtime = game_data.get("playtime", "")
+                    playtime = game_data.get("playtime", 0)
 
                     game = Game(gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
                                 protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime)
@@ -2055,7 +2055,7 @@ class Main(Gtk.Window):
         except FileNotFoundError:
             return
 
-        playtime_map = {g["gameid"]: g.get("playtime", "") for g in games_data}
+        playtime_map = {g["gameid"]: g.get("playtime", 0) for g in games_data}
 
         for game in self.games:
             if game.gameid in playtime_map:
@@ -2174,7 +2174,7 @@ class Main(Gtk.Window):
             lossless_flow = add_game_dialog.lossless_flow
             lossless_performance = add_game_dialog.lossless_performance
             lossless_hdr = add_game_dialog.lossless_hdr
-            playtime = ""
+            playtime = 0
 
             title_formatted = format_title(title)
 
@@ -7149,6 +7149,8 @@ def update_games_file():
     for game in games:
         if not game.get("gameid"):
             game["gameid"] = format_title(game["title"])
+        if game.get("playtime", "") == "":
+            game["playtime"] = 0
     with open(games_json, "w", encoding="utf-8") as f:
         json.dump(games, f, indent=4, ensure_ascii=False)
 
