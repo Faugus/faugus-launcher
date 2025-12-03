@@ -13,6 +13,7 @@ import os
 import gettext
 import locale
 import json
+import time
 
 class PathManager:
     @staticmethod
@@ -290,6 +291,7 @@ class FaugusRun:
             self.message = self.update_protonpath(self.message)
 
     def start_process(self, command):
+        self.start_time = time.time()
         protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
         if protonpath and protonpath != "GE-Proton" and protonpath != "Proton-EM":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
@@ -709,10 +711,38 @@ class FaugusRun:
 
     def on_process_exit(self, pid, condition):
         if self.process.poll() is not None:
+
+            end_time = time.time()
+            runtime = int(end_time - getattr(self, "start_time", end_time))
+
+            game_id = None
+            for part in self.message.split():
+                if part.startswith("GAMEID="):
+                    game_id = part.split("=")[1]
+                    break
+
+            if game_id and os.path.exists(games_dir):
+                try:
+                    with open(games_dir, "r", encoding="utf-8") as f:
+                        games = json.load(f)
+
+                    for game in games:
+                        if game.get("gameid") == game_id:
+                            old_time = game.get("playtime", 0)
+                            game["playtime"] = old_time + runtime
+                            break
+
+                    with open(games_dir, "w", encoding="utf-8") as f:
+                        json.dump(games, f, indent=4)
+
+                except Exception as e:
+                    pass
+
             GLib.idle_add(self.close_warning_dialog)
             GLib.idle_add(self.close_log_window)
             GLib.idle_add(self.show_exit_warning)
             GLib.idle_add(Gtk.main_quit)
+
         return False
 
 

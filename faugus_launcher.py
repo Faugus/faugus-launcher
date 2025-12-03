@@ -360,6 +360,16 @@ class Main(Gtk.Window):
 
         self.context_menu = Gtk.Menu()
 
+        self.menu_item_title = Gtk.MenuItem(label="")
+        self.menu_item_title.set_sensitive(False)
+        self.context_menu.append(self.menu_item_title)
+
+        self.menu_item_playtime = Gtk.MenuItem(label="")
+        self.menu_item_playtime.set_sensitive(False)
+        self.context_menu.append(self.menu_item_playtime)
+
+        self.context_menu.append(Gtk.SeparatorMenuItem())
+
         self.menu_item_play = Gtk.MenuItem(label=_("Play"))
         self.menu_item_play.connect("activate", self.on_context_menu_play)
         self.context_menu.append(self.menu_item_play)
@@ -816,7 +826,24 @@ class Main(Gtk.Window):
                 hbox = selected_child.get_child()
                 game_label = hbox.get_children()[1]
                 title = game_label.get_text()
+
+                self.menu_item_title.get_child().set_text(title)
+
                 game = next((j for j in self.games if j.title == title), None)
+
+                with open(games_json, "r") as f:
+                    data = json.load(f)
+
+                for item in data:
+                    if isinstance(item, dict) and item.get("gameid") == game.gameid:
+                        playtime = item.get("playtime", 0)
+                        formatted = self.format_playtime(playtime)
+                        if not formatted:
+                            self.menu_item_playtime.hide()
+                        else:
+                            self.menu_item_playtime.show()
+                            self.menu_item_playtime.get_child().set_text(formatted)
+                        break
 
                 if game.protonfix:
                     match = re.search(r"umu-(\d+)", game.protonfix)
@@ -853,6 +880,31 @@ class Main(Gtk.Window):
                     self.current_prefix = None
 
                 self.context_menu.popup_at_pointer(event)
+
+    def format_playtime(self, seconds):
+        seconds = int(seconds)
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+
+        if hours == 0 and minutes == 0:
+            return None
+
+        txt_hour   = _("hour")
+        txt_hours  = _("hours")
+        txt_minute = _("minute")
+        txt_minutes = _("minutes")
+
+        parts = []
+
+        if hours > 0:
+            word = txt_hour if hours == 1 else txt_hours
+            parts.append(f"{hours} {word}")
+
+        if minutes > 0:
+            word = txt_minute if minutes == 1 else txt_minutes
+            parts.append(f"{minutes} {word}")
+
+        return " ".join(parts)
 
     def on_context_menu_play(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
