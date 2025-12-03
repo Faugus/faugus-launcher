@@ -882,7 +882,14 @@ class Main(Gtk.Window):
                 self.context_menu.popup_at_pointer(event)
 
     def format_playtime(self, seconds):
-        seconds = int(seconds)
+        if not seconds:
+            return None
+
+        try:
+            seconds = int(seconds)
+        except (ValueError, TypeError):
+            seconds = 0
+
         hours = seconds // 3600
         minutes = (seconds % 3600) // 60
 
@@ -1370,9 +1377,10 @@ class Main(Gtk.Window):
                     lossless_flow = game_data.get("lossless_flow", "")
                     lossless_performance = game_data.get("lossless_performance", "")
                     lossless_hdr = game_data.get("lossless_hdr", "")
+                    playtime = game_data.get("playtime", "")
 
                     game = Game(gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                                protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr)
+                                protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime)
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -2128,6 +2136,7 @@ class Main(Gtk.Window):
             lossless_flow = add_game_dialog.lossless_flow
             lossless_performance = add_game_dialog.lossless_performance
             lossless_hdr = add_game_dialog.lossless_hdr
+            playtime = ""
 
             title_formatted = format_title(title)
 
@@ -2162,7 +2171,7 @@ class Main(Gtk.Window):
 
             # Create Game object and update UI
             game = Game(title_formatted, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                        protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr)
+                        protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime)
 
             # Determine the state of the shortcut checkbox
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -2207,7 +2216,7 @@ class Main(Gtk.Window):
             game_info = {"gameid": title_formatted, "title": title, "path": path, "prefix": prefix, "launch_arguments": launch_arguments,
                 "game_arguments": game_arguments, "mangohud": mangohud, "gamemode": gamemode, "disable_hidraw": disable_hidraw,
                 "protonfix": protonfix, "runner": runner, "addapp_checkbox": addapp_checkbox, "addapp": addapp,
-                "addapp_bat": addapp_bat, "banner": banner, "lossless_enabled": lossless_enabled, "lossless_multiplier": lossless_multiplier, "lossless_flow": lossless_flow, "lossless_performance": lossless_performance, "lossless_hdr": lossless_hdr, }
+                "addapp_bat": addapp_bat, "banner": banner, "lossless_enabled": lossless_enabled, "lossless_multiplier": lossless_multiplier, "lossless_flow": lossless_flow, "lossless_performance": lossless_performance, "lossless_hdr": lossless_hdr, "playtime": playtime,}
 
             games = []
             if os.path.exists("games.json"):
@@ -2846,7 +2855,7 @@ class Main(Gtk.Window):
                 "mangohud": "MANGOHUD=1" if game.mangohud else "", "gamemode": "gamemoderun" if game.gamemode else "",
                 "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "", "protonfix": game.protonfix,
                 "runner": game.runner, "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless_enabled": game.lossless_enabled, "lossless_multiplier": game.lossless_multiplier, "lossless_flow": game.lossless_flow, "lossless_performance": game.lossless_performance, "lossless_hdr": game.lossless_hdr, }
+                "addapp": game.addapp, "addapp_bat": game.addapp_bat, "banner": game.banner, "lossless_enabled": game.lossless_enabled, "lossless_multiplier": game.lossless_multiplier, "lossless_flow": game.lossless_flow, "lossless_performance": game.lossless_performance, "lossless_hdr": game.lossless_hdr, "playtime": game.playtime, }
             games_data.append(game_info)
 
         with open("games.json", "w", encoding="utf-8") as file:
@@ -4272,7 +4281,7 @@ class Settings(Gtk.Dialog):
 
 class Game:
     def __init__(self, gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
-                 runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr):
+                 runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime):
         self.gameid = gameid
         self.title = title
         self.path = path
@@ -4293,6 +4302,7 @@ class Game:
         self.lossless_flow = lossless_flow
         self.lossless_performance = lossless_performance
         self.lossless_hdr = lossless_hdr
+        self.playtime = playtime
 
 
 class DuplicateDialog(Gtk.Dialog):
