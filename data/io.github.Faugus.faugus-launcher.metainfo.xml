@@ -87,12 +87,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.10.5-1" date="2025-11-28">
+    <release version="1.10.6-1" date="2025-12-02">
       <description>
         <ul>
-          <li>Updated Epic Games Launcher installation</li>
-          <li>Fixed Linux native games not running when the default prefix doesn't exist</li>
-          <li>Fixed .ico files not showing on the new FilePicker</li>
+          <li>Added Italian translation</li>
+          <li>The HDR option now is only available when the Wayland driver is enabled</li>
+          <li>Added an option to load banner from URL</li>
+          <li>Added playtime tracking</li>
         </ul>
       </description>
     </release>
