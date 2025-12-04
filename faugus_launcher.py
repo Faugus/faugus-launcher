@@ -2176,6 +2176,17 @@ class Main(Gtk.Window):
             lossless_hdr = add_game_dialog.lossless_hdr
             playtime = 0
 
+            if add_game_dialog.combobox_launcher.get_active() == 2:
+                path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
+            if add_game_dialog.combobox_launcher.get_active() == 3:
+                path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
+            if add_game_dialog.combobox_launcher.get_active() == 4:
+                path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
+            if add_game_dialog.combobox_launcher.get_active() == 5:
+                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+            if add_game_dialog.combobox_launcher.get_active() == 6:
+                path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+
             title_formatted = format_title(title)
 
             addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
