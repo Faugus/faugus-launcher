@@ -333,9 +333,6 @@ class FaugusRun:
                     self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
             else:
                 self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
-        if "gamemoderun" in self.message:
-            self.set_ld_preload()
-            self.message = f'LD_PRELOAD={self.ld_preload} {self.message}'
 
         if not "winetricks-gui" in self.message:
             for part in self.message.split():
