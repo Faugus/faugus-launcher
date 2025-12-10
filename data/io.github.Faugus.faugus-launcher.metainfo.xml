@@ -87,11 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.11.2-1" date="2025-12-08">
+    <release version="1.11.3-1" date="2025-12-10">
       <description>
         <ul>
-          <li>Fixed Steam Overlay not working when GameMode is enabled</li>
-          <li>Fixed launchers not being installed when changing the prefix location</li>
+          <li>Fixed playtime being reset when editing an entry</li>
         </ul>
       </description>
     </release>
