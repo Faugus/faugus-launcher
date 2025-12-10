@@ -836,8 +836,8 @@ class Main(Gtk.Window):
 
                 for item in data:
                     if isinstance(item, dict) and item.get("gameid") == game.gameid:
-                        playtime = item.get("playtime", 0)
-                        formatted = self.format_playtime(playtime)
+                        game.playtime = item.get("playtime", 0)
+                        formatted = self.format_playtime(game.playtime)
                         if not formatted:
                             self.menu_item_playtime.hide()
                         else:
