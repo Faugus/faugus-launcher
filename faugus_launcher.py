@@ -7155,13 +7155,19 @@ def apply_dark_theme():
 def update_games_file():
     if not os.path.exists(games_json):
         return
-    with open(games_json, "r", encoding="utf-8") as f:
-        games = json.load(f)
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except json.JSONDecodeError:
+        games = []
+
     for game in games:
         if not game.get("gameid"):
             game["gameid"] = format_title(game["title"])
         if game.get("playtime", "") == "":
             game["playtime"] = 0
+
     with open(games_json, "w", encoding="utf-8") as f:
         json.dump(games, f, indent=4, ensure_ascii=False)
 
