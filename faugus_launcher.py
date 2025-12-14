@@ -3299,7 +3299,7 @@ class Settings(Gtk.Dialog):
         self.box.set_vexpand(True)
         self.box.set_hexpand(True)
 
-        url = f"https://github.com/Faugus/faugus-launcher/releases/tag/{VERSION}"
+        url = f"https://github.com/Faugus/faugus-launcher/releases"
         label_version = Gtk.Label()
         label_version.set_markup(f'<span underline="none"><a href="{url}"> {VERSION} </a></span>')
         label_version.set_use_markup(True)
