@@ -3150,7 +3150,7 @@ class Settings(Gtk.Dialog):
         self.label_miscellaneous.set_halign(Gtk.Align.START)
         self.label_miscellaneous.set_margin_start(10)
         self.label_miscellaneous.set_margin_end(10)
-        self.label_miscellaneous.set_margin_top(10)
+        #self.label_miscellaneous.set_margin_top(10)
 
         # Create checkbox for 'Use discrete GPU' option
         self.checkbox_discrete_gpu = Gtk.CheckButton(label=_("Use discrete GPU"))
@@ -3331,7 +3331,7 @@ class Settings(Gtk.Dialog):
         grid_prefix.set_column_spacing(10)
         grid_prefix.set_margin_start(10)
         grid_prefix.set_margin_end(10)
-        grid_prefix.set_margin_top(10)
+        #grid_prefix.set_margin_top(10)
         grid_prefix.set_margin_bottom(10)
 
         grid_runner = Gtk.Grid()
@@ -3379,7 +3379,7 @@ class Settings(Gtk.Dialog):
         grid_envar.set_column_spacing(10)
         grid_envar.set_margin_start(10)
         grid_envar.set_margin_end(10)
-        grid_envar.set_margin_top(10)
+        #grid_envar.set_margin_top(10)
         grid_envar.set_margin_bottom(10)
 
         grid_interface_mode = Gtk.Grid()
