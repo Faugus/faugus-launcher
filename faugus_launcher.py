@@ -69,6 +69,7 @@ class PathManager:
                 return path
         return icon_paths[-1]  # Fallback
 
+VERSION = "1.11.4"
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
@@ -3298,10 +3299,16 @@ class Settings(Gtk.Dialog):
         self.box.set_vexpand(True)
         self.box.set_hexpand(True)
 
+        url = f"https://github.com/Faugus/faugus-launcher/releases/tag/{VERSION}"
+        label_version = Gtk.Label()
+        label_version.set_markup(f'<span underline="none"><a href="{url}"> {VERSION} </a></span>')
+        label_version.set_use_markup(True)
+
         frame = Gtk.Frame()
+        frame.set_label_widget(label_version)
+        frame.set_label_align(0.99, 0.5)
         frame.set_margin_start(10)
         frame.set_margin_end(10)
-        frame.set_margin_top(10)
         frame.set_margin_bottom(10)
 
         box_main = Gtk.Grid()
