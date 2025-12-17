@@ -270,6 +270,7 @@ class ConfigManager:
             'enable-wow64': 'False',
             'language': lang,
             'logging-warning': 'False',
+            'show-hidden': 'False',
         }
 
         self.config = {}
@@ -386,6 +387,10 @@ class Main(Gtk.Window):
         menu_item_duplicate = Gtk.MenuItem(label=_("Duplicate"))
         menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
         self.context_menu.append(menu_item_duplicate)
+
+        self.menu_item_hide = Gtk.MenuItem(label=_("Hide"))
+        self.menu_item_hide.connect("activate", self.on_context_menu_hide)
+        self.context_menu.append(self.menu_item_hide)
 
         self.menu_item_prefix = Gtk.MenuItem(label=_("Open prefix location"))
         self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
@@ -867,6 +872,11 @@ class Main(Gtk.Window):
                 else:
                     self.menu_show_logs.set_visible(False)
 
+                if game.hidden:
+                    self.menu_item_hide.get_child().set_text(_("Remove from hidden"))
+                else:
+                    self.menu_item_hide.get_child().set_text(_("Hide"))
+
                 processos = self.load_processes_from_file()
                 if title in processos:
                     self.menu_item_play.get_child().set_text(_("Stop"))
@@ -929,6 +939,34 @@ class Main(Gtk.Window):
     def on_context_menu_duplicate(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
         self.on_duplicate_clicked(selected_item)
+
+    def on_context_menu_hide(self, menu_item):
+        selected = self.flowbox.get_selected_children()
+        if not selected:
+            return
+
+        title = selected[0].get_child().get_children()[1].get_text()
+        game = next((g for g in self.games if g.title == title), None)
+        if not game:
+            return
+
+        try:
+            with open(games_json, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            for item in data:
+                if item.get("gameid") == game.gameid:
+                    item["hidden"] = not item.get("hidden", False)
+                    game.hidden = item["hidden"]
+                    break
+
+            with open(games_json, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+        except Exception as e:
+            return
+
+        self.update_list()
 
     def on_context_menu_prefix(self, menu_item):
         subprocess.run(["xdg-open", self.current_prefix], check=True)
@@ -1097,6 +1135,7 @@ class Main(Gtk.Window):
                         "lossless_performance": game.lossless_performance,
                         "lossless_hdr": game.lossless_hdr,
                         "playtime": game.playtime,
+                        "hidden": game.hidden,
                     }
 
                     games = []
@@ -1170,6 +1209,48 @@ class Main(Gtk.Window):
 
     def on_key_press_event(self, widget, event):
         selected_children = self.flowbox.get_selected_children()
+
+        if event.keyval == Gdk.KEY_h and event.state & Gdk.ModifierType.CONTROL_MASK:
+            try:
+                with open(config_file_dir, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+
+                new_lines = []
+                found = False
+
+                for line in lines:
+                    stripped = line.strip()
+
+                    if stripped.lower().startswith("show-hidden"):
+                        sep_index = line.find("=")
+                        if sep_index != -1:
+                            left = line[:sep_index]
+                            right = line[sep_index + 1:].strip()
+
+                            if right.lower() == "true":
+                                new_value = "False"
+                            else:
+                                new_value = "True"
+
+                            new_lines.append(f"{left}={new_value}\n")
+                            found = True
+                        else:
+                            new_lines.append(line)
+                    else:
+                        new_lines.append(line)
+
+                if not found:
+                    new_lines.append("show-hidden=True\n")
+
+                with open(config_file_dir, "w", encoding="utf-8") as f:
+                    f.writelines(new_lines)
+
+                self.load_config()
+                self.update_list()
+                return True
+
+            except Exception as e:
+                return False
 
         if not selected_children:
             return
@@ -1295,6 +1376,7 @@ class Main(Gtk.Window):
         self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
+        self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
 
     def create_tray_menu(self):
         # Create the tray menu
@@ -1402,9 +1484,36 @@ class Main(Gtk.Window):
                     lossless_performance = game_data.get("lossless_performance", "")
                     lossless_hdr = game_data.get("lossless_hdr", "")
                     playtime = game_data.get("playtime", 0)
+                    hidden = game_data.get("hidden", False)
 
-                    game = Game(gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                                protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime)
+                    if not self.show_hidden:
+                        if hidden:
+                            continue
+
+                    game = Game(
+                        gameid,
+                        title,
+                        path,
+                        prefix,
+                        launch_arguments,
+                        game_arguments,
+                        mangohud,
+                        gamemode,
+                        disable_hidraw,
+                        protonfix,
+                        runner,
+                        addapp_checkbox,
+                        addapp,
+                        addapp_bat,
+                        banner,
+                        lossless_enabled,
+                        lossless_multiplier,
+                        lossless_flow,
+                        lossless_performance,
+                        lossless_hdr,
+                        playtime,
+                        hidden,
+                    )
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -1412,6 +1521,7 @@ class Main(Gtk.Window):
                 self.flowbox.foreach(Gtk.Widget.destroy)
                 for game in self.filtered_games:
                     self.add_item_list(game)
+
         except FileNotFoundError:
             pass
         except json.JSONDecodeError as e:
@@ -1625,6 +1735,10 @@ class Main(Gtk.Window):
                     self.destroy()
 
                 settings_dialog.update_envar_file()
+
+                if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
+                    self.load_config()
+                    self.update_list()
 
             self.load_config()
             settings_dialog.destroy()
@@ -2176,6 +2290,7 @@ class Main(Gtk.Window):
             lossless_performance = add_game_dialog.lossless_performance
             lossless_hdr = add_game_dialog.lossless_hdr
             playtime = 0
+            hidden = False
 
             if add_game_dialog.combobox_launcher.get_active() == 2:
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
@@ -2220,8 +2335,30 @@ class Main(Gtk.Window):
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
             # Create Game object and update UI
-            game = Game(title_formatted, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw,
-                        protonfix, runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime)
+            game = Game(
+                title_formatted,
+                title,
+                path,
+                prefix,
+                launch_arguments,
+                game_arguments,
+                mangohud,
+                gamemode,
+                disable_hidraw,
+                protonfix,
+                runner,
+                addapp_checkbox,
+                addapp,
+                addapp_bat,
+                banner,
+                lossless_enabled,
+                lossless_multiplier,
+                lossless_flow,
+                lossless_performance,
+                lossless_hdr,
+                playtime,
+                hidden,
+            )
 
             # Determine the state of the shortcut checkbox
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -2285,6 +2422,7 @@ class Main(Gtk.Window):
                 "lossless_performance": lossless_performance,
                 "lossless_hdr": lossless_hdr,
                 "playtime": playtime,
+                "hidden": hidden,
             }
 
             games = []
@@ -2941,6 +3079,7 @@ class Main(Gtk.Window):
                 "lossless_performance": game.lossless_performance,
                 "lossless_hdr": game.lossless_hdr,
                 "playtime": game.playtime,
+                "hidden": game.hidden,
             }
             games_data.append(game_info)
 
@@ -3181,6 +3320,10 @@ class Settings(Gtk.Dialog):
         # Create checkbox for 'Enable logging' option
         self.checkbox_enable_logging = Gtk.CheckButton(label=_("Enable logging"))
         self.checkbox_enable_logging.set_active(False)
+
+        self.checkbox_show_hidden = Gtk.CheckButton(label=_("Show hidden games"))
+        self.checkbox_show_hidden.set_active(False)
+        self.checkbox_show_hidden.set_tooltip_text(_("Press Ctrl+H to show/hide games."))
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Use Wayland driver (experimental)"))
         self.checkbox_wayland_driver.set_active(False)
@@ -3455,9 +3598,10 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
         grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 6, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3718,6 +3862,7 @@ class Settings(Gtk.Dialog):
         checkbox_mono_icon = self.checkbox_mono_icon.get_active()
         checkbox_close_after_launcher = self.checkbox_close_after_launch.get_active()
         checkbox_enable_logging = self.checkbox_enable_logging.get_active()
+        checkbox_show_hidden = self.checkbox_show_hidden.get_active()
         checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
         checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
         checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
@@ -3754,7 +3899,8 @@ class Settings(Gtk.Dialog):
             checkbox_enable_hdr,
             checkbox_enable_wow64,
             language,
-            logging_warning
+            logging_warning,
+            checkbox_show_hidden
         )
 
         self.set_sensitive(False)
@@ -4284,6 +4430,7 @@ class Settings(Gtk.Dialog):
         show_labels = cfg.config.get('show-labels', 'False') == 'True'
         smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
+        show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
@@ -4328,6 +4475,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_show_labels.set_active(show_labels)
         self.checkbox_smaller_banners.set_active(smaller_banners)
         self.checkbox_enable_logging.set_active(enable_logging)
+        self.checkbox_show_hidden.set_active(show_hidden)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_hdr.set_active(enable_hdr)
         self.checkbox_enable_wow64.set_active(enable_wow64)
@@ -4372,8 +4520,31 @@ class Settings(Gtk.Dialog):
         self.liststore.append([""])
 
 class Game:
-    def __init__(self, gameid, title, path, prefix, launch_arguments, game_arguments, mangohud, gamemode, disable_hidraw, protonfix,
-                 runner, addapp_checkbox, addapp, addapp_bat, banner, lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, playtime):
+    def __init__(
+        self,
+        gameid,
+        title,
+        path,
+        prefix,
+        launch_arguments,
+        game_arguments,
+        mangohud,
+        gamemode,
+        disable_hidraw,
+        protonfix,
+        runner,
+        addapp_checkbox,
+        addapp,
+        addapp_bat,
+        banner,
+        lossless_enabled,
+        lossless_multiplier,
+        lossless_flow,
+        lossless_performance,
+        lossless_hdr,
+        playtime,
+        hidden,
+    ):
         self.gameid = gameid
         self.title = title
         self.path = path
@@ -4395,6 +4566,7 @@ class Game:
         self.lossless_performance = lossless_performance
         self.lossless_hdr = lossless_hdr
         self.playtime = playtime
+        self.hidden = hidden
 
 
 class DuplicateDialog(Gtk.Dialog):
