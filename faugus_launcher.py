@@ -3441,12 +3441,19 @@ class Settings(Gtk.Dialog):
         self.box.set_valign(Gtk.Align.CENTER)
         self.box.set_vexpand(True)
         self.box.set_hexpand(True)
-
+        
+        tags = requests.get("https://api.github.com/repos/Faugus/faugus-launcher/tags").json()
+        latest = next(
+            t["name"] for t in tags
+            if re.fullmatch(r"\d+\.\d+\.\d+", t["name"])
+        )
         url = f"https://github.com/Faugus/faugus-launcher/releases"
         label_version = Gtk.Label()
-        label_version.set_markup(f'<span underline="none"><a href="{url}"> {VERSION} </a></span>')
         label_version.set_use_markup(True)
-
+        if VERSION != latest:
+            label_version.set_markup(f'<span><a href="{url}">{latest}</a></span>')
+        else:
+            label_version.set_markup(f'<span>{VERSION}</span>')
         frame = Gtk.Frame()
         frame.set_label_widget(label_version)
         frame.set_label_align(0.99, 0.5)
