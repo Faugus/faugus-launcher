@@ -2114,7 +2114,7 @@ class Main(Gtk.Window):
 
         if game := next((j for j in self.games if j.title == title), None):
             # Display confirmation dialog
-            confirmation_dialog = ConfirmationDialog(self, title, game.prefix)
+            confirmation_dialog = ConfirmationDialog(self, title, game.prefix, game.runner)
             response = confirmation_dialog.run()
 
             if response == Gtk.ResponseType.YES:
@@ -4678,7 +4678,7 @@ class DuplicateDialog(Gtk.Dialog):
 
 
 class ConfirmationDialog(Gtk.Dialog):
-    def __init__(self, parent, title, prefix):
+    def __init__(self, parent, title, prefix, runner):
         super().__init__(title=_("Delete %s") % title, transient_for=parent, modal=True)
         self.set_resizable(False)
         self.set_icon_from_file(faugus_png)
@@ -4718,7 +4718,7 @@ class ConfirmationDialog(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
-        if os.path.basename(prefix) != "default":
+        if os.path.basename(prefix) != "default" and runner != "Linux-Native":
             box_top.pack_start(self.checkbox, True, True, 0)
 
         box_bottom.pack_start(button_no, True, True, 0)
