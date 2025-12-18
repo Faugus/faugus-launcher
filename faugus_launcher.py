@@ -3055,36 +3055,53 @@ class Main(Gtk.Window):
                 self.grid_left.set_margin_start(0)
 
     def save_games(self):
-        games_data = []
-        for game in self.games:
-            game_info = {
-                "gameid": game.gameid,
-                "title": game.title,
-                "path": game.path,
-                "prefix": game.prefix,
-                "launch_arguments": game.launch_arguments,
-                "game_arguments": game.game_arguments,
-                "mangohud": "MANGOHUD=1" if game.mangohud else "",
-                "gamemode": "gamemoderun" if game.gamemode else "",
-                "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "",
-                "protonfix": game.protonfix,
-                "runner": game.runner,
-                "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                "addapp": game.addapp,
-                "addapp_bat": game.addapp_bat,
-                "banner": game.banner,
-                "lossless_enabled": game.lossless_enabled,
-                "lossless_multiplier": game.lossless_multiplier,
-                "lossless_flow": game.lossless_flow,
-                "lossless_performance": game.lossless_performance,
-                "lossless_hdr": game.lossless_hdr,
-                "playtime": game.playtime,
-                "hidden": game.hidden,
-            }
-            games_data.append(game_info)
+        try:
+            with open("games.json", "r", encoding="utf-8") as file:
+                all_games_data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            all_games_data = []
+
+        visible_games_map = {game.gameid: game for game in self.games}
+        new_games_data = []
+
+        for game_data in all_games_data:
+            gameid = game_data.get("gameid")
+            hidden = game_data.get("hidden", False)
+
+            if not hidden and gameid not in visible_games_map:
+                continue
+
+            if gameid in visible_games_map:
+                game = visible_games_map.pop(gameid)
+                game_data = {
+                    "gameid": game.gameid,
+                    "title": game.title,
+                    "path": game.path,
+                    "prefix": game.prefix,
+                    "launch_arguments": game.launch_arguments,
+                    "game_arguments": game.game_arguments,
+                    "mangohud": "MANGOHUD=1" if game.mangohud else "",
+                    "gamemode": "gamemoderun" if game.gamemode else "",
+                    "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "",
+                    "protonfix": game.protonfix,
+                    "runner": game.runner,
+                    "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
+                    "addapp": game.addapp,
+                    "addapp_bat": game.addapp_bat,
+                    "banner": game.banner,
+                    "lossless_enabled": game.lossless_enabled,
+                    "lossless_multiplier": game.lossless_multiplier,
+                    "lossless_flow": game.lossless_flow,
+                    "lossless_performance": game.lossless_performance,
+                    "lossless_hdr": game.lossless_hdr,
+                    "playtime": game.playtime,
+                    "hidden": hidden,
+                }
+
+            new_games_data.append(game_data)
 
         with open("games.json", "w", encoding="utf-8") as file:
-            json.dump(games_data, file, ensure_ascii=False, indent=4)
+            json.dump(new_games_data, file, ensure_ascii=False, indent=4)
 
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
