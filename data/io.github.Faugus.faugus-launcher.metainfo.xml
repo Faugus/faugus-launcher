@@ -87,11 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.11.5-1" date="2025-12-17">
+    <release version="1.11.6-1" date="2025-12-18">
       <description>
         <ul>
-          <li>Added the app version with a link to the GitHub releases page</li>
-          <li>Added the ability to hide games</li>
+          <li>Hotfix: hidden games were being deleted when removing another game</li>
+          <li>Removed the prefix deletion option when removing a Linux native game</li>
         </ul>
       </description>
     </release>
