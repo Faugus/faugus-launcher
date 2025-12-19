@@ -392,6 +392,10 @@ class Main(Gtk.Window):
         self.menu_item_hide.connect("activate", self.on_context_menu_hide)
         self.context_menu.append(self.menu_item_hide)
 
+        self.menu_item_game = Gtk.MenuItem(label=_("Open game location"))
+        self.menu_item_game.connect("activate", self.on_context_menu_game)
+        self.context_menu.append(self.menu_item_game)
+
         self.menu_item_prefix = Gtk.MenuItem(label=_("Open prefix location"))
         self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
         self.context_menu.append(self.menu_item_prefix)
@@ -883,6 +887,13 @@ class Main(Gtk.Window):
                 else:
                     self.menu_item_play.get_child().set_text(_("Play"))
 
+                if os.path.dirname(game.path):
+                    self.menu_item_game.set_sensitive(True)
+                    self.current_game = os.path.dirname(game.path)
+                else:
+                    self.menu_item_game.set_sensitive(False)
+                    self.current_game = None
+
                 if os.path.isdir(game.prefix):
                     self.menu_item_prefix.set_sensitive(True)
                     self.current_prefix = game.prefix
@@ -967,6 +978,9 @@ class Main(Gtk.Window):
             return
 
         self.update_list()
+
+    def on_context_menu_game(self, menu_item):
+        subprocess.run(["xdg-open", self.current_game], check=True)
 
     def on_context_menu_prefix(self, menu_item):
         subprocess.run(["xdg-open", self.current_prefix], check=True)
