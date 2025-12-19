@@ -2149,7 +2149,7 @@ class Main(Gtk.Window):
                 self.remove_steam_shortcut(title)
                 self.remove_banner_icon(game)
 
-                self.games.remove(game)
+                self._deleted_gameid = game.gameid
                 self.save_games()
                 self.update_list()
 
@@ -3062,12 +3062,15 @@ class Main(Gtk.Window):
             all_games_data = []
 
         visible_games_map = {game.gameid: game for game in self.games}
+        deleted_id = getattr(self, "_deleted_gameid", None)
         new_games_data = []
 
         for game_data in all_games_data:
             gameid = game_data.get("gameid")
             hidden = game_data.get("hidden", False)
 
+            if deleted_id and gameid == deleted_id:
+                continue
             if not hidden and gameid not in visible_games_map:
                 continue
 
@@ -3099,6 +3102,9 @@ class Main(Gtk.Window):
                 }
 
             new_games_data.append(game_data)
+
+        if hasattr(self, "_deleted_gameid"):
+            del self._deleted_gameid
 
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(new_games_data, file, ensure_ascii=False, indent=4)
