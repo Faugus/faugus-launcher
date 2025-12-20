@@ -81,11 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.11.6-1" date="2025-12-18">
+    <release version="1.11.7-1" date="2025-12-19">
       <description>
         <ul>
-          <li>Hotfix: hidden games were being deleted when removing another game</li>
-          <li>Removed the prefix deletion option when removing a Linux native game</li>
+          <li>Fixed hidden games not being deleted</li>
+          <li>Added an option to open the game location</li>
         </ul>
       </description>
     </release>
