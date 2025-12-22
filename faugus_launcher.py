@@ -2281,7 +2281,7 @@ class Main(Gtk.Window):
 
             # Proceed with adding the game
             # Get game information from dialog fields
-            prefix = add_game_dialog.entry_prefix.get_text()
+            prefix = os.path.normpath(add_game_dialog.entry_prefix.get_text())
             if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
                 title = add_game_dialog.entry_title.get_text()
             else:
@@ -2711,7 +2711,7 @@ class Main(Gtk.Window):
             # Update game object with new information
             game.title = edit_game_dialog.entry_title.get_text()
             game.path = edit_game_dialog.entry_path.get_text()
-            game.prefix = edit_game_dialog.entry_prefix.get_text()
+            game.prefix = os.path.normpath(edit_game_dialog.entry_prefix.get_text())
             game.launch_arguments = edit_game_dialog.entry_launch_arguments.get_text()
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
