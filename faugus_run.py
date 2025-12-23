@@ -454,15 +454,6 @@ class FaugusRun:
             self.on_process_exit
         )
 
-    def set_ld_preload(self):
-        lib_paths = [
-            PathManager.find_library('libgamemode.so.0'),
-            PathManager.find_library('libgamemodeauto.so.0')
-        ]
-
-        ld_preload_paths = [path for path in lib_paths if path]
-        self.ld_preload = ":".join(ld_preload_paths)
-
     def load_config(self):
         cfg = ConfigManager()
 
