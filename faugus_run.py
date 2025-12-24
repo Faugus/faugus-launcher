@@ -827,6 +827,8 @@ def build_launch_command(game):
         else:
             command_parts.append(f"WINEPREFIX='{prefix}'")
             command_parts.append(f"PROTONPATH={runner}")
+    else:
+        command_parts.append(f"WINEPREFIX='{prefix}'")
     if gamemode:
         command_parts.append(gamemode)
     if launch_arguments:
