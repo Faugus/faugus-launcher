@@ -2660,20 +2660,20 @@ class Main(Gtk.Window):
                 self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "epic":
                     self.label_download2.set_text("")
                     command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
+                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
 
                 if runner:
                     if runner == "Proton-CachyOS":
@@ -5744,7 +5744,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
-            self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1")
+            self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1 PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
@@ -5765,6 +5765,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
@@ -5805,6 +5806,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
@@ -5825,6 +5827,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe")
