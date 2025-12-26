@@ -81,11 +81,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.11.7-1" date="2025-12-19">
+    <release version="1.11.8-1" date="2025-12-26">
       <description>
         <ul>
-          <li>Fixed hidden games not being deleted</li>
-          <li>Added an option to open the game location</li>
+          <li>Disabled the Wayland driver for some launchers</li>
+          <li>Fixed UMU-Proton Latest not being used properly</li>
+          <li>Now the app prints the version on the terminal for easier debugging</li>
+          <li>Fixed broken prefix when using / at the end</li>
+          <li>Updated Dutch translation</li>
         </ul>
       </description>
     </release>

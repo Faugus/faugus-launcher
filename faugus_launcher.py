@@ -69,7 +69,7 @@ class PathManager:
                 return path
         return icon_paths[-1]  # Fallback
 
-VERSION = "1.11.7"
+VERSION = "1.11.8"
 print(f"Faugus Launcher {VERSION}")
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
