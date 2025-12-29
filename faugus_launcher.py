@@ -1262,6 +1262,7 @@ class Main(Gtk.Window):
 
                 self.load_config()
                 self.update_list()
+                self.button_play.set_sensitive(False)
                 return True
 
             except Exception as e:
@@ -1754,6 +1755,7 @@ class Main(Gtk.Window):
                 if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
                     self.load_config()
                     self.update_list()
+                    self.button_play.set_sensitive(False)
 
             self.load_config()
             settings_dialog.destroy()
