@@ -72,6 +72,7 @@ class PathManager:
 VERSION = "1.11.8"
 print(f"Faugus Launcher {VERSION}")
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+IS_SNAP = 'SNAP' in os.environ
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
@@ -1801,6 +1802,17 @@ class Main(Gtk.Window):
                             "Name=Faugus Launcher\n"
                             "Type=Application\n"
                         )
+                    if IS_SNAP:
+                        f.write(
+                            "[Desktop Entry]\n"
+                            "Categories=Utility;\n"
+                            "Exec=faugus-launcher --hide\n"
+                            "Icon=/snap/faugus-launcher/current/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png\n"
+                            "MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit\n"
+                            "Name=Faugus Launcher\n"
+                            "Type=Application\n"
+                            "StartupWMClass=faugus-launcher\n"
+                        )
                     else:
                         f.write(
                             "[Desktop Entry]\n"
@@ -2830,6 +2842,17 @@ class Main(Gtk.Window):
                 f'Type=Application\n'
                 f'Categories=Game;\n'
                 f'Path={game_directory}\n'
+            )
+        elif IS_SNAP:
+            desktop_file_content = (
+                f'[Desktop Entry]\n'
+                f'Name={game.title}\n'
+                f'Exec=faugus-launcher.run --game {game.gameid}\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
+                f'StartupWMClass=faugus-launcher\n'
             )
         else:
             desktop_file_content = (
@@ -7078,6 +7101,17 @@ class CreateShortcut(Gtk.Window):
                 f'Type=Application\n'
                 f'Categories=Game;\n'
                 f'Path={game_directory}\n'
+            )
+        elif IS_SNAP:
+            desktop_file_content = (
+                f'[Desktop Entry]\n'
+                f'Name={title}\n'
+                f'Exec=faugus-launcher.run "{command}"\n'
+                f'Icon={new_icon_path}\n'
+                f'Type=Application\n'
+                f'Categories=Game;\n'
+                f'Path={game_directory}\n'
+                f'StartupWMClass=faugus-launcher\n'
             )
         else:
             desktop_file_content = (

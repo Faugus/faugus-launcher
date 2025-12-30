@@ -69,10 +69,14 @@ class PathManager:
                 return str(path)
         return None
 
+IS_SNAP = 'SNAP' in os.environ
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+elif IS_SNAP:
+    share_dir = PathManager.user_data()
+    faugus_png = PathManager.get_icon('faugus-launcher.png')
 else:
     share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.png')

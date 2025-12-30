@@ -1,0 +1,31 @@
+#!/bin/bash
+
+export XDG_CONFIG_HOME="$SNAP_USER_COMMON/.config"
+
+export XDG_DATA_HOME="$SNAP_USER_COMMON/.local/share"
+
+export XDG_CACHE_HOME="$SNAP_USER_COMMON/.cache"
+
+unset PYTHONPATH
+
+export PYTHONPATH="$SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.12/site-packages:$SNAP/gnome-platform/usr/lib/python3/dist-packages"
+
+# Create a Desktop link in $SNAP_USER_COMMON that opens the user's actual desktop folder.
+DESKTOP_PATH=$(grep "XDG_DESKTOP_DIR" $SNAP_REAL_HOME/.config/user-dirs.dirs | cut -d'=' -f2 | sed 's/"//g' | sed "s#\$HOME#$SNAP_REAL_HOME#g")
+rm -r $SNAP_USER_COMMON/Desktop
+ln -sf "$DESKTOP_PATH" "$SNAP_USER_COMMON/Desktop"
+
+# Creates an applications shortcut in $SNAP_USER_COMMON/.local/share that opens the $SNAP_REAL_HOME/.local/share/applications folder.
+rm -r $SNAP_USER_COMMON/.local/share/applications
+ln -sf $SNAP_REAL_HOME/.local/share/applications/ $SNAP_USER_COMMON/.local/share/applications
+
+# Creates an autostart shortcut in $SNAP_USER_COMMON/.config/autostart that opens the $SNAP_REAL_HOME/.config/autostart folder.
+rm -r $SNAP_USER_COMMON/.config/autostart
+ln -sf $SNAP_REAL_HOME/.config/autostart/ $SNAP_USER_COMMON/.config/autostart
+
+# Changes the location of the Faugus folder to be inside a folder visible to the user.
+mkdir -p $SNAP_REAL_HOME/AppsFiles/Faugus
+rm -r $SNAP_USER_COMMON/Faugus
+ln -sf $SNAP_REAL_HOME/AppsFiles/Faugus/ $SNAP_USER_COMMON/Faugus
+
+exec "$@"

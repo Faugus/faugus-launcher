@@ -1,0 +1,171 @@
+name: faugus-launcher
+base: core24
+version: 1.11.8
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+summary: A simple and lightweight app for running games using UMU-Launcher
+description: |
+ A simple and lightweight app for running games using UMU-Launcher
+grade: stable
+confinement: strict
+compression: lzo
+
+apps:
+  faugus-launcher:
+    command-chain: [snap/command-chain/desktop-launch-faugus-launcher]
+    command: usr/bin/faugus-launcher
+    desktop: usr/share/applications/faugus-launcher.desktop
+    common-id: io.github.Faugus.faugus-launcher
+    environment:
+      HOME: $SNAP_USER_COMMON
+      PATH: $SNAP/usr/games:$PATH
+    extensions: [gnome]
+    plugs: &pluglist
+      - audio-playback
+      - unity7
+      - network
+      - network-bind
+      - screen-inhibit-control
+      - home
+      - removable-media
+      - mount-observe
+      - joystick
+      - bluez
+      - udisks2
+      - steam-support
+  proton-manager:
+    command-chain: [snap/command-chain/desktop-launch-faugus-launcher]
+    command: usr/bin/faugus-proton-manager
+    desktop: usr/share/applications/faugus-launcher.proton-manager.desktop
+    environment:
+      HOME: $SNAP_USER_COMMON
+      PATH: $SNAP/usr/games:$PATH
+    extensions: [gnome]
+    plugs: *pluglist
+  run:
+    command-chain: [snap/command-chain/desktop-launch-faugus-launcher]
+    command: usr/bin/faugus-run
+    desktop: usr/share/applications/faugus-launcher.run.desktop
+    environment:
+      HOME: $SNAP_USER_COMMON
+      PATH: $SNAP/usr/games:$PATH
+    extensions: [gnome]
+    plugs: *pluglist
+  shortcut:
+    command-chain: [snap/command-chain/desktop-launch-faugus-launcher]
+    command: usr/bin/faugus-launcher
+    desktop: usr/share/applications/faugus-launcher.shortcut.desktop
+    environment:
+      HOME: $SNAP_USER_COMMON
+      PATH: $SNAP/usr/games:$PATH
+    extensions: [gnome]
+    plugs: *pluglist
+
+plugs:
+  shared-memory:
+    private: true
+
+layout:
+  /usr/lib/x86_64-linux-gnu/mangohud:
+    symlink: $SNAP/usr/lib/x86_64-linux-gnu/mangohud
+
+parts:
+  faugus-launcher-app:
+    plugin: meson
+    source: ./faugus-launcher
+#    source-tag: $SNAPCRAFT_PROJECT_VERSION
+    meson-parameters:
+      - --prefix=/usr
+      - -Dsnap_build=true
+    override-build: |
+      craftctl default
+      sed -i 's|Name=Faugus Launcher|Name=Faugus Launcher [Snap]|' $CRAFT_PART_INSTALL/usr/share/applications/faugus-launcher.desktop
+      sed -i 's|Icon=faugus-launcher|Icon=${SNAP}/usr/share/icons/hicolor/256x256/apps/faugus-launcher.png|' $CRAFT_PART_INSTALL/usr/share/applications/faugus-launcher*.desktop
+      for desktop in $CRAFT_PART_INSTALL/usr/share/applications/faugus-launcher*.desktop; do
+          echo "StartupWMClass=faugus-launcher" >> "$desktop"
+      done
+
+  base-dependencies:
+    after: [faugus-launcher-app]
+    plugin: nil
+    stage-packages: [python3-psutil, python3-vdf, python3-pil, python3-filelock, python3-requests, python3-icoextract, gnome-session-canberra]
+
+  imagemagick:
+    plugin: autotools
+    source: https://github.com/ImageMagick/ImageMagick.git
+    source-tag: 7.1.2-12
+    autotools-configure-parameters:
+      - --prefix=/usr/
+      - --enable-shared
+      - --disable-static
+      - --disable-docs
+
+  icoextract:
+    plugin: python
+    source: .
+    python-packages:
+      - icoextract
+
+  gamemode:
+    plugin: nil
+    stage-packages: [gamemode, gamemode-daemon, libgamemode0, libgamemodeauto0]
+    prime:
+      - etc/security/limits.d/10-gamemode.conf
+      - usr/bin/gamemoded
+      - usr/games/gamemodelist
+      - usr/games/gamemoderun
+      - usr/games/gamemode-simulate-game
+      - usr/lib/*/libgamemode.so*
+      - usr/lib/*/libgamemodeauto.so*
+      - usr/lib/*/libinih.so*
+      - usr/lib/systemd/user/gamemoded.service
+      - usr/lib/sysusers.d/gamemode.conf
+      - usr/libexec/cpucorectl
+      - usr/libexec/cpugovctl
+      - usr/libexec/gpuclockctl
+      - usr/libexec/procsysctl
+      - usr/share/dbus-1/services/com.feralinteractive.GameMode.service
+      - usr/share/gamemode/gamemode.ini
+      - usr/share/lintian/overrides/libgamemode0
+      - usr/share/metainfo/io.github.feralinteractive.gamemode.metainfo.xml
+      - usr/share/polkit-1/actions/com.feralinteractive.GameMode.policy
+      - usr/share/polkit-1/rules.d/gamemode.rules
+
+  mangohud:
+    plugin: nil
+    stage-packages: [mangohud, libspdlog1.12, libfmt9]
+    prime:
+      - usr/bin/mangohud
+      - usr/lib/x86_64-linux-gnu/mangohud/libMangoHud.so*
+      - usr/lib/x86_64-linux-gnu/mangohud/libMangoHud_opengl.so*
+      - usr/lib/x86_64-linux-gnu/mangohud/libMangoHud_shim.so*
+      - usr/lib/x86_64-linux-gnu/libspdlog.so*
+      - usr/lib/x86_64-linux-gnu/libfmt.so*
+      - usr/share/metainfo/io.github.flightlessmango.mangohud.metainfo.xml
+      - usr/share/vulkan/implicit_layer.d/MangoHud.x86_64.json
+
+  command-chain:
+    plugin: dump
+    source: $CRAFT_PROJECT_DIR/snap/command-chain/
+    organize:
+      desktop-launch-faugus-launcher: snap/command-chain/desktop-launch-faugus-launcher
+
+  cleanup:
+    after: [faugus-launcher-app, imagemagick, icoextract, base-dependencies, gamemode, mangohud]
+    plugin: nil
+    build-snaps:
+      - mesa-2404
+      - gnome-46-2404
+    override-prime: |
+      set -eux
+      cd /snap/mesa-2404/current/usr/lib
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/lib/{} \;
+      cd /snap/mesa-2404/current/usr/share
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/share/{} \;
+
+      cd /snap/gnome-46-2404/current/usr/lib
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/lib/{} \;
+      cd /snap/gnome-46-2404/current/usr/share
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/share/{} \;

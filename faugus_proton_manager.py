@@ -44,10 +44,14 @@ class PathManager:
                 return path
         return icon_paths[-1]
 
+IS_SNAP = 'SNAP' in os.environ
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
     STEAM_COMPATIBILITY_PATH = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
+elif IS_SNAP:
+    faugus_png = PathManager.get_icon('faugus-launcher.png')
+    STEAM_COMPATIBILITY_PATH = Path(PathManager.user_data("~/AppsFiles/UMU-launcher/Steam/compatibilitytools.d"))
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     STEAM_COMPATIBILITY_PATH = Path(PathManager.user_data("Steam/compatibilitytools.d"))
