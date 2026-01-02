@@ -240,10 +240,11 @@ except FileNotFoundError:
     globals()['_'] = gettext.gettext
 
 def format_title(title):
-    title_formatted = re.sub(r'[^a-zA-Z0-9\s]', '', title)
-    title_formatted = title_formatted.replace(' ', '-')
-    title_formatted = '-'.join(title_formatted.lower().split())
-    return title_formatted
+    title = title.strip().lower()
+    title = re.sub(r"['’]", "", title)
+    title = re.sub(r"[^a-z0-9]+", "-", title)
+    title = title.strip("-")
+    return title
 
 class ConfigManager:
     def __init__(self):

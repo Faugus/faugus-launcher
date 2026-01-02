@@ -14,6 +14,7 @@ import gettext
 import locale
 import json
 import time
+import shlex
 
 class PathManager:
     @staticmethod
@@ -822,13 +823,13 @@ def build_launch_command(game):
         if runner == "Linux-Native":
             command_parts.append('UMU_NO_PROTON=1')
         elif runner == "Proton-CachyOS":
-            command_parts.append(f"WINEPREFIX='{prefix}'")
+            command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
-            command_parts.append(f"WINEPREFIX='{prefix}'")
+            command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={runner}")
     else:
-        command_parts.append(f"WINEPREFIX='{prefix}'")
+        command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     if gamemode:
         command_parts.append(gamemode)
     if launch_arguments:
@@ -847,9 +848,9 @@ def build_launch_command(game):
     command_parts.append(f"'{umu_run}'")
 
     if addapp_checkbox == "addapp_enabled":
-        command_parts.append(f"'{addapp_bat}'")
+        command_parts.append(shlex.quote(addapp_bat))
     else:
-        command_parts.append(f"'{path}'")
+        command_parts.append(shlex.quote(path))
 
     if game_arguments:
         command_parts.append(game_arguments)
