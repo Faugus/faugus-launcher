@@ -1,7 +1,8 @@
 #!/usr/bin/python3
+import sys
+sys.dont_write_bytecode = True
 
 import gi
-import sys
 import gettext
 import shutil
 import subprocess
