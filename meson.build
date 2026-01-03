@@ -13,19 +13,16 @@ gnome = import('gnome')
 subdir('assets')
 subdir('languages')
 subdir('data')
+subdir('faugus')
 
 install_data(
   'faugus_launcher.py',
   'faugus_run.py',
   'faugus_proton_manager.py',
-  'faugus_components.py',
-  'faugus_proton_downloader.py',
   rename: [
     'faugus-launcher',
     'faugus-run',
     'faugus-proton-manager',
-    'faugus-components',
-    'faugus-proton-downloader',
   ],
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),

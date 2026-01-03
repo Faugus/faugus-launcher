@@ -2,47 +2,15 @@
 
 import requests
 import gi
-import os
 import tarfile
 import shutil
 import gettext
-import locale
-from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
+
 from gi.repository import Gtk, Gio, GLib
-
-class PathManager:
-    @staticmethod
-    def system_data(*relative_paths):
-        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
-        for data_dir in xdg_data_dirs:
-            path = Path(data_dir).joinpath(*relative_paths)
-            if path.exists():
-                return str(path)
-        return str(Path(xdg_data_dirs[0]).joinpath(*relative_paths))
-
-    @staticmethod
-    def user_data(*relative_paths):
-        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
-        return str(xdg_data_home.joinpath(*relative_paths))
-
-    @staticmethod
-    def user_config(*relative_paths):
-        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
-        return str(xdg_config_home.joinpath(*relative_paths))
-
-    @staticmethod
-    def get_icon(icon_name):
-        icon_paths = [
-            PathManager.user_data('icons', icon_name),
-            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
-            PathManager.system_data('icons', icon_name)
-        ]
-        for path in icon_paths:
-            if Path(path).exists():
-                return path
-        return icon_paths[-1]
+from faugus.language_config import *
+from faugus.dark_theme import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
@@ -54,33 +22,6 @@ else:
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-
-def get_system_locale():
-    lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
-    if lang:
-        return lang.split('.')[0]
-
-    try:
-        return locale.getdefaultlocale()[0] or 'en_US'
-    except Exception:
-        return 'en_US'
-
-def get_language_from_config():
-    if os.path.exists(config_file_dir):
-        with open(config_file_dir, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith('language='):
-                    return line.split('=', 1)[1].strip()
-    return None
-
-lang = get_language_from_config() or get_system_locale()
-
-LOCALE_DIR = (
-    PathManager.system_data('locale')
-    if os.path.isdir(PathManager.system_data('locale'))
-    else os.path.join(os.path.dirname(__file__), 'locale')
-)
 
 try:
     translation = gettext.translation('faugus-proton-manager', localedir=LOCALE_DIR, languages=[lang])
@@ -443,31 +384,6 @@ class ProtonDownloader(Gtk.Dialog):
                 self.update_button(widget, _("Download"))
             except Exception:
                 pass
-
-def apply_dark_theme():
-    if IS_FLATPAK:
-        if (os.environ.get("XDG_CURRENT_DESKTOP")) == "KDE":
-            Gtk.Settings.get_default().set_property("gtk-theme-name", "Breeze")
-        try:
-            proxy = Gio.DBusProxy.new_sync(
-                Gio.bus_get_sync(Gio.BusType.SESSION, None), 0, None,
-                "org.freedesktop.portal.Desktop",
-                "/org/freedesktop/portal/desktop",
-                "org.freedesktop.portal.Settings", None)
-            is_dark = proxy.call_sync(
-                "Read", GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
-                0, -1, None).unpack()[0] == 1
-        except:
-            is_dark = False
-        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", is_dark)
-    else:
-        desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
-        try:
-            is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
-        except Exception:
-            is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
-        if is_dark_theme:
-            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def main():
     apply_dark_theme()

@@ -1,74 +1,21 @@
 #!/usr/bin/env python3
 
 import gi
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib, GdkPixbuf, Gio
-from threading import Thread
-from pathlib import Path
 import sys
 import subprocess
 import argparse
 import re
-import os
-import gettext
-import locale
 import json
 import time
 import shlex
+import gettext
 
-class PathManager:
-    @staticmethod
-    def system_data(*relative_paths):
-        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
-        for data_dir in xdg_data_dirs:
-            path = Path(data_dir).joinpath(*relative_paths)
-            if path.exists():
-                return str(path)
-        return str(Path(xdg_data_dirs[0]).joinpath(*relative_paths))
+gi.require_version("Gtk", "3.0")
 
-    @staticmethod
-    def user_data(*relative_paths):
-        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
-        return str(xdg_data_home.joinpath(*relative_paths))
-
-    @staticmethod
-    def user_config(*relative_paths):
-        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
-        return str(xdg_config_home.joinpath(*relative_paths))
-
-    @staticmethod
-    def find_binary(binary_name):
-        paths = os.getenv('PATH', '').split(':')
-        for path in paths:
-            binary_path = Path(path) / binary_name
-            if binary_path.exists():
-                return str(binary_path)
-        return f'/usr/bin/{binary_name}'
-
-    @staticmethod
-    def get_icon(icon_name):
-        icon_paths = [
-            PathManager.user_data('icons', icon_name),
-            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
-            PathManager.system_data('icons', icon_name)
-        ]
-        for path in icon_paths:
-            if Path(path).exists():
-                return path
-        return icon_paths[-1]
-
-    @staticmethod
-    def find_library(lib_name):
-        lib_paths = [
-            Path("/usr/lib") / lib_name,
-            Path("/usr/lib32") / lib_name,
-            Path("/usr/lib/x86_64-linux-gnu") / lib_name,
-            Path("/usr/lib64") / lib_name
-        ]
-        for path in lib_paths:
-            if path.exists():
-                return str(path)
-        return None
+from gi.repository import Gtk, GLib, GdkPixbuf, Gio
+from threading import Thread
+from faugus.config_manager import *
+from faugus.dark_theme import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
@@ -94,39 +41,6 @@ proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cach
 
 compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 os.makedirs(compatibility_dir, exist_ok=True)
-
-def get_system_locale():
-    lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
-    if lang:
-        return lang.split('.')[0]
-
-    try:
-        loc = locale.getdefaultlocale()[0]
-        if loc:
-            return loc
-    except Exception:
-        pass
-
-    return 'en_US'
-
-def get_language_from_config():
-    if os.path.exists(config_file_dir):
-        with open(config_file_dir, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith('language='):
-                    return line.split('=', 1)[1].strip()
-    return None
-
-lang = get_language_from_config()
-if not lang:
-    lang = get_system_locale()
-
-LOCALE_DIR = (
-    PathManager.system_data('locale')
-    if os.path.isdir(PathManager.system_data('locale'))
-    else os.path.join(os.path.dirname(__file__), 'locale')
-)
 
 try:
     translation = gettext.translation(
@@ -383,7 +297,7 @@ class FaugusRun:
 
         if "Proton-EM" in self.message:
             self.process = subprocess.Popen(
-                [PathManager.find_binary("bash"), "-c", f"{faugus_proton_downloader}"],
+                [sys.executable, "-m", "faugus.proton_downloader"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 bufsize=8192,
@@ -424,7 +338,7 @@ class FaugusRun:
 
     def execute_final_command(self):
         if "UMU_NO_PROTON" not in self.message:
-            cmd = f"{faugus_components}; {self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+            cmd = f"{sys.executable} -m faugus.components; {self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
         else:
             cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
 
@@ -753,31 +667,6 @@ def handle_command(message, command=None):
 
     process_thread.join()
     sys.exit(0)
-
-def apply_dark_theme():
-    if IS_FLATPAK:
-        if (os.environ.get("XDG_CURRENT_DESKTOP")) == "KDE":
-            Gtk.Settings.get_default().set_property("gtk-theme-name", "Breeze")
-        try:
-            proxy = Gio.DBusProxy.new_sync(
-                Gio.bus_get_sync(Gio.BusType.SESSION, None), 0, None,
-                "org.freedesktop.portal.Desktop",
-                "/org/freedesktop/portal/desktop",
-                "org.freedesktop.portal.Settings", None)
-            is_dark = proxy.call_sync(
-                "Read", GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
-                0, -1, None).unpack()[0] == 1
-        except:
-            is_dark = False
-        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", is_dark)
-    else:
-        desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
-        try:
-            is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
-        except Exception:
-            is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
-        if is_dark_theme:
-            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
