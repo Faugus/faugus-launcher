@@ -2898,6 +2898,8 @@ class Main(Gtk.Window):
     def remove_shortcut(self, game, shortcut):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
         desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
+        if os.path.exists(game.addapp_bat):
+            os.remove(game.addapp_bat)
         if shortcut == "appmenu":
             if os.path.exists(applications_shortcut_path):
                 os.remove(applications_shortcut_path)
