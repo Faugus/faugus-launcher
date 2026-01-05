@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import sys
 sys.dont_write_bytecode = True
 
@@ -753,9 +754,11 @@ class CreateShortcut(Gtk.Window):
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
         if self.entry_addapp.get_text():
-            command_parts.append(f"'{addapp_bat}'")
+            escaped_addapp_bat = addapp_bat.replace("'", "'\\''")
+            command_parts.append(f"'{escaped_addapp_bat}'")
         elif self.file_path:
-            command_parts.append(f"'{self.file_path}'")
+            escaped_file_path = self.file_path.replace("'", "'\\''")
+            command_parts.append(f"'{escaped_file_path}'")
         if game_arguments:
             command_parts.append(f"{game_arguments}")
 
