@@ -2029,6 +2029,7 @@ class Main(Gtk.Window):
 
                 # Remove the game from the latest-games file if it exists
                 self.remove_game_from_latest_games(title)
+                self.button_play.set_sensitive(False)
 
                 if self.flowbox.get_children():
                     self.flowbox.select_child(self.flowbox.get_children()[0])
