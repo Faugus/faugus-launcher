@@ -81,14 +81,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.11.8-1" date="2025-12-26">
+    <release version="1.12.1-1" date="2026-01-05">
       <description>
         <ul>
-          <li>Disabled the Wayland driver for some launchers</li>
-          <li>Fixed UMU-Proton Latest not being used properly</li>
-          <li>Now the app prints the version on the terminal for easier debugging</li>
-          <li>Fixed broken prefix when using / at the end</li>
-          <li>Updated Dutch translation</li>
+          <li>Now it prevents the system from sleeping when a game is running</li>
+          <li>Fixed games not running when having single quotes on the path</li>
+          <li>Now removes the additional application file when deleting a game</li>
+          <li>Small changes for the button play behavior</li>
+          <li>Some code restructuring</li>
         </ul>
       </description>
     </release>
