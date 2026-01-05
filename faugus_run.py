@@ -54,67 +54,6 @@ except FileNotFoundError:
     gettext.install('faugus-run', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
 
-class ConfigManager:
-    def __init__(self):
-        self.default_config = {
-            'close-onlaunch': 'False',
-            'default-prefix': prefixes_dir,
-            'mangohud': 'False',
-            'gamemode': 'False',
-            'disable-hidraw': 'False',
-            'default-runner': 'GE-Proton',
-            'lossless-location': 'False',
-            'discrete-gpu': 'False',
-            'splash-disable': 'False',
-            'system-tray': 'False',
-            'start-boot': 'False',
-            'mono-icon': 'False',
-            'interface-mode': 'List',
-            'start-maximized': 'False',
-            'start-fullscreen': 'False',
-            'show-labels': 'False',
-            'smaller-banners': 'False',
-            'enable-logging': 'False',
-            'wayland-driver': 'False',
-            'enable-hdr': 'False',
-            'enable-wow64': 'False',
-            'language': lang,
-            'logging-warning': 'False',
-        }
-
-        self.config = {}
-        self.load_config()
-
-    def load_config(self):
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        self.config[key] = value
-
-        updated = False
-        for key, default_value in self.default_config.items():
-            if key not in self.config:
-                self.config[key] = default_value
-                updated = True
-
-        if updated or not os.path.isfile(config_file_dir):
-            self.save_config()
-
-    def save_config(self):
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        with open(config_file_dir, 'w') as f:
-            for key, value in self.config.items():
-                if key in ['default-prefix', 'default-runner']:
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
-
 class FaugusRun:
     def __init__(self, message):
         self.message = message
