@@ -281,13 +281,49 @@ class FaugusRun:
         else:
             cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
 
-        self.process = subprocess.Popen(
-            [PathManager.find_binary("bash"), "-c", cmd],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=8192,
-            text=True
-        )
+        if IS_FLATPAK:
+            import dbus
+
+            bus = dbus.SessionBus()
+            portal = bus.get_object(
+                "org.freedesktop.portal.Desktop",
+                "/org/freedesktop/portal/desktop"
+            )
+            iface = dbus.Interface(
+                portal,
+                "org.freedesktop.portal.Inhibit"
+            )
+
+            iface.Inhibit(
+                "",
+                8,
+                {"reason": "Game is running"}
+            )
+
+            self.process = subprocess.Popen(
+                [PathManager.find_binary("bash"), "-c", cmd],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                bufsize=8192,
+                text=True
+            )
+
+        else:
+            self.process = subprocess.Popen(
+                [
+                    "systemd-inhibit",
+                    "--what=sleep",
+                    "--why=Game is running",
+                    "--mode=block",
+                    PathManager.find_binary("bash"),
+                    "-c",
+                    cmd
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                bufsize=8192,
+                text=True
+            )
 
         self.stdout_watch_id = GLib.io_add_watch(
             self.process.stdout,
