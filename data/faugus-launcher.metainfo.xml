@@ -81,14 +81,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.12.1-1" date="2026-01-05">
+    <release version="1.12.2-1" date="2026-01-06">
       <description>
         <ul>
-          <li>Now it prevents the system from sleeping when a game is running</li>
-          <li>Fixed games not running when having single quotes on the path</li>
-          <li>Now removes the additional application file when deleting a game</li>
-          <li>Small changes for the button play behavior</li>
-          <li>Some code restructuring</li>
+          <li>Disabled the sleep prevention for Deck Gaming mode and bubblewrap</li>
         </ul>
       </description>
     </release>
