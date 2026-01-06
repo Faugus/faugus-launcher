@@ -42,6 +42,8 @@ proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cach
 compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 os.makedirs(compatibility_dir, exist_ok=True)
 
+use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
+
 try:
     translation = gettext.translation(
         'faugus-run',
@@ -281,36 +283,40 @@ class FaugusRun:
         else:
             cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
 
+        popen_cmd = None
+
         if IS_FLATPAK:
-            import dbus
+            try:
+                import dbus
 
-            bus = dbus.SessionBus()
-            portal = bus.get_object(
-                "org.freedesktop.portal.Desktop",
-                "/org/freedesktop/portal/desktop"
-            )
-            iface = dbus.Interface(
-                portal,
-                "org.freedesktop.portal.Inhibit"
-            )
+                bus = dbus.SessionBus()
+                portal = bus.get_object(
+                    "org.freedesktop.portal.Desktop",
+                    "/org/freedesktop/portal/desktop"
+                )
+                iface = dbus.Interface(
+                    portal,
+                    "org.freedesktop.portal.Inhibit"
+                )
 
-            iface.Inhibit(
-                "",
-                8,
-                {"reason": "Game is running"}
-            )
+                iface.Inhibit(
+                    "",
+                    8,
+                    {"reason": "Game is running"}
+                )
 
-            self.process = subprocess.Popen(
-                [PathManager.find_binary("bash"), "-c", cmd],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=8192,
-                text=True
-            )
+            except Exception:
+                pass
+
+            popen_cmd = [
+                PathManager.find_binary("bash"),
+                "-c",
+                cmd
+            ]
 
         else:
-            self.process = subprocess.Popen(
-                [
+            if use_inhibit:
+                popen_cmd = [
                     "systemd-inhibit",
                     "--what=sleep",
                     "--why=Game is running",
@@ -318,12 +324,21 @@ class FaugusRun:
                     PathManager.find_binary("bash"),
                     "-c",
                     cmd
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=8192,
-                text=True
-            )
+                ]
+            else:
+                popen_cmd = [
+                    PathManager.find_binary("bash"),
+                    "-c",
+                    cmd
+                ]
+
+        self.process = subprocess.Popen(
+            popen_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=8192,
+            text=True
+        )
 
         self.stdout_watch_id = GLib.io_add_watch(
             self.process.stdout,
