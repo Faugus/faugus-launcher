@@ -27,8 +27,11 @@ CONFIGS = {
 
 
 def get_latest_tag_and_url(api, archive_ext):
-    with urllib.request.urlopen(api) as r:
-        data = json.loads(r.read())
+    try:
+        with urllib.request.urlopen(api, timeout=5) as r:
+            data = json.loads(r.read())
+    except Exception:
+        return None, None
 
     asset = next(
         (a for a in data.get("assets", []) if a["name"].endswith(archive_ext)),
@@ -72,8 +75,11 @@ def install_proton_latest(proton_dir, url, label):
     archive = STEAM_COMPAT_DIR / url.split("/")[-1]
     tmp = STEAM_COMPAT_DIR / "__proton_tmp__"
 
-    print(f"Downloading {label}...", flush=True)
-    urllib.request.urlretrieve(url, archive)
+    try:
+        print(f"Downloading {label}...", flush=True)
+        urllib.request.urlretrieve(url, archive)
+    except Exception:
+        return
 
     print(f"Extracting {label}...", flush=True)
     tmp.mkdir(exist_ok=True)
