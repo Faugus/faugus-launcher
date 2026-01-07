@@ -283,41 +283,37 @@ class FaugusRun:
         else:
             cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
 
+        use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
         popen_cmd = None
+        inhibit_ok = False
 
-        if IS_FLATPAK:
-            try:
-                import dbus
+        try:
+            import dbus
 
-                bus = dbus.SessionBus()
-                portal = bus.get_object(
-                    "org.freedesktop.portal.Desktop",
-                    "/org/freedesktop/portal/desktop"
-                )
-                iface = dbus.Interface(
-                    portal,
-                    "org.freedesktop.portal.Inhibit"
-                )
+            bus = dbus.SessionBus()
+            portal = bus.get_object(
+                "org.freedesktop.portal.Desktop",
+                "/org/freedesktop/portal/desktop"
+            )
+            iface = dbus.Interface(
+                portal, "org.freedesktop.portal.Inhibit"
+            )
 
-                iface.Inhibit(
-                    "",
-                    8,
-                    {"reason": "Game is running"}
-                )
+            iface.Inhibit(
+                "",
+                8,
+                {"reason": "Game is running"}
+            )
+            inhibit_ok = True
+        except Exception:
+            pass
 
-            except Exception:
-                pass
+        if not inhibit_ok and not IS_FLATPAK:
+            systemd_inhibit = PathManager.find_binary("systemd-inhibit")
 
-            popen_cmd = [
-                PathManager.find_binary("bash"),
-                "-c",
-                cmd
-            ]
-
-        else:
-            if use_inhibit:
+            if use_inhibit and systemd_inhibit:
                 popen_cmd = [
-                    "systemd-inhibit",
+                    systemd_inhibit,
                     "--what=sleep",
                     "--why=Game is running",
                     "--mode=block",
@@ -325,12 +321,13 @@ class FaugusRun:
                     "-c",
                     cmd
                 ]
-            else:
-                popen_cmd = [
-                    PathManager.find_binary("bash"),
-                    "-c",
-                    cmd
-                ]
+
+        if popen_cmd is None:
+            popen_cmd = [
+                PathManager.find_binary("bash"),
+                "-c",
+                cmd
+            ]
 
         self.process = subprocess.Popen(
             popen_cmd,
