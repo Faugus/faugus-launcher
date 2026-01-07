@@ -170,6 +170,21 @@ def format_title(title):
     title = title.strip("-")
     return title
 
+def convert_runner(runner):
+    if runner == "Proton-GE Latest":
+        return "GE-Proton Latest (default)"
+
+    if runner == "GE-Proton Latest (default)":
+        return "Proton-GE Latest"
+
+    if runner == "UMU-Proton Latest":
+        return ""
+
+    if runner == "":
+        return "UMU-Proton Latest"
+
+    return runner
+
 class Main(Gtk.Window):
     def __init__(self):
         # Initialize the main window with title and default size
@@ -1854,12 +1869,7 @@ class Main(Gtk.Window):
             index_runner = 0
             game_runner = game.runner
 
-            if game.runner == "GE-Proton":
-                game_runner = "GE-Proton Latest (default)"
-            if game.runner == "":
-                game_runner = "UMU-Proton Latest"
-            if game.runner == "Proton-EM":
-                game_runner = "Proton-EM Latest"
+            game_runner = convert_runner(game.runner)
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active(1)
 
@@ -2194,12 +2204,7 @@ class Main(Gtk.Window):
             else:
                 banner = ""
 
-            if runner == "UMU-Proton Latest":
-                runner = ""
-            if runner == "GE-Proton Latest (default)":
-                runner = "GE-Proton"
-            if runner == "Proton-EM Latest":
-                runner = "Proton-EM"
+            runner = convert_runner(runner)
             if add_game_dialog.combobox_launcher.get_active() == 1:
                 runner = "Linux-Native"
 
@@ -2604,12 +2609,7 @@ class Main(Gtk.Window):
                 except subprocess.CalledProcessError as e:
                     print(f"Error resizing banner: {e}")
 
-            if game.runner == "UMU-Proton Latest":
-                game.runner = ""
-            if game.runner == "GE-Proton Latest (default)":
-                game.runner = "GE-Proton"
-            if game.runner == "Proton-EM Latest":
-                game.runner = "Proton-EM"
+            game.runner = convert_runner(game.runner)
             if edit_game_dialog.combobox_launcher.get_active() == 1:
                 game.runner = "Linux-Native"
 
@@ -3717,7 +3717,12 @@ class Settings(Gtk.Dialog):
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
-                    if os.path.isdir(entry_path) and entry != "UMU-Latest" and entry != "LegacyRuntime":
+                    if (
+                        os.path.isdir(entry_path)
+                        and entry not in ("UMU-Latest", "LegacyRuntime")
+                        and not entry.startswith("Proton-GE Latest")
+                        and not entry.startswith("Proton-EM Latest")
+                    ):
                         versions.append(entry)
 
                 # Sort versions in descending order
@@ -3807,13 +3812,7 @@ class Settings(Gtk.Dialog):
 
     def get_default_runner(self):
         default_runner = self.combobox_runner.get_active_text()
-
-        if default_runner == "UMU-Proton Latest":
-            default_runner = ""
-        if default_runner == "GE-Proton Latest (default)":
-            default_runner = "GE-Proton"
-        if default_runner == "Proton-EM Latest":
-            default_runner = "Proton-EM"
+        default_runner = convert_runner(default_runner)
         return default_runner
 
     def update_system_tray(self):
@@ -3878,18 +3877,18 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
-            command_parts.append(f'FAUGUS_LOG=default')
-            command_parts.append(f'GAMEID=winetricks-gui')
-            command_parts.append(f'STORE=none')
+            command_parts.append(f"FAUGUS_LOG=default")
+            command_parts.append(f"GAMEID=winetricks-gui")
+            command_parts.append(f"STORE=none")
             if default_runner:
                 if default_runner == "Proton-CachyOS":
-                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
-                    command_parts.append(f'PROTONPATH={default_runner}')
+                    command_parts.append(f"PROTONPATH='{default_runner}'")
 
             # Add the fixed command and remaining arguments
-            command_parts.append(f'"{umu_run}"')
-            command_parts.append('""')
+            command_parts.append(f"'{umu_run}'")
+            command_parts.append("''")
 
             # Join all parts into a single command
             command = ' '.join(command_parts)
@@ -3926,17 +3925,17 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
-            command_parts.append(f'FAUGUS_LOG=default')
-            command_parts.append(f'GAMEID=default')
+            command_parts.append(f"FAUGUS_LOG=default")
+            command_parts.append(f"GAMEID=default")
             if default_runner:
                 if default_runner == "Proton-CachyOS":
-                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
-                    command_parts.append(f'PROTONPATH={default_runner}')
+                    command_parts.append(f"PROTONPATH='{default_runner}'")
 
             # Add the fixed command and remaining arguments
-            command_parts.append(f'"{umu_run}"')
-            command_parts.append('"winecfg"')
+            command_parts.append(f"'{umu_run}'")
+            command_parts.append("'winecfg'")
 
             # Join all parts into a single command
             command = ' '.join(command_parts)
@@ -4001,25 +4000,25 @@ class Settings(Gtk.Dialog):
         if response == Gtk.ResponseType.ACCEPT:
             command_parts = []
             file_run = filechooser.get_filename()
-            command_parts.append(f'FAUGUS_LOG=default')
+            command_parts.append(f"FAUGUS_LOG=default")
             if not file_run.endswith(".reg"):
                 if file_run:
-                    command_parts.append(f'GAMEID=default')
+                    command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS":
-                        command_parts.append(f'PROTONPATH={proton_cachyos}')
+                        command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
-                        command_parts.append(f'PROTONPATH={default_runner}')
-                command_parts.append(f'"{umu_run}" "{file_run}"')
+                        command_parts.append(f"PROTONPATH='{default_runner}'")
+                command_parts.append(f"'{umu_run}' '{file_run}'")
             else:
                 if file_run:
-                    command_parts.append(f'GAMEID=default')
+                    command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS":
-                        command_parts.append(f'PROTONPATH={proton_cachyos}')
+                        command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
-                        command_parts.append(f'PROTONPATH={default_runner}')
-                command_parts.append(f'"{umu_run}" regedit "{file_run}"')
+                        command_parts.append(f"PROTONPATH='{default_runner}'")
+                command_parts.append(f"'{umu_run}' regedit '{file_run}'")
 
             command = ' '.join(command_parts)
             print(command)
@@ -4351,12 +4350,7 @@ class Settings(Gtk.Dialog):
         else:
             self.entry_lossless.set_text(lossless_location)
 
-        if self.default_runner == "":
-            self.default_runner = "UMU-Proton Latest"
-        if self.default_runner == "GE-Proton":
-            self.default_runner = "GE-Proton Latest (default)"
-        if self.default_runner == "Proton-EM":
-            self.default_runner = "Proton-EM Latest"
+        self.default_runner = convert_runner(self.default_runner)
         model_runner = self.combobox_runner.get_model()
         index_runner = 0
         for i, row in enumerate(model_runner):
@@ -5110,12 +5104,7 @@ class AddGame(Gtk.Dialog):
         model = self.combobox_runner.get_model()
         index_to_activate = 0
 
-        if self.default_runner == "":
-            self.default_runner = "UMU-Proton Latest"
-        if self.default_runner == "GE-Proton":
-            self.default_runner = "GE-Proton Latest (default)"
-        if self.default_runner == "Proton-EM":
-            self.default_runner = "Proton-EM Latest"
+        self.default_runner = convert_runner(self.default_runner)
 
         for i, row in enumerate(model):
             if row[0] == self.default_runner:
@@ -5740,7 +5729,12 @@ class AddGame(Gtk.Dialog):
                 for entry in os.listdir(runner_path):
                     entry_path = os.path.join(runner_path, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
-                    if os.path.isdir(entry_path) and entry != "UMU-Latest" and entry != "LegacyRuntime":
+                    if (
+                        os.path.isdir(entry_path)
+                        and entry not in ("UMU-Latest", "LegacyRuntime")
+                        and not entry.startswith("Proton-GE Latest")
+                        and not entry.startswith("Proton-EM Latest")
+                    ):
                         versions.append(entry)
 
                 # Sort versions in descending order
@@ -5817,30 +5811,25 @@ class AddGame(Gtk.Dialog):
             title_formatted = format_title(title)
             runner = self.combobox_runner.get_active_text()
 
-            if runner == "UMU-Proton Latest":
-                runner = ""
-            if runner == "GE-Proton Latest (default)":
-                runner = "GE-Proton"
-            if runner == "Proton-EM Latest":
-                runner = "Proton-EM"
+            runner = convert_runner(runner)
 
             command_parts = []
 
             if title_formatted:
-                command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
+                command_parts.append(f"FAUGUS_LOG={title_formatted}")
             if prefix:
-                command_parts.append(f'WINEPREFIX="{prefix}"')
+                command_parts.append(f"WINEPREFIX='{prefix}'")
             if title_formatted:
-                command_parts.append(f'GAMEID={title_formatted}')
+                command_parts.append(f"GAMEID={title_formatted}")
             if runner:
                 if runner == "Proton-CachyOS":
-                    command_parts.append(f'PROTONPATH={proton_cachyos}')
+                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
-                    command_parts.append(f'PROTONPATH={runner}')
+                    command_parts.append(f"PROTONPATH='{runner}'")
             if file_run.endswith(".reg"):
-                command_parts.append(f'"{umu_run}" regedit "{file_run}"')
+                command_parts.append(f"'{umu_run}' regedit '{file_run}'")
             else:
-                command_parts.append(f'"{umu_run}" "{file_run}"')
+                command_parts.append(f"'{umu_run}' '{file_run}'")
 
             command = ' '.join(command_parts)
             print(command)
@@ -6090,31 +6079,26 @@ class AddGame(Gtk.Dialog):
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_text()
 
-        if runner == "UMU-Proton Latest":
-            runner = ""
-        if runner == "GE-Proton Latest (default)":
-            runner = "GE-Proton"
-        if runner == "Proton-EM Latest":
-            runner = "Proton-EM"
+        runner = convert_runner(runner)
 
         command_parts = []
 
         # Add command parts if they are not empty
         if title_formatted:
-            command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
+            command_parts.append(f"FAUGUS_LOG='{title_formatted}'")
         if prefix:
-            command_parts.append(f'WINEPREFIX="{prefix}"')
+            command_parts.append(f"WINEPREFIX='{prefix}'")
         if title_formatted:
-            command_parts.append(f'GAMEID={title_formatted}')
+            command_parts.append(f"GAMEID={title_formatted}")
         if runner:
             if runner == "Proton-CachyOS":
-                command_parts.append(f'PROTONPATH={proton_cachyos}')
+                command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
-                command_parts.append(f'PROTONPATH={runner}')
+                command_parts.append(f"PROTONPATH='{runner}'")
 
         # Add the fixed command and remaining arguments
-        command_parts.append(f'"{umu_run}"')
-        command_parts.append('"winecfg"')
+        command_parts.append(f"'{umu_run}'")
+        command_parts.append("'winecfg'")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
@@ -6152,31 +6136,26 @@ class AddGame(Gtk.Dialog):
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_text()
 
-        if runner == "UMU-Proton Latest":
-            runner = ""
-        if runner == "GE-Proton Latest (default)":
-            runner = "GE-Proton"
-        if runner == "Proton-EM Latest":
-            runner = "Proton-EM"
+        runner = convert_runner(runner)
 
         command_parts = []
 
         # Add command parts if they are not empty
         if title_formatted:
-            command_parts.append(f'FAUGUS_LOG="{title_formatted}"')
+            command_parts.append(f"FAUGUS_LOG={title_formatted}")
         if prefix:
-            command_parts.append(f'WINEPREFIX="{prefix}"')
-        command_parts.append(f'GAMEID=winetricks-gui')
-        command_parts.append(f'STORE=none')
+            command_parts.append(f"WINEPREFIX='{prefix}'")
+        command_parts.append(f"GAMEID=winetricks-gui")
+        command_parts.append(f"STORE=none")
         if runner:
             if runner == "Proton-CachyOS":
-                command_parts.append(f'PROTONPATH={proton_cachyos}')
+                command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
-                command_parts.append(f'PROTONPATH={runner}')
+                command_parts.append(f"PROTONPATH='{runner}'")
 
         # Add the fixed command and remaining arguments
-        command_parts.append(f'"{umu_run}"')
-        command_parts.append('""')
+        command_parts.append(f"'{umu_run}'")
+        command_parts.append("''")
 
         # Join all parts into a single command
         command = ' '.join(command_parts)
@@ -6378,68 +6357,86 @@ def run_file(file_path):
         mangohud_enabled = os.path.exists(mangohud_dir)
         gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
 
-    if default_runner == "UMU-Proton Latest":
-        default_runner = ""
-    if default_runner == "GE-Proton Latest (default)":
-        default_runner = "GE-Proton"
-    if default_runner == "Proton-EM Latest":
-        default_runner = "Proton-EM"
-
     command_parts = []
 
-    command_parts.append(f'FAUGUS_LOG=default')
+    command_parts.append(f"FAUGUS_LOG=default")
     if not file_path.endswith(".reg"):
         # Add command parts if they are not empty
         if mangohud_enabled and mangohud:
             command_parts.append(mangohud)
         if disable_hidraw:
             command_parts.append(disable_hidraw)
-    command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
-    command_parts.append('GAMEID=default')
+    command_parts.append(os.path.expanduser(f"WINEPREFIX='{default_prefix}/default'"))
+    command_parts.append("GAMEID=default")
     if default_runner:
         if default_runner == "Proton-CachyOS":
-            command_parts.append(f'PROTONPATH={proton_cachyos}')
+            command_parts.append(f"PROTONPATH='{proton_cachyos}'")
         else:
-            command_parts.append(f'PROTONPATH={default_runner}')
+            command_parts.append(f"PROTONPATH='{default_runner}'")
     if not file_path.endswith(".reg"):
         if gamemode_enabled and gamemode:
             command_parts.append(gamemode)
 
     # Add the fixed command and remaining arguments
-    command_parts.append(f'"{umu_run}"')
+    command_parts.append(f"'{umu_run}'")
     if file_path.endswith(".reg"):
-        command_parts.append(f'regedit "{file_path}"')
+        command_parts.append(f"regedit '{file_path}'")
     else:
-        command_parts.append(f'"{file_path}"')
+        command_parts.append(f"'{file_path}'")
 
     # Join all parts into a single command
     command = ' '.join(command_parts)
+    print(command)
 
     # Run the command in the directory of the file
     subprocess.run([faugus_run_path, command], cwd=file_dir)
 
-def update_games_file():
-    if not os.path.exists(games_json):
+def update_games_and_config():
+    if os.path.exists(games_json):
+        try:
+            with open(games_json, "r", encoding="utf-8") as f:
+                games = json.load(f)
+        except json.JSONDecodeError:
+            games = []
+
+        for game in games:
+            if not game.get("gameid"):
+                game["gameid"] = format_title(game["title"])
+
+            if game.get("playtime", "") == "":
+                game["playtime"] = 0
+
+            runner = game.get("runner")
+            if runner == "Proton-EM":
+                game["runner"] = "Proton-EM Latest"
+            elif runner == "GE-Proton":
+                game["runner"] = "Proton-GE Latest"
+
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
+    config_path = Path(PathManager.user_config("faugus-launcher/config.ini"))
+    if not config_path.exists():
         return
 
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except json.JSONDecodeError:
-        games = []
+    lines = config_path.read_text(encoding="utf-8").splitlines()
+    new_lines = []
 
-    for game in games:
-        if not game.get("gameid"):
-            game["gameid"] = format_title(game["title"])
-        if game.get("playtime", "") == "":
-            game["playtime"] = 0
+    for line in lines:
+        if line.startswith("default-runner="):
+            value = line.split("=", 1)[1].strip('"')
 
-    with open(games_json, "w", encoding="utf-8") as f:
-        json.dump(games, f, indent=4, ensure_ascii=False)
+            if value == "GE-Proton":
+                line = 'default-runner="Proton-GE Latest"'
+            elif value == "Proton-EM":
+                line = 'default-runner="Proton-EM Latest"'
+
+        new_lines.append(line)
+
+    config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
 def faugus_launcher():
     os.environ["GTK_USE_PORTAL"] = "1"
-    update_games_file()
     apply_dark_theme()
 
     if len(sys.argv) == 1:
@@ -6468,4 +6465,5 @@ def main():
             print("Faugus Launcher is already running.")
 
 if __name__ == "__main__":
+    update_games_and_config()
     main()

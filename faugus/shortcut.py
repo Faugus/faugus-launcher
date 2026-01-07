@@ -9,15 +9,14 @@ import shutil
 import subprocess
 import re
 import webbrowser
-import locale
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from PIL import Image
-from faugus.path_manager import *
 from faugus.dark_theme import *
+from faugus.config_manager import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
@@ -121,74 +120,6 @@ def format_title(title):
     title = re.sub(r"[^a-z0-9]+", "-", title)
     title = title.strip("-")
     return title
-
-class ConfigManager:
-    def __init__(self):
-        self.default_config = {
-            'close-onlaunch': 'False',
-            'default-prefix': prefixes_dir,
-            'mangohud': 'False',
-            'gamemode': 'False',
-            'disable-hidraw': 'False',
-            'default-runner': 'GE-Proton',
-            'lossless-location': '',
-            'discrete-gpu': 'False',
-            'splash-disable': 'False',
-            'system-tray': 'False',
-            'start-boot': 'False',
-            'mono-icon': 'False',
-            'interface-mode': 'List',
-            'start-maximized': 'False',
-            'start-fullscreen': 'False',
-            'show-labels': 'False',
-            'smaller-banners': 'False',
-            'enable-logging': 'False',
-            'wayland-driver': 'False',
-            'enable-hdr': 'False',
-            'enable-wow64': 'False',
-            'language': lang,
-            'logging-warning': 'False',
-            'show-hidden': 'False',
-        }
-
-        self.config = {}
-        self.load_config()
-
-    def load_config(self):
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        self.config[key] = value
-
-        updated = False
-        for key, default_value in self.default_config.items():
-            if key not in self.config:
-                self.config[key] = default_value
-                updated = True
-
-        if updated or not os.path.isfile(config_file_dir):
-            self.save_config()
-
-    def save_config(self):
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        with open(config_file_dir, 'w') as f:
-            for key, value in self.config.items():
-                if key in ['default-prefix', 'default-runner']:
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
-
-    def save_with_values(self, *args):
-        keys = list(self.default_config.keys())
-        for key, value in zip(keys, args):
-            self.config[key] = str(value)
-        self.save_config()
 
 class CreateShortcut(Gtk.Window):
     def __init__(self, file_path):

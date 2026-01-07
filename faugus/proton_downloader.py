@@ -1,71 +1,129 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import os
-import requests
+import json
 import tarfile
-import re
+import urllib.request
+import shutil
+import argparse
 from pathlib import Path
-import threading
+
 
 STEAM_COMPAT_DIR = Path.home() / ".local/share/Steam/compatibilitytools.d"
-GITHUB_API_URL = "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases/latest"
-DOWNLOAD_BASE_URL = "https://github.com/Etaash-mathamsetty/Proton/releases/download"
 
-def get_latest_release_tag():
-    response = requests.get(GITHUB_API_URL)
-    if response.status_code == 200:
-        return response.json()["tag_name"]
-    else:
-        print("Failed to access GitHub API:", response.status_code, flush=True)
+CONFIGS = {
+    "ge": {
+        "label": "GE-Proton",
+        "dir": "Proton-GE Latest",
+        "api": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest",
+        "archive_ext": ".tar.gz",
+    },
+    "em": {
+        "label": "Proton-EM",
+        "dir": "Proton-EM Latest",
+        "api": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases/latest",
+        "archive_ext": ".tar.xz",
+    },
+}
+
+
+def get_latest_tag_and_url(api, archive_ext):
+    with urllib.request.urlopen(api) as r:
+        data = json.loads(r.read())
+
+    asset = next(
+        (a for a in data.get("assets", []) if a["name"].endswith(archive_ext)),
+        None,
+    )
+
+    if not asset:
+        return None, None
+
+    return data["tag_name"], asset["browser_download_url"]
+
+
+def get_installed_version(proton_dir):
+    version_file = proton_dir / "version"
+    if not version_file.exists():
         return None
 
-def get_installed_proton_versions():
-    if not STEAM_COMPAT_DIR.exists():
-        return []
-    return sorted([
-        entry.name.replace("proton-", "")
-        for entry in STEAM_COMPAT_DIR.iterdir()
-        if entry.is_dir() and re.match(r"proton-EM-\d+\.\d+-\d+", entry.name)
-    ])
+    return version_file.read_text().strip().split()[-1].rstrip("+")
 
-def download_and_extract(version_tag):
-    tar_name = f"proton-{version_tag}.tar.xz"
-    url = f"{DOWNLOAD_BASE_URL}/{version_tag}/{tar_name}"
-    tar_path = STEAM_COMPAT_DIR / tar_name
 
-    print(f"Downloading {tar_name}...", flush=True)
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(tar_path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-    else:
-        print("Failed to download:", response.status_code)
+def rewrite_compatibilitytool_vdf(proton_dir, display_name):
+    (proton_dir / "compatibilitytool.vdf").write_text(
+        f'''"compatibilitytools"
+{{
+  "compat_tools"
+  {{
+    "{display_name}"
+    {{
+      "install_path" "."
+      "display_name" "{display_name}"
+      "from_oslist"  "windows"
+      "to_oslist"    "linux"
+    }}
+  }}
+}}
+'''
+    )
+
+
+def install_proton_latest(proton_dir, url, label):
+    archive = STEAM_COMPAT_DIR / url.split("/")[-1]
+    tmp = STEAM_COMPAT_DIR / "__proton_tmp__"
+
+    print(f"Downloading {label}...", flush=True)
+    urllib.request.urlretrieve(url, archive)
+
+    print(f"Extracting {label}...", flush=True)
+    tmp.mkdir(exist_ok=True)
+
+    with tarfile.open(archive) as tar:
+        tar.extractall(tmp, filter="data")
+
+    archive.unlink()
+
+    extracted = next(tmp.iterdir())
+
+    if proton_dir.exists():
+        shutil.rmtree(proton_dir)
+
+    extracted.rename(proton_dir)
+    shutil.rmtree(tmp)
+
+
+def ensure_latest(kind):
+    cfg = CONFIGS[kind]
+
+    proton_dir = STEAM_COMPAT_DIR / cfg["dir"]
+    proton_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    latest_tag, url = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
+    if not url:
         return
 
-    print("Extracting archive...", flush=True)
-    with tarfile.open(tar_path, "r:xz") as tar:
-        tar.extractall(path=STEAM_COMPAT_DIR)
+    installed = get_installed_version(proton_dir)
 
-    os.remove(tar_path)
-    print("Proton installed successfully.", flush=True)
+    if installed == latest_tag:
+        print(f"{cfg['label']} is up to date.", flush=True)
+        return
+
+    install_proton_latest(proton_dir, url, cfg["label"])
+    rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
+
 
 def main():
-    latest_version = get_latest_release_tag()
-    if not latest_version:
-        return
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--ge", action="store_true")
+    group.add_argument("--em", action="store_true")
+    args = parser.parse_args()
 
-    installed_versions = get_installed_proton_versions()
-    print("Latest available version:", latest_version, flush=True)
-    print("Installed versions:", ", ".join(installed_versions) or "none", flush=True)
+    if args.ge:
+        ensure_latest("ge")
+    if args.em:
+        ensure_latest("em")
 
-    if latest_version not in installed_versions:
-        thread = threading.Thread(target=download_and_extract, args=(latest_version,))
-        thread.start()
-        thread.join()
-    else:
-        print("The latest version is already installed.", flush=True)
 
 if __name__ == "__main__":
     main()

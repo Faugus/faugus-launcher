@@ -42,8 +42,6 @@ proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cach
 compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
 os.makedirs(compatibility_dir, exist_ok=True)
 
-use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
-
 try:
     translation = gettext.translation(
         'faugus-run',
@@ -55,6 +53,13 @@ try:
 except FileNotFoundError:
     gettext.install('faugus-run', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
+
+def format_title(title):
+    title = title.strip().lower()
+    title = re.sub(r"['’]", "", title)
+    title = re.sub(r"[^a-z0-9]+", "-", title)
+    title = title.strip("-")
+    return title
 
 class FaugusRun:
     def __init__(self, message):
@@ -114,42 +119,13 @@ class FaugusRun:
         Gtk.main_quit()
         sys.exit()
 
-    def update_protonpath(self, message):
-        versions = [
-            d for d in os.listdir(compatibility_dir)
-            if os.path.isdir(os.path.join(compatibility_dir, d)) and d.startswith("proton-EM-")
-        ]
-
-        if not versions:
-            return message
-
-        def version_key(v):
-            version_str = v.replace("proton-EM-", "")
-
-            if version_str.isdigit():
-                return (int(version_str), "")
-
-            match = re.match(r"^(\d+)([A-Za-z]*)$", version_str)
-            if match:
-                num_part = int(match.group(1))
-                alpha_part = match.group(2)
-                return (num_part, alpha_part)
-
-            return (0, version_str)
-
-        versions.sort(key=version_key, reverse=True)
-        latest_version = versions[0]
-        updated_message = re.sub(r'PROTONPATH=Proton-EM\b', f'PROTONPATH={latest_version}', message)
-        return updated_message
-
-    def update_test(self):
-        if "Proton-EM" in self.message:
-            self.message = self.update_protonpath(self.message)
-
     def start_process(self, command):
         self.start_time = time.time()
-        protonpath = next((part.split('=')[1] for part in self.message.split() if part.startswith("PROTONPATH=")), None)
-        if protonpath and protonpath != "GE-Proton" and protonpath != "Proton-EM":
+
+        parts = shlex.split(self.message)
+        protonpath = next((part.split("=", 1)[1] for part in parts if part.startswith("PROTONPATH=")), None)
+
+        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
@@ -160,13 +136,6 @@ class FaugusRun:
                 if not protonpath_path.is_dir():
                     self.close_warning_dialog()
                     self.show_error_dialog(protonpath)
-
-        if self.default_runner == "UMU-Proton Latest":
-            self.default_runner = ""
-        if self.default_runner == "GE-Proton Latest (default)":
-            self.default_runner = "GE-Proton"
-        if self.default_runner == "Proton-EM Latest":
-            self.default_runner = "Proton-EM"
 
         self.discrete_gpu = "DRI_PRIME=1"
         if not self.discrete_gpu:
@@ -182,13 +151,13 @@ class FaugusRun:
                     if "UMU_NO_PROTON" not in self.message:
                         if self.default_runner:
                             if self.default_runner == "Proton-CachyOS":
-                                self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={proton_cachyos} {self.message}'
+                                self.message = f"WINEPREFIX='{self.default_prefix}/default' PROTONPATH='{proton_cachyos}' {self.message}"
                             else:
-                                self.message = f'WINEPREFIX="{self.default_prefix}/default" PROTONPATH={self.default_runner} {self.message}'
+                                self.message = f"WINEPREFIX='{self.default_prefix}/default' PROTONPATH='{self.default_runner}' {self.message}"
                 else:
-                    self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
+                    self.message = f"WINEPREFIX='{self.default_prefix}/default' {self.message}"
             else:
-                self.message = f'WINEPREFIX="{self.default_prefix}/default" {self.message}'
+                self.message = f"WINEPREFIX='{self.default_prefix}/default' {self.message}"
 
         if not "winetricks-gui" in self.message:
             for part in self.message.split():
@@ -234,17 +203,25 @@ class FaugusRun:
     def run_processes_sequentially(self):
         if "UMU_NO_PROTON" not in self.message:
             if self.enable_logging:
-                self.message = f'UMU_LOG=1 PROTON_LOG_DIR={logs_dir}/{self.game_title} PROTON_LOG=1 {self.message}'
+                self.message = f"UMU_LOG=1 PROTON_LOG_DIR='{logs_dir}/{self.game_title}' PROTON_LOG=1 {self.message}"
 
-        if "Proton-EM" in self.message:
-            self.process = subprocess.Popen(
-                [sys.executable, "-m", "faugus.proton_downloader"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=8192,
-                text=True
-            )
-
+        if "Proton-EM Latest" in self.message or "Proton-GE Latest" in self.message:
+            if "Proton-EM Latest" in self.message:
+                self.process = subprocess.Popen(
+                    [sys.executable, "-m", "faugus.proton_downloader", "--em"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=8192,
+                    text=True
+                )
+            if "Proton-GE Latest" in self.message:
+                self.process = subprocess.Popen(
+                    [sys.executable, "-m", "faugus.proton_downloader", "--ge"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=8192,
+                    text=True
+                )
             self.stdout_watch_id = GLib.io_add_watch(
                 self.process.stdout,
                 GLib.PRIORITY_LOW,
@@ -273,7 +250,6 @@ class FaugusRun:
             GLib.source_remove(self.stdout_watch_id)
         if hasattr(self, 'stderr_watch_id'):
             GLib.source_remove(self.stderr_watch_id)
-        self.update_test()
 
         self.execute_final_command()
 
@@ -401,14 +377,9 @@ class FaugusRun:
         self.label = Gtk.Label()
         self.label.set_margin_start(20)
         self.label.set_margin_end(20)
-
-        self.label2 = Gtk.Label()
-        self.label2.set_margin_bottom(20)
-        self.label2.set_margin_start(20)
-        self.label2.set_margin_end(20)
+        self.label.set_margin_bottom(20)
 
         grid.attach(self.label, 0, 1, 1, 1)
-        grid.attach(self.label2, 0, 2, 1, 1)
 
         self.warning_dialog.add(frame)
 
@@ -479,35 +450,36 @@ class FaugusRun:
             self.label.set_text(_("Updating Easy Anti-Cheat..."))
         if "Components are up to date." in clean_line:
             self.label.set_text(_("Components are up to date"))
-        if "Downloading GE-Proton" in clean_line:
-            self.label.set_text(_("Downloading GE-Proton..."))
         if "Downloading UMU-Proton" in clean_line:
             self.label.set_text(_("Downloading UMU-Proton..."))
         if "Downloading steamrt3 (latest)" in clean_line:
-            self.label2.set_text(_("Downloading Steam Runtime..."))
+            self.label.set_text(_("Downloading Steam Runtime..."))
         if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-            self.label2.set_text(_("Extracting Steam Runtime..."))
-        if "Extracting GE-Proton" in clean_line:
-            self.label.set_text(_("Extracting GE-Proton..."))
+            self.label.set_text(_("Extracting Steam Runtime..."))
         if "Extracting UMU-Proton" in clean_line:
             self.label.set_text(_("Extracting UMU-Proton..."))
-        if "GE-Proton is up to date" in clean_line:
-            self.label.set_text(_("GE-Proton is up to date"))
         if "UMU-Proton is up to date" in clean_line:
             self.label.set_text(_("UMU-Proton is up to date"))
         if "steamrt3 is up to date" in clean_line:
-            self.label2.set_text(_("Steam Runtime is up to date"))
+            self.label.set_text(_("Steam Runtime is up to date"))
         if "->" in clean_line and "GE-Proton" in clean_line:
             self.label.set_text(_("GE-Proton is up to date"))
         if "->" in clean_line and "UMU-Proton" in clean_line:
             self.label.set_text(_("UMU-Proton is up to date"))
         if "mtree is OK" in clean_line:
-            self.label2.set_text(_("Steam Runtime is up to date"))
-        if "Downloading proton-EM" in clean_line:
+            self.label.set_text(_("Steam Runtime is up to date"))
+
+        if "Downloading GE-Proton" in clean_line:
+            self.label.set_text(_("Downloading GE-Proton..."))
+        if "Extracting GE-Proton" in clean_line:
+            self.label.set_text(_("Extracting GE-Proton..."))
+        if "GE-Proton is up to date" in clean_line:
+            self.label.set_text(_("GE-Proton is up to date"))
+        if "Downloading Proton-EM" in clean_line:
             self.label.set_text(_("Downloading Proton-EM..."))
-        if "Extracting archive" in clean_line:
+        if "Extracting Proton-EM" in clean_line:
             self.label.set_text(_("Extracting Proton-EM..."))
-        if "Proton installed successfully" in clean_line:
+        if "Proton-EM is up to date" in clean_line:
             self.label.set_text(_("Proton-EM is up to date"))
 
         if (
@@ -703,7 +675,7 @@ def build_launch_command(game):
             command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
-            command_parts.append(f"PROTONPATH={runner}")
+            command_parts.append(f"PROTONPATH='{runner}'")
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     if gamemode:
@@ -749,8 +721,53 @@ def load_game_from_json(gameid):
 
     return None
 
+def update_games_and_config():
+    if os.path.exists(games_dir):
+        try:
+            with open(games_dir, "r", encoding="utf-8") as f:
+                games = json.load(f)
+        except json.JSONDecodeError:
+            games = []
+
+        for game in games:
+            if not game.get("gameid"):
+                game["gameid"] = format_title(game["title"])
+
+            if game.get("playtime", "") == "":
+                game["playtime"] = 0
+
+            runner = game.get("runner")
+            if runner == "Proton-EM":
+                game["runner"] = "Proton-EM Latest"
+            elif runner == "GE-Proton":
+                game["runner"] = "Proton-GE Latest"
+
+        with open(games_dir, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
+    config_path = Path(PathManager.user_config("faugus-launcher/config.ini"))
+    if not config_path.exists():
+        return
+
+    lines = config_path.read_text(encoding="utf-8").splitlines()
+    new_lines = []
+
+    for line in lines:
+        if line.startswith("default-runner="):
+            value = line.split("=", 1)[1].strip('"')
+
+            if value == "GE-Proton":
+                line = 'default-runner="Proton-GE Latest"'
+            elif value == "Proton-EM":
+                line = 'default-runner="Proton-EM Latest"'
+
+        new_lines.append(line)
+
+    config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
 def main():
     apply_dark_theme()
+    update_games_and_config()
 
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument("message", nargs='?')
