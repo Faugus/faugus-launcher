@@ -39,7 +39,6 @@ icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-shorcuts_dir = PathManager.user_config('faugus-launcher/shortcuts.json')
 share_dir = PathManager.user_data()
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
@@ -2158,8 +2157,7 @@ class Main(Gtk.Window):
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
 
-            if any(game.title == title for game in self.games):
-                # Display an error message and prevent the dialog from closing
+            if any(game["title"] == title for game in json.load(open(games_json, encoding="utf-8"))):
                 self.show_warning_dialog(add_game_dialog, _("%s already exists.") % title, "")
                 return True
 
