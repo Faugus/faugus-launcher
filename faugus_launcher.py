@@ -2540,9 +2540,9 @@ class Main(Gtk.Window):
 
                 if runner:
                     if runner == "Proton-CachyOS":
-                        command = f"PROTONPATH={proton_cachyos} {command}"
+                        command = f"PROTONPATH='{proton_cachyos}' {command}"
                     else:
-                        command = f"PROTONPATH={runner} {command}"
+                        command = f"PROTONPATH='{runner}' {command}"
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
