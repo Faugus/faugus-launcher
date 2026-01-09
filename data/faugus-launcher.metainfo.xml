@@ -81,7 +81,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.2-1" date="2026-01-08">
+    <release version="1.13.3-1" date="2026-01-09">
       <description>
         <ul>
           <li>Fixed launchers not being installed with the new Proton management</li>

@@ -26,7 +26,7 @@ from filelock import FileLock, Timeout
 from faugus.config_manager import *
 from faugus.dark_theme import *
 
-VERSION = "1.13.2"
+VERSION = "1.13.3"
 print(f"Faugus Launcher {VERSION}")
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
@@ -2157,9 +2157,17 @@ class Main(Gtk.Window):
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
 
-            if any(game["title"] == title for game in json.load(open(games_json, encoding="utf-8"))):
-                self.show_warning_dialog(add_game_dialog, _("%s already exists.") % title, "")
-                return True
+            if os.path.exists(games_json):
+                with open(games_json, encoding="utf-8") as f:
+                    games = json.load(f)
+
+                if any(game.get("title") == title for game in games):
+                    self.show_warning_dialog(
+                        add_game_dialog,
+                        _("%s already exists.") % title,
+                        ""
+                    )
+                    return True
 
             path = add_game_dialog.entry_path.get_text()
             launch_arguments = add_game_dialog.entry_launch_arguments.get_text()
