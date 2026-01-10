@@ -81,13 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.3-1" date="2026-01-09">
+    <release version="1.13.4-1" date="2026-01-10">
       <description>
         <ul>
-          <li>Fixed launchers not being installed with the new Proton management</li>
-          <li>Properly checking if a game already exists when adding a new</li>
-          <li>Updated Italian translation</li>
-          <li>Updated Polish translation</li>
+          <li>Fixed an issue where editing an entry could lead to a loss of it</li>
+          <li>Fixed an issue when deleting a prefix</li>
         </ul>
       </description>
     </release>
