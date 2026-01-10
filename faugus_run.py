@@ -56,9 +56,8 @@ except FileNotFoundError:
 
 def format_title(title):
     title = title.strip().lower()
-    title = re.sub(r"['’]", "", title)
-    title = re.sub(r"[^a-z0-9]+", "-", title)
-    title = title.strip("-")
+    title = re.sub(r"[^a-z0-9 ]+", "", title)
+    title = re.sub(r"\s+", "-", title)
     return title
 
 class FaugusRun:
@@ -729,21 +728,31 @@ def update_games_and_config():
         except json.JSONDecodeError:
             games = []
 
+        changed = False
+
         for game in games:
-            if not game.get("gameid"):
-                game["gameid"] = format_title(game["title"])
+            title = game.get("title", "")
+            if title:
+                formatted = format_title(title)
+                if game.get("gameid") != formatted:
+                    game["gameid"] = formatted
+                    changed = True
 
             if game.get("playtime", "") == "":
                 game["playtime"] = 0
+                changed = True
 
             runner = game.get("runner")
             if runner == "Proton-EM":
                 game["runner"] = "Proton-EM Latest"
+                changed = True
             elif runner == "GE-Proton":
                 game["runner"] = "Proton-GE Latest"
+                changed = True
 
-        with open(games_dir, "w", encoding="utf-8") as f:
-            json.dump(games, f, indent=4, ensure_ascii=False)
+        if changed:
+            with open(games_dir, "w", encoding="utf-8") as f:
+                json.dump(games, f, indent=4, ensure_ascii=False)
 
     config_path = Path(PathManager.user_config("faugus-launcher/config.ini"))
     if not config_path.exists():
@@ -751,6 +760,7 @@ def update_games_and_config():
 
     lines = config_path.read_text(encoding="utf-8").splitlines()
     new_lines = []
+    changed = False
 
     for line in lines:
         if line.startswith("default-runner="):
@@ -758,12 +768,15 @@ def update_games_and_config():
 
             if value == "GE-Proton":
                 line = 'default-runner="Proton-GE Latest"'
+                changed = True
             elif value == "Proton-EM":
                 line = 'default-runner="Proton-EM Latest"'
+                changed = True
 
         new_lines.append(line)
 
-    config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+    if changed:
+        config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
 def main():
     apply_dark_theme()
