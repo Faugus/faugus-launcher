@@ -30,8 +30,6 @@ config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_dir = PathManager.user_config('faugus-launcher/games.json')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-faugus_components = PathManager.find_binary('faugus-components')
-faugus_proton_downloader = PathManager.find_binary('faugus-proton-downloader')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
@@ -67,6 +65,7 @@ class FaugusRun:
         self.warning_dialog = None
         self.log_window = None
         self.text_view = None
+        self.proton_latest = None
         self.load_config()
 
     def show_error_dialog(self, protonpath):
@@ -204,57 +203,21 @@ class FaugusRun:
             if self.enable_logging:
                 self.message = f"UMU_LOG=1 PROTON_LOG_DIR='{logs_dir}/{self.game_title}' PROTON_LOG=1 {self.message}"
 
-        if "Proton-EM Latest" in self.message or "Proton-GE Latest" in self.message:
-            if "Proton-EM Latest" in self.message:
-                self.process = subprocess.Popen(
-                    [sys.executable, "-m", "faugus.proton_downloader", "--em"],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    bufsize=8192,
-                    text=True
-                )
-            if "Proton-GE Latest" in self.message:
-                self.process = subprocess.Popen(
-                    [sys.executable, "-m", "faugus.proton_downloader", "--ge"],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    bufsize=8192,
-                    text=True
-                )
-            self.stdout_watch_id = GLib.io_add_watch(
-                self.process.stdout,
-                GLib.PRIORITY_LOW,
-                GLib.IO_IN,
-                self.on_output
-            )
-            self.stderr_watch_id = GLib.io_add_watch(
-                self.process.stderr,
-                GLib.PRIORITY_LOW,
-                GLib.IO_IN,
-                self.on_output
-            )
-
-            GLib.child_watch_add(
-                GLib.PRIORITY_DEFAULT,
-                self.process.pid,
-                self.on_proton_downloader_finished
-            )
-        else:
-            self.execute_final_command()
-
-        print(self.message)
-
-    def on_proton_downloader_finished(self, pid, status):
-        if hasattr(self, 'stdout_watch_id'):
-            GLib.source_remove(self.stdout_watch_id)
-        if hasattr(self, 'stderr_watch_id'):
-            GLib.source_remove(self.stderr_watch_id)
+        if "Proton-EM Latest" in self.message:
+            self.proton_latest = "--em"
+        if "Proton-GE Latest" in self.message:
+            self.proton_latest = "--ge"
 
         self.execute_final_command()
+        print(self.message)
 
     def execute_final_command(self):
         if "UMU_NO_PROTON" not in self.message:
-            cmd = f"{sys.executable} -m faugus.components; {self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+            cmd = (
+                f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}; "
+                f"{sys.executable} -m faugus.components; "
+                f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+            )
         else:
             cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
 
