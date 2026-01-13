@@ -4011,25 +4011,26 @@ class Settings(Gtk.Dialog):
         if response == Gtk.ResponseType.ACCEPT:
             command_parts = []
             file_run = filechooser.get_filename()
+            escaped_file_run = file_run.replace("'", "'\\''")
             command_parts.append(f"FAUGUS_LOG=default")
-            if not file_run.endswith(".reg"):
-                if file_run:
+            if not escaped_file_run.endswith(".reg"):
+                if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
                         command_parts.append(f"PROTONPATH='{default_runner}'")
-                command_parts.append(f"'{umu_run}' '{file_run}'")
+                command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
             else:
-                if file_run:
+                if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
                         command_parts.append(f"PROTONPATH='{default_runner}'")
-                command_parts.append(f"'{umu_run}' regedit '{file_run}'")
+                command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
             print(command)
@@ -5822,6 +5823,7 @@ class AddGame(Gtk.Dialog):
             title_formatted = format_title(title)
             runner = self.combobox_runner.get_active_text()
 
+            escaped_file_run = file_run.replace("'", "'\\''")
             runner = convert_runner(runner)
 
             command_parts = []
@@ -5837,10 +5839,10 @@ class AddGame(Gtk.Dialog):
                     command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
                     command_parts.append(f"PROTONPATH='{runner}'")
-            if file_run.endswith(".reg"):
-                command_parts.append(f"'{umu_run}' regedit '{file_run}'")
+            if escaped_file_run.endswith(".reg"):
+                command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
             else:
-                command_parts.append(f"'{umu_run}' '{file_run}'")
+                command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
             print(command)
