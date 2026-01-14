@@ -2536,20 +2536,20 @@ class Main(Gtk.Window):
                 self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "epic":
                     self.label_download2.set_text("")
-                    command = f"FAUGUS_LOG={title_formatted} WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
+                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"FAUGUS_LOG={title_formatted} PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
 
                 if runner:
                     if runner == "Proton-CachyOS":
@@ -3888,7 +3888,6 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
-            command_parts.append(f"FAUGUS_LOG=default")
             command_parts.append(f"GAMEID=winetricks-gui")
             command_parts.append(f"STORE=none")
             if default_runner:
@@ -3936,7 +3935,6 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             # Add command parts if they are not empty
-            command_parts.append(f"FAUGUS_LOG=default")
             command_parts.append(f"GAMEID=default")
             if default_runner:
                 if default_runner == "Proton-CachyOS":
@@ -4012,7 +4010,6 @@ class Settings(Gtk.Dialog):
             command_parts = []
             file_run = filechooser.get_filename()
             escaped_file_run = file_run.replace("'", "'\\''")
-            command_parts.append(f"FAUGUS_LOG=default")
             if not escaped_file_run.endswith(".reg"):
                 if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
@@ -5829,7 +5826,7 @@ class AddGame(Gtk.Dialog):
             command_parts = []
 
             if title_formatted:
-                command_parts.append(f"FAUGUS_LOG={title_formatted}")
+                command_parts.append(f"LOG_DIR={title_formatted}")
             if prefix:
                 command_parts.append(f"WINEPREFIX='{prefix}'")
             if title_formatted:
@@ -6098,7 +6095,7 @@ class AddGame(Gtk.Dialog):
 
         # Add command parts if they are not empty
         if title_formatted:
-            command_parts.append(f"FAUGUS_LOG='{title_formatted}'")
+            command_parts.append(f"LOG_DIR='{title_formatted}'")
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
         if title_formatted:
@@ -6155,7 +6152,7 @@ class AddGame(Gtk.Dialog):
 
         # Add command parts if they are not empty
         if title_formatted:
-            command_parts.append(f"FAUGUS_LOG={title_formatted}")
+            command_parts.append(f"LOG_DIR={title_formatted}")
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
         command_parts.append(f"GAMEID=winetricks-gui")
@@ -6372,7 +6369,6 @@ def run_file(file_path):
 
     command_parts = []
 
-    command_parts.append(f"FAUGUS_LOG=default")
     if not file_path.endswith(".reg"):
         # Add command parts if they are not empty
         if mangohud_enabled and mangohud:

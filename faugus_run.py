@@ -33,8 +33,8 @@ faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-eac_dir = f'PROTON_EAC_RUNTIME={PathManager.user_config("faugus-launcher/components/eac")}'
-be_dir = f'PROTON_BATTLEYE_RUNTIME={PathManager.user_config("faugus-launcher/components/be")}'
+eac_dir = PathManager.user_config("faugus-launcher/components/eac")
+be_dir = PathManager.user_config("faugus-launcher/components/be")
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
@@ -58,6 +58,11 @@ def format_title(title):
     title = re.sub(r"\s+", "-", title)
     return title
 
+_env_set = set()
+def set_env(key, value):
+    os.environ[key] = value
+    _env_set.add(key)
+
 class FaugusRun:
     def __init__(self, message):
         self.message = message
@@ -66,63 +71,55 @@ class FaugusRun:
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
+        self._env_set = set()
         self.load_config()
-
-    def show_error_dialog(self, protonpath):
-        dialog = Gtk.Dialog(title="Faugus Launcher")
-        dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-
-        label = Gtk.Label()
-        label.set_label(_("%s was not found.") % protonpath)
-        label.set_halign(Gtk.Align.CENTER)
-
-        label2 = Gtk.Label()
-        label2.set_label(_("Please install it or use another Proton version."))
-        label2.set_halign(Gtk.Align.CENTER)
-
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
-
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.pack_start(label, True, True, 0)
-        box_top.pack_start(label2, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
-
-        content_area.add(box_top)
-        content_area.add(box_bottom)
-
-        dialog.show_all()
-        dialog.run()
-        dialog.destroy()
-        Gtk.main_quit()
-        sys.exit()
 
     def start_process(self, command):
         self.start_time = time.time()
 
-        parts = shlex.split(self.message)
-        protonpath = next((part.split("=", 1)[1] for part in parts if part.startswith("PROTONPATH=")), None)
+        set_env("PROTON_EAC_RUNTIME", eac_dir)
+        set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
+        if self.discrete_gpu:
+            set_env("DRI_PRIME", "1")
+        if self.wayland_driver:
+            set_env("PROTON_ENABLE_WAYLAND", "1")
+            if self.enable_hdr:
+                set_env("PROTON_ENABLE_HDR", "1")
+        if self.enable_wow64:
+            set_env("PROTON_USE_WOW64", "1")
+
+        self.extract_env_from_message()
+
+        if os.environ.get("LSFG_LEGACY"):
+            if self.lossless_location:
+                set_env("LSFG_DLL_PATH", self.lossless_location)
+
+        if self.enable_logging:
+            if os.environ.get("LOG_DIR"):
+                self.log_dir = os.environ.get("LOG_DIR")
+            else:
+                self.log_dir = "default"
+
+        if not os.environ.get("UMU_NO_PROTON"):
+            if self.enable_logging:
+                set_env("UMU_LOG", "1")
+                set_env("PROTON_LOG_DIR", f"{logs_dir}/{self.log_dir}")
+                set_env("PROTON_LOG", "1")
+
+        if not os.environ.get("WINEPREFIX"):
+            if not os.environ.get("UMU_NO_PROTON"):
+                set_env("WINEPREFIX", f"{self.default_prefix}/default")
+                if self.default_runner == "Proton-CachyOS":
+                    set_env("PROTONPATH", f"{proton_cachyos}")
+                else:
+                    set_env("PROTONPATH", f"{self.default_runner}")
+
+        if os.environ.get("GAMEID") != "winetricks-gui":
+            if "umu" not in os.environ.get("GAMEID", ""):
+                set_env("PROTONFIXES_DISABLE", "1")
+
+        protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_warning_dialog()
@@ -134,92 +131,41 @@ class FaugusRun:
                 if not protonpath_path.is_dir():
                     self.close_warning_dialog()
                     self.show_error_dialog(protonpath)
-
-        self.discrete_gpu = "DRI_PRIME=1"
-        if not self.discrete_gpu:
-            self.discrete_gpu = "DRI_PRIME=0"
-        if self.discrete_gpu:
-            self.discrete_gpu = "DRI_PRIME=1"
-        if self.discrete_gpu == None:
-            self.discrete_gpu = "DRI_PRIME=1"
-
-        if "WINEPREFIX" not in self.message:
-            if self.default_runner:
-                if "PROTONPATH" not in self.message:
-                    if "UMU_NO_PROTON" not in self.message:
-                        if self.default_runner:
-                            if self.default_runner == "Proton-CachyOS":
-                                self.message = f"WINEPREFIX='{self.default_prefix}/default' PROTONPATH='{proton_cachyos}' {self.message}"
-                            else:
-                                self.message = f"WINEPREFIX='{self.default_prefix}/default' PROTONPATH='{self.default_runner}' {self.message}"
-                else:
-                    self.message = f"WINEPREFIX='{self.default_prefix}/default' {self.message}"
-            else:
-                self.message = f"WINEPREFIX='{self.default_prefix}/default' {self.message}"
-
-        if not "winetricks-gui" in self.message:
-            for part in self.message.split():
-                if part.startswith("GAMEID="):
-                    game_id = part.split("=")[1]
-                    if "umu" not in game_id:
-                        self.message = f'PROTONFIXES_DISABLE=1 {self.message}'
-                    break
-
-        if self.wayland_driver:
-            self.message = f'PROTON_ENABLE_WAYLAND=1 {self.message}'
-            if self.enable_hdr:
-                self.message = f'PROTON_ENABLE_HDR=1 {self.message}'
-        if self.enable_wow64:
-            self.message = f'PROTON_USE_WOW64=1 {self.message}'
-        if "LSFG_LEGACY" in self.message:
-            if self.lossless_location:
-                self.message = f'LSFG_DLL_PATH="{self.lossless_location}" {self.message}'
-
-        if self.enable_logging:
-            match = re.search(r"FAUGUS_LOG=(?:'([^']*)'|\"([^\"]*)\"|(\S+))", self.message)
-            if match:
-                self.game_title = next(g for g in match.groups() if g).split("/")[-1]
-            else:
-                self.game_title = "default"
-
-        self.load_env_from_file(envar_dir)
-        self.run_processes_sequentially()
-
-    def load_env_from_file(self, filename=envar_dir):
-        try:
-            with open(filename, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or "=" not in line:
-                        continue
-                    key, value = line.split("=", 1)
-                    key, value = key.strip(), value.strip()
-                    os.environ[key] = value
-        except FileNotFoundError:
-            pass
-
-    def run_processes_sequentially(self):
-        if "UMU_NO_PROTON" not in self.message:
-            if self.enable_logging:
-                self.message = f"UMU_LOG=1 PROTON_LOG_DIR='{logs_dir}/{self.game_title}' PROTON_LOG=1 {self.message}"
-
-        if "Proton-EM Latest" in self.message:
+        if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
-        if "Proton-GE Latest" in self.message:
+        if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
 
+        env_from_file = self.load_env_from_file(envar_dir)
+        if env_from_file:
+            print("\n=== GLOBAL ENVIRONMENT VARIABLES ===")
+            for key in sorted(env_from_file):
+                print(f"{key}={env_from_file[key]}")
+
+        print("\n=== ENVIRONMENT VARIABLES ===")
+        for key in sorted(_env_set):
+            print(f"{key}={os.environ.get(key)}")
+
+        print("\n=== UMU-LAUNCHER COMMAND ===")
+        print(f"{self.message}\n")
+
         self.execute_final_command()
-        print(self.message)
 
     def execute_final_command(self):
-        if "UMU_NO_PROTON" not in self.message:
-            cmd = (
-                f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}; "
-                f"{sys.executable} -m faugus.components; "
-                f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
-            )
+        if not os.environ.get("UMU_NO_PROTON"):
+            if self.proton_latest:
+                cmd = (
+                    f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}; "
+                    f"{sys.executable} -m faugus.components; "
+                    f"{self.message}"
+                )
+            else:
+                cmd = (
+                    f"{sys.executable} -m faugus.components; "
+                    f"{self.message}"
+                )
         else:
-            cmd = f"{self.discrete_gpu} {eac_dir} {be_dir} {self.message}"
+            cmd = f"{self.message}"
 
         use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
         popen_cmd = None
@@ -294,6 +240,92 @@ class FaugusRun:
             self.on_process_exit
         )
 
+    def show_error_dialog(self, protonpath):
+        dialog = Gtk.Dialog(title="Faugus Launcher")
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+
+        label = Gtk.Label()
+        label.set_label(_("%s was not found.") % protonpath)
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label()
+        label2.set_label(_("Please install it or use another Proton version."))
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_yes = Gtk.Button(label=_("Ok"))
+        button_yes.set_size_request(150, -1)
+        button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+
+        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label2, True, True, 0)
+        box_bottom.pack_start(button_yes, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+        Gtk.main_quit()
+        sys.exit()
+
+    def extract_env_from_message(self):
+        tokens = shlex.split(self.message, posix=True)
+
+        new_tokens = []
+        parsing_env = True
+
+        for token in tokens:
+            if parsing_env and "=" in token and token.split("=", 1)[0].isidentifier():
+                key, value = token.split("=", 1)
+                set_env(key, value)
+            else:
+                parsing_env = False
+                new_tokens.append(token)
+
+        self.message = " ".join(shlex.quote(t) for t in new_tokens)
+
+    def load_env_from_file(self, filename=envar_dir):
+        env_from_file = {}
+
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or "=" not in line:
+                        continue
+
+                    key, value = line.split("=", 1)
+                    key, value = key.strip(), value.strip()
+
+                    os.environ[key] = value
+                    env_from_file[key] = value
+
+        except FileNotFoundError:
+            pass
+
+        return env_from_file
+
     def load_config(self):
         cfg = ConfigManager()
 
@@ -366,7 +398,7 @@ class FaugusRun:
 
     def on_output(self, source, condition):
         if self.enable_logging:
-            log_dir = f"{logs_dir}/{self.game_title}"
+            log_dir = f"{logs_dir}/{self.log_dir}"
             if not os.path.exists(log_dir):
                 os.makedirs(log_dir)
 
@@ -392,7 +424,7 @@ class FaugusRun:
             if "libgamemode.so.0" in clean_line or "libgamemodeauto.so.0" in clean_line or "libgamemode.so" in clean_line:
                 return True
 
-            if "winetricks" in self.message:
+            if os.environ.get("GAMEID") == "winetricks-gui":
                 self.append_to_text_view(clean_line)
             else:
                 print(line, end='')
@@ -539,11 +571,7 @@ class FaugusRun:
             end_time = time.time()
             runtime = int(end_time - getattr(self, "start_time", end_time))
 
-            game_id = None
-            for part in self.message.split():
-                if part.startswith("GAMEID="):
-                    game_id = part.split("=")[1]
-                    break
+            game_id = os.environ.get("GAMEID")
 
             if game_id and os.path.exists(games_dir):
                 try:
@@ -620,7 +648,7 @@ def build_launch_command(game):
     command_parts = []
 
     if gameid:
-        command_parts.append(f"FAUGUS_LOG='{gameid}'")
+        command_parts.append(f"LOG_DIR='{gameid}'")
     if mangohud:
         command_parts.append(mangohud)
     if disable_hidraw:
