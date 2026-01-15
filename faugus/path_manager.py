@@ -30,7 +30,7 @@ class PathManager:
             binary_path = Path(path) / binary_name
             if binary_path.exists():
                 return str(binary_path)
-        return f'/usr/bin/{binary_name}'  # Fallback
+        return ""
 
     @staticmethod
     def get_icon(icon_name):
