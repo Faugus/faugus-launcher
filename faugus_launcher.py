@@ -2026,7 +2026,7 @@ class Main(Gtk.Window):
                         except Exception as e2:
                             self.show_warning_dialog(
                                 self,
-                                _("Failed to remove prefix"),
+                                _("Failed to remove prefix."),
                                 str(e2)
                             )
                     except FileNotFoundError:
