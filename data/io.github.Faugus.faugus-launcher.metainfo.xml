@@ -87,11 +87,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.4-1" date="2026-01-10">
+    <release version="1.13.5-1" date="2026-01-14">
       <description>
         <ul>
-          <li>Fixed an issue where editing an entry could lead to a loss of it</li>
-          <li>Fixed an issue when deleting a prefix</li>
+          <li>Fixed button run not working when the path has single quotes</li>
+          <li>Fixed games not running on non-systemd systems</li>
+          <li>Some code restructuring</li>
+          <li>Fixed games not running on non-systemd systems</li>
+          <li>Updated Portuguese translation</li>
         </ul>
       </description>
     </release>
