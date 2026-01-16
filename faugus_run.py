@@ -9,6 +9,7 @@ import json
 import time
 import shlex
 import gettext
+import signal
 
 gi.require_version("Gtk", "3.0")
 
@@ -73,6 +74,7 @@ class FaugusRun:
         self.proton_latest = None
         self._env_set = set()
         self.load_config()
+        signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def start_process(self, command):
         self.start_time = time.time()
@@ -566,34 +568,45 @@ class FaugusRun:
                 sys.exit()
 
     def on_process_exit(self, pid, condition):
-        if self.process.poll() is not None:
+        import psutil
+        def kill_child_proc():
 
-            end_time = time.time()
-            runtime = int(end_time - getattr(self, "start_time", end_time))
-
-            game_id = os.environ.get("GAMEID")
-
-            if game_id and os.path.exists(games_dir):
+            if self.process and self.process.poll() is None:
                 try:
-                    with open(games_dir, "r", encoding="utf-8") as f:
-                        games = json.load(f)
-
-                    for game in games:
-                        if game.get("gameid") == game_id:
-                            old_time = game.get("playtime", 0)
-                            game["playtime"] = old_time + runtime
-                            break
-
-                    with open(games_dir, "w", encoding="utf-8") as f:
-                        json.dump(games, f, indent=4)
-
-                except Exception as e:
+                    parent = psutil.Process(self.process.pid)
+                    for child in parent.children(recursive=True):
+                        child.kill()
+                    parent.kill()
+                except psutil.NoSuchProcess:
                     pass
 
-            GLib.idle_add(self.close_warning_dialog)
-            GLib.idle_add(self.close_log_window)
-            GLib.idle_add(self.show_exit_warning)
-            GLib.idle_add(Gtk.main_quit)
+        end_time = time.time()
+        runtime = int(end_time - getattr(self, "start_time", end_time))
+
+        game_id = os.environ.get("GAMEID")
+
+        if game_id and os.path.exists(games_dir):
+            try:
+                with open(games_dir, "r", encoding="utf-8") as f:
+                    games = json.load(f)
+
+                for game in games:
+                    if game.get("gameid") == game_id:
+                        old_time = game.get("playtime", 0)
+                        game["playtime"] = old_time + runtime
+                        break
+
+                with open(games_dir, "w", encoding="utf-8") as f:
+                    json.dump(games, f, indent=4)
+
+            except Exception as e:
+                pass
+
+        GLib.idle_add(self.close_warning_dialog)
+        GLib.idle_add(self.close_log_window)
+        GLib.idle_add(self.show_exit_warning)
+        GLib.idle_add(Gtk.main_quit)
+        kill_child_proc()
 
         return False
 

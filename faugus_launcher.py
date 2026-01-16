@@ -356,7 +356,7 @@ class Main(Gtk.Window):
         to_remove = []
 
         for title, data in processos.items():
-            pid_main = data.get("main")
+            pid_main = data.get("faugus-run")
 
             try:
                 proc = psutil.Process(pid_main)
@@ -364,7 +364,7 @@ class Main(Gtk.Window):
                     to_remove.append(title)
             except psutil.NoSuchProcess:
                 to_remove.append(title)
-            except Exception as e:
+            except Exception:
                 to_remove.append(title)
 
         for title in to_remove:
@@ -387,7 +387,6 @@ class Main(Gtk.Window):
             hbox = selected_child.get_children()[0]
             game_label = hbox.get_children()[1]
             selected_title = game_label.get_text()
-
             self.on_item_selected(self.flowbox, selected_child)
 
         return True
@@ -1688,6 +1687,9 @@ class Main(Gtk.Window):
 
     def on_button_play_clicked(self, widget):
         selected_children = self.flowbox.get_selected_children()
+        if not selected_children:
+            return
+
         selected_child = selected_children[0]
         hbox = selected_child.get_child()
         game_label = hbox.get_children()[1]
@@ -1698,17 +1700,12 @@ class Main(Gtk.Window):
 
         if title in processos:
             data = processos[title]
-
-            for key in ("umu", "main"):
-                pid = data.get(key)
-                if pid:
-                    try:
-                        proc = psutil.Process(pid)
-                        for child in proc.children(recursive=True):
-                            child.terminate()
-                        proc.terminate()
-                    except psutil.NoSuchProcess:
-                        continue
+            pid_main = data.get("faugus-run")
+            if pid_main:
+                try:
+                    os.kill(pid_main, signal.SIGUSR1)
+                except ProcessLookupError:
+                    pass
 
             return
 
@@ -1747,6 +1744,8 @@ class Main(Gtk.Window):
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
+                GLib.child_watch_add(self.processo.pid, self.on_process_exit)
+
                 if IS_FLATPAK:
                     self.processos[title] = self.processo
                 else:
@@ -1757,39 +1756,35 @@ class Main(Gtk.Window):
 
                     GLib.timeout_add(1000, check_pid_periodically)
 
+    def on_process_exit(self, pid, status):
+        if self.processo and self.processo.pid == pid:
+            self.processo = None
+
+        self.menu_item_play.set_sensitive(True)
+        self.button_play.set_sensitive(True)
+        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
+
     def find_pid(self, game):
         try:
             parent = psutil.Process(self.processo.pid)
-            all_descendants = parent.children(recursive=True)
         except psutil.NoSuchProcess:
             return False
 
-        umu_run_pid = None
-
-        for proc in all_descendants:
-            try:
-                name = os.path.splitext(proc.name())[0].lower()
-                if name == "umu-run":
-                    umu_run_pid = proc.pid
-                    break
-            except psutil.NoSuchProcess:
-                continue
-
         self.save_process_to_file(
             game.title,
-            main_pid=self.processo.pid,
-            umu_pid=umu_run_pid
+            main_pid=self.processo.pid
         )
 
         self.menu_item_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+
         if game.title in self.button_locked:
             del self.button_locked[game.title]
 
         return True
 
-    def save_process_to_file(self, title, main_pid, umu_pid=None):
+    def save_process_to_file(self, title, main_pid):
         os.makedirs(os.path.dirname(running_games), exist_ok=True)
 
         try:
@@ -1799,8 +1794,7 @@ class Main(Gtk.Window):
             processos = {}
 
         processos[title] = {
-            "main": main_pid,
-            "umu": umu_pid
+            "faugus-run": main_pid
         }
 
         with open(running_games, "w") as f:
