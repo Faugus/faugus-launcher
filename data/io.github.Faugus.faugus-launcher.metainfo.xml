@@ -87,14 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.5-1" date="2026-01-14">
+    <release version="1.13.6-1" date="2026-01-16">
       <description>
         <ul>
-          <li>Fixed button run not working when the path has single quotes</li>
-          <li>Fixed games not running on non-systemd systems</li>
-          <li>Some code restructuring</li>
-          <li>Fixed games not running on non-systemd systems</li>
-          <li>Updated Portuguese translation</li>
+          <li>Fixed a critical problem where the button stop sometimes would delete all the entries</li>
         </ul>
       </description>
     </release>
