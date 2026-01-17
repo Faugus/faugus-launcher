@@ -356,7 +356,7 @@ class Main(Gtk.Window):
         to_remove = []
 
         for title, data in processos.items():
-            pid_main = data.get("faugus-run")
+            pid_main = data.get("faugus-run") or data.get("main")
 
             try:
                 proc = psutil.Process(pid_main)
