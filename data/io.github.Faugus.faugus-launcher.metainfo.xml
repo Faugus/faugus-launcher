@@ -87,10 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.6-1" date="2026-01-16">
+    <release version="1.13.7-1" date="2026-01-17">
       <description>
         <ul>
-          <li>Fixed a critical problem where the button stop sometimes would delete all the entries</li>
+          <li>Fixed "game already running" when it is not</li>
         </ul>
       </description>
     </release>
