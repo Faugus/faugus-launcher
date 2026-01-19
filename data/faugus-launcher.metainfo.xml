@@ -81,10 +81,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.7-1" date="2026-01-17">
+    <release version="1.13.8-1" date="2026-01-19">
       <description>
         <ul>
-          <li>Fixed "game already running" when it is not</li>
+          <li>Fixed Lossless Scaling not working properly</li>
         </ul>
       </description>
     </release>
