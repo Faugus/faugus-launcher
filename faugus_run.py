@@ -293,17 +293,17 @@ class FaugusRun:
 
     def extract_env_from_message(self):
         tokens = shlex.split(self.message, posix=True)
-
         new_tokens = []
-        parsing_env = True
 
         for token in tokens:
-            if parsing_env and "=" in token and token.split("=", 1)[0].isidentifier():
+            if "=" in token:
                 key, value = token.split("=", 1)
-                set_env(key, value)
-            else:
-                parsing_env = False
-                new_tokens.append(token)
+
+                if key.isidentifier():
+                    set_env(key, value)
+                    continue
+
+            new_tokens.append(token)
 
         self.message = " ".join(shlex.quote(t) for t in new_tokens)
 
@@ -681,10 +681,6 @@ def build_launch_command(game):
             command_parts.append(f"PROTONPATH='{runner}'")
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
-    if gamemode:
-        command_parts.append(gamemode)
-    if launch_arguments:
-        command_parts.append(launch_arguments)
     if lossless_enabled:
         command_parts.append("LSFG_LEGACY=1")
         if lossless_multiplier:
@@ -695,6 +691,10 @@ def build_launch_command(game):
             command_parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance == 'true' else 0}")
         if lossless_hdr:
             command_parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr == 'true' else 0}")
+    if launch_arguments:
+        command_parts.append(launch_arguments)
+    if gamemode:
+        command_parts.append(gamemode)
 
     command_parts.append(f"'{umu_run}'")
 
