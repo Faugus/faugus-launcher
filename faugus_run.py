@@ -662,10 +662,8 @@ def build_launch_command(game):
 
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
-    if mangohud:
-        command_parts.append(mangohud)
     if disable_hidraw:
-        command_parts.append(disable_hidraw)
+        command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     else:
@@ -694,7 +692,9 @@ def build_launch_command(game):
     if launch_arguments:
         command_parts.append(launch_arguments)
     if gamemode:
-        command_parts.append(gamemode)
+        command_parts.append("gamemoderun")
+    if mangohud:
+        command_parts.append("mangohud")
 
     command_parts.append(f"'{umu_run}'")
 

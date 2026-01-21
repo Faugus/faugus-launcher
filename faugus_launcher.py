@@ -1898,19 +1898,19 @@ class Main(Gtk.Window):
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
-                if game.mangohud == "MANGOHUD=1":
+                if game.mangohud == True:
                     edit_game_dialog.checkbox_mangohud.set_active(True)
                 else:
                     edit_game_dialog.checkbox_mangohud.set_active(False)
 
             gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
             if gamemode_enabled:
-                if game.gamemode == "gamemoderun":
+                if game.gamemode == True:
                     edit_game_dialog.checkbox_gamemode.set_active(True)
                 else:
                     edit_game_dialog.checkbox_gamemode.set_active(False)
 
-            if game.disable_hidraw == "PROTON_DISABLE_HIDRAW=1":
+            if game.disable_hidraw == True:
                 edit_game_dialog.checkbox_disable_hidraw.set_active(True)
             else:
                 edit_game_dialog.checkbox_disable_hidraw.set_active(False)
@@ -2214,9 +2214,9 @@ class Main(Gtk.Window):
                 runner = "Linux-Native"
 
             # Determine mangohud and gamemode status
-            mangohud = "MANGOHUD=1" if add_game_dialog.checkbox_mangohud.get_active() else ""
-            gamemode = "gamemoderun" if add_game_dialog.checkbox_gamemode.get_active() else ""
-            disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
+            mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
+            gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
+            disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
 
             # Create Game object and update UI
@@ -2965,9 +2965,9 @@ class Main(Gtk.Window):
                     "prefix": game.prefix,
                     "launch_arguments": game.launch_arguments,
                     "game_arguments": game.game_arguments,
-                    "mangohud": "MANGOHUD=1" if game.mangohud else "",
-                    "gamemode": "gamemoderun" if game.gamemode else "",
-                    "disable_hidraw": "PROTON_DISABLE_HIDRAW=1" if game.disable_hidraw else "",
+                    "mangohud": True if game.mangohud else "",
+                    "gamemode": True if game.gamemode else "",
+                    "disable_hidraw": True if game.disable_hidraw else "",
                     "protonfix": game.protonfix,
                     "runner": game.runner,
                     "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
@@ -6346,29 +6346,16 @@ def run_file(file_path):
     disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
     default_runner = cfg.config.get('default-runner', '').strip('"')
 
-    if not file_path.endswith(".reg"):
-        mangohud = "MANGOHUD=1" if mangohud else ""
-        gamemode = "gamemoderun" if gamemode else ""
-        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if disable_hidraw else ""
+    if file_path.endswith(".reg"):
+        mangohud = False
+        gamemode = False
+        disable_hidraw = False
 
-    # Get the directory of the file
     file_dir = os.path.dirname(os.path.abspath(file_path))
-
-    # Define paths
-    faugus_run_path = faugus_run
-
-    if not file_path.endswith(".reg"):
-        mangohud_enabled = os.path.exists(mangohud_dir)
-        gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-
     command_parts = []
 
-    if not file_path.endswith(".reg"):
-        # Add command parts if they are not empty
-        if mangohud_enabled and mangohud:
-            command_parts.append(mangohud)
-        if disable_hidraw:
-            command_parts.append(disable_hidraw)
+    if disable_hidraw:
+        command_parts.append("PROTON_DISABLE_HIDRAW=1")
     command_parts.append(os.path.expanduser(f"WINEPREFIX='{default_prefix}/default'"))
     command_parts.append("GAMEID=default")
     if default_runner:
@@ -6376,23 +6363,18 @@ def run_file(file_path):
             command_parts.append(f"PROTONPATH='{proton_cachyos}'")
         else:
             command_parts.append(f"PROTONPATH='{default_runner}'")
-    if not file_path.endswith(".reg"):
-        if gamemode_enabled and gamemode:
-            command_parts.append(gamemode)
-
-    # Add the fixed command and remaining arguments
+    if gamemode:
+        command_parts.append("gamemoderun")
+    if mangohud:
+        command_parts.append("mangohud")
     command_parts.append(f"'{umu_run}'")
     if file_path.endswith(".reg"):
         command_parts.append(f"regedit '{file_path}'")
     else:
         command_parts.append(f"'{file_path}'")
 
-    # Join all parts into a single command
     command = ' '.join(command_parts)
-    print(command)
-
-    # Run the command in the directory of the file
-    subprocess.run([faugus_run_path, command], cwd=file_dir)
+    subprocess.run([faugus_run, command], cwd=file_dir)
 
 def update_games_and_config():
     if os.path.exists(games_json):

@@ -645,9 +645,9 @@ class CreateShortcut(Gtk.Window):
         lossless_performance = self.lossless_performance
         lossless_hdr = self.lossless_hdr
 
-        mangohud = "MANGOHUD=1" if self.checkbox_mangohud.get_active() else ""
-        gamemode = "gamemoderun" if self.checkbox_gamemode.get_active() else ""
-        disable_hidraw = "PROTON_DISABLE_HIDRAW=1" if self.checkbox_disable_hidraw.get_active() else ""
+        mangohud = True if self.checkbox_mangohud.get_active() else ""
+        gamemode = True if self.checkbox_gamemode.get_active() else ""
+        disable_hidraw = True if self.checkbox_disable_hidraw.get_active() else ""
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
@@ -655,20 +655,12 @@ class CreateShortcut(Gtk.Window):
         command_parts = []
 
         # Add command parts if they are not empty
-        if mangohud:
-            command_parts.append(mangohud)
         if disable_hidraw:
-            command_parts.append(disable_hidraw)
-
-        # command_parts.append(f'WINEPREFIX={self.default_prefix}/default')
-
+            command_parts.append("PROTON_DISABLE_HIDRAW=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         else:
             command_parts.append(f'GAMEID={title_formatted}')
-
-        if gamemode:
-            command_parts.append(gamemode)
         if launch_arguments:
             command_parts.append(launch_arguments)
         if lossless_enabled:
@@ -681,7 +673,10 @@ class CreateShortcut(Gtk.Window):
                 command_parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance == 'true' else 0}")
             if lossless_hdr:
                 command_parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr == 'true' else 0}")
-
+        if gamemode:
+            command_parts.append("gamemoderun")
+        if mangohud:
+            command_parts.append("mangohud")
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
         if self.entry_addapp.get_text():
