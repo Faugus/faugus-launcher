@@ -399,6 +399,11 @@ class FaugusRun:
         self.log_window.show_all()
 
     def on_output(self, source, condition):
+        try:
+            source.set_encoding(None)
+        except Exception:
+            pass
+
         if self.enable_logging:
             log_dir = f"{logs_dir}/{self.log_dir}"
             if not os.path.exists(log_dir):
@@ -413,11 +418,17 @@ class FaugusRun:
             ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
             return ansi_escape.sub('', text)
 
-        if line := source.readline():
+        raw = source.readline()
+        if raw:
+            if isinstance(raw, bytes):
+                line = raw.decode("utf-8", errors="ignore")
+            else:
+                line = raw
+
             clean_line = remove_ansi_escape(line).strip()
 
             if self.enable_logging:
-                with open(f"{log_dir}/umu.log", "a") as log_file:
+                with open(f"{log_dir}/umu.log", "a", encoding="utf-8") as log_file:
                     log_file.write(clean_line + "\n")
                     log_file.flush()
 
@@ -429,7 +440,7 @@ class FaugusRun:
             if os.environ.get("GAMEID") == "winetricks-gui":
                 self.append_to_text_view(clean_line)
             else:
-                print(line, end='')
+                print(line, end="")
 
         return True
 
