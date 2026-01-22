@@ -81,10 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.8-1" date="2026-01-19">
+    <release version="1.13.9-1" date="2026-01-22">
       <description>
         <ul>
-          <li>Fixed Lossless Scaling not working properly</li>
+          <li>Now MangoHud works properly with OpenGL games</li>
+          <li>Fixed games not launching from context menu when having single quotes</li>
         </ul>
       </description>
     </release>
