@@ -6356,22 +6356,22 @@ def run_file(file_path):
 
     if disable_hidraw:
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
-    command_parts.append(os.path.expanduser(f"WINEPREFIX='{default_prefix}/default'"))
+    command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append("GAMEID=default")
     if default_runner:
         if default_runner == "Proton-CachyOS":
-            command_parts.append(f"PROTONPATH='{proton_cachyos}'")
+            command_parts.append(f'PROTONPATH="{proton_cachyos}"')
         else:
-            command_parts.append(f"PROTONPATH='{default_runner}'")
+            command_parts.append(f'PROTONPATH="{default_runner}"')
     if gamemode:
         command_parts.append("gamemoderun")
     if mangohud:
         command_parts.append("mangohud")
-    command_parts.append(f"'{umu_run}'")
+    command_parts.append(f'"{umu_run}"')
     if file_path.endswith(".reg"):
-        command_parts.append(f"regedit '{file_path}'")
+        command_parts.append(f'regedit "{file_path}"')
     else:
-        command_parts.append(f"'{file_path}'")
+        command_parts.append(f'"{file_path}"')
 
     command = ' '.join(command_parts)
     subprocess.run([faugus_run, command], cwd=file_dir)
