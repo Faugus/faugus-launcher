@@ -187,7 +187,7 @@ class ProtonDownloader(Gtk.Dialog):
         for release in releases:
             tag_name = release["tag_name"]
             if tag_name in seen_tags:
-                continue  # ← Evita duplicados
+                continue
             seen_tags.add(tag_name)
 
             if "GloriousEggroll" in url:
@@ -196,7 +196,7 @@ class ProtonDownloader(Gtk.Dialog):
                 try:
                     version_str = tag_name.replace("GE-Proton", "")
                     major, minor = map(int, version_str.split("-"))
-                    if (major, minor) < (8, 1):
+                    if (major, minor) < (9, 1):
                         continue
                 except Exception:
                     continue
@@ -204,6 +204,14 @@ class ProtonDownloader(Gtk.Dialog):
             elif "Etaash-mathamsetty" in url:
                 if not tag_name.startswith("EM-"):
                     continue
+
+            assets = release.get("assets", [])
+            has_valid_asset = any(
+                asset["name"].endswith((".tar.gz", ".tar.xz"))
+                for asset in assets
+            )
+            if not has_valid_asset:
+                continue
 
             self.add_release_to_grid(release, grid)
 
