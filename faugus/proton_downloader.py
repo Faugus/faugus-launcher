@@ -49,7 +49,19 @@ def get_installed_version(proton_dir):
     if not version_file.exists():
         return None
 
-    return version_file.read_text().strip().split()[-1].rstrip("+")
+    text = version_file.read_text().strip()
+
+    parts = text.split()
+    if len(parts) < 2:
+        return None
+
+    ver = parts[1].rstrip("+")
+
+    if ver.startswith("GE-Proton"):
+        ver = ver.split("-g")[0]
+        ver = ver.rsplit("-", 1)[0]
+
+    return ver
 
 
 def rewrite_compatibilitytool_vdf(proton_dir, display_name):
