@@ -81,11 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.9-1" date="2026-01-22">
+    <release version="1.13.10-1" date="2026-01-25">
       <description>
         <ul>
-          <li>Now MangoHud works properly with OpenGL games</li>
-          <li>Fixed games not launching from context menu when having single quotes</li>
+          <li>Fixed the Proton Manager showing new releases even without assets</li>
+          <li>Fixed GE-Proton Latest being downloaded every time you run a game</li>
         </ul>
       </description>
     </release>
