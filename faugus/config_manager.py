@@ -11,6 +11,7 @@ class ConfigManager:
             'mangohud': 'False',
             'gamemode': 'False',
             'disable-hidraw': 'False',
+            'prevent-sleep': 'False',
             'default-runner': 'GE-Proton',
             'lossless-location': '',
             'discrete-gpu': 'False',

@@ -201,6 +201,7 @@ class CreateShortcut(Gtk.Window):
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
+        self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         # Button Cancel
         self.button_cancel = Gtk.Button(label=_("Cancel"))
@@ -319,6 +320,7 @@ class CreateShortcut(Gtk.Window):
 
         self.grid_tools.add(self.checkbox_mangohud)
         self.grid_tools.add(self.checkbox_gamemode)
+        self.grid_tools.add(self.checkbox_prevent_sleep)
         self.grid_tools.add(self.checkbox_disable_hidraw)
 
         self.grid_shortcut_icon.add(self.button_shortcut_icon)
@@ -596,12 +598,14 @@ class CreateShortcut(Gtk.Window):
         mangohud = cfg.config.get('mangohud', 'False') == 'True'
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+        prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
         self.default_runner = cfg.config.get('default-runner', '').strip('"')
         self.lossless_location = cfg.config.get('lossless-location', '')
 
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)
         self.checkbox_disable_hidraw.set_active(disable_hidraw)
+        self.checkbox_prevent_sleep.set_active(prevent_sleep)
 
     def on_cancel_clicked(self, widget):
         if os.path.isfile(self.icon_temp):
@@ -648,6 +652,7 @@ class CreateShortcut(Gtk.Window):
         mangohud = True if self.checkbox_mangohud.get_active() else ""
         gamemode = True if self.checkbox_gamemode.get_active() else ""
         disable_hidraw = True if self.checkbox_disable_hidraw.get_active() else ""
+        prevent_sleep = True if self.checkbox_prevent_sleep.get_active() else ""
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
@@ -657,6 +662,8 @@ class CreateShortcut(Gtk.Window):
         # Add command parts if they are not empty
         if disable_hidraw:
             command_parts.append("PROTON_DISABLE_HIDRAW=1")
+        if prevent_sleep:
+            command_parts.append("PREVENT_SLEEP=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         else:

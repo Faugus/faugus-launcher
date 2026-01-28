@@ -1020,6 +1020,7 @@ class Main(Gtk.Window):
                         "lossless_hdr": game.lossless_hdr,
                         "playtime": game.playtime,
                         "hidden": game.hidden,
+                        "prevent_sleep": game.prevent_sleep,
                     }
 
                     games = []
@@ -1370,6 +1371,7 @@ class Main(Gtk.Window):
                     lossless_hdr = game_data.get("lossless_hdr", "")
                     playtime = game_data.get("playtime", 0)
                     hidden = game_data.get("hidden", False)
+                    prevent_sleep = game_data.get("prevent_sleep", False)
 
                     if not self.show_hidden:
                         if hidden:
@@ -1398,6 +1400,7 @@ class Main(Gtk.Window):
                         lossless_hdr,
                         playtime,
                         hidden,
+                        prevent_sleep,
                     )
                     self.games.append(game)
 
@@ -1915,6 +1918,11 @@ class Main(Gtk.Window):
             else:
                 edit_game_dialog.checkbox_disable_hidraw.set_active(False)
 
+            if game.prevent_sleep == True:
+                edit_game_dialog.checkbox_prevent_sleep.set_active(True)
+            else:
+                edit_game_dialog.checkbox_prevent_sleep.set_active(False)
+
             if game.addapp_checkbox == "addapp_enabled":
                 edit_game_dialog.checkbox_addapp.set_active(True)
             else:
@@ -2218,6 +2226,7 @@ class Main(Gtk.Window):
             gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
             disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
             addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
+            prevent_sleep = True if add_game_dialog.checkbox_prevent_sleep.get_active() else ""
 
             # Create Game object and update UI
             game = Game(
@@ -2243,6 +2252,7 @@ class Main(Gtk.Window):
                 lossless_hdr,
                 playtime,
                 hidden,
+                prevent_sleep,
             )
 
             # Determine the state of the shortcut checkbox
@@ -2308,6 +2318,7 @@ class Main(Gtk.Window):
                 "lossless_hdr": lossless_hdr,
                 "playtime": playtime,
                 "hidden": hidden,
+                "prevent_sleep": prevent_sleep,
             }
 
             games = []
@@ -2597,6 +2608,7 @@ class Main(Gtk.Window):
             game.lossless_flow = edit_game_dialog.lossless_flow
             game.lossless_performance = edit_game_dialog.lossless_performance
             game.lossless_hdr = edit_game_dialog.lossless_hdr
+            game.prevent_sleep = edit_game_dialog.checkbox_prevent_sleep.get_active()
 
             title_formatted = format_title(game.title)
 
@@ -2981,6 +2993,7 @@ class Main(Gtk.Window):
                     "lossless_hdr": game.lossless_hdr,
                     "playtime": game.playtime,
                     "hidden": hidden,
+                    "prevent_sleep": game.prevent_sleep,
                 }
 
             new_games_data.append(game_data)
@@ -3269,6 +3282,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
+        self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         self.label_support = Gtk.Label(label=_("Support the Project"))
         self.label_support.set_halign(Gtk.Align.START)
@@ -3365,6 +3379,8 @@ class Settings(Gtk.Dialog):
         box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_mid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
         grid_language = Gtk.Grid()
         grid_language.set_row_spacing(10)
@@ -3485,13 +3501,16 @@ class Settings(Gtk.Dialog):
         self.button_proton_manager.set_hexpand(True)
         self.entry_lossless.set_hexpand(True)
 
+        box_buttons.pack_start(self.button_winetricks_default, True, True, 0)
+        box_buttons.pack_start(self.button_winecfg_default, True, True, 0)
+        box_buttons.pack_start(self.button_run_default, True, True, 0)
+
         grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid_tools.attach(self.checkbox_disable_hidraw, 0, 2, 1, 1)
-        grid_tools.attach(self.button_winetricks_default, 1, 0, 1, 1)
-        grid_tools.attach(self.button_winecfg_default, 1, 1, 1, 1)
-        grid_tools.attach(self.button_run_default, 1, 2, 1, 1)
+        grid_tools.attach(self.checkbox_prevent_sleep, 0, 2, 1, 1)
+        grid_tools.attach(self.checkbox_disable_hidraw, 0, 3, 1, 1)
+        grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
         grid_logs.attach(self.checkbox_enable_logging, 0, 0, 1, 1)
         grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
@@ -3765,6 +3784,7 @@ class Settings(Gtk.Dialog):
         checkbox_mangohud = self.checkbox_mangohud.get_active()
         checkbox_gamemode = self.checkbox_gamemode.get_active()
         checkbox_disable_hidraw = self.checkbox_disable_hidraw.get_active()
+        checkbox_prevent_sleep = self.checkbox_prevent_sleep.get_active()
         checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
         checkbox_splash_disable = self.checkbox_splash_disable.get_active()
         checkbox_system_tray = self.checkbox_system_tray.get_active()
@@ -3792,6 +3812,7 @@ class Settings(Gtk.Dialog):
             checkbox_mangohud,
             checkbox_gamemode,
             checkbox_disable_hidraw,
+            checkbox_prevent_sleep,
             combobox_default_runner,
             entry_lossless,
             checkbox_discrete_gpu_state,
@@ -4319,6 +4340,7 @@ class Settings(Gtk.Dialog):
         mangohud = cfg.config.get('mangohud', 'False') == 'True'
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+        prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
         self.default_runner = cfg.config.get('default-runner', '').strip('"')
         lossless_location = cfg.config.get('lossless-location', '').strip('"')
         discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
@@ -4345,6 +4367,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)
         self.checkbox_disable_hidraw.set_active(disable_hidraw)
+        self.checkbox_prevent_sleep.set_active(prevent_sleep)
 
         lossless_dll_path = find_lossless_dll()
         if not lossless_location:
@@ -4441,6 +4464,7 @@ class Game:
         lossless_hdr,
         playtime,
         hidden,
+        prevent_sleep,
     ):
         self.gameid = gameid
         self.title = title
@@ -4464,6 +4488,7 @@ class Game:
         self.lossless_hdr = lossless_hdr
         self.playtime = playtime
         self.hidden = hidden
+        self.prevent_sleep = prevent_sleep
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -4657,6 +4682,8 @@ class AddGame(Gtk.Dialog):
         self.content_area.set_valign(Gtk.Align.CENTER)
         self.content_area.set_vexpand(True)
         self.content_area.set_hexpand(True)
+
+        box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
         grid_page1 = Gtk.Grid()
         grid_page1.set_column_homogeneous(True)
@@ -4873,6 +4900,7 @@ class AddGame(Gtk.Dialog):
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
+        self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -5069,15 +5097,19 @@ class AddGame(Gtk.Dialog):
         self.entry_addapp.set_hexpand(True)
         self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
 
+        box_buttons.pack_start(self.button_winetricks, True, True, 0)
+        box_buttons.pack_start(self.button_winecfg, True, True, 0)
+        box_buttons.pack_start(self.button_run, True, True, 0)
+
         self.grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.checkbox_gamemode.set_hexpand(True)
-        self.grid_tools.attach(self.checkbox_disable_hidraw, 0, 2, 1, 1)
+        self.grid_tools.attach(self.checkbox_prevent_sleep, 0, 2, 1, 1)
+        self.checkbox_prevent_sleep.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_disable_hidraw, 0, 3, 1, 1)
         self.checkbox_disable_hidraw.set_hexpand(True)
-        self.grid_tools.attach(self.button_winetricks, 2, 0, 1, 1)
-        self.grid_tools.attach(self.button_winecfg, 2, 1, 1, 1)
-        self.grid_tools.attach(self.button_run, 2, 2, 1, 1)
+        self.grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
         page2.add(self.grid_protonfix)
         page2.add(self.grid_launch_arguments)
@@ -5555,6 +5587,7 @@ class AddGame(Gtk.Dialog):
             self.checkbox_mangohud.set_active(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_disable_hidraw.set_active(False)
+            self.checkbox_prevent_sleep.set_active(False)
             self.lossless_enabled = False
             self.lossless_multiplier = 1
             self.lossless_flow = 100
@@ -5574,6 +5607,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         if active_index == 1:
             self.grid_title.set_visible(True)
@@ -5586,6 +5620,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(False)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(False)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         elif active_index == 2:
             self.grid_title.set_visible(False)
@@ -5598,6 +5633,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1 PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5619,6 +5655,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5640,6 +5677,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
                 f"{self.entry_prefix.get_text()}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
@@ -5660,6 +5698,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -5681,6 +5720,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
+            self.checkbox_prevent_sleep.set_visible(True)
             self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
             self.entry_path.set_text(
@@ -6344,18 +6384,22 @@ def run_file(file_path):
     mangohud = cfg.config.get('mangohud', 'False') == 'True'
     gamemode = cfg.config.get('gamemode', 'False') == 'True'
     disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
+    prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
     default_runner = cfg.config.get('default-runner', '').strip('"')
 
     if file_path.endswith(".reg"):
         mangohud = False
         gamemode = False
         disable_hidraw = False
+        prevent_sleep = False
 
     file_dir = os.path.dirname(os.path.abspath(file_path))
     command_parts = []
 
     if disable_hidraw:
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
+    if prevent_sleep:
+        command_parts.append("PREVENT_SLEEP=1")
     command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
     command_parts.append("GAMEID=default")
     if default_runner:

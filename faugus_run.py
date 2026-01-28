@@ -169,44 +169,46 @@ class FaugusRun:
         else:
             cmd = f"{self.message}"
 
+        prevent_sleep = os.environ.get("PREVENT_SLEEP")
         use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
         popen_cmd = None
         inhibit_ok = False
 
-        try:
-            import dbus
+        if prevent_sleep:
+            try:
+                import dbus
 
-            bus = dbus.SessionBus()
-            portal = bus.get_object(
-                "org.freedesktop.portal.Desktop",
-                "/org/freedesktop/portal/desktop"
-            )
-            iface = dbus.Interface(
-                portal, "org.freedesktop.portal.Inhibit"
-            )
+                bus = dbus.SessionBus()
+                portal = bus.get_object(
+                    "org.freedesktop.portal.Desktop",
+                    "/org/freedesktop/portal/desktop"
+                )
+                iface = dbus.Interface(
+                    portal, "org.freedesktop.portal.Inhibit"
+                )
 
-            iface.Inhibit(
-                "",
-                8,
-                {"reason": "Game is running"}
-            )
-            inhibit_ok = True
-        except Exception:
-            pass
+                iface.Inhibit(
+                    "",
+                    8,
+                    {"reason": "Game is running"}
+                )
+                inhibit_ok = True
+            except Exception:
+                pass
 
-        if not inhibit_ok and not IS_FLATPAK:
-            systemd_inhibit = PathManager.find_binary("systemd-inhibit")
+            if not inhibit_ok and not IS_FLATPAK:
+                systemd_inhibit = PathManager.find_binary("systemd-inhibit")
 
-            if use_inhibit and systemd_inhibit:
-                popen_cmd = [
-                    systemd_inhibit,
-                    "--what=sleep",
-                    "--why=Game is running",
-                    "--mode=block",
-                    PathManager.find_binary("bash"),
-                    "-c",
-                    cmd
-                ]
+                if use_inhibit and systemd_inhibit:
+                    popen_cmd = [
+                        systemd_inhibit,
+                        "--what=sleep",
+                        "--why=Game is running",
+                        "--mode=block",
+                        PathManager.find_binary("bash"),
+                        "-c",
+                        cmd
+                    ]
 
         if popen_cmd is None:
             popen_cmd = [
@@ -653,6 +655,7 @@ def build_launch_command(game):
     mangohud = game.get("mangohud", "")
     gamemode = game.get("gamemode", "")
     disable_hidraw = game.get("disable_hidraw", "")
+    prevent_sleep = game.get("prevent_sleep", "")
     addapp_checkbox = game.get("addapp_checkbox", "")
     lossless_enabled = game.get("lossless_enabled", "")
     lossless_multiplier = game.get("lossless_multiplier", "")
@@ -675,6 +678,8 @@ def build_launch_command(game):
         command_parts.append(f"LOG_DIR='{gameid}'")
     if disable_hidraw:
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
+    if prevent_sleep:
+        command_parts.append("PREVENT_SLEEP=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     else:
