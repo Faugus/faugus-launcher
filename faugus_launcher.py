@@ -3335,6 +3335,7 @@ class Settings(Gtk.Dialog):
         treeview = Gtk.TreeView(model=self.liststore)
         treeview.set_has_tooltip(True)
         treeview.connect("query-tooltip", self.on_query_tooltip)
+        treeview.connect("key-press-event", self.on_envar_key_press)
 
         renderer = Gtk.CellRendererText()
         renderer.set_property("editable", True)
@@ -3605,6 +3606,25 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
+    def on_envar_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Delete:
+            selection = widget.get_selection()
+            model, treeiter = selection.get_selected()
+
+            if not treeiter:
+                return False
+
+            path = model.get_path(treeiter)
+            index = path.get_indices()[0]
+
+            if index == len(model) - 1:
+                return True
+
+            model.remove(treeiter)
+            return True
+
+        return False
 
     def get_dir_size(self, path):
         total = 0
