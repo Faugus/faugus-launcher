@@ -5444,8 +5444,6 @@ class AddGame(Gtk.Dialog):
                 break
 
             if response == Gtk.ResponseType.OK:
-                import urllib.request
-
                 url = entry.get_text().strip().replace(" ", "%20")
                 valid_exts = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg")
 
@@ -5455,10 +5453,13 @@ class AddGame(Gtk.Dialog):
                     continue
 
                 try:
-                    temp_file, headers = urllib.request.urlretrieve(url)
-                    shutil.copyfile(temp_file, self.banner_path_temp)
+                    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
+                        f.write(r.read())
+
                     self.update_image_banner()
                     break
+
                 except Exception:
                     self.show_invalid_image_dialog()
                     dialog.show_all()
