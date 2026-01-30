@@ -81,11 +81,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.10-1" date="2026-01-25">
+    <release version="1.13.11-1" date="2026-01-30">
       <description>
         <ul>
-          <li>Fixed the Proton Manager showing new releases even without assets</li>
-          <li>Fixed GE-Proton Latest being downloaded every time you run a game</li>
+          <li>Added prevent sleep as an option</li>
+          <li>Fixed banner from URL not being loaded</li>
+          <li>Pressing delete now removes a global envar</li>
+          <li>Updated Portuguese translation</li>
         </ul>
       </description>
     </release>
