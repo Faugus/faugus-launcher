@@ -118,7 +118,7 @@ class FaugusRun:
                     set_env("PROTONPATH", f"{self.default_runner}")
 
         if os.environ.get("GAMEID") != "winetricks-gui":
-            if "umu" not in os.environ.get("GAMEID", ""):
+            if "umu" not in os.environ.get("GAMEID", "") and not (os.environ.get("GAMEID", "").isnumeric()):
                 set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
