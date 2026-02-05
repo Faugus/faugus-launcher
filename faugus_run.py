@@ -10,6 +10,7 @@ import time
 import shlex
 import gettext
 import signal
+import shutil
 
 gi.require_version("Gtk", "3.0")
 
@@ -798,7 +799,31 @@ def update_games_and_config():
     if changed:
         config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
+def is_apple_silicon():
+    path = "/proc/device-tree/compatible"
+
+    if not os.path.exists(path):
+        return False
+
+    try:
+        with open(path, "rb") as f:
+            dtcompat = f.read().decode('utf-8', errors='ignore')
+
+            if "apple,arm-platform" in dtcompat:
+                return True
+            else:
+                return False
+    except:
+        return False
+
 def main():
+    if is_apple_silicon() and 'FAUGUS_MUVM' not in os.environ:
+        muvm_path = shutil.which('muvm')
+        if muvm_path:
+            env = os.environ.copy()
+            args = [muvm_path, "-i", "-e", "FAUGUS_MUVM=1", sys.executable, os.path.abspath(__file__)]
+            os.execvpe(muvm_path, args + sys.argv[1:], env)
+
     apply_dark_theme()
     update_games_and_config()
 
