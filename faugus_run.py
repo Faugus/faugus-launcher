@@ -245,23 +245,11 @@ class FaugusRun:
             self.on_process_exit
         )
 
-    def show_error_dialog(self, protonpath):
+    def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
         dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-
-        label = Gtk.Label()
-        label.set_label(_("%s was not found.") % protonpath)
-        label.set_halign(Gtk.Align.CENTER)
-
-        label2 = Gtk.Label()
-        label2.set_label(_("Please install it or use another Proton version."))
-        label2.set_halign(Gtk.Align.CENTER)
-
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
@@ -276,14 +264,31 @@ class FaugusRun:
         box_top.set_margin_top(20)
         box_top.set_margin_bottom(20)
 
+        if network_error:
+            label = Gtk.Label(label=_("Internet connection error."))
+            label.set_halign(Gtk.Align.CENTER)
+            box_top.pack_start(label, True, True, 0)
+        else:
+            label = Gtk.Label(label=_("%s was not found.") % protonpath)
+            label.set_halign(Gtk.Align.CENTER)
+
+            label2 = Gtk.Label(
+                label=_("Please install it or use another Proton version.")
+            )
+            label2.set_halign(Gtk.Align.CENTER)
+
+            box_top.pack_start(label, True, True, 0)
+            box_top.pack_start(label2, True, True, 0)
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
-
-        box_top.pack_start(label, True, True, 0)
-        box_top.pack_start(label2, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
+        box_bottom.pack_start(button_ok, True, True, 0)
 
         content_area.add(box_top)
         content_area.add(box_bottom)
@@ -491,6 +496,9 @@ class FaugusRun:
             self.label.set_text(_("Extracting Proton-EM..."))
         if "Proton-EM is up to date" in clean_line:
             self.label.set_text(_("Proton-EM is up to date"))
+
+        if "network error" in clean_line:
+            self.show_error_dialog(network_error=True)
 
         if (
             "fsync" in clean_line
