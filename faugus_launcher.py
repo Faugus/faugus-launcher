@@ -5167,6 +5167,11 @@ class AddGame(Gtk.Dialog):
                 break
         self.combobox_runner.set_active(index_to_activate)
 
+        self.checkbox_mangohud.set_active(self.default_mangohud)
+        self.checkbox_gamemode.set_active(self.default_gamemode)
+        self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
+        self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
+
         # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
@@ -5605,10 +5610,10 @@ class AddGame(Gtk.Dialog):
             self.entry_game_arguments.set_text("")
             self.checkbox_addapp.set_active(False)
             self.entry_addapp.set_text("")
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_disable_hidraw.set_active(False)
-            self.checkbox_prevent_sleep.set_active(False)
+            self.checkbox_mangohud.set_active(self.default_mangohud)
+            self.checkbox_gamemode.set_active(self.default_gamemode)
+            self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
+            self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
             self.lossless_enabled = False
             self.lossless_multiplier = 1
             self.lossless_flow = 100
@@ -5641,6 +5646,7 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(False)
             self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(False)
+            self.checkbox_disable_hidraw.set_active(False)
             self.checkbox_prevent_sleep.set_visible(True)
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
         elif active_index == 2:
@@ -5833,6 +5839,10 @@ class AddGame(Gtk.Dialog):
 
         self.default_runner = cfg.config.get('default-runner', '')
         self.default_prefix = cfg.config.get('default-prefix', '')
+        self.default_mangohud = cfg.config.get('mangohud') == 'True'
+        self.default_gamemode = cfg.config.get('gamemode') == 'True'
+        self.default_disable_hidraw = cfg.config.get('disable-hidraw') == 'True'
+        self.default_prevent_sleep = cfg.config.get('prevent-sleep') == 'True'
 
     def on_button_run_clicked(self, widget):
         self.set_sensitive(False)
