@@ -87,13 +87,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.13.11-1" date="2026-01-30">
+    <release version="1.14.1-1" date="2026-02-06">
       <description>
         <ul>
-          <li>Added prevent sleep as an option</li>
-          <li>Fixed banner from URL not being loaded</li>
-          <li>Pressing delete now removes a global envar</li>
+          <li>Updated Dutch translation</li>
           <li>Updated Portuguese translation</li>
+          <li>Added support to Asahi Linux</li>
+          <li>Fix allow protonfixes for Steam games</li>
+          <li>Added a message when SLR download fails due to internet connection error</li>
+          <li>Added global settings for new entries</li>
         </ul>
       </description>
     </release>
