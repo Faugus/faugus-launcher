@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 23:34-0300\n"
+"POT-Creation-Date: 2026-02-05 12:25-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,92 +17,91 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /usr/bin/faugus-run:216
+#: /usr/bin/faugus-run:268
+msgid "Internet connection error."
+msgstr ""
+
+#: /usr/bin/faugus-run:272
 #, python-format
 msgid "%s was not found."
 msgstr ""
 
-#: /usr/bin/faugus-run:220
+#: /usr/bin/faugus-run:276
 msgid "Please install it or use another Proton version."
 msgstr ""
 
-#: /usr/bin/faugus-run:223 /usr/bin/faugus-run:655
+#: /usr/bin/faugus-run:283 /usr/bin/faugus-run:558
 msgid "Ok"
 msgstr ""
 
-#: /usr/bin/faugus-run:492
-#, python-format
-msgid "Using %s"
-msgstr ""
-
-#: /usr/bin/faugus-run:567
+#: /usr/bin/faugus-run:459
 msgid "Updating UMU-Launcher..."
 msgstr ""
 
-#: /usr/bin/faugus-run:569
+#: /usr/bin/faugus-run:461
 msgid "UMU-Launcher is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:571
+#: /usr/bin/faugus-run:463
 msgid "Updating BattlEye..."
 msgstr ""
 
-#: /usr/bin/faugus-run:573
+#: /usr/bin/faugus-run:465
 msgid "Updating Easy Anti-Cheat..."
 msgstr ""
 
-#: /usr/bin/faugus-run:575
+#: /usr/bin/faugus-run:467
 msgid "Components are up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:577
-msgid "Downloading GE-Proton..."
-msgstr ""
-
-#: /usr/bin/faugus-run:579
+#: /usr/bin/faugus-run:469
 msgid "Downloading UMU-Proton..."
 msgstr ""
 
-#: /usr/bin/faugus-run:581
+#: /usr/bin/faugus-run:471
 msgid "Downloading Steam Runtime..."
 msgstr ""
 
-#: /usr/bin/faugus-run:583
+#: /usr/bin/faugus-run:473
 msgid "Extracting Steam Runtime..."
 msgstr ""
 
-#: /usr/bin/faugus-run:585
-msgid "Extracting GE-Proton..."
-msgstr ""
-
-#: /usr/bin/faugus-run:587
+#: /usr/bin/faugus-run:475
 msgid "Extracting UMU-Proton..."
 msgstr ""
 
-#: /usr/bin/faugus-run:589 /usr/bin/faugus-run:595
-msgid "GE-Proton is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:591 /usr/bin/faugus-run:597
+#: /usr/bin/faugus-run:477 /usr/bin/faugus-run:483
 msgid "UMU-Proton is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:593 /usr/bin/faugus-run:599
+#: /usr/bin/faugus-run:479 /usr/bin/faugus-run:485
 msgid "Steam Runtime is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:601
+#: /usr/bin/faugus-run:481 /usr/bin/faugus-run:492
+msgid "GE-Proton is up to date"
+msgstr ""
+
+#: /usr/bin/faugus-run:488
+msgid "Downloading GE-Proton..."
+msgstr ""
+
+#: /usr/bin/faugus-run:490
+msgid "Extracting GE-Proton..."
+msgstr ""
+
+#: /usr/bin/faugus-run:494
 msgid "Downloading Proton-EM..."
 msgstr ""
 
-#: /usr/bin/faugus-run:603
+#: /usr/bin/faugus-run:496
 msgid "Extracting Proton-EM..."
 msgstr ""
 
-#: /usr/bin/faugus-run:605
+#: /usr/bin/faugus-run:498
 msgid "Proton-EM is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:652
+#: /usr/bin/faugus-run:555
 msgid "The keys and values were successfully added to the registry."
 msgstr ""
