@@ -1504,23 +1504,19 @@ class Main(Gtk.Window):
 
     def on_search_changed(self, entry):
         search_text = entry.get_text().lower()
-        self.filtered_games = [game for game in self.games if search_text in game.title.lower()]
+        first_visible = None
 
         for child in self.flowbox.get_children():
-            self.flowbox.remove(child)
+            game = child.game
+            is_match = search_text in game.title.lower()
 
-        if self.filtered_games:
-            for game in self.filtered_games:
-                self.add_item_list(game)
+            child.set_visible(is_match)
+            if is_match and first_visible is None:
+                first_visible = child
 
-            first_child = self.flowbox.get_children()[0]
-            self.flowbox.select_child(first_child)
-            self.on_item_selected(self.flowbox, first_child)
-
-        else:
-            pass
-
-        self.flowbox.show_all()
+        if first_visible:
+            self.flowbox.select_child(first_visible)
+            self.on_item_selected(self.flowbox, first_visible)
 
     def on_item_selected(self, flowbox, child):
         if child is not None:
