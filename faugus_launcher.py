@@ -703,13 +703,10 @@ class Main(Gtk.Window):
 
                 selected_children = self.flowbox.get_selected_children()
                 selected_child = selected_children[0]
-                hbox = selected_child.get_child()
-                game_label = hbox.get_children()[1]
-                title = game_label.get_text()
+                game = selected_child.game
+                title = game.title
 
                 self.menu_item_title.get_child().set_text(title)
-
-                game = next((j for j in self.games if j.title == title), None)
 
                 with open(games_json, "r") as f:
                     data = json.load(f)
@@ -826,8 +823,7 @@ class Main(Gtk.Window):
         if not selected:
             return
 
-        title = selected[0].get_child().get_children()[1].get_text()
-        game = next((g for g in self.games if g.title == title), None)
+        game = selected[0].game
         if not game:
             return
 
@@ -955,14 +951,11 @@ class Main(Gtk.Window):
     def on_duplicate_clicked(self, widget):
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        game = selected_child.game
+        title = game.title
 
         # Display duplicate dialog
         duplicate_dialog = DuplicateDialog(self, title)
-
-        game = next((g for g in self.games if g.title == title), None)
 
         while True:
             response = duplicate_dialog.run()
@@ -1506,6 +1499,7 @@ class Main(Gtk.Window):
                 game_label.set_no_show_all(True)
 
         self.flowbox_child.add(hbox)
+        self.flowbox_child.game = game
         self.flowbox.add(self.flowbox_child)
 
     def on_search_changed(self, entry):
@@ -1694,9 +1688,8 @@ class Main(Gtk.Window):
             return
 
         selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        game = selected_child.game
+        title = game.title
 
         processos = self.load_processes_from_file()
         self.button_locked[title] = True
@@ -1712,8 +1705,6 @@ class Main(Gtk.Window):
 
             return
 
-        # Find the selected game object
-        game = next((j for j in self.games if j.title == title), None)
         if game:
             # Format the title for command execution
             game_directory = os.path.dirname(game.path)
@@ -1847,11 +1838,10 @@ class Main(Gtk.Window):
 
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        game = selected_child.game
+        title = game.title
 
-        if game := next((j for j in self.games if j.title == title), None):
+        if game:
             processos = self.load_processes_from_file()
             if game.title in processos:
                 self.game_running = True
@@ -1992,11 +1982,10 @@ class Main(Gtk.Window):
         self.reload_playtimes()
         selected_children = self.flowbox.get_selected_children()
         selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        game = selected_child.game
+        title = game.title
 
-        if game := next((j for j in self.games if j.title == title), None):
+        if game:
             # Display confirmation dialog
             confirmation_dialog = ConfirmationDialog(self, title, game.prefix, game.runner)
             response = confirmation_dialog.run()
