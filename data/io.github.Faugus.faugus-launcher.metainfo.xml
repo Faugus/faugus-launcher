@@ -87,15 +87,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.14.1-1" date="2026-02-06">
+    <release version="1.14.2-1" date="2026-02-10">
       <description>
         <ul>
-          <li>Updated Dutch translation</li>
-          <li>Updated Portuguese translation</li>
-          <li>Added support to Asahi Linux</li>
-          <li>Fix allow protonfixes for Steam games</li>
-          <li>Added a message when SLR download fails due to internet connection error</li>
-          <li>Added global settings for new entries</li>
+          <li>Fixed GE-Proton being redownloaded every time</li>
+          <li>Fixed permissions for Python executables</li>
+          <li>Improved search performance</li>
         </ul>
       </description>
     </release>
