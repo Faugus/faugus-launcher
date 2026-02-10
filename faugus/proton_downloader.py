@@ -49,19 +49,25 @@ def get_installed_version(proton_dir):
     if not version_file.exists():
         return None
 
-    text = version_file.read_text().strip()
-
-    parts = text.split()
-    if len(parts) < 2:
+    parts = version_file.read_text().strip().split(maxsplit=1)
+    if len(parts) != 2:
         return None
 
-    ver = parts[1].rstrip("+")
+    return parts[1]
 
-    if ver.startswith("GE-Proton"):
-        ver = ver.split("-g")[0]
-        ver = ver.rsplit("-", 1)[0]
 
-    return ver
+def normalize_version(v):
+    if not v:
+        return None
+
+    return (
+        v.lstrip("v")
+         .replace("GE-Proton", "")
+         .replace("Proton-EM-", "")
+         .replace("EM-", "")
+         .rstrip("+")
+         .strip("-")
+    )
 
 
 def rewrite_compatibilitytool_vdf(proton_dir, display_name):
@@ -122,7 +128,7 @@ def ensure_latest(kind):
 
     installed = get_installed_version(proton_dir)
 
-    if installed == latest_tag:
+    if installed and normalize_version(installed) == normalize_version(latest_tag):
         print(f"{cfg['label']} is up to date.", flush=True)
         return
 
