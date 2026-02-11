@@ -671,6 +671,7 @@ def build_launch_command(game):
     lossless_flow = game.get("lossless_flow", "")
     lossless_performance = game.get("lossless_performance", "")
     lossless_hdr = game.get("lossless_hdr", "")
+    lossless_present = game.get("lossless_present", "")
 
     if lossless_performance:
         lossless_performance = 1
@@ -718,6 +719,8 @@ def build_launch_command(game):
             command_parts.append("LSFG_HDR_MODE=1")
         else:
             command_parts.append("LSFG_HDR_MODE=0")
+        if lossless_present:
+            command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     if launch_arguments:
         command_parts.append(launch_arguments)
     if gamemode:

@@ -1011,6 +1011,7 @@ class Main(Gtk.Window):
                         "lossless_flow": game.lossless_flow,
                         "lossless_performance": game.lossless_performance,
                         "lossless_hdr": game.lossless_hdr,
+                        "lossless_present": game.lossless_present,
                         "playtime": game.playtime,
                         "hidden": game.hidden,
                         "prevent_sleep": game.prevent_sleep,
@@ -1362,6 +1363,7 @@ class Main(Gtk.Window):
                     lossless_flow = game_data.get("lossless_flow", "")
                     lossless_performance = game_data.get("lossless_performance", "")
                     lossless_hdr = game_data.get("lossless_hdr", "")
+                    lossless_present = game_data.get("lossless_present", "")
                     playtime = game_data.get("playtime", 0)
                     hidden = game_data.get("hidden", False)
                     prevent_sleep = game_data.get("prevent_sleep", False)
@@ -1391,6 +1393,7 @@ class Main(Gtk.Window):
                         lossless_flow,
                         lossless_performance,
                         lossless_hdr,
+                        lossless_present,
                         playtime,
                         hidden,
                         prevent_sleep,
@@ -1877,6 +1880,7 @@ class Main(Gtk.Window):
             edit_game_dialog.lossless_flow = game.lossless_flow
             edit_game_dialog.lossless_performance = game.lossless_performance
             edit_game_dialog.lossless_hdr = game.lossless_hdr
+            edit_game_dialog.lossless_present = game.lossless_present
 
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
@@ -2172,6 +2176,7 @@ class Main(Gtk.Window):
             lossless_flow = add_game_dialog.lossless_flow
             lossless_performance = add_game_dialog.lossless_performance
             lossless_hdr = add_game_dialog.lossless_hdr
+            lossless_present = add_game_dialog.lossless_present
             playtime = 0
             hidden = False
 
@@ -2235,6 +2240,7 @@ class Main(Gtk.Window):
                 lossless_flow,
                 lossless_performance,
                 lossless_hdr,
+                lossless_present,
                 playtime,
                 hidden,
                 prevent_sleep,
@@ -2301,6 +2307,7 @@ class Main(Gtk.Window):
                 "lossless_flow": lossless_flow,
                 "lossless_performance": lossless_performance,
                 "lossless_hdr": lossless_hdr,
+                "lossless_present": lossless_present,
                 "playtime": playtime,
                 "hidden": hidden,
                 "prevent_sleep": prevent_sleep,
@@ -2593,6 +2600,7 @@ class Main(Gtk.Window):
             game.lossless_flow = edit_game_dialog.lossless_flow
             game.lossless_performance = edit_game_dialog.lossless_performance
             game.lossless_hdr = edit_game_dialog.lossless_hdr
+            game.lossless_present = edit_game_dialog.lossless_present
             game.prevent_sleep = edit_game_dialog.checkbox_prevent_sleep.get_active()
 
             title_formatted = format_title(game.title)
@@ -2976,6 +2984,7 @@ class Main(Gtk.Window):
                     "lossless_flow": game.lossless_flow,
                     "lossless_performance": game.lossless_performance,
                     "lossless_hdr": game.lossless_hdr,
+                    "lossless_present": game.lossless_present,
                     "playtime": game.playtime,
                     "hidden": hidden,
                     "prevent_sleep": game.prevent_sleep,
@@ -4467,6 +4476,7 @@ class Game:
         lossless_flow,
         lossless_performance,
         lossless_hdr,
+        lossless_present,
         playtime,
         hidden,
         prevent_sleep,
@@ -4491,6 +4501,7 @@ class Game:
         self.lossless_flow = lossless_flow
         self.lossless_performance = lossless_performance
         self.lossless_hdr = lossless_hdr
+        self.lossless_present = lossless_present
         self.playtime = playtime
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
@@ -4660,6 +4671,7 @@ class AddGame(Gtk.Dialog):
         self.lossless_flow = 100
         self.lossless_performance = False
         self.lossless_hdr = False
+        self.lossless_present = False
 
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
@@ -5225,6 +5237,7 @@ class AddGame(Gtk.Dialog):
         flow = val if (val := getattr(self, "lossless_flow", 100)) != "" else 100
         performance = val if (val := getattr(self, "lossless_performance", False)) != "" else False
         hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
+        present = val if (val := getattr(self, "lossless_present", False)) != "" else "VSync/FIFO (default)"
 
         checkbox_enable = Gtk.CheckButton(label="Enable")
         checkbox_enable.set_active(enabled)
@@ -5254,6 +5267,30 @@ class AddGame(Gtk.Dialog):
         checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
         checkbox_hdr.set_active(hdr)
 
+        label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
+        label_present.set_halign(Gtk.Align.START)
+
+        combobox_present = Gtk.ComboBoxText()
+        combobox_present.set_tooltip_text(_("Override the present mode."))
+
+        options = [
+            "VSync/FIFO (default)",
+            "Mailbox",
+            "Immediate",
+        ]
+
+        for opt in options:
+            combobox_present.append_text(opt)
+
+        mapping = {
+            "fifo": "VSync/FIFO (default)",
+            "mailbox": "Mailbox",
+            "immediate": "Immediate",
+        }
+
+        ui_value = mapping.get(present, "VSync/FIFO (default)")
+        combobox_present.set_active(options.index(ui_value))
+
         def on_enable_toggled(cb):
             active = cb.get_active()
             label_multiplier.set_sensitive(active)
@@ -5262,6 +5299,8 @@ class AddGame(Gtk.Dialog):
             scale_flow.set_sensitive(active)
             checkbox_performance.set_sensitive(active)
             checkbox_hdr.set_sensitive(active)
+            label_present.set_sensitive(active)
+            combobox_present.set_sensitive(active)
 
         checkbox_enable.connect("toggled", on_enable_toggled)
         on_enable_toggled(checkbox_enable)
@@ -5273,6 +5312,8 @@ class AddGame(Gtk.Dialog):
         grid.attach(scale_flow,             0, 4, 1, 1)
         grid.attach(checkbox_performance,   0, 5, 1, 1)
         grid.attach(checkbox_hdr,           0, 6, 1, 1)
+        grid.attach(label_present,          0, 7, 1, 1)
+        grid.attach(combobox_present,       0, 8, 1, 1)
 
         frame.add(grid)
 
@@ -5306,6 +5347,16 @@ class AddGame(Gtk.Dialog):
             self.lossless_flow = scale_flow.get_value()
             self.lossless_performance = checkbox_performance.get_active()
             self.lossless_hdr = checkbox_hdr.get_active()
+
+            present = combobox_present.get_active_text()
+
+            mapping = {
+                "VSync/FIFO (default)": "fifo",
+                "Mailbox": "mailbox",
+                "Immediate": "immediate",
+            }
+
+            self.lossless_present = mapping.get(present, "fifo")
 
         dialog.destroy()
         return response
@@ -5604,6 +5655,7 @@ class AddGame(Gtk.Dialog):
             self.lossless_flow = 100
             self.lossless_performance = False
             self.lossless_hdr = False
+            self.lossless_present = "VSync/FIFO"
 
         cleanup_fields()
 

@@ -149,6 +149,7 @@ class CreateShortcut(Gtk.Window):
         self.lossless_flow = 100
         self.lossless_performance = False
         self.lossless_hdr = False
+        self.lossless_present = False
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
@@ -446,6 +447,7 @@ class CreateShortcut(Gtk.Window):
         flow = val if (val := getattr(self, "lossless_flow", 100)) != "" else 100
         performance = val if (val := getattr(self, "lossless_performance", False)) != "" else False
         hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
+        present = val if (val := getattr(self, "lossless_present", False)) != "" else "VSync/FIFO (default)"
 
         checkbox_enable = Gtk.CheckButton(label="Enable")
         checkbox_enable.set_active(enabled)
@@ -475,6 +477,30 @@ class CreateShortcut(Gtk.Window):
         checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
         checkbox_hdr.set_active(hdr)
 
+        label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
+        label_present.set_halign(Gtk.Align.START)
+
+        combobox_present = Gtk.ComboBoxText()
+        combobox_present.set_tooltip_text(_("Override the present mode."))
+
+        options = [
+            "VSync/FIFO (default)",
+            "Mailbox",
+            "Immediate",
+        ]
+
+        for opt in options:
+            combobox_present.append_text(opt)
+
+        mapping = {
+            "fifo": "VSync/FIFO (default)",
+            "mailbox": "Mailbox",
+            "immediate": "Immediate",
+        }
+
+        ui_value = mapping.get(present, "VSync/FIFO (default)")
+        combobox_present.set_active(options.index(ui_value))
+
         def on_enable_toggled(cb):
             active = cb.get_active()
             label_multiplier.set_sensitive(active)
@@ -483,6 +509,8 @@ class CreateShortcut(Gtk.Window):
             scale_flow.set_sensitive(active)
             checkbox_performance.set_sensitive(active)
             checkbox_hdr.set_sensitive(active)
+            label_present.set_sensitive(active)
+            combobox_present.set_sensitive(active)
 
         checkbox_enable.connect("toggled", on_enable_toggled)
         on_enable_toggled(checkbox_enable)
@@ -494,6 +522,8 @@ class CreateShortcut(Gtk.Window):
         grid.attach(scale_flow,             0, 4, 1, 1)
         grid.attach(checkbox_performance,   0, 5, 1, 1)
         grid.attach(checkbox_hdr,           0, 6, 1, 1)
+        grid.attach(label_present,          0, 7, 1, 1)
+        grid.attach(combobox_present,       0, 8, 1, 1)
 
         frame.add(grid)
 
@@ -527,6 +557,16 @@ class CreateShortcut(Gtk.Window):
             self.lossless_flow = scale_flow.get_value()
             self.lossless_performance = checkbox_performance.get_active()
             self.lossless_hdr = checkbox_hdr.get_active()
+
+            present = combobox_present.get_active_text()
+
+            mapping = {
+                "VSync/FIFO (default)": "fifo",
+                "Mailbox": "mailbox",
+                "Immediate": "immediate",
+            }
+
+            self.lossless_present = mapping.get(present, "fifo")
 
         dialog.destroy()
         return response
@@ -648,6 +688,7 @@ class CreateShortcut(Gtk.Window):
         lossless_flow = self.lossless_flow
         lossless_performance = self.lossless_performance
         lossless_hdr = self.lossless_hdr
+        lossless_present = self.lossless_present
 
         mangohud = True if self.checkbox_mangohud.get_active() else ""
         gamemode = True if self.checkbox_gamemode.get_active() else ""
@@ -684,6 +725,8 @@ class CreateShortcut(Gtk.Window):
                 command_parts.append("LSFG_HDR_MODE=1")
             else:
                 command_parts.append("LSFG_HDR_MODE=0")
+            if lossless_present:
+                command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
         if gamemode:
             command_parts.append("gamemoderun")
         if mangohud:
