@@ -87,12 +87,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.14.2-1" date="2026-02-10">
+    <release version="1.14.3-1" date="2026-02-13">
       <description>
         <ul>
-          <li>Fixed GE-Proton being redownloaded every time</li>
-          <li>Fixed permissions for Python executables</li>
-          <li>Improved search performance</li>
+          <li>Fixed duplicating an entry without giving a title</li>
+          <li>Fixed LSFG Performance Mode and HDR Mode</li>
+          <li>Added Present Mode to LSFG</li>
         </ul>
       </description>
     </release>
