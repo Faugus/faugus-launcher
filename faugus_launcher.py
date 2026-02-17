@@ -40,6 +40,7 @@ banners_dir = PathManager.user_config('faugus-launcher/banners')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 share_dir = PathManager.user_data()
+backup_dir = PathManager.user_config("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
@@ -2338,6 +2339,8 @@ class Main(Gtk.Window):
 
             games.append(game_info)
 
+            self.backup_games()
+
             with open("games.json", "w", encoding="utf-8") as file:
                 json.dump(games, file, ensure_ascii=False, indent=4)
 
@@ -3010,8 +3013,33 @@ class Main(Gtk.Window):
         if hasattr(self, "_deleted_gameid"):
             del self._deleted_gameid
 
+        self.backup_games()
+
         with open("games.json", "w", encoding="utf-8") as file:
             json.dump(new_games_data, file, ensure_ascii=False, indent=4)
+
+    def backup_games(self):
+        if os.path.isfile(games_json):
+            os.makedirs(backup_dir, exist_ok=True)
+
+            now = GLib.DateTime.new_now_local()
+            timestamp = now.format("%Y-%m-%d_%H-%M-%S")
+
+            backup_file = os.path.join(
+                backup_dir,
+                f"games-data-{timestamp}.json"
+            )
+
+            shutil.copy2(games_json, backup_file)
+
+            backups = sorted(
+                f for f in os.listdir(backup_dir)
+                if f.startswith("games-data-") and f.endswith(".json")
+            )
+
+            while len(backups) > 20:
+                oldest = backups.pop(0)
+                os.remove(os.path.join(backup_dir, oldest))
 
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
@@ -4102,7 +4130,7 @@ class Settings(Gtk.Dialog):
         self.response(Gtk.ResponseType.OK)
         self.show_warning_dialog(self, _("Prefixes and runners will not be backed up!"))
 
-        items = ["banners", "icons", "config.ini", "games.json", "latest-games.txt"]
+        items = ["banners", "games-backup", "icons", "config.ini", "envar.txt", "games.json", "latest-games.txt"]
 
         temp_dir = os.path.join(faugus_launcher_dir, "temp-backup")
         os.makedirs(temp_dir, exist_ok=True)
