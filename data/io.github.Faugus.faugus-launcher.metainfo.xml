@@ -87,12 +87,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.14.3-1" date="2026-02-13">
+    <release version="1.14.4-1" date="2026-02-19">
       <description>
         <ul>
-          <li>Fixed duplicating an entry without giving a title</li>
-          <li>Fixed LSFG Performance Mode and HDR Mode</li>
-          <li>Added Present Mode to LSFG</li>
+          <li>Added support to JXL images for icons and banners</li>
+          <li>Now prevents non latin characters in title</li>
+          <li>A backup system was added for the games.json file to prevent data loss and protect the user’s library</li>
         </ul>
       </description>
     </release>
