@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import re
 import webbrowser
+import unicodedata
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
@@ -121,6 +122,15 @@ def format_title(title):
     title = title.strip("-")
     return title
 
+def _validate_text(entry):
+    text = entry.get_text()
+    for i, c in enumerate(text):
+        if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
+            new_text = text[:i] + text[i+1:]
+            entry.set_text(new_text)
+            entry.set_position(i)
+            break
+
 class CreateShortcut(Gtk.Window):
     def __init__(self, file_path):
         super().__init__(title="Faugus Launcher")
@@ -155,6 +165,7 @@ class CreateShortcut(Gtk.Window):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", _validate_text)
         self.entry_title.set_tooltip_text(_("Game Title"))
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
