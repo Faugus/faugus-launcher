@@ -855,6 +855,7 @@ class CreateShortcut(Gtk.Window):
         filter_ico.add_pattern("*.png")
         filter_ico.add_pattern("*.jpg")
         filter_ico.add_pattern("*.jpeg")
+        filter_ico.add_pattern("*.jxl")
         filter_ico.add_pattern("*.bmp")
         filter_ico.add_pattern("*.gif")
         filter_ico.add_pattern("*.svg")
