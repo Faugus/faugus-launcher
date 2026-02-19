@@ -15,6 +15,7 @@ import requests
 import vdf
 import signal
 import gettext
+import unicodedata
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -183,6 +184,15 @@ def convert_runner(runner):
         return "UMU-Proton Latest"
 
     return runner
+
+def _validate_text(entry):
+    text = entry.get_text()
+    for i, c in enumerate(text):
+        if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
+            new_text = text[:i] + text[i+1:]
+            entry.set_text(new_text)
+            entry.set_position(i)
+            break
 
 class Main(Gtk.Window):
     def __init__(self):
@@ -4560,6 +4570,7 @@ class DuplicateDialog(Gtk.Dialog):
         label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.set_tooltip_text(_("Game Title"))
+        self.entry_title.connect("changed", _validate_text)
 
         button_cancel = Gtk.Button(label=_("Cancel"))
         button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -4863,6 +4874,7 @@ class AddGame(Gtk.Dialog):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", _validate_text)
         if interface_mode == "Banners":
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text(_("Game Title"))
