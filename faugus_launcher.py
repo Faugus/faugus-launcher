@@ -206,7 +206,6 @@ class Main(Gtk.Window):
         self.system_tray = False
         self.start_boot = False
         self.mono_icon = False
-        self.theme = None
 
         self.current_prefix = None
         self.games = []
@@ -216,7 +215,7 @@ class Main(Gtk.Window):
 
         self.last_click_time = 0
         self.last_clicked_item = None
-        self.double_click_time_threshold = 500
+        self.double_click_time_threshold = 400
 
         self.processos = {}
         self.button_locked = {}
@@ -226,20 +225,19 @@ class Main(Gtk.Window):
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
-            .hbox-dark-background {
-                background-color: rgba(25, 25, 25, 0.5);
-            }
-            .hbox-light-background {
-                background-color: rgba(25, 25, 25, 0.1);
-            }
             .hbox-red-background {
                 background-color: rgba(255, 0, 0, 0.5);
+            }
+            .hbox-favorite {
+                background-color: alpha(@theme_selected_bg_color, 0.2);
+            }
+            .hbox-normal {
+                background-color: alpha(@theme_base_color, 0.5);
             }
         """)
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-        self.check_theme()
         self.load_config()
 
         self.context_menu = Gtk.Menu()
@@ -273,6 +271,10 @@ class Main(Gtk.Window):
         self.menu_item_hide = Gtk.MenuItem(label=_("Hide"))
         self.menu_item_hide.connect("activate", self.on_context_menu_hide)
         self.context_menu.append(self.menu_item_hide)
+
+        self.menu_item_favorite = Gtk.MenuItem(label=_("Add to favorites"))
+        self.menu_item_favorite.connect("activate", self.on_context_menu_favorite)
+        self.context_menu.append(self.menu_item_favorite)
 
         self.menu_item_game = Gtk.MenuItem(label=_("Open game location"))
         self.menu_item_game.connect("activate", self.on_context_menu_game)
@@ -411,17 +413,6 @@ class Main(Gtk.Window):
                 return {}
         return {}
 
-    def check_theme(self):
-        settings = Gtk.Settings.get_default()
-        prefer_dark = settings.get_property('gtk-application-prefer-dark-theme')
-        output = subprocess.check_output(['gsettings', 'get', 'org.gnome.desktop.interface', 'gtk-theme']).decode(
-            'utf-8')
-        theme = output.strip().strip("'")
-        if prefer_dark or 'dark' in theme:
-            self.theme = "hbox-dark-background"
-        else:
-            self.theme = "hbox-light-background"
-
     def small_interface(self):
         self.set_default_size(-1, 610)
         self.set_resizable(False)
@@ -492,11 +483,23 @@ class Main(Gtk.Window):
 
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
-        self.flowbox.set_halign(Gtk.Align.START)
+        self.flowbox.set_halign(Gtk.Align.FILL)
         self.flowbox.set_valign(Gtk.Align.START)
         self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
-        self.flowbox.set_halign(Gtk.Align.FILL)
+
+        def sort_games(child1, child2, _):
+            g1 = child1.game
+            g2 = child2.game
+
+            if g1.favorite and not g2.favorite:
+                return -1
+            if not g1.favorite and g2.favorite:
+                return 1
+
+            return (g1.title > g2.title) - (g1.title < g2.title)
+
+        self.flowbox.set_sort_func(sort_games, None)
 
         scroll_box.add(self.flowbox)
         self.load_games()
@@ -637,6 +640,19 @@ class Main(Gtk.Window):
         self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
 
+        def sort_games(child1, child2, _):
+            g1 = child1.game
+            g2 = child2.game
+
+            if g1.favorite and not g2.favorite:
+                return -1
+            if not g1.favorite and g2.favorite:
+                return 1
+
+            return (g1.title > g2.title) - (g1.title < g2.title)
+
+        self.flowbox.set_sort_func(sort_games, None)
+
         scroll_box.add(self.flowbox)
         self.load_games()
 
@@ -759,6 +775,11 @@ class Main(Gtk.Window):
                 else:
                     self.menu_item_hide.get_child().set_text(_("Hide"))
 
+                if game.favorite:
+                    self.menu_item_favorite.get_child().set_text(_("Remove from favorites"))
+                else:
+                    self.menu_item_favorite.get_child().set_text(_("Add to favorites"))
+
                 processos = self.load_processes_from_file()
                 if title in processos:
                     self.menu_item_play.get_child().set_text(_("Stop"))
@@ -846,6 +867,33 @@ class Main(Gtk.Window):
                 if item.get("gameid") == game.gameid:
                     item["hidden"] = not item.get("hidden", False)
                     game.hidden = item["hidden"]
+                    break
+
+            with open(games_json, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+        except Exception as e:
+            return
+
+        self.update_list()
+
+    def on_context_menu_favorite(self, menu_item):
+        selected = self.flowbox.get_selected_children()
+        if not selected:
+            return
+
+        game = selected[0].game
+        if not game:
+            return
+
+        try:
+            with open(games_json, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            for item in data:
+                if item.get("gameid") == game.gameid:
+                    item["favorite"] = not item.get("favorite", False)
+                    game.favorite = item["favorite"]
                     break
 
             with open(games_json, "w", encoding="utf-8") as f:
@@ -1046,6 +1094,7 @@ class Main(Gtk.Window):
                 "playtime": game.playtime,
                 "hidden": game.hidden,
                 "prevent_sleep": game.prevent_sleep,
+                "favorite": game.favorite,
             }
 
             games = []
@@ -1363,71 +1412,51 @@ class Main(Gtk.Window):
         Gtk.main_quit()
 
     def load_games(self):
-        # Load games from JSON file
         try:
             with open("games.json", "r", encoding="utf-8") as file:
                 games_data = json.load(file)
 
+                self.games.clear()
                 for game_data in games_data:
-                    gameid = game_data.get("gameid", "")
-                    title = game_data.get("title", "")
-                    path = game_data.get("path", "")
-                    prefix = game_data.get("prefix", "")
-                    launch_arguments = game_data.get("launch_arguments", "")
-                    game_arguments = game_data.get("game_arguments", "")
-                    mangohud = game_data.get("mangohud", "")
-                    gamemode = game_data.get("gamemode", "")
-                    disable_hidraw = game_data.get("disable_hidraw", "")
-                    protonfix = game_data.get("protonfix", "")
-                    runner = game_data.get("runner", "")
-                    addapp_checkbox = game_data.get("addapp_checkbox", "")
-                    addapp = game_data.get("addapp", "")
-                    addapp_bat = game_data.get("addapp_bat", "")
-                    banner = game_data.get("banner", "")
-                    lossless_enabled = game_data.get("lossless_enabled", "")
-                    lossless_multiplier = game_data.get("lossless_multiplier", "")
-                    lossless_flow = game_data.get("lossless_flow", "")
-                    lossless_performance = game_data.get("lossless_performance", "")
-                    lossless_hdr = game_data.get("lossless_hdr", "")
-                    lossless_present = game_data.get("lossless_present", "")
-                    playtime = game_data.get("playtime", 0)
-                    hidden = game_data.get("hidden", False)
-                    prevent_sleep = game_data.get("prevent_sleep", False)
-
-                    if not self.show_hidden:
-                        if hidden:
-                            continue
-
                     game = Game(
-                        gameid,
-                        title,
-                        path,
-                        prefix,
-                        launch_arguments,
-                        game_arguments,
-                        mangohud,
-                        gamemode,
-                        disable_hidraw,
-                        protonfix,
-                        runner,
-                        addapp_checkbox,
-                        addapp,
-                        addapp_bat,
-                        banner,
-                        lossless_enabled,
-                        lossless_multiplier,
-                        lossless_flow,
-                        lossless_performance,
-                        lossless_hdr,
-                        lossless_present,
-                        playtime,
-                        hidden,
-                        prevent_sleep,
+                        game_data.get("gameid", ""),
+                        game_data.get("title", ""),
+                        game_data.get("path", ""),
+                        game_data.get("prefix", ""),
+                        game_data.get("launch_arguments", ""),
+                        game_data.get("game_arguments", ""),
+                        game_data.get("mangohud", ""),
+                        game_data.get("gamemode", ""),
+                        game_data.get("disable_hidraw", ""),
+                        game_data.get("protonfix", ""),
+                        game_data.get("runner", ""),
+                        game_data.get("addapp_checkbox", ""),
+                        game_data.get("addapp", ""),
+                        game_data.get("addapp_bat", ""),
+                        game_data.get("banner", ""),
+                        game_data.get("lossless_enabled", ""),
+                        game_data.get("lossless_multiplier", ""),
+                        game_data.get("lossless_flow", ""),
+                        game_data.get("lossless_performance", ""),
+                        game_data.get("lossless_hdr", ""),
+                        game_data.get("lossless_present", ""),
+                        game_data.get("playtime", 0),
+                        game_data.get("hidden", False),
+                        game_data.get("prevent_sleep", False),
+                        game_data.get("favorite", False)
                     )
+
+                    if not self.show_hidden and game.hidden:
+                        continue
+
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.filtered_games = self.games[:]
+
+                self._favorite_section_ended = False
+                self._has_any_favorite = any(game.favorite for game in self.filtered_games)
+
                 self.flowbox.foreach(Gtk.Widget.destroy)
                 for game in self.filtered_games:
                     self.add_item_list(game)
@@ -1438,7 +1467,6 @@ class Main(Gtk.Window):
             print(f"Error reading the JSON file: {e}")
 
     def add_item_list(self, game):
-        # Add a game item to the list
         if self.interface_mode == "List":
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         if self.interface_mode == "Blocks":
@@ -1447,83 +1475,106 @@ class Main(Gtk.Window):
         if self.interface_mode == "Banners":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        hbox.get_style_context().add_class(self.theme)
+
+        if game.favorite:
+            hbox.get_style_context().add_class("hbox-favorite")
+        else:
+            hbox.get_style_context().add_class("hbox-normal")
 
         game_icon = f'{icons_dir}/{game.gameid}.ico'
         game_label = Gtk.Label.new(game.title)
 
-        if self.interface_mode == "Blocks" or self.interface_mode == "Banners":
+        if self.interface_mode in ("Blocks", "Banners"):
             game_label.set_line_wrap(True)
             game_label.set_max_width_chars(1)
             game_label.set_justify(Gtk.Justification.CENTER)
 
-        if os.path.isfile(game_icon):
-            pass
-        else:
+        if not os.path.isfile(game_icon):
             game_icon = faugus_png
 
         self.flowbox_child = Gtk.FlowBoxChild()
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
+
         if self.interface_mode == "List":
             scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(game_icon)
             image.set_from_pixbuf(scaled_pixbuf)
+
             image.set_margin_start(10)
             image.set_margin_end(10)
             image.set_margin_top(10)
             image.set_margin_bottom(10)
+
             game_label.set_margin_start(10)
             game_label.set_margin_end(10)
             game_label.set_margin_top(10)
             game_label.set_margin_bottom(10)
+
             hbox.pack_start(image, False, False, 0)
             hbox.pack_start(game_label, False, False, 0)
+
             self.flowbox_child.set_size_request(300, -1)
             self.flowbox.set_homogeneous(True)
             self.flowbox_child.set_valign(Gtk.Align.START)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
+
         if self.interface_mode == "Blocks":
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
+
             scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
             image = Gtk.Image.new_from_file(game_icon)
             image.set_from_pixbuf(scaled_pixbuf)
-            hbox.pack_start(image, False, False, 0)
-            hbox.pack_start(game_label, True, False, 0)
+
             image.set_margin_top(10)
             game_label.set_margin_top(10)
-            game_label.set_margin_end(10)
             game_label.set_margin_start(10)
+            game_label.set_margin_end(10)
             game_label.set_margin_bottom(10)
+
+            hbox.pack_start(image, False, False, 0)
+            hbox.pack_start(game_label, True, False, 0)
+
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
+
         if self.interface_mode == "Banners":
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
+
             image2 = Gtk.Image()
             game_label.set_size_request(-1, 50)
-            game_label.set_margin_end(10)
             game_label.set_margin_start(10)
+            game_label.set_margin_end(10)
+
             self.flowbox_child.set_margin_start(10)
             self.flowbox_child.set_margin_end(10)
             self.flowbox_child.set_margin_top(10)
             self.flowbox_child.set_margin_bottom(10)
+
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
+
             if game.banner == "" or not os.path.isfile(game.banner):
                 if self.smaller_banners:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(faugus_banner, 180, 270, False)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                        faugus_banner, 180, 270, False)
                 else:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(faugus_banner, 230, 345, False)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                        faugus_banner, 230, 345, False)
             else:
                 if self.smaller_banners:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 180, 270, False)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                        game.banner, 180, 270, False)
                 else:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 230, 345, False)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                        game.banner, 230, 345, False)
+
             image2.set_from_pixbuf(pixbuf)
             hbox.pack_start(image2, False, False, 0)
             hbox.pack_start(game_label, True, False, 0)
+
             if not self.show_labels:
                 game_label.set_no_show_all(True)
 
@@ -2205,6 +2256,7 @@ class Main(Gtk.Window):
             lossless_present = add_game_dialog.lossless_present
             playtime = 0
             hidden = False
+            favorite = False
 
             if add_game_dialog.combobox_launcher.get_active() == 2:
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
@@ -2270,6 +2322,7 @@ class Main(Gtk.Window):
                 playtime,
                 hidden,
                 prevent_sleep,
+                favorite,
             )
 
             # Determine the state of the shortcut checkbox
@@ -2337,6 +2390,7 @@ class Main(Gtk.Window):
                 "playtime": playtime,
                 "hidden": hidden,
                 "prevent_sleep": prevent_sleep,
+                "favorite": favorite,
             }
 
             games = []
@@ -2959,6 +3013,7 @@ class Main(Gtk.Window):
         self.load_games()
         self.entry_search.set_text("")
         self.show_all()
+
         if self.interface_mode != "List":
             if self.fullscreen_activated:
                 self.fullscreen_activated = True
@@ -3016,6 +3071,7 @@ class Main(Gtk.Window):
                     "playtime": game.playtime,
                     "hidden": hidden,
                     "prevent_sleep": game.prevent_sleep,
+                    "favorite": game.favorite,
                 }
 
             new_games_data.append(game_data)
@@ -4533,6 +4589,7 @@ class Game:
         playtime,
         hidden,
         prevent_sleep,
+        favorite,
     ):
         self.gameid = gameid
         self.title = title
@@ -4558,6 +4615,7 @@ class Game:
         self.playtime = playtime
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
+        self.favorite = favorite
 
 
 class DuplicateDialog(Gtk.Dialog):
