@@ -229,7 +229,7 @@ class Main(Gtk.Window):
                 background-color: rgba(255, 0, 0, 0.5);
             }
             .hbox-favorite {
-                background-color: alpha(@theme_selected_bg_color, 0.2);
+                background-color: alpha(@theme_selected_bg_color, 0.25);
             }
             .hbox-normal {
                 background-color: alpha(@theme_base_color, 0.5);
@@ -332,6 +332,11 @@ class Main(Gtk.Window):
             signal.signal(signal.SIGCHLD, self.on_child_process_closed)
         else:
             GLib.timeout_add_seconds(1, self.check_running_processes)
+
+    def select_first_child(self):
+        if self.flowbox.get_children():
+            self.flowbox.select_child(self.flowbox.get_children()[0])
+            self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
 
     def on_child_process_closed(self, signum, frame):
         for title, processo in list(self.processos.items()):
@@ -524,9 +529,7 @@ class Main(Gtk.Window):
         self.menu_item_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
-        if self.flowbox.get_children():
-            self.flowbox.select_child(self.flowbox.get_children()[0])
-            self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
+        self.select_first_child()
 
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
@@ -672,9 +675,7 @@ class Main(Gtk.Window):
         self.menu_item_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
-        if self.flowbox.get_children():
-            self.flowbox.select_child(self.flowbox.get_children()[0])
-            self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
+        self.select_first_child()
 
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
@@ -876,6 +877,7 @@ class Main(Gtk.Window):
             return
 
         self.update_list()
+        self.select_first_child()
 
     def on_context_menu_favorite(self, menu_item):
         selected = self.flowbox.get_selected_children()
@@ -885,6 +887,8 @@ class Main(Gtk.Window):
         game = selected[0].game
         if not game:
             return
+
+        selected_gameid = game.gameid
 
         try:
             with open(games_json, "r", encoding="utf-8") as f:
@@ -903,6 +907,12 @@ class Main(Gtk.Window):
             return
 
         self.update_list()
+
+        for child in self.flowbox.get_children():
+            if hasattr(child, "game") and child.game.gameid == selected_gameid:
+                self.flowbox.select_child(child)
+                self.flowbox.set_focus_child(child)
+                break
 
     def on_context_menu_game(self, menu_item):
         subprocess.run(["xdg-open", self.current_game], check=True)
@@ -1202,6 +1212,7 @@ class Main(Gtk.Window):
                 self.load_config()
                 self.update_list()
                 self.button_play.set_sensitive(False)
+                self.select_first_child()
                 return True
 
             except Exception as e:
@@ -2112,10 +2123,7 @@ class Main(Gtk.Window):
                 # Remove the game from the latest-games file if it exists
                 self.remove_game_from_latest_games(title)
                 self.button_play.set_sensitive(False)
-
-                if self.flowbox.get_children():
-                    self.flowbox.select_child(self.flowbox.get_children()[0])
-                    self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
+                self.select_first_child()
 
             confirmation_dialog.destroy()
 
