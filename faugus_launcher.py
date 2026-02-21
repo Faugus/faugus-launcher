@@ -27,7 +27,7 @@ from filelock import FileLock, Timeout
 from faugus.config_manager import *
 from faugus.dark_theme import *
 
-VERSION = "1.14.4"
+VERSION = "1.15.1"
 print(f"Faugus Launcher {VERSION}")
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 

@@ -81,12 +81,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.14.4-1" date="2026-02-19">
+    <release version="1.15.1-1" date="2026-02-21">
       <description>
         <ul>
-          <li>Added support to JXL images for icons and banners</li>
-          <li>Now prevents non latin characters in title</li>
-          <li>A backup system was added for the games.json file to prevent data loss and protect the user’s library</li>
+          <li>Minor QOL improvements</li>
+          <li>Some code refactoring</li>
+          <li>Updated Portuguese translation</li>
+          <li>Added an option to set favorite games</li>
         </ul>
       </description>
     </release>
