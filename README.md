@@ -1,5 +1,5 @@
 # Faugus Launcher
-A simple and lightweight app for running Windows games using [UMU-Launcher](https://github.com/Open-Wine-Components/umu-launcher)
+A simple and lightweight app for running Windows games using [UMU-Launcher](https://github.com/Open-Wine-Components/umu-launcher). Read about using Faugus Launcher to manage your games and general tips in our [user guide](./GUIDE.md).
 
 ### Support the project
 <a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/assets/ko-fi.png width="155" height="35"/></a>&nbsp;&nbsp;
