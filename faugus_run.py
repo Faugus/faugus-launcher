@@ -20,6 +20,8 @@ from faugus.config_manager import *
 from faugus.dark_theme import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+from faugus.steam_setup import IS_STEAM_FLATPAK
+
 if IS_FLATPAK:
     share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
@@ -746,7 +748,14 @@ def build_launch_command(game):
         if runner != "Steam":
             command_parts.append(shlex.quote(path))
         else:
-            command_parts.append(f"steam -nobigpicture -nochatui -nofriendsui -silent -applaunch {path}")
+            if IS_FLATPAK:
+                command_parts.append(f"flatpak-spawn --host flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
+            else:
+                if IS_STEAM_FLATPAK:
+                    print("ENTREI AQUI")
+                    command_parts.append(f"flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
+                else:
+                    command_parts.append(f"steam -nobigpicture -nochatui -nofriendsui -silent -applaunch {path}")
 
     if game_arguments:
         command_parts.append(game_arguments)

@@ -12,6 +12,7 @@ possible_steam_locations = [
 
 steam_userdata_path = None
 IS_STEAM_FLATPAK = False
+IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 for location in possible_steam_locations:
     if Path(location).exists():
@@ -53,15 +54,19 @@ def find_lossless_dll():
 STEAM_BASE_DIRS = [
     Path.home() / ".steam/steam",
     Path.home() / ".local/share/Steam",
-    os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam')
+    Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam",
 ]
+
+if IS_FLATPAK:
+    STEAM_BASE_DIRS = [
+        Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam"
+    ]
 
 def find_steam_root():
     for base in STEAM_BASE_DIRS:
         if base.exists():
             return base
     return None
-
 
 def read_library_folders(steam_root: Path):
     libraries = []
@@ -77,7 +82,6 @@ def read_library_folders(steam_root: Path):
                 libraries.append(Path(path))
 
     return libraries
-
 
 def read_installed_games():
     steam_root = find_steam_root()
