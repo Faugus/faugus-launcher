@@ -53,6 +53,7 @@ def find_lossless_dll():
 STEAM_BASE_DIRS = [
     Path.home() / ".steam/steam",
     Path.home() / ".local/share/Steam",
+    os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam')
 ]
 
 def find_steam_root():
@@ -63,7 +64,7 @@ def find_steam_root():
 
 
 def read_library_folders(steam_root: Path):
-    libraries = [steam_root]
+    libraries = []
     vdf = steam_root / "config/libraryfolders.vdf"
 
     if not vdf.exists():
