@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-20 23:46-0300\n"
-"PO-Revision-Date: 2026-02-20 23:59-0300\n"
+"POT-Creation-Date: 2026-02-21 21:18-0300\n"
+"PO-Revision-Date: 2026-02-21 21:22-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -18,144 +18,144 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-launcher:255 /usr/bin/faugus-launcher:788
+#: /usr/bin/faugus-launcher:206 /usr/bin/faugus-launcher:754
 msgid "Play"
 msgstr "Executar"
 
-#: /usr/bin/faugus-launcher:259
+#: /usr/bin/faugus-launcher:210
 msgid "Edit"
 msgstr "Editar"
 
-#: /usr/bin/faugus-launcher:263
+#: /usr/bin/faugus-launcher:214
 msgid "Delete"
 msgstr "Excluir"
 
-#: /usr/bin/faugus-launcher:267
+#: /usr/bin/faugus-launcher:218
 msgid "Duplicate"
 msgstr "Duplicar"
 
-#: /usr/bin/faugus-launcher:271 /usr/bin/faugus-launcher:777
+#: /usr/bin/faugus-launcher:222 /usr/bin/faugus-launcher:728
 msgid "Hide"
 msgstr "Ocultar"
 
-#: /usr/bin/faugus-launcher:275 /usr/bin/faugus-launcher:782
+#: /usr/bin/faugus-launcher:226 /usr/bin/faugus-launcher:733
 msgid "Add to favorites"
 msgstr "Adicionar aos favoritos"
 
-#: /usr/bin/faugus-launcher:279
+#: /usr/bin/faugus-launcher:230
 msgid "Open game location"
 msgstr "Abrir local do jogo"
 
-#: /usr/bin/faugus-launcher:283
+#: /usr/bin/faugus-launcher:234
 msgid "Open prefix location"
 msgstr "Abrir local do prefixo"
 
-#: /usr/bin/faugus-launcher:287
+#: /usr/bin/faugus-launcher:238
 msgid "Show logs"
 msgstr "Exibir logs"
 
-#: /usr/bin/faugus-launcher:445 /usr/bin/faugus-launcher:561
+#: /usr/bin/faugus-launcher:396 /usr/bin/faugus-launcher:512
 msgid "Force close all running games"
 msgstr "Fecha forçadamente todos os jogos em execução"
 
-#: /usr/bin/faugus-launcher:473 /usr/bin/faugus-launcher:600
+#: /usr/bin/faugus-launcher:424 /usr/bin/faugus-launcher:551
 msgid "Search..."
 msgstr "Procurar..."
 
-#: /usr/bin/faugus-launcher:699
+#: /usr/bin/faugus-launcher:650
 msgid "Shut down"
 msgstr "Desligar"
 
-#: /usr/bin/faugus-launcher:700
+#: /usr/bin/faugus-launcher:651
 msgid "Reboot"
 msgstr "Reiniciar"
 
-#: /usr/bin/faugus-launcher:701
+#: /usr/bin/faugus-launcher:652
 msgid "Close"
 msgstr "Fechar"
 
-#: /usr/bin/faugus-launcher:775
+#: /usr/bin/faugus-launcher:726
 msgid "Remove from hidden"
 msgstr "Remover dos ocultos"
 
-#: /usr/bin/faugus-launcher:780
+#: /usr/bin/faugus-launcher:731
 msgid "Remove from favorites"
 msgstr "Remover dos favoritos"
 
-#: /usr/bin/faugus-launcher:786
+#: /usr/bin/faugus-launcher:752
 msgid "Stop"
 msgstr "Parar"
 
-#: /usr/bin/faugus-launcher:821
+#: /usr/bin/faugus-launcher:787
 msgid "hour"
 msgstr "hora"
 
-#: /usr/bin/faugus-launcher:822
+#: /usr/bin/faugus-launcher:788
 msgid "hours"
 msgstr "horas"
 
-#: /usr/bin/faugus-launcher:823
+#: /usr/bin/faugus-launcher:789
 msgid "minute"
 msgstr "minuto"
 
-#: /usr/bin/faugus-launcher:824
+#: /usr/bin/faugus-launcher:790
 msgid "minutes"
 msgstr "minutos"
 
-#: /usr/bin/faugus-launcher:928
+#: /usr/bin/faugus-launcher:894
 #, python-format
 msgid "%s Logs"
 msgstr "%s Logs"
 
-#: /usr/bin/faugus-launcher:968
+#: /usr/bin/faugus-launcher:934
 msgid "Copy to clipboard"
 msgstr "Copiar para a área de transferência"
 
-#: /usr/bin/faugus-launcher:972
+#: /usr/bin/faugus-launcher:938
 msgid "Open file location"
 msgstr "Abrir local do arquivo"
 
-#: /usr/bin/faugus-launcher:1056 /usr/bin/faugus-launcher:2248
+#: /usr/bin/faugus-launcher:1022 /usr/bin/faugus-launcher:2226
 #, python-format
 msgid "%s already exists."
 msgstr "%s já existe."
 
-#: /usr/bin/faugus-launcher:1293
+#: /usr/bin/faugus-launcher:1259
 #, python-format
 msgid "%s is already running."
 msgstr "%s já está em execução."
 
-#: /usr/bin/faugus-launcher:1296 /usr/bin/faugus-launcher:2192
-#: /usr/bin/faugus-launcher:3418 /usr/bin/faugus-launcher:4332
-#: /usr/bin/faugus-launcher:4645 /usr/bin/faugus-launcher:4688
-#: /usr/bin/faugus-launcher:5087 /usr/bin/faugus-launcher:5446
-#: /usr/bin/faugus-launcher:5574 /usr/bin/faugus-launcher:5646
-#: /usr/bin/faugus-launcher:6187
+#: /usr/bin/faugus-launcher:1262 /usr/bin/faugus-launcher:2170
+#: /usr/bin/faugus-launcher:3400 /usr/bin/faugus-launcher:4314
+#: /usr/bin/faugus-launcher:4627 /usr/bin/faugus-launcher:4670
+#: /usr/bin/faugus-launcher:5096 /usr/bin/faugus-launcher:5489
+#: /usr/bin/faugus-launcher:5617 /usr/bin/faugus-launcher:5689
+#: /usr/bin/faugus-launcher:6290
 msgid "Ok"
 msgstr "Confirmar"
 
-#: /usr/bin/faugus-launcher:1367
+#: /usr/bin/faugus-launcher:1333
 msgid "Open Faugus Launcher"
 msgstr "Abrir Faugus Launcher"
 
-#: /usr/bin/faugus-launcher:1372
+#: /usr/bin/faugus-launcher:1338
 msgid "Quit"
 msgstr "Sair"
 
-#: /usr/bin/faugus-launcher:1681
+#: /usr/bin/faugus-launcher:1647
 msgid "Proton may generate huge log files."
 msgstr "Proton pode gerar arquivos de log enormes."
 
-#: /usr/bin/faugus-launcher:1681
+#: /usr/bin/faugus-launcher:1647
 msgid "Enable logging only when debugging a problem."
 msgstr "Ative logs apenas quando estiver depurando um problema."
 
-#: /usr/bin/faugus-launcher:1961
+#: /usr/bin/faugus-launcher:1938
 #, python-format
 msgid "Edit %s"
 msgstr "Editar %s"
 
-#: /usr/bin/faugus-launcher:2019 /usr/bin/faugus-launcher:5311
+#: /usr/bin/faugus-launcher:1996 /usr/bin/faugus-launcher:5327
 msgid ""
 "Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
 "USERS FOUND."
@@ -163,218 +163,218 @@ msgstr ""
 "Adicionar ou remover um atalho da Steam. A Steam precisa ser reinicada. "
 "NENHUM USUÁRIO DA STEAM ENCONTRADO."
 
-#: /usr/bin/faugus-launcher:2029 /usr/bin/faugus-launcher:2031
-#: /usr/bin/faugus-launcher:2033
+#: /usr/bin/faugus-launcher:2007 /usr/bin/faugus-launcher:2009
+#: /usr/bin/faugus-launcher:2011
 #, python-format
 msgid "%s is running. Please close it first."
 msgstr "%s está em execução. Por favor feche-o primeiro."
 
-#: /usr/bin/faugus-launcher:2108
+#: /usr/bin/faugus-launcher:2086
 msgid "Failed to remove prefix."
 msgstr "Falha ao remover o prefixo."
 
-#: /usr/bin/faugus-launcher:2353
+#: /usr/bin/faugus-launcher:2333
 msgid "No internet connection."
 msgstr "Sem conexão com a internet."
 
-#: /usr/bin/faugus-launcher:2475 /usr/bin/faugus-launcher:2623
+#: /usr/bin/faugus-launcher:2455 /usr/bin/faugus-launcher:2603
 #, python-format
 msgid "Installing %s..."
 msgstr "Instalando %s..."
 
-#: /usr/bin/faugus-launcher:2486
+#: /usr/bin/faugus-launcher:2466
 msgid "Finish installation"
 msgstr "Finalizar instalação"
 
-#: /usr/bin/faugus-launcher:2493
+#: /usr/bin/faugus-launcher:2473
 msgid "Downloading Battle.net..."
 msgstr "Baixando Battle.net..."
 
-#: /usr/bin/faugus-launcher:2498
+#: /usr/bin/faugus-launcher:2478
 msgid "Downloading EA App..."
 msgstr "Baixando EA App..."
 
-#: /usr/bin/faugus-launcher:2503
+#: /usr/bin/faugus-launcher:2483
 msgid "Downloading Epic Games..."
 msgstr "Baixando Epic Games..."
 
-#: /usr/bin/faugus-launcher:2508
+#: /usr/bin/faugus-launcher:2488
 msgid "Downloading Ubisoft Connect..."
 msgstr "Baixando Ubisoft Connect..."
 
-#: /usr/bin/faugus-launcher:2513
+#: /usr/bin/faugus-launcher:2493
 msgid "Downloading Rockstar Launcher..."
 msgstr "Baixando Rockstar Launcher..."
 
-#: /usr/bin/faugus-launcher:2575
+#: /usr/bin/faugus-launcher:2555
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s não foi instalado!"
 
-#: /usr/bin/faugus-launcher:2617
+#: /usr/bin/faugus-launcher:2597
 msgid "Download complete"
 msgstr "Download finalizado"
 
-#: /usr/bin/faugus-launcher:2620
+#: /usr/bin/faugus-launcher:2600
 #, python-format
 msgid "Error during download: %s"
 msgstr "Erro ao baixar: %s"
 
-#: /usr/bin/faugus-launcher:2625 /usr/bin/faugus-launcher:2628
-#: /usr/bin/faugus-launcher:2638
+#: /usr/bin/faugus-launcher:2605 /usr/bin/faugus-launcher:2608
+#: /usr/bin/faugus-launcher:2618
 msgid "Please close the login window and wait..."
 msgstr "Por favor feche a janela de login e aguarde..."
 
-#: /usr/bin/faugus-launcher:2637
+#: /usr/bin/faugus-launcher:2617
 msgid "Please don't change the installation path."
 msgstr "Por favor não altere o caminho da instalação."
 
-#: /usr/bin/faugus-launcher:3121
+#: /usr/bin/faugus-launcher:3103
 msgid "Settings"
 msgstr "Configurações"
 
-#: /usr/bin/faugus-launcher:3245
+#: /usr/bin/faugus-launcher:3227
 msgid "Language"
 msgstr "Idioma"
 
-#: /usr/bin/faugus-launcher:3250
+#: /usr/bin/faugus-launcher:3232
 msgid "Interface Mode"
 msgstr "Modo de Interface"
 
-#: /usr/bin/faugus-launcher:3259
+#: /usr/bin/faugus-launcher:3241
 msgid "Start maximized"
 msgstr "Iniciar maximizado"
 
-#: /usr/bin/faugus-launcher:3264
+#: /usr/bin/faugus-launcher:3246
 msgid "Start in fullscreen"
 msgstr "Iniciar em tela cheia"
 
-#: /usr/bin/faugus-launcher:3267
+#: /usr/bin/faugus-launcher:3249
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter alterna a tela cheia"
 
-#: /usr/bin/faugus-launcher:3269
+#: /usr/bin/faugus-launcher:3251
 msgid "Show labels"
 msgstr "Exibir rótulos"
 
-#: /usr/bin/faugus-launcher:3272
+#: /usr/bin/faugus-launcher:3254
 msgid "Smaller banners"
 msgstr "Banners menores"
 
-#: /usr/bin/faugus-launcher:3276
+#: /usr/bin/faugus-launcher:3258
 msgid "Default Prefixes Location"
 msgstr "Local Padrão dos Prefixos"
 
-#: /usr/bin/faugus-launcher:3280 /usr/bin/faugus-launcher:4970
+#: /usr/bin/faugus-launcher:3262 /usr/bin/faugus-launcher:4979
 msgid "/path/to/the/prefix"
 msgstr "/caminho/para/o/prefixo"
 
-#: /usr/bin/faugus-launcher:3290
+#: /usr/bin/faugus-launcher:3272
 msgid "Lossless Scaling Location"
 msgstr "Local do Lossless Scaling"
 
-#: /usr/bin/faugus-launcher:3294
+#: /usr/bin/faugus-launcher:3276
 msgid "/path/to/Lossless.dll"
 msgstr "/caminho/para/Lossless.dll"
 
-#: /usr/bin/faugus-launcher:3303
+#: /usr/bin/faugus-launcher:3285
 msgid "Default Prefix Tools"
 msgstr "Ferramentas do Prefixo Padrão"
 
-#: /usr/bin/faugus-launcher:3310
+#: /usr/bin/faugus-launcher:3292
 msgid "Default Proton"
 msgstr "Proton Padrão"
 
-#: /usr/bin/faugus-launcher:3314
+#: /usr/bin/faugus-launcher:3296
 msgid "Proton Manager"
 msgstr "Gerenciador de Proton"
 
-#: /usr/bin/faugus-launcher:3317
+#: /usr/bin/faugus-launcher:3299
 msgid "Miscellaneous"
 msgstr "Diversos"
 
-#: /usr/bin/faugus-launcher:3324
+#: /usr/bin/faugus-launcher:3306
 msgid "Use discrete GPU"
 msgstr "Usar GPU dedicada"
 
-#: /usr/bin/faugus-launcher:3328
+#: /usr/bin/faugus-launcher:3310
 msgid "Close when running a game/app"
 msgstr "Fechar ao executar um jogo/aplicativo"
 
-#: /usr/bin/faugus-launcher:3332
+#: /usr/bin/faugus-launcher:3314
 msgid "System tray icon"
 msgstr "Ícone na bandeja do sistema"
 
-#: /usr/bin/faugus-launcher:3337
+#: /usr/bin/faugus-launcher:3319
 msgid "Start on boot"
 msgstr "Iniciar com o sistema"
 
-#: /usr/bin/faugus-launcher:3341
+#: /usr/bin/faugus-launcher:3323
 msgid "Monochrome icon"
 msgstr "Ícone monocromático"
 
-#: /usr/bin/faugus-launcher:3346
+#: /usr/bin/faugus-launcher:3328
 msgid "Disable splash window"
 msgstr "Desativar janela de respingo"
 
-#: /usr/bin/faugus-launcher:3350
+#: /usr/bin/faugus-launcher:3332
 msgid "Enable logging"
 msgstr "Ativar logs"
 
-#: /usr/bin/faugus-launcher:3353
+#: /usr/bin/faugus-launcher:3335
 msgid "Show hidden games"
 msgstr "Exibir jogos ocultos"
 
-#: /usr/bin/faugus-launcher:3355
+#: /usr/bin/faugus-launcher:3337
 msgid "Press Ctrl+H to show/hide games."
 msgstr "Pressione Ctrl+H para exibir/ocultar jogos."
 
-#: /usr/bin/faugus-launcher:3357
+#: /usr/bin/faugus-launcher:3339
 msgid "Use Wayland driver (experimental)"
 msgstr "Usar driver do Wayland (experimental)"
 
-#: /usr/bin/faugus-launcher:3359 /usr/bin/faugus-launcher:3365
+#: /usr/bin/faugus-launcher:3341 /usr/bin/faugus-launcher:3347
 msgid "Only works with GE-Proton10 or Proton-EM-10."
 msgstr "Só funciona com o GE-Proton10 ou Proton-EM-10."
 
-#: /usr/bin/faugus-launcher:3362
+#: /usr/bin/faugus-launcher:3344
 msgid "Enable HDR (experimental)"
 msgstr "Ativar HDR (experimental)"
 
-#: /usr/bin/faugus-launcher:3367
+#: /usr/bin/faugus-launcher:3349
 msgid "Enable WOW64 (experimental)"
 msgstr "Ativar WOW64 (experimental)"
 
-#: /usr/bin/faugus-launcher:3369
+#: /usr/bin/faugus-launcher:3351
 msgid ""
 "Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
 msgstr ""
 "Só funciona com o GE-Proton10-9 ou superior e Proton-EM-10-24 ou superior."
 
-#: /usr/bin/faugus-launcher:3382 /usr/bin/faugus-launcher:5054
+#: /usr/bin/faugus-launcher:3364 /usr/bin/faugus-launcher:5063
 msgid "Run"
 msgstr "Executar"
 
-#: /usr/bin/faugus-launcher:3385 /usr/bin/faugus-launcher:5057
+#: /usr/bin/faugus-launcher:3367 /usr/bin/faugus-launcher:5066
 msgid "Run a file inside the prefix"
 msgstr "Executa um arquivo dentro do prefixo"
 
-#: /usr/bin/faugus-launcher:3390 /usr/bin/faugus-launcher:5035
+#: /usr/bin/faugus-launcher:3372 /usr/bin/faugus-launcher:5044
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 msgstr ""
 "Mostra um overlay para monitorar FPS, temperaturas, carga da CPU/GPU e muito "
 "mais."
 
-#: /usr/bin/faugus-launcher:3392 /usr/bin/faugus-launcher:5037
+#: /usr/bin/faugus-launcher:3374 /usr/bin/faugus-launcher:5046
 msgid "Tweaks your system to improve performance."
 msgstr "Ajusta seu sistema para melhorar o desempenho."
 
-#: /usr/bin/faugus-launcher:3393 /usr/bin/faugus-launcher:5038
+#: /usr/bin/faugus-launcher:3375 /usr/bin/faugus-launcher:5047
 msgid "Disable Hidraw"
 msgstr "Desativar Hidraw"
 
-#: /usr/bin/faugus-launcher:3395 /usr/bin/faugus-launcher:5040
+#: /usr/bin/faugus-launcher:3377 /usr/bin/faugus-launcher:5049
 msgid ""
 "May fix controller issues with some games. Only works with GE-Proton10 or "
 "Proton-EM-10."
@@ -382,42 +382,42 @@ msgstr ""
 "Pode corrigir problemas com controle em alguns jogos. Só funciona com o GE-"
 "Proton10 ou Proton-EM-10."
 
-#: /usr/bin/faugus-launcher:3396 /usr/bin/faugus-launcher:5041
+#: /usr/bin/faugus-launcher:3378 /usr/bin/faugus-launcher:5050
 msgid "Prevent Sleep"
 msgstr "Impedir Suspensão"
 
-#: /usr/bin/faugus-launcher:3398
+#: /usr/bin/faugus-launcher:3380
 msgid "Support the Project"
 msgstr "Contribua com o Projeto"
 
-#: /usr/bin/faugus-launcher:3413 /usr/bin/faugus-launcher:4134
-#: /usr/bin/faugus-launcher:4237 /usr/bin/faugus-launcher:4270
-#: /usr/bin/faugus-launcher:4425 /usr/bin/faugus-launcher:4448
-#: /usr/bin/faugus-launcher:4641 /usr/bin/faugus-launcher:5082
-#: /usr/bin/faugus-launcher:5441 /usr/bin/faugus-launcher:5533
-#: /usr/bin/faugus-launcher:5578 /usr/bin/faugus-launcher:5727
-#: /usr/bin/faugus-launcher:6019 /usr/bin/faugus-launcher:6153
-#: /usr/bin/faugus-launcher:6429 /usr/bin/faugus-launcher:6502
+#: /usr/bin/faugus-launcher:3395 /usr/bin/faugus-launcher:4116
+#: /usr/bin/faugus-launcher:4219 /usr/bin/faugus-launcher:4252
+#: /usr/bin/faugus-launcher:4407 /usr/bin/faugus-launcher:4430
+#: /usr/bin/faugus-launcher:4623 /usr/bin/faugus-launcher:5091
+#: /usr/bin/faugus-launcher:5484 /usr/bin/faugus-launcher:5576
+#: /usr/bin/faugus-launcher:5621 /usr/bin/faugus-launcher:5770
+#: /usr/bin/faugus-launcher:6121 /usr/bin/faugus-launcher:6256
+#: /usr/bin/faugus-launcher:6532 /usr/bin/faugus-launcher:6605
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: /usr/bin/faugus-launcher:3422
+#: /usr/bin/faugus-launcher:3404
 msgid "Backup/Restore Settings"
 msgstr "Backup/Restaurar Configurações"
 
-#: /usr/bin/faugus-launcher:3429
+#: /usr/bin/faugus-launcher:3411
 msgid "Backup"
 msgstr "Backup"
 
-#: /usr/bin/faugus-launcher:3433
+#: /usr/bin/faugus-launcher:3415
 msgid "Restore"
 msgstr "Restaurar"
 
-#: /usr/bin/faugus-launcher:3440
+#: /usr/bin/faugus-launcher:3422
 msgid "Global Environment Variables"
 msgstr "Variáveis de Ambiente Globais"
 
-#: /usr/bin/faugus-launcher:3713 /usr/bin/faugus-launcher:5299
+#: /usr/bin/faugus-launcher:3695 /usr/bin/faugus-launcher:5315
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
@@ -425,157 +425,158 @@ msgstr ""
 "Mostra um overlay para monitorar FPS, temperaturas, carga da CPU/GPU e muito "
 "mais. NÃO INSTALADO."
 
-#: /usr/bin/faugus-launcher:3719 /usr/bin/faugus-launcher:5305
+#: /usr/bin/faugus-launcher:3701 /usr/bin/faugus-launcher:5321
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
 msgstr "Ajusta seu sistema para melhorar o desempenho. NÃO INSTALADO."
 
-#: /usr/bin/faugus-launcher:3756
+#: /usr/bin/faugus-launcher:3738
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Limpar Logs (%s)"
 
-#: /usr/bin/faugus-launcher:3759
+#: /usr/bin/faugus-launcher:3741
 msgid "Clear Logs"
 msgstr "Limpar Logs"
 
-#: /usr/bin/faugus-launcher:4130 /usr/bin/faugus-launcher:6015
+#: /usr/bin/faugus-launcher:4112 /usr/bin/faugus-launcher:6117
 msgid "Select a file to run inside the prefix"
 msgstr "Selecione um arquivo pra executar dentro do prefixo"
 
-#: /usr/bin/faugus-launcher:4133 /usr/bin/faugus-launcher:4269
-#: /usr/bin/faugus-launcher:4424 /usr/bin/faugus-launcher:4447
-#: /usr/bin/faugus-launcher:5532 /usr/bin/faugus-launcher:5726
-#: /usr/bin/faugus-launcher:6018 /usr/bin/faugus-launcher:6152
-#: /usr/bin/faugus-launcher:6428 /usr/bin/faugus-launcher:6501
+#: /usr/bin/faugus-launcher:4115 /usr/bin/faugus-launcher:4251
+#: /usr/bin/faugus-launcher:4406 /usr/bin/faugus-launcher:4429
+#: /usr/bin/faugus-launcher:5575 /usr/bin/faugus-launcher:5769
+#: /usr/bin/faugus-launcher:6120 /usr/bin/faugus-launcher:6255
+#: /usr/bin/faugus-launcher:6531 /usr/bin/faugus-launcher:6604
 msgid "Open"
 msgstr "Abrir"
 
-#: /usr/bin/faugus-launcher:4138 /usr/bin/faugus-launcher:5731
-#: /usr/bin/faugus-launcher:6023 /usr/bin/faugus-launcher:6436
+#: /usr/bin/faugus-launcher:4120 /usr/bin/faugus-launcher:5774
+#: /usr/bin/faugus-launcher:6125 /usr/bin/faugus-launcher:6539
 msgid "Windows files"
 msgstr "Arquivos do Windows"
 
-#: /usr/bin/faugus-launcher:4146 /usr/bin/faugus-launcher:5739
-#: /usr/bin/faugus-launcher:6031 /usr/bin/faugus-launcher:6444
+#: /usr/bin/faugus-launcher:4128 /usr/bin/faugus-launcher:5782
+#: /usr/bin/faugus-launcher:6133 /usr/bin/faugus-launcher:6547
 msgid "All files"
 msgstr "Todos os arquivos"
 
-#: /usr/bin/faugus-launcher:4205
+#: /usr/bin/faugus-launcher:4187
 msgid "Prefixes and runners will not be backed up!"
 msgstr "Não será feito backup dos prefixos e executores!"
 
-#: /usr/bin/faugus-launcher:4233
+#: /usr/bin/faugus-launcher:4215
 msgid "Save the backup file as..."
 msgstr "Salvar o arquivo como..."
 
-#: /usr/bin/faugus-launcher:4236
+#: /usr/bin/faugus-launcher:4218
 msgid "Save"
 msgstr "Salvar"
 
-#: /usr/bin/faugus-launcher:4266
+#: /usr/bin/faugus-launcher:4248
 msgid "Select a backup file to restore"
 msgstr "Selecione o arquivo de backup para restaurar"
 
-#: /usr/bin/faugus-launcher:4274
+#: /usr/bin/faugus-launcher:4256
 msgid "ZIP files"
 msgstr "Arquivos ZIP"
 
-#: /usr/bin/faugus-launcher:4285 /usr/bin/faugus-launcher:4295
+#: /usr/bin/faugus-launcher:4267 /usr/bin/faugus-launcher:4277
 msgid "This is not a valid Faugus Launcher backup file."
 msgstr "Este não é um arquivo de backup válido do Faugus Launcher."
 
-#: /usr/bin/faugus-launcher:4298
+#: /usr/bin/faugus-launcher:4280
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Tem certeza que deseja sobrescrever as configurações?"
 
-#: /usr/bin/faugus-launcher:4374 /usr/bin/faugus-launcher:4732
+#: /usr/bin/faugus-launcher:4356 /usr/bin/faugus-launcher:4714
 msgid "No"
 msgstr "Não"
 
-#: /usr/bin/faugus-launcher:4378 /usr/bin/faugus-launcher:4736
+#: /usr/bin/faugus-launcher:4360 /usr/bin/faugus-launcher:4718
 msgid "Yes"
 msgstr "Sim"
 
-#: /usr/bin/faugus-launcher:4421 /usr/bin/faugus-launcher:6498
+#: /usr/bin/faugus-launcher:4403 /usr/bin/faugus-launcher:6601
 msgid "Select a prefix location"
 msgstr "Selecione um local para o prefixo"
 
-#: /usr/bin/faugus-launcher:4444
+#: /usr/bin/faugus-launcher:4426
 msgid "Select the Lossless.dll file"
 msgstr "Selecione o arquivo Lossless.dll"
 
-#: /usr/bin/faugus-launcher:4631
+#: /usr/bin/faugus-launcher:4613
 #, python-format
 msgid "Duplicate %s"
 msgstr "Duplicar %s"
 
-#: /usr/bin/faugus-launcher:4635 /usr/bin/faugus-launcher:4939
+#: /usr/bin/faugus-launcher:4617 /usr/bin/faugus-launcher:4930
+#: /usr/bin/faugus-launcher:4948
 msgid "Title"
 msgstr "Título"
 
-#: /usr/bin/faugus-launcher:4638 /usr/bin/faugus-launcher:4946
+#: /usr/bin/faugus-launcher:4620 /usr/bin/faugus-launcher:4955
 msgid "Game Title"
 msgstr "Título do Jogo"
 
-#: /usr/bin/faugus-launcher:4723
+#: /usr/bin/faugus-launcher:4705
 #, python-format
 msgid "Delete %s"
 msgstr "Excluir %s"
 
-#: /usr/bin/faugus-launcher:4729
+#: /usr/bin/faugus-launcher:4711
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Tem certeza que deseja excluir %s?"
 
-#: /usr/bin/faugus-launcher:4740
+#: /usr/bin/faugus-launcher:4722
 msgid "Also remove the prefix"
 msgstr "Também remover o prefixo"
 
-#: /usr/bin/faugus-launcher:4781
+#: /usr/bin/faugus-launcher:4763
 msgid "New Game/App"
 msgstr "Novo Jogo/Aplicativo"
 
-#: /usr/bin/faugus-launcher:4951
+#: /usr/bin/faugus-launcher:4960
 msgid "Path"
 msgstr "Caminho"
 
-#: /usr/bin/faugus-launcher:4957
+#: /usr/bin/faugus-launcher:4966
 msgid "/path/to/the/exe"
 msgstr "/caminho/para/o/exe"
 
-#: /usr/bin/faugus-launcher:4966
+#: /usr/bin/faugus-launcher:4975
 msgid "Prefix"
 msgstr "Prefixo"
 
-#: /usr/bin/faugus-launcher:4979
+#: /usr/bin/faugus-launcher:4988
 msgid "Proton"
 msgstr "Proton"
 
-#: /usr/bin/faugus-launcher:4997
+#: /usr/bin/faugus-launcher:5006
 msgid "Launch Arguments"
 msgstr "Argumentos de Lançamento"
 
-#: /usr/bin/faugus-launcher:5000
+#: /usr/bin/faugus-launcher:5009
 msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 msgstr "ex.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 
-#: /usr/bin/faugus-launcher:5005
+#: /usr/bin/faugus-launcher:5014
 msgid "Game Arguments"
 msgstr "Argumentos do Jogo"
 
-#: /usr/bin/faugus-launcher:5008
+#: /usr/bin/faugus-launcher:5017
 msgid "e.g.: -d3d11 -fullscreen"
 msgstr "ex.: -d3d11 -fullscreen"
 
-#: /usr/bin/faugus-launcher:5013 /usr/bin/faugus-launcher:5338
+#: /usr/bin/faugus-launcher:5022 /usr/bin/faugus-launcher:5381
 msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling Gerador de Quadros"
 
-#: /usr/bin/faugus-launcher:5017
+#: /usr/bin/faugus-launcher:5026
 msgid "Additional Application"
 msgstr "Aplicativo Adicional"
 
-#: /usr/bin/faugus-launcher:5019
+#: /usr/bin/faugus-launcher:5028
 msgid ""
 "Additional application to run with the game, like Cheat Engine, Trainers, "
 "Mods..."
@@ -583,63 +584,63 @@ msgstr ""
 "Aplicativo adicionar para executar com o jogo, como Cheat Engine, Trainers, "
 "Mods..."
 
-#: /usr/bin/faugus-launcher:5022
+#: /usr/bin/faugus-launcher:5031
 msgid "/path/to/the/app"
 msgstr "/caminho/para/o/aplicativo"
 
-#: /usr/bin/faugus-launcher:5060
+#: /usr/bin/faugus-launcher:5069
 msgid "Shortcut"
 msgstr "Atalho"
 
-#: /usr/bin/faugus-launcher:5065
+#: /usr/bin/faugus-launcher:5074
 msgid "Desktop"
 msgstr "Área de Trabalho"
 
-#: /usr/bin/faugus-launcher:5067
+#: /usr/bin/faugus-launcher:5076
 msgid "Add or remove a shortcut from the Desktop."
 msgstr "Adiciona ou remove um atalho da Área de Trabalho."
 
-#: /usr/bin/faugus-launcher:5068
+#: /usr/bin/faugus-launcher:5077
 msgid "App Menu"
 msgstr "Menu de Aplicativos"
 
-#: /usr/bin/faugus-launcher:5070
+#: /usr/bin/faugus-launcher:5079
 msgid "Add or remove a shortcut from the Application Menu."
 msgstr "Adiciona ou remove um atalho do Menu de Aplicativos."
 
-#: /usr/bin/faugus-launcher:5071
+#: /usr/bin/faugus-launcher:5080
 msgid "Steam"
 msgstr "Steam"
 
-#: /usr/bin/faugus-launcher:5073
+#: /usr/bin/faugus-launcher:5082
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
 msgstr "Adiciona ou remove um atalho da Steam. Steam precisa ser reiniciada."
 
-#: /usr/bin/faugus-launcher:5079 /usr/bin/faugus-launcher:6149
+#: /usr/bin/faugus-launcher:5088 /usr/bin/faugus-launcher:6252
 msgid "Select an icon for the shortcut"
 msgstr "Selecione um ícone para o atalho"
 
-#: /usr/bin/faugus-launcher:5130
+#: /usr/bin/faugus-launcher:5139
 msgid "Refresh"
 msgstr "Atualizar"
 
-#: /usr/bin/faugus-launcher:5134
+#: /usr/bin/faugus-launcher:5143
 msgid "Load from file"
 msgstr "Carregar do arquivo"
 
-#: /usr/bin/faugus-launcher:5138
+#: /usr/bin/faugus-launcher:5147
 msgid "Load from URL"
 msgstr "Carregar do URL"
 
-#: /usr/bin/faugus-launcher:5146
+#: /usr/bin/faugus-launcher:5155
 msgid "Game/App"
 msgstr "Jogo/Aplicativo"
 
-#: /usr/bin/faugus-launcher:5162
+#: /usr/bin/faugus-launcher:5171
 msgid "Tools"
 msgstr "Ferramentas"
 
-#: /usr/bin/faugus-launcher:5320
+#: /usr/bin/faugus-launcher:5336
 msgid ""
 "Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
 "and set the location."
@@ -647,83 +648,87 @@ msgstr ""
 "Lossless.dll NÃO ENCONTRADO. Se está instalado, vá para as configurações do "
 "Faugus Launcher e coloque a local."
 
-#: /usr/bin/faugus-launcher:5323
+#: /usr/bin/faugus-launcher:5339
 msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
 msgstr "Lossless Scaling Vulkan Layer NÃO INSTALADO."
 
-#: /usr/bin/faugus-launcher:5367
+#: /usr/bin/faugus-launcher:5410
 msgid "Multiplier"
 msgstr "Multiplicador"
 
-#: /usr/bin/faugus-launcher:5372
+#: /usr/bin/faugus-launcher:5415
 msgid "Multiply the FPS."
 msgstr "Multiplica os FPS."
 
-#: /usr/bin/faugus-launcher:5374
+#: /usr/bin/faugus-launcher:5417
 msgid "Flow Scale"
 msgstr "Escala de Fluxo"
 
-#: /usr/bin/faugus-launcher:5381
+#: /usr/bin/faugus-launcher:5424
 msgid "Lower the internal motion estimation resolution."
 msgstr "Reduz a resolução interna da estimativa de movimento."
 
-#: /usr/bin/faugus-launcher:5383
+#: /usr/bin/faugus-launcher:5426
 msgid "Performance Mode"
 msgstr "Modo Performance"
 
-#: /usr/bin/faugus-launcher:5384
+#: /usr/bin/faugus-launcher:5427
 msgid "Massively improve performance at the cost of quality."
 msgstr "Melhora massivamente o desempenho, com custo na qualidade."
 
-#: /usr/bin/faugus-launcher:5387
+#: /usr/bin/faugus-launcher:5430
 msgid "HDR Mode"
 msgstr "Modo HDR"
 
-#: /usr/bin/faugus-launcher:5388
+#: /usr/bin/faugus-launcher:5431
 msgid "Enable special HDR-only behavior."
 msgstr "Ativar comportamento especial exclusivo para HDR."
 
-#: /usr/bin/faugus-launcher:5391
+#: /usr/bin/faugus-launcher:5434
 msgid "Present Mode (Experimental)"
 msgstr "Modo de Apresentação (Experimental)"
 
-#: /usr/bin/faugus-launcher:5395
+#: /usr/bin/faugus-launcher:5438
 msgid "Override the present mode."
 msgstr "Substitui o modo de apresentação."
 
-#: /usr/bin/faugus-launcher:5529
+#: /usr/bin/faugus-launcher:5572
 msgid "Select an image for the banner"
 msgstr "Selecione uma imagem para o banner"
 
-#: /usr/bin/faugus-launcher:5537 /usr/bin/faugus-launcher:6157
+#: /usr/bin/faugus-launcher:5580 /usr/bin/faugus-launcher:6260
 msgid "Image files"
 msgstr "Arquivos de imagem"
 
-#: /usr/bin/faugus-launcher:5564
+#: /usr/bin/faugus-launcher:5607
 msgid "Enter the image URL"
 msgstr "Coloque o URL da imagem"
 
-#: /usr/bin/faugus-launcher:5640 /usr/bin/faugus-launcher:6180
+#: /usr/bin/faugus-launcher:5683 /usr/bin/faugus-launcher:6283
 msgid "The selected file is not a valid image."
 msgstr "O arquivo selecionado não é uma imagem válida."
 
-#: /usr/bin/faugus-launcher:5643 /usr/bin/faugus-launcher:6184
+#: /usr/bin/faugus-launcher:5686 /usr/bin/faugus-launcher:6287
 msgid "Please choose another one."
 msgstr "Por favor escolha outra."
 
-#: /usr/bin/faugus-launcher:5723
+#: /usr/bin/faugus-launcher:5766
 msgid "Select an additional application"
 msgstr "Selecione um aplicativo adicional"
 
-#: /usr/bin/faugus-launcher:5930
+#: /usr/bin/faugus-launcher:6031
 msgid "Windows Game"
 msgstr "Jogo do Windows"
 
-#: /usr/bin/faugus-launcher:5931
+#: /usr/bin/faugus-launcher:6032
 msgid "Linux Game"
 msgstr "Jogo do Linux"
 
-#: /usr/bin/faugus-launcher:6425
+#: /usr/bin/faugus-launcher:6033
+msgid "Steam Game"
+msgstr "Jogo da Steam"
+
+#: /usr/bin/faugus-launcher:6528
 msgid "Select the game's .exe"
 msgstr "Selecione o .exe do jogo"
 
