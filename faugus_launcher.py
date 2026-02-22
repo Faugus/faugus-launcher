@@ -3140,6 +3140,7 @@ class Settings(Gtk.Dialog):
         self.set_icon_from_file(faugus_png)
         self.parent = parent
         self.logging_warning = False
+        self.modified = False
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -3734,6 +3735,7 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_sensitive(False)
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        self.track_modifications(self.box)
 
     def on_envar_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Delete:
@@ -3997,130 +3999,133 @@ class Settings(Gtk.Dialog):
                     f.write(val + "\n")
 
     def on_button_proton_manager_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            self.update_envar_file()
-            self.update_config_file()
-            proton_manager = faugus_proton_manager
+        proton_manager = faugus_proton_manager
+        current_runner = self.combobox_runner.get_active_text()
 
-            def run_command():
-                process = subprocess.Popen([sys.executable, proton_manager])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
+        def run_command():
+            process = subprocess.Popen([sys.executable, proton_manager])
+            process.wait()
 
-                GLib.idle_add(lambda: self.combobox_runner.remove_all())
-                GLib.idle_add(self.populate_combobox_with_runners)
-                GLib.idle_add(lambda: self.load_config())
+            GLib.idle_add(self.set_sensitive, True)
+            GLib.idle_add(self.parent.set_sensitive, True)
+            GLib.idle_add(self.blocking_window.destroy)
 
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
+            GLib.idle_add(lambda: self.combobox_runner.remove_all())
+            GLib.idle_add(self.populate_combobox_with_runners)
 
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
+            def restore_selection():
+                if current_runner:
+                    for i, text in enumerate(self.combobox_runner.get_model()):
+                        if text[0] == current_runner:
+                            self.combobox_runner.set_active(i)
+                            break
+
+            GLib.idle_add(restore_selection)
+
+        self.blocking_window = Gtk.Window()
+        self.blocking_window.set_transient_for(self.parent)
+        self.blocking_window.set_decorated(False)
+        self.blocking_window.set_modal(True)
+
+        command_thread = threading.Thread(target=run_command)
+        command_thread.start()
+
+    def track_modifications(self, container):
+        for child in container.get_children():
+            if isinstance(child, Gtk.Entry):
+                child.connect("changed", lambda w: setattr(self, "modified", True))
+            elif isinstance(child, Gtk.CheckButton):
+                child.connect("toggled", lambda w: setattr(self, "modified", True))
+            elif isinstance(child, Gtk.ComboBox):
+                child.connect("changed", lambda w: setattr(self, "modified", True))
+            elif isinstance(child, Gtk.TreeView):
+                selection = child.get_selection()
+                selection.connect("changed", lambda sel: setattr(self, "modified", True))
+            elif isinstance(child, Gtk.Container):
+                self.track_modifications(child)
+
+    def check_modified(self):
+        self.track_modifications(self.box)
+        if self.modified:
+            proceed = self.show_warning_dialog2(self.parent, _("Do you want to save the changes?"))
+            if proceed:
+                if self.entry_default_prefix.get_text() == "":
+                    self.entry_default_prefix.get_style_context().add_class("entry")
+                    return
+                self.update_envar_file()
+                self.update_config_file()
+                if self.checkbox_system_tray.get_active():
+                    self.parent.system_tray = True
+                else:
+                    self.parent.system_tray = False
+                GLib.timeout_add(1000, self.parent.load_tray_icon)
+                self.modified = False
+
+            else:
+                self.load_config()
+                self.modified = False
 
     def on_button_winetricks_default_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            self.update_envar_file()
-            self.update_config_file()
-            self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
-            default_runner = self.get_default_runner()
-            command_parts = []
+        self.check_modified()
+        self.set_sensitive(False)
 
-            # Add command parts if they are not empty
-            command_parts.append(f"GAMEID=winetricks-gui")
-            command_parts.append(f"STORE=none")
-            if default_runner:
-                if default_runner == "Proton-CachyOS":
-                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
-                else:
-                    command_parts.append(f"PROTONPATH='{default_runner}'")
+        self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
+        default_runner = self.get_default_runner()
+        command_parts = []
 
-            # Add the fixed command and remaining arguments
-            command_parts.append(f"'{umu_run}'")
-            command_parts.append("''")
+        command_parts.append(f"GAMEID=winetricks-gui")
+        command_parts.append(f"STORE=none")
+        if default_runner:
+            if default_runner == "Proton-CachyOS":
+                command_parts.append(f"PROTONPATH='{proton_cachyos}'")
+            else:
+                command_parts.append(f"PROTONPATH='{default_runner}'")
 
-            # Join all parts into a single command
-            command = ' '.join(command_parts)
+        command_parts.append(f"'{umu_run}'")
+        command_parts.append("''")
+        command = ' '.join(command_parts)
 
-            print(command)
+        faugus_run_path = faugus_run
 
-            # faugus-run path
-            faugus_run_path = faugus_run
+        def run_command():
+            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+            process.wait()
+            GLib.idle_add(self.set_sensitive, True)
 
-            def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
+        threading.Thread(target=run_command, daemon=True).start()
 
     def on_button_winecfg_default_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-        else:
-            self.update_envar_file()
-            self.update_config_file()
-            self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
-            default_runner = self.get_default_runner()
-            command_parts = []
+        self.check_modified()
+        self.set_sensitive(False)
 
-            # Add command parts if they are not empty
-            command_parts.append(f"GAMEID=default")
-            if default_runner:
-                if default_runner == "Proton-CachyOS":
-                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
-                else:
-                    command_parts.append(f"PROTONPATH='{default_runner}'")
+        self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
+        default_runner = self.get_default_runner()
+        command_parts = []
 
-            # Add the fixed command and remaining arguments
-            command_parts.append(f"'{umu_run}'")
-            command_parts.append("'winecfg'")
+        command_parts.append(f"GAMEID=default")
+        if default_runner:
+            if default_runner == "Proton-CachyOS":
+                command_parts.append(f"PROTONPATH='{proton_cachyos}'")
+            else:
+                command_parts.append(f"PROTONPATH='{default_runner}'")
 
-            # Join all parts into a single command
-            command = ' '.join(command_parts)
+        command_parts.append(f"'{umu_run}'")
+        command_parts.append("'winecfg'")
+        command = ' '.join(command_parts)
 
-            print(command)
+        faugus_run_path = faugus_run
 
-            # faugus-run path
-            faugus_run_path = faugus_run
+        def run_command():
+            process = subprocess.Popen([sys.executable, faugus_run_path, command])
+            process.wait()
+            GLib.idle_add(self.set_sensitive, True)
 
-            def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
-                process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
+        threading.Thread(target=run_command, daemon=True).start()
 
     def on_button_run_default_clicked(self, widget):
-        if self.entry_default_prefix.get_text() == "":
-            self.entry_default_prefix.get_style_context().add_class("entry")
-            return
+        self.check_modified()
+        self.set_sensitive(False)
 
-        self.update_envar_file()
-        self.update_config_file()
         self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
 
@@ -4174,7 +4179,6 @@ class Settings(Gtk.Dialog):
                 command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            print(command)
 
             faugus_run_path = faugus_run
 
@@ -4182,23 +4186,14 @@ class Settings(Gtk.Dialog):
                 process = subprocess.Popen([sys.executable, faugus_run_path, command])
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
 
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
-
-            command_thread = threading.Thread(target=run_command)
-            command_thread.start()
-
+            threading.Thread(target=run_command, daemon=True).start()
         else:
             self.set_sensitive(True)
 
-        filechooser.destroy()
-
     def on_button_backup_clicked(self, widget):
+        self.check_modified()
+
         self.response(Gtk.ResponseType.OK)
         self.show_warning_dialog(self, _("Prefixes and runners will not be backed up!"))
 
