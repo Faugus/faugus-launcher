@@ -26,6 +26,7 @@ from PIL import Image
 from filelock import FileLock, Timeout
 from faugus.config_manager import *
 from faugus.dark_theme import *
+from faugus.steam_setup import *
 
 VERSION = "1.15.1"
 print(f"Faugus Launcher {VERSION}")
@@ -94,53 +95,6 @@ faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
-
-possible_steam_locations = [
-    Path.home() / '.local' / 'share' / 'Steam' / 'userdata',
-    Path.home() / '.steam' / 'steam' / 'userdata',
-    Path.home() / '.steam' / 'root' / 'userdata',
-    os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')
-]
-
-steam_userdata_path = None
-IS_STEAM_FLATPAK = False
-
-for location in possible_steam_locations:
-    if Path(location).exists():
-        steam_userdata_path = location
-        if str(location).startswith(str(Path.home() / '.var' / 'app' / 'com.valvesoftware.Steam')):
-            IS_STEAM_FLATPAK = True
-        break
-
-def detect_steam_id():
-    if steam_userdata_path:
-        try:
-            steam_ids = [f for f in os.listdir(steam_userdata_path)
-                         if os.path.isdir(os.path.join(steam_userdata_path, f)) and f.isdigit()]
-            return steam_ids[0] if steam_ids else None
-        except (FileNotFoundError, PermissionError):
-            return None
-    return None
-
-steam_id = detect_steam_id()
-
-steam_shortcuts_path = f'{steam_userdata_path}/{steam_id}/config/shortcuts.vdf' if steam_id else ""
-
-def find_lossless_dll():
-    possible_common_locations = [
-        Path.home() / '.local' / 'share' / 'Steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'root' / 'steamapps' / 'common',
-        Path.home() / 'SteamLibrary' / 'steamapps' / 'common',
-        Path(os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steamapps/common/'))
-    ]
-
-    for location in possible_common_locations:
-        dll_candidate = location / 'Lossless Scaling' / 'Lossless.dll'
-        if dll_candidate.exists():
-            return str(dll_candidate)
-
-    return ""
 
 def get_desktop_dir():
     try:
@@ -225,9 +179,6 @@ class Main(Gtk.Window):
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
-            .hbox-red-background {
-                background-color: rgba(255, 0, 0, 0.5);
-            }
             .hbox-favorite {
                 background-color: alpha(@theme_selected_bg_color, 0.25);
             }
@@ -264,9 +215,9 @@ class Main(Gtk.Window):
         self.menu_item_delete.connect("activate", self.on_context_menu_delete)
         self.context_menu.append(self.menu_item_delete)
 
-        menu_item_duplicate = Gtk.MenuItem(label=_("Duplicate"))
-        menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
-        self.context_menu.append(menu_item_duplicate)
+        self.menu_item_duplicate = Gtk.MenuItem(label=_("Duplicate"))
+        self.menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
+        self.context_menu.append(self.menu_item_duplicate)
 
         self.menu_item_hide = Gtk.MenuItem(label=_("Hide"))
         self.menu_item_hide.connect("activate", self.on_context_menu_hide)
@@ -780,6 +731,21 @@ class Main(Gtk.Window):
                     self.menu_item_favorite.get_child().set_text(_("Remove from favorites"))
                 else:
                     self.menu_item_favorite.get_child().set_text(_("Add to favorites"))
+
+                if game.runner == "Steam":
+                    self.menu_item_duplicate.set_visible(False)
+                    self.menu_item_game.set_visible(False)
+                    self.menu_item_prefix.set_visible(False)
+                    self.menu_show_logs.set_visible(False)
+                elif game.runner == "Linux-Native":
+                    self.menu_item_duplicate.set_visible(True)
+                    self.menu_item_game.set_visible(True)
+                    self.menu_item_prefix.set_visible(False)
+                    self.menu_show_logs.set_visible(False)
+                else:
+                    self.menu_item_duplicate.set_visible(True)
+                    self.menu_item_game.set_visible(True)
+                    self.menu_item_prefix.set_visible(True)
 
                 processos = self.load_processes_from_file()
                 if title in processos:
@@ -1777,6 +1743,12 @@ class Main(Gtk.Window):
         selected_child = selected_children[0]
         game = selected_child.game
         title = game.title
+        game_directory = os.path.dirname(game.path)
+        cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
+
+        if game.runner == "Steam":
+            subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid],cwd=cwd)
+            return
 
         processos = self.load_processes_from_file()
         self.button_locked[title] = True
@@ -1793,19 +1765,16 @@ class Main(Gtk.Window):
             return
 
         if game:
-            # Format the title for command execution
-            game_directory = os.path.dirname(game.path)
-
             # Save the game title to the latest_games.txt file
             self.update_latest_games_file(title)
 
             if self.close_on_launch:
                 if IS_FLATPAK:
                     subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL, cwd=game_directory)
+                                    stderr=subprocess.DEVNULL, cwd=cwd)
                     sys.exit()
                 else:
-                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=game_directory)
+                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
 
                     self.menu_item_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
@@ -1819,7 +1788,7 @@ class Main(Gtk.Window):
                     GLib.timeout_add(1000, check_pid_timeout)
 
             else:
-                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=game_directory)
+                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
 
                 self.menu_item_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
@@ -1937,6 +1906,12 @@ class Main(Gtk.Window):
             edit_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
+            model_steam_title = edit_game_dialog.combobox_steam_title.get_model()
+            for i, row in enumerate(model_steam_title):
+                if row[0] == title:
+                    edit_game_dialog.combobox_steam_title.set_active(i)
+                    break
+
             model_runner = edit_game_dialog.combobox_runner.get_model()
             index_runner = 0
             game_runner = game.runner
@@ -1944,6 +1919,8 @@ class Main(Gtk.Window):
             game_runner = convert_runner(game.runner)
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active(1)
+            if game_runner == "Steam":
+                edit_game_dialog.combobox_launcher.set_active(2)
 
             for i, row in enumerate(model_runner):
                 if row[0] == game_runner:
@@ -2023,6 +2000,7 @@ class Main(Gtk.Window):
             image = self.set_image_shortcut_icon(game.title, edit_game_dialog.icons_path, edit_game_dialog.icon_temp)
             edit_game_dialog.button_shortcut_icon.set_image(image)
             edit_game_dialog.entry_title.set_sensitive(False)
+            edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
             if self.game_running:
                 edit_game_dialog.button_winecfg.set_sensitive(False)
@@ -2233,7 +2211,7 @@ class Main(Gtk.Window):
             # Proceed with adding the game
             # Get game information from dialog fields
             prefix = os.path.normpath(add_game_dialog.entry_prefix.get_text())
-            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
+            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1 or add_game_dialog.combobox_launcher.get_active() == 2:
                 title = add_game_dialog.entry_title.get_text()
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
@@ -2266,15 +2244,15 @@ class Main(Gtk.Window):
             hidden = False
             favorite = False
 
-            if add_game_dialog.combobox_launcher.get_active() == 2:
-                path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
             if add_game_dialog.combobox_launcher.get_active() == 3:
-                path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
+                path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
             if add_game_dialog.combobox_launcher.get_active() == 4:
-                path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
+                path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
             if add_game_dialog.combobox_launcher.get_active() == 5:
-                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+                path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
             if add_game_dialog.combobox_launcher.get_active() == 6:
+                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+            if add_game_dialog.combobox_launcher.get_active() == 7:
                 path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
 
             title_formatted = format_title(title)
@@ -2296,6 +2274,8 @@ class Main(Gtk.Window):
             runner = convert_runner(runner)
             if add_game_dialog.combobox_launcher.get_active() == 1:
                 runner = "Linux-Native"
+            if add_game_dialog.combobox_launcher.get_active() == 2:
+                runner = "Steam"
 
             # Determine mangohud and gamemode status
             mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
@@ -2353,10 +2333,6 @@ class Main(Gtk.Window):
                     self.show_warning_dialog(add_game_dialog, _("No internet connection."), "")
                     return True
                 else:
-                    if add_game_dialog.combobox_launcher.get_active() == 2:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "2", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
-
                     if add_game_dialog.combobox_launcher.get_active() == 3:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
@@ -2372,6 +2348,10 @@ class Main(Gtk.Window):
                     if add_game_dialog.combobox_launcher.get_active() == 6:
                         add_game_dialog.destroy()
                         self.launcher_screen(title, "6", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+
+                    if add_game_dialog.combobox_launcher.get_active() == 7:
+                        add_game_dialog.destroy()
+                        self.launcher_screen(title, "7", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
             game_info = {
                 "gameid": title_formatted,
@@ -2418,7 +2398,7 @@ class Main(Gtk.Window):
 
             self.games.append(game)
 
-            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1:
+            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1 or add_game_dialog.combobox_launcher.get_active() == 2:
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
@@ -2488,27 +2468,27 @@ class Main(Gtk.Window):
         self.button_finish_install.set_size_request(150, -1)
         self.button_finish_install.set_halign(Gtk.Align.CENTER)
 
-        if launcher == "2":
+        if launcher == "3":
             image_path = battle_icon
             self.label_download.set_text(_("Downloading Battle.net..."))
             self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "3":
+        elif launcher == "4":
             image_path = ea_icon
             self.label_download.set_text(_("Downloading EA App..."))
             self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "4":
+        elif launcher == "5":
             image_path = epic_icon
             self.label_download.set_text(_("Downloading Epic Games..."))
             self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "5":
+        elif launcher == "6":
             image_path = ubisoft_icon
             self.label_download.set_text(_("Downloading Ubisoft Connect..."))
             self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "6":
+        elif launcher == "7":
             image_path = rockstar_icon
             self.label_download.set_text(_("Downloading Rockstar Launcher..."))
             self.download_launcher("rockstar", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
@@ -2712,6 +2692,8 @@ class Main(Gtk.Window):
             game.runner = convert_runner(game.runner)
             if edit_game_dialog.combobox_launcher.get_active() == 1:
                 game.runner = "Linux-Native"
+            if edit_game_dialog.combobox_launcher.get_active() == 2:
+                game.runner = "Steam"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
@@ -4759,7 +4741,7 @@ class ConfirmationDialog(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
-        if os.path.basename(prefix) != "default" and runner != "Linux-Native":
+        if os.path.basename(prefix) != "default" and runner != "Linux-Native" and runner != "Steam":
             box_top.pack_start(self.checkbox, True, True, 0)
 
         box_bottom.pack_start(button_no, True, True, 0)
@@ -4822,12 +4804,12 @@ class AddGame(Gtk.Dialog):
 
         box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
-        grid_page1 = Gtk.Grid()
-        grid_page1.set_column_homogeneous(True)
-        grid_page1.set_column_spacing(10)
-        grid_page2 = Gtk.Grid()
-        grid_page2.set_column_homogeneous(True)
-        grid_page2.set_column_spacing(10)
+        self.grid_page1 = Gtk.Grid()
+        self.grid_page1.set_column_homogeneous(True)
+        self.grid_page1.set_column_spacing(10)
+        self.grid_page2 = Gtk.Grid()
+        self.grid_page2.set_column_homogeneous(True)
+        self.grid_page2.set_column_spacing(10)
 
         self.grid_launcher = Gtk.Grid()
         self.grid_launcher.set_row_spacing(10)
@@ -4842,6 +4824,13 @@ class AddGame(Gtk.Dialog):
         self.grid_title.set_margin_start(10)
         self.grid_title.set_margin_end(10)
         self.grid_title.set_margin_top(10)
+
+        self.grid_steam_title = Gtk.Grid()
+        self.grid_steam_title.set_row_spacing(10)
+        self.grid_steam_title.set_column_spacing(10)
+        self.grid_steam_title.set_margin_start(10)
+        self.grid_steam_title.set_margin_end(10)
+        self.grid_steam_title.set_margin_top(10)
 
         self.grid_path = Gtk.Grid()
         self.grid_path.set_row_spacing(10)
@@ -4928,12 +4917,32 @@ class AddGame(Gtk.Dialog):
         .entry {
             border-color: Red;
         }
+        .combobox {
+            border: 1px solid red;
+        }
         """
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.combobox_launcher = Gtk.ComboBoxText()
+
+        self.label_steam_title = Gtk.Label(label=_("Title"))
+        self.label_steam_title.set_halign(Gtk.Align.START)
+        self.combobox_steam_title = Gtk.ComboBoxText()
+
+        FILTER_KEYWORDS = [
+            "Proton",
+            "Steam Linux Runtime",
+            "Steamworks Common Redistributables",
+        ]
+
+        for appid, name in read_installed_games():
+            lname = name.lower()
+            if any(keyword.lower() in lname for keyword in FILTER_KEYWORDS):
+                continue
+
+            self.combobox_steam_title.append(appid, name)
 
         # Widgets for title
         self.label_title = Gtk.Label(label=_("Title"))
@@ -5142,40 +5151,44 @@ class AddGame(Gtk.Dialog):
         self.menu.show_all()
 
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label1 = Gtk.Label(label=_("Game/App"))
         tab_label1.set_width_chars(8)
         tab_label1.set_xalign(0.5)
-        tab_box1.pack_start(tab_label1, True, True, 0)
-        tab_box1.set_hexpand(True)
+        self.tab_box1.pack_start(tab_label1, True, True, 0)
+        self.tab_box1.set_hexpand(True)
 
-        grid_page1.attach(page1, 0, 0, 1, 1)
+        self.grid_page1.attach(page1, 0, 0, 1, 1)
         if interface_mode == "Banners":
-            grid_page1.attach(event_box, 1, 0, 1, 1)
+            self.grid_page1.attach(event_box, 1, 0, 1, 1)
         page1.set_hexpand(True)
         event_box.set_hexpand(True)
 
-        self.notebook.append_page(grid_page1, tab_box1)
+        self.notebook.append_page(self.grid_page1, self.tab_box1)
 
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         tab_label2 = Gtk.Label(label=_("Tools"))
         tab_label2.set_width_chars(8)
         tab_label2.set_xalign(0.5)
-        tab_box2.pack_start(tab_label2, True, True, 0)
-        tab_box2.set_hexpand(True)
+        self.tab_box2.pack_start(tab_label2, True, True, 0)
+        self.tab_box2.set_hexpand(True)
 
-        grid_page2.attach(page2, 0, 0, 1, 1)
+        self.grid_page2.attach(page2, 0, 0, 1, 1)
         if interface_mode == "Banners":
-            grid_page2.attach(event_box2, 1, 0, 1, 1)
+            self.grid_page2.attach(event_box2, 1, 0, 1, 1)
         page2.set_hexpand(True)
         event_box2.set_hexpand(True)
 
-        self.notebook.append_page(grid_page2, tab_box2)
+        self.notebook.append_page(self.grid_page2, self.tab_box2)
 
         self.grid_launcher.attach(self.combobox_launcher, 1, 0, 1, 1)
         self.combobox_launcher.set_hexpand(True)
         self.combobox_launcher.set_valign(Gtk.Align.CENTER)
+
+        self.grid_steam_title.attach(self.label_steam_title, 0, 0, 4, 1)
+        self.grid_steam_title.attach(self.combobox_steam_title, 0, 1, 4, 1)
+        self.combobox_steam_title.set_hexpand(True)
 
         self.grid_title.attach(self.label_title, 0, 0, 4, 1)
         self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
@@ -5207,6 +5220,7 @@ class AddGame(Gtk.Dialog):
         self.box_shortcut.pack_end(self.grid_shortcut_icon, False, False, 0)
 
         page1.add(self.grid_launcher)
+        page1.add(self.grid_steam_title)
         page1.add(self.grid_title)
         page1.add(self.grid_path)
         page1.add(self.grid_prefix)
@@ -5272,6 +5286,8 @@ class AddGame(Gtk.Dialog):
         self.combobox_launcher.set_active(0)
         self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
+        self.combobox_steam_title.connect("changed", self.on_combobox_steam_changed)
+
         self.populate_combobox_with_runners()
 
         model = self.combobox_runner.get_model()
@@ -5324,15 +5340,42 @@ class AddGame(Gtk.Dialog):
 
         self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
-        tab_box1.show_all()
-        tab_box2.show_all()
+        self.tab_box1.show_all()
+        self.tab_box2.show_all()
         self.show_all()
+        self.grid_steam_title.set_visible(False)
         if interface_mode != "Banners":
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
         self.image_banner.set_from_pixbuf(pixbuf)
         self.image_banner2.set_from_pixbuf(pixbuf)
+
+    def on_combobox_steam_changed(self, combobox):
+        self.combobox_steam_title.get_style_context().remove_class("combobox")
+
+        title = self.combobox_steam_title.get_active_text()
+        steamid = self.combobox_steam_title.get_active_id()
+
+        if not title or not steamid:
+            return
+
+        self.entry_title.set_text(title)
+        self.entry_path.set_text(steamid)
+
+        icon_path = get_steam_icon_path(steamid)
+        if not icon_path:
+            icon_path = faugus_png
+
+        self.on_entry_focus_out(self.entry_title, None)
+
+        shutil.copyfile(icon_path, os.path.expanduser(self.icon_temp))
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
+        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+        image = Gtk.Image.new_from_file(self.icon_temp)
+        image.set_from_pixbuf(scaled_pixbuf)
+        self.button_shortcut_icon.set_image(image)
+
 
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
@@ -5778,11 +5821,16 @@ class AddGame(Gtk.Dialog):
             self.lossless_performance = False
             self.lossless_hdr = False
             self.lossless_present = "VSync/FIFO"
+            self.combobox_steam_title.get_style_context().remove_class("combobox")
+            self.entry_title.get_style_context().remove_class("entry")
+            self.entry_prefix.get_style_context().remove_class("entry")
+            self.entry_path.get_style_context().remove_class("entry")
 
         cleanup_fields()
 
         if active_index == 0:
             self.grid_title.set_visible(True)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5794,8 +5842,13 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_visible(True)
             self.checkbox_prevent_sleep.set_visible(True)
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
         if active_index == 1:
             self.grid_title.set_visible(True)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
             self.grid_runner.set_visible(False)
             self.grid_prefix.set_visible(False)
@@ -5808,8 +5861,32 @@ class AddGame(Gtk.Dialog):
             self.checkbox_disable_hidraw.set_active(False)
             self.checkbox_prevent_sleep.set_visible(True)
             self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-        elif active_index == 2:
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
+        if active_index == 2:
             self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(True)
+            self.grid_path.set_visible(False)
+            self.grid_runner.set_visible(False)
+            self.grid_prefix.set_visible(False)
+            self.button_winetricks.set_visible(False)
+            self.button_winecfg.set_visible(False)
+            self.button_run.set_visible(False)
+            self.grid_protonfix.set_visible(False)
+            self.grid_addapp.set_visible(False)
+            self.checkbox_disable_hidraw.set_visible(False)
+            self.checkbox_disable_hidraw.set_active(False)
+            self.checkbox_prevent_sleep.set_visible(True)
+            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+            self.checkbox_shortcut_steam.set_visible(False)
+            self.grid_page2.set_visible(False)
+            self.tab_box2.set_visible(False)
+            self.notebook.set_show_tabs(False)
+        elif active_index == 3:
+            self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5830,8 +5907,13 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 3:
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
+        elif active_index == 4:
             self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5852,8 +5934,13 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 4:
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
+        elif active_index == 5:
             self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5873,8 +5960,13 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 5:
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
+        elif active_index == 6:
             self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5895,8 +5987,13 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
-        elif active_index == 6:
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
+        elif active_index == 7:
             self.grid_title.set_visible(False)
+            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5917,6 +6014,10 @@ class AddGame(Gtk.Dialog):
             image = Gtk.Image.new_from_file(self.icon_temp)
             image.set_from_pixbuf(scaled_pixbuf)
             self.button_shortcut_icon.set_image(image)
+            self.checkbox_shortcut_steam.set_visible(True)
+            self.grid_page2.set_visible(True)
+            self.tab_box2.set_visible(True)
+            self.notebook.set_show_tabs(True)
         if self.interface_mode == "Banners":
             if self.entry_title.get_text() != "":
                 self.get_banner()
@@ -5929,6 +6030,7 @@ class AddGame(Gtk.Dialog):
     def populate_combobox_with_launchers(self):
         self.combobox_launcher.append_text(_("Windows Game"))
         self.combobox_launcher.append_text(_("Linux Game"))
+        self.combobox_launcher.append_text(_("Steam Game"))
         self.combobox_launcher.append_text("Battle.net")
         self.combobox_launcher.append_text("EA App")
         self.combobox_launcher.append_text("Epic Games")
@@ -6116,27 +6218,28 @@ class AddGame(Gtk.Dialog):
 
         path = self.entry_path.get_text()
 
-        if not os.path.exists(self.icon_directory):
-            os.makedirs(self.icon_directory)
+        if os.path.isfile(path):
+            if not os.path.exists(self.icon_directory):
+                os.makedirs(self.icon_directory)
 
-        try:
-            command = f'icoextract "{path}" "{self.icon_extracted}"'
-            result = subprocess.run(command, shell=True, text=True, capture_output=True)
+            try:
+                command = f'icoextract "{path}" "{self.icon_extracted}"'
+                result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-            if result.returncode != 0:
-                if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                    print("The file does not contain icons.")
-                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                if result.returncode != 0:
+                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
+                        print("The file does not contain icons.")
+                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                    else:
+                        print(f"Error extracting icon: {result.stderr}")
                 else:
-                    print(f"Error extracting icon: {result.stderr}")
-            else:
-                command_magick = shutil.which("magick") or shutil.which("convert")
-                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
-                if os.path.isfile(self.icon_extracted):
-                    os.remove(self.icon_extracted)
+                    command_magick = shutil.which("magick") or shutil.which("convert")
+                    os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                    if os.path.isfile(self.icon_extracted):
+                        os.remove(self.icon_extracted)
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
         def is_valid_image(file_path):
             try:
@@ -6521,10 +6624,17 @@ class AddGame(Gtk.Dialog):
         title = self.entry_title.get_text()
         prefix = self.entry_prefix.get_text()
         path = self.entry_path.get_text()
+        combobox_steam = self.combobox_steam_title.get_active_text()
 
+        self.combobox_steam_title.get_style_context().remove_class("combobox")
         self.entry_title.get_style_context().remove_class("entry")
         self.entry_prefix.get_style_context().remove_class("entry")
         self.entry_path.get_style_context().remove_class("entry")
+
+        if self.grid_steam_title.get_visible():
+            if not combobox_steam:
+                self.combobox_steam_title.get_style_context().add_class("combobox")
+                self.notebook.set_current_page(0)
 
         if entry == "prefix":
             if not title or not prefix:

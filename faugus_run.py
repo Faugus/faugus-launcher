@@ -78,6 +78,15 @@ class FaugusRun:
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def start_process(self, command):
+        self.extract_env_from_message()
+
+        if os.environ.get("PROTONPATH") == "Steam":
+            subprocess.Popen(self.message, shell=True)
+            self.label.set_text(_("Starting Steam game..."))
+            time.sleep(5)
+            Gtk.main_quit()
+            sys.exit()
+
         self.start_time = time.time()
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
@@ -91,8 +100,6 @@ class FaugusRun:
                 set_env("PROTON_ENABLE_HDR", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
-
-        self.extract_env_from_message()
 
         if os.environ.get("LSFG_LEGACY"):
             if self.lossless_location:
@@ -128,6 +135,8 @@ class FaugusRun:
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
             if protonpath == "Linux-Native":
+                pass
+            if protonpath == "Steam":
                 pass
             else:
                 protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
@@ -728,12 +737,16 @@ def build_launch_command(game):
     if mangohud:
         command_parts.append("mangohud")
 
-    command_parts.append(f"'{umu_run}'")
+    if runner != "Steam":
+        command_parts.append(f"'{umu_run}'")
 
     if addapp_checkbox == "addapp_enabled":
         command_parts.append(shlex.quote(addapp_bat))
     else:
-        command_parts.append(shlex.quote(path))
+        if runner != "Steam":
+            command_parts.append(shlex.quote(path))
+        else:
+            command_parts.append(f"steam -nobigpicture -nochatui -nofriendsui -silent -applaunch {path}")
 
     if game_arguments:
         command_parts.append(game_arguments)

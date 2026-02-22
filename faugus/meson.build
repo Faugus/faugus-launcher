@@ -6,5 +6,6 @@ py.install_sources(
   'path_manager.py',
   'language_config.py',
   'dark_theme.py',
+  'steam_setup.py',
   subdir: 'faugus',
 )
