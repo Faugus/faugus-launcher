@@ -23,13 +23,11 @@ gi.require_version('AyatanaAppIndicator3', '0.1')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Gio, Pango
 from PIL import Image
-from filelock import FileLock, Timeout
 from faugus.config_manager import *
 from faugus.dark_theme import *
 from faugus.steam_setup import *
 
 VERSION = "1.15.1"
-print(f"Faugus Launcher {VERSION}")
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
@@ -88,9 +86,6 @@ faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = str(Path.home() / 'faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
-lock_file_path = PathManager.user_data('faugus-launcher/faugus-launcher.lock')
-lock = FileLock(lock_file_path, timeout=0)
-
 faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
@@ -148,16 +143,42 @@ def _validate_text(entry):
             entry.set_position(i)
             break
 
-class Main(Gtk.Window):
+class FaugusApp(Gtk.Application):
     def __init__(self):
-        # Initialize the main window with title and default size
-        Gtk.Window.__init__(self, title="Faugus Launcher")
+        super().__init__(
+            application_id="io.github.Faugus.faugus-launcher",
+            flags=Gio.ApplicationFlags.HANDLES_OPEN
+        )
+        self.window = None
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+        os.environ["GTK_USE_PORTAL"] = "1"
+        apply_dark_theme()
+
+    def do_activate(self):
+        if not self.window:
+            self.window = Main(self)
+        self.window.present()
+
+    def do_open(self, files, n_files, hint):
+        self.do_activate()
+        for file in files:
+            run_file(file.get_path())
+
+class Main(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        super().__init__(application=app, title="Faugus Launcher")
         self.set_icon_from_file(faugus_png)
+        self.connect("delete-event", self.on_close)
+        print(f"Faugus Launcher {VERSION}")
 
         self.start_maximized = False
         self.start_fullscreen = False
         self.fullscreen_activated = False
+
         self.system_tray = False
+        self.indicator = False
         self.start_boot = False
         self.mono_icon = False
 
@@ -263,26 +284,103 @@ class Main(Gtk.Window):
 
         self.flowbox.connect("button-press-event", self.on_item_right_click)
 
-        # Create the tray indicator
-        if self.mono_icon:
-            self.indicator = AyatanaAppIndicator3.Indicator.new("Faugus Launcher",
-                faugus_mono_icon,
-                AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS)
-        else:
-            self.indicator = AyatanaAppIndicator3.Indicator.new("Faugus Launcher",
-                tray_icon,  # Path to the icon
-                AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS)
-        self.indicator.set_menu(self.create_tray_menu())
-        self.indicator.set_title("Faugus Launcher")
-
-        if self.system_tray:
-            self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-            self.connect("delete-event", self.on_window_delete_event)
+        self.load_tray_icon()
 
         if IS_FLATPAK:
             signal.signal(signal.SIGCHLD, self.on_child_process_closed)
         else:
             GLib.timeout_add_seconds(1, self.check_running_processes)
+
+    def load_tray_icon(self):
+        if not self.system_tray:
+            if self.indicator:
+                try:
+                    self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
+                except:
+                    pass
+                self.indicator = None
+            return
+
+        menu = Gtk.Menu()
+        if os.path.exists(latest_games):
+            with open(latest_games, "r") as f:
+                for line in f:
+                    name = line.strip()
+                    if name:
+                        item = Gtk.MenuItem(label=name)
+                        item.connect("activate", self.on_game_selected, name)
+                        menu.append(item)
+
+        if menu.get_children():
+            menu.append(Gtk.SeparatorMenuItem())
+
+        restore_item = Gtk.MenuItem(label=_("Open Faugus Launcher"))
+        restore_item.connect("activate", self.restore_window)
+        menu.append(restore_item)
+
+        quit_item = Gtk.MenuItem(label=_("Quit"))
+        quit_item.connect("activate", self.on_quit)
+        menu.append(quit_item)
+
+        menu.show_all()
+
+        if self.indicator:
+            try:
+                old = self.indicator
+                self.indicator = None
+                old.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
+                del old
+            except:
+                pass
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
+        if not hasattr(self, "_tray_counter"):
+            self._tray_counter = 0
+        self._tray_counter += 1
+        unique_id = f"faugus-launcher-{self._tray_counter}"
+
+        icon = faugus_mono_icon if self.mono_icon else tray_icon
+
+        self.indicator = AyatanaAppIndicator3.Indicator.new(
+            unique_id, icon, AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS
+        )
+        self.indicator.set_menu(menu)
+        self.indicator.set_icon_full(icon, "Faugus Launcher")
+        self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
+        self.indicator.set_icon_theme_path("")
+
+    def on_close(self, *_):
+        if self.system_tray:
+            self.hide()
+            return True
+
+        if self.indicator:
+            self.indicator.set_status(
+                AyatanaAppIndicator3.IndicatorStatus.PASSIVE
+            )
+        self.get_application().quit()
+        return False
+
+    def restore_window(self, *_):
+        self.show_all()
+        if self.interface_mode != "List":
+            if self.fullscreen_activated:
+                self.fullscreen_activated = True
+                self.grid_corner.set_visible(True)
+                self.grid_left.set_margin_start(70)
+            else:
+                self.fullscreen_activated = False
+                self.grid_corner.set_visible(False)
+                self.grid_left.set_margin_start(0)
+        self.present()
+
+    def on_quit(self, *_):
+        if self.indicator:
+            self.indicator.set_status(
+                AyatanaAppIndicator3.IndicatorStatus.PASSIVE
+            )
+        self.get_application().quit()
 
     def select_first_child(self):
         if self.flowbox.get_children():
@@ -640,9 +738,7 @@ class Main(Gtk.Window):
             self.grid_left.set_margin_start(0)
 
     def on_destroy(self, *args):
-        if lock.is_locked:
-            lock.release()
-        Gtk.main_quit()
+        self.get_application().quit()
 
     def on_button_bye_clicked(self, widget):
         menu = Gtk.Menu()
@@ -653,13 +749,14 @@ class Main(Gtk.Window):
 
         shutdown_item.connect("activate", self.on_shutdown)
         reboot_item.connect("activate", self.on_reboot)
-        close_item.connect("activate", self.on_close)
+        close_item.connect("activate", self.on_close_fullscreen)
 
         menu.append(shutdown_item)
         menu.append(reboot_item)
         menu.append(close_item)
 
         menu.show_all()
+        menu.attach_to_widget(self, None)
         menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     def on_shutdown(self, widget):
@@ -668,10 +765,8 @@ class Main(Gtk.Window):
     def on_reboot(self, widget):
         subprocess.run(["pkexec", "reboot"])
 
-    def on_close(self, widget):
-        if lock.is_locked:
-            lock.release()
-        Gtk.main_quit()
+    def on_close_fullscreen(self, widget):
+        self.get_application().quit()
 
     def on_item_right_click(self, widget, event):
         if event.button == Gdk.BUTTON_SECONDARY:
@@ -1310,38 +1405,6 @@ class Main(Gtk.Window):
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
 
-    def create_tray_menu(self):
-        # Create the tray menu
-        menu = Gtk.Menu()
-
-        # Add game items from latest-games.txt
-        games_file_path = latest_games
-        if os.path.exists(games_file_path):
-            with open(games_file_path, "r") as games_file:
-                for line in games_file:
-                    game_name = line.strip()
-                    if game_name:
-                        game_item = Gtk.MenuItem(label=game_name)
-                        game_item.connect("activate", self.on_game_selected, game_name)
-                        menu.append(game_item)
-
-        # Add a separator between game items and the other menu items
-        separator = Gtk.SeparatorMenuItem()
-        menu.append(separator)
-
-        # Item to restore the window
-        restore_item = Gtk.MenuItem(label=_("Open Faugus Launcher"))
-        restore_item.connect("activate", self.restore_window)
-        menu.append(restore_item)
-
-        # Item to quit the application
-        quit_item = Gtk.MenuItem(label=_("Quit"))
-        quit_item.connect("activate", self.on_quit_activate)
-        menu.append(quit_item)
-
-        menu.show_all()
-        return menu
-
     def on_game_selected(self, widget, game_name):
         # Find the game in the FlowBox by name and select it
         self.flowbox.unselect_all()
@@ -1360,33 +1423,6 @@ class Main(Gtk.Window):
             self.on_button_play_clicked(widget)
         else:
             self.running_dialog(title)
-
-    def on_window_delete_event(self, widget, event):
-        # Only prevent closing when system tray is active
-        self.load_config()
-        if self.system_tray:
-            self.hide()  # Minimize the window instead of closing
-            return True  # Stop the event to keep the app running
-        return False  # Allow the window to close
-
-    def restore_window(self, widget):
-        # Restore the window when clicking the tray icon
-        self.show_all()
-        if self.interface_mode != "List":
-            if self.fullscreen_activated:
-                self.fullscreen_activated = True
-                self.grid_corner.set_visible(True)
-                self.grid_left.set_margin_start(70)
-            else:
-                self.fullscreen_activated = False
-                self.grid_corner.set_visible(False)
-                self.grid_left.set_margin_start(0)
-        self.present()
-
-    def on_quit_activate(self, widget):
-        if lock.is_locked:
-            lock.release()
-        Gtk.main_quit()
 
     def load_games(self):
         try:
@@ -1430,9 +1466,6 @@ class Main(Gtk.Window):
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
                 self.filtered_games = self.games[:]
-
-                self._favorite_section_ended = False
-                self._has_any_favorite = any(game.favorite for game in self.filtered_games)
 
                 self.flowbox.foreach(Gtk.Widget.destroy)
                 for game in self.filtered_games:
@@ -1649,7 +1682,12 @@ class Main(Gtk.Window):
 
             settings_dialog.update_config_file()
             self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active())
-            settings_dialog.update_system_tray()
+
+            if settings_dialog.checkbox_system_tray.get_active():
+                self.system_tray = True
+            else:
+                self.system_tray = False
+            GLib.timeout_add(1000, self.load_tray_icon)
 
             if validation_result:
                 combobox_language = settings_dialog.combobox_language.get_active_text()
@@ -1663,9 +1701,6 @@ class Main(Gtk.Window):
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
                 if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
-                if self.mono_icon != settings_dialog.checkbox_mono_icon.get_active():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
 
@@ -1869,7 +1904,7 @@ class Main(Gtk.Window):
         # Write the updated list back to the file
         with open(latest_games, 'w') as f:
             f.write('\n'.join(games))
-        self.indicator.set_menu(self.create_tray_menu())
+        self.load_tray_icon()
 
     def on_button_kill_clicked(self, widget):
         # Handle kill button click event
@@ -2148,7 +2183,7 @@ class Main(Gtk.Window):
                 # Write the updated list back, maintaining max 5 entries
                 with open(latest_games, 'w') as f:
                     f.write("\n".join(recent_games[:5]))
-            self.indicator.set_menu(self.create_tray_menu())
+            self.load_tray_icon()
 
         except FileNotFoundError:
             pass  # Ignore if the file doesn't exist yet
@@ -3954,21 +3989,6 @@ class Settings(Gtk.Dialog):
         default_runner = convert_runner(default_runner)
         return default_runner
 
-    def update_system_tray(self):
-        checkbox_system_tray = self.checkbox_system_tray.get_active()
-
-        if checkbox_system_tray:
-            self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-            if not hasattr(self, "window_delete_event_connected") or not self.window_delete_event_connected:
-                self.connect("delete-event", self.parent.on_window_delete_event)
-                self.parent.window_delete_event_connected = True
-            self.parent.indicator.set_menu(self.parent.create_tray_menu())
-        else:
-            self.parent.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-            if hasattr(self, "window_delete_event_connected") and self.window_delete_event_connected:
-                self.disconnect_by_func(self.parent.on_window_delete_event)
-                self.parent.window_delete_event_connected = False
-
     def update_envar_file(self):
         if hasattr(self, "liststore"):
             values = [row[0] for row in self.liststore if row[0].strip() != ""]
@@ -3983,7 +4003,6 @@ class Settings(Gtk.Dialog):
             self.update_envar_file()
             self.update_config_file()
             proton_manager = faugus_proton_manager
-            self.update_system_tray()
 
             def run_command():
                 process = subprocess.Popen([sys.executable, proton_manager])
@@ -4012,7 +4031,6 @@ class Settings(Gtk.Dialog):
             self.update_config_file()
             self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
             default_runner = self.get_default_runner()
-            self.update_system_tray()
             command_parts = []
 
             # Add command parts if they are not empty
@@ -4059,7 +4077,6 @@ class Settings(Gtk.Dialog):
             self.update_config_file()
             self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
             default_runner = self.get_default_runner()
-            self.update_system_tray()
             command_parts = []
 
             # Add command parts if they are not empty
@@ -4106,7 +4123,6 @@ class Settings(Gtk.Dialog):
         self.update_config_file()
         self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
-        self.update_system_tray()
 
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
@@ -6799,14 +6815,8 @@ def faugus_launcher():
         print("Invalid arguments")
 
 def main():
-    if len(sys.argv) == 2 and sys.argv[1] != "--hide":
-        run_file(sys.argv[1])
-    else:
-        try:
-            with lock:
-                faugus_launcher()
-        except Timeout:
-            print("Faugus Launcher is already running.")
+    app = FaugusApp()
+    app.run(sys.argv)
 
 if __name__ == "__main__":
     update_games_and_config()
