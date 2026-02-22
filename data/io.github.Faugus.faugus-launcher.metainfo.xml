@@ -87,13 +87,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.1-1" date="2026-02-21">
+    <release version="1.15.2-1" date="2026-02-22">
       <description>
         <ul>
-          <li>Minor QOL improvements</li>
-          <li>Some code refactoring</li>
-          <li>Updated Portuguese translation</li>
-          <li>Added an option to set favorite games</li>
+          <li>Reworked system tray icon functionality.</li>
+          <li>Now when the user changes some setting in the Settings menu and press a button like Winetricks or Winecfg, it asks to save the changes before proceeding.</li>
+          <li>Fixed toggle fullscreen (Alt+Enter) not working with an empty library.</li>
+          <li>Removed python-filelock.</li>
+          <li>Updated Portuguese translation.</li>
+          <li>Added support for Steam games. It's still a rough implementation. Maybe I'll add more features in the future.</li>
         </ul>
       </description>
     </release>
