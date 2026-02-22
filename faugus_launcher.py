@@ -1233,8 +1233,6 @@ class Main(Gtk.ApplicationWindow):
                 self.running_dialog(title)
 
     def on_key_press_event(self, widget, event):
-        selected_children = self.flowbox.get_selected_children()
-
         if event.keyval == Gdk.KEY_h and event.state & Gdk.ModifierType.CONTROL_MASK:
             try:
                 with open(config_file_dir, "r", encoding="utf-8") as f:
@@ -1245,18 +1243,12 @@ class Main(Gtk.ApplicationWindow):
 
                 for line in lines:
                     stripped = line.strip()
-
                     if stripped.lower().startswith("show-hidden"):
                         sep_index = line.find("=")
                         if sep_index != -1:
                             left = line[:sep_index]
                             right = line[sep_index + 1:].strip()
-
-                            if right.lower() == "true":
-                                new_value = "False"
-                            else:
-                                new_value = "True"
-
+                            new_value = "False" if right.lower() == "true" else "True"
                             new_lines.append(f"{left}={new_value}\n")
                             found = True
                         else:
@@ -1275,26 +1267,11 @@ class Main(Gtk.ApplicationWindow):
                 self.button_play.set_sensitive(False)
                 self.select_first_child()
                 return True
-
-            except Exception as e:
+            except Exception:
                 return False
 
-        if not selected_children:
-            return
-
-        selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
-
-        current_focus = self.get_focus()
-
-        if event.keyval in (Gdk.KEY_Up, Gdk.KEY_Down, Gdk.KEY_Left, Gdk.KEY_Right):
-            if current_focus not in self.flowbox.get_children():
-                selected_child.grab_focus()
-
-        if self.interface_mode != "List":
-            if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK:
+        if event.keyval == Gdk.KEY_Return and event.state & Gdk.ModifierType.MOD1_MASK:
+            if self.interface_mode != "List":
                 if self.get_window().get_state() & Gdk.WindowState.FULLSCREEN:
                     self.fullscreen_activated = False
                     self.unfullscreen()
@@ -1307,10 +1284,23 @@ class Main(Gtk.ApplicationWindow):
                     self.grid_left.set_margin_start(70)
                 return True
 
+        selected_children = self.flowbox.get_selected_children()
+        if not selected_children:
+            return
+
+        selected_child = selected_children[0]
+        hbox = selected_child.get_child()
+        game_label = hbox.get_children()[1]
+        title = game_label.get_text()
+        current_focus = self.get_focus()
+
+        if event.keyval in (Gdk.KEY_Up, Gdk.KEY_Down, Gdk.KEY_Left, Gdk.KEY_Right):
+            if current_focus not in self.flowbox.get_children():
+                selected_child.grab_focus()
+
         if IS_FLATPAK:
             if event.keyval == Gdk.KEY_Return:
                 if title not in self.processos:
-                    widget = self.button_play
                     self.on_button_play_clicked(selected_child)
                 else:
                     self.running_dialog(title)
@@ -1339,7 +1329,6 @@ class Main(Gtk.ApplicationWindow):
                 new_text = current_text[:-1]
                 self.entry_search.set_text(new_text)
                 self.entry_search.set_position(len(new_text))
-
             return True
 
         return False
