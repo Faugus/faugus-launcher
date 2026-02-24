@@ -70,7 +70,7 @@ def detect_steam_id():
     return None
 
 steam_id = detect_steam_id()
-steam_shortcuts_path = userdata / steam_id / "config/shortcuts.vdf" if userdata and steam_id else None
+steam_shortcuts_path = userdata / steam_id / "config/shortcuts.vdf" if userdata and steam_id else ""
 
 def read_library_folders():
     libraries = []
