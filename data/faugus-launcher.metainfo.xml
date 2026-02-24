@@ -81,15 +81,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.2-1" date="2026-02-22">
+    <release version="1.15.3-1" date="2026-02-23">
       <description>
         <ul>
-          <li>Reworked system tray icon functionality.</li>
-          <li>Now when the user changes some setting in the Settings menu and press a button like Winetricks or Winecfg, it asks to save the changes before proceeding.</li>
-          <li>Fixed toggle fullscreen (Alt+Enter) not working with an empty library.</li>
-          <li>Removed python-filelock.</li>
-          <li>Updated Portuguese translation.</li>
-          <li>Added support for Steam games. It's still a rough implementation. Maybe I'll add more features in the future.</li>
+          <li>Fixed a regression introduced in the previous version where some launchers didn’t work with the Wayland driver enabled in the settings.</li>
+          <li>Reworked the Steam detection.</li>
+          <li>Updated Persian translation.</li>
+          <li>Updated Italian translation.</li>
         </ul>
       </description>
     </release>
