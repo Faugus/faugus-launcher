@@ -120,9 +120,13 @@ def get_steam_icon_path(appid):
     if not librarycache.exists():
         return None
 
+    cache = librarycache / str(appid)
+    if not cache.exists():
+        return None
+
     images = []
 
-    for img in librarycache.rglob("*.jpg"):
+    for img in cache.rglob("*.jpg"):
         if img.name in (
             "header.jpg",
             "library_600x900.jpg",
