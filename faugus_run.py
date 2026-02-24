@@ -80,17 +80,6 @@ class FaugusRun:
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def start_process(self, command):
-        self.extract_env_from_message()
-
-        if os.environ.get("PROTONPATH") == "Steam":
-            subprocess.Popen(self.message, shell=True)
-            self.label.set_text(_("Starting Steam game..."))
-            time.sleep(5)
-            Gtk.main_quit()
-            sys.exit()
-
-        self.start_time = time.time()
-
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
@@ -102,6 +91,17 @@ class FaugusRun:
                 set_env("PROTON_ENABLE_HDR", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
+
+        self.extract_env_from_message()
+
+        if os.environ.get("PROTONPATH") == "Steam":
+            subprocess.Popen(self.message, shell=True)
+            self.label.set_text(_("Starting Steam game..."))
+            time.sleep(5)
+            Gtk.main_quit()
+            sys.exit()
+
+        self.start_time = time.time()
 
         if os.environ.get("LSFG_LEGACY"):
             if self.lossless_location:
@@ -752,7 +752,6 @@ def build_launch_command(game):
                 command_parts.append(f"flatpak-spawn --host flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
             else:
                 if IS_STEAM_FLATPAK:
-                    print("ENTREI AQUI")
                     command_parts.append(f"flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
                 else:
                     command_parts.append(f"steam -nobigpicture -nochatui -nofriendsui -silent -applaunch {path}")
