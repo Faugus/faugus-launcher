@@ -81,10 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.4-1" date="2026-02-24">
+    <release version="1.15.5-1" date="2026-02-24">
       <description>
         <ul>
           <li>Fixed Steam detection that was preventing users from managing games.</li>
+          <li>Fixed Steam games not running when gamemode is enabled in settings.</li>
           <li>Added Chinese (Traditional) translation.</li>
         </ul>
       </description>
