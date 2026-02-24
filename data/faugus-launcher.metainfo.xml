@@ -81,13 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.3-1" date="2026-02-23">
+    <release version="1.15.4-1" date="2026-02-24">
       <description>
         <ul>
-          <li>Fixed a regression introduced in the previous version where some launchers didn’t work with the Wayland driver enabled in the settings.</li>
-          <li>Reworked the Steam detection.</li>
-          <li>Updated Persian translation.</li>
-          <li>Updated Italian translation.</li>
+          <li>Fixed Steam detection that was preventing users from managing games.</li>
+          <li>Added Chinese (Traditional) translation.</li>
         </ul>
       </description>
     </release>
