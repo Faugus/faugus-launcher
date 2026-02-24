@@ -806,6 +806,17 @@ def update_games_and_config():
             elif runner == "GE-Proton":
                 game["runner"] = "Proton-GE Latest"
                 changed = True
+            elif runner == "Steam":
+                for key in (
+                    "mangohud",
+                    "gamemode",
+                    "disable_hidraw",
+                    "addapp_checkbox",
+                    "prevent_sleep",
+                ):
+                    if game.get(key, "") != "":
+                        game[key] = ""
+                        changed = True
 
         if changed:
             with open(games_dir, "w", encoding="utf-8") as f:

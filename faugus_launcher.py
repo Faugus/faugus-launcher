@@ -2302,11 +2302,18 @@ class Main(Gtk.ApplicationWindow):
                 runner = "Steam"
 
             # Determine mangohud and gamemode status
-            mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
-            gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
-            disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
-            addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
-            prevent_sleep = True if add_game_dialog.checkbox_prevent_sleep.get_active() else ""
+            if runner == "Steam":
+                mangohud = ""
+                gamemode = ""
+                disable_hidraw = ""
+                addapp_checkbox = ""
+                prevent_sleep = ""
+            else:
+                mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
+                gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
+                disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
+                addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
+                prevent_sleep = True if add_game_dialog.checkbox_prevent_sleep.get_active() else ""
 
             # Create Game object and update UI
             game = Game(
@@ -6748,6 +6755,17 @@ def update_games_and_config():
             elif runner == "GE-Proton":
                 game["runner"] = "Proton-GE Latest"
                 changed = True
+            elif runner == "Steam":
+                for key in (
+                    "mangohud",
+                    "gamemode",
+                    "disable_hidraw",
+                    "addapp_checkbox",
+                    "prevent_sleep",
+                ):
+                    if game.get(key, "") != "":
+                        game[key] = ""
+                        changed = True
 
         if changed:
             with open(games_json, "w", encoding="utf-8") as f:
