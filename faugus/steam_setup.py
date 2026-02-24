@@ -1,81 +1,84 @@
 import os
+import subprocess
+import shutil
 
 from pathlib import Path
 from gi.repository import GdkPixbuf
 
-possible_steam_locations = [
-    Path.home() / '.local' / 'share' / 'Steam' / 'userdata',
-    Path.home() / '.steam' / 'steam' / 'userdata',
-    Path.home() / '.steam' / 'root' / 'userdata',
-    os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/')
-]
-
-steam_userdata_path = None
-IS_STEAM_FLATPAK = False
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+IS_STEAM_FLATPAK = None
 
-for location in possible_steam_locations:
-    if Path(location).exists():
-        steam_userdata_path = location
-        if str(location).startswith(str(Path.home() / '.var' / 'app' / 'com.valvesoftware.Steam')):
-            IS_STEAM_FLATPAK = True
-        break
+def has_steam_flatpak():
+    try:
+        cmd = ["flatpak", "info", "com.valvesoftware.Steam"]
+
+        if IS_FLATPAK:
+            cmd = ["flatpak-spawn", "--host"] + cmd
+
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
+
+def has_steam_native():
+    return shutil.which("steam") is not None
+
+def detect_steam_version():
+    if IS_FLATPAK:
+        if has_steam_flatpak():
+            return "flatpak"
+    else:
+        if has_steam_native():
+            return "native"
+        elif has_steam_flatpak():
+            return "flatpak"
+        else:
+            return None
+
+def detect_steam_folder():
+    steam_version = detect_steam_version()
+    if steam_version == "flatpak":
+        IS_STEAM_FLATPAK = True
+        return Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam"
+    if steam_version == "native":
+        return Path.home() / ".steam" / "steam"
+
+steam_folder = detect_steam_folder()
+userdata = steam_folder / "userdata" if steam_folder else None
+library = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
+steamapps = steam_folder / "steamapps" if steam_folder else None
+librarycache = steam_folder / "appcache/librarycache" if steam_folder else None
+
+lossless_dll = (
+    (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll")
+    if steam_folder and (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll").is_file()
+    else ""
+)
 
 def detect_steam_id():
-    if steam_userdata_path:
+    if userdata:
         try:
-            steam_ids = [f for f in os.listdir(steam_userdata_path)
-                         if os.path.isdir(os.path.join(steam_userdata_path, f)) and f.isdigit()]
+            steam_ids = [f for f in os.listdir(userdata)
+                         if os.path.isdir(os.path.join(userdata, f)) and f.isdigit()]
             return steam_ids[0] if steam_ids else None
         except (FileNotFoundError, PermissionError):
             return None
     return None
 
 steam_id = detect_steam_id()
+steam_shortcuts_path = userdata / steam_id / "config/shortcuts.vdf" if userdata and steam_id else None
 
-steam_shortcuts_path = f'{steam_userdata_path}/{steam_id}/config/shortcuts.vdf' if steam_id else ""
-
-def find_lossless_dll():
-    possible_common_locations = [
-        Path.home() / '.local' / 'share' / 'Steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'root' / 'steamapps' / 'common',
-        Path.home() / 'SteamLibrary' / 'steamapps' / 'common',
-        Path(os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steamapps/common/'))
-    ]
-
-    for location in possible_common_locations:
-        dll_candidate = location / 'Lossless Scaling' / 'Lossless.dll'
-        if dll_candidate.exists():
-            return str(dll_candidate)
-
-    return ""
-
-STEAM_BASE_DIRS = [
-    Path.home() / ".steam/steam",
-    Path.home() / ".local/share/Steam",
-    Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam",
-]
-
-if IS_FLATPAK:
-    STEAM_BASE_DIRS = [
-        Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam"
-    ]
-
-def find_steam_root():
-    for base in STEAM_BASE_DIRS:
-        if base.exists():
-            return base
-    return None
-
-def read_library_folders(steam_root: Path):
+def read_library_folders():
     libraries = []
-    vdf = steam_root / "config/libraryfolders.vdf"
 
-    if not vdf.exists():
+    if not library.exists():
         return libraries
 
-    with open(vdf, "r", errors="ignore") as f:
+    with open(library, "r", errors="ignore") as f:
         for line in f:
             if '"path"' in line:
                 path = line.split('"')[-2]
@@ -84,19 +87,19 @@ def read_library_folders(steam_root: Path):
     return libraries
 
 def read_installed_games():
-    steam_root = find_steam_root()
-    if not steam_root:
+    if not steam_folder:
         return []
 
     games = []
-    libraries = read_library_folders(steam_root)
+    libraries = read_library_folders()
 
     for lib in libraries:
-        steamapps = lib / "steamapps"
-        if not steamapps.exists():
+        steamapps_dir = lib / "steamapps"
+
+        if not steamapps_dir.exists():
             continue
 
-        for manifest in steamapps.glob("appmanifest_*.acf"):
+        for manifest in steamapps_dir.glob("appmanifest_*.acf"):
             appid = manifest.stem.split("_")[-1]
             name = None
             state = None
@@ -114,17 +117,12 @@ def read_installed_games():
     return sorted(games, key=lambda x: x[1].lower())
 
 def get_steam_icon_path(appid):
-    steam_root = find_steam_root()
-    if not steam_root:
-        return None
-
-    cache = steam_root / "appcache/librarycache" / appid
-    if not cache.exists():
+    if not librarycache.exists():
         return None
 
     images = []
 
-    for img in cache.rglob("*.jpg"):
+    for img in librarycache.rglob("*.jpg"):
         if img.name in (
             "header.jpg",
             "library_600x900.jpg",

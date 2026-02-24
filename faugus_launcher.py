@@ -4482,10 +4482,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_disable_hidraw.set_active(disable_hidraw)
         self.checkbox_prevent_sleep.set_active(prevent_sleep)
 
-        lossless_dll_path = find_lossless_dll()
         if not lossless_location:
-            if lossless_dll_path:
-                self.entry_lossless.set_text(str(lossless_dll_path))
+            if lossless_dll:
+                self.entry_lossless.set_text(str(lossless_dll))
         else:
             self.entry_lossless.set_text(lossless_location)
 
@@ -5327,9 +5326,8 @@ class AddGame(Gtk.Dialog):
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
 
         self.lossless_location = ConfigManager().config.get('lossless-location', '')
-        lossless_dll_path = find_lossless_dll()
         if os.path.exists(lsfgvk_path):
-            if lossless_dll_path or os.path.exists(self.lossless_location):
+            if lossless_dll or os.path.exists(self.lossless_location):
                 self.button_lossless.set_sensitive(True)
             else:
                 self.button_lossless.set_sensitive(False)
