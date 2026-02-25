@@ -54,17 +54,24 @@ if IS_FLATPAK:
     if not mono_dest.exists():
         shutil.copy(faugus_mono_icon, mono_dest)
     faugus_mono_icon = os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg')
-
-    lsfgvk_path = Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so")
-    lsfgvk_path = lsfgvk_path if lsfgvk_path.exists() else Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+    lsfgvk_possible_paths = [
+        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+    ]
+    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
     app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
     lsfgvk_possible_paths = [
-        Path("/usr/lib/liblsfg-vk.so"),
-        Path("/usr/lib64/liblsfg-vk.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+        Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib/liblsfg-vk-layer.so"),
+        Path("/usr/lib64/liblsfg-vk-layer.so"),
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
@@ -5408,7 +5415,7 @@ class AddGame(Gtk.Dialog):
         hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
         present = val if (val := getattr(self, "lossless_present", False)) != "" else "VSync/FIFO (default)"
 
-        checkbox_enable = Gtk.CheckButton(label="Enable")
+        checkbox_enable = Gtk.CheckButton(label=_("Enable"))
         checkbox_enable.set_active(enabled)
         checkbox_enable.set_halign(Gtk.Align.START)
 

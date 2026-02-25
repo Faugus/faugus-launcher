@@ -103,9 +103,11 @@ class FaugusRun:
 
         self.start_time = time.time()
 
-        if os.environ.get("LSFG_LEGACY"):
+        # LSFG_LEGACY env is deprecated in LSFG-VK 2.0
+        if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
             if self.lossless_location:
-                set_env("LSFG_DLL_PATH", self.lossless_location)
+                set_env("LSFG_DLL_PATH", self.lossless_location) # Deprecated in LSFG-VK v2.0
+                set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
         if self.enable_logging:
             if os.environ.get("LOG_DIR"):
@@ -717,20 +719,25 @@ def build_launch_command(game):
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     if lossless_enabled:
-        command_parts.append("LSFG_LEGACY=1")
+        command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
+        command_parts.append("LSFGVK_ENV=1")
         if lossless_multiplier:
-            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}")
+            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
+            command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
         if lossless_flow:
-            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}")
+            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
+            command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
         if lossless_performance:
-            command_parts.append("LSFG_PERFORMANCE_MODE=1")
+            command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
+            command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
         else:
-            command_parts.append("LSFG_PERFORMANCE_MODE=0")
-        if lossless_hdr:
+            command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
+            command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
+        if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
             command_parts.append("LSFG_HDR_MODE=1")
         else:
             command_parts.append("LSFG_HDR_MODE=0")
-        if lossless_present:
+        if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
             command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     if launch_arguments:
         command_parts.append(launch_arguments)
