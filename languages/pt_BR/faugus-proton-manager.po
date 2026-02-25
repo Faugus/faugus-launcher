@@ -8,45 +8,50 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-11 19:52-0300\n"
-"PO-Revision-Date: 2025-07-11 19:53-0300\n"
+"POT-Creation-Date: 2026-02-25 04:51-0300\n"
+"PO-Revision-Date: 2026-02-25 18:38-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-proton-manager:128
+#: /usr/bin/faugus-proton-manager:69
 msgid "Faugus Proton Manager"
 msgstr "Faugus Gerenciador de Proton"
 
-#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:406
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:375
 msgid "Remove"
 msgstr "Excluir"
 
-#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:417
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:382
+#: /usr/bin/faugus-proton-manager:392
 msgid "Download"
 msgstr "Baixar"
 
-#: /usr/bin/faugus-proton-manager:352
+#: /usr/bin/faugus-proton-manager:294
 msgid "Downloading..."
 msgstr "Baixando..."
 
-#: /usr/bin/faugus-proton-manager:354
+#: /usr/bin/faugus-proton-manager:296
 #, python-format
 msgid "Downloading %s..."
 msgstr "Baixando %s..."
 
-#: /usr/bin/faugus-proton-manager:377
+#: /usr/bin/faugus-proton-manager:329
 msgid "Extracting..."
 msgstr "Extraindo..."
 
-#: /usr/bin/faugus-proton-manager:379
+#: /usr/bin/faugus-proton-manager:331
 #, python-format
 msgid "Extracting %s..."
 msgstr "Extraindo %s..."
+
+#: /usr/bin/faugus-proton-manager:381
+msgid "Error during extraction"
+msgstr "Erro durante a extração"
 
 #, python-brace-format
 #~ msgid "Downloading {tag}..."
