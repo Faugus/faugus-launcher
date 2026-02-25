@@ -82,10 +82,11 @@ class FaugusRun:
 
     def start_process(self, command):
         if self.show_donate:
-            if self.should_show_donate_monthly():
+            current_month = GLib.DateTime.new_now_local().format("%Y-%m")
+
+            if self.cfg.config.get("donate-last", "") != current_month:
                 self.show_donate_dialog()
-                now = GLib.DateTime.new_now_local()
-                self.cfg.set_value("donate-last", now.format("%Y-%m"))
+                self.cfg.set_value("donate-last", current_month)
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
@@ -265,16 +266,6 @@ class FaugusRun:
             self.on_process_exit
         )
 
-    def should_show_donate_monthly(self):
-        if not self.show_donate:
-            return False
-
-        last = self.cfg.config.get("donate-last", "")
-        now = GLib.DateTime.new_now_local()
-        current_month = now.format("%Y-%m")
-
-        return last != current_month
-
     def show_donate_dialog(self):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
@@ -295,7 +286,7 @@ class FaugusRun:
         """
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+                                                Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
@@ -354,14 +345,21 @@ class FaugusRun:
         content_area.add(box_top)
         content_area.add(box_bottom)
 
+        checkbox_state = False
+
+        def on_dialog_response(dialog, response_id):
+            nonlocal checkbox_state
+            if response_id == Gtk.ResponseType.OK:
+                checkbox_state = checkbox.get_active()
+            dialog.destroy()
+
+        dialog.connect("response", on_dialog_response)
+
         dialog.show_all()
-        response = dialog.run()
+        dialog.run()
 
-        if response == Gtk.ResponseType.OK:
-            if checkbox.get_active():
-                self.cfg.set_value("show-donate", False)
-
-        dialog.destroy()
+        if checkbox_state:
+            self.cfg.set_value("show-donate", False)
 
     def on_button_kofi_clicked(self, widget):
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
