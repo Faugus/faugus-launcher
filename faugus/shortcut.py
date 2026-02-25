@@ -23,15 +23,23 @@ IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
-    lsfgvk_path = Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so")
-    lsfgvk_path = lsfgvk_path if lsfgvk_path.exists() else Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+    lsfgvk_possible_paths = [
+        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+    ]
+    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
     app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     lsfgvk_possible_paths = [
-        Path("/usr/lib/liblsfg-vk.so"),
-        Path("/usr/lib64/liblsfg-vk.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so'))
+        Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib/liblsfg-vk-layer.so"),
+        Path("/usr/lib64/liblsfg-vk-layer.so"),
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 icons_dir = PathManager.user_config('faugus-launcher/icons')
@@ -723,20 +731,25 @@ class CreateShortcut(Gtk.Window):
         if launch_arguments:
             command_parts.append(launch_arguments)
         if lossless_enabled:
-            command_parts.append("LSFG_LEGACY=1")
+            command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
+            command_parts.append("LSFGVK_ENV=1")
             if lossless_multiplier:
-                command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}")
+                command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
+                command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
             if lossless_flow:
-                command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}")
+                command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
+                command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
             if lossless_performance:
-                command_parts.append("LSFG_PERFORMANCE_MODE=1")
+                command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
+                command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
             else:
-                command_parts.append("LSFG_PERFORMANCE_MODE=0")
-            if lossless_hdr:
+                command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
+                command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
+            if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
                 command_parts.append("LSFG_HDR_MODE=1")
             else:
                 command_parts.append("LSFG_HDR_MODE=0")
-            if lossless_present:
+            if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
                 command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
         if gamemode:
             command_parts.append("gamemoderun")
