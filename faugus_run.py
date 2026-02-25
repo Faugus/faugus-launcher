@@ -11,10 +11,11 @@ import shlex
 import gettext
 import signal
 import shutil
+import webbrowser
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, GLib, GdkPixbuf, Gio
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, Gio
 from threading import Thread
 from faugus.config_manager import *
 from faugus.dark_theme import *
@@ -80,6 +81,12 @@ class FaugusRun:
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def start_process(self, command):
+        if self.show_donate:
+            if self.should_show_donate_monthly():
+                self.show_donate_dialog()
+                now = GLib.DateTime.new_now_local()
+                self.cfg.set_value("donate-last", now.format("%Y-%m"))
+
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
@@ -258,6 +265,110 @@ class FaugusRun:
             self.on_process_exit
         )
 
+    def should_show_donate_monthly(self):
+        if not self.show_donate:
+            return False
+
+        last = self.cfg.config.get("donate-last", "")
+        now = GLib.DateTime.new_now_local()
+        current_month = now.format("%Y-%m")
+
+        return last != current_month
+
+    def show_donate_dialog(self):
+        dialog = Gtk.Dialog(title="Faugus Launcher")
+        dialog.set_decorated(False)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+
+        css_provider = Gtk.CssProvider()
+        css = """
+        .paypal {
+            color: white;
+            background: #001C64;
+        }
+        .kofi {
+            color: white;
+            background: #1AC0FF;
+        }
+        """
+        css_provider.load_from_data(css.encode('utf-8'))
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
+                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        image_path = faugus_png
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+        pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
+        image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+        label = Gtk.Label(label=_("Are you enjoying Faugus Launcher?"))
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label(
+            label = _("Please consider donating") + " ❤️"
+        )
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_kofi = Gtk.Button(label="Ko-fi")
+        button_kofi.connect("clicked", self.on_button_kofi_clicked)
+        button_kofi.get_style_context().add_class("kofi")
+
+        button_paypal = Gtk.Button(label="PayPal")
+        button_paypal.connect("clicked", self.on_button_paypal_clicked)
+        button_paypal.get_style_context().add_class("paypal")
+
+        checkbox = Gtk.CheckButton(label=_("Never show this message again"))
+        checkbox.set_halign(Gtk.Align.CENTER)
+
+        box_top.pack_start(image, True, True, 0)
+        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label2, True, True, 0)
+        box_top.pack_start(button_kofi, True, True, 0)
+        box_top.pack_start(button_paypal, True, True, 0)
+        box_top.pack_start(checkbox, True, True, 0)
+
+        button_continue = Gtk.Button(label=_("Continue"))
+        button_continue.set_size_request(150, -1)
+        button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        box_bottom.pack_start(button_continue, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            if checkbox.get_active():
+                self.cfg.set_value("show-donate", False)
+
+        dialog.destroy()
+
+    def on_button_kofi_clicked(self, widget):
+        webbrowser.open("https://ko-fi.com/K3K210EMDU")
+
+    def on_button_paypal_clicked(self, widget):
+        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+
     def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
@@ -350,18 +461,19 @@ class FaugusRun:
         return env_from_file
 
     def load_config(self):
-        cfg = ConfigManager()
+        self.cfg = ConfigManager()
 
-        self.discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
-        self.splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
-        self.default_runner = cfg.config.get('default-runner', '')
-        self.lossless_location = cfg.config.get('lossless-location', '')
-        self.default_prefix = cfg.config.get('default-prefix', '')
-        self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
-        self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
-        self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
-        self.language = cfg.config.get('language', '')
+        self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
+        self.splash_disable = self.cfg.config.get('splash-disable', 'False') == 'True'
+        self.default_runner = self.cfg.config.get('default-runner', '')
+        self.lossless_location = self.cfg.config.get('lossless-location', '')
+        self.default_prefix = self.cfg.config.get('default-prefix', '')
+        self.enable_logging = self.cfg.config.get('enable-logging', 'False') == 'True'
+        self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
+        self.enable_hdr = self.cfg.config.get('enable-hdr', 'False') == 'True'
+        self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
+        self.language = self.cfg.config.get('language', '')
+        self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
 
     def show_warning_dialog(self):
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")

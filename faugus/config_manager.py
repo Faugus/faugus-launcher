@@ -31,6 +31,8 @@ class ConfigManager:
             'language': lang,
             'logging-warning': 'False',
             'show-hidden': 'False',
+            'show-donate': 'True',
+            'donate-last': '',
         }
 
         self.config = {}
@@ -70,4 +72,11 @@ class ConfigManager:
         keys = list(self.default_config.keys())
         for key, value in zip(keys, args):
             self.config[key] = str(value)
+        self.save_config()
+
+    def set_value(self, key, value):
+        if key not in self.default_config:
+            return
+
+        self.config[key] = str(value)
         self.save_config()
