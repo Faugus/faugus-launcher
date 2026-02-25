@@ -153,8 +153,7 @@ def _validate_text(entry):
 class FaugusApp(Gtk.Application):
     def __init__(self):
         super().__init__(
-            application_id="io.github.Faugus.faugus-launcher",
-            flags=Gio.ApplicationFlags.HANDLES_OPEN
+            application_id="io.github.Faugus.faugus-launcher"
         )
         self.window = None
 
@@ -167,11 +166,6 @@ class FaugusApp(Gtk.Application):
         if not self.window:
             self.window = Main(self)
         self.window.present()
-
-    def do_open(self, files, n_files, hint):
-        self.do_activate()
-        for file in files:
-            run_file(file.get_path())
 
 class Main(Gtk.ApplicationWindow):
     def __init__(self, app):
@@ -6802,26 +6796,11 @@ def update_games_and_config():
     if changed:
         config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
-def faugus_launcher():
-    os.environ["GTK_USE_PORTAL"] = "1"
-    apply_dark_theme()
-
-    if len(sys.argv) == 1:
-        app = Main()
-        app.connect("destroy", app.on_destroy)
-        Gtk.main()
-
-    elif len(sys.argv) == 2:
-        if sys.argv[1] == "--hide":
-            app = Main()
-            app.hide()
-            app.connect("destroy", app.on_destroy)
-            Gtk.main()
-
-    else:
-        print("Invalid arguments")
-
 def main():
+    if len(sys.argv) == 2 and sys.argv[1] != "--hide":
+        run_file(sys.argv[1])
+        return
+
     app = FaugusApp()
     app.run(sys.argv)
 
