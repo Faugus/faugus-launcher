@@ -8,102 +8,109 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 23:34-0300\n"
-"PO-Revision-Date: 2025-08-07 10:56+0200\n"
+"POT-Creation-Date: 2026-02-21 21:18-0300\n"
+"PO-Revision-Date: 2026-02-25 10:43+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-run:216
+#: /usr/bin/faugus-run:85
+msgid "Starting Steam game..."
+msgstr "Bezig met starten van Steam-game…"
+
+#: /usr/bin/faugus-run:277
+msgid "Internet connection error."
+msgstr "Er is geen internetverbinding."
+
+#: /usr/bin/faugus-run:281
 #, python-format
 msgid "%s was not found."
 msgstr "‘%s’ is niet aangetroffen."
 
-#: /usr/bin/faugus-run:220
+#: /usr/bin/faugus-run:285
 msgid "Please install it or use another Proton version."
 msgstr "Installeer dit of maak gebruik van een andere Proton-versie."
 
-#: /usr/bin/faugus-run:223 /usr/bin/faugus-run:655
+#: /usr/bin/faugus-run:292 /usr/bin/faugus-run:567
 msgid "Ok"
 msgstr "Oké"
 
-#: /usr/bin/faugus-run:492
-#, python-format
-msgid "Using %s"
-msgstr "Gebruikmakend van ‘%s’"
-
-#: /usr/bin/faugus-run:567
+#: /usr/bin/faugus-run:468
 msgid "Updating UMU-Launcher..."
 msgstr "Bezig met bijwerken van UMU-Launcher…"
 
-#: /usr/bin/faugus-run:569
+#: /usr/bin/faugus-run:470
 msgid "UMU-Launcher is up to date"
 msgstr "UMU-Launcher is bijgewerkt"
 
-#: /usr/bin/faugus-run:571
+#: /usr/bin/faugus-run:472
 msgid "Updating BattlEye..."
 msgstr "Bezig met bijwerken van BattlEye…"
 
-#: /usr/bin/faugus-run:573
+#: /usr/bin/faugus-run:474
 msgid "Updating Easy Anti-Cheat..."
 msgstr "Bezig met bijwerken van Easy Anti-Cheat…"
 
-#: /usr/bin/faugus-run:575
+#: /usr/bin/faugus-run:476
 msgid "Components are up to date"
 msgstr "Je beschikt over de nieuwste onderdelen"
 
-#: /usr/bin/faugus-run:577
-msgid "Downloading GE-Proton..."
-msgstr "Bezig met downloaden van GE-Proton…"
-
-#: /usr/bin/faugus-run:579
+#: /usr/bin/faugus-run:478
 msgid "Downloading UMU-Proton..."
 msgstr "Bezig met downloaden van UMU-Proton…"
 
-#: /usr/bin/faugus-run:581
+#: /usr/bin/faugus-run:480
 msgid "Downloading Steam Runtime..."
 msgstr "Bezig met downloaden van Steam-runtime…"
 
-#: /usr/bin/faugus-run:583
+#: /usr/bin/faugus-run:482
 msgid "Extracting Steam Runtime..."
 msgstr "Bezig met uitpakken van Steam-runtime…"
 
-#: /usr/bin/faugus-run:585
-msgid "Extracting GE-Proton..."
-msgstr "Bezig met uitpakken van GE-Proton…"
-
-#: /usr/bin/faugus-run:587
+#: /usr/bin/faugus-run:484
 msgid "Extracting UMU-Proton..."
 msgstr "Bezig met uitpakken van UMU-Proton…"
 
-#: /usr/bin/faugus-run:589 /usr/bin/faugus-run:595
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton is bijgewerkt"
-
-#: /usr/bin/faugus-run:591 /usr/bin/faugus-run:597
+#: /usr/bin/faugus-run:486 /usr/bin/faugus-run:492
 msgid "UMU-Proton is up to date"
 msgstr "UMU-Proton is bijgewerkt"
 
-#: /usr/bin/faugus-run:593 /usr/bin/faugus-run:599
+#: /usr/bin/faugus-run:488 /usr/bin/faugus-run:494
 msgid "Steam Runtime is up to date"
 msgstr "De Steam-runtime is bijgewerkt"
 
-#: /usr/bin/faugus-run:601
+#: /usr/bin/faugus-run:490 /usr/bin/faugus-run:501
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton is bijgewerkt"
+
+#: /usr/bin/faugus-run:497
+msgid "Downloading GE-Proton..."
+msgstr "Bezig met downloaden van GE-Proton…"
+
+#: /usr/bin/faugus-run:499
+msgid "Extracting GE-Proton..."
+msgstr "Bezig met uitpakken van GE-Proton…"
+
+#: /usr/bin/faugus-run:503
 msgid "Downloading Proton-EM..."
 msgstr "Bezig met downloaden van Proton-EM…"
 
-#: /usr/bin/faugus-run:603
+#: /usr/bin/faugus-run:505
 msgid "Extracting Proton-EM..."
 msgstr "Bezig met uitpakken van Proton-EM…"
 
-#: /usr/bin/faugus-run:605
+#: /usr/bin/faugus-run:507
 msgid "Proton-EM is up to date"
 msgstr "Proton-EM is bijgewerkt"
 
-#: /usr/bin/faugus-run:652
+#: /usr/bin/faugus-run:564
 msgid "The keys and values were successfully added to the registry."
 msgstr "De sleutels en waarden zijn toegevoegd aan het register."
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "Gebruikmakend van ‘%s’"
