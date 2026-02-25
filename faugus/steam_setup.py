@@ -102,16 +102,13 @@ def read_installed_games():
         for manifest in steamapps_dir.glob("appmanifest_*.acf"):
             appid = manifest.stem.split("_")[-1]
             name = None
-            state = None
 
             with open(manifest, "r", errors="ignore") as f:
                 for line in f:
                     if '"name"' in line:
                         name = line.split('"')[-2]
-                    elif '"StateFlags"' in line:
-                        state = line.split('"')[-2]
 
-            if name and state == "4":
+            if name:
                 games.append((appid, name))
 
     return sorted(games, key=lambda x: x[1].lower())
