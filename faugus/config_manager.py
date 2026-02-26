@@ -33,6 +33,7 @@ class ConfigManager:
             'show-hidden': 'False',
             'show-donate': 'True',
             'donate-last': '',
+            'playtime': 0,
         }
 
         self.config = {}

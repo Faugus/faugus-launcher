@@ -82,11 +82,12 @@ class FaugusRun:
 
     def start_process(self, command):
         if self.show_donate:
-            current_month = GLib.DateTime.new_now_local().format("%Y-%m")
+            if self.playtime >= 1800:
+                current_month = GLib.DateTime.new_now_local().format("%Y-%m")
 
-            if self.cfg.config.get("donate-last", "") != current_month:
-                self.show_donate_dialog()
-                self.cfg.set_value("donate-last", current_month)
+                if self.cfg.config.get("donate-last", "") != current_month:
+                    self.show_donate_dialog()
+                    self.cfg.set_value("donate-last", current_month)
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
@@ -472,6 +473,7 @@ class FaugusRun:
         self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = self.cfg.config.get('language', '')
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
+        self.playtime = int(self.cfg.config.get("playtime", 0))
 
     def show_warning_dialog(self):
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
@@ -727,6 +729,8 @@ class FaugusRun:
 
         end_time = time.time()
         runtime = int(end_time - getattr(self, "start_time", end_time))
+
+        self.cfg.set_value("playtime", self.playtime + runtime)
 
         game_id = os.environ.get("GAMEID")
 
