@@ -42,12 +42,11 @@ def detect_steam_version():
 def detect_steam_folder():
     steam_version = detect_steam_version()
     if steam_version == "flatpak":
-        IS_STEAM_FLATPAK = True
-        return Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam"
+        return (Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam", True)
     if steam_version == "native":
-        return Path.home() / ".steam" / "steam"
+        return (Path.home() / ".steam" / "steam", False)
 
-steam_folder = detect_steam_folder()
+steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()
 userdata = steam_folder / "userdata" if steam_folder else None
 library = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
 steamapps = steam_folder / "steamapps" if steam_folder else None
