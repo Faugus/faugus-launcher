@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-11 19:52-0300\n"
-"PO-Revision-Date: 2026-02-24 11:25+0800\n"
+"POT-Creation-Date: 2026-02-25 04:51-0300\n"
+"PO-Revision-Date: 2026-02-26 11:10+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -18,32 +18,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-proton-manager:128
+#: /usr/bin/faugus-proton-manager:69
 msgid "Faugus Proton Manager"
 msgstr "Faugus Proton 管理員"
 
-#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:406
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:375
 msgid "Remove"
 msgstr "移除"
 
-#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:417
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:382
+#: /usr/bin/faugus-proton-manager:392
 msgid "Download"
 msgstr "下載"
 
-#: /usr/bin/faugus-proton-manager:352
+#: /usr/bin/faugus-proton-manager:294
 msgid "Downloading..."
 msgstr "正在下載..."
 
-#: /usr/bin/faugus-proton-manager:354
+#: /usr/bin/faugus-proton-manager:296
 #, python-format
 msgid "Downloading %s..."
 msgstr "正在下載 %s..."
 
-#: /usr/bin/faugus-proton-manager:377
+#: /usr/bin/faugus-proton-manager:329
 msgid "Extracting..."
 msgstr "正在解壓縮..."
 
-#: /usr/bin/faugus-proton-manager:379
+#: /usr/bin/faugus-proton-manager:331
 #, python-format
 msgid "Extracting %s..."
 msgstr "正在解壓縮 %s..."
+
+#: /usr/bin/faugus-proton-manager:381
+msgid "Error during extraction"
+msgstr "解壓縮時出錯"
