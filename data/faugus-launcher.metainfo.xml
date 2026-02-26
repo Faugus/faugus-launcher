@@ -81,17 +81,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.7-1" date="2026-02-26">
+    <release version="1.15.8-1" date="2026-02-26">
       <description>
         <ul>
-          <li>Added support for LSFG-VK 2.0.</li>
-          <li>Now lists Steam games with pending updates or preloaded.</li>
-          <li>Fixed games not running from file manager after recent changes.</li>
-          <li>Fixed default Proton on new installations.</li>
-          <li>Fixed Steam not launching Faugus games.</li>
-          <li>Updated Portuguese translation.</li>
-          <li>Updated Dutch translation.</li>
-          <li>Added a donation message.</li>
+          <li>Hotfix: App not launching when Steam not installed.</li>
+          <li>Updated Chinese (Traditional) translation.</li>
         </ul>
       </description>
     </release>
