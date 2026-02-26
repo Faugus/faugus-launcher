@@ -730,6 +730,7 @@ class FaugusRun:
         end_time = time.time()
         runtime = int(end_time - getattr(self, "start_time", end_time))
 
+        self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
 
         game_id = os.environ.get("GAMEID")
