@@ -2833,93 +2833,57 @@ class Main(Gtk.ApplicationWindow):
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
         def add_game_to_steam(title, game_directory, icon):
-            # Load existing shortcuts
             shortcuts = load_shortcuts(title)
 
-            # Check if the game already exists
             existing_app_id = None
             for app_id, game_info in shortcuts["shortcuts"].items():
                 if isinstance(game_info, dict) and "AppName" in game_info and game_info["AppName"] == title:
                     existing_app_id = app_id
                     break
 
-            if existing_app_id:
-                # Update only the necessary fields without replacing the entire entry
-                game_info = shortcuts["shortcuts"][existing_app_id]
-                if IS_FLATPAK:
-                    if IS_STEAM_FLATPAK:
-                        game_info["Exe"] = f'"flatpak-spawn"'
-                        game_info["LaunchOptions"] = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
-                    else:
-                        game_info["Exe"] = f'"flatpak"'
-                        game_info["LaunchOptions"] = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
+            if IS_FLATPAK:
+                if IS_STEAM_FLATPAK:
+                    exe = '"flatpak-spawn"'
+                    launch_options = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
                 else:
-                    game_info["Exe"] = f'"{faugus_run}"'
-                    game_info["LaunchOptions"] = f'--game {game.gameid}'
-                game_info["StartDir"] = game_directory
-                game_info["icon"] = icon
+                    exe = '"flatpak"'
+                    launch_options = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
             else:
-                # Generate a new ID for the game
+                if IS_STEAM_FLATPAK:
+                    exe = '"flatpak-spawn"'
+                    launch_options = f'--host {faugus_run} --game {game.gameid}'
+                else:
+                    exe = f'"{faugus_run}"'
+                    launch_options = f'--game {game.gameid}'
+
+            if existing_app_id:
+                game_info = shortcuts["shortcuts"][existing_app_id]
+                game_info.update({
+                    "Exe": exe,
+                    "StartDir": game_directory,
+                    "icon": icon,
+                    "LaunchOptions": launch_options
+                })
+            else:
                 new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
 
-                # Add the new game
-                if IS_FLATPAK:
-                    if IS_STEAM_FLATPAK:
-                        shortcuts["shortcuts"][str(new_app_id)] = {
-                            "appid": new_app_id,
-                            "AppName": title,
-                            "Exe": f'"flatpak-spawn"',
-                            "StartDir": game_directory,
-                            "icon": icon,
-                            "ShortcutPath": "",
-                            "LaunchOptions": f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}',
-                            "IsHidden": 0,
-                            "AllowDesktopConfig": 1,
-                            "AllowOverlay": 1,
-                            "OpenVR": 0,
-                            "Devkit": 0,
-                            "DevkitGameID": "",
-                            "LastPlayTime": 0,
-                            "FlatpakAppID": "",
-                        }
-                    else:
-                        shortcuts["shortcuts"][str(new_app_id)] = {
-                            "appid": new_app_id,
-                            "AppName": title,
-                            "Exe": f'"flatpak"',
-                            "StartDir": game_directory,
-                            "icon": icon,
-                            "ShortcutPath": "",
-                            "LaunchOptions": f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}',
-                            "IsHidden": 0,
-                            "AllowDesktopConfig": 1,
-                            "AllowOverlay": 1,
-                            "OpenVR": 0,
-                            "Devkit": 0,
-                            "DevkitGameID": "",
-                            "LastPlayTime": 0,
-                            "FlatpakAppID": "",
-                        }
-                else:
-                    shortcuts["shortcuts"][str(new_app_id)] = {
-                        "appid": new_app_id,
-                        "AppName": title,
-                        "Exe": f'"{faugus_run}"',
-                        "StartDir": game_directory,
-                        "icon": icon,
-                        "ShortcutPath": "",
-                        "LaunchOptions": f'--game {game.gameid}',
-                        "IsHidden": 0,
-                        "AllowDesktopConfig": 1,
-                        "AllowOverlay": 1,
-                        "OpenVR": 0,
-                        "Devkit": 0,
-                        "DevkitGameID": "",
-                        "LastPlayTime": 0,
-                        "FlatpakAppID": "",
-                    }
-
-            # Save shortcuts back to the file
+                shortcuts["shortcuts"][str(new_app_id)] = {
+                    "appid": new_app_id,
+                    "AppName": title,
+                    "Exe": exe,
+                    "StartDir": game_directory,
+                    "icon": icon,
+                    "ShortcutPath": "",
+                    "LaunchOptions": launch_options,
+                    "IsHidden": 0,
+                    "AllowDesktopConfig": 1,
+                    "AllowOverlay": 1,
+                    "OpenVR": 0,
+                    "Devkit": 0,
+                    "DevkitGameID": "",
+                    "LastPlayTime": 0,
+                    "FlatpakAppID": "",
+                }
             save_shortcuts(shortcuts)
 
         def remove_shortcuts(shortcuts, title):

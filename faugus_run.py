@@ -870,13 +870,17 @@ def build_launch_command(game):
         if runner != "Steam":
             command_parts.append(shlex.quote(path))
         else:
+            steam_arguments = "-nobigpicture -nochatui -nofriendsui -silent -applaunch"
             if IS_FLATPAK:
-                command_parts.append(f"flatpak-spawn --host flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
+                if IS_STEAM_FLATPAK:
+                    command_parts.append(f"flatpak-spawn --host flatpak run com.valvesoftware.Steam {steam_arguments} {path}")
+                else:
+                    command_parts.append(f"flatpak-spawn --host steam {steam_arguments} {path}")
             else:
                 if IS_STEAM_FLATPAK:
-                    command_parts.append(f"flatpak run com.valvesoftware.Steam -silent -applaunch {path}")
+                    command_parts.append(f"flatpak run com.valvesoftware.Steam {steam_arguments} {path}")
                 else:
-                    command_parts.append(f"steam -nobigpicture -nochatui -nofriendsui -silent -applaunch {path}")
+                    command_parts.append(f"steam {steam_arguments} {path}")
 
     if game_arguments:
         command_parts.append(game_arguments)

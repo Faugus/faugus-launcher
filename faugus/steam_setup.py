@@ -25,19 +25,28 @@ def has_steam_flatpak():
         return False
 
 def has_steam_native():
-    return shutil.which("steam") is not None
+    try:
+        cmd = ["which", "steam"]
+
+        if IS_FLATPAK:
+            cmd = ["flatpak-spawn", "--host"] + cmd
+
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
 
 def detect_steam_version():
-    if IS_FLATPAK:
-        if has_steam_flatpak():
-            return "flatpak"
+    if has_steam_native():
+        return "native"
+    elif has_steam_flatpak():
+        return "flatpak"
     else:
-        if has_steam_native():
-            return "native"
-        elif has_steam_flatpak():
-            return "flatpak"
-        else:
-            return None
+        return None
 
 def detect_steam_folder():
     steam_version = detect_steam_version()
