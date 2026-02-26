@@ -38,7 +38,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.15.5/faugus-launcher_1.15.5-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.15.6/faugus-launcher_1.15.6-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -60,9 +60,13 @@ flatpak run io.github.Faugus.faugus-launcher
 flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
 ```
 ### Steam Flatpak integration
-Allow Faugus Launcher to detect Steam users:
+Allow Faugus Launcher to detect Steam users and games:
 ```
-sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/.steam/steam/userdata/
+sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/
+```
+Allow Faugus Launcher to detect Steam installation and run games:
+```
+sudo flatpak override io.github.Faugus.faugus-launcher --talk-name=org.freedesktop.Flatpak
 ```
 Allow Steam to run Faugus Launcher's shortcuts:
 ```
