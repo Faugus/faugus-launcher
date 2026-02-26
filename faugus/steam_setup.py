@@ -45,6 +45,7 @@ def detect_steam_folder():
         return (Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam", True)
     if steam_version == "native":
         return (Path.home() / ".steam" / "steam", False)
+    return (None, False)
 
 steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()
 userdata = steam_folder / "userdata" if steam_folder else None
