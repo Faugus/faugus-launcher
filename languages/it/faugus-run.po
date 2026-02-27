@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-21 21:18-0300\n"
-"PO-Revision-Date: 2026-02-23 10:15+0100\n"
+"POT-Creation-Date: 2026-02-25 18:25-0300\n"
+"PO-Revision-Date: 2026-02-27 10:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -18,96 +18,112 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-run:85
+#: /usr/bin/faugus-run:106
 msgid "Starting Steam game..."
 msgstr "Avvio gioco Steam in corso..."
 
-#: /usr/bin/faugus-run:277
+#: /usr/bin/faugus-run:318
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Ti sta piacendo Faugus Launcher?"
+
+#: /usr/bin/faugus-run:322
+msgid "Please consider donating"
+msgstr "Prendi in considerazione una donazione"
+
+#: /usr/bin/faugus-run:334
+msgid "Never show this message again"
+msgstr "Non mostrare più questo messaggio"
+
+#: /usr/bin/faugus-run:344
+msgid "Continue"
+msgstr "Continua"
+
+#: /usr/bin/faugus-run:392
 msgid "Internet connection error."
 msgstr "Errore connessione internet."
 
-#: /usr/bin/faugus-run:281
+#: /usr/bin/faugus-run:396
 #, python-format
 msgid "%s was not found."
 msgstr "%s non è stato trovato."
 
-#: /usr/bin/faugus-run:285
+#: /usr/bin/faugus-run:400
 msgid "Please install it or use another Proton version."
 msgstr "Si prega di installarlo o usare un'altra versione di Proton."
 
-#: /usr/bin/faugus-run:292 /usr/bin/faugus-run:567
+#: /usr/bin/faugus-run:407 /usr/bin/faugus-run:683
 msgid "Ok"
 msgstr "Ok"
 
-#: /usr/bin/faugus-run:468
+#: /usr/bin/faugus-run:584
 msgid "Updating UMU-Launcher..."
 msgstr "Aggiornamento di UMU-Launcher in corso..."
 
-#: /usr/bin/faugus-run:470
+#: /usr/bin/faugus-run:586
 msgid "UMU-Launcher is up to date"
 msgstr "UMU-Launcher è aggiornato"
 
-#: /usr/bin/faugus-run:472
+#: /usr/bin/faugus-run:588
 msgid "Updating BattlEye..."
 msgstr "Aggiornamento di BattlEye in corso..."
 
-#: /usr/bin/faugus-run:474
+#: /usr/bin/faugus-run:590
 msgid "Updating Easy Anti-Cheat..."
 msgstr "Aggiornamento di Easy Anti-Cheat in corso..."
 
-#: /usr/bin/faugus-run:476
+#: /usr/bin/faugus-run:592
 msgid "Components are up to date"
 msgstr "I componenti sono aggiornati"
 
-#: /usr/bin/faugus-run:478
+#: /usr/bin/faugus-run:594
 msgid "Downloading UMU-Proton..."
 msgstr "Scaricamento di UMU-Proton in corso..."
 
-#: /usr/bin/faugus-run:480
+#: /usr/bin/faugus-run:596
 msgid "Downloading Steam Runtime..."
 msgstr "Scaricamento di Steam Runtime in corso..."
 
-#: /usr/bin/faugus-run:482
+#: /usr/bin/faugus-run:598
 msgid "Extracting Steam Runtime..."
 msgstr "Estrazione di Steam Runtime in corso..."
 
-#: /usr/bin/faugus-run:484
+#: /usr/bin/faugus-run:600
 msgid "Extracting UMU-Proton..."
 msgstr "Estrazione di UMU-Proton in corso..."
 
-#: /usr/bin/faugus-run:486 /usr/bin/faugus-run:492
+#: /usr/bin/faugus-run:602 /usr/bin/faugus-run:608
 msgid "UMU-Proton is up to date"
 msgstr "UMU-Proton è aggiornato"
 
-#: /usr/bin/faugus-run:488 /usr/bin/faugus-run:494
+#: /usr/bin/faugus-run:604 /usr/bin/faugus-run:610
 msgid "Steam Runtime is up to date"
 msgstr "Steam Runtime è aggiornato"
 
-#: /usr/bin/faugus-run:490 /usr/bin/faugus-run:501
+#: /usr/bin/faugus-run:606 /usr/bin/faugus-run:617
 msgid "GE-Proton is up to date"
 msgstr "GE-Proton è aggiornato"
 
-#: /usr/bin/faugus-run:497
+#: /usr/bin/faugus-run:613
 msgid "Downloading GE-Proton..."
 msgstr "Scaricamento di GE-Proton in corso..."
 
-#: /usr/bin/faugus-run:499
+#: /usr/bin/faugus-run:615
 msgid "Extracting GE-Proton..."
 msgstr "Estrazione di GE-Proton in corso..."
 
-#: /usr/bin/faugus-run:503
+#: /usr/bin/faugus-run:619
 msgid "Downloading Proton-EM..."
 msgstr "Scaricamento di Proton-EM in corso..."
 
-#: /usr/bin/faugus-run:505
+#: /usr/bin/faugus-run:621
 msgid "Extracting Proton-EM..."
 msgstr "Estrazione di Proton-EM in corso..."
 
-#: /usr/bin/faugus-run:507
+#: /usr/bin/faugus-run:623
 msgid "Proton-EM is up to date"
 msgstr "Proton-EM è aggiornato"
 
-#: /usr/bin/faugus-run:564
+#: /usr/bin/faugus-run:680
 msgid "The keys and values were successfully added to the registry."
 msgstr "Le chiavi e i valori sono stati aggiunti con successo al registro."
 
