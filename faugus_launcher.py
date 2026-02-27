@@ -151,11 +151,12 @@ def _validate_text(entry):
             break
 
 class FaugusApp(Gtk.Application):
-    def __init__(self):
+    def __init__(self, start_hidden=False):
         super().__init__(
             application_id="io.github.Faugus.faugus-launcher"
         )
         self.window = None
+        self.start_hidden = start_hidden
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -165,6 +166,11 @@ class FaugusApp(Gtk.Application):
     def do_activate(self):
         if not self.window:
             self.window = Main(self)
+
+            if self.start_hidden:
+                self.window.hide()
+                return
+
         self.window.present()
 
 class Main(Gtk.ApplicationWindow):
@@ -6761,11 +6767,14 @@ def update_games_and_config():
         config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
 def main():
-    if len(sys.argv) == 2 and sys.argv[1] != "--hide":
+    start_hidden = "--hide" in sys.argv
+    sys.argv = [arg for arg in sys.argv if arg != "--hide"]
+
+    if len(sys.argv) == 2:
         run_file(sys.argv[1])
         return
 
-    app = FaugusApp()
+    app = FaugusApp(start_hidden)
     app.run(sys.argv)
 
 if __name__ == "__main__":
