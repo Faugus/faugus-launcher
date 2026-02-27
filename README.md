@@ -85,7 +85,7 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow vdf psutil imagemagick icoextract libayatana-appindicator
+meson ninja pygobject requests pillow vdf psutil imagemagick icoextract libayatana-appindicator libcanberra
 ```
 
 # Usage
