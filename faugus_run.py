@@ -82,7 +82,7 @@ class FaugusRun:
 
     def start_process(self, command):
         if self.show_donate:
-            if self.playtime >= 1800:
+            if self.playtime >= 3600:
                 current_month = GLib.DateTime.new_now_local().format("%Y-%m")
 
                 if self.cfg.config.get("donate-last", "") != current_month:
