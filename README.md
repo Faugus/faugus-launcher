@@ -68,7 +68,7 @@ sudo flatpak override io.github.Faugus.faugus-launcher --talk-name=org.freedeskt
 sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
 
 # Allow Steam to see games icons
-sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/.config/faugus-launcher/
+sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.config/faugus-launcher/
 ```
 ### Known issues:
