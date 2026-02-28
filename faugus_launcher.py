@@ -1778,6 +1778,7 @@ class Main(Gtk.ApplicationWindow):
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
         if game.runner == "Steam":
+            self.update_latest_games_file(title)
             subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid],cwd=cwd)
             return
 
