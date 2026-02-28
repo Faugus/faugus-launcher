@@ -87,11 +87,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.9-1" date="2026-02-27">
+    <release version="1.15.10-1" date="2026-02-28">
       <description>
         <ul>
-          <li>Now properly detects Steam native and Flatpak.</li>
-          <li>Updated Italian translation.</li>
+          <li>Steam games are now shown in the system tray menu.</li>
+          <li>Fixed start on boot not working properly due to recent changes.</li>
         </ul>
       </description>
     </release>
