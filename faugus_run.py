@@ -296,6 +296,14 @@ class FaugusRun:
         content_area.set_vexpand(True)
         content_area.set_hexpand(True)
 
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5, 0.5)
+        frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        frame.add(frame_box)
+        content_area.add(frame)
+
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_top.set_margin_start(20)
         box_top.set_margin_end(20)
@@ -343,8 +351,8 @@ class FaugusRun:
         box_bottom.set_margin_bottom(10)
         box_bottom.pack_start(button_continue, True, True, 0)
 
-        content_area.add(box_top)
-        content_area.add(box_bottom)
+        frame_box.pack_start(box_top, True, True, 0)
+        frame_box.pack_start(box_bottom, False, False, 0)
 
         checkbox_state = False
 
