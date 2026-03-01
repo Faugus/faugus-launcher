@@ -6696,7 +6696,7 @@ def run_file(file_path):
         command_parts.append(f'"{file_path}"')
 
     command = ' '.join(command_parts)
-    subprocess.run([faugus_run, command], cwd=file_dir)
+    subprocess.Popen([faugus_run, command], cwd=file_dir)
 
 def update_games_and_config():
     if os.path.exists(games_json):
@@ -6773,6 +6773,7 @@ def main():
 
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
+        sys.exit(0)
         return
 
     app = FaugusApp(start_hidden)
