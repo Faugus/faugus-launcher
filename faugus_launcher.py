@@ -3967,6 +3967,8 @@ class Settings(Gtk.Dialog):
                     f.write(val + "\n")
 
     def on_button_proton_manager_clicked(self, widget):
+        self.set_sensitive(False)
+
         proton_manager = faugus_proton_manager
         current_runner = self.combobox_runner.get_active_text()
 
@@ -3976,7 +3978,6 @@ class Settings(Gtk.Dialog):
 
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent.set_sensitive, True)
-            GLib.idle_add(self.blocking_window.destroy)
 
             GLib.idle_add(lambda: self.combobox_runner.remove_all())
             GLib.idle_add(self.populate_combobox_with_runners)
@@ -3989,11 +3990,6 @@ class Settings(Gtk.Dialog):
                             break
 
             GLib.idle_add(restore_selection)
-
-        self.blocking_window = Gtk.Window()
-        self.blocking_window.set_transient_for(self.parent)
-        self.blocking_window.set_decorated(False)
-        self.blocking_window.set_modal(True)
 
         command_thread = threading.Thread(target=run_command)
         command_thread.start()
@@ -6154,12 +6150,6 @@ class AddGame(Gtk.Dialog):
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent_window.set_sensitive, True)
-                GLib.idle_add(self.blocking_window.destroy)
-
-            self.blocking_window = Gtk.Window()
-            self.blocking_window.set_transient_for(self.parent_window)
-            self.blocking_window.set_decorated(False)
-            self.blocking_window.set_modal(True)
 
             command_thread = threading.Thread(target=run_command)
             command_thread.start()
@@ -6428,12 +6418,6 @@ class AddGame(Gtk.Dialog):
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
-            GLib.idle_add(self.blocking_window.destroy)
-
-        self.blocking_window = Gtk.Window()
-        self.blocking_window.set_transient_for(self.parent_window)
-        self.blocking_window.set_decorated(False)
-        self.blocking_window.set_modal(True)
 
         command_thread = threading.Thread(target=run_command)
         command_thread.start()
@@ -6485,12 +6469,6 @@ class AddGame(Gtk.Dialog):
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
-            GLib.idle_add(self.blocking_window.destroy)
-
-        self.blocking_window = Gtk.Window()
-        self.blocking_window.set_transient_for(self.parent_window)
-        self.blocking_window.set_decorated(False)
-        self.blocking_window.set_modal(True)
 
         command_thread = threading.Thread(target=run_command)
         command_thread.start()
