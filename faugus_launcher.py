@@ -301,14 +301,25 @@ class Main(Gtk.ApplicationWindow):
     def load_tray_icon(self):
         if not self.system_tray:
             if self.indicator:
-                try:
-                    self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                except:
-                    pass
-                self.indicator = None
+                self.indicator.set_status(
+                    AyatanaAppIndicator3.IndicatorStatus.PASSIVE
+                )
             return
 
+        if not self.indicator:
+            icon = faugus_mono_icon if self.mono_icon else tray_icon
+            self.indicator = AyatanaAppIndicator3.Indicator.new(
+                "faugus-launcher",
+                icon,
+                AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS
+            )
+            self.indicator.set_icon_theme_path("")
+            self.indicator.set_status(
+                AyatanaAppIndicator3.IndicatorStatus.ACTIVE
+            )
+
         menu = Gtk.Menu()
+
         if os.path.exists(latest_games):
             with open(latest_games, "r") as f:
                 for line in f:
@@ -331,31 +342,12 @@ class Main(Gtk.ApplicationWindow):
 
         menu.show_all()
 
-        if self.indicator:
-            try:
-                old = self.indicator
-                self.indicator = None
-                old.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
-                del old
-            except:
-                pass
-            while Gtk.events_pending():
-                Gtk.main_iteration()
-
-        if not hasattr(self, "_tray_counter"):
-            self._tray_counter = 0
-        self._tray_counter += 1
-        unique_id = f"faugus-launcher-{self._tray_counter}"
-
         icon = faugus_mono_icon if self.mono_icon else tray_icon
-
-        self.indicator = AyatanaAppIndicator3.Indicator.new(
-            unique_id, icon, AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS
-        )
         self.indicator.set_menu(menu)
         self.indicator.set_icon_full(icon, "Faugus Launcher")
-        self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-        self.indicator.set_icon_theme_path("")
+        self.indicator.set_status(
+            AyatanaAppIndicator3.IndicatorStatus.ACTIVE
+        )
 
     def on_close(self, *_):
         if self.system_tray:
