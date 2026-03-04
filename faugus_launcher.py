@@ -2634,20 +2634,20 @@ class Main(Gtk.ApplicationWindow):
                 self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "epic":
                     self.label_download2.set_text("")
-                    command = f"WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
+                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait..."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
 
                 if runner:
                     if runner == "Proton-CachyOS":
