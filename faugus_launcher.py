@@ -2663,7 +2663,7 @@ class Main(Gtk.ApplicationWindow):
                     self.label_download2.set_text(_("Please close the login window and wait..."))
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
                 elif launcher == "wargaming":
-                    self.label_download2.set_text(_("Please close Wargaming to finish the installation..."))
+                    self.label_download2.set_text(_("Please close Wargaming to finish the installation."))
                     command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /SILENT"
 
                 if runner:
