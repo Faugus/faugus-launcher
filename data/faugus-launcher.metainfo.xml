@@ -81,11 +81,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.10-1" date="2026-02-28">
+    <release version="1.15.11-1" date="2026-03-04">
       <description>
         <ul>
-          <li>Steam games are now shown in the system tray menu.</li>
-          <li>Fixed start on boot not working properly due to recent changes.</li>
+          <li>Added Wargaming Game Center installation.</li>
+          <li>Now uses less resources when running a game from the file manager.</li>
+          <li>Fixed system tray icon being duplicated.</li>
+          <li>Now installing launchers will generate logs if enabled.</li>
+          <li>Updated Portuguese translation.</li>
         </ul>
       </description>
     </release>
