@@ -911,75 +911,6 @@ def load_game_from_json(gameid):
 
     return None
 
-def update_games_and_config():
-    if os.path.exists(games_dir):
-        try:
-            with open(games_dir, "r", encoding="utf-8") as f:
-                games = json.load(f)
-        except json.JSONDecodeError:
-            games = []
-
-        changed = False
-
-        for game in games:
-            title = game.get("title", "")
-            if title:
-                formatted = format_title(title)
-                if game.get("gameid") != formatted:
-                    game["gameid"] = formatted
-                    changed = True
-
-            if game.get("playtime", "") == "":
-                game["playtime"] = 0
-                changed = True
-
-            runner = game.get("runner")
-            if runner == "Proton-EM":
-                game["runner"] = "Proton-EM Latest"
-                changed = True
-            elif runner == "GE-Proton":
-                game["runner"] = "Proton-GE Latest"
-                changed = True
-            elif runner == "Steam":
-                for key in (
-                    "mangohud",
-                    "gamemode",
-                    "disable_hidraw",
-                    "addapp_checkbox",
-                    "prevent_sleep",
-                ):
-                    if game.get(key, "") != "":
-                        game[key] = ""
-                        changed = True
-
-        if changed:
-            with open(games_dir, "w", encoding="utf-8") as f:
-                json.dump(games, f, indent=4, ensure_ascii=False)
-
-    config_path = Path(PathManager.user_config("faugus-launcher/config.ini"))
-    if not config_path.exists():
-        return
-
-    lines = config_path.read_text(encoding="utf-8").splitlines()
-    new_lines = []
-    changed = False
-
-    for line in lines:
-        if line.startswith("default-runner="):
-            value = line.split("=", 1)[1].strip('"')
-
-            if value == "GE-Proton":
-                line = 'default-runner="Proton-GE Latest"'
-                changed = True
-            elif value == "Proton-EM":
-                line = 'default-runner="Proton-EM Latest"'
-                changed = True
-
-        new_lines.append(line)
-
-    if changed:
-        config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-
 def is_apple_silicon():
     path = "/proc/device-tree/compatible"
 
@@ -1006,7 +937,6 @@ def main():
             os.execvpe(muvm_path, args + sys.argv[1:], env)
 
     apply_dark_theme()
-    update_games_and_config()
 
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument("message", nargs='?')
