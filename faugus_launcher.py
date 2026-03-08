@@ -222,47 +222,51 @@ class Main(Gtk.ApplicationWindow):
 
         self.context_menu = Gtk.Menu()
 
-        self.menu_item_title = Gtk.MenuItem(label="")
-        self.menu_item_title.set_sensitive(False)
-        self.context_menu.append(self.menu_item_title)
+        self.menu_title = Gtk.MenuItem(label="")
+        self.menu_title.set_sensitive(False)
+        self.context_menu.append(self.menu_title)
 
-        self.menu_item_playtime = Gtk.MenuItem(label="")
-        self.menu_item_playtime.set_sensitive(False)
-        self.context_menu.append(self.menu_item_playtime)
+        self.menu_playtime = Gtk.MenuItem(label="")
+        self.menu_playtime.set_sensitive(False)
+        self.context_menu.append(self.menu_playtime)
 
         self.context_menu.append(Gtk.SeparatorMenuItem())
 
-        self.menu_item_play = Gtk.MenuItem(label=_("Play"))
-        self.menu_item_play.connect("activate", self.on_context_menu_play)
-        self.context_menu.append(self.menu_item_play)
+        self.menu_play = Gtk.MenuItem(label=_("Play"))
+        self.menu_play.connect("activate", self.on_context_menu_play)
+        self.context_menu.append(self.menu_play)
 
-        self.menu_item_edit = Gtk.MenuItem(label=_("Edit"))
-        self.menu_item_edit.connect("activate", self.on_context_menu_edit)
-        self.context_menu.append(self.menu_item_edit)
+        self.menu_edit = Gtk.MenuItem(label=_("Edit"))
+        self.menu_edit.connect("activate", self.on_context_menu_edit)
+        self.context_menu.append(self.menu_edit)
 
-        self.menu_item_delete = Gtk.MenuItem(label=_("Delete"))
-        self.menu_item_delete.connect("activate", self.on_context_menu_delete)
-        self.context_menu.append(self.menu_item_delete)
+        self.menu_delete = Gtk.MenuItem(label=_("Delete"))
+        self.menu_delete.connect("activate", self.on_context_menu_delete)
+        self.context_menu.append(self.menu_delete)
 
-        self.menu_item_duplicate = Gtk.MenuItem(label=_("Duplicate"))
-        self.menu_item_duplicate.connect("activate", self.on_context_menu_duplicate)
-        self.context_menu.append(self.menu_item_duplicate)
+        self.menu_duplicate = Gtk.MenuItem(label=_("Duplicate"))
+        self.menu_duplicate.connect("activate", self.on_context_menu_duplicate)
+        self.context_menu.append(self.menu_duplicate)
 
-        self.menu_item_hide = Gtk.MenuItem(label=_("Hide"))
-        self.menu_item_hide.connect("activate", self.on_context_menu_hide)
-        self.context_menu.append(self.menu_item_hide)
+        self.menu_hide = Gtk.MenuItem(label=_("Hide"))
+        self.menu_hide.connect("activate", self.on_context_menu_hide)
+        self.context_menu.append(self.menu_hide)
 
-        self.menu_item_favorite = Gtk.MenuItem(label=_("Add to favorites"))
-        self.menu_item_favorite.connect("activate", self.on_context_menu_favorite)
-        self.context_menu.append(self.menu_item_favorite)
+        self.menu_favorite = Gtk.MenuItem(label=_("Add to favorites"))
+        self.menu_favorite.connect("activate", self.on_context_menu_favorite)
+        self.context_menu.append(self.menu_favorite)
 
-        self.menu_item_game = Gtk.MenuItem(label=_("Open game location"))
-        self.menu_item_game.connect("activate", self.on_context_menu_game)
-        self.context_menu.append(self.menu_item_game)
+        self.menu_game_location = Gtk.MenuItem(label=_("Open game location"))
+        self.menu_game_location.connect("activate", self.on_context_menu_game_location)
+        self.context_menu.append(self.menu_game_location)
 
-        self.menu_item_prefix = Gtk.MenuItem(label=_("Open prefix location"))
-        self.menu_item_prefix.connect("activate", self.on_context_menu_prefix)
-        self.context_menu.append(self.menu_item_prefix)
+        self.menu_prefix_location = Gtk.MenuItem(label=_("Open prefix location"))
+        self.menu_prefix_location.connect("activate", self.on_context_menu_prefix_location)
+        self.context_menu.append(self.menu_prefix_location)
+
+        self.menu_run = Gtk.MenuItem(label=_("Run file inside the prefix"))
+        self.menu_run.connect("activate", self.on_context_menu_run)
+        #self.context_menu.append(self.menu_run)
 
         self.menu_show_logs = Gtk.MenuItem(label=_("Show logs"))
         self.menu_show_logs.connect("activate", self.on_context_show_logs)
@@ -406,12 +410,12 @@ class Main(Gtk.ApplicationWindow):
                     selected_title = game_label.get_text()
 
                     if selected_title not in self.processos:
-                        self.menu_item_play.set_sensitive(True)
+                        self.menu_play.set_sensitive(True)
                         self.button_play.set_sensitive(True)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
                     else:
-                        self.menu_item_play.set_sensitive(False)
+                        self.menu_play.set_sensitive(False)
                         self.button_play.set_sensitive(False)
                         self.button_play.set_image(
                             Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
@@ -573,9 +577,9 @@ class Main(Gtk.ApplicationWindow):
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
 
-        self.menu_item_edit.set_sensitive(False)
-        self.menu_item_delete.set_sensitive(False)
-        self.menu_item_play.set_sensitive(False)
+        self.menu_edit.set_sensitive(False)
+        self.menu_delete.set_sensitive(False)
+        self.menu_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
         self.select_first_child()
@@ -719,9 +723,9 @@ class Main(Gtk.ApplicationWindow):
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
 
-        self.menu_item_edit.set_sensitive(False)
-        self.menu_item_delete.set_sensitive(False)
-        self.menu_item_play.set_sensitive(False)
+        self.menu_edit.set_sensitive(False)
+        self.menu_delete.set_sensitive(False)
+        self.menu_play.set_sensitive(False)
         self.button_play.set_sensitive(False)
 
         self.select_first_child()
@@ -780,7 +784,7 @@ class Main(Gtk.ApplicationWindow):
                 game = selected_child.game
                 title = game.title
 
-                self.menu_item_title.get_child().set_text(title)
+                self.menu_title.get_child().set_text(title)
 
                 with open(games_json, "r") as f:
                     data = json.load(f)
@@ -790,10 +794,10 @@ class Main(Gtk.ApplicationWindow):
                         game.playtime = item.get("playtime", 0)
                         formatted = self.format_playtime(game.playtime)
                         if not formatted:
-                            self.menu_item_playtime.hide()
+                            self.menu_playtime.hide()
                         else:
-                            self.menu_item_playtime.show()
-                            self.menu_item_playtime.get_child().set_text(formatted)
+                            self.menu_playtime.show()
+                            self.menu_playtime.get_child().set_text(formatted)
                         break
 
                 if game.protonfix:
@@ -818,48 +822,51 @@ class Main(Gtk.ApplicationWindow):
                     self.menu_show_logs.set_visible(False)
 
                 if game.hidden:
-                    self.menu_item_hide.get_child().set_text(_("Remove from hidden"))
+                    self.menu_hide.get_child().set_text(_("Remove from hidden"))
                 else:
-                    self.menu_item_hide.get_child().set_text(_("Hide"))
+                    self.menu_hide.get_child().set_text(_("Hide"))
 
                 if game.favorite:
-                    self.menu_item_favorite.get_child().set_text(_("Remove from favorites"))
+                    self.menu_favorite.get_child().set_text(_("Remove from favorites"))
                 else:
-                    self.menu_item_favorite.get_child().set_text(_("Add to favorites"))
+                    self.menu_favorite.get_child().set_text(_("Add to favorites"))
 
                 if game.runner == "Steam":
-                    self.menu_item_duplicate.set_visible(False)
-                    self.menu_item_game.set_visible(False)
-                    self.menu_item_prefix.set_visible(False)
+                    self.menu_duplicate.set_visible(False)
+                    self.menu_game_location.set_visible(False)
+                    self.menu_prefix_location.set_visible(False)
+                    self.menu_run.set_visible(False)
                     self.menu_show_logs.set_visible(False)
                 elif game.runner == "Linux-Native":
-                    self.menu_item_duplicate.set_visible(True)
-                    self.menu_item_game.set_visible(True)
-                    self.menu_item_prefix.set_visible(False)
+                    self.menu_duplicate.set_visible(True)
+                    self.menu_game_location.set_visible(True)
+                    self.menu_prefix_location.set_visible(False)
+                    self.menu_run.set_visible(False)
                     self.menu_show_logs.set_visible(False)
                 else:
-                    self.menu_item_duplicate.set_visible(True)
-                    self.menu_item_game.set_visible(True)
-                    self.menu_item_prefix.set_visible(True)
+                    self.menu_duplicate.set_visible(True)
+                    self.menu_game_location.set_visible(True)
+                    self.menu_prefix_location.set_visible(True)
+                    self.menu_run.set_visible(True)
 
                 processos = self.load_processes_from_file()
                 if title in processos:
-                    self.menu_item_play.get_child().set_text(_("Stop"))
+                    self.menu_play.get_child().set_text(_("Stop"))
                 else:
-                    self.menu_item_play.get_child().set_text(_("Play"))
+                    self.menu_play.get_child().set_text(_("Play"))
 
                 if os.path.dirname(game.path):
-                    self.menu_item_game.set_sensitive(True)
+                    self.menu_game_location.set_sensitive(True)
                     self.current_game = os.path.dirname(game.path)
                 else:
-                    self.menu_item_game.set_sensitive(False)
+                    self.menu_game_location.set_sensitive(False)
                     self.current_game = None
 
                 if os.path.isdir(game.prefix):
-                    self.menu_item_prefix.set_sensitive(True)
+                    self.menu_prefix_location.set_sensitive(True)
                     self.current_prefix = game.prefix
                 else:
-                    self.menu_item_prefix.set_sensitive(False)
+                    self.menu_prefix_location.set_sensitive(False)
                     self.current_prefix = None
 
                 self.context_menu.popup_at_pointer(event)
@@ -975,11 +982,78 @@ class Main(Gtk.ApplicationWindow):
                 self.flowbox.set_focus_child(child)
                 break
 
-    def on_context_menu_game(self, menu_item):
+    def on_context_menu_game_location(self, menu_item):
         subprocess.run(["xdg-open", self.current_game], check=True)
 
-    def on_context_menu_prefix(self, menu_item):
+    def on_context_menu_prefix_location(self, menu_item):
         subprocess.run(["xdg-open", self.current_prefix], check=True)
+
+    def on_context_menu_run(self, menu_item):
+        selected = self.flowbox.get_selected_children()
+        if not selected:
+            return
+
+        game = selected[0].game
+        if not game:
+            return
+        filechooser = Gtk.FileChooserNative(
+            title=_("Select a file to run inside the prefix"),
+            transient_for=self,
+            action=Gtk.FileChooserAction.OPEN,
+            accept_label=_("Open"),
+            cancel_label=_("Cancel"),
+        )
+
+        windows_filter = Gtk.FileFilter()
+        windows_filter.set_name(_("Windows files"))
+        windows_filter.add_pattern("*.exe")
+        windows_filter.add_pattern("*.msi")
+        windows_filter.add_pattern("*.bat")
+        windows_filter.add_pattern("*.lnk")
+        windows_filter.add_pattern("*.reg")
+
+        all_files_filter = Gtk.FileFilter()
+        all_files_filter.set_name(_("All files"))
+        all_files_filter.add_pattern("*")
+
+        filechooser.add_filter(windows_filter)
+        filechooser.add_filter(all_files_filter)
+        filechooser.set_filter(windows_filter)
+
+        response = filechooser.run()
+
+        if response == Gtk.ResponseType.ACCEPT:
+            title = game.title
+            prefix = game.prefix
+            runner = game.runner
+            title_formatted = format_title(title)
+            file_run = filechooser.get_filename()
+
+            escaped_file_run = file_run.replace("'", "'\\''")
+            runner = convert_runner(runner)
+
+            command_parts = []
+
+            if title_formatted:
+                command_parts.append(f"LOG_DIR={title_formatted}")
+            if prefix:
+                command_parts.append(f"WINEPREFIX='{prefix}'")
+            if title_formatted:
+                command_parts.append(f"GAMEID={title_formatted}")
+            if runner:
+                if runner == "Proton-CachyOS":
+                    command_parts.append(f"PROTONPATH='{proton_cachyos}'")
+                else:
+                    command_parts.append(f"PROTONPATH='{runner}'")
+            if escaped_file_run.endswith(".reg"):
+                command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
+            else:
+                command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
+
+            command = ' '.join(command_parts)
+            subprocess.Popen([sys.executable, faugus_run, command])
+
+        filechooser.destroy()
 
     def on_context_show_logs(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
@@ -1605,40 +1679,40 @@ class Main(Gtk.ApplicationWindow):
             game_label = label_children[1]
             title = game_label.get_text()
 
-            self.menu_item_edit.set_sensitive(True)
-            self.menu_item_delete.set_sensitive(True)
+            self.menu_edit.set_sensitive(True)
+            self.menu_delete.set_sensitive(True)
 
             if IS_FLATPAK:
                 if title in self.processos:
-                    self.menu_item_play.set_sensitive(False)
+                    self.menu_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
                     self.button_play.set_image(
                         Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
                 else:
-                    self.menu_item_play.set_sensitive(True)
+                    self.menu_play.set_sensitive(True)
                     self.button_play.set_sensitive(True)
                     self.button_play.set_image(
                         Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
             else:
                 processos = self.load_processes_from_file()
                 if title in self.button_locked:
-                    self.menu_item_play.set_sensitive(False)
+                    self.menu_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
                     self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
                 elif title in processos:
-                    self.menu_item_play.set_sensitive(True)
+                    self.menu_play.set_sensitive(True)
                     self.button_play.set_sensitive(True)
                     self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
                 else:
-                    self.menu_item_play.set_sensitive(True)
+                    self.menu_play.set_sensitive(True)
                     self.button_play.set_sensitive(True)
                     self.button_play.set_image(
                         Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
 
         else:
-            self.menu_item_edit.set_sensitive(False)
-            self.menu_item_delete.set_sensitive(False)
-            self.menu_item_play.set_sensitive(False)
+            self.menu_edit.set_sensitive(False)
+            self.menu_delete.set_sensitive(False)
+            self.menu_play.set_sensitive(False)
             self.button_play.set_sensitive(False)
 
     def on_button_settings_clicked(self, widget):
@@ -1801,7 +1875,7 @@ class Main(Gtk.ApplicationWindow):
                 else:
                     self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
 
-                    self.menu_item_play.set_sensitive(False)
+                    self.menu_play.set_sensitive(False)
                     self.button_play.set_sensitive(False)
                     self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
@@ -1815,7 +1889,7 @@ class Main(Gtk.ApplicationWindow):
             else:
                 self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
 
-                self.menu_item_play.set_sensitive(False)
+                self.menu_play.set_sensitive(False)
                 self.button_play.set_sensitive(False)
                 self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
@@ -1835,7 +1909,7 @@ class Main(Gtk.ApplicationWindow):
         if self.processo and self.processo.pid == pid:
             self.processo = None
 
-        self.menu_item_play.set_sensitive(True)
+        self.menu_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
 
@@ -1850,7 +1924,7 @@ class Main(Gtk.ApplicationWindow):
             main_pid=self.processo.pid
         )
 
-        self.menu_item_play.set_sensitive(True)
+        self.menu_play.set_sensitive(True)
         self.button_play.set_sensitive(True)
         self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
 
