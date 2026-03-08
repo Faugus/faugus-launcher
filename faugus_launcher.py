@@ -1030,10 +1030,9 @@ class Main(Gtk.ApplicationWindow):
             file_run = filechooser.get_filename()
 
             escaped_file_run = file_run.replace("'", "'\\''")
-            runner = convert_runner(runner)
-
             command_parts = []
 
+            command_parts.append(f"FAUGUS_NOUPDATE=1")
             if title_formatted:
                 command_parts.append(f"LOG_DIR={title_formatted}")
             if prefix:
