@@ -1032,7 +1032,7 @@ class Main(Gtk.ApplicationWindow):
             escaped_file_run = file_run.replace("'", "'\\''")
             command_parts = []
 
-            command_parts.append(f"FAUGUS_NOUPDATE=1")
+            command_parts.append(f"FAUGUS_DISABLE_UPDATES=1")
             if title_formatted:
                 command_parts.append(f"LOG_DIR={title_formatted}")
             if prefix:
@@ -1455,6 +1455,7 @@ class Main(Gtk.ApplicationWindow):
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
+        self.disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         self.start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
@@ -3414,6 +3415,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_splash_disable = Gtk.CheckButton(label=_("Disable splash window"))
         self.checkbox_splash_disable.set_active(False)
 
+        self.checkbox_disable_updates = Gtk.CheckButton(label=_("Disable automatic updates"))
+        self.checkbox_disable_updates.set_active(False)
+
         # Create checkbox for 'Enable logging' option
         self.checkbox_enable_logging = Gtk.CheckButton(label=_("Enable logging"))
         self.checkbox_enable_logging.set_active(False)
@@ -3698,14 +3702,15 @@ class Settings(Gtk.Dialog):
 
         grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3981,58 +3986,37 @@ class Settings(Gtk.Dialog):
         entry_default_prefix = self.entry_default_prefix.get_text()
         combobox_default_runner = self.get_default_runner()
         entry_lossless = self.entry_lossless.get_text()
-        checkbox_mangohud = self.checkbox_mangohud.get_active()
-        checkbox_gamemode = self.checkbox_gamemode.get_active()
-        checkbox_disable_hidraw = self.checkbox_disable_hidraw.get_active()
-        checkbox_prevent_sleep = self.checkbox_prevent_sleep.get_active()
-        checkbox_discrete_gpu_state = self.checkbox_discrete_gpu.get_active()
-        checkbox_splash_disable = self.checkbox_splash_disable.get_active()
-        checkbox_system_tray = self.checkbox_system_tray.get_active()
-        checkbox_start_boot = self.checkbox_start_boot.get_active()
-        checkbox_mono_icon = self.checkbox_mono_icon.get_active()
-        checkbox_close_after_launcher = self.checkbox_close_after_launch.get_active()
-        checkbox_enable_logging = self.checkbox_enable_logging.get_active()
-        checkbox_show_hidden = self.checkbox_show_hidden.get_active()
-        checkbox_wayland_driver = self.checkbox_wayland_driver.get_active()
-        checkbox_enable_hdr = self.checkbox_enable_hdr.get_active()
-        checkbox_enable_wow64 = self.checkbox_enable_wow64.get_active()
-        combobox_interface = self.combobox_interface.get_active_text()
-        checkbox_start_maximized = self.checkbox_start_maximized.get_active()
-        checkbox_start_fullscreen = self.checkbox_start_fullscreen.get_active()
-        checkbox_show_labels = self.checkbox_show_labels.get_active()
-        checkbox_smaller_banners = self.checkbox_smaller_banners.get_active()
-
         language = self.lang_codes.get(combobox_language, "en_US")
         logging_warning = self.logging_warning
 
         config = ConfigManager()
-        config.save_with_values(
-            checkbox_close_after_launcher,
-            entry_default_prefix,
-            checkbox_mangohud,
-            checkbox_gamemode,
-            checkbox_disable_hidraw,
-            checkbox_prevent_sleep,
-            combobox_default_runner,
-            entry_lossless,
-            checkbox_discrete_gpu_state,
-            checkbox_splash_disable,
-            checkbox_system_tray,
-            checkbox_start_boot,
-            checkbox_mono_icon,
-            combobox_interface,
-            checkbox_start_maximized,
-            checkbox_start_fullscreen,
-            checkbox_show_labels,
-            checkbox_smaller_banners,
-            checkbox_enable_logging,
-            checkbox_wayland_driver,
-            checkbox_enable_hdr,
-            checkbox_enable_wow64,
-            language,
-            logging_warning,
-            checkbox_show_hidden
-        )
+        config.set_value("language", language)
+        config.set_value("default-prefix", entry_default_prefix)
+        config.set_value("default-runner", combobox_default_runner)
+        config.set_value("lossless-location", entry_lossless)
+        config.set_value("mangohud", self.checkbox_mangohud.get_active())
+        config.set_value("gamemode", self.checkbox_gamemode.get_active())
+        config.set_value("disable-hidraw", self.checkbox_disable_hidraw.get_active())
+        config.set_value("prevent-sleep", self.checkbox_prevent_sleep.get_active())
+        config.set_value("discrete-gpu", self.checkbox_discrete_gpu.get_active())
+        config.set_value("splash-disable", self.checkbox_splash_disable.get_active())
+        config.set_value("disable-updates", self.checkbox_disable_updates.get_active())
+        config.set_value("system-tray", self.checkbox_system_tray.get_active())
+        config.set_value("start-boot", self.checkbox_start_boot.get_active())
+        config.set_value("mono-icon", self.checkbox_mono_icon.get_active())
+        config.set_value("close-onlaunch", self.checkbox_close_after_launch.get_active())
+        config.set_value("enable-logging", self.checkbox_enable_logging.get_active())
+        config.set_value("show-hidden", self.checkbox_show_hidden.get_active())
+        config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
+        config.set_value("enable-hdr", self.checkbox_enable_hdr.get_active())
+        config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
+        config.set_value("interface-mode", self.combobox_interface.get_active_text())
+        config.set_value("start-maximized", self.checkbox_start_maximized.get_active())
+        config.set_value("start-fullscreen", self.checkbox_start_fullscreen.get_active())
+        config.set_value("show-labels", self.checkbox_show_labels.get_active())
+        config.set_value("smaller-banners", self.checkbox_smaller_banners.get_active())
+        config.set_value("logging-warning", logging_warning)
+        config.save_config()
 
         self.set_sensitive(False)
 
@@ -4515,6 +4499,7 @@ class Settings(Gtk.Dialog):
         lossless_location = cfg.config.get('lossless-location', '').strip('"')
         discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
         splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
+        disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         system_tray = cfg.config.get('system-tray', 'False') == 'True'
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
@@ -4556,6 +4541,7 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.set_active(index_runner)
         self.checkbox_discrete_gpu.set_active(discrete_gpu)
         self.checkbox_splash_disable.set_active(splash_disable)
+        self.checkbox_disable_updates.set_active(disable_updates)
         self.checkbox_system_tray.set_active(system_tray)
         self.checkbox_start_boot.set_active(self.start_boot)
         self.checkbox_mono_icon.set_active(self.mono_icon)

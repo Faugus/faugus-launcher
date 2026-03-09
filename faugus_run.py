@@ -69,16 +69,34 @@ def set_env(key, value):
     _env_set.add(key)
 
 class FaugusRun:
-    def __init__(self, message):
+    def __init__(self, message, command=None):
         self.message = message
+        self.command = command
         self.process = None
         self.warning_dialog = None
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
         self._env_set = set()
+
         self.load_config()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
+
+    def run(self):
+        def run_process():
+            self.start_process(self.command)
+
+        self.process_thread = Thread(target=run_process)
+
+        def start_thread():
+            self.process_thread.start()
+
+        GLib.idle_add(start_thread)
+
+        Gtk.main()
+
+        self.process_thread.join()
+        sys.exit(0)
 
     def start_process(self, command):
         if self.show_donate:
@@ -88,6 +106,7 @@ class FaugusRun:
                 if self.cfg.config.get("donate-last", "") != current_month:
                     self.show_donate_dialog()
                     self.cfg.set_value("donate-last", current_month)
+                    self.cfg.save_config()
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
@@ -158,8 +177,20 @@ class FaugusRun:
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
+            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-EM Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
+            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-GE Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        components_path = PathManager.user_config("faugus-launcher/components")
+        self.components_exists = os.path.isdir(components_path)
+
+        self.show_warning_dialog()
+        if self.command == "winetricks":
+            GLib.idle_add(self.show_log_window)
 
         env_from_file = self.load_env_from_file(envar_dir)
         if env_from_file:
@@ -177,20 +208,28 @@ class FaugusRun:
         self.execute_final_command()
 
     def execute_final_command(self):
-        if not os.environ.get("UMU_NO_PROTON"):
-            if self.proton_latest:
-                cmd = (
-                    f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}; "
-                    f"{sys.executable} -m faugus.components; "
-                    f"{self.message}"
-                )
-            else:
-                cmd = (
-                    f"{sys.executable} -m faugus.components; "
-                    f"{self.message}"
-                )
+        if os.environ.get("UMU_NO_PROTON"):
+            cmd = self.message
         else:
-            cmd = f"{self.message}"
+            commands = []
+
+            if os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates:
+                set_env("UMU_RUNTIME_UPDATE", "0")
+
+                if self.proton_latest and not self.proton_exists:
+                    commands.append(f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}")
+
+                if not self.components_exists:
+                    commands.append(f"{sys.executable} -m faugus.components")
+
+            else:
+                if self.proton_latest:
+                    commands.append(f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}")
+
+                commands.append(f"{sys.executable} -m faugus.components")
+
+            commands.append(self.message)
+            cmd = "; ".join(commands)
 
         prevent_sleep = os.environ.get("PREVENT_SLEEP")
         use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
@@ -369,6 +408,7 @@ class FaugusRun:
 
         if checkbox_state:
             self.cfg.set_value("show-donate", False)
+            self.cfg.save_config()
 
     def on_button_kofi_clicked(self, widget):
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
@@ -482,6 +522,7 @@ class FaugusRun:
         self.language = self.cfg.config.get('language', '')
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
+        self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
 
     def show_warning_dialog(self):
         self.warning_dialog = Gtk.Window(title="Faugus Launcher")
@@ -520,7 +561,7 @@ class FaugusRun:
 
         self.warning_dialog.add(frame)
 
-        if not self.splash_disable:
+        if not self.splash_disable and not self.disable_updates and not os.environ.get("FAUGUS_DISABLE_UPDATES"):
             self.warning_dialog.show_all()
 
     def show_log_window(self):
@@ -740,6 +781,7 @@ class FaugusRun:
 
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
+        self.cfg.save_config()
 
         game_id = os.environ.get("GAMEID")
 
@@ -951,9 +993,9 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        handle_command(launch_options, None)
+        FaugusRun(launch_options, None).run()
     else:
-        handle_command(args.message, args.command)
+        FaugusRun(args.message, args.command).run()
 
 if __name__ == "__main__":
     main()

@@ -31,6 +31,7 @@ class ConfigManager:
             'language': lang,
             'logging-warning': 'False',
             'show-hidden': 'False',
+            'disable-updates': 'False',
             'show-donate': 'True',
             'donate-last': '',
             'playtime': 0,
@@ -69,15 +70,8 @@ class ConfigManager:
                 else:
                     f.write(f'{key}={value}\n')
 
-    def save_with_values(self, *args):
-        keys = list(self.default_config.keys())
-        for key, value in zip(keys, args):
-            self.config[key] = str(value)
-        self.save_config()
-
     def set_value(self, key, value):
         if key not in self.default_config:
             return
 
         self.config[key] = str(value)
-        self.save_config()
