@@ -1229,6 +1229,8 @@ class Main(Gtk.ApplicationWindow):
                 "addapp_checkbox": game.addapp_checkbox,
                 "addapp": game.addapp,
                 "addapp_bat": game.addapp_bat,
+                "addapp_delay": game.addapp_delay,
+                "addapp_first": game.addapp_first,
                 "banner": game.banner,
                 "lossless_enabled": game.lossless_enabled,
                 "lossless_multiplier": game.lossless_multiplier,
@@ -1509,6 +1511,8 @@ class Main(Gtk.ApplicationWindow):
                         game_data.get("addapp_checkbox", ""),
                         game_data.get("addapp", ""),
                         game_data.get("addapp_bat", ""),
+                        game_data.get("addapp_delay", ""),
+                        game_data.get("addapp_first", ""),
                         game_data.get("banner", ""),
                         game_data.get("lossless_enabled", ""),
                         game_data.get("lossless_multiplier", ""),
@@ -2036,8 +2040,12 @@ class Main(Gtk.ApplicationWindow):
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(_("Edit %s") % game.title)
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
-            edit_game_dialog.entry_addapp.set_text(game.addapp)
             edit_game_dialog.grid_launcher.set_visible(False)
+
+            edit_game_dialog.addapp_enabled = game.addapp_checkbox
+            edit_game_dialog.addapp = game.addapp
+            edit_game_dialog.addapp_delay = game.addapp_delay
+            edit_game_dialog.addapp_first = game.addapp_first
 
             edit_game_dialog.lossless_enabled = game.lossless_enabled
             edit_game_dialog.lossless_multiplier = game.lossless_multiplier
@@ -2076,11 +2084,6 @@ class Main(Gtk.ApplicationWindow):
                 edit_game_dialog.checkbox_prevent_sleep.set_active(True)
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
-
-            if game.addapp_checkbox == "addapp_enabled":
-                edit_game_dialog.checkbox_addapp.set_active(True)
-            else:
-                edit_game_dialog.checkbox_addapp.set_active(False)
 
             self.updated_steam_id = detect_steam_id()
             if self.updated_steam_id is not None:
@@ -2332,7 +2335,9 @@ class Main(Gtk.ApplicationWindow):
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combobox_runner.get_active_text()
-            addapp = add_game_dialog.entry_addapp.get_text()
+            addapp = add_game_dialog.addapp
+            addapp_delay = add_game_dialog.addapp_delay
+            addapp_first = add_game_dialog.addapp_first
             lossless_enabled = add_game_dialog.lossless_enabled
             lossless_multiplier = add_game_dialog.lossless_multiplier
             lossless_flow = add_game_dialog.lossless_flow
@@ -2389,7 +2394,7 @@ class Main(Gtk.ApplicationWindow):
                 mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
                 gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
                 disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
-                addapp_checkbox = "addapp_enabled" if add_game_dialog.checkbox_addapp.get_active() else ""
+                addapp_checkbox = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
                 prevent_sleep = True if add_game_dialog.checkbox_prevent_sleep.get_active() else ""
 
             # Create Game object and update UI
@@ -2408,6 +2413,8 @@ class Main(Gtk.ApplicationWindow):
                 addapp_checkbox,
                 addapp,
                 addapp_bat,
+                addapp_delay,
+                addapp_first,
                 banner,
                 lossless_enabled,
                 lossless_multiplier,
@@ -2480,6 +2487,8 @@ class Main(Gtk.ApplicationWindow):
                 "addapp_checkbox": addapp_checkbox,
                 "addapp": addapp,
                 "addapp_bat": addapp_bat,
+                "addapp_delay": addapp_delay,
+                "addapp_first": addapp_first,
                 "banner": banner,
                 "lossless_enabled": lossless_enabled,
                 "lossless_multiplier": lossless_multiplier,
@@ -2518,11 +2527,23 @@ class Main(Gtk.ApplicationWindow):
 
                 if addapp_checkbox == "addapp_enabled":
                     with open(addapp_bat, "w") as bat_file:
-                        bat_file.write(f'start "" "z:{addapp}"\n')
-                        if game_arguments:
-                            bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
+                        bat_file.write(f'@echo off\n')
+                        if not addapp_first:
+                            if game_arguments:
+                                bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
+                            else:
+                                bat_file.write(f'start "" "z:{path}"\n')
+                            if addapp_delay:
+                                bat_file.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
+                            bat_file.write(f'start "" "z:{addapp}"\n')
                         else:
-                            bat_file.write(f'start "" "z:{path}"\n')
+                            bat_file.write(f'start "" "z:{addapp}"\n')
+                            if addapp_delay:
+                                bat_file.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
+                            if game_arguments:
+                                bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
+                            else:
+                                bat_file.write(f'start "" "z:{path}"\n')
 
                 self.add_item_list(game)
                 self.update_list()
@@ -2785,8 +2806,10 @@ class Main(Gtk.ApplicationWindow):
             game.disable_hidraw = edit_game_dialog.checkbox_disable_hidraw.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combobox_runner.get_active_text()
-            game.addapp_checkbox = edit_game_dialog.checkbox_addapp.get_active()
-            game.addapp = edit_game_dialog.entry_addapp.get_text()
+            game.addapp_checkbox = edit_game_dialog.addapp_enabled
+            game.addapp = edit_game_dialog.addapp
+            game.addapp_delay = edit_game_dialog.addapp_delay
+            game.addapp_first = edit_game_dialog.addapp_first
             game.lossless_enabled = edit_game_dialog.lossless_enabled
             game.lossless_multiplier = edit_game_dialog.lossless_multiplier
             game.lossless_flow = edit_game_dialog.lossless_flow
@@ -2832,11 +2855,23 @@ class Main(Gtk.ApplicationWindow):
 
             if game.addapp_checkbox == True:
                 with open(game.addapp_bat, "w") as bat_file:
-                    bat_file.write(f'start "" "z:{game.addapp}"\n')
-                    if game.game_arguments:
-                        bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
+                    bat_file.write(f'@echo off\n')
+                    if not game.addapp_first:
+                        if game.game_arguments:
+                            bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
+                        else:
+                            bat_file.write(f'start "" "z:{game.path}"\n')
+                        if game.addapp_delay:
+                            bat_file.write(f'ping -n {game.addapp_delay} 127.0.0.1 >nul\n')
+                        bat_file.write(f'start "" "z:{game.addapp}"\n')
                     else:
-                        bat_file.write(f'start "" "z:{game.path}"\n')
+                        bat_file.write(f'start "" "z:{game.addapp}"\n')
+                        if game.addapp_delay:
+                            bat_file.write(f'ping -n {game.addapp_delay} 127.0.0.1 >nul\n')
+                        if game.game_arguments:
+                            bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
+                        else:
+                            bat_file.write(f'start "" "z:{game.path}"\n')
 
             # Save changes and update UI
             self.save_games()
@@ -3137,6 +3172,8 @@ class Main(Gtk.ApplicationWindow):
                     "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
                     "addapp": game.addapp,
                     "addapp_bat": game.addapp_bat,
+                    "addapp_delay": game.addapp_delay,
+                    "addapp_first": game.addapp_first,
                     "banner": game.banner,
                     "lossless_enabled": game.lossless_enabled,
                     "lossless_multiplier": game.lossless_multiplier,
@@ -4611,6 +4648,8 @@ class Game:
         addapp_checkbox,
         addapp,
         addapp_bat,
+        addapp_delay,
+        addapp_first,
         banner,
         lossless_enabled,
         lossless_multiplier,
@@ -4637,6 +4676,8 @@ class Game:
         self.addapp_checkbox = addapp_checkbox
         self.addapp = addapp
         self.addapp_bat = addapp_bat
+        self.addapp_delay = addapp_delay
+        self.addapp_first = addapp_first
         self.banner = banner
         self.lossless_enabled = lossless_enabled
         self.lossless_multiplier = lossless_multiplier
@@ -4809,6 +4850,11 @@ class AddGame(Gtk.Dialog):
         self.set_icon_from_file(faugus_png)
         self.interface_mode = interface_mode
         self.updated_steam_id = None
+
+        self.addapp_enabled = False
+        self.addapp = ""
+        self.addapp_delay = ""
+        self.addapp_first = False
 
         self.lossless_enabled = False
         self.lossless_multiplier = 1
@@ -5060,25 +5106,14 @@ class AddGame(Gtk.Dialog):
         self.entry_game_arguments.set_has_tooltip(True)
         self.entry_game_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
 
+        self.button_addapp = Gtk.Button(label=_("Additional Application"))
+        self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
+        self.button_addapp.set_tooltip_text(
+            _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
+
         # Widgets for lossless scaling
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
-
-        # Widgets for extra executable
-        self.checkbox_addapp = Gtk.CheckButton(label=_("Additional Application"))
-        self.checkbox_addapp.set_tooltip_text(
-            _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
-        self.checkbox_addapp.connect("toggled", self.on_checkbox_addapp_toggled)
-        self.entry_addapp = Gtk.Entry()
-        self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
-        self.entry_addapp.set_has_tooltip(True)
-        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
-        self.entry_addapp.set_sensitive(False)
-        self.button_search_addapp = Gtk.Button()
-        self.button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
-        self.button_search_addapp.set_size_request(50, -1)
-        self.button_search_addapp.set_sensitive(False)
 
         # Checkboxes for optional features
         self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
@@ -5286,10 +5321,8 @@ class AddGame(Gtk.Dialog):
         self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
         self.button_lossless.set_hexpand(True)
 
-        self.grid_addapp.attach(self.checkbox_addapp, 0, 0, 1, 1)
-        self.grid_addapp.attach(self.entry_addapp, 0, 1, 3, 1)
-        self.entry_addapp.set_hexpand(True)
-        self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
+        self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
+        self.button_addapp.set_hexpand(True)
 
         box_buttons.pack_start(self.button_winetricks, True, True, 0)
         box_buttons.pack_start(self.button_winecfg, True, True, 0)
@@ -5417,6 +5450,124 @@ class AddGame(Gtk.Dialog):
         image.set_from_pixbuf(scaled_pixbuf)
         self.button_shortcut_icon.set_image(image)
 
+    def on_button_addapp_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+
+        enabled = val if (val := getattr(self, "addapp_enabled", False)) != "" else False
+        addapp = val if (val := getattr(self, "addapp", "")) != "" else ""
+        addapp_delay = val if (val := getattr(self, "addapp_delay", "")) != "" else ""
+        addapp_first = val if (val := getattr(self, "addapp_first", False)) != "" else False
+
+        checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+        checkbox_enable.set_active(enabled)
+        checkbox_enable.set_halign(Gtk.Align.START)
+
+        label_path = Gtk.Label(label=_("Path"))
+        label_path.set_halign(Gtk.Align.START)
+
+        self.entry_addapp = Gtk.Entry()
+        self.entry_addapp.set_text(addapp)
+        self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
+        self.entry_addapp.set_has_tooltip(True)
+        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.set_hexpand(True)
+
+        button_search_addapp = Gtk.Button()
+        button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
+        button_search_addapp.set_size_request(50, -1)
+
+        label_delay = Gtk.Label(label=_("Delay (seconds)"))
+        label_delay.set_halign(Gtk.Align.START)
+
+        adjustment = Gtk.Adjustment(
+            value=int(addapp_delay) if addapp_delay else 0,
+            lower=0,
+            upper=60,
+            step_increment=1,
+            page_increment=10,
+            page_size=0
+        )
+
+        self.entry_delay = Gtk.SpinButton()
+        self.entry_delay.set_adjustment(adjustment)
+        self.entry_delay.set_numeric(True)
+        self.entry_delay.set_hexpand(True)
+
+        checkbox_addapp_first = Gtk.CheckButton(label=_("Run additional application first"))
+        checkbox_addapp_first.set_active(addapp_first)
+        checkbox_addapp_first.set_halign(Gtk.Align.START)
+
+        def on_enable_toggled(cb):
+            active = cb.get_active()
+            label_path.set_sensitive(active)
+            self.entry_addapp.set_sensitive(active)
+            button_search_addapp.set_sensitive(active)
+            label_delay.set_sensitive(active)
+            self.entry_delay.set_sensitive(active)
+            checkbox_addapp_first.set_sensitive(active)
+
+        checkbox_enable.connect("toggled", on_enable_toggled)
+        on_enable_toggled(checkbox_enable)
+
+        grid.attach(checkbox_enable,        0, 0, 1, 1)
+        grid.attach(label_path,             0, 1, 1, 1)
+        grid.attach(self.entry_addapp,      0, 2, 3, 1)
+        grid.attach(button_search_addapp,   3, 2, 1, 1)
+        grid.attach(label_delay,            0, 3, 1, 1)
+        grid.attach(self.entry_delay,       0, 4, 4, 1)
+        grid.attach(checkbox_addapp_first,  0, 5, 1, 1)
+
+        frame.add(grid)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
+        button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        bottom_box.set_margin_bottom(10)
+        bottom_box.pack_start(button_cancel, True, True, 0)
+        bottom_box.pack_start(button_ok, True, True, 0)
+
+        content_area = dialog.get_content_area()
+        content_area.pack_start(frame, True, True, 0)
+        content_area.pack_start(bottom_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.addapp_enabled = checkbox_enable.get_active()
+            self.addapp = self.entry_addapp.get_text()
+            self.addapp_delay = self.entry_delay.get_text()
+            self.addapp_first = checkbox_addapp_first.get_active()
+
+        dialog.destroy()
+        return response
 
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)

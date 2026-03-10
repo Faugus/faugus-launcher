@@ -162,6 +162,11 @@ class CreateShortcut(Gtk.Window):
 
         self.default_prefix = ""
 
+        self.addapp_enabled = False
+        self.addapp = ""
+        self.addapp_delay = ""
+        self.addapp_first = False
+
         self.lossless_enabled = False
         self.lossless_multiplier = 1
         self.lossless_flow = 100
@@ -199,14 +204,10 @@ class CreateShortcut(Gtk.Window):
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
-        self.label_addapp = Gtk.Label(label=_("Additional Application"))
-        self.label_addapp.set_halign(Gtk.Align.START)
-        self.entry_addapp = Gtk.Entry()
-        self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
-        self.button_search_addapp = Gtk.Button()
-        self.button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
-        self.button_search_addapp.set_size_request(50, -1)
+        self.button_addapp = Gtk.Button(label=_("Additional Application"))
+        self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
+        self.button_addapp.set_tooltip_text(
+            _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
@@ -314,10 +315,8 @@ class CreateShortcut(Gtk.Window):
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        self.grid_addapp.attach(self.label_addapp, 0, 0, 1, 1)
-        self.grid_addapp.attach(self.entry_addapp, 0, 1, 3, 1)
-        self.entry_addapp.set_hexpand(True)
-        self.grid_addapp.attach(self.button_search_addapp, 3, 1, 1, 1)
+        self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
+        self.button_addapp.set_hexpand(True)
 
         self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
         self.button_lossless.set_hexpand(True)
@@ -441,6 +440,133 @@ class CreateShortcut(Gtk.Window):
 
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
+
+    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
+        current_text = widget.get_text()
+        if current_text.strip():
+            tooltip.set_text(current_text)
+        else:
+            tooltip.set_text(widget.get_tooltip_text())
+        return True
+
+    def on_button_addapp_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
+        dialog.set_resizable(False)
+        dialog.set_icon_from_file(faugus_png)
+
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        grid = Gtk.Grid()
+        grid.set_row_spacing(10)
+        grid.set_column_spacing(10)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
+        grid.set_margin_start(10)
+        grid.set_margin_end(10)
+
+        enabled = val if (val := getattr(self, "addapp_enabled", False)) != "" else False
+        addapp = val if (val := getattr(self, "addapp", "")) != "" else ""
+        addapp_delay = val if (val := getattr(self, "addapp_delay", "")) != "" else ""
+        addapp_first = val if (val := getattr(self, "addapp_first", False)) != "" else False
+
+        checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+        checkbox_enable.set_active(enabled)
+        checkbox_enable.set_halign(Gtk.Align.START)
+
+        label_path = Gtk.Label(label=_("Path"))
+        label_path.set_halign(Gtk.Align.START)
+
+        self.entry_addapp = Gtk.Entry()
+        self.entry_addapp.set_text(addapp)
+        self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
+        self.entry_addapp.set_has_tooltip(True)
+        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.set_hexpand(True)
+
+        button_search_addapp = Gtk.Button()
+        button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        button_search_addapp.connect("clicked", self.on_button_search_addapp_clicked)
+        button_search_addapp.set_size_request(50, -1)
+
+        label_delay = Gtk.Label(label=_("Delay (seconds)"))
+        label_delay.set_halign(Gtk.Align.START)
+
+        adjustment = Gtk.Adjustment(
+            value=int(addapp_delay) if addapp_delay else 0,
+            lower=0,
+            upper=60,
+            step_increment=1,
+            page_increment=10,
+            page_size=0
+        )
+
+        self.entry_delay = Gtk.SpinButton()
+        self.entry_delay.set_adjustment(adjustment)
+        self.entry_delay.set_numeric(True)
+        self.entry_delay.set_hexpand(True)
+
+        checkbox_addapp_first = Gtk.CheckButton(label=_("Run additional application first"))
+        checkbox_addapp_first.set_active(addapp_first)
+        checkbox_addapp_first.set_halign(Gtk.Align.START)
+
+        def on_enable_toggled(cb):
+            active = cb.get_active()
+            label_path.set_sensitive(active)
+            self.entry_addapp.set_sensitive(active)
+            button_search_addapp.set_sensitive(active)
+            label_delay.set_sensitive(active)
+            self.entry_delay.set_sensitive(active)
+            checkbox_addapp_first.set_sensitive(active)
+
+        checkbox_enable.connect("toggled", on_enable_toggled)
+        on_enable_toggled(checkbox_enable)
+
+        grid.attach(checkbox_enable,        0, 0, 1, 1)
+        grid.attach(label_path,             0, 1, 1, 1)
+        grid.attach(self.entry_addapp,      0, 2, 3, 1)
+        grid.attach(button_search_addapp,   3, 2, 1, 1)
+        grid.attach(label_delay,            0, 3, 1, 1)
+        grid.attach(self.entry_delay,       0, 4, 4, 1)
+        grid.attach(checkbox_addapp_first,  0, 5, 1, 1)
+
+        frame.add(grid)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
+        button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        bottom_box.set_margin_bottom(10)
+        bottom_box.pack_start(button_cancel, True, True, 0)
+        bottom_box.pack_start(button_ok, True, True, 0)
+
+        content_area = dialog.get_content_area()
+        content_area.pack_start(frame, True, True, 0)
+        content_area.pack_start(bottom_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            self.addapp_enabled = checkbox_enable.get_active()
+            self.addapp = self.entry_addapp.get_text()
+            self.addapp_delay = self.entry_delay.get_text()
+            self.addapp_first = checkbox_addapp_first.get_active()
+
+        dialog.destroy()
+        return response
 
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
@@ -683,13 +809,28 @@ class CreateShortcut(Gtk.Window):
         title = self.entry_title.get_text()
         title_formatted = format_title(title)
 
-        addapp = self.entry_addapp.get_text()
         addapp_bat = f"{os.path.dirname(self.file_path)}/faugus-{title_formatted}.bat"
+        game_arguments = self.entry_game_arguments.get_text()
 
-        if self.entry_addapp.get_text():
+        if self.addapp_enabled:
             with open(addapp_bat, "w") as bat_file:
-                bat_file.write(f'start "" "z:{addapp}"\n')
-                bat_file.write(f'start "" "z:{self.file_path}"\n')
+                bat_file.write(f'@echo off\n')
+                if not self.addapp_first:
+                    if game_arguments:
+                        bat_file.write(f'start "" "z:{self.file_path}" {game_arguments}\n')
+                    else:
+                        bat_file.write(f'start "" "z:{self.file_path}"\n')
+                    if self.addapp_delay:
+                        bat_file.write(f'ping -n {self.addapp_delay} 127.0.0.1 >nul\n')
+                    bat_file.write(f'start "" "z:{self.addapp}"\n')
+                else:
+                    bat_file.write(f'start "" "z:{self.addapp}"\n')
+                    if self.addapp_delay:
+                        bat_file.write(f'ping -n {self.addapp_delay} 127.0.0.1 >nul\n')
+                    if game_arguments:
+                        bat_file.write(f'start "" "z:{self.file_path}" {game_arguments}\n')
+                    else:
+                        bat_file.write(f'start "" "z:{self.file_path}"\n')
 
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.ico')
@@ -757,7 +898,7 @@ class CreateShortcut(Gtk.Window):
             command_parts.append("mangohud")
         # Add the fixed command and remaining arguments
         command_parts.append(f"'{umu_run}'")
-        if self.entry_addapp.get_text():
+        if self.addapp_enabled:
             escaped_addapp_bat = addapp_bat.replace("'", "'\\''")
             command_parts.append(f"'{escaped_addapp_bat}'")
         elif self.file_path:
