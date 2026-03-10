@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-10 11:02-0300\n"
-"PO-Revision-Date: 2026-03-10 11:09-0300\n"
+"PO-Revision-Date: 2026-03-10 11:42-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -351,7 +351,7 @@ msgstr "Desativar janela de respingo"
 
 #: /usr/bin/faugus-launcher:3455
 msgid "Disable automatic updates"
-msgstr "Desativar atualizações automaticas"
+msgstr "Desativar atualizações automáticas"
 
 #: /usr/bin/faugus-launcher:3459
 msgid "Enable logging"
