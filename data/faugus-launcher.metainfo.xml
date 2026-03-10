@@ -81,13 +81,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.15.11-1" date="2026-03-04">
+    <release version="1.16.1-1" date="2026-03-10">
       <description>
         <ul>
-          <li>Added Wargaming Game Center installation.</li>
-          <li>Now uses less resources when running a game from the file manager.</li>
-          <li>Fixed system tray icon being duplicated.</li>
-          <li>Now installing launchers will generate logs if enabled.</li>
+          <li>Added an option to disable automatic updates.</li>
+          <li>Added an option to run a file inside the prefix.</li>
+          <li>Added new options to the Additional Application.</li>
           <li>Updated Portuguese translation.</li>
         </ul>
       </description>
