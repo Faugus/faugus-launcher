@@ -205,6 +205,8 @@ class FaugusRun:
         print("\n=== UMU-LAUNCHER COMMAND ===")
         print(f"{self.message}\n")
 
+        set_env("UMU_USE_STEAM", "1")
+
         self.execute_final_command()
 
     def execute_final_command(self):

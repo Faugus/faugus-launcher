@@ -266,7 +266,7 @@ class Main(Gtk.ApplicationWindow):
 
         self.menu_run = Gtk.MenuItem(label=_("Run file inside the prefix"))
         self.menu_run.connect("activate", self.on_context_menu_run)
-        #self.context_menu.append(self.menu_run)
+        self.context_menu.append(self.menu_run)
 
         self.menu_show_logs = Gtk.MenuItem(label=_("Show logs"))
         self.menu_show_logs.connect("activate", self.on_context_show_logs)
@@ -2105,12 +2105,8 @@ class Main(Gtk.ApplicationWindow):
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
             if self.game_running:
-                edit_game_dialog.button_winecfg.set_sensitive(False)
-                edit_game_dialog.button_winecfg.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
-                edit_game_dialog.button_run.set_sensitive(False)
-                edit_game_dialog.button_run.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
             edit_game_dialog.show()
 
@@ -5510,7 +5506,7 @@ class AddGame(Gtk.Dialog):
         self.entry_delay.set_numeric(True)
         self.entry_delay.set_hexpand(True)
 
-        checkbox_addapp_first = Gtk.CheckButton(label=_("Run additional application first"))
+        checkbox_addapp_first = Gtk.CheckButton(label=_("Run the application first"))
         checkbox_addapp_first.set_active(addapp_first)
         checkbox_addapp_first.set_halign(Gtk.Align.START)
 
