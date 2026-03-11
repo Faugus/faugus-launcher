@@ -108,6 +108,10 @@ class FaugusRun:
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
+        self.show_warning_dialog()
+        if self.command == "winetricks":
+            GLib.idle_add(self.show_log_window)
+
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
@@ -187,10 +191,6 @@ class FaugusRun:
 
         components_path = PathManager.user_config("faugus-launcher/components")
         self.components_exists = os.path.isdir(components_path)
-
-        self.show_warning_dialog()
-        if self.command == "winetricks":
-            GLib.idle_add(self.show_log_window)
 
         env_from_file = self.load_env_from_file(envar_dir)
         if env_from_file:
