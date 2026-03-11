@@ -81,10 +81,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.2-1" date="2026-03-10">
+    <release version="1.16.3-1" date="2026-03-11">
       <description>
         <ul>
-          <li>Hotfix: Fixed issue when selecting the game/launcher.</li>
+          <li>Fixed Linux native games not launching with the new umu-launcher.</li>
+          <li>Fixed splash window not showing up for Steam games due to recent changes.</li>
+          <li>Updated Dutch translation.</li>
+          <li>Updated Italian translation.</li>
         </ul>
       </description>
     </release>
