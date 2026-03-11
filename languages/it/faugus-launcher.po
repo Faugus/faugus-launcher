@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-10 14:01-0300\n"
-"PO-Revision-Date: 2026-03-11 11:01+0100\n"
+"PO-Revision-Date: 2026-03-11 11:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -54,7 +54,7 @@ msgstr "Apri posizione del prefix"
 #, fuzzy
 #| msgid "Run a file inside the prefix"
 msgid "Run file inside the prefix"
-msgstr "Esegui un file all'interno del prefix"
+msgstr "Esegui file all'interno del prefix"
 
 #: /usr/bin/faugus-launcher:271
 msgid "Show logs"
