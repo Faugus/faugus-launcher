@@ -87,13 +87,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.1-1" date="2026-03-10">
+    <release version="1.16.2-1" date="2026-03-10">
       <description>
         <ul>
-          <li>Added an option to disable automatic updates.</li>
-          <li>Added an option to run a file inside the prefix.</li>
-          <li>Added new options to the Additional Application.</li>
-          <li>Updated Portuguese translation.</li>
+          <li>Hotfix: Fixed issue when selecting the game/launcher.</li>
         </ul>
       </description>
     </release>
