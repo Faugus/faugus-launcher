@@ -5997,12 +5997,14 @@ class AddGame(Gtk.Dialog):
             self.entry_protonfix.set_text("")
             self.entry_launch_arguments.set_text("")
             self.entry_game_arguments.set_text("")
-            self.checkbox_addapp.set_active(False)
-            self.entry_addapp.set_text("")
             self.checkbox_mangohud.set_active(self.default_mangohud)
             self.checkbox_gamemode.set_active(self.default_gamemode)
             self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
             self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
+            self.addapp_enabled = False
+            self.addapp = ""
+            self.addapp_delay = ""
+            self.addapp_first = False
             self.lossless_enabled = False
             self.lossless_multiplier = 1
             self.lossless_flow = 100
