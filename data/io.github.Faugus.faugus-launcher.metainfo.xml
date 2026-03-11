@@ -7,6 +7,7 @@
   <url type="homepage">https://github.com/Faugus/faugus-launcher</url>
   <url type="donation">https://ko-fi.com/faugus</url>
   <url type="bugtracker">https://github.com/Faugus/faugus-launcher/issues</url>
+  <url type="vcs-browser">https://github.com/Faugus/faugus-launcher</url>
   <project_license>MIT</project_license>
   <metadata_license>CC0-1.0</metadata_license>
   <branding>
