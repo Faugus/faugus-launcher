@@ -147,14 +147,14 @@ class FaugusRun:
             else:
                 self.log_dir = "default"
 
-        if not os.environ.get("UMU_NO_PROTON"):
+        if not os.environ.get("PROTONPATH") == "umu-sniper":
             if self.enable_logging:
                 set_env("UMU_LOG", "1")
                 set_env("PROTON_LOG_DIR", f"{logs_dir}/{self.log_dir}")
                 set_env("PROTON_LOG", "1")
 
         if not os.environ.get("WINEPREFIX"):
-            if not os.environ.get("UMU_NO_PROTON"):
+            if not os.environ.get("PROTONPATH") == "umu-sniper":
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
                 if self.default_runner == "Proton-CachyOS":
                     set_env("PROTONPATH", f"{proton_cachyos}")
@@ -166,7 +166,7 @@ class FaugusRun:
                 set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest":
+        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_warning_dialog()
                 self.show_error_dialog(protonpath)
@@ -210,7 +210,7 @@ class FaugusRun:
         self.execute_final_command()
 
     def execute_final_command(self):
-        if os.environ.get("UMU_NO_PROTON"):
+        if os.environ.get("PROTONPATH") == "umu-sniper":
             cmd = self.message
         else:
             commands = []
@@ -876,7 +876,7 @@ def build_launch_command(game):
         command_parts.append(f"GAMEID={game['gameid']}")
     if runner:
         if runner == "Linux-Native":
-            command_parts.append('UMU_NO_PROTON=1')
+            command_parts.append('PROTONPATH=umu-sniper')
         elif runner == "Proton-CachyOS":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
