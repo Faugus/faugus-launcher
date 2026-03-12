@@ -15,9 +15,11 @@ from faugus.dark_theme import *
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    GLib.set_prgname("io.github.Faugus.faugus-launcher")
     STEAM_COMPATIBILITY_PATH = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
 else:
     faugus_png = PathManager.get_icon('faugus-launcher.png')
+    GLib.set_prgname("faugus-launcher")
     STEAM_COMPATIBILITY_PATH = Path(PathManager.user_data("Steam/compatibilitytools.d"))
 
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
@@ -69,7 +71,6 @@ class ProtonDownloader(Gtk.Dialog):
         super().__init__(title=_("Faugus Proton Manager"))
         self.set_resizable(False)
         self.set_modal(True)
-        self.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)

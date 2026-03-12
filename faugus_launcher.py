@@ -48,6 +48,7 @@ if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
     tray_icon = 'io.github.Faugus.faugus-launcher'
+    GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
     mono_dest = Path(os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg'))
     mono_dest.parent.mkdir(parents=True, exist_ok=True)
@@ -65,6 +66,7 @@ else:
     app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
     tray_icon = PathManager.get_icon('faugus-launcher.png')
+    GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
@@ -177,7 +179,6 @@ class FaugusApp(Gtk.Application):
 class Main(Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title="Faugus Launcher")
-        self.set_icon_from_file(faugus_png)
         self.connect("delete-event", self.on_close)
         print(f"Faugus Launcher {VERSION}")
 
@@ -1060,7 +1061,6 @@ class Main(Gtk.ApplicationWindow):
 
     def on_show_logs_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self, modal=True)
-        dialog.set_icon_from_file(faugus_png)
         dialog.set_default_size(1280, 720)
 
         scrolled_window1 = Gtk.ScrolledWindow()
@@ -1411,7 +1411,6 @@ class Main(Gtk.ApplicationWindow):
     def running_dialog(self, title):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
@@ -2254,7 +2253,6 @@ class Main(Gtk.ApplicationWindow):
     def show_warning_dialog(self, parent, text1, text2):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label1 = Gtk.Label()
@@ -3221,7 +3219,6 @@ class Settings(Gtk.Dialog):
         # Initialize the Settings dialog
         super().__init__(title=_("Settings"), transient_for=parent, modal=True)
         self.set_resizable(False)
-        self.set_icon_from_file(faugus_png)
         self.parent = parent
         self.logging_warning = False
         self.modified = False
@@ -4378,7 +4375,6 @@ class Settings(Gtk.Dialog):
     def show_warning_dialog(self, parent, title):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
@@ -4420,7 +4416,6 @@ class Settings(Gtk.Dialog):
     def show_warning_dialog2(self, parent, title):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
@@ -4691,7 +4686,6 @@ class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
         super().__init__(title=_("Duplicate %s") % title, transient_for=parent, modal=True)
         self.set_resizable(False)
-        self.set_icon_from_file(faugus_png)
 
         label_title = Gtk.Label(label=_("Title"))
         label_title.set_halign(Gtk.Align.START)
@@ -4739,7 +4733,6 @@ class DuplicateDialog(Gtk.Dialog):
     def show_warning_dialog(self, parent, title):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
@@ -4783,7 +4776,6 @@ class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix, runner):
         super().__init__(title=_("Delete %s") % title, transient_for=parent, modal=True)
         self.set_resizable(False)
-        self.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label()
@@ -4843,7 +4835,6 @@ class AddGame(Gtk.Dialog):
         self.set_resizable(False)
         self.set_modal(True)
         self.parent_window = parent
-        self.set_icon_from_file(faugus_png)
         self.interface_mode = interface_mode
         self.updated_steam_id = None
 
@@ -5449,7 +5440,6 @@ class AddGame(Gtk.Dialog):
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -5568,7 +5558,6 @@ class AddGame(Gtk.Dialog):
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -5797,7 +5786,6 @@ class AddGame(Gtk.Dialog):
             modal=True
         )
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
 
         entry = Gtk.Entry()
         entry.set_tooltip_text("https://example.com/banner.png")
@@ -5865,7 +5853,6 @@ class AddGame(Gtk.Dialog):
     def show_invalid_image_dialog(self):
         dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
         dialog_image.set_resizable(False)
-        dialog_image.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label(label=_("The selected file is not a valid image."))
@@ -6487,7 +6474,6 @@ class AddGame(Gtk.Dialog):
             if not file_path or not is_valid_image(file_path):
                 dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
                 dialog_image.set_resizable(False)
-                dialog_image.set_icon_from_file(faugus_png)
                 subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
                 label = Gtk.Label()

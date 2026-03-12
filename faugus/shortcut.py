@@ -23,6 +23,7 @@ IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    GLib.set_prgname("io.github.Faugus.faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
@@ -33,6 +34,7 @@ if IS_FLATPAK:
 else:
     app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.png')
+    GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
@@ -144,7 +146,6 @@ class CreateShortcut(Gtk.Window):
         super().__init__(title="Faugus Launcher")
         self.file_path = file_path
         self.set_resizable(False)
-        self.set_icon_from_file(faugus_png)
 
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
@@ -452,7 +453,6 @@ class CreateShortcut(Gtk.Window):
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -571,7 +571,6 @@ class CreateShortcut(Gtk.Window):
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -1035,7 +1034,6 @@ class CreateShortcut(Gtk.Window):
             if not file_path or not is_valid_image(file_path):
                 dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
                 dialog_image.set_resizable(False)
-                dialog_image.set_icon_from_file(faugus_png)
                 subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
                 label = Gtk.Label()

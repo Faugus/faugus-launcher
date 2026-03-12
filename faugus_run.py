@@ -26,9 +26,11 @@ from faugus.steam_setup import IS_STEAM_FLATPAK
 if IS_FLATPAK:
     share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:
     share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.png')
+    GLib.set_prgname("faugus-launcher")
 
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
@@ -312,7 +314,6 @@ class FaugusRun:
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         css_provider = Gtk.CssProvider()
@@ -421,7 +422,6 @@ class FaugusRun:
     def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
-        dialog.set_icon_from_file(faugus_png)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         content_area = dialog.get_content_area()
@@ -531,7 +531,6 @@ class FaugusRun:
         self.warning_dialog.set_decorated(False)
         self.warning_dialog.set_resizable(False)
         self.warning_dialog.set_default_size(280, -1)
-        self.warning_dialog.set_icon_from_file(faugus_png)
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -569,7 +568,6 @@ class FaugusRun:
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
         self.log_window.set_default_size(600, 400)
-        self.log_window.set_icon_from_file(faugus_png)
 
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -724,7 +722,6 @@ class FaugusRun:
             if last_part.endswith(".reg"):
                 dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
                 dialog.set_resizable(False)
-                dialog.set_icon_from_file(faugus_png)
                 subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
 
                 label = Gtk.Label()
