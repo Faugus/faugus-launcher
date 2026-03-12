@@ -5,6 +5,7 @@ import gi
 import tarfile
 import shutil
 import gettext
+import threading
 
 gi.require_version("Gtk", "3.0")
 
@@ -160,18 +161,16 @@ class ProtonDownloader(Gtk.Dialog):
         self.language = cfg.config.get('language', '')
 
     def get_releases(self):
-        self.fetch_releases_from_url(
-            "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
-            self.grid_ge
-        )
-        self.fetch_releases_from_url(
-            "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
-            self.grid_em
-        )
+        threading.Thread(target=self.fetch_releases_from_url,
+                         args=("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases", self.grid_ge),
+                         daemon=True).start()
+
+        threading.Thread(target=self.fetch_releases_from_url,
+                         args=("https://api.github.com/repos/Etaash-mathamsetty/Proton/releases", self.grid_em),
+                         daemon=True).start()
 
     def fetch_releases_from_url(self, url, grid):
         page = 1
-        releases = []
         seen_tags = set()
 
         while True:
@@ -180,41 +179,41 @@ class ProtonDownloader(Gtk.Dialog):
                 page_releases = response.json()
                 if not page_releases:
                     break
-                releases.extend(page_releases)
+
+                for release in page_releases:
+                    tag_name = release["tag_name"]
+                    if tag_name in seen_tags:
+                        continue
+                    seen_tags.add(tag_name)
+
+                    if "GloriousEggroll" in url:
+                        if not tag_name.startswith("GE-Proton"):
+                            continue
+                        try:
+                            version_str = tag_name.replace("GE-Proton", "")
+                            major, minor = map(int, version_str.split("-"))
+                            if (major, minor) < (9, 1):
+                                continue
+                        except Exception:
+                            continue
+
+                    elif "Etaash-mathamsetty" in url:
+                        if not tag_name.startswith("EM-"):
+                            continue
+
+                    assets = release.get("assets", [])
+                    has_valid_asset = any(
+                        asset["name"].endswith((".tar.gz", ".tar.xz"))
+                        for asset in assets
+                    )
+                    if not has_valid_asset:
+                        continue
+
+                    GLib.idle_add(self.add_release_to_grid, release, grid)
+
                 page += 1
             else:
                 break
-
-        for release in releases:
-            tag_name = release["tag_name"]
-            if tag_name in seen_tags:
-                continue
-            seen_tags.add(tag_name)
-
-            if "GloriousEggroll" in url:
-                if not tag_name.startswith("GE-Proton"):
-                    continue
-                try:
-                    version_str = tag_name.replace("GE-Proton", "")
-                    major, minor = map(int, version_str.split("-"))
-                    if (major, minor) < (9, 1):
-                        continue
-                except Exception:
-                    continue
-
-            elif "Etaash-mathamsetty" in url:
-                if not tag_name.startswith("EM-"):
-                    continue
-
-            assets = release.get("assets", [])
-            has_valid_asset = any(
-                asset["name"].endswith((".tar.gz", ".tar.xz"))
-                for asset in assets
-            )
-            if not has_valid_asset:
-                continue
-
-            self.add_release_to_grid(release, grid)
 
     def add_release_to_grid(self, release, grid):
         tag_name = release["tag_name"]
@@ -234,6 +233,8 @@ class ProtonDownloader(Gtk.Dialog):
         button.connect("clicked", self.on_button_clicked, release)
         button.set_size_request(120, -1)
         grid.attach(button, 1, row_index, 1, 1)
+
+        grid.show_all()
 
     def get_installed_path(self, tag_name):
         tag_lower = tag_name.lower()
@@ -293,38 +294,80 @@ class ProtonDownloader(Gtk.Dialog):
 
     def download_and_extract(self, url, filename, tag_name, button):
         button.set_label(_("Downloading..."))
-        display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
-        self.progress_label.set_text(_("Downloading %s...") % display_tag_name)
+        button.set_sensitive(False)
+        self.progress_label.set_text(_("Downloading %s...") % tag_name)
         self.progress_label.set_visible(True)
         self.progress_bar.set_visible(True)
         self.progress_bar.set_fraction(0)
-        button.set_sensitive(False)
+        self.progress_bar.set_text("0%")
 
         while Gtk.events_pending():
             Gtk.main_iteration_do(False)
 
-        if not os.path.exists(STEAM_COMPATIBILITY_PATH):
-            os.makedirs(STEAM_COMPATIBILITY_PATH)
+        def worker():
+            try:
+                response = requests.get(url, stream=True, timeout=30)
+                response.raise_for_status()
+                total_size = int(response.headers.get("content-length", 0))
+                downloaded_size = 0
+                tar_file_path = os.path.join(os.getcwd(), filename)
 
-        response = requests.get(url, stream=True)
-        total_size = int(response.headers.get("content-length", 0))
-        downloaded_size = 0
+                with open(tar_file_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=1024*64):
+                        if not chunk: break
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        if total_size > 0:
+                            progress = downloaded_size / total_size
+                            GLib.idle_add(self.progress_bar.set_fraction, progress)
+                            GLib.idle_add(self.progress_bar.set_text, f"{int(progress * 100)}%")
 
-        tar_file_path = os.path.join(os.getcwd(), filename)
-        with open(tar_file_path, "wb") as file:
-            for data in response.iter_content(1024):
-                file.write(data)
-                downloaded_size += len(data)
-                progress = downloaded_size / total_size if total_size > 0 else 0
-                self.progress_bar.set_fraction(progress)
-                self.progress_bar.set_text(f"{int(progress * 100)}%")
+                GLib.idle_add(self.progress_label.set_text, _("Extracting %s...") % tag_name)
+                GLib.idle_add(self.progress_bar.set_fraction, 0)
 
-                while Gtk.events_pending():
-                    Gtk.main_iteration_do(False)
-            file.flush()
-            os.fsync(file.fileno())
+                mode = 'r:xz' if tar_file_path.endswith('.tar.xz') else 'r:gz'
+                temp_dir = os.path.join(STEAM_COMPATIBILITY_PATH, f"temp_{tag_name}")
+                os.makedirs(temp_dir, exist_ok=True)
 
-        self.extract_tar_and_update_button(tar_file_path, tag_name, button)
+                with tarfile.open(tar_file_path, mode) as tar:
+                    members = tar.getmembers()
+                    total_members = len(members)
+                    for i, member in enumerate(members):
+                        tar.extract(member, path=temp_dir, filter="fully_trusted")
+                        if i % 10 == 0:
+                            progress = (i + 1) / total_members
+                            GLib.idle_add(self.progress_bar.set_fraction, progress)
+                            GLib.idle_add(self.progress_bar.set_text, f"{int(progress * 100)}%")
+
+                extracted_dir = None
+                for item in os.listdir(temp_dir):
+                    item_path = os.path.join(temp_dir, item)
+                    if os.path.isdir(item_path):
+                        extracted_dir = item_path
+                        break
+
+                if extracted_dir:
+                    final_dir = os.path.join(STEAM_COMPATIBILITY_PATH, os.path.basename(extracted_dir))
+                    if os.path.exists(final_dir):
+                        shutil.rmtree(final_dir)
+                    shutil.move(extracted_dir, STEAM_COMPATIBILITY_PATH)
+
+                shutil.rmtree(temp_dir)
+                if os.path.exists(tar_file_path):
+                    os.remove(tar_file_path)
+
+                GLib.idle_add(self.update_button, button, _("Remove"))
+                GLib.idle_add(self.progress_bar.set_visible, False)
+                GLib.idle_add(self.progress_label.set_visible, False)
+
+            except Exception as e:
+                print(f"Error during download: {e}")
+                GLib.idle_add(self.update_button, button, _("Download"))
+                GLib.idle_add(self.progress_label.set_text, _("Error during download"))
+            finally:
+                GLib.idle_add(self.enable_all_buttons)
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
         button.set_label(_("Extracting..."))
