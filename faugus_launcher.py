@@ -1917,6 +1917,9 @@ class Main(Gtk.ApplicationWindow):
         self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
 
     def find_pid(self, game):
+        if self.processo is None:
+            return True
+
         try:
             parent = psutil.Process(self.processo.pid)
         except psutil.NoSuchProcess:

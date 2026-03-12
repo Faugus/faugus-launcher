@@ -75,7 +75,7 @@ class FaugusRun:
         self.message = message
         self.command = command
         self.process = None
-        self.warning_dialog = None
+        self.splash_window = None
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
@@ -110,10 +110,6 @@ class FaugusRun:
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        self.show_warning_dialog()
-        if self.command == "winetricks":
-            GLib.idle_add(self.show_log_window)
-
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
@@ -127,6 +123,10 @@ class FaugusRun:
             set_env("PROTON_USE_WOW64", "1")
 
         self.extract_env_from_message()
+
+        self.show_splash_window()
+        if self.command == "winetricks":
+            GLib.idle_add(self.show_log_window)
 
         if os.environ.get("PROTONPATH") == "Steam":
             subprocess.Popen(self.message, shell=True)
@@ -170,7 +170,7 @@ class FaugusRun:
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
-                self.close_warning_dialog()
+                self.close_splash_window()
                 self.show_error_dialog(protonpath)
             if protonpath == "Linux-Native":
                 pass
@@ -179,7 +179,7 @@ class FaugusRun:
             else:
                 protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
                 if not protonpath_path.is_dir():
-                    self.close_warning_dialog()
+                    self.close_splash_window()
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
@@ -526,11 +526,11 @@ class FaugusRun:
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
 
-    def show_warning_dialog(self):
-        self.warning_dialog = Gtk.Window(title="Faugus Launcher")
-        self.warning_dialog.set_decorated(False)
-        self.warning_dialog.set_resizable(False)
-        self.warning_dialog.set_default_size(280, -1)
+    def show_splash_window(self):
+        self.splash_window = Gtk.Window(title="Faugus Launcher")
+        self.splash_window.set_decorated(False)
+        self.splash_window.set_resizable(False)
+        self.splash_window.set_default_size(280, -1)
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5, 0.5)
@@ -560,10 +560,12 @@ class FaugusRun:
 
         grid.attach(self.label, 0, 1, 1, 1)
 
-        self.warning_dialog.add(frame)
+        self.splash_window.add(frame)
 
         if not self.splash_disable and not self.disable_updates and not os.environ.get("FAUGUS_DISABLE_UPDATES"):
-            self.warning_dialog.show_all()
+            if self.splash_window is None:
+                self.show_splash_window()
+            self.splash_window.show_all()
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
@@ -628,7 +630,9 @@ class FaugusRun:
 
     def check_game_output(self, clean_line):
         if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line or "Updating UMU-Launcher..." in clean_line:
-            self.warning_dialog.show_all()
+            if self.splash_window is None:
+                self.show_splash_window()
+            self.splash_window.show_all()
         if "Updating UMU-Launcher..." in clean_line:
             self.label.set_text(_("Updating UMU-Launcher..."))
         if "UMU-Launcher is up to date." in clean_line:
@@ -686,7 +690,7 @@ class FaugusRun:
             or "SingleInstance" in clean_line
             or "mtree is OK" in clean_line
         ):
-            GLib.timeout_add_seconds(0, self.close_warning_dialog)
+            GLib.timeout_add_seconds(0, self.close_splash_window)
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
@@ -701,10 +705,10 @@ class FaugusRun:
             adj = self.text_view.get_parent().get_vadjustment()
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
-    def close_warning_dialog(self):
-        if self.warning_dialog:
-            self.warning_dialog.destroy()
-            self.warning_dialog = None
+    def close_splash_window(self):
+        if self.splash_window:
+            self.splash_window.destroy()
+            self.splash_window = None
 
     def close_log_window(self):
         if self.log_window:
@@ -714,7 +718,7 @@ class FaugusRun:
     def on_log_window_delete_event(self, widget, event):
         return True
 
-    def show_exit_warning(self):
+    def show_regedit_confirmation(self):
         parts = self.message.split()
         if parts:
             last_part = parts[-1].strip('"')
@@ -801,9 +805,9 @@ class FaugusRun:
             except Exception as e:
                 pass
 
-        GLib.idle_add(self.close_warning_dialog)
+        GLib.idle_add(self.close_splash_window)
         GLib.idle_add(self.close_log_window)
-        GLib.idle_add(self.show_exit_warning)
+        GLib.idle_add(self.show_regedit_confirmation)
         GLib.idle_add(Gtk.main_quit)
         kill_child_proc()
 
@@ -811,7 +815,7 @@ class FaugusRun:
 
 def handle_command(message, command=None):
     updater = FaugusRun(message)
-    updater.show_warning_dialog()
+    updater.show_splash_window()
     if command == "winetricks":
         updater.show_log_window()
 
