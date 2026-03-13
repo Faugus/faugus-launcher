@@ -4788,6 +4788,10 @@ class ConfirmationDialog(Gtk.Dialog):
         label.set_label(_("Are you sure you want to delete %s?") % title)
         label.set_halign(Gtk.Align.CENTER)
 
+        prefix_label = Gtk.Label()
+        prefix_label.set_label(_("Prefix: %s") % prefix)
+        prefix_label.set_halign(Gtk.Align.CENTER)
+
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
@@ -4819,6 +4823,7 @@ class ConfirmationDialog(Gtk.Dialog):
 
         box_top.pack_start(label, True, True, 0)
         if os.path.basename(prefix) != "default" and runner != "Linux-Native" and runner != "Steam":
+            box_top.pack_start(prefix_label, True, True, 0)
             box_top.pack_start(self.checkbox, True, True, 0)
 
         box_bottom.pack_start(button_no, True, True, 0)
