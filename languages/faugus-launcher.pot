@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-13 14:28+0100\n"
+"POT-Creation-Date: 2026-03-13 11:01-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,33 +113,41 @@ msgstr ""
 msgid "minutes"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:4207 /usr/bin/faugus-launcher:6327
+#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:4207
+#: /usr/bin/faugus-launcher:6327
 msgid "Select a file to run inside the prefix"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1004 /usr/bin/faugus-launcher:4210 /usr/bin/faugus-launcher:4336
-#: /usr/bin/faugus-launcher:4489 /usr/bin/faugus-launcher:4512 /usr/bin/faugus-launcher:5758
-#: /usr/bin/faugus-launcher:5950 /usr/bin/faugus-launcher:6330 /usr/bin/faugus-launcher:6459
-#: /usr/bin/faugus-launcher:6722 /usr/bin/faugus-launcher:6795
+#: /usr/bin/faugus-launcher:1004 /usr/bin/faugus-launcher:4210
+#: /usr/bin/faugus-launcher:4336 /usr/bin/faugus-launcher:4489
+#: /usr/bin/faugus-launcher:4512 /usr/bin/faugus-launcher:5758
+#: /usr/bin/faugus-launcher:5950 /usr/bin/faugus-launcher:6330
+#: /usr/bin/faugus-launcher:6459 /usr/bin/faugus-launcher:6722
+#: /usr/bin/faugus-launcher:6795
 msgid "Open"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:3529 /usr/bin/faugus-launcher:4211
-#: /usr/bin/faugus-launcher:4304 /usr/bin/faugus-launcher:4337 /usr/bin/faugus-launcher:4490
-#: /usr/bin/faugus-launcher:4513 /usr/bin/faugus-launcher:4702 /usr/bin/faugus-launcher:5161
-#: /usr/bin/faugus-launcher:5531 /usr/bin/faugus-launcher:5667 /usr/bin/faugus-launcher:5759
-#: /usr/bin/faugus-launcher:5803 /usr/bin/faugus-launcher:5951 /usr/bin/faugus-launcher:6331
-#: /usr/bin/faugus-launcher:6460 /usr/bin/faugus-launcher:6723 /usr/bin/faugus-launcher:6796
+#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:3529
+#: /usr/bin/faugus-launcher:4211 /usr/bin/faugus-launcher:4304
+#: /usr/bin/faugus-launcher:4337 /usr/bin/faugus-launcher:4490
+#: /usr/bin/faugus-launcher:4513 /usr/bin/faugus-launcher:4702
+#: /usr/bin/faugus-launcher:5161 /usr/bin/faugus-launcher:5531
+#: /usr/bin/faugus-launcher:5667 /usr/bin/faugus-launcher:5759
+#: /usr/bin/faugus-launcher:5803 /usr/bin/faugus-launcher:5951
+#: /usr/bin/faugus-launcher:6331 /usr/bin/faugus-launcher:6460
+#: /usr/bin/faugus-launcher:6723 /usr/bin/faugus-launcher:6796
 msgid "Cancel"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1009 /usr/bin/faugus-launcher:4215 /usr/bin/faugus-launcher:5955
-#: /usr/bin/faugus-launcher:6335 /usr/bin/faugus-launcher:6730
+#: /usr/bin/faugus-launcher:1009 /usr/bin/faugus-launcher:4215
+#: /usr/bin/faugus-launcher:5955 /usr/bin/faugus-launcher:6335
+#: /usr/bin/faugus-launcher:6730
 msgid "Windows files"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1017 /usr/bin/faugus-launcher:4223 /usr/bin/faugus-launcher:5963
-#: /usr/bin/faugus-launcher:6343 /usr/bin/faugus-launcher:6738
+#: /usr/bin/faugus-launcher:1017 /usr/bin/faugus-launcher:4223
+#: /usr/bin/faugus-launcher:5963 /usr/bin/faugus-launcher:6343
+#: /usr/bin/faugus-launcher:6738
 msgid "All files"
 msgstr ""
 
@@ -166,10 +174,12 @@ msgstr ""
 msgid "%s is already running."
 msgstr ""
 
-#: /usr/bin/faugus-launcher:1420 /usr/bin/faugus-launcher:2280 /usr/bin/faugus-launcher:3534
-#: /usr/bin/faugus-launcher:4398 /usr/bin/faugus-launcher:4706 /usr/bin/faugus-launcher:4748
-#: /usr/bin/faugus-launcher:5166 /usr/bin/faugus-launcher:5536 /usr/bin/faugus-launcher:5672
-#: /usr/bin/faugus-launcher:5799 /usr/bin/faugus-launcher:5870 /usr/bin/faugus-launcher:6493
+#: /usr/bin/faugus-launcher:1420 /usr/bin/faugus-launcher:2280
+#: /usr/bin/faugus-launcher:3534 /usr/bin/faugus-launcher:4398
+#: /usr/bin/faugus-launcher:4706 /usr/bin/faugus-launcher:4748
+#: /usr/bin/faugus-launcher:5166 /usr/bin/faugus-launcher:5536
+#: /usr/bin/faugus-launcher:5672 /usr/bin/faugus-launcher:5799
+#: /usr/bin/faugus-launcher:5870 /usr/bin/faugus-launcher:6493
 msgid "Ok"
 msgstr ""
 
@@ -214,8 +224,9 @@ msgstr ""
 msgid "Finish installation"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:2614 /usr/bin/faugus-launcher:2619 /usr/bin/faugus-launcher:2624
-#: /usr/bin/faugus-launcher:2629 /usr/bin/faugus-launcher:2634 /usr/bin/faugus-launcher:2639
+#: /usr/bin/faugus-launcher:2614 /usr/bin/faugus-launcher:2619
+#: /usr/bin/faugus-launcher:2624 /usr/bin/faugus-launcher:2629
+#: /usr/bin/faugus-launcher:2634 /usr/bin/faugus-launcher:2639
 msgid "Downloading"
 msgstr ""
 
@@ -233,7 +244,8 @@ msgstr ""
 msgid "Error during download: %s"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:2753 /usr/bin/faugus-launcher:2756 /usr/bin/faugus-launcher:2766
+#: /usr/bin/faugus-launcher:2753 /usr/bin/faugus-launcher:2756
+#: /usr/bin/faugus-launcher:2766
 msgid "Please close the login window and wait."
 msgstr ""
 
@@ -505,7 +517,8 @@ msgstr ""
 msgid "Duplicate %s"
 msgstr ""
 
-#: /usr/bin/faugus-launcher:4696 /usr/bin/faugus-launcher:5011 /usr/bin/faugus-launcher:5029
+#: /usr/bin/faugus-launcher:4696 /usr/bin/faugus-launcher:5011
+#: /usr/bin/faugus-launcher:5029
 msgid "Title"
 msgstr ""
 
