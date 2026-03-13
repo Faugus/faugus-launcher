@@ -1977,7 +1977,18 @@ class Main(Gtk.ApplicationWindow):
         self.load_tray_icon()
 
     def on_button_kill_clicked(self, widget):
-        # Handle kill button click event
+        if not IS_FLATPAK:
+            processos = self.load_processes_from_file()
+
+            for data in processos.values():
+                pid_main = data.get("faugus-run")
+
+                if pid_main:
+                    try:
+                        os.kill(pid_main, signal.SIGUSR1)
+                    except ProcessLookupError:
+                        pass
+
         subprocess.run(r"""
     for pid in $(ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver|winedevice.exe' | awk -F'/' '{print $3}'); do
         kill -9 "$pid"
