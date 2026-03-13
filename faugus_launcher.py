@@ -4789,7 +4789,7 @@ class ConfirmationDialog(Gtk.Dialog):
         label.set_halign(Gtk.Align.CENTER)
 
         prefix_label = Gtk.Label()
-        prefix_label.set_label(_("Prefix: %s") % prefix)
+        prefix_label.set_label(prefix)
         prefix_label.set_halign(Gtk.Align.CENTER)
 
         button_no = Gtk.Button(label=_("No"))
@@ -4800,7 +4800,7 @@ class ConfirmationDialog(Gtk.Dialog):
         button_yes.set_size_request(150, -1)
         button_yes.connect("clicked", lambda x: self.response(Gtk.ResponseType.YES))
 
-        self.checkbox = Gtk.CheckButton(label=_("Also remove the prefix"))
+        self.checkbox = Gtk.CheckButton(label=_("Also remove the prefix:"))
         self.checkbox.set_halign(Gtk.Align.CENTER)
 
         content_area = self.get_content_area()
@@ -4823,8 +4823,8 @@ class ConfirmationDialog(Gtk.Dialog):
 
         box_top.pack_start(label, True, True, 0)
         if os.path.basename(prefix) != "default" and runner != "Linux-Native" and runner != "Steam":
-            box_top.pack_start(prefix_label, True, True, 0)
             box_top.pack_start(self.checkbox, True, True, 0)
+            box_top.pack_start(prefix_label, True, True, 0)
 
         box_bottom.pack_start(button_no, True, True, 0)
         box_bottom.pack_start(button_yes, True, True, 0)
