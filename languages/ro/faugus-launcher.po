@@ -1,0 +1,754 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# SPDX-FileCopyrightText: 2026 Sergiu Bivol <sergiu@cip.md>
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 15:49-0300\n"
+"PO-Revision-Date: 2026-03-12 13:55+0000\n"
+"Last-Translator: Sergiu Bivol <sergiu@cip.md>\n"
+"Language-Team: Romanian <kde-i18n-ro@kde.org>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2;\n"
+"X-Generator: Lokalize 25.08.1\n"
+
+#: /usr/bin/faugus-launcher:236 /usr/bin/faugus-launcher:857
+msgid "Play"
+msgstr "Joacă"
+
+#: /usr/bin/faugus-launcher:240
+msgid "Edit"
+msgstr "Modifică"
+
+#: /usr/bin/faugus-launcher:244
+msgid "Delete"
+msgstr "Șterge"
+
+#: /usr/bin/faugus-launcher:248
+msgid "Duplicate"
+msgstr "Duplică"
+
+#: /usr/bin/faugus-launcher:252 /usr/bin/faugus-launcher:828
+msgid "Hide"
+msgstr "Ascunde"
+
+#: /usr/bin/faugus-launcher:256 /usr/bin/faugus-launcher:833
+msgid "Add to favorites"
+msgstr "Adaugă la favorite"
+
+#: /usr/bin/faugus-launcher:260
+msgid "Open game location"
+msgstr "Deschide amplasarea jocului"
+
+#: /usr/bin/faugus-launcher:264
+msgid "Open prefix location"
+msgstr "Deschide amplasarea prefixului"
+
+#: /usr/bin/faugus-launcher:268
+msgid "Run file inside the prefix"
+msgstr "Rulează fișier în cadrul prefixului"
+
+#: /usr/bin/faugus-launcher:272
+msgid "Show logs"
+msgstr "Arată jurnale"
+
+#: /usr/bin/faugus-launcher:341
+msgid "Open Faugus Launcher"
+msgstr "Deschide Lansatorul Faugus"
+
+#: /usr/bin/faugus-launcher:345
+msgid "Quit"
+msgstr "Termină"
+
+#: /usr/bin/faugus-launcher:499 /usr/bin/faugus-launcher:615
+msgid "Force close all running games"
+msgstr "Închide forțat toate jocurile ce rulează"
+
+#: /usr/bin/faugus-launcher:527 /usr/bin/faugus-launcher:654
+msgid "Search..."
+msgstr "Caută…"
+
+#: /usr/bin/faugus-launcher:751
+msgid "Shut down"
+msgstr "Stinge"
+
+#: /usr/bin/faugus-launcher:752
+msgid "Reboot"
+msgstr "Repornește"
+
+#: /usr/bin/faugus-launcher:753
+msgid "Close"
+msgstr "Închide"
+
+#: /usr/bin/faugus-launcher:826
+msgid "Remove from hidden"
+msgstr "Elimină din ascunse"
+
+#: /usr/bin/faugus-launcher:831
+msgid "Remove from favorites"
+msgstr "Elimină din favorite"
+
+#: /usr/bin/faugus-launcher:855
+msgid "Stop"
+msgstr "Oprește"
+
+#: /usr/bin/faugus-launcher:890
+msgid "hour"
+msgstr "oră"
+
+#: /usr/bin/faugus-launcher:891
+msgid "hours"
+msgstr "ore"
+
+#: /usr/bin/faugus-launcher:892
+msgid "minute"
+msgstr "minut"
+
+#: /usr/bin/faugus-launcher:893
+msgid "minutes"
+msgstr "minute"
+
+#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:4196
+#: /usr/bin/faugus-launcher:6324
+msgid "Select a file to run inside the prefix"
+msgstr "Alegeți fișierul de rulat în cadrul prefixului"
+
+#: /usr/bin/faugus-launcher:1004 /usr/bin/faugus-launcher:4199
+#: /usr/bin/faugus-launcher:4325 /usr/bin/faugus-launcher:4478
+#: /usr/bin/faugus-launcher:4501 /usr/bin/faugus-launcher:5755
+#: /usr/bin/faugus-launcher:5947 /usr/bin/faugus-launcher:6327
+#: /usr/bin/faugus-launcher:6456 /usr/bin/faugus-launcher:6719
+#: /usr/bin/faugus-launcher:6792
+msgid "Open"
+msgstr "Deschide"
+
+#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:3518
+#: /usr/bin/faugus-launcher:4200 /usr/bin/faugus-launcher:4293
+#: /usr/bin/faugus-launcher:4326 /usr/bin/faugus-launcher:4479
+#: /usr/bin/faugus-launcher:4502 /usr/bin/faugus-launcher:4699
+#: /usr/bin/faugus-launcher:5158 /usr/bin/faugus-launcher:5528
+#: /usr/bin/faugus-launcher:5664 /usr/bin/faugus-launcher:5756
+#: /usr/bin/faugus-launcher:5800 /usr/bin/faugus-launcher:5948
+#: /usr/bin/faugus-launcher:6328 /usr/bin/faugus-launcher:6457
+#: /usr/bin/faugus-launcher:6720 /usr/bin/faugus-launcher:6793
+msgid "Cancel"
+msgstr "Renunță"
+
+#: /usr/bin/faugus-launcher:1009 /usr/bin/faugus-launcher:4204
+#: /usr/bin/faugus-launcher:5952 /usr/bin/faugus-launcher:6332
+#: /usr/bin/faugus-launcher:6727
+msgid "Windows files"
+msgstr "Fișiere Windows"
+
+#: /usr/bin/faugus-launcher:1017 /usr/bin/faugus-launcher:4212
+#: /usr/bin/faugus-launcher:5960 /usr/bin/faugus-launcher:6340
+#: /usr/bin/faugus-launcher:6735
+msgid "All files"
+msgstr "Toate fișierele"
+
+#: /usr/bin/faugus-launcher:1063
+#, python-format
+msgid "%s Logs"
+msgstr "Jurnale %s"
+
+#: /usr/bin/faugus-launcher:1102
+msgid "Copy to clipboard"
+msgstr "Copiază în clipboard"
+
+#: /usr/bin/faugus-launcher:1106
+msgid "Open file location"
+msgstr "Deschide amplasarea fișierului"
+
+#: /usr/bin/faugus-launcher:1190 /usr/bin/faugus-launcher:2325
+#, python-format
+msgid "%s already exists."
+msgstr "%s există deja."
+
+#: /usr/bin/faugus-launcher:1417
+#, python-format
+msgid "%s is already running."
+msgstr "%s rulează deja."
+
+#: /usr/bin/faugus-launcher:1420 /usr/bin/faugus-launcher:2269
+#: /usr/bin/faugus-launcher:3523 /usr/bin/faugus-launcher:4387
+#: /usr/bin/faugus-launcher:4703 /usr/bin/faugus-launcher:4745
+#: /usr/bin/faugus-launcher:5163 /usr/bin/faugus-launcher:5533
+#: /usr/bin/faugus-launcher:5669 /usr/bin/faugus-launcher:5796
+#: /usr/bin/faugus-launcher:5867 /usr/bin/faugus-launcher:6490
+msgid "Ok"
+msgstr "Bine"
+
+#: /usr/bin/faugus-launcher:1746
+msgid "Proton may generate huge log files."
+msgstr "Proton poate genera fișiere cu jurnal uriașe."
+
+#: /usr/bin/faugus-launcher:1746
+msgid "Enable logging only when debugging a problem."
+msgstr "Activați jurnalizarea doar când depanați o problemă."
+
+#: /usr/bin/faugus-launcher:2043
+#, python-format
+msgid "Edit %s"
+msgstr "Modifică %s"
+
+#: /usr/bin/faugus-launcher:2100 /usr/bin/faugus-launcher:5392
+msgid ""
+"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
+"USERS FOUND."
+msgstr ""
+"Adaugă sau elimină o scurtătură din Steam. Steam trebuie repornit. NU AU "
+"FOST GĂSIȚI UTILIZATORI STEAM."
+
+#: /usr/bin/faugus-launcher:2111
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s rulează. Închideți-l mai întâi."
+
+#: /usr/bin/faugus-launcher:2186
+msgid "Failed to remove prefix."
+msgstr "Eliminarea prefixului a eșuat."
+
+#: /usr/bin/faugus-launcher:2445
+msgid "No internet connection."
+msgstr "Fără conexiune la Internet."
+
+#: /usr/bin/faugus-launcher:2585 /usr/bin/faugus-launcher:2740
+#, python-format
+msgid "Installing %s..."
+msgstr "Se instalează %s…"
+
+#: /usr/bin/faugus-launcher:2596
+msgid "Finish installation"
+msgstr "Finalizează instalarea"
+
+#: /usr/bin/faugus-launcher:2603 /usr/bin/faugus-launcher:2608
+#: /usr/bin/faugus-launcher:2613 /usr/bin/faugus-launcher:2618
+#: /usr/bin/faugus-launcher:2623 /usr/bin/faugus-launcher:2628
+msgid "Downloading"
+msgstr "Se descarcă"
+
+#: /usr/bin/faugus-launcher:2690
+#, python-format
+msgid "%s was not installed!"
+msgstr "%s nu a fost instalat!"
+
+#: /usr/bin/faugus-launcher:2734
+msgid "Download complete"
+msgstr "Descărcare încheiată"
+
+#: /usr/bin/faugus-launcher:2737
+#, python-format
+msgid "Error during download: %s"
+msgstr "Eroare la descărcare: %s"
+
+#: /usr/bin/faugus-launcher:2742 /usr/bin/faugus-launcher:2745
+#: /usr/bin/faugus-launcher:2755
+msgid "Please close the login window and wait."
+msgstr "Închideți fereastra de autentificare și așteptați."
+
+#: /usr/bin/faugus-launcher:2754
+msgid "Please don't change the installation path."
+msgstr "Nu modificați calea de instalare."
+
+#: /usr/bin/faugus-launcher:2758
+msgid "Please close Wargaming to finish the installation."
+msgstr "Închideți Wargaming pentru a finaliza instalarea."
+
+#: /usr/bin/faugus-launcher:3223
+msgid "Settings"
+msgstr "Configurări"
+
+#: /usr/bin/faugus-launcher:3347
+msgid "Language"
+msgstr "Limbă"
+
+#: /usr/bin/faugus-launcher:3352
+msgid "Interface Mode"
+msgstr "Regimul interfeței"
+
+#: /usr/bin/faugus-launcher:3361
+msgid "Start maximized"
+msgstr "Pornește maximizat"
+
+#: /usr/bin/faugus-launcher:3366
+msgid "Start in fullscreen"
+msgstr "Pornește în ecran complet"
+
+#: /usr/bin/faugus-launcher:3369
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt+Enter comută ecranul complet"
+
+#: /usr/bin/faugus-launcher:3371
+msgid "Show labels"
+msgstr "Arată etichetele"
+
+#: /usr/bin/faugus-launcher:3374
+msgid "Smaller banners"
+msgstr "Bandiere mai mici"
+
+#: /usr/bin/faugus-launcher:3378
+msgid "Default Prefixes Location"
+msgstr "Amplasare implicită pentru prefixe"
+
+#: /usr/bin/faugus-launcher:3382 /usr/bin/faugus-launcher:5057
+msgid "/path/to/the/prefix"
+msgstr "/calea/către/prefix"
+
+#: /usr/bin/faugus-launcher:3392
+msgid "Lossless Scaling Location"
+msgstr "Amplasarea „Lossless Scaling”"
+
+#: /usr/bin/faugus-launcher:3396
+msgid "/path/to/Lossless.dll"
+msgstr "/calea/către/Lossless.dll"
+
+#: /usr/bin/faugus-launcher:3405
+msgid "Default Prefix Tools"
+msgstr "Unelte implicite pentru prefix"
+
+#: /usr/bin/faugus-launcher:3412
+msgid "Default Proton"
+msgstr "Proton implicit"
+
+#: /usr/bin/faugus-launcher:3416
+msgid "Proton Manager"
+msgstr "Gestionarul de Proton"
+
+#: /usr/bin/faugus-launcher:3419
+msgid "Miscellaneous"
+msgstr "Diverse"
+
+#: /usr/bin/faugus-launcher:3426
+msgid "Use discrete GPU"
+msgstr "Folosește placa grafică discretă"
+
+#: /usr/bin/faugus-launcher:3430
+msgid "Close when running a game/app"
+msgstr "Închide când rulează joc/aplicație"
+
+#: /usr/bin/faugus-launcher:3434
+msgid "System tray icon"
+msgstr "Pictogramă în tava de sistem"
+
+#: /usr/bin/faugus-launcher:3439
+msgid "Start on boot"
+msgstr "Pornește la demarare"
+
+#: /usr/bin/faugus-launcher:3443
+msgid "Monochrome icon"
+msgstr "Pictogramă monocromă"
+
+#: /usr/bin/faugus-launcher:3448
+msgid "Disable splash window"
+msgstr "Dezactivează fereastra de întâmpinare"
+
+#: /usr/bin/faugus-launcher:3451
+msgid "Disable automatic updates"
+msgstr "Dezactivează actualizările automate"
+
+#: /usr/bin/faugus-launcher:3455
+msgid "Enable logging"
+msgstr "Activează jurnalizarea"
+
+#: /usr/bin/faugus-launcher:3458
+msgid "Show hidden games"
+msgstr "Arată jocurile ascunse"
+
+#: /usr/bin/faugus-launcher:3460
+msgid "Press Ctrl+H to show/hide games."
+msgstr "Apăsați Ctrl+H pentru a ascunde/arăta jocuri."
+
+#: /usr/bin/faugus-launcher:3462
+msgid "Use Wayland driver (experimental)"
+msgstr "Folosește driver Wayland (experimental)"
+
+#: /usr/bin/faugus-launcher:3464 /usr/bin/faugus-launcher:3470
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "Funcționează doar cu GE-Proton10 sau Proton-EM-10."
+
+#: /usr/bin/faugus-launcher:3467
+msgid "Enable HDR (experimental)"
+msgstr "Activează HDR (experimental)"
+
+#: /usr/bin/faugus-launcher:3472
+msgid "Enable WOW64 (experimental)"
+msgstr "Activează WOW64 (experimental)"
+
+#: /usr/bin/faugus-launcher:3474
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"Funcționează doar cu GE-Proton10-9 sau ulterior și Proton-EM-10-24 sau "
+"ulterior."
+
+#: /usr/bin/faugus-launcher:3487 /usr/bin/faugus-launcher:5130
+msgid "Run"
+msgstr "Rulează"
+
+#: /usr/bin/faugus-launcher:3490 /usr/bin/faugus-launcher:5133
+msgid "Run a file inside the prefix"
+msgstr "Rulează un fișier în cadrul prefixului"
+
+#: /usr/bin/faugus-launcher:3495 /usr/bin/faugus-launcher:5111
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+msgstr ""
+"Arată o suprapunere pentru monitorizarea ratei de cadre, temperaturii, "
+"încărcării procesorului și plăcii grafice, și altele."
+
+#: /usr/bin/faugus-launcher:3497 /usr/bin/faugus-launcher:5113
+msgid "Tweaks your system to improve performance."
+msgstr "Vă ajustează sistemul pentru a-i îmbunătăți performanța."
+
+#: /usr/bin/faugus-launcher:3498 /usr/bin/faugus-launcher:5114
+msgid "Disable Hidraw"
+msgstr "Dezactivează Hidraw"
+
+#: /usr/bin/faugus-launcher:3500 /usr/bin/faugus-launcher:5116
+msgid ""
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
+msgstr ""
+"Poate rezolva problemele cu controlori în unele jocuri. Funcționează doar cu "
+"GE-Proton10 sau Proton-EM-10."
+
+#: /usr/bin/faugus-launcher:3501 /usr/bin/faugus-launcher:5117
+msgid "Prevent Sleep"
+msgstr "Previne adormirea"
+
+#: /usr/bin/faugus-launcher:3503
+msgid "Support the Project"
+msgstr "Susțineți proiectul"
+
+#: /usr/bin/faugus-launcher:3527
+msgid "Backup/Restore Settings"
+msgstr "Copiază/restabilește configurările"
+
+#: /usr/bin/faugus-launcher:3534
+msgid "Backup"
+msgstr "Creează copie de rezervă"
+
+#: /usr/bin/faugus-launcher:3538
+msgid "Restore"
+msgstr "Restabilește"
+
+#: /usr/bin/faugus-launcher:3545
+msgid "Global Environment Variables"
+msgstr "Variabile de mediu globale"
+
+#: /usr/bin/faugus-launcher:3819 /usr/bin/faugus-launcher:5380
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
+"NOT INSTALLED."
+msgstr ""
+"Arată o suprapunere pentru monitorizarea ratei de cadre, temperaturii, "
+"încărcării procesorului și plăcii grafice, și altele. NU ESTE INSTALAT."
+
+#: /usr/bin/faugus-launcher:3825 /usr/bin/faugus-launcher:5386
+msgid "Tweaks your system to improve performance. NOT INSTALLED."
+msgstr ""
+"Vă ajustează sistemul pentru a-i îmbunătăți performanța. NU ESTE INSTALAT."
+
+#: /usr/bin/faugus-launcher:3863
+#, python-format
+msgid "Clear Logs (%s)"
+msgstr "Curăță jurnalele (%s)"
+
+#: /usr/bin/faugus-launcher:3866
+msgid "Clear Logs"
+msgstr "Curăță jurnalele"
+
+#: /usr/bin/faugus-launcher:4113
+msgid "Do you want to save the changes?"
+msgstr "Doriți să salvați modificările?"
+
+#: /usr/bin/faugus-launcher:4261
+msgid "Prefixes and runners will not be backed up!"
+msgstr "Prefixele și executorii nu vor fi copiați!"
+
+#: /usr/bin/faugus-launcher:4289
+msgid "Save the backup file as..."
+msgstr "Salvează copia de rezervă ca…"
+
+#: /usr/bin/faugus-launcher:4292
+msgid "Save"
+msgstr "Salvează"
+
+#: /usr/bin/faugus-launcher:4322
+msgid "Select a backup file to restore"
+msgstr "Alegeți un fișier cu copia de rezervă de restabilit"
+
+#: /usr/bin/faugus-launcher:4330
+msgid "ZIP files"
+msgstr "Fișiere ZIP"
+
+#: /usr/bin/faugus-launcher:4341 /usr/bin/faugus-launcher:4351
+msgid "This is not a valid Faugus Launcher backup file."
+msgstr ""
+"Acest fișier nu conține o copie de rezervă validă pentru Lansatorul Faugus."
+
+#: /usr/bin/faugus-launcher:4354
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "Sigur doriți să suprascrieți configurările?"
+
+#: /usr/bin/faugus-launcher:4428 /usr/bin/faugus-launcher:4788
+msgid "No"
+msgstr "Nu"
+
+#: /usr/bin/faugus-launcher:4432 /usr/bin/faugus-launcher:4792
+msgid "Yes"
+msgstr "Da"
+
+#: /usr/bin/faugus-launcher:4475 /usr/bin/faugus-launcher:6789
+msgid "Select a prefix location"
+msgstr "Alegeți amplasarea prefixului"
+
+#: /usr/bin/faugus-launcher:4498
+msgid "Select the Lossless.dll file"
+msgstr "Alegeți fișierul Lossless.dll"
+
+#: /usr/bin/faugus-launcher:4690
+#, python-format
+msgid "Duplicate %s"
+msgstr "Duplică %s"
+
+#: /usr/bin/faugus-launcher:4693 /usr/bin/faugus-launcher:5008
+#: /usr/bin/faugus-launcher:5026
+msgid "Title"
+msgstr "Titlu"
+
+#: /usr/bin/faugus-launcher:4696 /usr/bin/faugus-launcher:5033
+msgid "Game Title"
+msgstr "Titlul jocului"
+
+#: /usr/bin/faugus-launcher:4780
+#, python-format
+msgid "Delete %s"
+msgstr "Șterge %s"
+
+#: /usr/bin/faugus-launcher:4785
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "Sigur doriți să ștergeți %s?"
+
+#: /usr/bin/faugus-launcher:4796
+msgid "Also remove the prefix"
+msgstr "Elimină și prefixul"
+
+#: /usr/bin/faugus-launcher:4837
+msgid "New Game/App"
+msgstr "Joc/aplicație nouă"
+
+#: /usr/bin/faugus-launcher:5038 /usr/bin/faugus-launcher:5470
+msgid "Path"
+msgstr "Cale"
+
+#: /usr/bin/faugus-launcher:5044
+msgid "/path/to/the/exe"
+msgstr "/calea/către/exe"
+
+#: /usr/bin/faugus-launcher:5053
+msgid "Prefix"
+msgstr "Prefix"
+
+#: /usr/bin/faugus-launcher:5066
+msgid "Proton"
+msgstr "Proton"
+
+#: /usr/bin/faugus-launcher:5084
+msgid "Launch Arguments"
+msgstr "Argumente pentru lansare"
+
+#: /usr/bin/faugus-launcher:5087
+msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+msgstr "exemplu: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+
+#: /usr/bin/faugus-launcher:5092
+msgid "Game Arguments"
+msgstr "Argumente pentru joc"
+
+#: /usr/bin/faugus-launcher:5095
+msgid "e.g.: -d3d11 -fullscreen"
+msgstr "exemplu: -d3d11 -fullscreen"
+
+#: /usr/bin/faugus-launcher:5099 /usr/bin/faugus-launcher:5444
+msgid "Additional Application"
+msgstr "Aplicație suplimentară"
+
+#: /usr/bin/faugus-launcher:5102
+msgid ""
+"Additional application to run with the game, like Cheat Engine, Trainers, "
+"Mods..."
+msgstr ""
+"Aplicație suplimentară de rulat împreună cu jocul, ca Cheat Engine, "
+"antrenori, modificări…"
+
+#: /usr/bin/faugus-launcher:5105 /usr/bin/faugus-launcher:5562
+msgid "Lossless Scaling Frame Generation"
+msgstr "Generarea cadrelor Lossless Scaling"
+
+#: /usr/bin/faugus-launcher:5136
+msgid "Shortcut"
+msgstr "Scurtătură"
+
+#: /usr/bin/faugus-launcher:5141
+msgid "Desktop"
+msgstr "Birou"
+
+#: /usr/bin/faugus-launcher:5143
+msgid "Add or remove a shortcut from the Desktop."
+msgstr "Adaugă sau elimină o scurtătură de pe birou."
+
+#: /usr/bin/faugus-launcher:5144
+msgid "App Menu"
+msgstr "Meniu de aplicații"
+
+#: /usr/bin/faugus-launcher:5146
+msgid "Add or remove a shortcut from the Application Menu."
+msgstr "Adaugă sau elimină o scurtătură din meniul de aplicații."
+
+#: /usr/bin/faugus-launcher:5147
+msgid "Steam"
+msgstr "Steam"
+
+#: /usr/bin/faugus-launcher:5149
+msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
+msgstr "Adaugă sau elimină o scurtătură din Steam. Steam trebuie repornit."
+
+#: /usr/bin/faugus-launcher:5155 /usr/bin/faugus-launcher:6453
+msgid "Select an icon for the shortcut"
+msgstr "Alegeți o pictogramă pentru scurtătură"
+
+#: /usr/bin/faugus-launcher:5206
+msgid "Refresh"
+msgstr "Împrospătează"
+
+#: /usr/bin/faugus-launcher:5210
+msgid "Load from file"
+msgstr "Încarcă din fișier"
+
+#: /usr/bin/faugus-launcher:5214
+msgid "Load from URL"
+msgstr "Încarcă din URL"
+
+#: /usr/bin/faugus-launcher:5222
+msgid "Game/App"
+msgstr "Joc/aplicație"
+
+#: /usr/bin/faugus-launcher:5238
+msgid "Tools"
+msgstr "Unelte"
+
+#: /usr/bin/faugus-launcher:5400
+msgid ""
+"Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
+"and set the location."
+msgstr ""
+"Lossless.dll NU A FOST GĂSIT. Dacă acesta e instalat, mergeți în "
+"configurările Lansatorului Faugus și stabiliți amplasarea."
+
+#: /usr/bin/faugus-launcher:5403
+msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
+msgstr "Stratul Vulkan pentru Lossless Scaling NU E INSTALAT."
+
+#: /usr/bin/faugus-launcher:5466 /usr/bin/faugus-launcher:5586
+msgid "Enable"
+msgstr "Activează"
+
+#: /usr/bin/faugus-launcher:5475
+msgid "/path/to/the/app"
+msgstr "/calea/către/aplicație"
+
+#: /usr/bin/faugus-launcher:5485
+msgid "Delay (seconds)"
+msgstr "Întârziere (secunde)"
+
+#: /usr/bin/faugus-launcher:5502
+msgid "Run the application first"
+msgstr "Rulează mai întâi aplicația"
+
+#: /usr/bin/faugus-launcher:5590
+msgid "Multiplier"
+msgstr "Multiplicator"
+
+#: /usr/bin/faugus-launcher:5595
+msgid "Multiply the FPS."
+msgstr "Multiplică rata de cadre."
+
+#: /usr/bin/faugus-launcher:5597
+msgid "Flow Scale"
+msgstr "Scara debitului"
+
+#: /usr/bin/faugus-launcher:5604
+msgid "Lower the internal motion estimation resolution."
+msgstr "Scade rezoluția internă a estimării mișcării."
+
+#: /usr/bin/faugus-launcher:5606
+msgid "Performance Mode"
+msgstr "Regim de performanță"
+
+#: /usr/bin/faugus-launcher:5607
+msgid "Massively improve performance at the cost of quality."
+msgstr "Crește masiv performanța în detrimentul calității."
+
+#: /usr/bin/faugus-launcher:5610
+msgid "HDR Mode"
+msgstr "Regim HDR"
+
+#: /usr/bin/faugus-launcher:5611
+msgid "Enable special HDR-only behavior."
+msgstr "Activează comportamentul special pentru HDR exclusiv."
+
+#: /usr/bin/faugus-launcher:5614
+msgid "Present Mode (Experimental)"
+msgstr "Regim de prezentare (experimental)"
+
+#: /usr/bin/faugus-launcher:5618
+msgid "Override the present mode."
+msgstr "Supradefinește regimul de prezentare."
+
+#: /usr/bin/faugus-launcher:5752
+msgid "Select an image for the banner"
+msgstr "Alegeți o imagine pentru bandieră"
+
+#: /usr/bin/faugus-launcher:5760 /usr/bin/faugus-launcher:6461
+msgid "Image files"
+msgstr "Fișiere cu imagine"
+
+#: /usr/bin/faugus-launcher:5787
+msgid "Enter the image URL"
+msgstr "Introduceți URL-ul imaginii"
+
+#: /usr/bin/faugus-launcher:5861 /usr/bin/faugus-launcher:6483
+msgid "The selected file is not a valid image."
+msgstr "Fișierul ales nu este o imagine validă."
+
+#: /usr/bin/faugus-launcher:5864 /usr/bin/faugus-launcher:6487
+msgid "Please choose another one."
+msgstr "Alegeți altul."
+
+#: /usr/bin/faugus-launcher:5944
+msgid "Select an additional application"
+msgstr "Alegeți o aplicație suplimentară"
+
+#: /usr/bin/faugus-launcher:6237
+msgid "Windows Game"
+msgstr "Joc Windows"
+
+#: /usr/bin/faugus-launcher:6238
+msgid "Linux Game"
+msgstr "Joc Linux"
+
+#: /usr/bin/faugus-launcher:6239
+msgid "Steam Game"
+msgstr "Joc Steam"
+
+#: /usr/bin/faugus-launcher:6716
+msgid "Select the game's .exe"
+msgstr "Alegeți .exe-ul jocului"

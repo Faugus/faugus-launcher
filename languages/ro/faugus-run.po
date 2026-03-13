@@ -1,0 +1,128 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# SPDX-FileCopyrightText: 2026 Sergiu Bivol <sergiu@cip.md>
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-25 18:25-0300\n"
+"PO-Revision-Date: 2026-03-12 13:19+0000\n"
+"Last-Translator: Sergiu Bivol <sergiu@cip.md>\n"
+"Language-Team: Romanian <kde-i18n-ro@kde.org>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)"
+") ? 1 : 2;\n"
+"X-Generator: Lokalize 25.08.1\n"
+
+#: /usr/bin/faugus-run:106
+msgid "Starting Steam game..."
+msgstr "Se pornește un joc Steam…"
+
+#: /usr/bin/faugus-run:318
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Vă place Lansatorul Faugus?"
+
+#: /usr/bin/faugus-run:322
+msgid "Please consider donating"
+msgstr "Vă rugăm să donați"
+
+#: /usr/bin/faugus-run:334
+msgid "Never show this message again"
+msgstr "Nu mai arăta acest mesaj niciodată"
+
+#: /usr/bin/faugus-run:344
+msgid "Continue"
+msgstr "Continuă"
+
+#: /usr/bin/faugus-run:392
+msgid "Internet connection error."
+msgstr "Eroare de conexiune la Internet."
+
+#: /usr/bin/faugus-run:396
+#, python-format
+msgid "%s was not found."
+msgstr "%s nu a fost găsit."
+
+#: /usr/bin/faugus-run:400
+msgid "Please install it or use another Proton version."
+msgstr "Instalați-l sau folosiți altă versiune de Proton."
+
+#: /usr/bin/faugus-run:407 /usr/bin/faugus-run:683
+msgid "Ok"
+msgstr "Bine"
+
+#: /usr/bin/faugus-run:584
+msgid "Updating UMU-Launcher..."
+msgstr "Se actualizează UMU-Launcher…"
+
+#: /usr/bin/faugus-run:586
+msgid "UMU-Launcher is up to date"
+msgstr "UMU-Launcher este la zi"
+
+#: /usr/bin/faugus-run:588
+msgid "Updating BattlEye..."
+msgstr "Se actualizează BattlEye…"
+
+#: /usr/bin/faugus-run:590
+msgid "Updating Easy Anti-Cheat..."
+msgstr "Se actualizează Easy Anti-Cheat…"
+
+#: /usr/bin/faugus-run:592
+msgid "Components are up to date"
+msgstr "Componentele sunt la zi"
+
+#: /usr/bin/faugus-run:594
+msgid "Downloading UMU-Proton..."
+msgstr "Se descarcă UMU-Proton…"
+
+#: /usr/bin/faugus-run:596
+msgid "Downloading Steam Runtime..."
+msgstr "Se descarcă Steam Runtime…"
+
+#: /usr/bin/faugus-run:598
+msgid "Extracting Steam Runtime..."
+msgstr "Se extrage Steam Runtime…"
+
+#: /usr/bin/faugus-run:600
+msgid "Extracting UMU-Proton..."
+msgstr "Se extrage UMU-Proton…"
+
+#: /usr/bin/faugus-run:602 /usr/bin/faugus-run:608
+msgid "UMU-Proton is up to date"
+msgstr "UMU-Proton este la zi"
+
+#: /usr/bin/faugus-run:604 /usr/bin/faugus-run:610
+msgid "Steam Runtime is up to date"
+msgstr "Steam Runtime este la zi"
+
+#: /usr/bin/faugus-run:606 /usr/bin/faugus-run:617
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton este la zi"
+
+#: /usr/bin/faugus-run:613
+msgid "Downloading GE-Proton..."
+msgstr "Se descarcă GE-Proton…"
+
+#: /usr/bin/faugus-run:615
+msgid "Extracting GE-Proton..."
+msgstr "Se extrage GE-Proton…"
+
+#: /usr/bin/faugus-run:619
+msgid "Downloading Proton-EM..."
+msgstr "Se descarcă Proton-EM…"
+
+#: /usr/bin/faugus-run:621
+msgid "Extracting Proton-EM..."
+msgstr "Se extrage Proton-EM…"
+
+#: /usr/bin/faugus-run:623
+msgid "Proton-EM is up to date"
+msgstr "Proton-EM este la zi"
+
+#: /usr/bin/faugus-run:680
+msgid "The keys and values were successfully added to the registry."
+msgstr "Cheile și valorile au fost adăugate cu succes la registru."

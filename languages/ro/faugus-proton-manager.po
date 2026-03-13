@@ -1,0 +1,59 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# SPDX-FileCopyrightText: 2026 Sergiu Bivol <sergiu@cip.md>
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 09:18-0300\n"
+"PO-Revision-Date: 2026-03-12 13:21+0000\n"
+"Last-Translator: Sergiu Bivol <sergiu@cip.md>\n"
+"Language-Team: Romanian <kde-i18n-ro@kde.org>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)"
+") ? 1 : 2;\n"
+"X-Generator: Lokalize 25.08.1\n"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Gestionarul de Proton Faugus"
+
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:359
+#: /usr/bin/faugus-proton-manager:419
+msgid "Remove"
+msgstr "Elimină"
+
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:365
+#: /usr/bin/faugus-proton-manager:426 /usr/bin/faugus-proton-manager:436
+msgid "Download"
+msgstr "Descarcă"
+
+#: /usr/bin/faugus-proton-manager:296
+msgid "Downloading..."
+msgstr "Se descarcă…"
+
+#: /usr/bin/faugus-proton-manager:298
+#, python-format
+msgid "Downloading %s..."
+msgstr "Se descarcă %s…"
+
+#: /usr/bin/faugus-proton-manager:325 /usr/bin/faugus-proton-manager:375
+#, python-format
+msgid "Extracting %s..."
+msgstr "Se extrage %s…"
+
+#: /usr/bin/faugus-proton-manager:366
+msgid "Error during download"
+msgstr "Eroare la descărcare"
+
+#: /usr/bin/faugus-proton-manager:373
+msgid "Extracting..."
+msgstr "Se extrage…"
+
+#: /usr/bin/faugus-proton-manager:425
+msgid "Error during extraction"
+msgstr "Eroare la extragere"
