@@ -82,12 +82,18 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.3-1" date="2026-03-11">
+    <release version="1.16.4-1" date="2026-03-13">
       <description>
         <ul>
-          <li>Fixed Linux native games not launching with the new umu-launcher.</li>
-          <li>Fixed splash window not showing up for Steam games due to recent changes.</li>
-          <li>Updated Dutch translation.</li>
+          <li>Fixed some linter issues when building the Flatpak.</li>
+          <li>Fixed icon not showing on the title bar.</li>
+          <li>Improved Proton Manager startup.</li>
+          <li>Improved the kill button for the native version.</li>
+          <li>Now the strings on the interface mode dropdown menu can be translated.</li>
+          <li>Now shows the prefix when deleting an entry.</li>
+          <li>Minor code improvements.</li>
+          <li>Added Romanian translation.</li>
+          <li>Updated Portuguese translation.</li>
           <li>Updated Italian translation.</li>
         </ul>
       </description>
