@@ -1786,7 +1786,7 @@ class Main(Gtk.ApplicationWindow):
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
 
-        if settings_dialog.combobox_interface.get_active_text() == "Banners":
+        if settings_dialog.combobox_interface.get_active_id() == "Banners":
             if not default_prefix:
                 if not default_prefix:
                     settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
@@ -3364,9 +3364,9 @@ class Settings(Gtk.Dialog):
         self.label_interface.set_halign(Gtk.Align.START)
         self.combobox_interface = Gtk.ComboBoxText()
         self.combobox_interface.connect("changed", self.on_combobox_interface_changed)
-        self.combobox_interface.append_text("List")
-        self.combobox_interface.append_text("Blocks")
-        self.combobox_interface.append_text("Banners")
+        self.combobox_interface.append("List", _("List"))
+        self.combobox_interface.append("Blocks", _("Blocks"))
+        self.combobox_interface.append("Banners", _("Banners"))
 
         # Create checkbox for 'Start maximized' option
         self.checkbox_start_maximized = Gtk.CheckButton(label=_("Start maximized"))
@@ -3938,14 +3938,14 @@ class Settings(Gtk.Dialog):
                 self.checkbox_start_maximized.set_active(False)
 
     def on_combobox_interface_changed(self, combobox):
-        active_index = combobox.get_active()
-        if active_index == 0:
+        active_id = combobox.get_active_id()
+        if active_id == "List":
             self.grid_big_interface.set_visible(False)
-        if active_index == 1:
+        if active_id == "Blocks":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(False)
             self.checkbox_smaller_banners.set_visible(False)
-        if active_index == 2:
+        if active_id == "Banners":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(True)
             self.checkbox_smaller_banners.set_visible(True)
@@ -4054,7 +4054,7 @@ class Settings(Gtk.Dialog):
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
         config.set_value("enable-hdr", self.checkbox_enable_hdr.get_active())
         config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
-        config.set_value("interface-mode", self.combobox_interface.get_active_text())
+        config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("start-maximized", self.checkbox_start_maximized.get_active())
         config.set_value("start-fullscreen", self.checkbox_start_fullscreen.get_active())
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
@@ -4596,15 +4596,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_hdr.set_active(enable_hdr)
         self.checkbox_enable_wow64.set_active(enable_wow64)
-
-        model_interface = self.combobox_interface.get_model()
-        index_interface = 0
-        for i, row in enumerate(model_interface):
-            if row[0] == self.interface_mode:
-                index_interface = i
-                break
-
-        self.combobox_interface.set_active(index_interface)
+        self.combobox_interface.set_active_id(self.interface_mode)
 
         model_language = self.combobox_language.get_model()
         index_language = 0
