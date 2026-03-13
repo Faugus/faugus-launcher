@@ -191,8 +191,11 @@ class FaugusRun:
             steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-GE Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
-        components_path = PathManager.user_config("faugus-launcher/components")
-        self.components_exists = os.path.isdir(components_path)
+        self.components_exists = (
+            os.path.exists(eac_dir) and
+            os.path.exists(be_dir) and
+            os.path.exists(umu_run)
+        )
 
         env_from_file = self.load_env_from_file(envar_dir)
         if env_from_file:
