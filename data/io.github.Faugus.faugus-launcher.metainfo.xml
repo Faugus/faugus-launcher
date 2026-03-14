@@ -88,19 +88,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.4-1" date="2026-03-13">
+    <release version="1.16.5-1" date="2026-03-14">
       <description>
         <ul>
-          <li>Fixed some linter issues when building the Flatpak.</li>
-          <li>Fixed icon not showing on the title bar.</li>
-          <li>Improved Proton Manager startup.</li>
-          <li>Improved the kill button for the native version.</li>
-          <li>Now the strings on the interface mode dropdown menu can be translated.</li>
-          <li>Now shows the prefix when deleting an entry.</li>
-          <li>Minor code improvements.</li>
-          <li>Added Romanian translation.</li>
-          <li>Updated Portuguese translation.</li>
-          <li>Updated Italian translation.</li>
+          <li>Fixed 'Faugus Create Shortcut' not showing up on the context menu of Linux Mint and others.</li>
+          <li>Fixed app restarting when applying any settings in the settings menu.</li>
         </ul>
       </description>
     </release>
