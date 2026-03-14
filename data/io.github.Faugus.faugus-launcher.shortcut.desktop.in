@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Faugus Create Shortcut
-Exec=python -m faugus.shortcut %f
+Name=Faugus Shortcut
+Exec=faugus-shortcut
 MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
 Icon=@ICON@
 NoDisplay=true
