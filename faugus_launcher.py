@@ -1757,7 +1757,7 @@ class Main(Gtk.ApplicationWindow):
 
             if validation_result:
                 combobox_language = settings_dialog.combobox_language.get_active_text()
-                if self.interface_mode != settings_dialog.combobox_interface.get_active_text():
+                if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
                     subprocess.Popen([sys.executable, __file__])
                     self.destroy()
                 if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
