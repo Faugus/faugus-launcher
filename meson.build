@@ -19,10 +19,12 @@ install_data(
   'faugus_launcher.py',
   'faugus_run.py',
   'faugus_proton_manager.py',
+  'faugus_shortcut.py',
   rename: [
     'faugus-launcher',
     'faugus-run',
     'faugus-proton-manager',
+    'faugus-shortcut',
   ],
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
