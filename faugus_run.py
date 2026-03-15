@@ -124,12 +124,17 @@ class FaugusRun:
             
         if IS_FLATPAK:
             gamescope_bin = "/usr/lib/extensions/vulkan/gamescope/bin"
+            gamescope_lib = "/usr/lib/extensions/vulkan/gamescope/lib"
+
+            if "gamescope" in self.message and not os.path.exists(gamescope_bin):
+                self.close_splash_window()
+                self.show_gamescope_error_dialog()
+
             if os.path.exists(gamescope_bin):
                 current_path = os.environ.get("PATH", "")
                 if gamescope_bin not in current_path:
                     set_env("PATH", f"{gamescope_bin}:{current_path}")
             
-            gamescope_lib = "/usr/lib/extensions/vulkan/gamescope/lib"
             if os.path.exists(gamescope_lib):
                 current_ld = os.environ.get("LD_LIBRARY_PATH", "")
                 if gamescope_lib not in current_ld:
@@ -151,10 +156,9 @@ class FaugusRun:
 
         self.start_time = time.time()
 
-        # LSFG_LEGACY env is deprecated in LSFG-VK 2.0
         if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
             if self.lossless_location:
-                set_env("LSFG_DLL_PATH", self.lossless_location) # Deprecated in LSFG-VK v2.0
+                set_env("LSFG_DLL_PATH", self.lossless_location) 
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
         if self.enable_logging:
@@ -469,6 +473,54 @@ class FaugusRun:
 
             box_top.pack_start(label, True, True, 0)
             box_top.pack_start(label2, True, True, 0)
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        box_bottom.pack_start(button_ok, True, True, 0)
+
+        content_area.add(box_top)
+        content_area.add(box_bottom)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+        Gtk.main_quit()
+        sys.exit()
+
+    def show_gamescope_error_dialog(self):
+        dialog = Gtk.Dialog(title="Faugus Launcher")
+        dialog.set_resizable(False)
+        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+
+        content_area = dialog.get_content_area()
+        content_area.set_border_width(0)
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        label = Gtk.Label(label=_("Gamescope Flatpak extension is missing."))
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label()
+        label2.set_markup(_("Please install it by running the following command in your terminal:\n\n<b>flatpak install org.freedesktop.Platform.VulkanLayer.gamescope</b>"))
+        label2.set_halign(Gtk.Align.CENTER)
+        label2.set_selectable(True)
+
+        box_top.pack_start(label, True, True, 0)
+        box_top.pack_start(label2, True, True, 0)
 
         button_ok = Gtk.Button(label=_("Ok"))
         button_ok.set_size_request(150, -1)
@@ -904,25 +956,25 @@ def build_launch_command(game):
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     if lossless_enabled:
-        command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
+        command_parts.append("LSFG_LEGACY=1") 
         command_parts.append("LSFGVK_ENV=1")
         if lossless_multiplier:
-            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
+            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") 
             command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
         if lossless_flow:
-            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
+            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") 
             command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
         if lossless_performance:
-            command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
+            command_parts.append("LSFG_PERFORMANCE_MODE=1") 
             command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
         else:
-            command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
+            command_parts.append("LSFG_PERFORMANCE_MODE=0") 
             command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
-        if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
+        if lossless_hdr: 
             command_parts.append("LSFG_HDR_MODE=1")
         else:
             command_parts.append("LSFG_HDR_MODE=0")
-        if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
+        if lossless_present: 
             command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     if launch_arguments:
         command_parts.append(launch_arguments)
