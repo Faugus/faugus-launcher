@@ -41,7 +41,7 @@
       <li>The 'stop' button won't close games.</li>
       <li>Gamescope doesn't work.</li>
       <li>It may not use the system theme in some DEs.</li>
-      <li>Game windows will use the Faugus Launcher icon when running instead of their intended icon</li>
+      <li>Game windows will use the Faugus Launcher icon instead of their intended icon</li>
     </ul>
   </description>
   <categories>
