@@ -121,6 +121,20 @@ class FaugusRun:
                 set_env("PROTON_ENABLE_HDR", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
+            
+        if IS_FLATPAK:
+            gamescope_bin = "/usr/lib/extensions/vulkan/gamescope/bin"
+            if os.path.exists(gamescope_bin):
+                current_path = os.environ.get("PATH", "")
+                if gamescope_bin not in current_path:
+                    set_env("PATH", f"{gamescope_bin}:{current_path}")
+            
+            gamescope_lib = "/usr/lib/extensions/vulkan/gamescope/lib"
+            if os.path.exists(gamescope_lib):
+                current_ld = os.environ.get("LD_LIBRARY_PATH", "")
+                if gamescope_lib not in current_ld:
+                    new_ld = f"{gamescope_lib}:{current_ld}" if current_ld else gamescope_lib
+                    set_env("LD_LIBRARY_PATH", new_ld)
 
         self.extract_env_from_message()
 
