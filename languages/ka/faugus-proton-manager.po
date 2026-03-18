@@ -1,0 +1,58 @@
+# Georgian translation for faugus-proton-manager.
+# Copyright (C) 2026 faugus-proton-manager's authors.
+# This file is distributed under the same license as the faugus-proton-manager package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: faugus-proton-manager\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 09:18-0300\n"
+"PO-Revision-Date: 2026-03-18 04:49+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Manager"
+
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:359
+#: /usr/bin/faugus-proton-manager:419
+msgid "Remove"
+msgstr "წაშლა"
+
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:365
+#: /usr/bin/faugus-proton-manager:426 /usr/bin/faugus-proton-manager:436
+msgid "Download"
+msgstr "გადმოწერა"
+
+#: /usr/bin/faugus-proton-manager:296
+msgid "Downloading..."
+msgstr "გადმოწერა..."
+
+#: /usr/bin/faugus-proton-manager:298
+#, python-format
+msgid "Downloading %s..."
+msgstr "%s-ის გადმოწერა..."
+
+#: /usr/bin/faugus-proton-manager:325 /usr/bin/faugus-proton-manager:375
+#, python-format
+msgid "Extracting %s..."
+msgstr "%s-ის გაშლა..."
+
+#: /usr/bin/faugus-proton-manager:366
+msgid "Error during download"
+msgstr "შეცდომა გადმოწერისას"
+
+#: /usr/bin/faugus-proton-manager:373
+msgid "Extracting..."
+msgstr "გაშლა..."
+
+#: /usr/bin/faugus-proton-manager:425
+msgid "Error during extraction"
+msgstr "შეცდომა გაშლისას"
