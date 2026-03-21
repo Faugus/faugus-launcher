@@ -82,11 +82,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.5-1" date="2026-03-14">
+    <release version="1.16.6-1" date="2026-03-21">
       <description>
         <ul>
-          <li>Fixed 'Faugus Create Shortcut' not showing up on the context menu of Linux Mint and others.</li>
-          <li>Fixed app restarting when applying any settings in the settings menu.</li>
+          <li>Temporarily removed the EA App installation.</li>
+          <li>Added Georgian translation.</li>
+          <li>Updated Dutch translation.</li>
+          <li>Updated Russian translation.</li>
         </ul>
       </description>
     </release>
