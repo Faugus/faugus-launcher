@@ -2028,15 +2028,15 @@ class Main(Gtk.ApplicationWindow):
                     edit_game_dialog.combobox_steam_title.set_active(i)
                     break
 
+            game_runner = convert_runner(game.runner)
+
+            if game_runner == "Linux-Native":
+                edit_game_dialog.combobox_launcher.set_active_id("linux")
+            if game_runner == "Steam":
+                edit_game_dialog.combobox_launcher.set_active_id("steam")
+
             model_runner = edit_game_dialog.combobox_runner.get_model()
             index_runner = 0
-            game_runner = game.runner
-
-            game_runner = convert_runner(game.runner)
-            if game_runner == "Linux-Native":
-                edit_game_dialog.combobox_launcher.set_active(1)
-            if game_runner == "Steam":
-                edit_game_dialog.combobox_launcher.set_active(2)
 
             for i, row in enumerate(model_runner):
                 if row[0] == game_runner:
@@ -2317,11 +2317,12 @@ class Main(Gtk.ApplicationWindow):
             if not add_game_dialog.validate_fields(entry="path+prefix"):
                 # If fields are not validated, return and keep the dialog open
                 return True
+            launcher_id = add_game_dialog.combobox_launcher.get_active_id()
 
             # Proceed with adding the game
             # Get game information from dialog fields
             prefix = os.path.normpath(add_game_dialog.entry_prefix.get_text())
-            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1 or add_game_dialog.combobox_launcher.get_active() == 2:
+            if launcher_id in ("windows", "linux", "steam"):
                 title = add_game_dialog.entry_title.get_text()
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
@@ -2356,17 +2357,17 @@ class Main(Gtk.ApplicationWindow):
             hidden = False
             favorite = False
 
-            if add_game_dialog.combobox_launcher.get_active() == 3:
+            if launcher_id == "battle":
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
-            if add_game_dialog.combobox_launcher.get_active() == 4:
+            if launcher_id == "ea":
                 path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
-            if add_game_dialog.combobox_launcher.get_active() == 5:
+            if launcher_id == "epic":
                 path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
-            if add_game_dialog.combobox_launcher.get_active() == 6:
+            if launcher_id == "ubisoft":
                 path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
-            if add_game_dialog.combobox_launcher.get_active() == 7:
+            if launcher_id == "rockstar":
                 path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
-            if add_game_dialog.combobox_launcher.get_active() == 8:
+            if launcher_id == "wargaming":
                 path = f"{prefix}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
 
             title_formatted = format_title(title)
@@ -2386,9 +2387,9 @@ class Main(Gtk.ApplicationWindow):
                 banner = ""
 
             runner = convert_runner(runner)
-            if add_game_dialog.combobox_launcher.get_active() == 1:
+            if launcher_id == "linux":
                 runner = "Linux-Native"
-            if add_game_dialog.combobox_launcher.get_active() == 2:
+            if launcher_id == "steam":
                 runner = "Steam"
 
             # Determine mangohud and gamemode status
@@ -2451,34 +2452,18 @@ class Main(Gtk.ApplicationWindow):
                 except socket.gaierror:
                     return False
 
-            if add_game_dialog.combobox_launcher.get_active() != 0 and add_game_dialog.combobox_launcher.get_active() != 1:
+            if launcher_id not in ("windows", "linux", "steam"):
                 if not check_internet_connection():
                     self.show_warning_dialog(add_game_dialog, _("No internet connection."), "")
                     return True
-                else:
-                    if add_game_dialog.combobox_launcher.get_active() == 3:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "3", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-                    if add_game_dialog.combobox_launcher.get_active() == 4:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "4", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combobox_launcher.get_active() == 5:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "5", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combobox_launcher.get_active() == 6:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "6", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combobox_launcher.get_active() == 7:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "7", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
-
-                    if add_game_dialog.combobox_launcher.get_active() == 8:
-                        add_game_dialog.destroy()
-                        self.launcher_screen(title, "8", title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+                if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
+                    add_game_dialog.destroy()
+                    self.launcher_screen(
+                        title, launcher_id, title_formatted, runner, prefix, umu_run,
+                        game, desktop_shortcut_state, appmenu_shortcut_state,
+                        steam_shortcut_state, icon_temp, icon_final
+                    )
 
             game_info = {
                 "gameid": title_formatted,
@@ -2527,7 +2512,7 @@ class Main(Gtk.ApplicationWindow):
 
             self.games.append(game)
 
-            if add_game_dialog.combobox_launcher.get_active() == 0 or add_game_dialog.combobox_launcher.get_active() == 1 or add_game_dialog.combobox_launcher.get_active() == 2:
+            if launcher_id in ("windows", "linux", "steam"):
                 # Call add_remove_shortcut method
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
@@ -2609,32 +2594,32 @@ class Main(Gtk.ApplicationWindow):
         self.button_finish_install.set_size_request(150, -1)
         self.button_finish_install.set_halign(Gtk.Align.CENTER)
 
-        if launcher == "3":
+        if launcher == "battle":
             image_path = battle_icon
             self.label_download.set_text(_("Downloading") + " Battle.net...")
             self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "4":
+        elif launcher == "ea":
             image_path = ea_icon
             self.label_download.set_text(_("Downloading") + " EA App...")
             self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "5":
+        elif launcher == "epic":
             image_path = epic_icon
             self.label_download.set_text(_("Downloading") + " Epic Games...")
             self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "6":
+        elif launcher == "ubisoft":
             image_path = ubisoft_icon
             self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
             self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "7":
+        elif launcher == "rockstar":
             image_path = rockstar_icon
             self.label_download.set_text(_("Downloading") + " Rockstar Launcher...")
             self.download_launcher("rockstar", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        elif launcher == "8":
+        elif launcher == "wargaming":
             image_path = wargaming_icon
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
             self.download_launcher("wargaming", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
@@ -2843,9 +2828,9 @@ class Main(Gtk.ApplicationWindow):
                     print(f"Error resizing banner: {e}")
 
             game.runner = convert_runner(game.runner)
-            if edit_game_dialog.combobox_launcher.get_active() == 1:
+            if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
-            if edit_game_dialog.combobox_launcher.get_active() == 2:
+            if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
                 game.runner = "Steam"
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
@@ -5356,7 +5341,7 @@ class AddGame(Gtk.Dialog):
         self.box.add(bottom_box)
 
         self.populate_combobox_with_launchers()
-        self.combobox_launcher.set_active(0)
+        self.combobox_launcher.set_active_id("windows")
         self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
         self.combobox_steam_title.connect("changed", self.on_combobox_steam_changed)
@@ -5982,7 +5967,7 @@ class AddGame(Gtk.Dialog):
         filechooser.destroy()
 
     def on_combobox_changed(self, combobox):
-        active_index = combobox.get_active()
+        active_id = combobox.get_active_id()
 
         def cleanup_fields():
             self.entry_title.set_text("")
@@ -6016,7 +6001,7 @@ class AddGame(Gtk.Dialog):
 
         cleanup_fields()
 
-        if active_index == 0:
+        if active_id == "windows":
             self.grid_title.set_visible(True)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
@@ -6034,7 +6019,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        if active_index == 1:
+        if active_id == "linux":
             self.grid_title.set_visible(True)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
@@ -6053,7 +6038,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        if active_index == 2:
+        if active_id == "steam":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(True)
             self.grid_path.set_visible(False)
@@ -6072,7 +6057,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(False)
             self.tab_box2.set_visible(False)
             self.notebook.set_show_tabs(False)
-        elif active_index == 3:
+        elif active_id == "battle":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6099,7 +6084,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        elif active_index == 4:
+        elif active_id == "ea":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6126,7 +6111,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        elif active_index == 5:
+        elif active_id == "epic":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6152,7 +6137,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        elif active_index == 6:
+        elif active_id == "ubisoft":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6179,7 +6164,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        elif active_index == 7:
+        elif active_id == "rockstar":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6206,7 +6191,7 @@ class AddGame(Gtk.Dialog):
             self.grid_page2.set_visible(True)
             self.tab_box2.set_visible(True)
             self.notebook.set_show_tabs(True)
-        elif active_index == 8:
+        elif active_id == "wargaming":
             self.grid_title.set_visible(False)
             self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(False)
@@ -6242,15 +6227,15 @@ class AddGame(Gtk.Dialog):
                 self.image_banner2.set_from_pixbuf(pixbuf)
 
     def populate_combobox_with_launchers(self):
-        self.combobox_launcher.append_text(_("Windows Game"))
-        self.combobox_launcher.append_text(_("Linux Game"))
-        self.combobox_launcher.append_text(_("Steam Game"))
-        self.combobox_launcher.append_text("Battle.net")
-        self.combobox_launcher.append_text("EA App")
-        self.combobox_launcher.append_text("Epic Games")
-        self.combobox_launcher.append_text("Ubisoft Connect")
-        self.combobox_launcher.append_text("Rockstar Launcher")
-        self.combobox_launcher.append_text("Wargaming Game Center")
+        self.combobox_launcher.append("windows", _("Windows Game"))
+        self.combobox_launcher.append("linux", _("Linux Game"))
+        self.combobox_launcher.append("steam", _("Steam Game"))
+        self.combobox_launcher.append("battle", "Battle.net")
+        #self.combobox_launcher.append("ea", "EA App")
+        self.combobox_launcher.append("epic", "Epic Games")
+        self.combobox_launcher.append("rockstar", "Rockstar Launcher")
+        self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
+        self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runners(self):
         # List of default entries
@@ -6730,7 +6715,7 @@ class AddGame(Gtk.Dialog):
 
         filechooser.set_current_folder(initial_folder)
 
-        if self.combobox_launcher.get_active() != 1:
+        if self.combobox_launcher.get_active_id() != "linux":
             windows_filter = Gtk.FileFilter()
             windows_filter.set_name(_("Windows files"))
             windows_filter.add_pattern("*.exe")
