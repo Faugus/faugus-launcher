@@ -641,53 +641,37 @@ class FaugusRun:
             if self.splash_window is None:
                 self.show_splash_window()
             self.splash_window.show_all()
-        if "Updating UMU-Launcher..." in clean_line:
-            self.label.set_text(_("Updating UMU-Launcher..."))
-        if "UMU-Launcher is up to date." in clean_line:
-            self.label.set_text(_("UMU-Launcher is up to date"))
-        if "Updating BattlEye..." in clean_line:
-            self.label.set_text(_("Updating BattlEye..."))
-        if "Updating Easy Anti-Cheat..." in clean_line:
-            self.label.set_text(_("Updating Easy Anti-Cheat..."))
-        if "Components are up to date." in clean_line:
-            self.label.set_text(_("Components are up to date"))
-        if "Downloading UMU-Proton" in clean_line:
-            self.label.set_text(_("Downloading UMU-Proton..."))
-        if "Downloading steamrt3 (latest)" in clean_line:
-            self.label.set_text(_("Downloading Steam Runtime..."))
-        if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-            self.label.set_text(_("Extracting Steam Runtime..."))
-        if "Extracting UMU-Proton" in clean_line:
-            self.label.set_text(_("Extracting UMU-Proton..."))
-        if "UMU-Proton is up to date" in clean_line:
-            self.label.set_text(_("UMU-Proton is up to date"))
-        if "steamrt3 is up to date" in clean_line:
-            self.label.set_text(_("Steam Runtime is up to date"))
-        if "->" in clean_line and "GE-Proton" in clean_line:
-            self.label.set_text(_("GE-Proton is up to date"))
-        if "->" in clean_line and "UMU-Proton" in clean_line:
-            self.label.set_text(_("UMU-Proton is up to date"))
-        if "mtree is OK" in clean_line:
-            self.label.set_text(_("Steam Runtime is up to date"))
 
-        if "Downloading GE-Proton" in clean_line:
-            self.label.set_text(_("Downloading GE-Proton..."))
-        if "Extracting GE-Proton" in clean_line:
-            self.label.set_text(_("Extracting GE-Proton..."))
-        if "GE-Proton is up to date" in clean_line:
-            self.label.set_text(_("GE-Proton is up to date"))
-        if "Downloading Proton-EM" in clean_line:
-            self.label.set_text(_("Downloading Proton-EM..."))
-        if "Extracting Proton-EM" in clean_line:
-            self.label.set_text(_("Extracting Proton-EM..."))
-        if "Proton-EM is up to date" in clean_line:
-            self.label.set_text(_("Proton-EM is up to date"))
-        if "Downloading Proton-CachyOS" in clean_line:
-            self.label.set_text(_("Downloading Proton-CachyOS..."))
-        if "Extracting Proton-CachyOS" in clean_line:
-            self.label.set_text(_("Extracting Proton-CachyOS..."))
-        if "Proton-CachyOS is up to date" in clean_line:
-            self.label.set_text(_("Proton-CachyOS is up to date"))
+        component = None
+
+        if "UMU-Launcher" in clean_line:
+            component = "UMU-Launcher"
+        elif "BattlEye" in clean_line:
+            component = "BattlEye"
+        elif "Easy Anti-Cheat" in clean_line:
+            component = "Easy Anti-Cheat"
+        elif "UMU-Proton" in clean_line:
+            component = "UMU-Proton"
+        elif "GE-Proton" in clean_line:
+            component = "GE-Proton"
+        elif "Proton-EM" in clean_line:
+            component = "Proton-EM"
+        elif "Proton-CachyOS" in clean_line:
+            component = "Proton-CachyOS"
+        elif "steamrt3" in clean_line or "SteamLinuxRuntime" in clean_line:
+            component = "Steam Runtime"
+
+        if component:
+            if "Downloading" in clean_line:
+                self.label.set_text(_("Downloading") + f" {component}...")
+            elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
+                self.label.set_text(_("Extracting") + f" {component}...")
+            elif (
+                "is up to date" in clean_line
+                or "mtree is OK" in clean_line
+                or ("->" in clean_line and component in clean_line)
+            ):
+                self.label.set_text(f"{component} " + _("is up to date"))
 
         if "network error" in clean_line:
             self.show_error_dialog(network_error=True)
