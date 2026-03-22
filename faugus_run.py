@@ -10,8 +10,6 @@ import time
 import shlex
 import gettext
 import signal
-import shutil
-import webbrowser
 
 gi.require_version("Gtk", "3.0")
 
@@ -317,8 +315,10 @@ class FaugusRun:
             self.process.pid,
             self.on_process_exit
         )
+        Thread(target=self._watch_game_process, daemon=True).start()
 
     def show_donate_dialog(self):
+        import webbrowser
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
         dialog.set_resizable(False)
@@ -692,19 +692,28 @@ class FaugusRun:
         if "network error" in clean_line:
             self.show_error_dialog(network_error=True)
 
-        if (
-            "fsync" in clean_line
-            or "NTSync" in clean_line
-            or "Using winetricks" in clean_line
-            or "Selected GPU" in clean_line
-            or "Skipping fix execution" in clean_line
-            or "Executable a unix path" in clean_line
-            or "status: 0" in clean_line
-            or "PosixPath" in clean_line
-            or "SingleInstance" in clean_line
-            or "mtree is OK" in clean_line
-        ):
-            GLib.timeout_add_seconds(0, self.close_splash_window)
+    def _watch_game_process(self):
+        import psutil
+
+        try:
+            parent = psutil.Process(self.process.pid)
+        except:
+            return
+
+        ignore = ("bash", "sh", "python", "systemd-inhibit")
+
+        while True:
+            try:
+                for child in parent.children(recursive=True):
+                    name = child.name().lower()
+
+                    if any(x in name for x in ignore):
+                        continue
+
+                    GLib.idle_add(self.close_splash_window)
+                    return
+            except:
+                return
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
@@ -989,6 +998,7 @@ def is_apple_silicon():
 
 def main():
     if is_apple_silicon() and 'FAUGUS_MUVM' not in os.environ:
+        import shutil
         muvm_path = shutil.which('muvm')
         if muvm_path:
             env = os.environ.copy()
