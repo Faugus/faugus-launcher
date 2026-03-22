@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-22 14:26-0300\n"
-"PO-Revision-Date: 2026-03-22 14:30-0300\n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-22 16:24-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -22,52 +22,60 @@ msgstr ""
 msgid "Starting Steam game..."
 msgstr "Iniciando jogo da Steam..."
 
-#: /usr/bin/faugus-run:368
+#: /usr/bin/faugus-run:367
 msgid "Are you enjoying Faugus Launcher?"
 msgstr "Tá curtindo o Faugus Launcher?"
 
-#: /usr/bin/faugus-run:372
+#: /usr/bin/faugus-run:371
 msgid "Please consider donating"
 msgstr "Por favor considere fazer uma doação"
 
-#: /usr/bin/faugus-run:384
+#: /usr/bin/faugus-run:383
 msgid "Never show this message again"
 msgstr "Nunca mais exibir essa mensagem"
 
-#: /usr/bin/faugus-run:394
+#: /usr/bin/faugus-run:393
 msgid "Continue"
 msgstr "Continuar"
 
-#: /usr/bin/faugus-run:449
+#: /usr/bin/faugus-run:450
 msgid "Internet connection error."
 msgstr "Erro de conexão com a internet."
 
-#: /usr/bin/faugus-run:453
+#: /usr/bin/faugus-run:454
 #, python-format
 msgid "%s was not found."
 msgstr "%s não encontrado."
 
-#: /usr/bin/faugus-run:457
+#: /usr/bin/faugus-run:458
 msgid "Please install it or use another Proton version."
 msgstr "Por favor instale-o ou use outra versão do Proton."
 
-#: /usr/bin/faugus-run:464 /usr/bin/faugus-run:742
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
 msgid "Ok"
 msgstr "Confirmar"
 
-#: /usr/bin/faugus-run:666
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Componentes estão atualizados"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Atualizando"
+
+#: /usr/bin/faugus-run:673
 msgid "Downloading"
 msgstr "Baixando"
 
-#: /usr/bin/faugus-run:668
+#: /usr/bin/faugus-run:675
 msgid "Extracting"
 msgstr "Extraindo"
 
-#: /usr/bin/faugus-run:674
+#: /usr/bin/faugus-run:681
 msgid "is up to date"
 msgstr "está atualizado"
 
-#: /usr/bin/faugus-run:739
+#: /usr/bin/faugus-run:743
 msgid "The keys and values were successfully added to the registry."
 msgstr "As chaves e valores foram adicionados ao registro corretamente."
 
@@ -82,9 +90,6 @@ msgstr "As chaves e valores foram adicionados ao registro corretamente."
 
 #~ msgid "Updating Easy Anti-Cheat..."
 #~ msgstr "Atualizando Easy Anti-Cheat..."
-
-#~ msgid "Components are up to date"
-#~ msgstr "Componentes estão atualizados"
 
 #~ msgid "Downloading UMU-Proton..."
 #~ msgstr "Baixando UMU-Proton..."
