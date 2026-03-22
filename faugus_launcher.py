@@ -3215,7 +3215,6 @@ class Settings(Gtk.Dialog):
     def __init__(self, parent):
         # Initialize the Settings dialog
         super().__init__(title=_("Settings"), transient_for=parent, modal=True)
-        import webbrowser
         self.set_resizable(False)
         self.parent = parent
         self.logging_warning = False
@@ -4462,9 +4461,11 @@ class Settings(Gtk.Dialog):
         return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
     def on_button_paypal_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
