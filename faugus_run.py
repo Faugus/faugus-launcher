@@ -645,6 +645,10 @@ class FaugusRun:
 
         component = None
 
+        if "Components are up to date" in clean_line:
+            self.label.set_text(_("Components are up to date"))
+            return
+
         if "UMU-Launcher" in clean_line:
             component = "UMU-Launcher"
         elif "BattlEye" in clean_line:
@@ -663,7 +667,9 @@ class FaugusRun:
             component = "Steam Runtime"
 
         if component:
-            if "Downloading" in clean_line:
+            if "Updating" in clean_line:
+                self.label.set_text(_("Updating") + f" {component}...")
+            elif "Downloading" in clean_line:
                 self.label.set_text(_("Downloading") + f" {component}...")
             elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
                 self.label.set_text(_("Extracting") + f" {component}...")
@@ -673,9 +679,6 @@ class FaugusRun:
                 or ("->" in clean_line and component in clean_line)
             ):
                 self.label.set_text(f"{component} " + _("is up to date"))
-
-        if "network error" in clean_line:
-            self.show_error_dialog(network_error=True)
 
     def _watch_game_process(self):
         import psutil
