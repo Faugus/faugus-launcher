@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-22 13:53-0300\n"
+"POT-Creation-Date: 2026-03-22 14:26-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,90 +50,22 @@ msgstr ""
 msgid "Please install it or use another Proton version."
 msgstr ""
 
-#: /usr/bin/faugus-run:464 /usr/bin/faugus-run:758
+#: /usr/bin/faugus-run:464 /usr/bin/faugus-run:742
 msgid "Ok"
 msgstr ""
 
-#: /usr/bin/faugus-run:645
-msgid "Updating UMU-Launcher..."
+#: /usr/bin/faugus-run:666
+msgid "Downloading"
 msgstr ""
 
-#: /usr/bin/faugus-run:647
-msgid "UMU-Launcher is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:649
-msgid "Updating BattlEye..."
-msgstr ""
-
-#: /usr/bin/faugus-run:651
-msgid "Updating Easy Anti-Cheat..."
-msgstr ""
-
-#: /usr/bin/faugus-run:653
-msgid "Components are up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:655
-msgid "Downloading UMU-Proton..."
-msgstr ""
-
-#: /usr/bin/faugus-run:657
-msgid "Downloading Steam Runtime..."
-msgstr ""
-
-#: /usr/bin/faugus-run:659
-msgid "Extracting Steam Runtime..."
-msgstr ""
-
-#: /usr/bin/faugus-run:661
-msgid "Extracting UMU-Proton..."
-msgstr ""
-
-#: /usr/bin/faugus-run:663 /usr/bin/faugus-run:669
-msgid "UMU-Proton is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:665 /usr/bin/faugus-run:671
-msgid "Steam Runtime is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:667 /usr/bin/faugus-run:678
-msgid "GE-Proton is up to date"
+#: /usr/bin/faugus-run:668
+msgid "Extracting"
 msgstr ""
 
 #: /usr/bin/faugus-run:674
-msgid "Downloading GE-Proton..."
+msgid "is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:676
-msgid "Extracting GE-Proton..."
-msgstr ""
-
-#: /usr/bin/faugus-run:680
-msgid "Downloading Proton-EM..."
-msgstr ""
-
-#: /usr/bin/faugus-run:682
-msgid "Extracting Proton-EM..."
-msgstr ""
-
-#: /usr/bin/faugus-run:684
-msgid "Proton-EM is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:686
-msgid "Downloading Proton-CachyOS..."
-msgstr ""
-
-#: /usr/bin/faugus-run:688
-msgid "Extracting Proton-CachyOS..."
-msgstr ""
-
-#: /usr/bin/faugus-run:690
-msgid "Proton-CachyOS is up to date"
-msgstr ""
-
-#: /usr/bin/faugus-run:755
+#: /usr/bin/faugus-run:739
 msgid "The keys and values were successfully added to the registry."
 msgstr ""
