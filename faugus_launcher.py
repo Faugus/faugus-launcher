@@ -3,19 +3,14 @@
 import json
 import re
 import shutil
-import socket
 import subprocess
 import sys
 import threading
-import urllib.request
-import webbrowser
 import gi
 import psutil
-import requests
 import vdf
 import signal
 import gettext
-import unicodedata
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -145,6 +140,7 @@ def convert_runner(runner):
     return runner
 
 def _validate_text(entry):
+    import unicodedata
     text = entry.get_text()
     for i, c in enumerate(text):
         if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
@@ -2446,6 +2442,7 @@ class Main(Gtk.ApplicationWindow):
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
 
             def check_internet_connection():
+                import socket
                 try:
                     socket.gethostbyname("github.com")
                     return True
@@ -2725,6 +2722,7 @@ class Main(Gtk.ApplicationWindow):
 
             def start_download():
                 try:
+                    import urllib.request
                     urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
                     GLib.idle_add(self.bar_download.set_fraction, 1.0)
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
@@ -3217,6 +3215,7 @@ class Settings(Gtk.Dialog):
     def __init__(self, parent):
         # Initialize the Settings dialog
         super().__init__(title=_("Settings"), transient_for=parent, modal=True)
+        import webbrowser
         self.set_resizable(False)
         self.parent = parent
         self.logging_warning = False
@@ -5833,6 +5832,7 @@ class AddGame(Gtk.Dialog):
                     continue
 
                 try:
+                    import urllib.request
                     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
                     with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
                         f.write(r.read())
@@ -5893,6 +5893,7 @@ class AddGame(Gtk.Dialog):
         dialog_image.destroy()
 
     def get_banner(self):
+        import requests
         def fetch_banner():
             game_name = self.entry_title.get_text().strip()
             if not game_name:
@@ -6391,6 +6392,7 @@ class AddGame(Gtk.Dialog):
         filechooser.destroy()
 
     def on_button_search_protonfix_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://umu.openwinecomponents.org/")
 
     def set_image_shortcut_icon(self):
