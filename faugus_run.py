@@ -318,7 +318,6 @@ class FaugusRun:
         Thread(target=self._watch_game_process, daemon=True).start()
 
     def show_donate_dialog(self):
-        import webbrowser
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
         dialog.set_resizable(False)
@@ -422,9 +421,11 @@ class FaugusRun:
             self.cfg.save_config()
 
     def on_button_kofi_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
     def on_button_paypal_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def show_error_dialog(self, protonpath=None, network_error=False):
