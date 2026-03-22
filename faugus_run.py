@@ -35,7 +35,7 @@ else:
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_dir = PathManager.user_config('faugus-launcher/games.json')
+games_json = PathManager.user_config('faugus-launcher/games.json')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
@@ -168,7 +168,7 @@ class FaugusRun:
                 set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "umu-sniper":
+        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -189,6 +189,11 @@ class FaugusRun:
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
             steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-GE Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        if protonpath == "Proton-CachyOS Latest":
+            self.proton_latest = "--cachyos"
+            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-CachyOS Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         self.components_exists = (
@@ -677,6 +682,12 @@ class FaugusRun:
             self.label.set_text(_("Extracting Proton-EM..."))
         if "Proton-EM is up to date" in clean_line:
             self.label.set_text(_("Proton-EM is up to date"))
+        if "Downloading Proton-CachyOS" in clean_line:
+            self.label.set_text(_("Downloading Proton-CachyOS..."))
+        if "Extracting Proton-CachyOS" in clean_line:
+            self.label.set_text(_("Extracting Proton-CachyOS..."))
+        if "Proton-CachyOS is up to date" in clean_line:
+            self.label.set_text(_("Proton-CachyOS is up to date"))
 
         if "network error" in clean_line:
             self.show_error_dialog(network_error=True)
@@ -791,9 +802,9 @@ class FaugusRun:
 
         game_id = os.environ.get("GAMEID")
 
-        if game_id and os.path.exists(games_dir):
+        if game_id and os.path.exists(games_json):
             try:
-                with open(games_dir, "r", encoding="utf-8") as f:
+                with open(games_json, "r", encoding="utf-8") as f:
                     games = json.load(f)
 
                 for game in games:
@@ -802,7 +813,7 @@ class FaugusRun:
                         game["playtime"] = old_time + runtime
                         break
 
-                with open(games_dir, "w", encoding="utf-8") as f:
+                with open(games_json, "w", encoding="utf-8") as f:
                     json.dump(games, f, indent=4)
 
             except Exception as e:
@@ -881,7 +892,7 @@ def build_launch_command(game):
     if runner:
         if runner == "Linux-Native":
             command_parts.append('PROTONPATH=umu-sniper')
-        elif runner == "Proton-CachyOS":
+        elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
@@ -944,11 +955,11 @@ def build_launch_command(game):
     return " ".join(command_parts)
 
 def load_game_from_json(gameid):
-    if not os.path.exists(games_dir):
+    if not os.path.exists(games_json):
         return None
 
     try:
-        with open(games_dir, "r", encoding="utf-8") as f:
+        with open(games_json, "r", encoding="utf-8") as f:
             games = json.load(f)
     except json.JSONDecodeError:
         return None
@@ -1003,5 +1014,26 @@ def main():
     else:
         FaugusRun(args.message, args.command).run()
 
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
 if __name__ == "__main__":
+    update_games_json()
     main()

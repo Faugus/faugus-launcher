@@ -150,6 +150,28 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_em.show_all()
         self.notebook.append_page(scroll_em, tab_box_em)
 
+        # Tab 3: CachyOS Proton
+        self.grid_cachyos = Gtk.Grid()
+        self.grid_cachyos.set_hexpand(True)
+        self.grid_cachyos.set_row_spacing(5)
+        self.grid_cachyos.set_column_spacing(10)
+        scroll_cachyos = Gtk.ScrolledWindow()
+        scroll_cachyos.set_size_request(400, 400)
+        scroll_cachyos.set_margin_top(10)
+        scroll_cachyos.set_margin_bottom(10)
+        scroll_cachyos.set_margin_start(10)
+        scroll_cachyos.set_margin_end(10)
+        scroll_cachyos.add(self.grid_cachyos)
+
+        tab_box_cachyos = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label_cachyos = Gtk.Label(label="Proton-CachyOS")
+        tab_label_cachyos.set_width_chars(15)
+        tab_label_cachyos.set_xalign(0.5)
+        tab_box_cachyos.pack_start(tab_label_cachyos, True, True, 0)
+        tab_box_cachyos.set_hexpand(True)
+        tab_box_cachyos.show_all()
+        self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
+
         self.load_config()
         self.get_releases()
         self.show_all()
@@ -167,6 +189,10 @@ class ProtonDownloader(Gtk.Dialog):
 
         threading.Thread(target=self.fetch_releases_from_url,
                          args=("https://api.github.com/repos/Etaash-mathamsetty/Proton/releases", self.grid_em),
+                         daemon=True).start()
+
+        threading.Thread(target=self.fetch_releases_from_url,
+                         args=("https://api.github.com/repos/CachyOS/proton-cachyos/releases", self.grid_cachyos),
                          daemon=True).start()
 
     def fetch_releases_from_url(self, url, grid):
@@ -201,6 +227,10 @@ class ProtonDownloader(Gtk.Dialog):
                         if not tag_name.startswith("EM-"):
                             continue
 
+                    elif "CachyOS" in url:
+                        if not tag_name.startswith("cachyos-"):
+                            continue
+
                     assets = release.get("assets", [])
                     has_valid_asset = any(
                         asset["name"].endswith((".tar.gz", ".tar.xz"))
@@ -217,7 +247,12 @@ class ProtonDownloader(Gtk.Dialog):
 
     def add_release_to_grid(self, release, grid):
         tag_name = release["tag_name"]
-        display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
+        if tag_name.startswith("cachyos-"):
+            display_tag_name = f"Proton-CachyOS-{tag_name.replace('cachyos-', '')}"
+        elif tag_name.startswith("EM-"):
+            display_tag_name = f"proton-{tag_name}"
+        else:
+            display_tag_name = tag_name
 
         row_index = len(grid.get_children()) // 2
 
@@ -237,18 +272,24 @@ class ProtonDownloader(Gtk.Dialog):
         grid.show_all()
 
     def get_installed_path(self, tag_name):
-        tag_lower = tag_name.lower()
+            tag_lower = tag_name.lower()
 
-        if STEAM_COMPATIBILITY_PATH.exists():
-            for folder in STEAM_COMPATIBILITY_PATH.iterdir():
-                folder_name_lower = folder.name.lower()
-                if folder_name_lower.endswith(tag_lower):
-                    return folder
-                if tag_lower.startswith("proton-"):
-                    if folder_name_lower.endswith(tag_lower[len("proton-"):]):
+            if STEAM_COMPATIBILITY_PATH.exists():
+                for folder in STEAM_COMPATIBILITY_PATH.iterdir():
+                    folder_name_lower = folder.name.lower()
+
+                    if folder_name_lower.endswith(tag_lower):
                         return folder
+                    if tag_lower.startswith("proton-"):
+                        if folder_name_lower.endswith(tag_lower[len("proton-"):]):
+                            return folder
 
-        return STEAM_COMPATIBILITY_PATH / tag_name
+                    if "cachyos" in tag_lower:
+                        base_tag = tag_lower.replace("proton-cachyos-", "cachyos-").replace("proton-", "")
+                        if base_tag in folder_name_lower:
+                            return folder
+
+            return STEAM_COMPATIBILITY_PATH / tag_name
 
     def update_button(self, button, new_label):
         button.set_label(new_label)
@@ -269,28 +310,42 @@ class ProtonDownloader(Gtk.Dialog):
             self.on_download_clicked(widget, release)
 
     def disable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em):
+        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos):
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(False)
 
     def enable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em):
+        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos):
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(True)
 
     def on_download_clicked(self, widget, release):
-        self.disable_all_buttons()
-        for asset in release["assets"]:
-            if asset["name"].endswith((".tar.gz", ".tar.xz")):
+            self.disable_all_buttons()
+
+            selected_asset = None
+            for asset in release["assets"]:
+                name = asset["name"]
+                if name.endswith((".tar.gz", ".tar.xz")):
+                    if "cachyos" in name.lower():
+                        if name.endswith("x86_64.tar.xz") or name.endswith("x86_64.tar.gz"):
+                            selected_asset = asset
+                            break
+                    else:
+                        selected_asset = asset
+                        break
+
+            if selected_asset:
                 self.download_and_extract(
-                    asset["browser_download_url"],
-                    asset["name"],
+                    selected_asset["browser_download_url"],
+                    selected_asset["name"],
                     release["tag_name"],
                     widget
                 )
-                break
+            else:
+                print(release['tag_name'])
+                self.enable_all_buttons()
 
     def download_and_extract(self, url, filename, tag_name, button):
         button.set_label(_("Downloading..."))

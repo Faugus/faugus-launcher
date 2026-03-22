@@ -3957,8 +3957,9 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest")
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
-            self.combobox_runner.append_text("Proton-CachyOS")
+            self.combobox_runner.append_text("Proton-CachyOS (System)")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -3980,6 +3981,7 @@ class Settings(Gtk.Dialog):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
 
@@ -6242,8 +6244,9 @@ class AddGame(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest")
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
-            self.combobox_runner.append_text("Proton-CachyOS")
+            self.combobox_runner.append_text("Proton-CachyOS (System)")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -6265,6 +6268,7 @@ class AddGame(Gtk.Dialog):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
 
@@ -6914,5 +6918,26 @@ def main():
     app = FaugusApp(start_hidden)
     app.run(sys.argv)
 
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
 if __name__ == "__main__":
+    update_games_json()
     main()
