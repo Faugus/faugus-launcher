@@ -8,57 +8,61 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 14:08-0300\n"
-"PO-Revision-Date: 2026-02-26 13:12+0800\n"
+"POT-Creation-Date: 2026-03-22 14:10-0300\n"
+"PO-Revision-Date: 2026-03-23 12:58+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
-#: /usr/bin/faugus-launcher:228 /usr/bin/faugus-launcher:850
+#: /usr/bin/faugus-launcher:232 /usr/bin/faugus-launcher:853
 msgid "Play"
 msgstr "遊玩"
 
-#: /usr/bin/faugus-launcher:232
+#: /usr/bin/faugus-launcher:236
 msgid "Edit"
 msgstr "編輯"
 
-#: /usr/bin/faugus-launcher:236
+#: /usr/bin/faugus-launcher:240
 msgid "Delete"
 msgstr "刪除"
 
-#: /usr/bin/faugus-launcher:240
+#: /usr/bin/faugus-launcher:244
 msgid "Duplicate"
 msgstr "建立副本"
 
-#: /usr/bin/faugus-launcher:244 /usr/bin/faugus-launcher:824
+#: /usr/bin/faugus-launcher:248 /usr/bin/faugus-launcher:824
 msgid "Hide"
 msgstr "隱藏"
 
-#: /usr/bin/faugus-launcher:248 /usr/bin/faugus-launcher:829
+#: /usr/bin/faugus-launcher:252 /usr/bin/faugus-launcher:829
 msgid "Add to favorites"
 msgstr "加到最愛"
 
-#: /usr/bin/faugus-launcher:252
+#: /usr/bin/faugus-launcher:256
 msgid "Open game location"
 msgstr "開啟遊戲位置"
 
-#: /usr/bin/faugus-launcher:256
+#: /usr/bin/faugus-launcher:260
 msgid "Open prefix location"
 msgstr "開啟前綴位置"
 
-#: /usr/bin/faugus-launcher:260
+#: /usr/bin/faugus-launcher:264
+msgid "Run file inside the prefix"
+msgstr "在此前綴中運行檔案"
+
+#: /usr/bin/faugus-launcher:268
 msgid "Show logs"
 msgstr "顯示紀錄"
 
-#: /usr/bin/faugus-launcher:318
+#: /usr/bin/faugus-launcher:337
 msgid "Open Faugus Launcher"
 msgstr "開啟 Faugus 啟動器"
 
-#: /usr/bin/faugus-launcher:322
+#: /usr/bin/faugus-launcher:341
 msgid "Quit"
 msgstr "離開"
 
@@ -90,640 +94,658 @@ msgstr "從隱藏移除"
 msgid "Remove from favorites"
 msgstr "從最愛移除"
 
-#: /usr/bin/faugus-launcher:848
+#: /usr/bin/faugus-launcher:851
 msgid "Stop"
 msgstr "停止"
 
-#: /usr/bin/faugus-launcher:883
+#: /usr/bin/faugus-launcher:886
 msgid "hour"
 msgstr "小時"
 
-#: /usr/bin/faugus-launcher:884
+#: /usr/bin/faugus-launcher:887
 msgid "hours"
 msgstr "小時"
 
-#: /usr/bin/faugus-launcher:885
+#: /usr/bin/faugus-launcher:888
 msgid "minute"
 msgstr "分鐘"
 
-#: /usr/bin/faugus-launcher:886
+#: /usr/bin/faugus-launcher:889
 msgid "minutes"
 msgstr "分鐘"
 
-#: /usr/bin/faugus-launcher:990
+#: /usr/bin/faugus-launcher:997 /usr/bin/faugus-launcher:4193
+#: /usr/bin/faugus-launcher:6322
+msgid "Select a file to run inside the prefix"
+msgstr "選取一個檔案在此前綴中運行"
+
+#: /usr/bin/faugus-launcher:1000 /usr/bin/faugus-launcher:4196
+#: /usr/bin/faugus-launcher:4322 /usr/bin/faugus-launcher:4475
+#: /usr/bin/faugus-launcher:4498 /usr/bin/faugus-launcher:5749
+#: /usr/bin/faugus-launcher:5943 /usr/bin/faugus-launcher:6325
+#: /usr/bin/faugus-launcher:6455 /usr/bin/faugus-launcher:6718
+#: /usr/bin/faugus-launcher:6791
+msgid "Open"
+msgstr "開啟"
+
+#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:3513
+#: /usr/bin/faugus-launcher:4197 /usr/bin/faugus-launcher:4290
+#: /usr/bin/faugus-launcher:4323 /usr/bin/faugus-launcher:4476
+#: /usr/bin/faugus-launcher:4499 /usr/bin/faugus-launcher:4688
+#: /usr/bin/faugus-launcher:5152 /usr/bin/faugus-launcher:5522
+#: /usr/bin/faugus-launcher:5658 /usr/bin/faugus-launcher:5750
+#: /usr/bin/faugus-launcher:5794 /usr/bin/faugus-launcher:5944
+#: /usr/bin/faugus-launcher:6326 /usr/bin/faugus-launcher:6456
+#: /usr/bin/faugus-launcher:6719 /usr/bin/faugus-launcher:6792
+msgid "Cancel"
+msgstr "取消"
+
+#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:4201
+#: /usr/bin/faugus-launcher:5948 /usr/bin/faugus-launcher:6330
+#: /usr/bin/faugus-launcher:6726
+msgid "Windows files"
+msgstr "Windows 檔案"
+
+#: /usr/bin/faugus-launcher:1013 /usr/bin/faugus-launcher:4209
+#: /usr/bin/faugus-launcher:5956 /usr/bin/faugus-launcher:6338
+#: /usr/bin/faugus-launcher:6734
+msgid "All files"
+msgstr "所有檔案"
+
+#: /usr/bin/faugus-launcher:1059
 #, python-format
 msgid "%s Logs"
 msgstr "%s 紀錄"
 
-#: /usr/bin/faugus-launcher:1030
+#: /usr/bin/faugus-launcher:1098
 msgid "Copy to clipboard"
 msgstr "複製至剪貼簿"
 
-#: /usr/bin/faugus-launcher:1034
+#: /usr/bin/faugus-launcher:1102
 msgid "Open file location"
 msgstr "開啟檔案位置"
 
-#: /usr/bin/faugus-launcher:1118 /usr/bin/faugus-launcher:2251
+#: /usr/bin/faugus-launcher:1186 /usr/bin/faugus-launcher:2333
 #, python-format
 msgid "%s already exists."
 msgstr "%s 已經存在。"
 
-#: /usr/bin/faugus-launcher:1344
+#: /usr/bin/faugus-launcher:1413
 #, python-format
 msgid "%s is already running."
 msgstr "%s 已經在運行。"
 
-#: /usr/bin/faugus-launcher:1347 /usr/bin/faugus-launcher:2195
-#: /usr/bin/faugus-launcher:3433 /usr/bin/faugus-launcher:4322
-#: /usr/bin/faugus-launcher:4634 /usr/bin/faugus-launcher:4677
-#: /usr/bin/faugus-launcher:5103 /usr/bin/faugus-launcher:5495
-#: /usr/bin/faugus-launcher:5623 /usr/bin/faugus-launcher:5695
-#: /usr/bin/faugus-launcher:6296
+#: /usr/bin/faugus-launcher:1416 /usr/bin/faugus-launcher:2276
+#: /usr/bin/faugus-launcher:3518 /usr/bin/faugus-launcher:4384
+#: /usr/bin/faugus-launcher:4692 /usr/bin/faugus-launcher:4734
+#: /usr/bin/faugus-launcher:5157 /usr/bin/faugus-launcher:5527
+#: /usr/bin/faugus-launcher:5663 /usr/bin/faugus-launcher:5790
+#: /usr/bin/faugus-launcher:5862 /usr/bin/faugus-launcher:6489
 msgid "Ok"
 msgstr "好"
 
-#: /usr/bin/faugus-launcher:1670
+#: /usr/bin/faugus-launcher:1742
 msgid "Proton may generate huge log files."
 msgstr "Proton 可能會產生大量紀錄檔案。"
 
-#: /usr/bin/faugus-launcher:1670
+#: /usr/bin/faugus-launcher:1742
 msgid "Enable logging only when debugging a problem."
 msgstr "只在問題除錯時啟用紀錄。"
 
-#: /usr/bin/faugus-launcher:1963
+#: /usr/bin/faugus-launcher:2050
 #, python-format
 msgid "Edit %s"
 msgstr "編輯 %s"
 
-#: /usr/bin/faugus-launcher:2021 /usr/bin/faugus-launcher:5334
+#: /usr/bin/faugus-launcher:2107 /usr/bin/faugus-launcher:5386
 msgid ""
 "Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
 "USERS FOUND."
 msgstr ""
 "在 Steam 中增加或移除捷徑。需要重新啟動 Steam。沒有找到 Steam 使用者。"
 
-#: /usr/bin/faugus-launcher:2032 /usr/bin/faugus-launcher:2034
-#: /usr/bin/faugus-launcher:2036
+#: /usr/bin/faugus-launcher:2118
 #, python-format
 msgid "%s is running. Please close it first."
 msgstr "%s 正在運行。請先將它關閉。"
 
-#: /usr/bin/faugus-launcher:2111
+#: /usr/bin/faugus-launcher:2193
 msgid "Failed to remove prefix."
 msgstr "移除前綴失敗。"
 
-#: /usr/bin/faugus-launcher:2365
+#: /usr/bin/faugus-launcher:2454
 msgid "No internet connection."
 msgstr "沒有網路連線。"
 
-#: /usr/bin/faugus-launcher:2487 /usr/bin/faugus-launcher:2635
+#: /usr/bin/faugus-launcher:2578 /usr/bin/faugus-launcher:2734
 #, python-format
 msgid "Installing %s..."
 msgstr "正在安裝 %s..."
 
-#: /usr/bin/faugus-launcher:2498
+#: /usr/bin/faugus-launcher:2589
 msgid "Finish installation"
 msgstr "完成安裝"
 
-#: /usr/bin/faugus-launcher:2505
-msgid "Downloading Battle.net..."
-msgstr "正在下載 Battle.net..."
+#: /usr/bin/faugus-launcher:2596 /usr/bin/faugus-launcher:2601
+#: /usr/bin/faugus-launcher:2606 /usr/bin/faugus-launcher:2611
+#: /usr/bin/faugus-launcher:2616 /usr/bin/faugus-launcher:2621
+msgid "Downloading"
+msgstr "正在下載"
 
-#: /usr/bin/faugus-launcher:2510
-msgid "Downloading EA App..."
-msgstr "正在下載 EA App..."
-
-#: /usr/bin/faugus-launcher:2515
-msgid "Downloading Epic Games..."
-msgstr "正在下載 Epic Games..."
-
-#: /usr/bin/faugus-launcher:2520
-msgid "Downloading Ubisoft Connect..."
-msgstr "正在下載 Ubisoft Connect..."
-
-#: /usr/bin/faugus-launcher:2525
-msgid "Downloading Rockstar Launcher..."
-msgstr "正在下載 Rockstar Launcher..."
-
-#: /usr/bin/faugus-launcher:2587
+#: /usr/bin/faugus-launcher:2683
 #, python-format
 msgid "%s was not installed!"
 msgstr "沒有安裝 %s!"
 
-#: /usr/bin/faugus-launcher:2629
+#: /usr/bin/faugus-launcher:2728
 msgid "Download complete"
 msgstr "下載完成"
 
-#: /usr/bin/faugus-launcher:2632
+#: /usr/bin/faugus-launcher:2731
 #, python-format
 msgid "Error during download: %s"
 msgstr "下載時出錯：%s"
 
-#: /usr/bin/faugus-launcher:2637 /usr/bin/faugus-launcher:2640
-#: /usr/bin/faugus-launcher:2650
-msgid "Please close the login window and wait..."
-msgstr "請關閉登入視窗並等待..."
+#: /usr/bin/faugus-launcher:2736 /usr/bin/faugus-launcher:2739
+#: /usr/bin/faugus-launcher:2749
+msgid "Please close the login window and wait."
+msgstr "請關閉登入視窗並等待。"
 
-#: /usr/bin/faugus-launcher:2649
+#: /usr/bin/faugus-launcher:2748
 msgid "Please don't change the installation path."
 msgstr "請勿變更安裝路徑。"
 
-#: /usr/bin/faugus-launcher:3135
+#: /usr/bin/faugus-launcher:2752
+msgid "Please close Wargaming to finish the installation."
+msgstr "請關閉 Wargaming 來完成安裝。"
+
+#: /usr/bin/faugus-launcher:3217
 msgid "Settings"
 msgstr "設定"
 
-#: /usr/bin/faugus-launcher:3260
+#: /usr/bin/faugus-launcher:3342
 msgid "Language"
 msgstr "語言"
 
-#: /usr/bin/faugus-launcher:3265
+#: /usr/bin/faugus-launcher:3347
 msgid "Interface Mode"
 msgstr "介面模式"
 
-#: /usr/bin/faugus-launcher:3274
+#: /usr/bin/faugus-launcher:3351
+msgid "List"
+msgstr "列表"
+
+#: /usr/bin/faugus-launcher:3352
+msgid "Blocks"
+msgstr "方塊"
+
+#: /usr/bin/faugus-launcher:3353
+msgid "Banners"
+msgstr "橫幅"
+
+#: /usr/bin/faugus-launcher:3356
 msgid "Start maximized"
 msgstr "啟動時最大化"
 
-#: /usr/bin/faugus-launcher:3279
+#: /usr/bin/faugus-launcher:3361
 msgid "Start in fullscreen"
 msgstr "以全螢幕啟動"
 
-#: /usr/bin/faugus-launcher:3282
+#: /usr/bin/faugus-launcher:3364
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter 會切換全螢幕"
 
-#: /usr/bin/faugus-launcher:3284
+#: /usr/bin/faugus-launcher:3366
 msgid "Show labels"
 msgstr "顯示標籤"
 
-#: /usr/bin/faugus-launcher:3287
+#: /usr/bin/faugus-launcher:3369
 msgid "Smaller banners"
 msgstr "較小橫幅"
 
-#: /usr/bin/faugus-launcher:3291
+#: /usr/bin/faugus-launcher:3373
 msgid "Default Prefixes Location"
 msgstr "預設前綴位置"
 
-#: /usr/bin/faugus-launcher:3295 /usr/bin/faugus-launcher:4986
+#: /usr/bin/faugus-launcher:3377 /usr/bin/faugus-launcher:5051
 msgid "/path/to/the/prefix"
 msgstr "/路徑/至/該/前綴"
 
-#: /usr/bin/faugus-launcher:3305
+#: /usr/bin/faugus-launcher:3387
 msgid "Lossless Scaling Location"
 msgstr "Lossless Scaling 位置"
 
-#: /usr/bin/faugus-launcher:3309
+#: /usr/bin/faugus-launcher:3391
 msgid "/path/to/Lossless.dll"
 msgstr "/路徑/至/Lossless.dll"
 
-#: /usr/bin/faugus-launcher:3318
+#: /usr/bin/faugus-launcher:3400
 msgid "Default Prefix Tools"
 msgstr "預設前綴工具"
 
-#: /usr/bin/faugus-launcher:3325
+#: /usr/bin/faugus-launcher:3407
 msgid "Default Proton"
 msgstr "預設 Proton"
 
-#: /usr/bin/faugus-launcher:3329
+#: /usr/bin/faugus-launcher:3411
 msgid "Proton Manager"
 msgstr "Proton 管理員"
 
-#: /usr/bin/faugus-launcher:3332
+#: /usr/bin/faugus-launcher:3414
 msgid "Miscellaneous"
 msgstr "雜項"
 
-#: /usr/bin/faugus-launcher:3339
+#: /usr/bin/faugus-launcher:3421
 msgid "Use discrete GPU"
 msgstr "使用獨立顯示卡"
 
-#: /usr/bin/faugus-launcher:3343
+#: /usr/bin/faugus-launcher:3425
 msgid "Close when running a game/app"
 msgstr "運行遊戲/程式時關閉"
 
-#: /usr/bin/faugus-launcher:3347
+#: /usr/bin/faugus-launcher:3429
 msgid "System tray icon"
 msgstr "系統匣圖示"
 
-#: /usr/bin/faugus-launcher:3352
+#: /usr/bin/faugus-launcher:3434
 msgid "Start on boot"
 msgstr "開機時啟動"
 
-#: /usr/bin/faugus-launcher:3356
+#: /usr/bin/faugus-launcher:3438
 msgid "Monochrome icon"
 msgstr "單色圖示"
 
-#: /usr/bin/faugus-launcher:3361
+#: /usr/bin/faugus-launcher:3443
 msgid "Disable splash window"
 msgstr "停用啟動視窗"
 
-#: /usr/bin/faugus-launcher:3365
+#: /usr/bin/faugus-launcher:3446
+msgid "Disable automatic updates"
+msgstr "停用自動更新"
+
+#: /usr/bin/faugus-launcher:3450
 msgid "Enable logging"
 msgstr "啟用紀錄"
 
-#: /usr/bin/faugus-launcher:3368
+#: /usr/bin/faugus-launcher:3453
 msgid "Show hidden games"
 msgstr "顯示隱藏遊戲"
 
-#: /usr/bin/faugus-launcher:3370
+#: /usr/bin/faugus-launcher:3455
 msgid "Press Ctrl+H to show/hide games."
-msgstr "按下 Ctrl+H 顯示/隱藏遊戲。"
+msgstr "按下 Ctrl+H 來顯示/隱藏遊戲。"
 
-#: /usr/bin/faugus-launcher:3372
+#: /usr/bin/faugus-launcher:3457
 msgid "Use Wayland driver (experimental)"
 msgstr "使用 Wayland 驅動 (實驗性)"
 
-#: /usr/bin/faugus-launcher:3374 /usr/bin/faugus-launcher:3380
+#: /usr/bin/faugus-launcher:3459 /usr/bin/faugus-launcher:3465
 msgid "Only works with GE-Proton10 or Proton-EM-10."
 msgstr "只在 GE-Proton10 或 Proton-EM-10 運作。"
 
-#: /usr/bin/faugus-launcher:3377
+#: /usr/bin/faugus-launcher:3462
 msgid "Enable HDR (experimental)"
 msgstr "啟用 HDR (實驗性)"
 
-#: /usr/bin/faugus-launcher:3382
+#: /usr/bin/faugus-launcher:3467
 msgid "Enable WOW64 (experimental)"
 msgstr "啟用 WOW64 (實驗性)"
 
-#: /usr/bin/faugus-launcher:3384
+#: /usr/bin/faugus-launcher:3469
 msgid ""
 "Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
 msgstr "只在 GE-Proton10 或更高及 Proton-EM-10 或更高運作。"
 
-#: /usr/bin/faugus-launcher:3397 /usr/bin/faugus-launcher:5070
+#: /usr/bin/faugus-launcher:3482 /usr/bin/faugus-launcher:5124
 msgid "Run"
 msgstr "運行"
 
-#: /usr/bin/faugus-launcher:3400 /usr/bin/faugus-launcher:5073
+#: /usr/bin/faugus-launcher:3485 /usr/bin/faugus-launcher:5127
 msgid "Run a file inside the prefix"
 msgstr "在此前綴中運行檔案"
 
-#: /usr/bin/faugus-launcher:3405 /usr/bin/faugus-launcher:5051
+#: /usr/bin/faugus-launcher:3490 /usr/bin/faugus-launcher:5105
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 msgstr "顯示一個監控 FPS、溫度、CPU/GPU 負載等等的疊層。"
 
-#: /usr/bin/faugus-launcher:3407 /usr/bin/faugus-launcher:5053
+#: /usr/bin/faugus-launcher:3492 /usr/bin/faugus-launcher:5107
 msgid "Tweaks your system to improve performance."
 msgstr "微調系統以增進效能。"
 
-#: /usr/bin/faugus-launcher:3408 /usr/bin/faugus-launcher:5054
+#: /usr/bin/faugus-launcher:3493 /usr/bin/faugus-launcher:5108
 msgid "Disable Hidraw"
 msgstr "停用 Hidraw"
 
-#: /usr/bin/faugus-launcher:3410 /usr/bin/faugus-launcher:5056
+#: /usr/bin/faugus-launcher:3495 /usr/bin/faugus-launcher:5110
 msgid ""
 "May fix controller issues with some games. Only works with GE-Proton10 or "
 "Proton-EM-10."
 msgstr "可能修復一些遊戲的控制器問題。只在 GE-Proton10 或 Proton-EM-10 運作。"
 
-#: /usr/bin/faugus-launcher:3411 /usr/bin/faugus-launcher:5057
+#: /usr/bin/faugus-launcher:3496 /usr/bin/faugus-launcher:5111
 msgid "Prevent Sleep"
 msgstr "防止睡眠"
 
-#: /usr/bin/faugus-launcher:3413
+#: /usr/bin/faugus-launcher:3498
 msgid "Support the Project"
 msgstr "支持本專案"
 
-#: /usr/bin/faugus-launcher:3428 /usr/bin/faugus-launcher:4134
-#: /usr/bin/faugus-launcher:4227 /usr/bin/faugus-launcher:4260
-#: /usr/bin/faugus-launcher:4415 /usr/bin/faugus-launcher:4438
-#: /usr/bin/faugus-launcher:4630 /usr/bin/faugus-launcher:5098
-#: /usr/bin/faugus-launcher:5490 /usr/bin/faugus-launcher:5582
-#: /usr/bin/faugus-launcher:5627 /usr/bin/faugus-launcher:5776
-#: /usr/bin/faugus-launcher:6127 /usr/bin/faugus-launcher:6262
-#: /usr/bin/faugus-launcher:6538 /usr/bin/faugus-launcher:6611
-msgid "Cancel"
-msgstr "取消"
-
-#: /usr/bin/faugus-launcher:3437
+#: /usr/bin/faugus-launcher:3522
 msgid "Backup/Restore Settings"
 msgstr "備份/回復設定"
 
-#: /usr/bin/faugus-launcher:3444
+#: /usr/bin/faugus-launcher:3529
 msgid "Backup"
 msgstr "備份"
 
-#: /usr/bin/faugus-launcher:3448
+#: /usr/bin/faugus-launcher:3533
 msgid "Restore"
 msgstr "回復"
 
-#: /usr/bin/faugus-launcher:3455
+#: /usr/bin/faugus-launcher:3540
 msgid "Global Environment Variables"
 msgstr "全域環境變數"
 
-#: /usr/bin/faugus-launcher:3728 /usr/bin/faugus-launcher:5322
+#: /usr/bin/faugus-launcher:3814 /usr/bin/faugus-launcher:5374
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
 msgstr "顯示一個監控 FPS、溫度、CPU/GPU 負載等等的疊層。未安裝。"
 
-#: /usr/bin/faugus-launcher:3734 /usr/bin/faugus-launcher:5328
+#: /usr/bin/faugus-launcher:3820 /usr/bin/faugus-launcher:5380
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
 msgstr "微調系統以增進效能。未安裝。"
 
-#: /usr/bin/faugus-launcher:3772
+#: /usr/bin/faugus-launcher:3858
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "清除紀錄 (%s)"
 
-#: /usr/bin/faugus-launcher:3775
+#: /usr/bin/faugus-launcher:3861
 msgid "Clear Logs"
 msgstr "清除紀錄"
 
-#: /usr/bin/faugus-launcher:4047
+#: /usr/bin/faugus-launcher:4110
 msgid "Do you want to save the changes?"
 msgstr "你要儲存變動嗎？"
 
-#: /usr/bin/faugus-launcher:4130 /usr/bin/faugus-launcher:6123
-msgid "Select a file to run inside the prefix"
-msgstr "選取一個檔案在此前綴中運行"
-
-#: /usr/bin/faugus-launcher:4133 /usr/bin/faugus-launcher:4259
-#: /usr/bin/faugus-launcher:4414 /usr/bin/faugus-launcher:4437
-#: /usr/bin/faugus-launcher:5581 /usr/bin/faugus-launcher:5775
-#: /usr/bin/faugus-launcher:6126 /usr/bin/faugus-launcher:6261
-#: /usr/bin/faugus-launcher:6537 /usr/bin/faugus-launcher:6610
-msgid "Open"
-msgstr "開啟"
-
-#: /usr/bin/faugus-launcher:4138 /usr/bin/faugus-launcher:5780
-#: /usr/bin/faugus-launcher:6131 /usr/bin/faugus-launcher:6545
-msgid "Windows files"
-msgstr "Windows 檔案"
-
-#: /usr/bin/faugus-launcher:4146 /usr/bin/faugus-launcher:5788
-#: /usr/bin/faugus-launcher:6139 /usr/bin/faugus-launcher:6553
-msgid "All files"
-msgstr "所有檔案"
-
-#: /usr/bin/faugus-launcher:4195
+#: /usr/bin/faugus-launcher:4258
 msgid "Prefixes and runners will not be backed up!"
 msgstr "前綴與運行器不會備份！"
 
-#: /usr/bin/faugus-launcher:4223
+#: /usr/bin/faugus-launcher:4286
 msgid "Save the backup file as..."
 msgstr "儲存備份檔案為..."
 
-#: /usr/bin/faugus-launcher:4226
+#: /usr/bin/faugus-launcher:4289
 msgid "Save"
 msgstr "儲存"
 
-#: /usr/bin/faugus-launcher:4256
+#: /usr/bin/faugus-launcher:4319
 msgid "Select a backup file to restore"
 msgstr "選取一個備份檔案來回復"
 
-#: /usr/bin/faugus-launcher:4264
+#: /usr/bin/faugus-launcher:4327
 msgid "ZIP files"
 msgstr "ZIP 檔案"
 
-#: /usr/bin/faugus-launcher:4275 /usr/bin/faugus-launcher:4285
+#: /usr/bin/faugus-launcher:4338 /usr/bin/faugus-launcher:4348
 msgid "This is not a valid Faugus Launcher backup file."
 msgstr "這不是有效的 Faugus 啟動器備份檔案。"
 
-#: /usr/bin/faugus-launcher:4288
+#: /usr/bin/faugus-launcher:4351
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "你確定要覆寫設定？"
 
-#: /usr/bin/faugus-launcher:4364 /usr/bin/faugus-launcher:4721
+#: /usr/bin/faugus-launcher:4425 /usr/bin/faugus-launcher:4781
 msgid "No"
 msgstr "否"
 
-#: /usr/bin/faugus-launcher:4368 /usr/bin/faugus-launcher:4725
+#: /usr/bin/faugus-launcher:4429 /usr/bin/faugus-launcher:4785
 msgid "Yes"
 msgstr "是"
 
-#: /usr/bin/faugus-launcher:4411 /usr/bin/faugus-launcher:6607
+#: /usr/bin/faugus-launcher:4472 /usr/bin/faugus-launcher:6788
 msgid "Select a prefix location"
 msgstr "選取一個前綴位置"
 
-#: /usr/bin/faugus-launcher:4434
+#: /usr/bin/faugus-launcher:4495
 msgid "Select the Lossless.dll file"
 msgstr "選取 Lossless.dll 檔案"
 
-#: /usr/bin/faugus-launcher:4620
+#: /usr/bin/faugus-launcher:4679
 #, python-format
 msgid "Duplicate %s"
 msgstr "建立 %s 的副本"
 
-#: /usr/bin/faugus-launcher:4624 /usr/bin/faugus-launcher:4937
-#: /usr/bin/faugus-launcher:4955
+#: /usr/bin/faugus-launcher:4682 /usr/bin/faugus-launcher:5002
+#: /usr/bin/faugus-launcher:5020
 msgid "Title"
 msgstr "標題"
 
-#: /usr/bin/faugus-launcher:4627 /usr/bin/faugus-launcher:4962
+#: /usr/bin/faugus-launcher:4685 /usr/bin/faugus-launcher:5027
 msgid "Game Title"
 msgstr "遊戲標題"
 
-#: /usr/bin/faugus-launcher:4712
+#: /usr/bin/faugus-launcher:4769
 #, python-format
 msgid "Delete %s"
 msgstr "刪除 %s"
 
-#: /usr/bin/faugus-launcher:4718
+#: /usr/bin/faugus-launcher:4774
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "你確定要刪除 %s？"
 
-#: /usr/bin/faugus-launcher:4729
-msgid "Also remove the prefix"
-msgstr "也刪除該前綴"
+#: /usr/bin/faugus-launcher:4789
+msgid "Also remove the prefix:"
+msgstr "也刪除此前綴："
 
-#: /usr/bin/faugus-launcher:4770
+#: /usr/bin/faugus-launcher:4831
 msgid "New Game/App"
 msgstr "新遊戲/程式"
 
-#: /usr/bin/faugus-launcher:4967
+#: /usr/bin/faugus-launcher:5032 /usr/bin/faugus-launcher:5464
 msgid "Path"
 msgstr "路徑"
 
-#: /usr/bin/faugus-launcher:4973
+#: /usr/bin/faugus-launcher:5038
 msgid "/path/to/the/exe"
 msgstr "/路徑/至/該/exe"
 
-#: /usr/bin/faugus-launcher:4982
+#: /usr/bin/faugus-launcher:5047
 msgid "Prefix"
 msgstr "前綴"
 
-#: /usr/bin/faugus-launcher:4995
+#: /usr/bin/faugus-launcher:5060
 msgid "Proton"
 msgstr "Proton"
 
-#: /usr/bin/faugus-launcher:5013
+#: /usr/bin/faugus-launcher:5078
 msgid "Launch Arguments"
 msgstr "啟動引數"
 
-#: /usr/bin/faugus-launcher:5016
+#: /usr/bin/faugus-launcher:5081
 msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 msgstr "例：PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 
-#: /usr/bin/faugus-launcher:5021
+#: /usr/bin/faugus-launcher:5086
 msgid "Game Arguments"
 msgstr "遊戲引數"
 
-#: /usr/bin/faugus-launcher:5024
+#: /usr/bin/faugus-launcher:5089
 msgid "e.g.: -d3d11 -fullscreen"
 msgstr "例：-d3d11 -fullscreen"
 
-#: /usr/bin/faugus-launcher:5029 /usr/bin/faugus-launcher:5387
-msgid "Lossless Scaling Frame Generation"
-msgstr "Lossless Scaling 畫格生成"
-
-#: /usr/bin/faugus-launcher:5033
+#: /usr/bin/faugus-launcher:5093 /usr/bin/faugus-launcher:5438
 msgid "Additional Application"
 msgstr "額外程式"
 
-#: /usr/bin/faugus-launcher:5035
+#: /usr/bin/faugus-launcher:5096
 msgid ""
 "Additional application to run with the game, like Cheat Engine, Trainers, "
 "Mods..."
-msgstr "與遊戲一起運行的程式，像是 Cheat Engine、遊戲輔助、模組..."
+msgstr "與遊戲一起運行的額外程式，像是 Cheat Engine、遊戲輔助、模組..."
 
-#: /usr/bin/faugus-launcher:5038
-msgid "/path/to/the/app"
-msgstr "/路徑/至/該/程式"
+#: /usr/bin/faugus-launcher:5099 /usr/bin/faugus-launcher:5556
+msgid "Lossless Scaling Frame Generation"
+msgstr "Lossless Scaling 影格生成"
 
-#: /usr/bin/faugus-launcher:5076
+#: /usr/bin/faugus-launcher:5130
 msgid "Shortcut"
 msgstr "捷徑"
 
-#: /usr/bin/faugus-launcher:5081
+#: /usr/bin/faugus-launcher:5135
 msgid "Desktop"
 msgstr "桌面"
 
-#: /usr/bin/faugus-launcher:5083
+#: /usr/bin/faugus-launcher:5137
 msgid "Add or remove a shortcut from the Desktop."
 msgstr "在桌面上增加或移除捷徑。"
 
-#: /usr/bin/faugus-launcher:5084
+#: /usr/bin/faugus-launcher:5138
 msgid "App Menu"
 msgstr "程式選單"
 
-#: /usr/bin/faugus-launcher:5086
+#: /usr/bin/faugus-launcher:5140
 msgid "Add or remove a shortcut from the Application Menu."
 msgstr "在程式選單中增加或移除捷徑。"
 
-#: /usr/bin/faugus-launcher:5087
+#: /usr/bin/faugus-launcher:5141
 msgid "Steam"
 msgstr "Steam"
 
-#: /usr/bin/faugus-launcher:5089
+#: /usr/bin/faugus-launcher:5143
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
 msgstr "在 Steam 中增加或移除捷徑。需要重新啟動 Steam。"
 
-#: /usr/bin/faugus-launcher:5095 /usr/bin/faugus-launcher:6258
+#: /usr/bin/faugus-launcher:5149 /usr/bin/faugus-launcher:6452
 msgid "Select an icon for the shortcut"
 msgstr "為捷徑選取一個圖示"
 
-#: /usr/bin/faugus-launcher:5146
+#: /usr/bin/faugus-launcher:5200
 msgid "Refresh"
 msgstr "重新整理"
 
-#: /usr/bin/faugus-launcher:5150
+#: /usr/bin/faugus-launcher:5204
 msgid "Load from file"
 msgstr "從檔案載入"
 
-#: /usr/bin/faugus-launcher:5154
+#: /usr/bin/faugus-launcher:5208
 msgid "Load from URL"
 msgstr "從網址載入"
 
-#: /usr/bin/faugus-launcher:5162
+#: /usr/bin/faugus-launcher:5216
 msgid "Game/App"
 msgstr "遊戲/程式"
 
-#: /usr/bin/faugus-launcher:5178
+#: /usr/bin/faugus-launcher:5232
 msgid "Tools"
 msgstr "工具"
 
-#: /usr/bin/faugus-launcher:5342
+#: /usr/bin/faugus-launcher:5394
 msgid ""
 "Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
 "and set the location."
-msgstr "找不到 Lossless.dll。若已安裝，去到 Faugus 啟動器的設定並設定位置。"
+msgstr "找不到 Lossless.dll。若已安裝，前往 Faugus 啟動器的設定並設定位置。"
 
-#: /usr/bin/faugus-launcher:5345
+#: /usr/bin/faugus-launcher:5397
 msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
 msgstr "未安裝 Lossless Scaling Vulkan 層。"
 
-#: /usr/bin/faugus-launcher:5412
+#: /usr/bin/faugus-launcher:5460 /usr/bin/faugus-launcher:5580
 msgid "Enable"
 msgstr "啟用"
 
-#: /usr/bin/faugus-launcher:5416
+#: /usr/bin/faugus-launcher:5469
+msgid "/path/to/the/app"
+msgstr "/路徑/至/該/程式"
+
+#: /usr/bin/faugus-launcher:5479
+msgid "Delay (seconds)"
+msgstr "延遲(秒)"
+
+#: /usr/bin/faugus-launcher:5496
+msgid "Run the application first"
+msgstr "先運行此程式"
+
+#: /usr/bin/faugus-launcher:5584
 msgid "Multiplier"
 msgstr "倍率"
 
-#: /usr/bin/faugus-launcher:5421
+#: /usr/bin/faugus-launcher:5589
 msgid "Multiply the FPS."
 msgstr "將 FPS 加倍。"
 
-#: /usr/bin/faugus-launcher:5423
+#: /usr/bin/faugus-launcher:5591
 msgid "Flow Scale"
 msgstr "流動縮放"
 
-#: /usr/bin/faugus-launcher:5430
+#: /usr/bin/faugus-launcher:5598
 msgid "Lower the internal motion estimation resolution."
 msgstr "降低內部動態推算的解析度。"
 
-#: /usr/bin/faugus-launcher:5432
+#: /usr/bin/faugus-launcher:5600
 msgid "Performance Mode"
 msgstr "效能模式"
 
-#: /usr/bin/faugus-launcher:5433
+#: /usr/bin/faugus-launcher:5601
 msgid "Massively improve performance at the cost of quality."
 msgstr "以品質為代價大幅增進效能。"
 
-#: /usr/bin/faugus-launcher:5436
+#: /usr/bin/faugus-launcher:5604
 msgid "HDR Mode"
 msgstr "HDR 模式"
 
-#: /usr/bin/faugus-launcher:5437
+#: /usr/bin/faugus-launcher:5605
 msgid "Enable special HDR-only behavior."
-msgstr "啟用特殊 HDR 限定行為。"
+msgstr "啟用特別的 HDR 限定行為。"
 
-#: /usr/bin/faugus-launcher:5440
+#: /usr/bin/faugus-launcher:5608
 msgid "Present Mode (Experimental)"
 msgstr "呈現模式 (實驗性)"
 
-#: /usr/bin/faugus-launcher:5444
+#: /usr/bin/faugus-launcher:5612
 msgid "Override the present mode."
 msgstr "覆寫呈現模式。"
 
-#: /usr/bin/faugus-launcher:5578
+#: /usr/bin/faugus-launcher:5746
 msgid "Select an image for the banner"
 msgstr "為橫幅選取一個影像"
 
-#: /usr/bin/faugus-launcher:5586 /usr/bin/faugus-launcher:6266
+#: /usr/bin/faugus-launcher:5754 /usr/bin/faugus-launcher:6460
 msgid "Image files"
 msgstr "影像檔案"
 
-#: /usr/bin/faugus-launcher:5613
+#: /usr/bin/faugus-launcher:5781
 msgid "Enter the image URL"
 msgstr "輸入影像網址"
 
-#: /usr/bin/faugus-launcher:5689 /usr/bin/faugus-launcher:6289
+#: /usr/bin/faugus-launcher:5856 /usr/bin/faugus-launcher:6482
 msgid "The selected file is not a valid image."
 msgstr "選取的檔案不是有效的影像。"
 
-#: /usr/bin/faugus-launcher:5692 /usr/bin/faugus-launcher:6293
+#: /usr/bin/faugus-launcher:5859 /usr/bin/faugus-launcher:6486
 msgid "Please choose another one."
 msgstr "請選擇另一個。"
 
-#: /usr/bin/faugus-launcher:5772
+#: /usr/bin/faugus-launcher:5940
 msgid "Select an additional application"
 msgstr "選取一個額外程式"
 
-#: /usr/bin/faugus-launcher:6037
+#: /usr/bin/faugus-launcher:6233
 msgid "Windows Game"
 msgstr "Windows 遊戲"
 
-#: /usr/bin/faugus-launcher:6038
+#: /usr/bin/faugus-launcher:6234
 msgid "Linux Game"
 msgstr "Linux 遊戲"
 
-#: /usr/bin/faugus-launcher:6039
+#: /usr/bin/faugus-launcher:6235
 msgid "Steam Game"
 msgstr "Steam 遊戲"
 
-#: /usr/bin/faugus-launcher:6534
+#: /usr/bin/faugus-launcher:6715
 msgid "Select the game's .exe"
 msgstr "選取遊戲的 .exe"
