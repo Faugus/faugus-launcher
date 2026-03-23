@@ -10,8 +10,6 @@ import time
 import shlex
 import gettext
 import signal
-import shutil
-import webbrowser
 
 gi.require_version("Gtk", "3.0")
 
@@ -35,7 +33,7 @@ else:
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_dir = PathManager.user_config('faugus-launcher/games.json')
+games_json = PathManager.user_config('faugus-launcher/games.json')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = str(Path.home() / 'Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
@@ -168,7 +166,7 @@ class FaugusRun:
                 set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "umu-sniper":
+        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -189,6 +187,11 @@ class FaugusRun:
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
             steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-GE Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        if protonpath == "Proton-CachyOS Latest":
+            self.proton_latest = "--cachyos"
+            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-CachyOS Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         self.components_exists = (
@@ -312,6 +315,7 @@ class FaugusRun:
             self.process.pid,
             self.on_process_exit
         )
+        Thread(target=self._watch_game_process, daemon=True).start()
 
     def show_donate_dialog(self):
         dialog = Gtk.Dialog(title="Faugus Launcher")
@@ -417,9 +421,11 @@ class FaugusRun:
             self.cfg.save_config()
 
     def on_button_kofi_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
     def on_button_paypal_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def show_error_dialog(self, protonpath=None, network_error=False):
@@ -636,64 +642,66 @@ class FaugusRun:
             if self.splash_window is None:
                 self.show_splash_window()
             self.splash_window.show_all()
-        if "Updating UMU-Launcher..." in clean_line:
-            self.label.set_text(_("Updating UMU-Launcher..."))
-        if "UMU-Launcher is up to date." in clean_line:
-            self.label.set_text(_("UMU-Launcher is up to date"))
-        if "Updating BattlEye..." in clean_line:
-            self.label.set_text(_("Updating BattlEye..."))
-        if "Updating Easy Anti-Cheat..." in clean_line:
-            self.label.set_text(_("Updating Easy Anti-Cheat..."))
-        if "Components are up to date." in clean_line:
+
+        component = None
+
+        if "Components are up to date" in clean_line:
             self.label.set_text(_("Components are up to date"))
-        if "Downloading UMU-Proton" in clean_line:
-            self.label.set_text(_("Downloading UMU-Proton..."))
-        if "Downloading steamrt3 (latest)" in clean_line:
-            self.label.set_text(_("Downloading Steam Runtime..."))
-        if "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-            self.label.set_text(_("Extracting Steam Runtime..."))
-        if "Extracting UMU-Proton" in clean_line:
-            self.label.set_text(_("Extracting UMU-Proton..."))
-        if "UMU-Proton is up to date" in clean_line:
-            self.label.set_text(_("UMU-Proton is up to date"))
-        if "steamrt3 is up to date" in clean_line:
-            self.label.set_text(_("Steam Runtime is up to date"))
-        if "->" in clean_line and "GE-Proton" in clean_line:
-            self.label.set_text(_("GE-Proton is up to date"))
-        if "->" in clean_line and "UMU-Proton" in clean_line:
-            self.label.set_text(_("UMU-Proton is up to date"))
-        if "mtree is OK" in clean_line:
-            self.label.set_text(_("Steam Runtime is up to date"))
+            return
 
-        if "Downloading GE-Proton" in clean_line:
-            self.label.set_text(_("Downloading GE-Proton..."))
-        if "Extracting GE-Proton" in clean_line:
-            self.label.set_text(_("Extracting GE-Proton..."))
-        if "GE-Proton is up to date" in clean_line:
-            self.label.set_text(_("GE-Proton is up to date"))
-        if "Downloading Proton-EM" in clean_line:
-            self.label.set_text(_("Downloading Proton-EM..."))
-        if "Extracting Proton-EM" in clean_line:
-            self.label.set_text(_("Extracting Proton-EM..."))
-        if "Proton-EM is up to date" in clean_line:
-            self.label.set_text(_("Proton-EM is up to date"))
+        if "UMU-Launcher" in clean_line:
+            component = "UMU-Launcher"
+        elif "BattlEye" in clean_line:
+            component = "BattlEye"
+        elif "Easy Anti-Cheat" in clean_line:
+            component = "Easy Anti-Cheat"
+        elif "UMU-Proton" in clean_line:
+            component = "UMU-Proton"
+        elif "GE-Proton" in clean_line:
+            component = "GE-Proton"
+        elif "Proton-EM" in clean_line:
+            component = "Proton-EM"
+        elif "Proton-CachyOS" in clean_line:
+            component = "Proton-CachyOS"
+        elif "steamrt3" in clean_line or "SteamLinuxRuntime" in clean_line:
+            component = "Steam Runtime"
 
-        if "network error" in clean_line:
-            self.show_error_dialog(network_error=True)
+        if component:
+            if "Updating" in clean_line:
+                self.label.set_text(_("Updating") + f" {component}...")
+            elif "Downloading" in clean_line:
+                self.label.set_text(_("Downloading") + f" {component}...")
+            elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
+                self.label.set_text(_("Extracting") + f" {component}...")
+            elif (
+                "is up to date" in clean_line
+                or "mtree is OK" in clean_line
+                or ("->" in clean_line and component in clean_line)
+            ):
+                self.label.set_text(f"{component} " + _("is up to date"))
 
-        if (
-            "fsync" in clean_line
-            or "NTSync" in clean_line
-            or "Using winetricks" in clean_line
-            or "Selected GPU" in clean_line
-            or "Skipping fix execution" in clean_line
-            or "Executable a unix path" in clean_line
-            or "status: 0" in clean_line
-            or "PosixPath" in clean_line
-            or "SingleInstance" in clean_line
-            or "mtree is OK" in clean_line
-        ):
-            GLib.timeout_add_seconds(0, self.close_splash_window)
+    def _watch_game_process(self):
+        import psutil
+
+        try:
+            parent = psutil.Process(self.process.pid)
+        except:
+            return
+
+        ignore = ("bash", "sh", "python", "systemd-inhibit")
+
+        while True:
+            try:
+                for child in parent.children(recursive=True):
+                    name = child.name().lower()
+
+                    if any(x in name for x in ignore):
+                        continue
+
+                    GLib.idle_add(self.close_splash_window)
+                    return
+            except:
+                return
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
@@ -791,9 +799,9 @@ class FaugusRun:
 
         game_id = os.environ.get("GAMEID")
 
-        if game_id and os.path.exists(games_dir):
+        if game_id and os.path.exists(games_json):
             try:
-                with open(games_dir, "r", encoding="utf-8") as f:
+                with open(games_json, "r", encoding="utf-8") as f:
                     games = json.load(f)
 
                 for game in games:
@@ -802,7 +810,7 @@ class FaugusRun:
                         game["playtime"] = old_time + runtime
                         break
 
-                with open(games_dir, "w", encoding="utf-8") as f:
+                with open(games_json, "w", encoding="utf-8") as f:
                     json.dump(games, f, indent=4)
 
             except Exception as e:
@@ -881,7 +889,7 @@ def build_launch_command(game):
     if runner:
         if runner == "Linux-Native":
             command_parts.append('PROTONPATH=umu-sniper')
-        elif runner == "Proton-CachyOS":
+        elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
         else:
@@ -944,11 +952,11 @@ def build_launch_command(game):
     return " ".join(command_parts)
 
 def load_game_from_json(gameid):
-    if not os.path.exists(games_dir):
+    if not os.path.exists(games_json):
         return None
 
     try:
-        with open(games_dir, "r", encoding="utf-8") as f:
+        with open(games_json, "r", encoding="utf-8") as f:
             games = json.load(f)
     except json.JSONDecodeError:
         return None
@@ -978,6 +986,7 @@ def is_apple_silicon():
 
 def main():
     if is_apple_silicon() and 'FAUGUS_MUVM' not in os.environ:
+        import shutil
         muvm_path = shutil.which('muvm')
         if muvm_path:
             env = os.environ.copy()
@@ -1003,5 +1012,26 @@ def main():
     else:
         FaugusRun(args.message, args.command).run()
 
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
 if __name__ == "__main__":
+    update_games_json()
     main()

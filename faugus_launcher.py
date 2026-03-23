@@ -3,19 +3,14 @@
 import json
 import re
 import shutil
-import socket
 import subprocess
 import sys
 import threading
-import urllib.request
-import webbrowser
 import gi
 import psutil
-import requests
 import vdf
 import signal
 import gettext
-import unicodedata
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -145,6 +140,7 @@ def convert_runner(runner):
     return runner
 
 def _validate_text(entry):
+    import unicodedata
     text = entry.get_text()
     for i, c in enumerate(text):
         if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
@@ -2446,6 +2442,7 @@ class Main(Gtk.ApplicationWindow):
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
 
             def check_internet_connection():
+                import socket
                 try:
                     socket.gethostbyname("github.com")
                     return True
@@ -2725,6 +2722,7 @@ class Main(Gtk.ApplicationWindow):
 
             def start_download():
                 try:
+                    import urllib.request
                     urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
                     GLib.idle_add(self.bar_download.set_fraction, 1.0)
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
@@ -3957,8 +3955,9 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest")
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
-            self.combobox_runner.append_text("Proton-CachyOS")
+            self.combobox_runner.append_text("Proton-CachyOS (System)")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -3980,6 +3979,7 @@ class Settings(Gtk.Dialog):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
 
@@ -4461,9 +4461,11 @@ class Settings(Gtk.Dialog):
         return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
     def on_button_paypal_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
@@ -5831,6 +5833,7 @@ class AddGame(Gtk.Dialog):
                     continue
 
                 try:
+                    import urllib.request
                     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
                     with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
                         f.write(r.read())
@@ -5891,6 +5894,7 @@ class AddGame(Gtk.Dialog):
         dialog_image.destroy()
 
     def get_banner(self):
+        import requests
         def fetch_banner():
             game_name = self.entry_title.get_text().strip()
             if not game_name:
@@ -6242,8 +6246,9 @@ class AddGame(Gtk.Dialog):
         self.combobox_runner.append_text("GE-Proton Latest (default)")
         self.combobox_runner.append_text("UMU-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest")
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
-            self.combobox_runner.append_text("Proton-CachyOS")
+            self.combobox_runner.append_text("Proton-CachyOS (System)")
 
         # Path to the directory containing the folders
         if IS_FLATPAK:
@@ -6265,6 +6270,7 @@ class AddGame(Gtk.Dialog):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
 
@@ -6387,6 +6393,7 @@ class AddGame(Gtk.Dialog):
         filechooser.destroy()
 
     def on_button_search_protonfix_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://umu.openwinecomponents.org/")
 
     def set_image_shortcut_icon(self):
@@ -6914,5 +6921,26 @@ def main():
     app = FaugusApp(start_hidden)
     app.run(sys.argv)
 
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)
+
 if __name__ == "__main__":
+    update_games_json()
     main()

@@ -23,6 +23,12 @@ CONFIGS = {
         "api": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases/latest",
         "archive_ext": ".tar.xz",
     },
+    "cachyos": {
+        "label": "Proton-CachyOS",
+        "dir": "Proton-CachyOS Latest",
+        "api": "https://api.github.com/repos/CachyOS/proton-cachyos/releases/latest",
+        "archive_ext": "x86_64.tar.xz",
+    },
 }
 
 
@@ -65,6 +71,7 @@ def normalize_version(v):
          .replace("GE-Proton", "")
          .replace("Proton-EM-", "")
          .replace("EM-", "")
+         .replace("cachyos-", "")
          .rstrip("+")
          .strip("-")
     )
@@ -141,12 +148,15 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--ge", action="store_true")
     group.add_argument("--em", action="store_true")
+    group.add_argument("--cachyos", action="store_true")
     args = parser.parse_args()
 
     if args.ge:
         ensure_latest("ge")
     if args.em:
         ensure_latest("em")
+    if args.cachyos:
+        ensure_latest("cachyos")
 
 
 if __name__ == "__main__":
