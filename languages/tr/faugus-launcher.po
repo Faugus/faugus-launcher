@@ -1,0 +1,764 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 14:10-0300\n"
+"PO-Revision-Date: 2026-03-23 18:30+0300\n"
+"Last-Translator: Gökay BALCI <g0kkai@duck.com>\n"
+"Language-Team: \n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-launcher:232 /usr/bin/faugus-launcher:853
+msgid "Play"
+msgstr "Oyna"
+
+#: /usr/bin/faugus-launcher:236
+msgid "Edit"
+msgstr "Düzenle"
+
+#: /usr/bin/faugus-launcher:240
+msgid "Delete"
+msgstr "Kaldır"
+
+#: /usr/bin/faugus-launcher:244
+msgid "Duplicate"
+msgstr "Çoğalt"
+
+#: /usr/bin/faugus-launcher:248 /usr/bin/faugus-launcher:824
+msgid "Hide"
+msgstr "Gizle"
+
+#: /usr/bin/faugus-launcher:252 /usr/bin/faugus-launcher:829
+msgid "Add to favorites"
+msgstr "Favorilere ekle"
+
+#: /usr/bin/faugus-launcher:256
+msgid "Open game location"
+msgstr "Oyun klasörünü aç"
+
+#: /usr/bin/faugus-launcher:260
+msgid "Open prefix location"
+msgstr "Ortam klasörünü aç"
+
+#: /usr/bin/faugus-launcher:264
+msgid "Run file inside the prefix"
+msgstr "Ortam içinde dosya yürüt"
+
+#: /usr/bin/faugus-launcher:268
+msgid "Show logs"
+msgstr "Kayıtları göster"
+
+#: /usr/bin/faugus-launcher:337
+msgid "Open Faugus Launcher"
+msgstr "Faugus Launcher'ı Aç"
+
+#: /usr/bin/faugus-launcher:341
+msgid "Quit"
+msgstr "Kapat"
+
+#: /usr/bin/faugus-launcher:495 /usr/bin/faugus-launcher:611
+msgid "Force close all running games"
+msgstr "Yürütülen tüm oyunları zorla kapat"
+
+#: /usr/bin/faugus-launcher:523 /usr/bin/faugus-launcher:650
+msgid "Search..."
+msgstr "Ara..."
+
+#: /usr/bin/faugus-launcher:747
+msgid "Shut down"
+msgstr "Kapat"
+
+#: /usr/bin/faugus-launcher:748
+msgid "Reboot"
+msgstr "Yeniden başlat"
+
+#: /usr/bin/faugus-launcher:749
+msgid "Close"
+msgstr "Kapat"
+
+#: /usr/bin/faugus-launcher:822
+msgid "Remove from hidden"
+msgstr "Gizlenenlerden kaldır"
+
+#: /usr/bin/faugus-launcher:827
+msgid "Remove from favorites"
+msgstr "Favorilerden kaldır"
+
+#: /usr/bin/faugus-launcher:851
+msgid "Stop"
+msgstr "Durdur"
+
+#: /usr/bin/faugus-launcher:886
+msgid "hour"
+msgstr "saat"
+
+#: /usr/bin/faugus-launcher:887
+msgid "hours"
+msgstr "saat"
+
+#: /usr/bin/faugus-launcher:888
+msgid "minute"
+msgstr "dakika"
+
+#: /usr/bin/faugus-launcher:889
+msgid "minutes"
+msgstr "dakika"
+
+#: /usr/bin/faugus-launcher:997 /usr/bin/faugus-launcher:4193
+#: /usr/bin/faugus-launcher:6322
+msgid "Select a file to run inside the prefix"
+msgstr "Ortam içinde yürütülecek dosyayı seç"
+
+#: /usr/bin/faugus-launcher:1000 /usr/bin/faugus-launcher:4196
+#: /usr/bin/faugus-launcher:4322 /usr/bin/faugus-launcher:4475
+#: /usr/bin/faugus-launcher:4498 /usr/bin/faugus-launcher:5749
+#: /usr/bin/faugus-launcher:5943 /usr/bin/faugus-launcher:6325
+#: /usr/bin/faugus-launcher:6455 /usr/bin/faugus-launcher:6718
+#: /usr/bin/faugus-launcher:6791
+msgid "Open"
+msgstr "Aç"
+
+#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:3513
+#: /usr/bin/faugus-launcher:4197 /usr/bin/faugus-launcher:4290
+#: /usr/bin/faugus-launcher:4323 /usr/bin/faugus-launcher:4476
+#: /usr/bin/faugus-launcher:4499 /usr/bin/faugus-launcher:4688
+#: /usr/bin/faugus-launcher:5152 /usr/bin/faugus-launcher:5522
+#: /usr/bin/faugus-launcher:5658 /usr/bin/faugus-launcher:5750
+#: /usr/bin/faugus-launcher:5794 /usr/bin/faugus-launcher:5944
+#: /usr/bin/faugus-launcher:6326 /usr/bin/faugus-launcher:6456
+#: /usr/bin/faugus-launcher:6719 /usr/bin/faugus-launcher:6792
+msgid "Cancel"
+msgstr "İptal"
+
+#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:4201
+#: /usr/bin/faugus-launcher:5948 /usr/bin/faugus-launcher:6330
+#: /usr/bin/faugus-launcher:6726
+msgid "Windows files"
+msgstr "Windows dosyaları"
+
+#: /usr/bin/faugus-launcher:1013 /usr/bin/faugus-launcher:4209
+#: /usr/bin/faugus-launcher:5956 /usr/bin/faugus-launcher:6338
+#: /usr/bin/faugus-launcher:6734
+msgid "All files"
+msgstr "Tüm dosyalar"
+
+#: /usr/bin/faugus-launcher:1059
+#, python-format
+msgid "%s Logs"
+msgstr "%s günlüğü"
+
+#: /usr/bin/faugus-launcher:1098
+msgid "Copy to clipboard"
+msgstr "Panoya kopyala"
+
+#: /usr/bin/faugus-launcher:1102
+msgid "Open file location"
+msgstr "Dosya konumunu aç"
+
+#: /usr/bin/faugus-launcher:1186 /usr/bin/faugus-launcher:2333
+#, python-format
+msgid "%s already exists."
+msgstr "%s zaten mevcut."
+
+#: /usr/bin/faugus-launcher:1413
+#, python-format
+msgid "%s is already running."
+msgstr "%s zaten yürütülüyor."
+
+#: /usr/bin/faugus-launcher:1416 /usr/bin/faugus-launcher:2276
+#: /usr/bin/faugus-launcher:3518 /usr/bin/faugus-launcher:4384
+#: /usr/bin/faugus-launcher:4692 /usr/bin/faugus-launcher:4734
+#: /usr/bin/faugus-launcher:5157 /usr/bin/faugus-launcher:5527
+#: /usr/bin/faugus-launcher:5663 /usr/bin/faugus-launcher:5790
+#: /usr/bin/faugus-launcher:5862 /usr/bin/faugus-launcher:6489
+msgid "Ok"
+msgstr "Tamam"
+
+#: /usr/bin/faugus-launcher:1742
+msgid "Proton may generate huge log files."
+msgstr "Proton büyük boyutta günlük dosyaları üretebilir."
+
+#: /usr/bin/faugus-launcher:1742
+msgid "Enable logging only when debugging a problem."
+msgstr "Günlük kaydetmeyi sadece bir problemi çözerken etkinleştirin."
+
+#: /usr/bin/faugus-launcher:2050
+#, python-format
+msgid "Edit %s"
+msgstr "Düzenle %s"
+
+#: /usr/bin/faugus-launcher:2107 /usr/bin/faugus-launcher:5386
+msgid ""
+"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
+"USERS FOUND."
+msgstr ""
+"Steam'den bir kısayol ekle veya kaldır. Steam'in yeniden başlatılması "
+"gerekir. STEAM KULLANICIS BULUNAMADI."
+
+#: /usr/bin/faugus-launcher:2118
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s yürütülüyor. Önce kapatmayı deneyin."
+
+#: /usr/bin/faugus-launcher:2193
+msgid "Failed to remove prefix."
+msgstr "Ortamı kaldırmak başarısız oldu."
+
+#: /usr/bin/faugus-launcher:2454
+msgid "No internet connection."
+msgstr "İnternet bağlantısı yok."
+
+#: /usr/bin/faugus-launcher:2578 /usr/bin/faugus-launcher:2734
+#, python-format
+msgid "Installing %s..."
+msgstr "%s yükleniyor..."
+
+#: /usr/bin/faugus-launcher:2589
+msgid "Finish installation"
+msgstr "Yükleme tamamla"
+
+#: /usr/bin/faugus-launcher:2596 /usr/bin/faugus-launcher:2601
+#: /usr/bin/faugus-launcher:2606 /usr/bin/faugus-launcher:2611
+#: /usr/bin/faugus-launcher:2616 /usr/bin/faugus-launcher:2621
+msgid "Downloading"
+msgstr "İndiriliyor"
+
+#: /usr/bin/faugus-launcher:2683
+#, python-format
+msgid "%s was not installed!"
+msgstr "%s yüklenmedi"
+
+#: /usr/bin/faugus-launcher:2728
+msgid "Download complete"
+msgstr "İndirme tamamlandı"
+
+#: /usr/bin/faugus-launcher:2731
+#, python-format
+msgid "Error during download: %s"
+msgstr "İndirme sırasında hata oluştu: %s"
+
+#: /usr/bin/faugus-launcher:2736 /usr/bin/faugus-launcher:2739
+#: /usr/bin/faugus-launcher:2749
+msgid "Please close the login window and wait."
+msgstr "Lütfen giriş penceresini kapayın ve bekleyin."
+
+#: /usr/bin/faugus-launcher:2748
+msgid "Please don't change the installation path."
+msgstr "Lütfen kurulum konumunu değiştirmeyin."
+
+#: /usr/bin/faugus-launcher:2752
+msgid "Please close Wargaming to finish the installation."
+msgstr "Lütfen yüklemeyi bitirmek için Wargaming'i kapatın."
+
+#: /usr/bin/faugus-launcher:3217
+msgid "Settings"
+msgstr "Ayarlar"
+
+#: /usr/bin/faugus-launcher:3342
+msgid "Language"
+msgstr "Dil"
+
+#: /usr/bin/faugus-launcher:3347
+msgid "Interface Mode"
+msgstr "Arayüz Modu"
+
+#: /usr/bin/faugus-launcher:3351
+msgid "List"
+msgstr "Liste"
+
+#: /usr/bin/faugus-launcher:3352
+msgid "Blocks"
+msgstr "Bloklar"
+
+#: /usr/bin/faugus-launcher:3353
+msgid "Banners"
+msgstr "Pankartlar"
+
+#: /usr/bin/faugus-launcher:3356
+msgid "Start maximized"
+msgstr "Büyütülmüş ekranda başlat"
+
+#: /usr/bin/faugus-launcher:3361
+msgid "Start in fullscreen"
+msgstr "Tam ekran başlat"
+
+#: /usr/bin/faugus-launcher:3364
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt+Enter tam ekranı açar"
+
+#: /usr/bin/faugus-launcher:3366
+msgid "Show labels"
+msgstr "Etiketler göster"
+
+#: /usr/bin/faugus-launcher:3369
+msgid "Smaller banners"
+msgstr "Daha küçük pankartlar"
+
+#: /usr/bin/faugus-launcher:3373
+msgid "Default Prefixes Location"
+msgstr "Varsayılan Ortam Konumu"
+
+#: /usr/bin/faugus-launcher:3377 /usr/bin/faugus-launcher:5051
+msgid "/path/to/the/prefix"
+msgstr "/ortama/giden/konum"
+
+#: /usr/bin/faugus-launcher:3387
+msgid "Lossless Scaling Location"
+msgstr "Lossless Scaling Konumu"
+
+#: /usr/bin/faugus-launcher:3391
+msgid "/path/to/Lossless.dll"
+msgstr "/klasor/konumu/Lossless.dll"
+
+#: /usr/bin/faugus-launcher:3400
+msgid "Default Prefix Tools"
+msgstr "Varsayılan Ortam Araçları"
+
+#: /usr/bin/faugus-launcher:3407
+msgid "Default Proton"
+msgstr "Varsayılan Proton"
+
+#: /usr/bin/faugus-launcher:3411
+msgid "Proton Manager"
+msgstr "Proton Yöneticisi"
+
+#: /usr/bin/faugus-launcher:3414
+msgid "Miscellaneous"
+msgstr "Diğer"
+
+#: /usr/bin/faugus-launcher:3421
+msgid "Use discrete GPU"
+msgstr "Harici ekran kartı kullan"
+
+#: /usr/bin/faugus-launcher:3425
+msgid "Close when running a game/app"
+msgstr "Uygulama/oyun yürütülerken kapat"
+
+#: /usr/bin/faugus-launcher:3429
+msgid "System tray icon"
+msgstr "Sistem tepsi sembolu"
+
+#: /usr/bin/faugus-launcher:3434
+msgid "Start on boot"
+msgstr "Açılışta başlat"
+
+#: /usr/bin/faugus-launcher:3438
+msgid "Monochrome icon"
+msgstr "Tek renkli sembol"
+
+#: /usr/bin/faugus-launcher:3443
+msgid "Disable splash window"
+msgstr "Açılma ekranını devre dışı bırak"
+
+#: /usr/bin/faugus-launcher:3446
+msgid "Disable automatic updates"
+msgstr "Otomatik güncellemeleri devre dışı bırak"
+
+#: /usr/bin/faugus-launcher:3450
+msgid "Enable logging"
+msgstr "Günlüklemeyi etkinleştir"
+
+#: /usr/bin/faugus-launcher:3453
+msgid "Show hidden games"
+msgstr "Gizli oyunları göster"
+
+#: /usr/bin/faugus-launcher:3455
+msgid "Press Ctrl+H to show/hide games."
+msgstr "Oyunları gizlemek ve açmak için Ctrl+H'ye bas."
+
+#: /usr/bin/faugus-launcher:3457
+msgid "Use Wayland driver (experimental)"
+msgstr "Wayland sürücüsü kullan (deneysel)"
+
+#: /usr/bin/faugus-launcher:3459 /usr/bin/faugus-launcher:3465
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "Sadece GE-Proton10 ya da Proton-EM-10 ile çalışır."
+
+#: /usr/bin/faugus-launcher:3462
+msgid "Enable HDR (experimental)"
+msgstr "HDR'ı etkinleştir (deneysel)"
+
+#: /usr/bin/faugus-launcher:3467
+msgid "Enable WOW64 (experimental)"
+msgstr "WOW64'ü etkinleştir (deneysel)"
+
+#: /usr/bin/faugus-launcher:3469
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"Sadece GE-Proton10-9 ve üstü ya da Proton-EM-10-24 ve üstü ile çalışır."
+
+#: /usr/bin/faugus-launcher:3482 /usr/bin/faugus-launcher:5124
+msgid "Run"
+msgstr "Yürüt"
+
+#: /usr/bin/faugus-launcher:3485 /usr/bin/faugus-launcher:5127
+msgid "Run a file inside the prefix"
+msgstr "Ortam içinde dosya yürüt"
+
+#: /usr/bin/faugus-launcher:3490 /usr/bin/faugus-launcher:5105
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+msgstr ""
+"FPS, sıcaklıklar, CPU/GPU yükü ve daha fazlasını gösteren bir arayüz "
+"gösterir."
+
+#: /usr/bin/faugus-launcher:3492 /usr/bin/faugus-launcher:5107
+msgid "Tweaks your system to improve performance."
+msgstr "Performans arttırmak için sisteminizde ayarlamalar yapar."
+
+#: /usr/bin/faugus-launcher:3493 /usr/bin/faugus-launcher:5108
+msgid "Disable Hidraw"
+msgstr "Hidraw'ı devre dışı bırak"
+
+#: /usr/bin/faugus-launcher:3495 /usr/bin/faugus-launcher:5110
+msgid ""
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
+msgstr ""
+"Bazı oyunlarda kontrol aygıtı sorunlarını giderebilir. Sadece GE-Proton10 "
+"ya da Proton-EM-10 ile çalışır."
+
+#: /usr/bin/faugus-launcher:3496 /usr/bin/faugus-launcher:5111
+msgid "Prevent Sleep"
+msgstr "Uykuyu Engelle"
+
+#: /usr/bin/faugus-launcher:3498
+msgid "Support the Project"
+msgstr "Projeyi Destekle"
+
+#: /usr/bin/faugus-launcher:3522
+msgid "Backup/Restore Settings"
+msgstr "Ayarları Yedekle/Geri Yükle"
+
+#: /usr/bin/faugus-launcher:3529
+msgid "Backup"
+msgstr "Yedekle"
+
+#: /usr/bin/faugus-launcher:3533
+msgid "Restore"
+msgstr "Geri Yükle"
+
+#: /usr/bin/faugus-launcher:3540
+msgid "Global Environment Variables"
+msgstr "Genel Ortam Değişkenleri"
+
+#: /usr/bin/faugus-launcher:3814 /usr/bin/faugus-launcher:5374
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
+"NOT INSTALLED."
+msgstr ""
+"FPS, sıcaklıklar, CPU/GPU yükü ve daha fazlasını gösteren bir arayüz "
+"gösterir. YÜKLÜ DEĞİL."
+
+#: /usr/bin/faugus-launcher:3820 /usr/bin/faugus-launcher:5380
+msgid "Tweaks your system to improve performance. NOT INSTALLED."
+msgstr ""
+"Performans arttırmak için sisteminizde ayarlamalar yapar. YÜKLÜ DEĞİL."
+
+#: /usr/bin/faugus-launcher:3858
+#, python-format
+msgid "Clear Logs (%s)"
+msgstr "(%s) Günlükleri Temizler"
+
+#: /usr/bin/faugus-launcher:3861
+msgid "Clear Logs"
+msgstr "Günlükleri Temizle"
+
+#: /usr/bin/faugus-launcher:4110
+msgid "Do you want to save the changes?"
+msgstr "Değişimleri kaydetmek istiyor musunuz?"
+
+#: /usr/bin/faugus-launcher:4258
+msgid "Prefixes and runners will not be backed up!"
+msgstr "Ortamlar ve yürütücüler yedeklenmeyecek!"
+
+#: /usr/bin/faugus-launcher:4286
+msgid "Save the backup file as..."
+msgstr "Yedekleri şu şekilde kaydet..."
+
+#: /usr/bin/faugus-launcher:4289
+msgid "Save"
+msgstr "Kaydet"
+
+#: /usr/bin/faugus-launcher:4319
+msgid "Select a backup file to restore"
+msgstr "Geri yüklenecek bir yedek dosyası seç"
+
+#: /usr/bin/faugus-launcher:4327
+msgid "ZIP files"
+msgstr "ZIP dosyaları"
+
+#: /usr/bin/faugus-launcher:4338 /usr/bin/faugus-launcher:4348
+msgid "This is not a valid Faugus Launcher backup file."
+msgstr "Bu geçerli bir Faugus Launcher yedek dosyası değil."
+
+#: /usr/bin/faugus-launcher:4351
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "Ayarların üzerine yazmak istediğinize emin misiniz?"
+
+#: /usr/bin/faugus-launcher:4425 /usr/bin/faugus-launcher:4781
+msgid "No"
+msgstr "Hayır"
+
+#: /usr/bin/faugus-launcher:4429 /usr/bin/faugus-launcher:4785
+msgid "Yes"
+msgstr "Evet"
+
+#: /usr/bin/faugus-launcher:4472 /usr/bin/faugus-launcher:6788
+msgid "Select a prefix location"
+msgstr "Ortam klasörü seç"
+
+#: /usr/bin/faugus-launcher:4495
+msgid "Select the Lossless.dll file"
+msgstr "Lossless.dll dosyasını seç"
+
+#: /usr/bin/faugus-launcher:4679
+#, python-format
+msgid "Duplicate %s"
+msgstr "%s Çoğalt"
+
+#: /usr/bin/faugus-launcher:4682 /usr/bin/faugus-launcher:5002
+#: /usr/bin/faugus-launcher:5020
+msgid "Title"
+msgstr "Başlık"
+
+#: /usr/bin/faugus-launcher:4685 /usr/bin/faugus-launcher:5027
+msgid "Game Title"
+msgstr "Oyun Başlığı"
+
+#: /usr/bin/faugus-launcher:4769
+#, python-format
+msgid "Delete %s"
+msgstr "%s Kaldır"
+
+#: /usr/bin/faugus-launcher:4774
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "%s'i silmek istediğinizden emin misiniz?"
+
+#: /usr/bin/faugus-launcher:4789
+msgid "Also remove the prefix:"
+msgstr "Aynı zamanda şu ortamı kaldırır:"
+
+#: /usr/bin/faugus-launcher:4831
+msgid "New Game/App"
+msgstr "Yeni Oyun/Uygulama"
+
+#: /usr/bin/faugus-launcher:5032 /usr/bin/faugus-launcher:5464
+msgid "Path"
+msgstr "Konum"
+
+#: /usr/bin/faugus-launcher:5038
+msgid "/path/to/the/exe"
+msgstr "/exe'ye/giden/konum"
+
+#: /usr/bin/faugus-launcher:5047
+msgid "Prefix"
+msgstr "Ortam"
+
+#: /usr/bin/faugus-launcher:5060
+msgid "Proton"
+msgstr "Proton"
+
+#: /usr/bin/faugus-launcher:5078
+msgid "Launch Arguments"
+msgstr "Başlatma Parametreleri"
+
+#: /usr/bin/faugus-launcher:5081
+msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+msgstr "örnek: e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+
+#: /usr/bin/faugus-launcher:5086
+msgid "Game Arguments"
+msgstr "Oyun Parametreleri"
+
+#: /usr/bin/faugus-launcher:5089
+msgid "e.g.: -d3d11 -fullscreen"
+msgstr "örnek.: -d3d11 -fullscreen"
+
+#: /usr/bin/faugus-launcher:5093 /usr/bin/faugus-launcher:5438
+msgid "Additional Application"
+msgstr "Ek Uygulama"
+
+#: /usr/bin/faugus-launcher:5096
+msgid ""
+"Additional application to run with the game, like Cheat Engine, Trainers, "
+"Mods..."
+msgstr "Mod, çalıştırıcı ve Cheat Engine gibi oyunla çalışacak ek uygulama..."
+
+#: /usr/bin/faugus-launcher:5099 /usr/bin/faugus-launcher:5556
+msgid "Lossless Scaling Frame Generation"
+msgstr "Lossless Scaling Kare Jenerasyonu"
+
+#: /usr/bin/faugus-launcher:5130
+msgid "Shortcut"
+msgstr "Kısayol"
+
+#: /usr/bin/faugus-launcher:5135
+msgid "Desktop"
+msgstr "Masaüstü"
+
+#: /usr/bin/faugus-launcher:5137
+msgid "Add or remove a shortcut from the Desktop."
+msgstr "Masaüstünden kısayolu kaldır veya ekle"
+
+#: /usr/bin/faugus-launcher:5138
+msgid "App Menu"
+msgstr "Uygulama Menüsü"
+
+#: /usr/bin/faugus-launcher:5140
+msgid "Add or remove a shortcut from the Application Menu."
+msgstr "Uygulama Menüsüne kısayolu ekle veya kaldır."
+
+#: /usr/bin/faugus-launcher:5141
+msgid "Steam"
+msgstr "Steam"
+
+#: /usr/bin/faugus-launcher:5143
+msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
+msgstr ""
+"Steam'den bir kısayol ekle veya kaldır. Steam'in yeniden başlatılması "
+"gerekir."
+
+#: /usr/bin/faugus-launcher:5149 /usr/bin/faugus-launcher:6452
+msgid "Select an icon for the shortcut"
+msgstr "Kısayol için bir sembol seç"
+
+#: /usr/bin/faugus-launcher:5200
+msgid "Refresh"
+msgstr "Yenile"
+
+#: /usr/bin/faugus-launcher:5204
+msgid "Load from file"
+msgstr "Dosyadan yükle"
+
+#: /usr/bin/faugus-launcher:5208
+msgid "Load from URL"
+msgstr "Bağlantıdan yükle"
+
+#: /usr/bin/faugus-launcher:5216
+msgid "Game/App"
+msgstr "Oyun/Uygulama"
+
+#: /usr/bin/faugus-launcher:5232
+msgid "Tools"
+msgstr "Araçlar"
+
+#: /usr/bin/faugus-launcher:5394
+msgid ""
+"Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
+"and set the location."
+msgstr ""
+"Lossless.dll BULUNAMADI. Eğer yüklüyse, Faugus Launcher'ın ayarlarına gidin "
+"ve konum belirtin."
+
+#: /usr/bin/faugus-launcher:5397
+msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
+msgstr "Lossless Scaling Vulkan Katmanı YÜKLÜ DEĞİL."
+
+#: /usr/bin/faugus-launcher:5460 /usr/bin/faugus-launcher:5580
+msgid "Enable"
+msgstr "Etkinleştir"
+
+#: /usr/bin/faugus-launcher:5469
+msgid "/path/to/the/app"
+msgstr "/uygulamaya/giden/konum"
+
+#: /usr/bin/faugus-launcher:5479
+msgid "Delay (seconds)"
+msgstr "Gecikme (saniye)"
+
+#: /usr/bin/faugus-launcher:5496
+msgid "Run the application first"
+msgstr "Önce uygulamayı çalıştır"
+
+#: /usr/bin/faugus-launcher:5584
+msgid "Multiplier"
+msgstr "Çoğaltıcı"
+
+#: /usr/bin/faugus-launcher:5589
+msgid "Multiply the FPS."
+msgstr "FPS'i Çoğalt"
+
+#: /usr/bin/faugus-launcher:5591
+msgid "Flow Scale"
+msgstr "Akış Ölçeği"
+
+#: /usr/bin/faugus-launcher:5598
+msgid "Lower the internal motion estimation resolution."
+msgstr "İç hareket tahmini çözünürlüğünü düşür."
+
+#: /usr/bin/faugus-launcher:5600
+msgid "Performance Mode"
+msgstr "Performans Modu"
+
+#: /usr/bin/faugus-launcher:5601
+msgid "Massively improve performance at the cost of quality."
+msgstr "Kaliteden ödün vererek performansı oldukça arttır."
+
+#: /usr/bin/faugus-launcher:5604
+msgid "HDR Mode"
+msgstr "HDR Modu"
+
+#: /usr/bin/faugus-launcher:5605
+msgid "Enable special HDR-only behavior."
+msgstr "HDR'a özel davranışları etkinleştir."
+
+#: /usr/bin/faugus-launcher:5608
+msgid "Present Mode (Experimental)"
+msgstr "Sunum Modu (deneysel)"
+
+#: /usr/bin/faugus-launcher:5612
+msgid "Override the present mode."
+msgstr "Sunum modunu devre dışı bırak"
+
+#: /usr/bin/faugus-launcher:5746
+msgid "Select an image for the banner"
+msgstr "Pankart için bir görsel seç"
+
+#: /usr/bin/faugus-launcher:5754 /usr/bin/faugus-launcher:6460
+msgid "Image files"
+msgstr "Görsel dosyaları"
+
+#: /usr/bin/faugus-launcher:5781
+msgid "Enter the image URL"
+msgstr "Görsel bağlantısı gir"
+
+#: /usr/bin/faugus-launcher:5856 /usr/bin/faugus-launcher:6482
+msgid "The selected file is not a valid image."
+msgstr "Seçilen dosya geçerli bir görsel dosyası değil."
+
+#: /usr/bin/faugus-launcher:5859 /usr/bin/faugus-launcher:6486
+msgid "Please choose another one."
+msgstr "Lütfen başka bir şey seçin."
+
+#: /usr/bin/faugus-launcher:5940
+msgid "Select an additional application"
+msgstr "Ek uygulama seç"
+
+#: /usr/bin/faugus-launcher:6233
+msgid "Windows Game"
+msgstr "Windows Oyunu"
+
+#: /usr/bin/faugus-launcher:6234
+msgid "Linux Game"
+msgstr "Linux Oyunu"
+
+#: /usr/bin/faugus-launcher:6235
+msgid "Steam Game"
+msgstr "Steam Oyunu"
+
+#: /usr/bin/faugus-launcher:6715
+msgid "Select the game's .exe"
+msgstr "Oyunun .exe dosyasını seç"

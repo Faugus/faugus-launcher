@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr ""
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr ""
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr ""
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr ""
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr ""
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr ""
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr ""
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr ""
+
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
+msgid "Ok"
+msgstr ""
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr ""
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr ""
+
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr ""
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr ""
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr ""
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr ""

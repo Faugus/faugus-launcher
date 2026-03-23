@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-23 17:40+0300\n"
+"Last-Translator: Gökay BALCI <g0kkai@duck.com>\n"
+"Language-Team: \n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Steam oyunu başlatılıyor..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Faugus Launcher'ı kullanmaktan memnun musunuz?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Lütfen bağış yapmayı düşünün"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Bu mesajı bir daha gösterme"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Devam"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "İnternet bağlantı problemi."
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s bulunamadı."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Lütfen bunu yükleyin veya başka bir Proton sürümü deneyin."
+
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
+msgid "Ok"
+msgstr "Tamam"
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Bileşenler güncel"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Güncelleniyor"
+
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr "İndiriliyor"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Ayıklanıyor"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "güncel"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "Anahtarlar ve değerler başarıyla kayıtlara eklendi."
