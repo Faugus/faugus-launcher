@@ -8,121 +8,73 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 18:25-0300\n"
-"PO-Revision-Date: 2026-02-26 11:09+0800\n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-23 12:59+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
-#: /usr/bin/faugus-run:106
+#: /usr/bin/faugus-run:131
 msgid "Starting Steam game..."
 msgstr "正在啟動 Steam 遊戲..."
 
-#: /usr/bin/faugus-run:318
+#: /usr/bin/faugus-run:367
 msgid "Are you enjoying Faugus Launcher?"
 msgstr "你享受 Faugus 啟動器嗎？"
 
-#: /usr/bin/faugus-run:322
+#: /usr/bin/faugus-run:371
 msgid "Please consider donating"
 msgstr "請考慮捐款"
 
-#: /usr/bin/faugus-run:334
+#: /usr/bin/faugus-run:383
 msgid "Never show this message again"
 msgstr "不再顯示此訊息"
 
-#: /usr/bin/faugus-run:344
+#: /usr/bin/faugus-run:393
 msgid "Continue"
 msgstr "繼續"
 
-#: /usr/bin/faugus-run:392
+#: /usr/bin/faugus-run:450
 msgid "Internet connection error."
 msgstr "網路連線錯誤。"
 
-#: /usr/bin/faugus-run:396
+#: /usr/bin/faugus-run:454
 #, python-format
 msgid "%s was not found."
 msgstr "找不到 %s。"
 
-#: /usr/bin/faugus-run:400
+#: /usr/bin/faugus-run:458
 msgid "Please install it or use another Proton version."
 msgstr "請安裝它或使用另一個 Proton 版本。"
 
-#: /usr/bin/faugus-run:407 /usr/bin/faugus-run:683
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
 msgid "Ok"
 msgstr "好"
 
-#: /usr/bin/faugus-run:584
-msgid "Updating UMU-Launcher..."
-msgstr "正在更新 UMU-Launcher..."
-
-#: /usr/bin/faugus-run:586
-msgid "UMU-Launcher is up to date"
-msgstr "UMU-Launcher 是最新的"
-
-#: /usr/bin/faugus-run:588
-msgid "Updating BattlEye..."
-msgstr "正在更新 BattlEye..."
-
-#: /usr/bin/faugus-run:590
-msgid "Updating Easy Anti-Cheat..."
-msgstr "正在更新 Easy Anti-Cheat..."
-
-#: /usr/bin/faugus-run:592
+#: /usr/bin/faugus-run:649
 msgid "Components are up to date"
 msgstr "元件是最新的"
 
-#: /usr/bin/faugus-run:594
-msgid "Downloading UMU-Proton..."
-msgstr "正在下載 UMU-Proton..."
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "正在更新"
 
-#: /usr/bin/faugus-run:596
-msgid "Downloading Steam Runtime..."
-msgstr "正在下載 Steam Runtime..."
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr "正在下載"
 
-#: /usr/bin/faugus-run:598
-msgid "Extracting Steam Runtime..."
-msgstr "正在解壓縮 Steam Runtime..."
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "正在解壓縮"
 
-#: /usr/bin/faugus-run:600
-msgid "Extracting UMU-Proton..."
-msgstr "正在解壓縮 UMU-Proton..."
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "是最新的"
 
-#: /usr/bin/faugus-run:602 /usr/bin/faugus-run:608
-msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton 是最新的"
-
-#: /usr/bin/faugus-run:604 /usr/bin/faugus-run:610
-msgid "Steam Runtime is up to date"
-msgstr "Steam Runtime 是最新的"
-
-#: /usr/bin/faugus-run:606 /usr/bin/faugus-run:617
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton 是最新的"
-
-#: /usr/bin/faugus-run:613
-msgid "Downloading GE-Proton..."
-msgstr "正在下載 GE-Proton..."
-
-#: /usr/bin/faugus-run:615
-msgid "Extracting GE-Proton..."
-msgstr "正在解壓縮 GE-Proton..."
-
-#: /usr/bin/faugus-run:619
-msgid "Downloading Proton-EM..."
-msgstr "正在下載 Proton-EM..."
-
-#: /usr/bin/faugus-run:621
-msgid "Extracting Proton-EM..."
-msgstr "正在解壓縮 Proton-EM..."
-
-#: /usr/bin/faugus-run:623
-msgid "Proton-EM is up to date"
-msgstr "Proton-EM 是最新的"
-
-#: /usr/bin/faugus-run:680
+#: /usr/bin/faugus-run:743
 msgid "The keys and values were successfully added to the registry."
 msgstr "成功增加鍵與值至登錄。"
