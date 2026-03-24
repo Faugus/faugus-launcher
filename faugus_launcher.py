@@ -4779,6 +4779,17 @@ class ConfirmationDialog(Gtk.Dialog):
         prefix_label.set_label(prefix)
         prefix_label.set_halign(Gtk.Align.CENTER)
 
+        # display a warning message if the prefix about to get deleted is shared with other games
+        pfx_count = prefixes_count(prefix)
+        if pfx_count > 0:
+            warn_msg = _("WARNING: This prefix is used by %d other games.") % pfx_count
+            if pfx_count == 1:
+                warn_msg = _("WARNING: This prefix is used by 1 other game.")
+            warn_label = Gtk.Label()
+            warn_label.set_markup(f'<span color="red">{warn_msg}</span>')
+            warn_label.set_use_markup(True)
+            warn_label.set_halign(Gtk.Align.CENTER)
+
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
@@ -4812,6 +4823,8 @@ class ConfirmationDialog(Gtk.Dialog):
         if os.path.basename(prefix) != "default" and runner != "Linux-Native" and runner != "Steam":
             box_top.pack_start(self.checkbox, True, True, 0)
             box_top.pack_start(prefix_label, True, True, 0)
+            if pfx_count > 0:
+                box_top.pack_start(warn_label, True, True, 0)
 
         box_bottom.pack_start(button_no, True, True, 0)
         box_bottom.pack_start(button_yes, True, True, 0)
@@ -6940,6 +6953,19 @@ def update_games_json():
     if changed:
         with open(games_json, "w", encoding="utf-8") as f:
             json.dump(games, f, indent=4, ensure_ascii=False)
+
+# returns the number of other games using the same prefix
+def prefixes_count(prefix):
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    return sum(1 for x in games if x.get("prefix") == prefix) - 1
 
 if __name__ == "__main__":
     update_games_json()
