@@ -57,12 +57,6 @@ except FileNotFoundError:
     gettext.install('faugus-run', localedir=LOCALE_DIR)
     globals()['_'] = gettext.gettext
 
-def format_title(title):
-    title = title.strip().lower()
-    title = re.sub(r"[^\w\s-]", "", title)
-    title = re.sub(r"\s+", "-", title)
-    return title
-
 _env_set = set()
 def set_env(key, value):
     os.environ[key] = value
@@ -824,26 +818,6 @@ class FaugusRun:
         kill_child_proc()
 
         return False
-
-def handle_command(message, command=None):
-    updater = FaugusRun(message)
-    updater.show_splash_window()
-    if command == "winetricks":
-        updater.show_log_window()
-
-    def run_process():
-        updater.start_process(command)
-
-    process_thread = Thread(target=run_process)
-
-    def start_thread():
-        process_thread.start()
-
-    GLib.idle_add(start_thread)
-    Gtk.main()
-
-    process_thread.join()
-    sys.exit(0)
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")

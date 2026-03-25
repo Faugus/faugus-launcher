@@ -1,15 +1,11 @@
 #!/usr/bin/python3
 
 import sys
-sys.dont_write_bytecode = True
-
 import gi
 import gettext
 import shutil
 import subprocess
 import re
-import webbrowser
-import unicodedata
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
@@ -131,15 +127,6 @@ def format_title(title):
     title = re.sub(r"\s+", "-", title)
     return title
 
-def _validate_text(entry):
-    text = entry.get_text()
-    for i, c in enumerate(text):
-        if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
-            new_text = text[:i] + text[i+1:]
-            entry.set_text(new_text)
-            entry.set_position(i)
-            break
-
 class CreateShortcut(Gtk.Window):
     def __init__(self, file_path):
         super().__init__(title="Faugus Launcher")
@@ -178,7 +165,6 @@ class CreateShortcut(Gtk.Window):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
-        self.entry_title.connect("changed", _validate_text)
         self.entry_title.set_tooltip_text(_("Game Title"))
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
@@ -772,6 +758,7 @@ class CreateShortcut(Gtk.Window):
         return largest_image
 
     def on_button_search_protonfix_clicked(self, widget):
+        import webbrowser
         webbrowser.open("https://umu.openwinecomponents.org/")
 
     def load_config(self):
@@ -1089,34 +1076,8 @@ class CreateShortcut(Gtk.Window):
             shutil.rmtree(self.icon_directory)
         self.set_sensitive(True)
 
-    def update_preview(self, dialog):
-        if file_path := dialog.get_preview_filename():
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-                max_width = 400
-                max_height = 400
-                width = pixbuf.get_width()
-                height = pixbuf.get_height()
-
-                if width > max_width or height > max_height:
-                    ratio = min(max_width / width, max_height / height)
-                    new_width = int(width * ratio)
-                    new_height = int(height * ratio)
-                    pixbuf = pixbuf.scale_simple(new_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-
-                image = Gtk.Image.new_from_pixbuf(pixbuf)
-                dialog.set_preview_widget(image)
-                dialog.set_preview_widget_active(True)
-                dialog.get_preview_widget().set_size_request(max_width, max_height)
-            except GLib.Error:
-                dialog.set_preview_widget_active(False)
-        else:
-            dialog.set_preview_widget_active(False)
-
     def validate_fields(self):
-
         title = self.entry_title.get_text()
-
         self.entry_title.get_style_context().remove_class("entry")
 
         if not title:
