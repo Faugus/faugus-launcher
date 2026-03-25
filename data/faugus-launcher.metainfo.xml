@@ -82,13 +82,20 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.16.6-1" date="2026-03-21">
+    <release version="1.17.1-1" date="2026-03-26">
       <description>
         <ul>
-          <li>Temporarily removed the EA App installation.</li>
-          <li>Added Georgian translation.</li>
-          <li>Updated Dutch translation.</li>
-          <li>Updated Russian translation.</li>
+          <li>Added support to Proton-CachyOS.</li>
+          <li>Added Proton-CachyOS to the Proton Manager.</li>
+          <li>Added a warning when deleting a shared prefix.</li>
+          <li>Updated UMU-Launcher to version 1.4.0.</li>
+          <li>Improved splash window handling.</li>
+          <li>Reduced RAM usage.</li>
+          <li>Some code refactoring and cleanup.</li>
+          <li>Added Turkish translation.</li>
+          <li>Updated Italian translation.</li>
+          <li>Updated Chinese (Traditional) translation.</li>
+          <li>Updated Portuguese translation.</li>
         </ul>
       </description>
     </release>
