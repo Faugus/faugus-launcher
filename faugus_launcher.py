@@ -139,16 +139,6 @@ def convert_runner(runner):
 
     return runner
 
-def _validate_text(entry):
-    import unicodedata
-    text = entry.get_text()
-    for i, c in enumerate(text):
-        if c.isalpha() and "LATIN" not in unicodedata.name(c, ""):
-            new_text = text[:i] + text[i+1:]
-            entry.set_text(new_text)
-            entry.set_position(i)
-            break
-
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
         super().__init__(
@@ -191,14 +181,25 @@ class Main(Gtk.ApplicationWindow):
         self.games = []
         self.flowbox_child = None
         self.updated_steam_id = None
-        self.game_running = False
 
         self.last_click_time = 0
         self.last_clicked_item = None
         self.double_click_time_threshold = 400
 
-        self.processos = {}
-        self.button_locked = {}
+        self.processes = {}
+
+        if not os.path.exists(running_games):
+            os.makedirs(os.path.dirname(running_games), exist_ok=True)
+            with open(running_games, 'w') as f:
+                json.dump({}, f)
+
+        try:
+            with open(running_games) as f:
+                self.running = json.load(f)
+                if not isinstance(self.running, dict):
+                    self.running = {}
+        except:
+            self.running = {}
 
         self.working_directory = faugus_launcher_dir
         os.chdir(self.working_directory)
@@ -292,13 +293,69 @@ class Main(Gtk.ApplicationWindow):
             self.small_interface()
 
         self.flowbox.connect("button-press-event", self.on_item_right_click)
+        self.flowbox.connect("selected-children-changed", lambda *_: self.update_icon())
 
         self.load_tray_icon()
 
+        if not IS_FLATPAK:
+            GLib.timeout_add(1000, self.check_running)
+
+    def update_icon(self):
+        game = self.selected()
+        gameid = game.gameid if game else None
+
+        is_running = gameid in self.running if gameid else False
+        icon = "faugus-stop-symbolic" if is_running else "faugus-play-symbolic"
+        text = _("Stop") if is_running else _("Play")
+
+        self.button_play.set_image(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON))
+        self.menu_play.get_child().set_text(text)
+
         if IS_FLATPAK:
-            signal.signal(signal.SIGCHLD, self.on_child_process_closed)
-        else:
-            GLib.timeout_add_seconds(1, self.check_running_processes)
+            self.button_play.set_sensitive(not is_running)
+            self.menu_play.set_sensitive(not is_running)
+
+    def selected(self):
+        selected = self.flowbox.get_selected_children()
+        if not selected:
+            return None
+
+        child = selected[0]
+        box = child.get_child()
+        label = box.get_children()[1]
+
+        title = label.get_text()
+
+        for game in self.games:
+            if game.title == title:
+                return game
+
+        return None
+
+    def check_running(self):
+        if not isinstance(self.running, dict):
+            self.running = {}
+
+        changed = False
+
+        for gameid, pid in list(self.running.items()):
+            if gameid not in self.processes:
+                try:
+                    if isinstance(pid, dict):
+                        pid = next(iter(pid.values()))
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    self.running.pop(gameid)
+                    changed = True
+
+        if changed:
+            self.save_running()
+
+        self.update_icon()
+        return True
+
+    def save_running(self):
+        json.dump(self.running, open(running_games, "w"))
 
     def load_tray_icon(self):
         if not self.system_tray:
@@ -322,14 +379,18 @@ class Main(Gtk.ApplicationWindow):
 
         menu = Gtk.Menu()
 
+        games_by_id = {g.gameid: g for g in self.games}
+
         if os.path.exists(latest_games):
-            with open(latest_games, "r") as f:
-                for line in f:
-                    name = line.strip()
-                    if name:
-                        item = Gtk.MenuItem(label=name)
-                        item.connect("activate", self.on_game_selected, name)
-                        menu.append(item)
+            with open(latest_games) as f:
+                for gameid in map(str.strip, f):
+                    game = games_by_id.get(gameid)
+                    if not game:
+                        continue
+
+                    item = Gtk.MenuItem(label=game.title)
+                    item.connect("activate", self.on_game_selected, game)
+                    menu.append(item)
 
         if menu.get_children():
             menu.append(Gtk.SeparatorMenuItem())
@@ -350,6 +411,12 @@ class Main(Gtk.ApplicationWindow):
         self.indicator.set_status(
             AyatanaAppIndicator3.IndicatorStatus.ACTIVE
         )
+
+    def on_game_selected(self, widget, game):
+        if game.gameid in self.running:
+            self.running_dialog(game.title)
+        else:
+            self.on_button_play_clicked(game)
 
     def on_close(self, *_):
         if self.system_tray:
@@ -386,87 +453,6 @@ class Main(Gtk.ApplicationWindow):
     def select_first_child(self):
         if self.flowbox.get_children():
             self.flowbox.select_child(self.flowbox.get_children()[0])
-            self.on_item_selected(self.flowbox, self.flowbox.get_children()[0])
-
-    def on_child_process_closed(self, signum, frame):
-        for title, processo in list(self.processos.items()):
-            retcode = processo.poll()
-            if retcode is not None:
-                del self.processos[title]
-
-                selected_child = None
-
-                for child in self.flowbox.get_children():
-                    if child.get_state_flags() & Gtk.StateFlags.SELECTED:
-                        selected_child = child
-                        break
-
-                if selected_child:
-                    hbox = selected_child.get_children()[0]
-                    game_label = hbox.get_children()[1]
-                    selected_title = game_label.get_text()
-
-                    if selected_title not in self.processos:
-                        self.menu_play.set_sensitive(True)
-                        self.button_play.set_sensitive(True)
-                        self.button_play.set_image(
-                            Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-                    else:
-                        self.menu_play.set_sensitive(False)
-                        self.button_play.set_sensitive(False)
-                        self.button_play.set_image(
-                            Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-
-    def check_running_processes(self):
-        processos = self.load_processes_from_file()
-
-        updated = False
-        to_remove = []
-
-        for title, data in processos.items():
-            pid_main = data.get("faugus-run") or data.get("main")
-
-            try:
-                proc = psutil.Process(pid_main)
-                if proc.status() == psutil.STATUS_ZOMBIE:
-                    to_remove.append(title)
-            except psutil.NoSuchProcess:
-                to_remove.append(title)
-            except Exception:
-                to_remove.append(title)
-
-        for title in to_remove:
-            del processos[title]
-            updated = True
-            if title in self.button_locked:
-                del self.button_locked[title]
-
-        if updated:
-            with open(running_games, "w") as f:
-                json.dump(processos, f, indent=2)
-
-        selected_child = None
-        for child in self.flowbox.get_children():
-            if child.get_state_flags() & Gtk.StateFlags.SELECTED:
-                selected_child = child
-                break
-
-        if selected_child:
-            hbox = selected_child.get_children()[0]
-            game_label = hbox.get_children()[1]
-            selected_title = game_label.get_text()
-            self.on_item_selected(self.flowbox, selected_child)
-
-        return True
-
-    def load_processes_from_file(self):
-        if os.path.exists(running_games):
-            try:
-                with open(running_games, "r") as f:
-                    return json.load(f)
-            except json.JSONDecodeError:
-                return {}
-        return {}
 
     def small_interface(self):
         self.set_default_size(-1, 610)
@@ -540,7 +526,6 @@ class Main(Gtk.ApplicationWindow):
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.set_halign(Gtk.Align.FILL)
         self.flowbox.set_valign(Gtk.Align.START)
-        self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
 
         def sort_games(child1, child2, _):
@@ -573,11 +558,6 @@ class Main(Gtk.ApplicationWindow):
         self.box_main.pack_start(self.box_top, True, True, 0)
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
-
-        self.menu_edit.set_sensitive(False)
-        self.menu_delete.set_sensitive(False)
-        self.menu_play.set_sensitive(False)
-        self.button_play.set_sensitive(False)
 
         self.select_first_child()
 
@@ -690,7 +670,6 @@ class Main(Gtk.ApplicationWindow):
         self.flowbox.set_valign(Gtk.Align.CENTER)
         self.flowbox.set_min_children_per_line(2)
         self.flowbox.set_max_children_per_line(20)
-        self.flowbox.connect('child-activated', self.on_item_selected)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
 
         def sort_games(child1, child2, _):
@@ -720,11 +699,6 @@ class Main(Gtk.ApplicationWindow):
         self.box_main.pack_end(self.box_bottom, False, True, 0)
         self.add(self.box_main)
 
-        self.menu_edit.set_sensitive(False)
-        self.menu_delete.set_sensitive(False)
-        self.menu_play.set_sensitive(False)
-        self.button_play.set_sensitive(False)
-
         self.select_first_child()
 
         self.connect("key-press-event", self.on_key_press_event)
@@ -737,9 +711,6 @@ class Main(Gtk.ApplicationWindow):
             self.fullscreen_activated = False
             self.grid_corner.set_visible(False)
             self.grid_left.set_margin_start(0)
-
-    def on_destroy(self, *args):
-        self.get_application().quit()
 
     def on_button_bye_clicked(self, widget):
         menu = Gtk.Menu()
@@ -776,9 +747,7 @@ class Main(Gtk.ApplicationWindow):
                 self.flowbox.emit('child-activated', item)
                 self.flowbox.select_child(item)
 
-                selected_children = self.flowbox.get_selected_children()
-                selected_child = selected_children[0]
-                game = selected_child.game
+                game = self.selected()
                 title = game.title
 
                 self.menu_title.get_child().set_text(title)
@@ -845,12 +814,6 @@ class Main(Gtk.ApplicationWindow):
                     self.menu_game_location.set_visible(True)
                     self.menu_prefix_location.set_visible(True)
                     self.menu_run.set_visible(True)
-
-                processos = self.load_processes_from_file()
-                if title in processos:
-                    self.menu_play.get_child().set_text(_("Stop"))
-                else:
-                    self.menu_play.get_child().set_text(_("Play"))
 
                 if os.path.dirname(game.path):
                     self.menu_game_location.set_sensitive(True)
@@ -1148,9 +1111,7 @@ class Main(Gtk.ApplicationWindow):
         dialog.destroy()
 
     def on_duplicate_clicked(self, widget):
-        selected_children = self.flowbox.get_selected_children()
-        selected_child = selected_children[0]
-        game = selected_child.game
+        game = self.selected()
         title = game.title
 
         css_provider = Gtk.CssProvider()
@@ -1175,15 +1136,20 @@ class Main(Gtk.ApplicationWindow):
                 break
 
             new_title = duplicate_dialog.entry_title.get_text().strip()
+            gameid = format_title(new_title)
 
             if not new_title:
                 duplicate_dialog.entry_title.get_style_context().add_class("entry")
                 continue
+            if not gameid:
+                duplicate_dialog.entry_title.get_style_context().add_class("entry")
+                continue
 
-            if any(new_title == g.title for g in self.games):
-                duplicate_dialog.show_warning_dialog(
+            if any(new_title.casefold() == g.title.casefold() for g in self.games):
+                self.show_warning_dialog_main(
                     duplicate_dialog,
-                    _("%s already exists.") % new_title
+                    _("%s already exists.") % new_title,
+                    ""
                 )
                 continue
 
@@ -1279,29 +1245,16 @@ class Main(Gtk.ApplicationWindow):
         return self.flowbox.get_child_at_pos(x, y)
 
     def on_item_double_click(self, item):
-        selected_children = self.flowbox.get_selected_children()
-
-        if not selected_children:
-            return
-
-        selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        game = self.selected()
+        gameid = game.gameid
+        title = game.title
 
         current_focus = self.get_focus()
 
-        if IS_FLATPAK:
-            if title not in self.processos:
-                self.on_button_play_clicked(item)
-            else:
-                self.running_dialog(title)
+        if gameid in self.running:
+            self.running_dialog(title)
         else:
-            processos = self.load_processes_from_file()
-            if title not in processos:
-                self.on_button_play_clicked(selected_child)
-            else:
-                self.running_dialog(title)
+            self.on_button_play_clicked()
 
     def on_key_press_event(self, widget, event):
         if event.keyval == Gdk.KEY_h and event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -1335,7 +1288,6 @@ class Main(Gtk.ApplicationWindow):
 
                 self.load_config()
                 self.update_list()
-                self.button_play.set_sensitive(False)
                 self.select_first_child()
                 return True
             except Exception:
@@ -1355,37 +1307,28 @@ class Main(Gtk.ApplicationWindow):
                     self.grid_left.set_margin_start(70)
                 return True
 
-        selected_children = self.flowbox.get_selected_children()
-        if not selected_children:
+        game = self.selected()
+        if not game:
             return
+        gameid = game.gameid
+        title = game.title
 
-        selected_child = selected_children[0]
-        hbox = selected_child.get_child()
-        game_label = hbox.get_children()[1]
-        title = game_label.get_text()
+        selected = self.flowbox.get_selected_children()
+        if selected:
+            child = selected[0]
         current_focus = self.get_focus()
 
         if event.keyval in (Gdk.KEY_Up, Gdk.KEY_Down, Gdk.KEY_Left, Gdk.KEY_Right):
             if current_focus not in self.flowbox.get_children():
-                selected_child.grab_focus()
+                child.grab_focus()
 
-        if IS_FLATPAK:
-            if event.keyval == Gdk.KEY_Return:
-                if title not in self.processos:
-                    self.on_button_play_clicked(selected_child)
-                else:
-                    self.running_dialog(title)
-            elif event.keyval == Gdk.KEY_Delete:
-                self.on_button_delete_clicked(selected_child)
-        else:
-            if event.keyval == Gdk.KEY_Return:
-                processos = self.load_processes_from_file()
-                if title not in processos:
-                    self.on_button_play_clicked(selected_child)
-                else:
-                    self.running_dialog(title)
-            elif event.keyval == Gdk.KEY_Delete:
-                self.on_button_delete_clicked(selected_child)
+        if event.keyval == Gdk.KEY_Return:
+            if gameid in self.running:
+                self.running_dialog(title)
+            else:
+                self.on_button_play_clicked()
+        elif event.keyval == Gdk.KEY_Delete:
+            self.on_button_delete_clicked()
 
         if event.string:
             if event.string.isprintable():
@@ -1464,25 +1407,6 @@ class Main(Gtk.ApplicationWindow):
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
-
-    def on_game_selected(self, widget, game_name):
-        # Find the game in the FlowBox by name and select it
-        self.flowbox.unselect_all()
-        for child in self.flowbox.get_children():
-            hbox = child.get_children()[0]  # Assuming HBox structure
-            game_label = hbox.get_children()[1]  # The label should be the second item in HBox
-            title = game_label.get_text()
-            if game_label.get_text() == game_name:
-                # Select this item in FlowBox
-                self.flowbox.select_child(child)
-                break
-
-        # Call the function to run the selected game
-        processos = self.load_processes_from_file()
-        if title not in processos:
-            self.on_button_play_clicked(widget)
-        else:
-            self.running_dialog(title)
 
     def load_games(self):
         try:
@@ -1668,51 +1592,6 @@ class Main(Gtk.ApplicationWindow):
 
         if first_visible:
             self.flowbox.select_child(first_visible)
-            self.on_item_selected(self.flowbox, first_visible)
-
-    def on_item_selected(self, flowbox, child):
-        if child is not None:
-            children = child.get_children()
-            hbox = children[0]
-            label_children = hbox.get_children()
-            game_label = label_children[1]
-            title = game_label.get_text()
-
-            self.menu_edit.set_sensitive(True)
-            self.menu_delete.set_sensitive(True)
-
-            if IS_FLATPAK:
-                if title in self.processos:
-                    self.menu_play.set_sensitive(False)
-                    self.button_play.set_sensitive(False)
-                    self.button_play.set_image(
-                        Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-                else:
-                    self.menu_play.set_sensitive(True)
-                    self.button_play.set_sensitive(True)
-                    self.button_play.set_image(
-                        Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-            else:
-                processos = self.load_processes_from_file()
-                if title in self.button_locked:
-                    self.menu_play.set_sensitive(False)
-                    self.button_play.set_sensitive(False)
-                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-                elif title in processos:
-                    self.menu_play.set_sensitive(True)
-                    self.button_play.set_sensitive(True)
-                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-                else:
-                    self.menu_play.set_sensitive(True)
-                    self.button_play.set_sensitive(True)
-                    self.button_play.set_image(
-                        Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-
-        else:
-            self.menu_edit.set_sensitive(False)
-            self.menu_delete.set_sensitive(False)
-            self.menu_play.set_sensitive(False)
-            self.button_play.set_sensitive(False)
 
     def on_button_settings_clicked(self, widget):
         # Handle add button click event
@@ -1739,7 +1618,7 @@ class Main(Gtk.ApplicationWindow):
 
             if not settings_dialog.logging_warning:
                 if settings_dialog.checkbox_enable_logging.get_active():
-                    self.show_warning_dialog(self, _("Proton may generate huge log files."), _("Enable logging only when debugging a problem."))
+                    self.show_warning_dialog_main(self, _("Proton may generate huge log files."), _("Enable logging only when debugging a problem."))
                     settings_dialog.logging_warning = True
 
             settings_dialog.update_config_file()
@@ -1771,7 +1650,6 @@ class Main(Gtk.ApplicationWindow):
                 if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
                     self.load_config()
                     self.update_list()
-                    self.button_play.set_sensitive(False)
 
             self.load_config()
             settings_dialog.destroy()
@@ -1832,190 +1710,119 @@ class Main(Gtk.ApplicationWindow):
             if os.path.exists(autostart_path):
                 os.remove(autostart_path)
 
-    def on_button_play_clicked(self, widget):
-        selected_children = self.flowbox.get_selected_children()
-        if not selected_children:
+    def on_button_play_clicked(self, widget=None, game=None):
+        if game is None:
+            game = self.selected()
+
+        if not game:
             return
 
-        selected_child = selected_children[0]
-        game = selected_child.game
+        gameid = game.gameid
         title = game.title
         game_directory = os.path.dirname(game.path)
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
         if game.runner == "Steam":
-            self.update_latest_games_file(title)
-            subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid],cwd=cwd)
+            self.update_latest_games_file(game.gameid)
+            subprocess.Popen([sys.executable, faugus_run, "--game", gameid], cwd=cwd)
             return
 
-        processos = self.load_processes_from_file()
-        self.button_locked[title] = True
+        # STOP
+        if gameid in self.running:
+            try:
+                os.kill(self.running[gameid], signal.SIGUSR1)
+            except ProcessLookupError:
+                pass
 
-        if title in processos:
-            data = processos[title]
-            pid_main = data.get("faugus-run")
-            if pid_main:
-                try:
-                    os.kill(pid_main, signal.SIGUSR1)
-                except ProcessLookupError:
-                    pass
-
+            self.running.pop(gameid, None)
+            self.processes.pop(gameid, None)
+            self.save_running()
+            self.update_icon()
             return
 
-        if game:
-            # Save the game title to the latest_games.txt file
-            self.update_latest_games_file(title)
+        # PLAY
+        self.update_latest_games_file(game.gameid)
 
-            if self.close_on_launch:
-                if IS_FLATPAK:
-                    subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL, cwd=cwd)
-                    sys.exit()
-                else:
-                    self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
+        cmd = sys.executable, faugus_run, "--game", gameid
+        proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
-                    self.menu_play.set_sensitive(False)
-                    self.button_play.set_sensitive(False)
-                    self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
+        if not IS_FLATPAK or not self.close_on_launch:
+            self.running[gameid] = proc.pid
+            self.processes[gameid] = proc
+            GLib.child_watch_add(proc.pid, self.on_exit, gameid)
+            self.save_running()
 
-                    def check_pid_timeout():
-                        if self.find_pid(game):
-                            sys.exit()
-                        return True
+        if self.close_on_launch:
+            sys.exit()
 
-                    GLib.timeout_add(1000, check_pid_timeout)
+        self.update_icon()
 
-            else:
-                self.processo = subprocess.Popen([sys.executable, faugus_run, "--game", game.gameid], cwd=cwd)
+    def on_exit(self, pid, status, game):
+        self.running.pop(game, None)
+        self.processes.pop(game, None)
+        self.save_running()
+        GLib.idle_add(self.update_icon)
 
-                self.menu_play.set_sensitive(False)
-                self.button_play.set_sensitive(False)
-                self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-
-                GLib.child_watch_add(self.processo.pid, self.on_process_exit)
-
-                if IS_FLATPAK:
-                    self.processos[title] = self.processo
-                else:
-                    def check_pid_periodically():
-                        if self.find_pid(game):
-                            return False
-                        return True
-
-                    GLib.timeout_add(1000, check_pid_periodically)
-
-    def on_process_exit(self, pid, status):
-        if self.processo and self.processo.pid == pid:
-            self.processo = None
-
-        self.menu_play.set_sensitive(True)
-        self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-
-    def find_pid(self, game):
-        if self.processo is None:
-            return True
-
+    def update_latest_games_file(self, gameid):
         try:
-            parent = psutil.Process(self.processo.pid)
-        except psutil.NoSuchProcess:
-            return False
-
-        self.save_process_to_file(
-            game.title,
-            main_pid=self.processo.pid
-        )
-
-        self.menu_play.set_sensitive(True)
-        self.button_play.set_sensitive(True)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-stop-symbolic", Gtk.IconSize.BUTTON))
-
-        if game.title in self.button_locked:
-            del self.button_locked[game.title]
-
-        return True
-
-    def save_process_to_file(self, title, main_pid):
-        os.makedirs(os.path.dirname(running_games), exist_ok=True)
-
-        try:
-            with open(running_games, "r") as f:
-                processos = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            processos = {}
-
-        processos[title] = {
-            "faugus-run": main_pid
-        }
-
-        with open(running_games, "w") as f:
-            json.dump(processos, f, indent=2)
-
-    def update_latest_games_file(self, title):
-        # Read the existing games from the file, if it exists
-        try:
-            with open(latest_games, 'r') as f:
+            with open(latest_games) as f:
                 games = f.read().splitlines()
         except FileNotFoundError:
             games = []
 
-        # Remove the game if it already exists in the list and add it to the top
-        if title in games:
-            games.remove(title)
-        games.insert(0, title)
+        valid_ids = {g.gameid for g in self.games}
 
-        # Keep only the 5 most recent games
-        games = games[:5]
+        games = [g for g in games if g in valid_ids and g != gameid]
+        games.insert(0, gameid)
 
-        # Write the updated list back to the file
         with open(latest_games, 'w') as f:
-            f.write('\n'.join(games))
+            f.write('\n'.join(games[:5]))
+
         self.load_tray_icon()
 
     def on_button_kill_clicked(self, widget):
         if not IS_FLATPAK:
-            processos = self.load_processes_from_file()
+            if not isinstance(self.running, dict):
+                self.running = {}
 
-            for data in processos.values():
-                pid_main = data.get("faugus-run")
+            for gameid, pid in list(self.running.items()):
+                try:
+                    os.kill(pid, signal.SIGUSR1)
+                except ProcessLookupError:
+                    pass
 
-                if pid_main:
-                    try:
-                        os.kill(pid_main, signal.SIGUSR1)
-                    except ProcessLookupError:
-                        pass
+            self.running.clear()
+            self.processes.clear()
+            self.save_running()
+            self.update_icon()
 
         subprocess.run(r"""
     for pid in $(ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver|winedevice.exe' | awk -F'/' '{print $3}'); do
         kill -9 "$pid"
     done
 """, shell=True)
-        self.game_running = False
-        self.button_locked.clear()
 
     def on_button_add_clicked(self, widget):
         file_path = ""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
+        add_game_dialog = AddGame(self, self.running, file_path, self.interface_mode)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
 
     def on_button_edit_clicked(self, widget):
         file_path = ""
+        game_running = False
 
-        selected_children = self.flowbox.get_selected_children()
-        selected_child = selected_children[0]
-        game = selected_child.game
+        game = self.selected()
+        gameid = game.gameid
         title = game.title
 
         if game:
-            processos = self.load_processes_from_file()
-            if game.title in processos:
-                self.game_running = True
-            else:
-                self.game_running = False
-            edit_game_dialog = AddGame(self, self.game_running, file_path, self.interface_mode)
+            if gameid in self.running:
+                game_running = True
+
+            edit_game_dialog = AddGame(self, game_running, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model_steam_title = edit_game_dialog.combobox_steam_title.get_model()
@@ -2113,7 +1920,7 @@ class Main(Gtk.ApplicationWindow):
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
-            if self.game_running:
+            if game_running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
@@ -2151,11 +1958,10 @@ class Main(Gtk.ApplicationWindow):
 
         return image
 
-    def on_button_delete_clicked(self, widget):
+    def on_button_delete_clicked(self, *_):
         self.reload_playtimes()
-        selected_children = self.flowbox.get_selected_children()
-        selected_child = selected_children[0]
-        game = selected_child.game
+        game = self.selected()
+        gameid = game.gameid
         title = game.title
 
         if game:
@@ -2164,18 +1970,16 @@ class Main(Gtk.ApplicationWindow):
             response = confirmation_dialog.run()
 
             if response == Gtk.ResponseType.YES:
-                processos = self.load_processes_from_file()
-                if title in processos:
-                    data = processos[title]
-                    pid = data.get("main")
-                    if pid:
-                        parent = psutil.Process(pid)
-                        children = parent.children(recursive=True)
+                if gameid in self.running:
+                    try:
+                        os.kill(self.running[gameid], signal.SIGUSR1)
+                    except ProcessLookupError:
+                        pass
 
-                        for child in children:
-                            child.terminate()
-
-                        parent.terminate()
+                    self.running.pop(gameid, None)
+                    self.processes.pop(gameid, None)
+                    self.save_running()
+                    self.update_icon()
 
                 # Remove game and associated files if required
                 if confirmation_dialog.get_remove_prefix_state():
@@ -2188,7 +1992,7 @@ class Main(Gtk.ApplicationWindow):
                             os.system(f'chmod -R u+rwX "{prefix_path}"')
                             shutil.rmtree(prefix_path)
                         except Exception as e2:
-                            self.show_warning_dialog(
+                            self.show_warning_dialog_main(
                                 self,
                                 _("Failed to remove prefix."),
                                 str(e2)
@@ -2207,7 +2011,6 @@ class Main(Gtk.ApplicationWindow):
 
                 # Remove the game from the latest-games file if it exists
                 self.remove_game_from_latest_games(title)
-                self.button_play.set_sensitive(False)
                 self.select_first_child()
 
             confirmation_dialog.destroy()
@@ -2260,7 +2063,7 @@ class Main(Gtk.ApplicationWindow):
         except FileNotFoundError:
             pass  # Ignore if the file doesn't exist yet
 
-    def show_warning_dialog(self, parent, text1, text2):
+    def show_warning_dialog_main(self, parent, text1, text2):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -2327,8 +2130,8 @@ class Main(Gtk.ApplicationWindow):
                 with open(games_json, encoding="utf-8") as f:
                     games = json.load(f)
 
-                if any(game.get("title") == title for game in games):
-                    self.show_warning_dialog(
+                if any(game.get("title", "").casefold() == title.casefold() for game in games):
+                    self.show_warning_dialog_main(
                         add_game_dialog,
                         _("%s already exists.") % title,
                         ""
@@ -2451,7 +2254,7 @@ class Main(Gtk.ApplicationWindow):
 
             if launcher_id not in ("windows", "linux", "steam"):
                 if not check_internet_connection():
-                    self.show_warning_dialog(add_game_dialog, _("No internet connection."), "")
+                    self.show_warning_dialog_main(add_game_dialog, _("No internet connection."), "")
                     return True
 
                 if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
@@ -2680,7 +2483,7 @@ class Main(Gtk.ApplicationWindow):
                 self.save_games()
                 self.update_list()
                 self.remove_game_from_latest_games(title)
-                self.show_warning_dialog(self, _("%s was not installed!") % title, "")
+                self.show_warning_dialog_main(self, _("%s was not installed!") % title, "")
 
             if self.interface_mode != "List":
                 if self.fullscreen_activated:
@@ -2728,7 +2531,7 @@ class Main(Gtk.ApplicationWindow):
                     GLib.idle_add(self.bar_download.set_text, _("Download complete"))
                     GLib.idle_add(on_download_complete)
                 except Exception as e:
-                    GLib.idle_add(self.show_warning_dialog, self, _("Error during download: %s") % e, "")
+                    GLib.idle_add(self.show_warning_dialog_main, self, _("Error during download: %s") % e, "")
 
             def on_download_complete():
                 self.label_download.set_text(_("Installing %s...") % title)
@@ -2776,9 +2579,6 @@ class Main(Gtk.ApplicationWindow):
                 # Selects the child in the FlowBox
                 self.flowbox.select_child(child)
                 break
-
-        # Calls the item selection method to ensure the buttons are updated
-        self.on_item_selected(self.flowbox, child)
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response
@@ -3053,34 +2853,6 @@ class Main(Gtk.ApplicationWindow):
         game_directory = os.path.dirname(game.path)
 
         add_game_to_steam(game.title, game_directory, new_icon_path)
-
-    def update_preview(self, dialog):
-        if file_path := dialog.get_preview_filename():
-            try:
-                # Create an image widget for the thumbnail
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-
-                # Resize the thumbnail if it's too large, maintaining the aspect ratio
-                max_width = 400
-                max_height = 400
-                width = pixbuf.get_width()
-                height = pixbuf.get_height()
-
-                if width > max_width or height > max_height:
-                    # Calculate the new width and height while maintaining the aspect ratio
-                    ratio = min(max_width / width, max_height / height)
-                    new_width = int(width * ratio)
-                    new_height = int(height * ratio)
-                    pixbuf = pixbuf.scale_simple(new_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-
-                image = Gtk.Image.new_from_pixbuf(pixbuf)
-                dialog.set_preview_widget(image)
-                dialog.set_preview_widget_active(True)
-                dialog.get_preview_widget().set_size_request(max_width, max_height)
-            except GLib.Error:
-                dialog.set_preview_widget_active(False)
-        else:
-            dialog.set_preview_widget_active(False)
 
     def remove_banner_icon(self, game):
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
@@ -3953,9 +3725,10 @@ class Settings(Gtk.Dialog):
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combobox_runner.append_text("GE-Proton Latest (default)")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("Proton-CachyOS Latest")
+        self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("UMU-Proton Latest")
+
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
             self.combobox_runner.append_text("Proton-CachyOS (System)")
 
@@ -4106,7 +3879,7 @@ class Settings(Gtk.Dialog):
     def check_modified(self):
         self.track_modifications(self.box)
         if self.modified:
-            proceed = self.show_warning_dialog2(self.parent, _("Do you want to save the changes?"))
+            proceed = self.show_warning_dialog_settings(self.parent, _("Do you want to save the changes?"), True)
             if proceed:
                 if self.entry_default_prefix.get_text() == "":
                     self.entry_default_prefix.get_style_context().add_class("entry")
@@ -4254,7 +4027,7 @@ class Settings(Gtk.Dialog):
         self.check_modified()
 
         self.response(Gtk.ResponseType.OK)
-        self.show_warning_dialog(self, _("Prefixes and runners will not be backed up!"))
+        self.show_warning_dialog_settings(self, _("Prefixes and runners will not be backed up!"), False)
 
         items = ["banners", "games-backup", "icons", "config.ini", "envar.txt", "games.json", "latest-games.txt"]
 
@@ -4334,7 +4107,7 @@ class Settings(Gtk.Dialog):
             zip_file = filechooser.get_filename()
             if not os.path.isfile(zip_file):
                 filechooser.destroy()
-                self.show_warning_dialog(self, _("This is not a valid Faugus Launcher backup file."))
+                self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
                 return
 
             temp_dir = os.path.join(faugus_launcher_dir, "temp-restore")
@@ -4344,10 +4117,10 @@ class Settings(Gtk.Dialog):
             if not os.path.exists(marker_path):
                 shutil.rmtree(temp_dir)
                 filechooser.destroy()
-                self.show_warning_dialog(self, _("This is not a valid Faugus Launcher backup file."))
+                self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
                 return
 
-            if self.show_warning_dialog2(self, _("Are you sure you want to overwrite the settings?")):
+            if self.show_warning_dialog_settings(self, _("Are you sure you want to overwrite the settings?"), True):
                 for item in os.listdir(temp_dir):
                     if item == ".faugus_marker":
                         continue
@@ -4371,7 +4144,7 @@ class Settings(Gtk.Dialog):
 
         filechooser.destroy()
 
-    def show_warning_dialog(self, parent, title):
+    def show_warning_dialog_settings(self, parent, title, buttons):
         dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -4380,46 +4153,9 @@ class Settings(Gtk.Dialog):
         label.set_label(title)
         label.set_halign(Gtk.Align.CENTER)
 
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.destroy())
-
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.pack_start(label, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
-
-        content_area.add(box_top)
-        content_area.add(box_bottom)
-
-        dialog.show_all()
-        dialog.run()
-        dialog.destroy()
-
-    def show_warning_dialog2(self, parent, title):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
-        dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-
-        label = Gtk.Label()
-        label.set_label(title)
-        label.set_halign(Gtk.Align.CENTER)
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.connect("clicked", lambda x: dialog.destroy())
 
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
@@ -4448,17 +4184,18 @@ class Settings(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
-        box_bottom.pack_start(button_no, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
+        if buttons:
+            box_bottom.pack_start(button_no, True, True, 0)
+            box_bottom.pack_start(button_yes, True, True, 0)
+        else:
+            box_bottom.pack_start(button_ok, True, True, 0)
 
         content_area.add(box_top)
         content_area.add(box_bottom)
 
         dialog.show_all()
-        response = dialog.run()
+        dialog.run()
         dialog.destroy()
-
-        return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
         import webbrowser
@@ -4684,7 +4421,6 @@ class DuplicateDialog(Gtk.Dialog):
         label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.set_tooltip_text(_("Game Title"))
-        self.entry_title.connect("changed", _validate_text)
 
         button_cancel = Gtk.Button(label=_("Cancel"))
         button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -4722,48 +4458,6 @@ class DuplicateDialog(Gtk.Dialog):
         content_area.add(box_bottom)
 
         self.show_all()
-
-    def show_warning_dialog(self, parent, title):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
-        dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
-
-        label = Gtk.Label()
-        label.set_label(title)
-        label.set_halign(Gtk.Align.CENTER)
-
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.destroy())
-
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.pack_start(label, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
-
-        content_area.add(box_top)
-        content_area.add(box_bottom)
-
-        dialog.show_all()
-        dialog.run()
-        dialog.destroy()
-
 
 class ConfirmationDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix, runner):
@@ -5035,7 +4729,6 @@ class AddGame(Gtk.Dialog):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
-        self.entry_title.connect("changed", _validate_text)
         if interface_mode == "Banners":
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text(_("Game Title"))
@@ -6257,9 +5950,10 @@ class AddGame(Gtk.Dialog):
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combobox_runner.append_text("GE-Proton Latest (default)")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("Proton-CachyOS Latest")
+        self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("UMU-Proton Latest")
+
         if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
             self.combobox_runner.append_text("Proton-CachyOS (System)")
 
@@ -6569,34 +6263,6 @@ class AddGame(Gtk.Dialog):
 
         return largest_image
 
-    def update_preview(self, dialog):
-        if file_path := dialog.get_preview_filename():
-            try:
-                # Create an image widget for the thumbnail
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-
-                # Resize the thumbnail if it's too large, maintaining the aspect ratio
-                max_width = 400
-                max_height = 400
-                width = pixbuf.get_width()
-                height = pixbuf.get_height()
-
-                if width > max_width or height > max_height:
-                    # Calculate the new width and height while maintaining the aspect ratio
-                    ratio = min(max_width / width, max_height / height)
-                    new_width = int(width * ratio)
-                    new_height = int(height * ratio)
-                    pixbuf = pixbuf.scale_simple(new_width, new_height, GdkPixbuf.InterpType.BILINEAR)
-
-                image = Gtk.Image.new_from_pixbuf(pixbuf)
-                dialog.set_preview_widget(image)
-                dialog.set_preview_widget_active(True)
-                dialog.get_preview_widget().set_size_request(max_width, max_height)
-            except GLib.Error:
-                dialog.set_preview_widget_active(False)
-        else:
-            dialog.set_preview_widget_active(False)
-
     def check_existing_shortcut(self):
         # Check if the shortcut already exists and mark or unmark the checkbox
         title = self.entry_title.get_text().strip()
@@ -6823,6 +6489,7 @@ class AddGame(Gtk.Dialog):
     def validate_fields(self, entry):
         # Validate the input fields for title, prefix and path
         title = self.entry_title.get_text()
+        gameid = format_title(title)
         prefix = self.entry_prefix.get_text()
         path = self.entry_path.get_text()
         combobox_steam = self.combobox_steam_title.get_active_text()
@@ -6862,7 +6529,7 @@ class AddGame(Gtk.Dialog):
                 return False
 
         if entry == "path+prefix":
-            if not title or not path or not prefix:
+            if not title or not path or not prefix or not gameid:
                 if not title:
                     self.entry_title.get_style_context().add_class("entry")
                     self.notebook.set_current_page(0)
@@ -6873,6 +6540,10 @@ class AddGame(Gtk.Dialog):
 
                 if not prefix:
                     self.entry_prefix.get_style_context().add_class("entry")
+                    self.notebook.set_current_page(0)
+
+                if not gameid:
+                    self.entry_title.get_style_context().add_class("entry")
                     self.notebook.set_current_page(0)
 
                 return False
