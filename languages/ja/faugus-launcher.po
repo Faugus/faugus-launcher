@@ -1,0 +1,763 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 14:10-0300\n"
+"PO-Revision-Date: 2026-03-26 01:36+0800\n"
+"Last-Translator: skyhighcaterpie\n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-launcher:232 /usr/bin/faugus-launcher:853
+msgid "Play"
+msgstr "再生する"
+
+#: /usr/bin/faugus-launcher:236
+msgid "Edit"
+msgstr "編集する"
+
+#: /usr/bin/faugus-launcher:240
+msgid "Delete"
+msgstr "削除する"
+
+#: /usr/bin/faugus-launcher:244
+msgid "Duplicate"
+msgstr "複製する"
+
+#: /usr/bin/faugus-launcher:248 /usr/bin/faugus-launcher:824
+msgid "Hide"
+msgstr "非表示にする"
+
+#: /usr/bin/faugus-launcher:252 /usr/bin/faugus-launcher:829
+msgid "Add to favorites"
+msgstr "お気に入りに追加"
+
+#: /usr/bin/faugus-launcher:256
+msgid "Open game location"
+msgstr "ゲームの場所を開く"
+
+#: /usr/bin/faugus-launcher:260
+msgid "Open prefix location"
+msgstr "Prefixの場所を開く"
+
+#: /usr/bin/faugus-launcher:264
+msgid "Run file inside the prefix"
+msgstr "Prefix内でファイルを実行する"
+
+#: /usr/bin/faugus-launcher:268
+msgid "Show logs"
+msgstr "ログを表示する"
+
+#: /usr/bin/faugus-launcher:337
+msgid "Open Faugus Launcher"
+msgstr "Faugus Launcherを開く"
+
+#: /usr/bin/faugus-launcher:341
+msgid "Quit"
+msgstr "終了する"
+
+#: /usr/bin/faugus-launcher:495 /usr/bin/faugus-launcher:611
+msgid "Force close all running games"
+msgstr "起動中のゲームをすべて強制終了する"
+
+#: /usr/bin/faugus-launcher:523 /usr/bin/faugus-launcher:650
+msgid "Search..."
+msgstr "検索..."
+
+#: /usr/bin/faugus-launcher:747
+msgid "Shut down"
+msgstr "シャットダウン"
+
+#: /usr/bin/faugus-launcher:748
+msgid "Reboot"
+msgstr "再起動する"
+
+#: /usr/bin/faugus-launcher:749
+msgid "Close"
+msgstr "閉じる"
+
+#: /usr/bin/faugus-launcher:822
+msgid "Remove from hidden"
+msgstr "非表示を解除する"
+
+#: /usr/bin/faugus-launcher:827
+msgid "Remove from favorites"
+msgstr "お気に入りから削除"
+
+#: /usr/bin/faugus-launcher:851
+msgid "Stop"
+msgstr "停止する"
+
+#: /usr/bin/faugus-launcher:886
+msgid "hour"
+msgstr "時間"
+
+#: /usr/bin/faugus-launcher:887
+msgid "hours"
+msgstr "時間"
+
+#: /usr/bin/faugus-launcher:888
+msgid "minute"
+msgstr "分"
+
+#: /usr/bin/faugus-launcher:889
+msgid "minutes"
+msgstr "分"
+
+#: /usr/bin/faugus-launcher:997 /usr/bin/faugus-launcher:4193
+#: /usr/bin/faugus-launcher:6322
+msgid "Select a file to run inside the prefix"
+msgstr "Prefix内で実行するファイルを選択してください"
+
+#: /usr/bin/faugus-launcher:1000 /usr/bin/faugus-launcher:4196
+#: /usr/bin/faugus-launcher:4322 /usr/bin/faugus-launcher:4475
+#: /usr/bin/faugus-launcher:4498 /usr/bin/faugus-launcher:5749
+#: /usr/bin/faugus-launcher:5943 /usr/bin/faugus-launcher:6325
+#: /usr/bin/faugus-launcher:6455 /usr/bin/faugus-launcher:6718
+#: /usr/bin/faugus-launcher:6791
+msgid "Open"
+msgstr "開く"
+
+#: /usr/bin/faugus-launcher:1001 /usr/bin/faugus-launcher:3513
+#: /usr/bin/faugus-launcher:4197 /usr/bin/faugus-launcher:4290
+#: /usr/bin/faugus-launcher:4323 /usr/bin/faugus-launcher:4476
+#: /usr/bin/faugus-launcher:4499 /usr/bin/faugus-launcher:4688
+#: /usr/bin/faugus-launcher:5152 /usr/bin/faugus-launcher:5522
+#: /usr/bin/faugus-launcher:5658 /usr/bin/faugus-launcher:5750
+#: /usr/bin/faugus-launcher:5794 /usr/bin/faugus-launcher:5944
+#: /usr/bin/faugus-launcher:6326 /usr/bin/faugus-launcher:6456
+#: /usr/bin/faugus-launcher:6719 /usr/bin/faugus-launcher:6792
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: /usr/bin/faugus-launcher:1005 /usr/bin/faugus-launcher:4201
+#: /usr/bin/faugus-launcher:5948 /usr/bin/faugus-launcher:6330
+#: /usr/bin/faugus-launcher:6726
+msgid "Windows files"
+msgstr "Windowsのファイル"
+
+#: /usr/bin/faugus-launcher:1013 /usr/bin/faugus-launcher:4209
+#: /usr/bin/faugus-launcher:5956 /usr/bin/faugus-launcher:6338
+#: /usr/bin/faugus-launcher:6734
+msgid "All files"
+msgstr "すべてのファイル"
+
+#: /usr/bin/faugus-launcher:1059
+#, python-format
+msgid "%s Logs"
+msgstr "%s ログ"
+
+#: /usr/bin/faugus-launcher:1098
+msgid "Copy to clipboard"
+msgstr "クリップボードにコピー"
+
+#: /usr/bin/faugus-launcher:1102
+msgid "Open file location"
+msgstr "ファイルの場所を開く"
+
+#: /usr/bin/faugus-launcher:1186 /usr/bin/faugus-launcher:2333
+#, python-format
+msgid "%s already exists."
+msgstr "%s はすでに存在します。"
+
+#: /usr/bin/faugus-launcher:1413
+#, python-format
+msgid "%s is already running."
+msgstr "%s はすでに実行中です。"
+
+#: /usr/bin/faugus-launcher:1416 /usr/bin/faugus-launcher:2276
+#: /usr/bin/faugus-launcher:3518 /usr/bin/faugus-launcher:4384
+#: /usr/bin/faugus-launcher:4692 /usr/bin/faugus-launcher:4734
+#: /usr/bin/faugus-launcher:5157 /usr/bin/faugus-launcher:5527
+#: /usr/bin/faugus-launcher:5663 /usr/bin/faugus-launcher:5790
+#: /usr/bin/faugus-launcher:5862 /usr/bin/faugus-launcher:6489
+msgid "Ok"
+msgstr "確認"
+
+#: /usr/bin/faugus-launcher:1742
+msgid "Proton may generate huge log files."
+msgstr "Protonは膨大なログファイルを生成する場合があります。"
+
+#: /usr/bin/faugus-launcher:1742
+msgid "Enable logging only when debugging a problem."
+msgstr "デバッグ時のみ、ログ記録を有効に。"
+
+#: /usr/bin/faugus-launcher:2050
+#, python-format
+msgid "Edit %s"
+msgstr "%s を編集"
+
+#: /usr/bin/faugus-launcher:2107 /usr/bin/faugus-launcher:5386
+msgid ""
+"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
+"USERS FOUND."
+msgstr ""
+"Steamからショートカットを追加または削除します。Steamを再起動する必要がありま"
+"す。Steamユーザーが見つかりません。"
+
+#: /usr/bin/faugus-launcher:2118
+#, python-format
+msgid "%s is running. Please close it first."
+msgstr "%s が実行中です。まずそれを閉じてください。"
+
+#: /usr/bin/faugus-launcher:2193
+msgid "Failed to remove prefix."
+msgstr "Prefixの削除に失敗しました。"
+
+#: /usr/bin/faugus-launcher:2454
+msgid "No internet connection."
+msgstr "インターネットに接続されていません。"
+
+#: /usr/bin/faugus-launcher:2578 /usr/bin/faugus-launcher:2734
+#, python-format
+msgid "Installing %s..."
+msgstr "%sをインストールしています..."
+
+#: /usr/bin/faugus-launcher:2589
+msgid "Finish installation"
+msgstr "インストールを完了する"
+
+#: /usr/bin/faugus-launcher:2596 /usr/bin/faugus-launcher:2601
+#: /usr/bin/faugus-launcher:2606 /usr/bin/faugus-launcher:2611
+#: /usr/bin/faugus-launcher:2616 /usr/bin/faugus-launcher:2621
+msgid "Downloading"
+msgstr "ダウンロード中"
+
+#: /usr/bin/faugus-launcher:2683
+#, python-format
+msgid "%s was not installed!"
+msgstr "%sがインストールされていません！"
+
+#: /usr/bin/faugus-launcher:2728
+msgid "Download complete"
+msgstr "ダウンロード完了"
+
+#: /usr/bin/faugus-launcher:2731
+#, python-format
+msgid "Error during download: %s"
+msgstr "ダウンロード中にエラーが発生しました：%s"
+
+#: /usr/bin/faugus-launcher:2736 /usr/bin/faugus-launcher:2739
+#: /usr/bin/faugus-launcher:2749
+msgid "Please close the login window and wait."
+msgstr "ログイン画面を閉じて、しばらくお待ちください。"
+
+#: /usr/bin/faugus-launcher:2748
+msgid "Please don't change the installation path."
+msgstr "インストール先は変更しないでください。"
+
+#: /usr/bin/faugus-launcher:2752
+msgid "Please close Wargaming to finish the installation."
+msgstr "インストールを完了するにはWargamingを閉じてください。"
+
+#: /usr/bin/faugus-launcher:3217
+msgid "Settings"
+msgstr "設定"
+
+#: /usr/bin/faugus-launcher:3342
+msgid "Language"
+msgstr "言語"
+
+#: /usr/bin/faugus-launcher:3347
+msgid "Interface Mode"
+msgstr "インターフェースモード"
+
+#: /usr/bin/faugus-launcher:3351
+msgid "List"
+msgstr "リスト"
+
+#: /usr/bin/faugus-launcher:3352
+msgid "Blocks"
+msgstr "ブロック"
+
+#: /usr/bin/faugus-launcher:3353
+msgid "Banners"
+msgstr "バナー"
+
+#: /usr/bin/faugus-launcher:3356
+msgid "Start maximized"
+msgstr "ウィンドウの最大化で起動"
+
+#: /usr/bin/faugus-launcher:3361
+msgid "Start in fullscreen"
+msgstr "フルスクリーンで起動"
+
+#: /usr/bin/faugus-launcher:3364
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt＋Enterキーで全画面表示を切り替え"
+
+#: /usr/bin/faugus-launcher:3366
+msgid "Show labels"
+msgstr "ラベルを表示する"
+
+#: /usr/bin/faugus-launcher:3369
+msgid "Smaller banners"
+msgstr "小さなバナー"
+
+#: /usr/bin/faugus-launcher:3373
+msgid "Default Prefixes Location"
+msgstr "デフォルトのPrefixの場所"
+
+#: /usr/bin/faugus-launcher:3377 /usr/bin/faugus-launcher:5051
+msgid "/path/to/the/prefix"
+msgstr "/Prefix/へ/の/パス"
+
+#: /usr/bin/faugus-launcher:3387
+msgid "Lossless Scaling Location"
+msgstr "Lossless Scalingの場所"
+
+#: /usr/bin/faugus-launcher:3391
+msgid "/path/to/Lossless.dll"
+msgstr "/Lossless.dllへ/の/パス"
+
+#: /usr/bin/faugus-launcher:3400
+msgid "Default Prefix Tools"
+msgstr "デフォルトのPrefix設定ツール"
+
+#: /usr/bin/faugus-launcher:3407
+msgid "Default Proton"
+msgstr "デフォルトのProton"
+
+#: /usr/bin/faugus-launcher:3411
+msgid "Proton Manager"
+msgstr "Protonマネージャー"
+
+#: /usr/bin/faugus-launcher:3414
+msgid "Miscellaneous"
+msgstr "その他"
+
+#: /usr/bin/faugus-launcher:3421
+msgid "Use discrete GPU"
+msgstr "ディスクリートGPUを使用する"
+
+#: /usr/bin/faugus-launcher:3425
+msgid "Close when running a game/app"
+msgstr "ゲームやアプリの実行中に閉じる"
+
+#: /usr/bin/faugus-launcher:3429
+msgid "System tray icon"
+msgstr "システムトレイのアイコン"
+
+#: /usr/bin/faugus-launcher:3434
+msgid "Start on boot"
+msgstr "起動時に開始する"
+
+#: /usr/bin/faugus-launcher:3438
+msgid "Monochrome icon"
+msgstr "モノクロのアイコン"
+
+#: /usr/bin/faugus-launcher:3443
+msgid "Disable splash window"
+msgstr "スプラッシュ画面を無効にする"
+
+#: /usr/bin/faugus-launcher:3446
+msgid "Disable automatic updates"
+msgstr "自動更新を無効にする"
+
+#: /usr/bin/faugus-launcher:3450
+msgid "Enable logging"
+msgstr "ログ記録を有効にする"
+
+#: /usr/bin/faugus-launcher:3453
+msgid "Show hidden games"
+msgstr "非表示のゲームを表示する"
+
+#: /usr/bin/faugus-launcher:3455
+msgid "Press Ctrl+H to show/hide games."
+msgstr "Ctrl+Hキーでゲームの表示/非表示を切り替え。"
+
+#: /usr/bin/faugus-launcher:3457
+msgid "Use Wayland driver (experimental)"
+msgstr "Waylandドライバーを使用する（実験的）"
+
+#: /usr/bin/faugus-launcher:3459 /usr/bin/faugus-launcher:3465
+msgid "Only works with GE-Proton10 or Proton-EM-10."
+msgstr "GE-Proton10またはProton-EM-10でのみ動作します。"
+
+#: /usr/bin/faugus-launcher:3462
+msgid "Enable HDR (experimental)"
+msgstr "HDRを有効にする（実験的機能）"
+
+#: /usr/bin/faugus-launcher:3467
+msgid "Enable WOW64 (experimental)"
+msgstr "WOW64を有効にする（実験的機能）"
+
+#: /usr/bin/faugus-launcher:3469
+msgid ""
+"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+msgstr ""
+"GE-Proton10-9以降、およびProton-EM-10-24以降のモデルでのみ動作します。"
+
+#: /usr/bin/faugus-launcher:3482 /usr/bin/faugus-launcher:5124
+msgid "Run"
+msgstr "実行する"
+
+#: /usr/bin/faugus-launcher:3485 /usr/bin/faugus-launcher:5127
+msgid "Run a file inside the prefix"
+msgstr "Prefix内のファイルを実行します"
+
+#: /usr/bin/faugus-launcher:3490 /usr/bin/faugus-launcher:5105
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+msgstr ""
+"FPS、温度、CPU/GPUの使用率などを監視するためのオーバーレイを表示します。"
+
+#: /usr/bin/faugus-launcher:3492 /usr/bin/faugus-launcher:5107
+msgid "Tweaks your system to improve performance."
+msgstr "システムのパフォーマンスを向上させるよう調整します。"
+
+#: /usr/bin/faugus-launcher:3493 /usr/bin/faugus-launcher:5108
+msgid "Disable Hidraw"
+msgstr "Hidrawを無効にする"
+
+#: /usr/bin/faugus-launcher:3495 /usr/bin/faugus-launcher:5110
+msgid ""
+"May fix controller issues with some games. Only works with GE-Proton10 or "
+"Proton-EM-10."
+msgstr ""
+"一部のゲームにおけるコントローラーの問題が解決される可能性があります。GE-"
+"Proton10またはProton-EM-10でのみ動作します。"
+
+#: /usr/bin/faugus-launcher:3496 /usr/bin/faugus-launcher:5111
+msgid "Prevent Sleep"
+msgstr "スリープモードにしない"
+
+#: /usr/bin/faugus-launcher:3498
+msgid "Support the Project"
+msgstr "プロジェクトへのご支援"
+
+#: /usr/bin/faugus-launcher:3522
+msgid "Backup/Restore Settings"
+msgstr "バックアップ/復元設定"
+
+#: /usr/bin/faugus-launcher:3529
+msgid "Backup"
+msgstr "バックアップ"
+
+#: /usr/bin/faugus-launcher:3533
+msgid "Restore"
+msgstr "復元する"
+
+#: /usr/bin/faugus-launcher:3540
+msgid "Global Environment Variables"
+msgstr "グローバル環境変数"
+
+#: /usr/bin/faugus-launcher:3814 /usr/bin/faugus-launcher:5374
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
+"NOT INSTALLED."
+msgstr ""
+"FPS、温度、CPU/GPUの使用率などを監視するためのオーバーレイを表示します。未イ"
+"ンストール。"
+
+#: /usr/bin/faugus-launcher:3820 /usr/bin/faugus-launcher:5380
+msgid "Tweaks your system to improve performance. NOT INSTALLED."
+msgstr "システムのパフォーマンスを向上させるよう調整します。未インストール。"
+
+#: /usr/bin/faugus-launcher:3858
+#, python-format
+msgid "Clear Logs (%s)"
+msgstr "ログ（%s）を削除"
+
+#: /usr/bin/faugus-launcher:3861
+msgid "Clear Logs"
+msgstr "ログを削除する"
+
+#: /usr/bin/faugus-launcher:4110
+msgid "Do you want to save the changes?"
+msgstr "変更を保存しますか？"
+
+#: /usr/bin/faugus-launcher:4258
+msgid "Prefixes and runners will not be backed up!"
+msgstr "プレフィックスとランナーはバックアップされません！"
+
+#: /usr/bin/faugus-launcher:4286
+msgid "Save the backup file as..."
+msgstr "バックアップファイルを次の場所に保存..."
+
+#: /usr/bin/faugus-launcher:4289
+msgid "Save"
+msgstr "保存する"
+
+#: /usr/bin/faugus-launcher:4319
+msgid "Select a backup file to restore"
+msgstr "復元するバックアップファイルを選択してください"
+
+#: /usr/bin/faugus-launcher:4327
+msgid "ZIP files"
+msgstr "ZIPファイル"
+
+#: /usr/bin/faugus-launcher:4338 /usr/bin/faugus-launcher:4348
+msgid "This is not a valid Faugus Launcher backup file."
+msgstr "これはFaugus Launcherの有効なバックアップファイルではありません。"
+
+#: /usr/bin/faugus-launcher:4351
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "設定を上書きしてもよろしいですか？"
+
+#: /usr/bin/faugus-launcher:4425 /usr/bin/faugus-launcher:4781
+msgid "No"
+msgstr "いいえ"
+
+#: /usr/bin/faugus-launcher:4429 /usr/bin/faugus-launcher:4785
+msgid "Yes"
+msgstr "はい"
+
+#: /usr/bin/faugus-launcher:4472 /usr/bin/faugus-launcher:6788
+msgid "Select a prefix location"
+msgstr "Prefixの場所を選択してください"
+
+#: /usr/bin/faugus-launcher:4495
+msgid "Select the Lossless.dll file"
+msgstr "Lossless.dllファイルを選択してください"
+
+#: /usr/bin/faugus-launcher:4679
+#, python-format
+msgid "Duplicate %s"
+msgstr "%s を複製する"
+
+#: /usr/bin/faugus-launcher:4682 /usr/bin/faugus-launcher:5002
+#: /usr/bin/faugus-launcher:5020
+msgid "Title"
+msgstr "タイトル"
+
+#: /usr/bin/faugus-launcher:4685 /usr/bin/faugus-launcher:5027
+msgid "Game Title"
+msgstr "ゲームタイトル"
+
+#: /usr/bin/faugus-launcher:4769
+#, python-format
+msgid "Delete %s"
+msgstr "%s を削除する"
+
+#: /usr/bin/faugus-launcher:4774
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "%s を削除してもよろしいですか？"
+
+#: /usr/bin/faugus-launcher:4789
+msgid "Also remove the prefix:"
+msgstr "Prefixも削除する："
+
+#: /usr/bin/faugus-launcher:4831
+msgid "New Game/App"
+msgstr "新しいゲーム/アプリ"
+
+#: /usr/bin/faugus-launcher:5032 /usr/bin/faugus-launcher:5464
+msgid "Path"
+msgstr "パス"
+
+#: /usr/bin/faugus-launcher:5038
+msgid "/path/to/the/exe"
+msgstr "/exe/へ/の/パス"
+
+#: /usr/bin/faugus-launcher:5047
+msgid "Prefix"
+msgstr "Prefix"
+
+#: /usr/bin/faugus-launcher:5060
+msgid "Proton"
+msgstr "Proton"
+
+#: /usr/bin/faugus-launcher:5078
+msgid "Launch Arguments"
+msgstr "Launch Arguments（起動引数）"
+
+#: /usr/bin/faugus-launcher:5081
+msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+msgstr "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+
+#: /usr/bin/faugus-launcher:5086
+msgid "Game Arguments"
+msgstr "Game Arguments（ゲーム引数）"
+
+#: /usr/bin/faugus-launcher:5089
+msgid "e.g.: -d3d11 -fullscreen"
+msgstr "e.g.: -d3d11 -fullscreen"
+
+#: /usr/bin/faugus-launcher:5093 /usr/bin/faugus-launcher:5438
+msgid "Additional Application"
+msgstr "追加アプリ"
+
+#: /usr/bin/faugus-launcher:5096
+msgid ""
+"Additional application to run with the game, like Cheat Engine, Trainers, "
+"Mods..."
+msgstr ""
+"ゲームと一緒に実行する追加のアプリ（Cheat Engine、トレーナー、MODなど）"
+
+#: /usr/bin/faugus-launcher:5099 /usr/bin/faugus-launcher:5556
+msgid "Lossless Scaling Frame Generation"
+msgstr "Lossless Scalingフレーム生成"
+
+#: /usr/bin/faugus-launcher:5130
+msgid "Shortcut"
+msgstr "ショートカット"
+
+#: /usr/bin/faugus-launcher:5135
+msgid "Desktop"
+msgstr "デスクトップ"
+
+#: /usr/bin/faugus-launcher:5137
+msgid "Add or remove a shortcut from the Desktop."
+msgstr "デスクトップにショートカットを追加または削除する。"
+
+#: /usr/bin/faugus-launcher:5138
+msgid "App Menu"
+msgstr "アプリメニュー"
+
+#: /usr/bin/faugus-launcher:5140
+msgid "Add or remove a shortcut from the Application Menu."
+msgstr "アプリメニューからショートカットを追加または削除する。"
+
+#: /usr/bin/faugus-launcher:5141
+msgid "Steam"
+msgstr "Steam"
+
+#: /usr/bin/faugus-launcher:5143
+msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
+msgstr ""
+"Steamからショートカットを追加または削除します。Steamを再起動する必要がありま"
+"す。"
+
+#: /usr/bin/faugus-launcher:5149 /usr/bin/faugus-launcher:6452
+msgid "Select an icon for the shortcut"
+msgstr "ショートカットのアイコンを選択してください"
+
+#: /usr/bin/faugus-launcher:5200
+msgid "Refresh"
+msgstr "更新する"
+
+#: /usr/bin/faugus-launcher:5204
+msgid "Load from file"
+msgstr "ファイルから読み込む"
+
+#: /usr/bin/faugus-launcher:5208
+msgid "Load from URL"
+msgstr "URLから読み込む"
+
+#: /usr/bin/faugus-launcher:5216
+msgid "Game/App"
+msgstr "ゲーム/アプリ"
+
+#: /usr/bin/faugus-launcher:5232
+msgid "Tools"
+msgstr "ツール"
+
+#: /usr/bin/faugus-launcher:5394
+msgid ""
+"Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
+"and set the location."
+msgstr ""
+"Lossless.dllが見つかりません。インストール済みの場合は、Faugus Launcherの設"
+"定を開き、ファイルの場所を設定してください。"
+
+#: /usr/bin/faugus-launcher:5397
+msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
+msgstr "Lossless Scaling Vulkanレイヤーがインストールされていません。"
+
+#: /usr/bin/faugus-launcher:5460 /usr/bin/faugus-launcher:5580
+msgid "Enable"
+msgstr "有効にする"
+
+#: /usr/bin/faugus-launcher:5469
+msgid "/path/to/the/app"
+msgstr "/アプリ/へ/の/パス"
+
+#: /usr/bin/faugus-launcher:5479
+msgid "Delay (seconds)"
+msgstr "遅延時間（秒）"
+
+#: /usr/bin/faugus-launcher:5496
+msgid "Run the application first"
+msgstr "このアプリを先に起動する"
+
+#: /usr/bin/faugus-launcher:5584
+msgid "Multiplier"
+msgstr "Multiplier（フレーム生成の乗数）"
+
+#: /usr/bin/faugus-launcher:5589
+msgid "Multiply the FPS."
+msgstr "フレームレートを倍増させる。"
+
+#: /usr/bin/faugus-launcher:5591
+msgid "Flow Scale"
+msgstr "流量スケール"
+
+#: /usr/bin/faugus-launcher:5598
+msgid "Lower the internal motion estimation resolution."
+msgstr "内部の運動推定の解像度を下げます。"
+
+#: /usr/bin/faugus-launcher:5600
+msgid "Performance Mode"
+msgstr "パフォーマンスモード"
+
+#: /usr/bin/faugus-launcher:5601
+msgid "Massively improve performance at the cost of quality."
+msgstr "品質を犠牲にして、パフォーマンスを大幅に向上させる。"
+
+#: /usr/bin/faugus-launcher:5604
+msgid "HDR Mode"
+msgstr "HDRモード"
+
+#: /usr/bin/faugus-launcher:5605
+msgid "Enable special HDR-only behavior."
+msgstr "HDR専用モードを有効にする。"
+
+#: /usr/bin/faugus-launcher:5608
+msgid "Present Mode (Experimental)"
+msgstr "プレゼンモード（実験的）"
+
+#: /usr/bin/faugus-launcher:5612
+msgid "Override the present mode."
+msgstr "プレゼンモードを上書きする。"
+
+#: /usr/bin/faugus-launcher:5746
+msgid "Select an image for the banner"
+msgstr "バナー用の画像を選択してください"
+
+#: /usr/bin/faugus-launcher:5754 /usr/bin/faugus-launcher:6460
+msgid "Image files"
+msgstr "画像ファイル"
+
+#: /usr/bin/faugus-launcher:5781
+msgid "Enter the image URL"
+msgstr "画像のURLを入力してください"
+
+#: /usr/bin/faugus-launcher:5856 /usr/bin/faugus-launcher:6482
+msgid "The selected file is not a valid image."
+msgstr "The selected file is not a valid image."
+
+#: /usr/bin/faugus-launcher:5859 /usr/bin/faugus-launcher:6486
+msgid "Please choose another one."
+msgstr "別のものを選択してください。"
+
+#: /usr/bin/faugus-launcher:5940
+msgid "Select an additional application"
+msgstr "別のアプリを選択してください"
+
+#: /usr/bin/faugus-launcher:6233
+msgid "Windows Game"
+msgstr "Windowsのゲーム"
+
+#: /usr/bin/faugus-launcher:6234
+msgid "Linux Game"
+msgstr "Linuxのゲーム"
+
+#: /usr/bin/faugus-launcher:6235
+msgid "Steam Game"
+msgstr "Steamのゲーム"
+
+#: /usr/bin/faugus-launcher:6715
+msgid "Select the game's .exe"
+msgstr "ゲームの.exeファイルを選択してください"

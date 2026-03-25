@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 10:58-0300\n"
+"PO-Revision-Date: 2026-03-25 19:19+0800\n"
+"Last-Translator: skyhighcaterpie\n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Protonマネージャー"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
+msgid "Remove"
+msgstr "削除"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+msgid "Download"
+msgstr "ダウンロード"
+
+#: /usr/bin/faugus-proton-manager:351
+msgid "Downloading..."
+msgstr "ダウンロード中..."
+
+#: /usr/bin/faugus-proton-manager:353
+#, python-format
+msgid "Downloading %s..."
+msgstr "%s をダウンロード中..."
+
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
+msgid "Extracting %s..."
+msgstr "%s を展開しています..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "ダウンロード中にエラーが発生しました"
+
+#: /usr/bin/faugus-proton-manager:428
+msgid "Extracting..."
+msgstr "展開しています..."
+
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "展開中にエラーが発生しました"

@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-26 00:08+0800\n"
+"Last-Translator: skyhighcaterpie\n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Steamのゲームを起動しています..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Faugus Launcherを楽しんでいますか？"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "ご支援を賜りましたら幸甚に存じます"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "このメッセージを二度と表示しない"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "続ける"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "インターネット接続にエラーが発生しました。"
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s が見つかりませんでした。"
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "インストールするか、別のProtonのバージョンを使用してください。"
+
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
+msgid "Ok"
+msgstr "確認"
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "コンポーネントは最新の状態です"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "更新中"
+
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr "ダウンロード中"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "展開しています"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "最新の状態です"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "キーと値がレジストリに正常に追加されました。"
