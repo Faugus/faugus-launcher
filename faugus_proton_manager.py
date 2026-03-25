@@ -128,29 +128,7 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_ge.show_all()
         self.notebook.append_page(scroll_ge, tab_box_ge)
 
-        # Tab 2: Proton-EM
-        self.grid_em = Gtk.Grid()
-        self.grid_em.set_hexpand(True)
-        self.grid_em.set_row_spacing(5)
-        self.grid_em.set_column_spacing(10)
-        scroll_em = Gtk.ScrolledWindow()
-        scroll_em.set_size_request(400, 400)
-        scroll_em.set_margin_top(10)
-        scroll_em.set_margin_bottom(10)
-        scroll_em.set_margin_start(10)
-        scroll_em.set_margin_end(10)
-        scroll_em.add(self.grid_em)
-
-        tab_box_em = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_em = Gtk.Label(label="Proton-EM")
-        tab_label_em.set_width_chars(15)
-        tab_label_em.set_xalign(0.5)
-        tab_box_em.pack_start(tab_label_em, True, True, 0)
-        tab_box_em.set_hexpand(True)
-        tab_box_em.show_all()
-        self.notebook.append_page(scroll_em, tab_box_em)
-
-        # Tab 3: CachyOS Proton
+        # Tab 2: CachyOS Proton
         self.grid_cachyos = Gtk.Grid()
         self.grid_cachyos.set_hexpand(True)
         self.grid_cachyos.set_row_spacing(5)
@@ -171,6 +149,28 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_cachyos.set_hexpand(True)
         tab_box_cachyos.show_all()
         self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
+
+        # Tab 3: Proton-EM
+        self.grid_em = Gtk.Grid()
+        self.grid_em.set_hexpand(True)
+        self.grid_em.set_row_spacing(5)
+        self.grid_em.set_column_spacing(10)
+        scroll_em = Gtk.ScrolledWindow()
+        scroll_em.set_size_request(400, 400)
+        scroll_em.set_margin_top(10)
+        scroll_em.set_margin_bottom(10)
+        scroll_em.set_margin_start(10)
+        scroll_em.set_margin_end(10)
+        scroll_em.add(self.grid_em)
+
+        tab_box_em = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label_em = Gtk.Label(label="Proton-EM")
+        tab_label_em.set_width_chars(15)
+        tab_label_em.set_xalign(0.5)
+        tab_box_em.pack_start(tab_label_em, True, True, 0)
+        tab_box_em.set_hexpand(True)
+        tab_box_em.show_all()
+        self.notebook.append_page(scroll_em, tab_box_em)
 
         self.load_config()
         self.get_releases()
