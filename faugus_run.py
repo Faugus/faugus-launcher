@@ -702,6 +702,7 @@ class FaugusRun:
                     return
             except:
                 return
+            time.sleep(0.5)
 
     def append_to_text_view(self, clean_line):
         if self.text_view:
