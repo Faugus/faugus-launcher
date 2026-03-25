@@ -120,7 +120,7 @@ except FileNotFoundError:
 
 def format_title(title):
     title = title.strip().lower()
-    title = re.sub(r"[^a-z0-9 ]+", "", title)
+    title = re.sub(r"[^\w\s-]", "", title)
     title = re.sub(r"\s+", "-", title)
     return title
 
