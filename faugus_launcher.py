@@ -1723,6 +1723,13 @@ class Main(Gtk.ApplicationWindow):
         game_directory = os.path.dirname(game.path)
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
+        self.button_play.set_sensitive(False)
+        def reenable():
+            if not IS_FLATPAK:
+                self.button_play.set_sensitive(True)
+            return False
+        GLib.timeout_add(1000, reenable)
+
         if game.runner == "Steam":
             self.update_latest_games_file(game.gameid)
             subprocess.Popen([sys.executable, faugus_run, "--game", gameid], cwd=cwd)
@@ -1743,17 +1750,6 @@ class Main(Gtk.ApplicationWindow):
 
         # PLAY
         self.update_latest_games_file(game.gameid)
-
-        button.set_sensitive(False)
-
-        def delayed_launch():
-            button.set_sensitive(True)
-            self._launch_game(gameid, cwd)
-            return False
-
-        GLib.timeout_add(500, delayed_launch)
-
-    def _launch_game(self, gameid, cwd):
         cmd = (sys.executable, faugus_run, "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
