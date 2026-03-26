@@ -416,7 +416,7 @@ class Main(Gtk.ApplicationWindow):
         if game.gameid in self.running:
             self.running_dialog(game.title)
         else:
-            self.on_button_play_clicked(game)
+            self.on_button_play_clicked(None, game)
 
     def on_close(self, *_):
         if self.system_tray:
@@ -865,7 +865,7 @@ class Main(Gtk.ApplicationWindow):
 
     def on_context_menu_play(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
-        self.on_button_play_clicked(selected_item)
+        self.on_button_play_clicked(None, selected_item.game)
 
     def on_context_menu_edit(self, menu_item):
         selected_item = self.flowbox.get_selected_children()[0]
@@ -1717,6 +1717,7 @@ class Main(Gtk.ApplicationWindow):
         if not game:
             return
 
+        button = widget or self.button_play
         gameid = game.gameid
         title = game.title
         game_directory = os.path.dirname(game.path)
@@ -1743,7 +1744,17 @@ class Main(Gtk.ApplicationWindow):
         # PLAY
         self.update_latest_games_file(game.gameid)
 
-        cmd = sys.executable, faugus_run, "--game", gameid
+        button.set_sensitive(False)
+
+        def delayed_launch():
+            button.set_sensitive(True)
+            self._launch_game(gameid, cwd)
+            return False
+
+        GLib.timeout_add(500, delayed_launch)
+
+    def _launch_game(self, gameid, cwd):
+        cmd = (sys.executable, faugus_run, "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
         if not IS_FLATPAK or not self.close_on_launch:
@@ -1756,6 +1767,8 @@ class Main(Gtk.ApplicationWindow):
             sys.exit()
 
         self.update_icon()
+
+        return False
 
     def on_exit(self, pid, status, game):
         self.running.pop(game, None)
