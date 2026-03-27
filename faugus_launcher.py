@@ -1711,6 +1711,13 @@ class Main(Gtk.ApplicationWindow):
                 os.remove(autostart_path)
 
     def on_button_play_clicked(self, widget=None, game=None):
+        self.button_play.set_sensitive(False)
+        def reenable():
+            if not IS_FLATPAK:
+                self.button_play.set_sensitive(True)
+            return False
+        GLib.timeout_add(1000, reenable)
+
         if game is None:
             game = self.selected()
 
@@ -1722,13 +1729,6 @@ class Main(Gtk.ApplicationWindow):
         title = game.title
         game_directory = os.path.dirname(game.path)
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
-
-        self.button_play.set_sensitive(False)
-        def reenable():
-            if not IS_FLATPAK:
-                self.button_play.set_sensitive(True)
-            return False
-        GLib.timeout_add(1000, reenable)
 
         if game.runner == "Steam":
             self.update_latest_games_file(game.gameid)
