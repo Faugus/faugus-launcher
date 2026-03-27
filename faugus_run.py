@@ -10,6 +10,7 @@ import time
 import shlex
 import gettext
 import signal
+import fcntl
 
 gi.require_version("Gtk", "3.0")
 
@@ -209,7 +210,26 @@ class FaugusRun:
 
         set_env("UMU_USE_STEAM", "1")
 
+        self.lock_prefix()
         self.execute_final_command()
+
+    def lock_prefix(self):
+        prefix = os.environ.get("WINEPREFIX")
+
+        if not prefix:
+            return
+
+        os.makedirs(prefix, exist_ok=True)
+        lock_file = os.path.join(prefix, ".faugus.lock")
+        self.lock_fd = open(lock_file, "w")
+
+        try:
+            fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.has_lock = True
+
+        except BlockingIOError:
+            self.has_lock = False
+            set_env("UMU_CONTAINER_NSENTER", "1")
 
     def execute_final_command(self):
         if os.environ.get("PROTONPATH") == "umu-sniper":
@@ -792,6 +812,7 @@ class FaugusRun:
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
 
+        self.release_prefix()
         game_id = os.environ.get("GAMEID")
 
         if game_id and os.path.exists(games_json):
@@ -818,6 +839,14 @@ class FaugusRun:
         kill_child_proc()
 
         return False
+
+    def release_prefix(self):
+        if hasattr(self, "lock_fd"):
+            try:
+                fcntl.flock(self.lock_fd, fcntl.LOCK_UN)
+                self.lock_fd.close()
+            except:
+                pass
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
