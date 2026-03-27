@@ -52,6 +52,10 @@ flatpak install flathub io.github.Faugus.faugus-launcher
 ```
 flatpak run io.github.Faugus.faugus-launcher
 ```
+### Run multiple applications in the same prefix:
+```
+sudo flatpak override --socket=session-dbus io.github.Faugus.faugus-launcher
+```
 ### MangoHud installation:
 ```
 flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
