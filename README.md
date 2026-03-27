@@ -52,26 +52,23 @@ flatpak install flathub io.github.Faugus.faugus-launcher
 ```
 flatpak run io.github.Faugus.faugus-launcher
 ```
-### Run multiple applications in the same prefix:
-```
-sudo flatpak override --socket=session-dbus io.github.Faugus.faugus-launcher
-```
 ### MangoHud installation:
 ```
 flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
 ```
-### Steam Flatpak integration
+### Important permissions:
 ```
+# Allow running multiple applications in the same prefix
+sudo flatpak override --socket=session-dbus io.github.Faugus.faugus-launcher
+
 # Allow Faugus Launcher to detect Steam users and games
 sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/
-
-# Allow Faugus Launcher to detect the Steam installation and run games
 sudo flatpak override io.github.Faugus.faugus-launcher --talk-name=org.freedesktop.Flatpak
 
 # Allow Steam to run Faugus Launcher shortcuts
 sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpak
 
-# Allow Steam to see games icons
+# Allow Steam to see Faugus Launcher games icons
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.config/faugus-launcher/
 ```
