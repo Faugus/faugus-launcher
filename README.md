@@ -59,7 +59,7 @@ flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
 ### Important permissions:
 ```
 # Allow running multiple applications in the same prefix
-sudo flatpak override --socket=session-dbus io.github.Faugus.faugus-launcher
+sudo flatpak override --socket=session-bus io.github.Faugus.faugus-launcher
 
 # Allow Faugus Launcher to detect Steam users and games
 sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=~/.var/app/com.valvesoftware.Steam/
