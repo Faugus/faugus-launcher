@@ -88,7 +88,7 @@ gamemoderun = PathManager.find_binary('gamemoderun')
 games_json = PathManager.user_config('faugus-launcher/games.json')
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
-faugus_temp = str(Path.home() / 'faugus_temp')
+faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
 faugus_backup = False
