@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 18:25-0300\n"
-"PO-Revision-Date: 2026-03-11 11:16+0100\n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-28 10:57+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -18,114 +18,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: /usr/bin/faugus-run:106
+#: /usr/bin/faugus-run:131
 msgid "Starting Steam game..."
 msgstr "Bezig met starten van Steam-game…"
 
-#: /usr/bin/faugus-run:318
+#: /usr/bin/faugus-run:367
 msgid "Are you enjoying Faugus Launcher?"
 msgstr "Gebruik je Faugus graag?"
 
-#: /usr/bin/faugus-run:322
+#: /usr/bin/faugus-run:371
 msgid "Please consider donating"
 msgstr "Overweeg dan een donatie."
 
-#: /usr/bin/faugus-run:334
+#: /usr/bin/faugus-run:383
 msgid "Never show this message again"
 msgstr "Bericht niet meer tonen"
 
-#: /usr/bin/faugus-run:344
+#: /usr/bin/faugus-run:393
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: /usr/bin/faugus-run:392
+#: /usr/bin/faugus-run:450
 msgid "Internet connection error."
 msgstr "Er is geen internetverbinding."
 
-#: /usr/bin/faugus-run:396
+#: /usr/bin/faugus-run:454
 #, python-format
 msgid "%s was not found."
 msgstr "‘%s’ is niet aangetroffen."
 
-#: /usr/bin/faugus-run:400
+#: /usr/bin/faugus-run:458
 msgid "Please install it or use another Proton version."
 msgstr "Installeer dit of maak gebruik van een andere Proton-versie."
 
-#: /usr/bin/faugus-run:407 /usr/bin/faugus-run:683
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
 msgid "Ok"
 msgstr "Oké"
 
-#: /usr/bin/faugus-run:584
-msgid "Updating UMU-Launcher..."
-msgstr "Bezig met bijwerken van UMU-Launcher…"
-
-#: /usr/bin/faugus-run:586
-msgid "UMU-Launcher is up to date"
-msgstr "UMU-Launcher is bijgewerkt"
-
-#: /usr/bin/faugus-run:588
-msgid "Updating BattlEye..."
-msgstr "Bezig met bijwerken van BattlEye…"
-
-#: /usr/bin/faugus-run:590
-msgid "Updating Easy Anti-Cheat..."
-msgstr "Bezig met bijwerken van Easy Anti-Cheat…"
-
-#: /usr/bin/faugus-run:592
+#: /usr/bin/faugus-run:649
 msgid "Components are up to date"
 msgstr "Je beschikt over de nieuwste onderdelen"
 
-#: /usr/bin/faugus-run:594
-msgid "Downloading UMU-Proton..."
-msgstr "Bezig met downloaden van UMU-Proton…"
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Bezig met bijwerken…"
 
-#: /usr/bin/faugus-run:596
-msgid "Downloading Steam Runtime..."
-msgstr "Bezig met downloaden van Steam-runtime…"
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr "Bezig met downloaden…"
 
-#: /usr/bin/faugus-run:598
-msgid "Extracting Steam Runtime..."
-msgstr "Bezig met uitpakken van Steam-runtime…"
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Bezig met uitpakken…"
 
-#: /usr/bin/faugus-run:600
-msgid "Extracting UMU-Proton..."
-msgstr "Bezig met uitpakken van UMU-Proton…"
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "is bijgewerkt"
 
-#: /usr/bin/faugus-run:602 /usr/bin/faugus-run:608
-msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton is bijgewerkt"
-
-#: /usr/bin/faugus-run:604 /usr/bin/faugus-run:610
-msgid "Steam Runtime is up to date"
-msgstr "De Steam-runtime is bijgewerkt"
-
-#: /usr/bin/faugus-run:606 /usr/bin/faugus-run:617
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton is bijgewerkt"
-
-#: /usr/bin/faugus-run:613
-msgid "Downloading GE-Proton..."
-msgstr "Bezig met downloaden van GE-Proton…"
-
-#: /usr/bin/faugus-run:615
-msgid "Extracting GE-Proton..."
-msgstr "Bezig met uitpakken van GE-Proton…"
-
-#: /usr/bin/faugus-run:619
-msgid "Downloading Proton-EM..."
-msgstr "Bezig met downloaden van Proton-EM…"
-
-#: /usr/bin/faugus-run:621
-msgid "Extracting Proton-EM..."
-msgstr "Bezig met uitpakken van Proton-EM…"
-
-#: /usr/bin/faugus-run:623
-msgid "Proton-EM is up to date"
-msgstr "Proton-EM is bijgewerkt"
-
-#: /usr/bin/faugus-run:680
+#: /usr/bin/faugus-run:743
 msgid "The keys and values were successfully added to the registry."
 msgstr "De sleutels en waarden zijn toegevoegd aan het register."
+
+#~ msgid "Updating UMU-Launcher..."
+#~ msgstr "Bezig met bijwerken van UMU-Launcher…"
+
+#~ msgid "UMU-Launcher is up to date"
+#~ msgstr "UMU-Launcher is bijgewerkt"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Bezig met bijwerken van BattlEye…"
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Bezig met bijwerken van Easy Anti-Cheat…"
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Bezig met downloaden van UMU-Proton…"
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Bezig met downloaden van Steam-runtime…"
+
+#~ msgid "Extracting Steam Runtime..."
+#~ msgstr "Bezig met uitpakken van Steam-runtime…"
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Bezig met uitpakken van UMU-Proton…"
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton is bijgewerkt"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "De Steam-runtime is bijgewerkt"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "Bezig met downloaden van Proton-EM…"
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "Bezig met uitpakken van Proton-EM…"
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM is bijgewerkt"
 
 #, python-format
 #~ msgid "Using %s"
