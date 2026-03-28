@@ -297,8 +297,7 @@ class Main(Gtk.ApplicationWindow):
 
         self.load_tray_icon()
 
-        if not IS_FLATPAK:
-            GLib.timeout_add(1000, self.check_running)
+        GLib.timeout_add(1000, self.check_running)
 
     def update_icon(self):
         game = self.selected()
