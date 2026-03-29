@@ -125,11 +125,11 @@ def format_title(title):
     return title
 
 def convert_runner(runner):
-    if runner == "Proton-GE Latest":
-        return "GE-Proton Latest (default)"
+    if runner == "Proton-CachyOS Latest":
+        return "Proton-CachyOS Latest (default)"
 
-    if runner == "GE-Proton Latest (default)":
-        return "Proton-GE Latest"
+    if runner == "Proton-CachyOS Latest (default)":
+        return "Proton-CachyOS Latest"
 
     if runner == "UMU-Proton Latest":
         return ""
@@ -3235,17 +3235,14 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Use Wayland driver (experimental)"))
         self.checkbox_wayland_driver.set_active(False)
-        self.checkbox_wayland_driver.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
         self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
 
         self.checkbox_enable_hdr = Gtk.CheckButton(label=_("Enable HDR (experimental)"))
         self.checkbox_enable_hdr.set_active(False)
         self.checkbox_enable_hdr.set_sensitive(False)
-        self.checkbox_enable_hdr.set_tooltip_text(_("Only works with GE-Proton10 or Proton-EM-10."))
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
         self.checkbox_enable_wow64.set_active(False)
-        self.checkbox_enable_wow64.set_tooltip_text(_("Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."))
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -3270,8 +3267,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
-        self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         self.label_support = Gtk.Label(label=_("Support the Project"))
@@ -3732,8 +3727,8 @@ class Settings(Gtk.Dialog):
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combobox_runner.append_text("GE-Proton Latest (default)")
-        self.combobox_runner.append_text("Proton-CachyOS Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
+        self.combobox_runner.append_text("Proton-GE Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
@@ -3766,10 +3761,9 @@ class Settings(Gtk.Dialog):
 
                 # Sort versions in descending order
                 def version_key(v):
-                    # Remove 'GE-Proton' and split the remaining part into segments of digits and non-digits
-                    v_parts = re.split(r'(\d+)', v.replace('GE-Proton', ''))
-                    # Convert numeric parts to integers for proper sorting
-                    return [int(part) if part.isdigit() else part for part in v_parts]
+                    cleaned = re.sub(r'^[^\d]+', '', v)
+                    parts = re.split(r'(\d+)', cleaned)
+                    return [int(p) if p.isdigit() else p for p in parts]
 
                 versions.sort(key=version_key, reverse=True)
 
@@ -4157,13 +4151,12 @@ class Settings(Gtk.Dialog):
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
-        label = Gtk.Label()
-        label.set_label(title)
+        label = Gtk.Label(label=title)
         label.set_halign(Gtk.Align.CENTER)
 
         button_ok = Gtk.Button(label=_("Ok"))
         button_ok.set_size_request(150, -1)
-        button_ok.connect("clicked", lambda x: dialog.destroy())
+        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
@@ -4174,11 +4167,6 @@ class Settings(Gtk.Dialog):
         button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
 
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_top.set_margin_start(20)
@@ -4192,6 +4180,7 @@ class Settings(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
+
         if buttons:
             box_bottom.pack_start(button_no, True, True, 0)
             box_bottom.pack_start(button_yes, True, True, 0)
@@ -4202,8 +4191,11 @@ class Settings(Gtk.Dialog):
         content_area.add(box_bottom)
 
         dialog.show_all()
-        dialog.run()
+
+        response = dialog.run()
         dialog.destroy()
+
+        return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
         import webbrowser
@@ -4821,8 +4813,6 @@ class AddGame(Gtk.Dialog):
         self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
-        self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         # Button for Winecfg
@@ -5957,8 +5947,8 @@ class AddGame(Gtk.Dialog):
 
     def populate_combobox_with_runners(self):
         # List of default entries
-        self.combobox_runner.append_text("GE-Proton Latest (default)")
-        self.combobox_runner.append_text("Proton-CachyOS Latest")
+        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
+        self.combobox_runner.append_text("Proton-GE Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
@@ -5991,10 +5981,9 @@ class AddGame(Gtk.Dialog):
 
                 # Sort versions in descending order
                 def version_key(v):
-                    # Remove 'GE-Proton' and split the remaining part into segments of digits and non-digits
-                    v_parts = re.split(r'(\d+)', v.replace('GE-Proton', ''))
-                    # Convert numeric parts to integers for proper sorting
-                    return [int(part) if part.isdigit() else part for part in v_parts]
+                    cleaned = re.sub(r'^[^\d]+', '', v)
+                    parts = re.split(r'(\d+)', cleaned)
+                    return [int(p) if p.isdigit() else p for p in parts]
 
                 versions.sort(key=version_key, reverse=True)
 

@@ -12,7 +12,7 @@ class ConfigManager:
             'gamemode': 'False',
             'disable-hidraw': 'False',
             'prevent-sleep': 'False',
-            'default-runner': 'Proton-GE Latest',
+            'default-runner': 'Proton-CachyOS Latest',
             'lossless-location': '',
             'discrete-gpu': 'False',
             'splash-disable': 'False',
