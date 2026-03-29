@@ -1,6 +1,5 @@
 import os
 import subprocess
-import shutil
 
 from pathlib import Path
 from gi.repository import GdkPixbuf

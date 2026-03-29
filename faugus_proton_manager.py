@@ -9,7 +9,7 @@ import threading
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Gio, GLib
+from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.dark_theme import *
 

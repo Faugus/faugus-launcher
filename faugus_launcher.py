@@ -7,7 +7,6 @@ import subprocess
 import sys
 import threading
 import gi
-import psutil
 import vdf
 import signal
 import gettext
