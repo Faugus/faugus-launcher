@@ -88,15 +88,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.17.2-1" date="2026-03-27">
+    <release version="1.17.3-1" date="2026-03-28">
       <description>
         <ul>
-          <li>Added support for non ascii characters in the game title.</li>
-          <li>Now blocks the button play for 1 second to prevent double clicking.</li>
-          <li>Flatpak version can now run multiple games/applications in the same prefix.</li>
-          <li>Some code cleanup.</li>
-          <li>Added Janapese translation.</li>
-          <li>Updated Polish translation.</li>
+          <li>Proton-CachyOS is now the default Proton.</li>
+          <li>Fixed "Game is already running" in the Flatpak version.</li>
+          <li>Updated Dutch translation.</li>
         </ul>
       </description>
     </release>
