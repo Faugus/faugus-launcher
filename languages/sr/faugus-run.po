@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: faugus-run\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"PO-Revision-Date: 2026-03-29 11:41+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Serbian (Latin) <sr@li.org>\n"
+"Language: sr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Pokretanje Steam igre..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Da li vam se sviđa Faugus Launcher?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Molimo razmotrite donaciju"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Nikada više ne prikazuj ovu poruku"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Nastavi"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "Greška sa internet konekcijom."
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s nije pronađen."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Molimo instalirajte ga ili koristite drugu verziju Protona."
+
+#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
+msgid "Ok"
+msgstr "U redu"
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Komponente su ažurirane"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Ažuriranje"
+
+#: /usr/bin/faugus-run:673
+msgid "Downloading"
+msgstr "Preuzimanje"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Raspakivanje"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "je ažurirano"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "Ključevi i vrednosti su uspešno dodati u registar."
