@@ -93,6 +93,7 @@
         <ul>
           <li>Proton-CachyOS is now the default Proton.</li>
           <li>Fixed "Game is already running" in the Flatpak version.</li>
+          <li>Fixed settings not saving when pressing ok on the confirmation dialog.</li>
           <li>Updated Dutch translation.</li>
         </ul>
       </description>
