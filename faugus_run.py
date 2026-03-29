@@ -14,7 +14,7 @@ import fcntl
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, Gio
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 from threading import Thread
 from faugus.config_manager import *
 from faugus.dark_theme import *
