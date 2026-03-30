@@ -306,7 +306,7 @@ class FaugusRun:
 
         if cmds_to_run: gc.collect()
 
-        game_cmd = popen_prefix + self.message.split()
+        game_cmd = popen_prefix + shlex.split(self.message)
         start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
