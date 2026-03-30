@@ -106,29 +106,7 @@ class ProtonDownloader(Gtk.Dialog):
         self.notebook.set_hexpand(True)
         frame.add(self.notebook)
 
-        # Tab 1: GE-Proton
-        self.grid_ge = Gtk.Grid()
-        self.grid_ge.set_hexpand(True)
-        self.grid_ge.set_row_spacing(5)
-        self.grid_ge.set_column_spacing(10)
-        scroll_ge = Gtk.ScrolledWindow()
-        scroll_ge.set_size_request(400, 400)
-        scroll_ge.set_margin_top(10)
-        scroll_ge.set_margin_bottom(10)
-        scroll_ge.set_margin_start(10)
-        scroll_ge.set_margin_end(10)
-        scroll_ge.add(self.grid_ge)
-
-        tab_box_ge = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_ge = Gtk.Label(label="GE-Proton")
-        tab_label_ge.set_width_chars(15)
-        tab_label_ge.set_xalign(0.5)
-        tab_box_ge.pack_start(tab_label_ge, True, True, 0)
-        tab_box_ge.set_hexpand(True)
-        tab_box_ge.show_all()
-        self.notebook.append_page(scroll_ge, tab_box_ge)
-
-        # Tab 2: CachyOS Proton
+        # Tab 1: CachyOS Proton
         self.grid_cachyos = Gtk.Grid()
         self.grid_cachyos.set_hexpand(True)
         self.grid_cachyos.set_row_spacing(5)
@@ -149,6 +127,28 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_cachyos.set_hexpand(True)
         tab_box_cachyos.show_all()
         self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
+
+        # Tab 2: GE-Proton
+        self.grid_ge = Gtk.Grid()
+        self.grid_ge.set_hexpand(True)
+        self.grid_ge.set_row_spacing(5)
+        self.grid_ge.set_column_spacing(10)
+        scroll_ge = Gtk.ScrolledWindow()
+        scroll_ge.set_size_request(400, 400)
+        scroll_ge.set_margin_top(10)
+        scroll_ge.set_margin_bottom(10)
+        scroll_ge.set_margin_start(10)
+        scroll_ge.set_margin_end(10)
+        scroll_ge.add(self.grid_ge)
+
+        tab_box_ge = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label_ge = Gtk.Label(label="GE-Proton")
+        tab_label_ge.set_width_chars(15)
+        tab_label_ge.set_xalign(0.5)
+        tab_box_ge.pack_start(tab_label_ge, True, True, 0)
+        tab_box_ge.set_hexpand(True)
+        tab_box_ge.show_all()
+        self.notebook.append_page(scroll_ge, tab_box_ge)
 
         # Tab 3: Proton-EM
         self.grid_em = Gtk.Grid()
