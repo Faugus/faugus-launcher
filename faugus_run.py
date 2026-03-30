@@ -78,6 +78,11 @@ class FaugusRun:
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def run(self):
+        if not self.splash_disable and not self.disable_updates:
+            self.create_splash_window()
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
         def run_process():
             self.start_process()
 
@@ -85,9 +90,9 @@ class FaugusRun:
 
         def start_thread():
             self.process_thread.start()
+            return False
 
         GLib.idle_add(start_thread)
-
         Gtk.main()
 
         self.process_thread.join()
@@ -103,6 +108,8 @@ class FaugusRun:
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
+        self.show_splash()
+
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
 
@@ -117,7 +124,6 @@ class FaugusRun:
 
         self.extract_env_from_message()
 
-        self.show_splash_window()
         if self.command == "winetricks":
             GLib.idle_add(self.show_log_window)
 
@@ -549,7 +555,7 @@ class FaugusRun:
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
 
-    def show_splash_window(self):
+    def create_splash_window(self):
         self.splash_window = Gtk.Window(title="Faugus Launcher")
         self.splash_window.set_decorated(False)
         self.splash_window.set_resizable(False)
@@ -566,7 +572,6 @@ class FaugusRun:
 
         image_path = faugus_png
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-
         pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
 
         image = Gtk.Image.new_from_pixbuf(pixbuf)
@@ -585,9 +590,8 @@ class FaugusRun:
 
         self.splash_window.add(frame)
 
-        if not self.splash_disable and not self.disable_updates and not os.environ.get("FAUGUS_DISABLE_UPDATES"):
-            if self.splash_window is None:
-                self.show_splash_window()
+    def show_splash(self):
+        if self.splash_window:
             self.splash_window.show_all()
 
     def show_log_window(self):
@@ -652,15 +656,21 @@ class FaugusRun:
         return True
 
     def check_game_output(self, clean_line):
-        if "Downloading" in clean_line or "Updating BattlEye..." in clean_line or "Updating Easy Anti-Cheat..." in clean_line or "Updating UMU-Launcher..." in clean_line:
+        if (
+            "Downloading" in clean_line
+            or "Updating BattlEye..." in clean_line
+            or "Updating Easy Anti-Cheat..." in clean_line
+            or "Updating UMU-Launcher..." in clean_line
+        ):
             if self.splash_window is None:
-                self.show_splash_window()
-            self.splash_window.show_all()
+                self.create_splash_window()
+            self.show_splash()
 
         component = None
 
         if "Components are up to date" in clean_line:
-            self.label.set_text(_("Components are up to date"))
+            if self.splash_window:
+                self.label.set_text(_("Components are up to date"))
             return
 
         if "UMU-Launcher" in clean_line:
@@ -680,7 +690,7 @@ class FaugusRun:
         elif "steamrt3" in clean_line or "SteamLinuxRuntime" in clean_line:
             component = "Steam Runtime"
 
-        if component:
+        if component and self.splash_window:
             if "Updating" in clean_line:
                 self.label.set_text(_("Updating") + f" {component}...")
             elif "Downloading" in clean_line:
