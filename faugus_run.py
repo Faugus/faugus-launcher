@@ -238,104 +238,76 @@ class FaugusRun:
             set_env("UMU_CONTAINER_NSENTER", "1")
 
     def execute_final_command(self):
-        if os.environ.get("PROTONPATH") == "umu-sniper":
-            cmd = self.message
-        else:
-            commands = []
+        import gc
 
-            if os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates:
-                set_env("UMU_RUNTIME_UPDATE", "0")
+        def start_and_watch(cmd, is_game=False):
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                bufsize=8192, text=True
+            )
 
-                if self.proton_latest and not self.proton_exists:
-                    commands.append(f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}")
+            def watch_stream(stream):
+                for line in iter(stream.readline, ""):
+                    clean_line = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', line).strip()
 
-                if not self.components_exists:
-                    commands.append(f"{sys.executable} -m faugus.components")
+                    if self.enable_logging:
+                        log_path = Path(logs_dir) / self.log_dir
+                        log_path.mkdir(parents=True, exist_ok=True)
+                        with open(log_path / "umu.log", "a", encoding="utf-8") as f:
+                            f.write(f"{clean_line}\n")
 
+                    self.check_game_output(clean_line)
+
+                    if os.environ.get("GAMEID") == "winetricks-gui":
+                        GLib.idle_add(self.append_to_text_view, clean_line)
+                    else:
+                        print(line, end="")
+                stream.close()
+
+            threads = [
+                Thread(target=watch_stream, args=(process.stdout,), daemon=True),
+                Thread(target=watch_stream, args=(process.stderr,), daemon=True)
+            ]
+            for t in threads: t.start()
+
+            if is_game:
+                self.process = process
+                GLib.child_watch_add(GLib.PRIORITY_DEFAULT, process.pid, self.on_process_exit)
+                Thread(target=self._watch_game_process, daemon=True).start()
             else:
-                if self.proton_latest:
-                    commands.append(f"{sys.executable} -m faugus.proton_downloader {self.proton_latest}")
+                process.wait()
+                for t in threads: t.join(timeout=1)
 
-                commands.append(f"{sys.executable} -m faugus.components")
-
-            commands.append(self.message)
-            cmd = "; ".join(commands)
-
-        prevent_sleep = os.environ.get("PREVENT_SLEEP")
-        use_inhibit = os.path.exists("/run/dbus/system_bus_socket")
-        popen_cmd = None
-        inhibit_ok = False
-
-        if prevent_sleep:
+        popen_prefix = []
+        if os.environ.get("PREVENT_SLEEP"):
             try:
                 import dbus
-
-                bus = dbus.SessionBus()
-                portal = bus.get_object(
-                    "org.freedesktop.portal.Desktop",
-                    "/org/freedesktop/portal/desktop"
-                )
-                iface = dbus.Interface(
-                    portal, "org.freedesktop.portal.Inhibit"
-                )
-
-                iface.Inhibit(
-                    "",
-                    8,
-                    {"reason": "Game is running"}
-                )
-                inhibit_ok = True
-            except Exception:
-                pass
-
-            if not inhibit_ok and not IS_FLATPAK:
+                iface = dbus.Interface(dbus.SessionBus().get_object("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop"), "org.freedesktop.portal.Inhibit")
+                iface.Inhibit("", 8, {"reason": "Game is running"})
+            except:
                 systemd_inhibit = PathManager.find_binary("systemd-inhibit")
+                if not IS_FLATPAK and os.path.exists("/run/dbus/system_bus_socket") and systemd_inhibit:
+                    popen_prefix = [systemd_inhibit, "--what=sleep", "--why=Game is running", "--mode=block"]
 
-                if use_inhibit and systemd_inhibit:
-                    popen_cmd = [
-                        systemd_inhibit,
-                        "--what=sleep",
-                        "--why=Game is running",
-                        "--mode=block",
-                        PathManager.find_binary("bash"),
-                        "-c",
-                        cmd
-                    ]
+        cmds_to_run = []
+        is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
 
-        if popen_cmd is None:
-            popen_cmd = [
-                PathManager.find_binary("bash"),
-                "-c",
-                cmd
-            ]
+        if not is_sniper:
+            force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates
+            if force_off: set_env("UMU_RUNTIME_UPDATE", "0")
 
-        self.process = subprocess.Popen(
-            popen_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=8192,
-            text=True
-        )
+            if self.proton_latest and (not force_off or not self.proton_exists):
+                cmds_to_run.append([sys.executable, "-m", "faugus.proton_downloader", self.proton_latest])
+            if not force_off or not self.components_exists:
+                cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
-        self.stdout_watch_id = GLib.io_add_watch(
-            self.process.stdout,
-            GLib.PRIORITY_LOW,
-            GLib.IO_IN,
-            self.on_output
-        )
-        self.stderr_watch_id = GLib.io_add_watch(
-            self.process.stderr,
-            GLib.PRIORITY_LOW,
-            GLib.IO_IN,
-            self.on_output
-        )
+        for cmd in cmds_to_run:
+            start_and_watch(cmd)
 
-        GLib.child_watch_add(
-            GLib.PRIORITY_DEFAULT,
-            self.process.pid,
-            self.on_process_exit
-        )
-        Thread(target=self._watch_game_process, daemon=True).start()
+        if cmds_to_run: gc.collect()
+
+        game_cmd = popen_prefix + self.message.split()
+        start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
         dialog = Gtk.Dialog(title="Faugus Launcher")
@@ -608,52 +580,6 @@ class FaugusRun:
 
         self.log_window.connect("delete-event", self.on_log_window_delete_event)
         self.log_window.show_all()
-
-    def on_output(self, source, condition):
-        try:
-            source.set_encoding(None)
-        except Exception:
-            pass
-
-        if self.enable_logging:
-            log_dir = f"{logs_dir}/{self.log_dir}"
-            if not os.path.exists(log_dir):
-                os.makedirs(log_dir)
-
-            if not hasattr(self, "_log_file_cleaned"):
-                with open(f"{log_dir}/umu.log", "w") as log_file:
-                    log_file.write("")
-                self._log_file_cleaned = True
-
-        def remove_ansi_escape(text):
-            ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-            return ansi_escape.sub('', text)
-
-        raw = source.readline()
-        if raw:
-            if isinstance(raw, bytes):
-                line = raw.decode("utf-8", errors="ignore")
-            else:
-                line = raw
-
-            clean_line = remove_ansi_escape(line).strip()
-
-            if self.enable_logging:
-                with open(f"{log_dir}/umu.log", "a", encoding="utf-8") as log_file:
-                    log_file.write(clean_line + "\n")
-                    log_file.flush()
-
-            self.check_game_output(clean_line)
-
-            if "libgamemode.so.0" in clean_line or "libgamemodeauto.so.0" in clean_line or "libgamemode.so" in clean_line:
-                return True
-
-            if os.environ.get("GAMEID") == "winetricks-gui":
-                self.append_to_text_view(clean_line)
-            else:
-                print(line, end="")
-
-        return True
 
     def check_game_output(self, clean_line):
         if (
