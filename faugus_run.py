@@ -79,7 +79,7 @@ class FaugusRun:
 
     def run(self):
         def run_process():
-            self.start_process(self.command)
+            self.start_process()
 
         self.process_thread = Thread(target=run_process)
 
@@ -93,7 +93,7 @@ class FaugusRun:
         self.process_thread.join()
         sys.exit(0)
 
-    def start_process(self, command):
+    def start_process(self):
         if self.show_donate:
             if self.playtime >= 7200:
                 current_month = GLib.DateTime.new_now_local().format("%Y-%m")
