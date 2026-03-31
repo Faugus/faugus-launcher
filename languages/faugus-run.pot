@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-22 16:21-0300\n"
+"POT-Creation-Date: 2026-03-30 23:20-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,63 +17,63 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /usr/bin/faugus-run:131
+#: /usr/bin/faugus-run:132
 msgid "Starting Steam game..."
 msgstr ""
 
-#: /usr/bin/faugus-run:367
+#: /usr/bin/faugus-run:359
 msgid "Are you enjoying Faugus Launcher?"
 msgstr ""
 
-#: /usr/bin/faugus-run:371
+#: /usr/bin/faugus-run:363
 msgid "Please consider donating"
 msgstr ""
 
-#: /usr/bin/faugus-run:383
+#: /usr/bin/faugus-run:375
 msgid "Never show this message again"
 msgstr ""
 
-#: /usr/bin/faugus-run:393
+#: /usr/bin/faugus-run:385
 msgid "Continue"
 msgstr ""
 
-#: /usr/bin/faugus-run:450
+#: /usr/bin/faugus-run:442
 msgid "Internet connection error."
 msgstr ""
 
-#: /usr/bin/faugus-run:454
+#: /usr/bin/faugus-run:446
 #, python-format
 msgid "%s was not found."
 msgstr ""
 
-#: /usr/bin/faugus-run:458
+#: /usr/bin/faugus-run:450
 msgid "Please install it or use another Proton version."
 msgstr ""
 
-#: /usr/bin/faugus-run:465 /usr/bin/faugus-run:746
+#: /usr/bin/faugus-run:457 /usr/bin/faugus-run:697
 msgid "Ok"
 msgstr ""
 
-#: /usr/bin/faugus-run:649
+#: /usr/bin/faugus-run:599
 msgid "Components are up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:671
+#: /usr/bin/faugus-run:621
 msgid "Updating"
 msgstr ""
 
-#: /usr/bin/faugus-run:673
+#: /usr/bin/faugus-run:623
 msgid "Downloading"
 msgstr ""
 
-#: /usr/bin/faugus-run:675
+#: /usr/bin/faugus-run:625
 msgid "Extracting"
 msgstr ""
 
-#: /usr/bin/faugus-run:681
+#: /usr/bin/faugus-run:631
 msgid "is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:743
+#: /usr/bin/faugus-run:694
 msgid "The keys and values were successfully added to the registry."
 msgstr ""
