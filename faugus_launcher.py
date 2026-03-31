@@ -130,6 +130,12 @@ def convert_runner(runner):
     if runner == "Proton-CachyOS Latest (default)":
         return "Proton-CachyOS Latest"
 
+    if runner == "Proton-GE Latest":
+        return "GE-Proton Latest"
+
+    if runner == "GE-Proton Latest":
+        return "Proton-GE Latest"
+
     if runner == "UMU-Proton Latest":
         return ""
 
@@ -3727,7 +3733,7 @@ class Settings(Gtk.Dialog):
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("Proton-GE Latest")
+        self.combobox_runner.append_text("GE-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
@@ -5947,7 +5953,7 @@ class AddGame(Gtk.Dialog):
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("Proton-GE Latest")
+        self.combobox_runner.append_text("GE-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
