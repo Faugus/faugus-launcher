@@ -49,46 +49,47 @@
   <launchable type="desktop-id">faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/bc54b5e/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/c8202c4/screenshots/main-blocks.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/main-blocks.png</image>
       <caption>Main window: Blocks interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/c8202c4/screenshots/main-banners.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/main-banners.png</image>
       <caption>Main window: Banners interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f3548fe/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f3548fe/screenshots/add-tools.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/add-tools.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/05f60c0/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/b98f03c/screenshots/proton-manager.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/94bafde/screenshots/proton-manager.png</image>
       <caption>Proton Manager</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/05f60c0/screenshots/shortcut-file.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/shortcut-file.png</image>
       <caption>Create shortcut from .exe file</caption>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.17.3-1" date="2026-03-28">
+    <release version="1.17.4-1" date="2026-03-31">
       <description>
         <ul>
-          <li>Proton-CachyOS is now the default Proton.</li>
-          <li>Fixed "Game is already running" in the Flatpak version.</li>
-          <li>Fixed settings not saving when pressing ok on the confirmation dialog.</li>
-          <li>Updated Dutch translation.</li>
+          <li>Reworked game execution.</li>
+          <li>Set working directory for buttons "Run" and "Run file inside the prefix".</li>
+          <li>Fixed race condition between splash window and the main process.</li>
+          <li>Removed some leftover code.</li>
+          <li>Added Serbian translation.</li>
         </ul>
       </description>
     </release>
