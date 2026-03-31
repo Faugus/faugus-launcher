@@ -3995,9 +3995,12 @@ class Settings(Gtk.Dialog):
         response = filechooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            command_parts = []
             file_run = filechooser.get_filename()
+            game_directory = os.path.dirname(file_run)
+            cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
             escaped_file_run = file_run.replace("'", "'\\''")
+            command_parts = []
+
             if not escaped_file_run.endswith(".reg"):
                 if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
@@ -4018,11 +4021,10 @@ class Settings(Gtk.Dialog):
                 command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-
-            faugus_run_path = faugus_run
+            cmd = (sys.executable, faugus_run, command)
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
 
@@ -6060,10 +6062,10 @@ class AddGame(Gtk.Dialog):
             prefix = self.entry_prefix.get_text()
             title_formatted = format_title(title)
             runner = self.combobox_runner.get_active_text()
-
+            game_directory = os.path.dirname(file_run)
+            cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
             escaped_file_run = file_run.replace("'", "'\\''")
             runner = convert_runner(runner)
-
             command_parts = []
 
             if title_formatted:
@@ -6083,12 +6085,10 @@ class AddGame(Gtk.Dialog):
                 command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            print(command)
-
-            faugus_run_path = faugus_run
+            cmd = (sys.executable, faugus_run, command)
 
             def run_command():
-                process = subprocess.Popen([sys.executable, faugus_run_path, command])
+                process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
                 GLib.idle_add(self.parent_window.set_sensitive, True)
