@@ -992,7 +992,8 @@ class Main(Gtk.ApplicationWindow):
             runner = game.runner
             title_formatted = format_title(title)
             file_run = filechooser.get_filename()
-
+            game_directory = os.path.dirname(game.path)
+            cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
             escaped_file_run = file_run.replace("'", "'\\''")
             command_parts = []
 
@@ -1014,7 +1015,8 @@ class Main(Gtk.ApplicationWindow):
                 command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            subprocess.Popen([sys.executable, faugus_run, command])
+            cmd = (sys.executable, faugus_run, command)
+            subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
         filechooser.destroy()
 
