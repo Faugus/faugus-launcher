@@ -6,7 +6,7 @@ py.install_sources(
   'launcher.py',
   'path_manager.py',
   'proton_downloader.py',
-  'proton_manager',
+  'proton_manager.py',
   'runner.py',
   'shortcut.py',
   'steam_setup.py',
