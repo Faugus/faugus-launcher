@@ -23,9 +23,9 @@ install_data(
 
 install_data(
   'faugus_run.py',
+  rename: 'faugus-run',
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
-  install_filename: 'faugus-run',
 )
 
 install_data(
