@@ -78,8 +78,7 @@ ea_icon = PathManager.get_icon('faugus-ea.png')
 rockstar_icon = PathManager.get_icon('faugus-rockstar.png')
 wargaming_icon = PathManager.get_icon('faugus-wargaming.png')
 
-faugus_run = PathManager.find_binary('faugus-run')
-faugus_proton_manager = PathManager.find_binary('faugus-proton-manager')
+launcher_path = PathManager.find_binary('faugus-launcher')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
@@ -1015,7 +1014,7 @@ class Main(Gtk.ApplicationWindow):
                 command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            cmd = (sys.executable, faugus_run, command)
+            cmd = (sys.executable, "-m", "faugus.runner", command)
             subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
         filechooser.destroy()
@@ -1738,7 +1737,14 @@ class Main(Gtk.ApplicationWindow):
 
         if game.runner == "Steam":
             self.update_latest_games_file(game.gameid)
-            subprocess.Popen([sys.executable, faugus_run, "--game", gameid], cwd=cwd)
+            subprocess.Popen(
+                [sys.executable, "-m", "faugus.runner", "--game", gameid],
+                cwd=cwd,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                close_fds=True
+            )
             return
 
         # STOP
@@ -1756,7 +1762,7 @@ class Main(Gtk.ApplicationWindow):
 
         # PLAY
         self.update_latest_games_file(game.gameid)
-        cmd = (sys.executable, faugus_run, "--game", gameid)
+        cmd = (sys.executable, "-m", "faugus.runner", "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
         if not IS_FLATPAK or not self.close_on_launch:
@@ -2578,7 +2584,7 @@ class Main(Gtk.ApplicationWindow):
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
-                processo = subprocess.Popen([sys.executable, faugus_run, command])
+                processo = subprocess.Popen([sys.executable, "-m", "faugus.runner", command])
                 GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
             threading.Thread(target=start_download).start()
@@ -2728,7 +2734,7 @@ class Main(Gtk.ApplicationWindow):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher --game {game.gameid}\n'
+                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher --game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2738,7 +2744,7 @@ class Main(Gtk.ApplicationWindow):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec={faugus_run} --game {game.gameid}\n'
+                f'Exec={launcher_path} --game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -2775,16 +2781,16 @@ class Main(Gtk.ApplicationWindow):
             if IS_FLATPAK:
                 if IS_STEAM_FLATPAK:
                     exe = '"flatpak-spawn"'
-                    launch_options = f'--host flatpak run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
+                    launch_options = f'--host flatpak run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
                 else:
                     exe = '"flatpak"'
-                    launch_options = f'run --command=/app/bin/faugus-run io.github.Faugus.faugus-launcher --game {game.gameid}'
+                    launch_options = f'run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
             else:
                 if IS_STEAM_FLATPAK:
                     exe = '"flatpak-spawn"'
-                    launch_options = f'--host {faugus_run} --game {game.gameid}'
+                    launch_options = f'--host {launcher_path} --game {game.gameid}'
                 else:
-                    exe = f'"{faugus_run}"'
+                    exe = f'"{launcher_path}"'
                     launch_options = f'--game {game.gameid}'
 
             if existing_app_id:
@@ -3845,12 +3851,10 @@ class Settings(Gtk.Dialog):
 
     def on_button_proton_manager_clicked(self, widget):
         self.set_sensitive(False)
-
-        proton_manager = faugus_proton_manager
         current_runner = self.combobox_runner.get_active_text()
 
         def run_command():
-            process = subprocess.Popen([sys.executable, proton_manager])
+            process = subprocess.Popen([sys.executable, "-m", "faugus.proton_manager"])
             process.wait()
 
             GLib.idle_add(self.set_sensitive, True)
@@ -3926,10 +3930,8 @@ class Settings(Gtk.Dialog):
         command_parts.append("''")
         command = ' '.join(command_parts)
 
-        faugus_run_path = faugus_run
-
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+            process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command, "winetricks"])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
 
@@ -3954,10 +3956,8 @@ class Settings(Gtk.Dialog):
         command_parts.append("'winecfg'")
         command = ' '.join(command_parts)
 
-        faugus_run_path = faugus_run
-
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command])
+            process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
 
@@ -4023,7 +4023,7 @@ class Settings(Gtk.Dialog):
                 command_parts.append(f"'{umu_run}' regedit '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            cmd = (sys.executable, faugus_run, command)
+            cmd = (sys.executable, "-m", "faugus.runner", command)
 
             def run_command():
                 process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
@@ -6087,7 +6087,7 @@ class AddGame(Gtk.Dialog):
                 command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
 
             command = ' '.join(command_parts)
-            cmd = (sys.executable, faugus_run, command)
+            cmd = (sys.executable, "-m", "faugus.runner", command)
 
             def run_command():
                 process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
@@ -6326,11 +6326,8 @@ class AddGame(Gtk.Dialog):
 
         print(command)
 
-        # faugus-run path
-        faugus_run_path = faugus_run
-
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command])
+            process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -6377,11 +6374,8 @@ class AddGame(Gtk.Dialog):
 
         print(command)
 
-        # faugus-run path
-        faugus_run_path = faugus_run
-
         def run_command():
-            process = subprocess.Popen([sys.executable, faugus_run_path, command, "winetricks"])
+            process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command, "winetricks"])
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
@@ -6595,7 +6589,7 @@ def run_file(file_path):
         command_parts.append(f'"{file_path}"')
 
     command = ' '.join(command_parts)
-    subprocess.Popen([faugus_run, command], cwd=file_dir)
+    subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir)
 
 def main():
     start_hidden = "--hide" in sys.argv

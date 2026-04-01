@@ -1,10 +1,14 @@
 py.install_sources(
   'components.py',
-  'proton_downloader.py',
   'config_manager.py',
-  'path_manager.py',
-  'language_config.py',
   'dark_theme.py',
+  'language_config.py',
+  'launcher.py',
+  'path_manager.py',
+  'proton_downloader.py',
+  'proton_manager',
+  'runner.py',
+  'shortcut.py',
   'steam_setup.py',
   subdir: 'faugus',
 )

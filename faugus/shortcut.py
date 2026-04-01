@@ -46,7 +46,7 @@ prefixes_dir = str(Path.home() / 'Faugus')
 mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
-faugus_run = PathManager.find_binary('faugus-run')
+launcher_path = PathManager.find_binary('faugus-launcher')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
@@ -900,7 +900,7 @@ class CreateShortcut(Gtk.Window):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec=flatpak run --command={faugus_run} io.github.Faugus.faugus-launcher "{command}"\n'
+                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher --run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -910,7 +910,7 @@ class CreateShortcut(Gtk.Window):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec={faugus_run} "{command}"\n'
+                f'Exec={launcher_path} --run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'

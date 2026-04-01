@@ -16,18 +16,16 @@ subdir('data')
 subdir('faugus')
 
 install_data(
-  'faugus_launcher.py',
-  'faugus_run.py',
-  'faugus_proton_manager.py',
-  'faugus_shortcut.py',
-  rename: [
-    'faugus-launcher',
-    'faugus-run',
-    'faugus-proton-manager',
-    'faugus-shortcut',
-  ],
+  'faugus-launcher',
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
+)
+
+install_data(
+  'faugus_run.py',
+  install_mode: 'rwxr-xr-x',
+  install_dir: get_option('bindir'),
+  install_filename: 'faugus-run',
 )
 
 install_data(
