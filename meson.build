@@ -36,3 +36,5 @@ install_data(
 gnome.post_install(
   gtk_update_icon_cache: true,
 )
+
+meson.add_install_script('clean_pycache.sh')
