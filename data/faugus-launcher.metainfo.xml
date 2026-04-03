@@ -82,14 +82,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.17.4-1" date="2026-03-31">
+    <release version="1.17.5-1" date="2026-04-03">
       <description>
         <ul>
-          <li>Reworked game execution.</li>
-          <li>Set working directory for buttons "Run" and "Run file inside the prefix".</li>
-          <li>Fixed race condition between splash window and the main process.</li>
-          <li>Removed some leftover code.</li>
-          <li>Added Serbian translation.</li>
+          <li>Re-enabled EA App installation.</li>
+          <li>Improved detection of running applications.</li>
+          <li>Improved Splash window when running Steam games.</li>
+          <li>Some code restructuring.</li>
         </ul>
       </description>
     </release>
