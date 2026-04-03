@@ -341,6 +341,12 @@ class Main(Gtk.ApplicationWindow):
 
         changed = False
 
+        for gameid, proc in list(self.processes.items()):
+            if proc.poll() is not None:
+                self.processes.pop(gameid, None)
+                self.running.pop(gameid, None)
+                changed = True
+
         for gameid, pid in list(self.running.items()):
             if gameid not in self.processes:
                 try:
