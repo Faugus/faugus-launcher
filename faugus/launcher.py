@@ -20,6 +20,7 @@ from PIL import Image
 from faugus.config_manager import *
 from faugus.dark_theme import *
 from faugus.steam_setup import *
+from faugus.ea_fix import *
 
 VERSION = "1.17.4"
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -2491,6 +2492,9 @@ class Main(Gtk.ApplicationWindow):
             self.box_main.remove(self.box_launcher)
             self.box_launcher.destroy()
             self.box_main.show_all()
+
+            if game.gameid == "ea-app":
+                game.path = update_ea_path(game.prefix)
 
             if os.path.exists(game.path):
                 print(f"{title} installed.")
@@ -5954,7 +5958,7 @@ class AddGame(Gtk.Dialog):
         self.combobox_launcher.append("linux", _("Linux Game"))
         self.combobox_launcher.append("steam", _("Steam Game"))
         self.combobox_launcher.append("battle", "Battle.net")
-        #self.combobox_launcher.append("ea", "EA App")
+        self.combobox_launcher.append("ea", "EA App")
         self.combobox_launcher.append("epic", "Epic Games")
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")

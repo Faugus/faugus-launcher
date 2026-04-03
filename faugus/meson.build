@@ -2,6 +2,7 @@ py.install_sources(
   'components.py',
   'config_manager.py',
   'dark_theme.py',
+  'ea_fix.py',
   'language_config.py',
   'launcher.py',
   'path_manager.py',
