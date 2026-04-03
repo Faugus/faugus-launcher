@@ -78,11 +78,6 @@ class FaugusRun:
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def run(self):
-        if not self.splash_disable and not self.disable_updates:
-            self.create_splash_window()
-            while Gtk.events_pending():
-                Gtk.main_iteration()
-
         def run_process():
             self.start_process()
 
@@ -108,7 +103,8 @@ class FaugusRun:
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        self.show_splash()
+        if not self.splash_disable and not self.disable_updates:
+            self.show_splash()
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
@@ -528,7 +524,7 @@ class FaugusRun:
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
 
-    def create_splash_window(self):
+    def show_splash(self):
         self.splash_window = Gtk.Window(title="Faugus Launcher")
         self.splash_window.set_decorated(False)
         self.splash_window.set_resizable(False)
@@ -562,10 +558,10 @@ class FaugusRun:
         grid.attach(self.label, 0, 1, 1, 1)
 
         self.splash_window.add(frame)
+        self.splash_window.show_all()
 
-    def show_splash(self):
-        if self.splash_window:
-            self.splash_window.show_all()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
@@ -590,8 +586,7 @@ class FaugusRun:
             or "Updating UMU-Launcher..." in clean_line
         ):
             if self.splash_window is None:
-                self.create_splash_window()
-            self.show_splash()
+                self.show_splash()
 
         component = None
 
