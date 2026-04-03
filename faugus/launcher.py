@@ -10,7 +10,6 @@ import gi
 import vdf
 import signal
 import gettext
-import os
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -21,6 +20,7 @@ from PIL import Image
 from faugus.config_manager import *
 from faugus.dark_theme import *
 from faugus.steam_setup import *
+from faugus.ea_fix import *
 
 VERSION = "1.17.4"
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -94,19 +94,6 @@ faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
-
-def get_ea_app_path(prefix):
-    try:
-        with open(os.path.join(prefix, "drive_c", "ProgramData", "EA Desktop", "machine.ini"), "r") as machine_ini:
-            for l in machine_ini.readlines():
-                if "machine.telemetry.updatestats" in l:
-                    launcher_version = json.loads(l.split("=")[1])["version"]
-                    return f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/{launcher_version}/EA Desktop/EALauncher.exe"
-    except FileNotFoundError:
-        print("machine.ini not found")
-    except KeyError:
-        print("version not found in updatestats")
-    return f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
 
 def get_desktop_dir():
     try:
@@ -1473,9 +1460,6 @@ class Main(Gtk.ApplicationWindow):
                     if not self.show_hidden and game.hidden:
                         continue
 
-                    if game.gameid == "ea-app":
-                        game.path = get_ea_app_path(game.prefix)
-
                     self.games.append(game)
 
                 self.games = sorted(self.games, key=lambda x: x.title.lower())
@@ -2203,7 +2187,7 @@ class Main(Gtk.ApplicationWindow):
             if launcher_id == "battle":
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
             if launcher_id == "ea":
-                path = get_ea_app_path(prefix)
+                path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
             if launcher_id == "epic":
                 path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
             if launcher_id == "ubisoft":
@@ -2348,10 +2332,6 @@ class Main(Gtk.ApplicationWindow):
                     print(f"Error reading the JSON file: {e}")
 
             games.append(game_info)
-
-            for game in games:
-                if game["gameid"] == "ea-app":
-                    game["path"] = get_ea_app_path(game["prefix"])
 
             self.backup_games()
 
@@ -2501,7 +2481,7 @@ class Main(Gtk.ApplicationWindow):
     def on_button_finish_install_clicked(self):
         self.on_button_kill_clicked(widget)
 
-    def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title, launcher):
+    def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
         retcode = processo.poll()
 
         if retcode is not None:
@@ -2513,8 +2493,8 @@ class Main(Gtk.ApplicationWindow):
             self.box_launcher.destroy()
             self.box_main.show_all()
 
-            if launcher == "ea":
-                game.path = get_ea_app_path(game.prefix)
+            if game.gameid == "ea-app":
+                game.path = update_ea_path(game.prefix)
 
             if os.path.exists(game.path):
                 print(f"{title} installed.")
@@ -2615,7 +2595,7 @@ class Main(Gtk.ApplicationWindow):
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
                 processo = subprocess.Popen([sys.executable, "-m", "faugus.runner", command])
-                GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title, launcher)
+                GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
             threading.Thread(target=start_download).start()
 
@@ -2974,7 +2954,7 @@ class Main(Gtk.ApplicationWindow):
                 game_data = {
                     "gameid": game.gameid,
                     "title": game.title,
-                    "path": get_ea_app_path(game.prefix) if game.gameid == "ea-app" else game.path,
+                    "path": game.path,
                     "prefix": game.prefix,
                     "launch_arguments": game.launch_arguments,
                     "game_arguments": game.game_arguments,
@@ -5846,7 +5826,8 @@ class AddGame(Gtk.Dialog):
             self.checkbox_prevent_sleep.set_visible(True)
             self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(get_ea_app_path(self.entry_prefix.get_text()))
+            self.entry_path.set_text(
+                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
             shutil.copyfile(ea_icon, os.path.expanduser(self.icon_temp))
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
             scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)

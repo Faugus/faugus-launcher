@@ -18,6 +18,7 @@ from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 from threading import Thread
 from faugus.config_manager import *
 from faugus.dark_theme import *
+from faugus.ea_fix import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 from faugus.steam_setup import IS_STEAM_FLATPAK
@@ -809,6 +810,9 @@ def build_launch_command(game):
         lossless_hdr = 1
     else:
         lossless_hdr = 0
+
+    if gameid == "ea-app":
+        path = update_ea_path(prefix)
 
     command_parts = []
 
