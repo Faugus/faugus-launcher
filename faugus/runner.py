@@ -744,9 +744,12 @@ class FaugusRun:
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
-
         self.release_prefix()
-        game_id = os.environ.get("GAMEID")
+
+        if os.environ.get("FAUGUSID"):
+            game_id = os.environ.get("FAUGUSID")
+        else:
+            game_id = os.environ.get("GAMEID")
 
         if game_id and os.path.exists(games_json):
             try:
@@ -824,6 +827,7 @@ def build_launch_command(game):
         command_parts.append("PREVENT_SLEEP=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
+        command_parts.append(f"FAUGUSID={game['gameid']}")
     else:
         command_parts.append(f"GAMEID={game['gameid']}")
     if runner:
