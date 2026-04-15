@@ -5,3 +5,4 @@ Exec=@EXEC@ %f
 MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
 Icon=@ICON@
 Categories=Game;
+StartupWMClass=@EXEC@

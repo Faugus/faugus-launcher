@@ -146,9 +146,7 @@ def convert_runner(runner):
 
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
-        super().__init__(
-            application_id="io.github.Faugus.faugus-launcher"
-        )
+        super().__init__()
         self.window = None
         self.start_hidden = start_hidden
 
