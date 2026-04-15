@@ -22,7 +22,7 @@ from faugus.dark_theme import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 
-VERSION = "1.17.5"
+VERSION = "1.18.1"
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')

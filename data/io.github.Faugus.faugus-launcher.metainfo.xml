@@ -88,13 +88,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.17.5-1" date="2026-04-03">
+    <release version="1.18.1-1" date="2026-04-15">
       <description>
         <ul>
-          <li>Re-enabled EA App installation.</li>
-          <li>Improved detection of running applications.</li>
-          <li>Improved Splash window when running Steam games.</li>
-          <li>Some code restructuring.</li>
+          <li>Now shows the banner and icon in grayscale if can't find the game executable.</li>
+          <li>Fixed playtime not counting when using protonfix.</li>
+          <li>Fixed app icon not showing on X11 sessions.</li>
+          <li>Fixed games not running from file manager with Proton-CachyOS (System).</li>
+          <li>Improved interface mode switching.</li>
         </ul>
       </description>
     </release>
