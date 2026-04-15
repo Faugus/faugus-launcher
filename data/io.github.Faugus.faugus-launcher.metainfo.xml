@@ -88,7 +88,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.1-1" date="2026-04-15">
+    <release version="1.18.2-1" date="2026-04-15">
       <description>
         <ul>
           <li>Now shows the banner and icon in grayscale if can't find the game executable.</li>
