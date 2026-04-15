@@ -3868,9 +3868,9 @@ class Settings(Gtk.Dialog):
 
     def update_config_file(self):
         combobox_language = self.combobox_language.get_active_text()
-        entry_default_prefix = self.entry_default_prefix.get_text()
+        entry_default_prefix = os.path.expanduser(self.entry_default_prefix.get_text())
         combobox_default_runner = self.get_default_runner()
-        entry_lossless = self.entry_lossless.get_text()
+        entry_lossless = os.path.expanduser(self.entry_lossless.get_text())
         language = self.lang_codes.get(combobox_language, "en_US")
         logging_warning = self.logging_warning
 
