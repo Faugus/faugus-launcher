@@ -1669,14 +1669,8 @@ class Main(Gtk.ApplicationWindow):
 
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
         if faugus_backup:
-            subprocess.Popen([sys.executable, __file__])
-            self.destroy()
-            self.load_config()
-            self.manage_autostart_file(self.start_boot)
-            settings_dialog.destroy()
-            return
+            os.execv(sys.executable, [sys.executable] + sys.argv)
 
-        # Handle dialog response
         if response_id == Gtk.ResponseType.OK:
             default_prefix = settings_dialog.entry_default_prefix.get_text()
             validation_result = self.validate_settings_fields(settings_dialog, default_prefix)
@@ -1685,7 +1679,11 @@ class Main(Gtk.ApplicationWindow):
 
             if not settings_dialog.logging_warning:
                 if settings_dialog.checkbox_enable_logging.get_active():
-                    self.show_warning_dialog_main(self, _("Proton may generate huge log files."), _("Enable logging only when debugging a problem."))
+                    self.show_warning_dialog_main(
+                        self,
+                        _("Proton may generate huge log files."),
+                        _("Enable logging only when debugging a problem.")
+                    )
                     settings_dialog.logging_warning = True
 
             settings_dialog.update_config_file()
@@ -1695,22 +1693,23 @@ class Main(Gtk.ApplicationWindow):
                 self.system_tray = True
             else:
                 self.system_tray = False
+
             GLib.timeout_add(1000, self.load_tray_icon)
 
             if validation_result:
                 combobox_language = settings_dialog.combobox_language.get_active_text()
+
                 if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
                 if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
                 if self.smaller_banners != settings_dialog.checkbox_smaller_banners.get_active():
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
                 if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
-                    subprocess.Popen([sys.executable, __file__])
-                    self.destroy()
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 settings_dialog.update_envar_file()
 
