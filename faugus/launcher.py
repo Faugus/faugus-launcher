@@ -1481,13 +1481,15 @@ class Main(Gtk.ApplicationWindow):
         if self.interface_mode == "Banners":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-
         if game.favorite:
             hbox.get_style_context().add_class("hbox-favorite")
         else:
             hbox.get_style_context().add_class("hbox-normal")
 
         game_icon = f'{icons_dir}/{game.gameid}.ico'
+        if not os.path.isfile(game_icon):
+            game_icon = faugus_png
+
         game_label = Gtk.Label.new(game.title)
 
         if self.interface_mode in ("Blocks", "Banners"):
@@ -1495,17 +1497,17 @@ class Main(Gtk.ApplicationWindow):
             game_label.set_max_width_chars(1)
             game_label.set_justify(Gtk.Justification.CENTER)
 
-        if not os.path.isfile(game_icon):
-            game_icon = faugus_png
-
         self.flowbox_child = Gtk.FlowBoxChild()
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(game_icon)
+        self.flowbox_child.game = game
 
         if self.interface_mode == "List":
-            scaled_pixbuf = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(game_icon)
-            image.set_from_pixbuf(scaled_pixbuf)
+            pixbuf = self.get_pixbuf(game_icon, game)
+            scaled = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
+
+            image = Gtk.Image()
+            image.set_from_pixbuf(scaled)
+
+            self.flowbox_child.image = image
 
             image.set_margin_start(10)
             image.set_margin_end(10)
@@ -1529,9 +1531,13 @@ class Main(Gtk.ApplicationWindow):
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
-            scaled_pixbuf = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(game_icon)
-            image.set_from_pixbuf(scaled_pixbuf)
+            pixbuf = self.get_pixbuf(game_icon, game)
+            scaled = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
+
+            image = Gtk.Image()
+            image.set_from_pixbuf(scaled)
+
+            self.flowbox_child.image = image
 
             image.set_margin_top(10)
             game_label.set_margin_top(10)
@@ -1550,6 +1556,8 @@ class Main(Gtk.ApplicationWindow):
             self.flowbox_child.set_vexpand(True)
 
             image2 = Gtk.Image()
+            self.flowbox_child.banner = image2
+
             game_label.set_size_request(-1, 50)
             game_label.set_margin_start(10)
             game_label.set_margin_end(10)
@@ -1563,21 +1571,17 @@ class Main(Gtk.ApplicationWindow):
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
             if game.banner == "" or not os.path.isfile(game.banner):
-                if self.smaller_banners:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        faugus_banner, 180, 270, False)
-                else:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        faugus_banner, 230, 345, False)
+                banner_path = faugus_banner
             else:
-                if self.smaller_banners:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        game.banner, 180, 270, False)
-                else:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        game.banner, 230, 345, False)
+                banner_path = game.banner
+
+            if self.smaller_banners:
+                pixbuf = self.get_pixbuf(banner_path, game, 180, 270)
+            else:
+                pixbuf = self.get_pixbuf(banner_path, game, 230, 345)
 
             image2.set_from_pixbuf(pixbuf)
+
             hbox.pack_start(image2, False, False, 0)
             hbox.pack_start(game_label, True, False, 0)
 
@@ -1585,8 +1589,61 @@ class Main(Gtk.ApplicationWindow):
                 game_label.set_no_show_all(True)
 
         self.flowbox_child.add(hbox)
-        self.flowbox_child.game = game
         self.flowbox.add(self.flowbox_child)
+
+    def update_game_visual(self, flowbox_child):
+        game = flowbox_child.game
+
+        game_icon = f'{icons_dir}/{game.gameid}.ico'
+        if not os.path.isfile(game_icon):
+            game_icon = faugus_png
+
+        if hasattr(flowbox_child, "image"):
+            pixbuf = self.get_pixbuf(game_icon, game)
+
+            if self.interface_mode == "List":
+                scaled = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
+            else:
+                scaled = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
+
+            flowbox_child.image.set_from_pixbuf(scaled)
+
+        if hasattr(flowbox_child, "banner"):
+            if game.banner == "" or not os.path.isfile(game.banner):
+                banner_path = faugus_banner
+            else:
+                banner_path = game.banner
+
+            if self.smaller_banners:
+                pixbuf = self.get_pixbuf(banner_path, game, 180, 270)
+            else:
+                pixbuf = self.get_pixbuf(banner_path, game, 230, 345)
+
+            flowbox_child.banner.set_from_pixbuf(pixbuf)
+
+    def get_pixbuf(self, path, game, width=None, height=None):
+        if width and height:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, width, height, False)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+
+        if not self.is_game_installed(game):
+            gray = pixbuf.copy()
+            gray.saturate_and_pixelate(gray, 0.0, False)
+            return gray
+
+        return pixbuf
+
+    def is_game_installed(self, game):
+        if game.runner == "Steam":
+            for appid, name in read_installed_games():
+                if hasattr(game, "appid") and str(game.appid) == str(appid):
+                    return True
+                if game.title.lower() == name.lower():
+                    return True
+            return False
+
+        return os.path.exists(game.path)
 
     def on_search_changed(self, entry):
         search_text = entry.get_text().lower()
@@ -1733,6 +1790,10 @@ class Main(Gtk.ApplicationWindow):
 
         if not game:
             return
+
+        selected = self.flowbox.get_selected_children()
+        child = selected[0]
+        self.update_game_visual(child)
 
         button = widget or self.button_play
         gameid = game.gameid
