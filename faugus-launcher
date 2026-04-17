@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 if [ "$1" = "--hide" ]; then
-    exec python3 -m faugus.launcher --hide
+    exec /usr/bin/python3 -m faugus.launcher --hide
 elif [ "$1" = "--shortcut" ]; then
-    exec python3 -m faugus.shortcut "$2"
+    exec /usr/bin/python3 -m faugus.shortcut "$2"
 elif [ "$1" = "--game" ]; then
-    exec python3 -m faugus.runner --game "$2"
+    exec /usr/bin/python3 -m faugus.runner --game "$2"
 elif [ "$1" = "--run" ]; then
-    exec python3 -m faugus.runner "$2"
+    exec /usr/bin/python3 -m faugus.runner "$2"
 elif [ -n "$1" ]; then
-    exec python3 -m faugus.launcher "$1"
+    exec /usr/bin/python3 -m faugus.launcher "$1"
 else
-    exec python3 -m faugus.launcher
+    exec /usr/bin/python3 -m faugus.launcher
 fi
