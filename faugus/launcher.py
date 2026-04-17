@@ -727,23 +727,33 @@ class Main(Gtk.ApplicationWindow):
             self.grid_left.set_margin_start(0)
 
     def on_button_bye_clicked(self, widget):
-        menu = Gtk.Menu()
+        dialog = Gtk.Dialog(title=_("Power Options"), parent=self)
+        dialog.set_modal(True)
+        dialog.set_resizable(False)
+        dialog.set_default_size(300,-1)
 
-        shutdown_item = Gtk.MenuItem(label=_("Shut down"))
-        reboot_item = Gtk.MenuItem(label=_("Reboot"))
-        close_item = Gtk.MenuItem(label=_("Close"))
+        content = dialog.get_content_area()
 
-        shutdown_item.connect("activate", self.on_shutdown)
-        reboot_item.connect("activate", self.on_reboot)
-        close_item.connect("activate", self.on_close_fullscreen)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box.set_margin_top(10)
+        box.set_margin_bottom(10)
+        box.set_margin_start(10)
+        box.set_margin_end(10)
 
-        menu.append(shutdown_item)
-        menu.append(reboot_item)
-        menu.append(close_item)
+        shutdown_btn = Gtk.Button(label=_("Shut down"))
+        shutdown_btn.connect("clicked", lambda w: (self.on_shutdown(w), dialog.destroy()))
+        reboot_btn = Gtk.Button(label=_("Reboot"))
+        reboot_btn.connect("clicked", lambda w: (self.on_reboot(w), dialog.destroy()))
+        close_btn = Gtk.Button(label=_("Close"))
+        close_btn.connect("clicked", lambda w: (self.on_close_fullscreen(w), dialog.destroy()))
 
-        menu.show_all()
-        menu.attach_to_widget(self, None)
-        menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        box.pack_start(shutdown_btn, True, True, 0)
+        box.pack_start(reboot_btn, True, True, 0)
+        box.pack_start(close_btn, True, True, 0)
+
+        content.add(box)
+
+        dialog.show_all()
 
     def on_shutdown(self, widget):
         subprocess.run(["pkexec", "shutdown", "-h", "now"])
@@ -755,8 +765,9 @@ class Main(Gtk.ApplicationWindow):
         self.get_application().quit()
 
     def on_item_right_click(self, widget, event):
-        if event.button == Gdk.BUTTON_SECONDARY:
-            item = self.get_item_at_event(event)
+        if event is None or event.button == Gdk.BUTTON_SECONDARY:
+            item = self.get_item_at_event(event) if event else self.flowbox.get_selected_children()[0]
+
             if item:
                 self.flowbox.emit('child-activated', item)
                 self.flowbox.select_child(item)
@@ -843,7 +854,15 @@ class Main(Gtk.ApplicationWindow):
                     self.menu_prefix_location.set_sensitive(False)
                     self.current_prefix = None
 
-                self.context_menu.popup_at_pointer(event)
+                if event:
+                    self.context_menu.popup_at_pointer(event)
+                else:
+                    self.context_menu.popup_at_widget(
+                        widget,
+                        Gdk.Gravity.CENTER,
+                        Gdk.Gravity.CENTER,
+                        None
+                    )
 
     def format_playtime(self, seconds):
         if not seconds:
@@ -2063,53 +2082,58 @@ class Main(Gtk.ApplicationWindow):
         if game:
             # Display confirmation dialog
             confirmation_dialog = ConfirmationDialog(self, title, game.prefix, game.runner)
-            response = confirmation_dialog.run()
+            confirmation_dialog.connect("response", self._on_confirm_delete_response, game)
+            confirmation_dialog.show()
 
-            if response == Gtk.ResponseType.YES:
-                if gameid in self.running:
+    def _on_confirm_delete_response(self, dialog, response, game):
+        dialog.destroy()
+
+        if response == Gtk.ResponseType.YES:
+            gameid = game.gameid
+            title = game.title
+
+            if gameid in self.running:
+                try:
+                    os.kill(self.running[gameid], signal.SIGUSR1)
+                except ProcessLookupError:
+                    pass
+
+                self.running.pop(gameid, None)
+                self.processes.pop(gameid, None)
+                self.save_running()
+                self.update_icon()
+
+            # Remove game and associated files if required
+            if dialog.checkbox.get_active():
+                prefix_path = os.path.expanduser(game.prefix)
+
+                try:
+                    shutil.rmtree(prefix_path)
+                except PermissionError as e:
                     try:
-                        os.kill(self.running[gameid], signal.SIGUSR1)
-                    except ProcessLookupError:
-                        pass
-
-                    self.running.pop(gameid, None)
-                    self.processes.pop(gameid, None)
-                    self.save_running()
-                    self.update_icon()
-
-                # Remove game and associated files if required
-                if confirmation_dialog.get_remove_prefix_state():
-                    prefix_path = os.path.expanduser(game.prefix)
-
-                    try:
+                        os.system(f'chmod -R u+rwX "{prefix_path}"')
                         shutil.rmtree(prefix_path)
-                    except PermissionError as e:
-                        try:
-                            os.system(f'chmod -R u+rwX "{prefix_path}"')
-                            shutil.rmtree(prefix_path)
-                        except Exception as e2:
-                            self.show_warning_dialog_main(
-                                self,
-                                _("Failed to remove prefix."),
-                                str(e2)
-                            )
-                    except FileNotFoundError:
-                        pass
+                    except Exception as e2:
+                        self.show_warning_dialog_main(
+                            self,
+                            _("Failed to remove prefix."),
+                            str(e2)
+                        )
+                except FileNotFoundError:
+                    pass
 
-                # Remove the shortcut
-                self.remove_shortcut(game, "both")
-                self.remove_steam_shortcut(title)
-                self.remove_banner_icon(game)
+            # Remove the shortcut
+            self.remove_shortcut(game, "both")
+            self.remove_steam_shortcut(title)
+            self.remove_banner_icon(game)
 
-                self._deleted_gameid = game.gameid
-                self.save_games()
-                self.update_list()
+            self._deleted_gameid = gameid
+            self.save_games()
+            self.update_list()
 
-                # Remove the game from the latest-games file if it exists
-                self.remove_game_from_latest_games(title)
-                self.select_first_child()
-
-            confirmation_dialog.destroy()
+            # Remove the game from the latest-games file if it exists
+            self.remove_game_from_latest_games(title)
+            self.select_first_child()
 
     def reload_playtimes(self):
         import json
