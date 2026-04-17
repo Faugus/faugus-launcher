@@ -126,7 +126,9 @@ def poll_gamepad(self):
                     self.on_button_kill_clicked(None)
 
                 elif event.button == btn["triangle"]:
-                    self.on_item_right_click(self.get_focus(), None)
+                    focused = self.get_focus()
+                    if isinstance(focused, Gtk.FlowBoxChild):
+                        self.on_item_right_click(focused, None)
 
                 elif event.button == btn["lb"]:
                     self.on_button_add_clicked(None)
