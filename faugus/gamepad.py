@@ -30,7 +30,6 @@ def get_button_map(joy):
         "start_alt": 6,
     }
 
-
 def init_gamepad(self):
     pygame.init()
     pygame.joystick.init()
@@ -111,45 +110,31 @@ def poll_gamepad(self):
 
         # --- BUTTONS ---
         elif event.type == pygame.JOYBUTTONDOWN and btn:
+            win = get_active_window()
+            is_dialog_active = isinstance(win, Gtk.Dialog)
 
             if event.button == btn["confirm"]:
                 activate_focused_widget(self)
 
             elif event.button == btn["back"]:
-                win = get_active_window()
-                if isinstance(win, Gtk.Dialog):
+                if is_dialog_active:
                     win.response(Gtk.ResponseType.CANCEL)
                     win.destroy()
 
-            elif event.button == btn["square"]:
-                win = get_active_window()
-                if isinstance(win, Gtk.Dialog):
-                    win.destroy()
-                else:
+            elif not is_dialog_active:
+                if event.button == btn["square"]:
                     self.on_button_kill_clicked(None)
 
-            elif event.button == btn["triangle"]:
-                self.on_item_right_click(self.get_focus(), None)
+                elif event.button == btn["triangle"]:
+                    self.on_item_right_click(self.get_focus(), None)
 
-            elif event.button == btn["lb"]:
-                win = get_active_window()
-                if isinstance(win, Gtk.Dialog):
-                    win.destroy()
-                else:
+                elif event.button == btn["lb"]:
                     self.on_button_add_clicked(None)
 
-            elif event.button == btn["rb"]:
-                win = get_active_window()
-                if isinstance(win, Gtk.Dialog):
-                    win.destroy()
-                else:
+                elif event.button == btn["rb"]:
                     self.on_button_settings_clicked(None)
 
-            elif event.button == btn["start"]:
-                win = get_active_window()
-                if isinstance(win, Gtk.Dialog):
-                    win.destroy()
-                else:
+                elif event.button == btn["start"]:
                     self.on_button_bye_clicked(None)
 
     return True

@@ -1162,105 +1162,114 @@ class Main(Gtk.ApplicationWindow):
             Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
 
-        duplicate_dialog = DuplicateDialog(self, title)
+        self._dup_game = game
+        self._dup_dialog = DuplicateDialog(self, title)
 
-        while True:
-            response = duplicate_dialog.run()
+        self._dup_handler_id = self._dup_dialog.connect(
+            "response",
+            self._on_confirm_duplicate_response
+        )
 
-            if response != Gtk.ResponseType.OK:
-                break
+        self._dup_dialog.show()
 
-            new_title = duplicate_dialog.entry_title.get_text().strip()
-            gameid = format_title(new_title)
 
-            if not new_title:
-                duplicate_dialog.entry_title.get_style_context().add_class("entry")
-                continue
-            if not gameid:
-                duplicate_dialog.entry_title.get_style_context().add_class("entry")
-                continue
+    def _on_confirm_duplicate_response(self, dialog, response):
+        game = self._dup_game
 
-            if any(new_title.casefold() == g.title.casefold() for g in self.games):
-                self.show_warning_dialog_main(
-                    duplicate_dialog,
-                    _("%s already exists.") % new_title,
-                    ""
-                )
-                continue
+        if response != Gtk.ResponseType.OK:
+            dialog.destroy()
+            return
 
-            title_formatted_old = format_title(game.title)
-            title_formatted = format_title(new_title)
+        new_title = dialog.entry_title.get_text().strip()
+        gameid = format_title(new_title)
 
-            icon = f"{icons_dir}/{title_formatted_old}.ico"
-            banner = game.banner
+        if not new_title:
+            dialog.entry_title.get_style_context().add_class("entry")
+            return
 
-            new_icon = f"{icons_dir}/{title_formatted}.ico"
-            new_banner = f"{banners_dir}/{title_formatted}.png"
-            new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
+        if not gameid:
+            dialog.entry_title.get_style_context().add_class("entry")
+            return
 
-            if os.path.exists(icon):
-                shutil.copyfile(icon, new_icon)
+        if any(new_title.casefold() == g.title.casefold() for g in self.games):
+            self.show_warning_dialog_main(
+                dialog,
+                _("%s already exists.") % new_title,
+                ""
+            )
+            return
 
-            if os.path.exists(banner):
-                shutil.copyfile(banner, new_banner)
+        title_formatted_old = format_title(game.title)
+        title_formatted = format_title(new_title)
 
-            if os.path.exists(game.addapp_bat):
-                shutil.copyfile(game.addapp_bat, new_addapp_bat)
+        icon = f"{icons_dir}/{title_formatted_old}.ico"
+        banner = game.banner
 
-            game.title = new_title
-            game.banner = new_banner
-            game.addapp_bat = new_addapp_bat
+        new_icon = f"{icons_dir}/{title_formatted}.ico"
+        new_banner = f"{banners_dir}/{title_formatted}.png"
+        new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
 
-            game_info = {
-                "gameid": title_formatted,
-                "title": game.title,
-                "path": game.path,
-                "prefix": game.prefix,
-                "launch_arguments": game.launch_arguments,
-                "game_arguments": game.game_arguments,
-                "mangohud": game.mangohud,
-                "gamemode": game.gamemode,
-                "disable_hidraw": game.disable_hidraw,
-                "protonfix": game.protonfix,
-                "runner": game.runner,
-                "addapp_checkbox": game.addapp_checkbox,
-                "addapp": game.addapp,
-                "addapp_bat": game.addapp_bat,
-                "addapp_delay": game.addapp_delay,
-                "addapp_first": game.addapp_first,
-                "banner": game.banner,
-                "lossless_enabled": game.lossless_enabled,
-                "lossless_multiplier": game.lossless_multiplier,
-                "lossless_flow": game.lossless_flow,
-                "lossless_performance": game.lossless_performance,
-                "lossless_hdr": game.lossless_hdr,
-                "playtime": game.playtime,
-                "hidden": game.hidden,
-                "prevent_sleep": game.prevent_sleep,
-                "favorite": game.favorite,
-            }
+        if os.path.exists(icon):
+            shutil.copyfile(icon, new_icon)
 
-            games = []
-            if os.path.exists("games.json"):
-                try:
-                    with open("games.json", "r", encoding="utf-8") as file:
-                        games = json.load(file)
-                except json.JSONDecodeError as e:
-                    print(f"Error reading the JSON file: {e}")
+        if os.path.exists(banner):
+            shutil.copyfile(banner, new_banner)
 
-            games.append(game_info)
+        if os.path.exists(game.addapp_bat):
+            shutil.copyfile(game.addapp_bat, new_addapp_bat)
 
-            with open("games.json", "w", encoding="utf-8") as file:
-                json.dump(games, file, ensure_ascii=False, indent=4)
+        game.title = new_title
+        game.banner = new_banner
+        game.addapp_bat = new_addapp_bat
 
-            self.games.append(game)
-            self.add_item_list(game)
-            self.update_list()
-            self.select_game_by_title(new_title)
+        game_info = {
+            "gameid": title_formatted,
+            "title": game.title,
+            "path": game.path,
+            "prefix": game.prefix,
+            "launch_arguments": game.launch_arguments,
+            "game_arguments": game.game_arguments,
+            "mangohud": game.mangohud,
+            "gamemode": game.gamemode,
+            "disable_hidraw": game.disable_hidraw,
+            "protonfix": game.protonfix,
+            "runner": game.runner,
+            "addapp_checkbox": game.addapp_checkbox,
+            "addapp": game.addapp,
+            "addapp_bat": game.addapp_bat,
+            "addapp_delay": game.addapp_delay,
+            "addapp_first": game.addapp_first,
+            "banner": game.banner,
+            "lossless_enabled": game.lossless_enabled,
+            "lossless_multiplier": game.lossless_multiplier,
+            "lossless_flow": game.lossless_flow,
+            "lossless_performance": game.lossless_performance,
+            "lossless_hdr": game.lossless_hdr,
+            "playtime": game.playtime,
+            "hidden": game.hidden,
+            "prevent_sleep": game.prevent_sleep,
+            "favorite": game.favorite,
+        }
 
-            break
+        games = []
+        if os.path.exists("games.json"):
+            try:
+                with open("games.json", "r", encoding="utf-8") as file:
+                    games = json.load(file)
+            except json.JSONDecodeError as e:
+                print(f"Error reading the JSON file: {e}")
 
-        duplicate_dialog.destroy()
+        games.append(game_info)
+
+        with open("games.json", "w", encoding="utf-8") as file:
+            json.dump(games, file, ensure_ascii=False, indent=4)
+
+        self.games.append(game)
+        self.add_item_list(game)
+        self.update_list()
+        self.select_game_by_title(new_title)
+
+        dialog.destroy()
 
     def on_item_release_event(self, widget, event):
         if event.button == Gdk.BUTTON_PRIMARY:
