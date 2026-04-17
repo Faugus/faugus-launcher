@@ -300,6 +300,10 @@ class Main(Gtk.ApplicationWindow):
 
         self.load_tray_icon()
 
+        if self.gamepad_navigation:
+            import faugus.gamepad as gamepad
+            gamepad.init_gamepad(self)
+
         GLib.timeout_add(1000, self.check_running)
 
     def update_icon(self):
@@ -516,6 +520,7 @@ class Main(Gtk.ApplicationWindow):
         self.entry_search = Gtk.Entry()
         self.entry_search.set_placeholder_text(_("Search..."))
         self.entry_search.connect("changed", self.on_search_changed)
+        self.entry_search.set_can_focus(False)
 
         self.entry_search.set_size_request(170, 50)
         self.entry_search.set_margin_top(10)
@@ -637,6 +642,7 @@ class Main(Gtk.ApplicationWindow):
         self.entry_search = Gtk.Entry()
         self.entry_search.set_placeholder_text(_("Search..."))
         self.entry_search.connect("changed", self.on_search_changed)
+        self.entry_search.set_can_focus(False)
 
         self.entry_search.set_size_request(170, 50)
         self.entry_search.set_margin_top(10)
@@ -1412,6 +1418,7 @@ class Main(Gtk.ApplicationWindow):
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
         self.smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
+        self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
@@ -1709,6 +1716,9 @@ class Main(Gtk.ApplicationWindow):
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
+                if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 settings_dialog.update_envar_file()
@@ -3279,24 +3289,19 @@ class Settings(Gtk.Dialog):
 
         # Create checkbox for 'Use discrete GPU' option
         self.checkbox_discrete_gpu = Gtk.CheckButton(label=_("Use discrete GPU"))
-        self.checkbox_discrete_gpu.set_active(False)
 
         # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label=_("Close when running a game/app"))
-        self.checkbox_close_after_launch.set_active(False)
 
         # Create checkbox for 'System tray' option
         self.checkbox_system_tray = Gtk.CheckButton(label=_("System tray icon"))
-        self.checkbox_system_tray.set_active(False)
         self.checkbox_system_tray.connect("toggled", self.on_checkbox_system_tray_toggled)
 
         # Create checkbox for 'Start on boot' option
         self.checkbox_start_boot = Gtk.CheckButton(label=_("Start on boot"))
-        self.checkbox_start_boot.set_active(False)
         self.checkbox_start_boot.set_sensitive(False)
 
         self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
-        self.checkbox_mono_icon.set_active(False)
         self.checkbox_mono_icon.set_sensitive(False)
 
         # Create checkbox for 'Splash screen' option
@@ -3311,19 +3316,19 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_logging.set_active(False)
 
         self.checkbox_show_hidden = Gtk.CheckButton(label=_("Show hidden games"))
-        self.checkbox_show_hidden.set_active(False)
         self.checkbox_show_hidden.set_tooltip_text(_("Press Ctrl+H to show/hide games."))
+
+        self.checkbox_gamepad_navigation = Gtk.CheckButton(label=_("Gamepad navigation"))
+        self.checkbox_gamepad_navigation.set_active(False)
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Use Wayland driver (experimental)"))
         self.checkbox_wayland_driver.set_active(False)
         self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
 
         self.checkbox_enable_hdr = Gtk.CheckButton(label=_("Enable HDR (experimental)"))
-        self.checkbox_enable_hdr.set_active(False)
         self.checkbox_enable_hdr.set_sensitive(False)
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
-        self.checkbox_enable_wow64.set_active(False)
 
         # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
@@ -3591,9 +3596,10 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 7, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 13, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3901,6 +3907,7 @@ class Settings(Gtk.Dialog):
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
         config.set_value("smaller-banners", self.checkbox_smaller_banners.get_active())
         config.set_value("logging-warning", logging_warning)
+        config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.save_config()
 
         self.set_sensitive(False)
@@ -4353,6 +4360,7 @@ class Settings(Gtk.Dialog):
         smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
+        gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
@@ -4394,6 +4402,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_smaller_banners.set_active(smaller_banners)
         self.checkbox_enable_logging.set_active(enable_logging)
         self.checkbox_show_hidden.set_active(show_hidden)
+        self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_hdr.set_active(enable_hdr)
         self.checkbox_enable_wow64.set_active(enable_wow64)

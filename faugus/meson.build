@@ -3,6 +3,7 @@ py.install_sources(
   'config_manager.py',
   'dark_theme.py',
   'ea_fix.py',
+  'gamepad.py',
   'language_config.py',
   'launcher.py',
   'path_manager.py',
