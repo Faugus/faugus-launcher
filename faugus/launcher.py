@@ -1015,7 +1015,7 @@ class Main(Gtk.ApplicationWindow):
             if title_formatted:
                 command_parts.append(f"GAMEID={title_formatted}")
             if runner:
-                if runner == "Proton-CachyOS":
+                if runner == "Proton-CachyOS (System)":
                     command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
                     command_parts.append(f"PROTONPATH='{runner}'")
@@ -2655,7 +2655,7 @@ class Main(Gtk.ApplicationWindow):
                     command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /SILENT"
 
                 if runner:
-                    if runner == "Proton-CachyOS":
+                    if runner == "Proton-CachyOS (System)":
                         command = f"PROTONPATH='{proton_cachyos}' {command}"
                     else:
                         command = f"PROTONPATH='{runner}' {command}"
@@ -3996,7 +3996,7 @@ class Settings(Gtk.Dialog):
         command_parts.append(f"GAMEID=winetricks-gui")
         command_parts.append(f"STORE=none")
         if default_runner:
-            if default_runner == "Proton-CachyOS":
+            if default_runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
                 command_parts.append(f"PROTONPATH='{default_runner}'")
@@ -4022,7 +4022,7 @@ class Settings(Gtk.Dialog):
 
         command_parts.append(f"GAMEID=default")
         if default_runner:
-            if default_runner == "Proton-CachyOS":
+            if default_runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
                 command_parts.append(f"PROTONPATH='{default_runner}'")
@@ -4082,7 +4082,7 @@ class Settings(Gtk.Dialog):
                 if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
                 if default_runner:
-                    if default_runner == "Proton-CachyOS":
+                    if default_runner == "Proton-CachyOS (System)":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
                         command_parts.append(f"PROTONPATH='{default_runner}'")
@@ -4091,7 +4091,7 @@ class Settings(Gtk.Dialog):
                 if escaped_file_run:
                     command_parts.append(f"GAMEID=default")
                 if default_runner:
-                    if default_runner == "Proton-CachyOS":
+                    if default_runner == "Proton-CachyOS (System)":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                     else:
                         command_parts.append(f"PROTONPATH='{default_runner}'")
@@ -6154,7 +6154,7 @@ class AddGame(Gtk.Dialog):
             if title_formatted:
                 command_parts.append(f"GAMEID={title_formatted}")
             if runner:
-                if runner == "Proton-CachyOS":
+                if runner == "Proton-CachyOS (System)":
                     command_parts.append(f"PROTONPATH='{proton_cachyos}'")
                 else:
                     command_parts.append(f"PROTONPATH='{runner}'")
@@ -6389,7 +6389,7 @@ class AddGame(Gtk.Dialog):
         if title_formatted:
             command_parts.append(f"GAMEID={title_formatted}")
         if runner:
-            if runner == "Proton-CachyOS":
+            if runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
                 command_parts.append(f"PROTONPATH='{runner}'")
@@ -6437,7 +6437,7 @@ class AddGame(Gtk.Dialog):
         command_parts.append(f"GAMEID=winetricks-gui")
         command_parts.append(f"STORE=none")
         if runner:
-            if runner == "Proton-CachyOS":
+            if runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
             else:
                 command_parts.append(f"PROTONPATH='{runner}'")

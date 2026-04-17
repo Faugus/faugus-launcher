@@ -155,7 +155,7 @@ class FaugusRun:
         if not os.environ.get("WINEPREFIX"):
             if not os.environ.get("PROTONPATH") == "umu-sniper":
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
-                if self.default_runner == "Proton-CachyOS":
+                if self.default_runner == "Proton-CachyOS (System)":
                     set_env("PROTONPATH", f"{proton_cachyos}")
                 else:
                     set_env("PROTONPATH", f"{self.default_runner}")
@@ -166,7 +166,7 @@ class FaugusRun:
 
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
-            if protonpath == "Proton-CachyOS" and not os.path.exists(proton_cachyos):
+            if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
             if protonpath == "Linux-Native":
