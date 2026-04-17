@@ -88,14 +88,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.2-1" date="2026-04-15">
+    <release version="1.18.3-1" date="2026-04-17">
       <description>
         <ul>
-          <li>Now shows the banner and icon in grayscale if can't find the game executable.</li>
-          <li>Fixed playtime not counting when using protonfix.</li>
-          <li>Fixed app icon not showing on X11 sessions.</li>
-          <li>Fixed games not running from file manager with Proton-CachyOS (System).</li>
-          <li>Improved interface mode switching.</li>
+          <li>Added gamepad navigation support.</li>
+          <li>Now allows relative path for default prefix and Lossless location.</li>
+          <li>Updated Splash window messages handling.</li>
+          <li>Fixed Proton-CachyOS (System) not working with tools.</li>
+          <li>Updated Portuguese translation.</li>
         </ul>
       </description>
     </release>
