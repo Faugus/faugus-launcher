@@ -610,7 +610,7 @@ class FaugusRun:
             component = "Proton-EM"
         elif "Proton-CachyOS" in clean_line:
             component = "Proton-CachyOS"
-        elif "steamrt3" in clean_line or "SteamLinuxRuntime" in clean_line:
+        elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
             component = "Steam Runtime"
 
         if component and self.splash_window:
@@ -635,7 +635,7 @@ class FaugusRun:
         except:
             return
 
-        ignore = ("bash", "sh", "python", "systemd-inhibit")
+        ignore = ("bash", "sh", "systemd-inhibit")
 
         while True:
             try:
