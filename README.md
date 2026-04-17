@@ -110,6 +110,17 @@ For Application Launchers
 ~/.local/share/applications/
 ```
 
+### Gamepad mapping
+| Action        | Playstation | Xbox     |
+|---------------|-------------|----------|
+| Confirm       | Cross       | A        |
+| Cancel        | Circle      | B        |
+| Game menu     | Triangle    | Y        |
+| Kill          | Square      | X        |
+| Add game/app  | L1          | LB       |
+| Settings      | R1          | RB       |
+| Power options | Options     | Menu     |
+
 # Screenshots
 ### Main window
 <img src=screenshots/main-list.png/><br><br>
