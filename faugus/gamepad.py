@@ -46,7 +46,6 @@ def init_gamepad(self):
 
 def poll_gamepad(self):
     events = pygame.event.get()
-    active = any(w.is_active() for w in Gtk.Window.list_toplevels())
 
     for event in events:
         # --- HOTPLUG ---
@@ -60,9 +59,6 @@ def poll_gamepad(self):
             if self.joystick and self.joystick.get_instance_id() == event.instance_id:
                 self.joystick.quit()
                 self.joystick = None
-
-        if not active:
-            continue
 
         joy = self.joystick
         btn = get_button_map(joy) if joy else None
@@ -127,7 +123,7 @@ def poll_gamepad(self):
                         combo.set_active((current + 1) % count if count >= 0 else 0)
                     continue
 
-                activate_focused_widget(self)
+                GLib.idle_add(lambda: activate_focused_widget(self))
 
             elif event.button == btn["back"]:
                 if is_dialog_active:
@@ -155,7 +151,7 @@ def poll_gamepad(self):
                     self.on_button_settings_clicked(None)
 
                 elif event.button == btn["start"]:
-                    self.on_button_bye_clicked(None)
+                    GLib.idle_add(lambda: self.on_button_bye_clicked(None))
 
     return True
 
@@ -200,7 +196,10 @@ def handle_menu_navigation(self, event, btn=None):
     elif event.type == pygame.JOYBUTTONDOWN and btn:
         if event.button == btn["confirm"]:
             if is_valid(items[self.menu_index]):
-                items[self.menu_index].activate()
+                GLib.idle_add(items[self.menu_index].activate)
+
+        elif event.button == btn["back"]:
+            self.context_menu.popdown()
 
         elif event.button == btn["back"]:
             self.context_menu.popdown()

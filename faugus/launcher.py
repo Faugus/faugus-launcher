@@ -745,8 +745,6 @@ class Main(Gtk.ApplicationWindow):
         dialog.set_resizable(False)
         dialog.set_default_size(300, -1)
 
-        dialog.connect("response", lambda d, rid: d.destroy())
-
         content = dialog.get_content_area()
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -771,6 +769,8 @@ class Main(Gtk.ApplicationWindow):
         content.add(box)
 
         dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def on_shutdown(self, widget):
         subprocess.run(["pkexec", "shutdown", "-h", "now"])
@@ -1077,7 +1077,8 @@ class Main(Gtk.ApplicationWindow):
         self.on_show_logs_clicked(selected_item)
 
     def on_show_logs_clicked(self, widget):
-        dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self, modal=True)
+        dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self)
+        dialog.set_modal(True)
         dialog.set_default_size(1280, 720)
 
         scrolled_window1 = Gtk.ScrolledWindow()
@@ -1164,6 +1165,7 @@ class Main(Gtk.ApplicationWindow):
 
         tab_box1.show_all()
         tab_box2.show_all()
+
         dialog.show_all()
         dialog.run()
         dialog.destroy()
@@ -1192,9 +1194,6 @@ class Main(Gtk.ApplicationWindow):
             "response",
             self._on_confirm_duplicate_response
         )
-
-        self._dup_dialog.show()
-
 
     def _on_confirm_duplicate_response(self, dialog, response):
         game = self._dup_game
@@ -1415,7 +1414,8 @@ class Main(Gtk.ApplicationWindow):
         return False
 
     def running_dialog(self, title):
-        dialog = Gtk.Dialog(title="Faugus Launcher", parent=self, modal=True)
+        dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
@@ -1423,9 +1423,9 @@ class Main(Gtk.ApplicationWindow):
         label.set_label(_("%s is already running.") % title)
         label.set_halign(Gtk.Align.CENTER)
 
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
@@ -1446,7 +1446,7 @@ class Main(Gtk.ApplicationWindow):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
+        box_bottom.pack_start(button_ok, True, True, 0)
 
         content_area.add(box_top)
         content_area.add(box_bottom)
@@ -2078,8 +2078,6 @@ class Main(Gtk.ApplicationWindow):
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
-            edit_game_dialog.show()
-
     def check_steam_shortcut(self, title):
         if os.path.exists(steam_shortcuts_path):
             try:
@@ -2119,10 +2117,8 @@ class Main(Gtk.ApplicationWindow):
         title = game.title
 
         if game:
-            # Display confirmation dialog
-            confirmation_dialog = ConfirmationDialog(self, title, game.prefix, game.runner)
-            confirmation_dialog.connect("response", self._on_confirm_delete_response, game)
-            confirmation_dialog.show()
+            delete_dialog = DeleteDialog(self, title, game.prefix, game.runner)
+            delete_dialog.connect("response", self._on_confirm_delete_response, game)
 
     def _on_confirm_delete_response(self, dialog, response, game):
         dialog.destroy()
@@ -2223,7 +2219,8 @@ class Main(Gtk.ApplicationWindow):
             pass  # Ignore if the file doesn't exist yet
 
     def show_warning_dialog_main(self, parent, text1, text2):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
@@ -2235,9 +2232,9 @@ class Main(Gtk.ApplicationWindow):
         label2.set_label(text2)
         label2.set_halign(Gtk.Align.CENTER)
 
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
@@ -2260,7 +2257,7 @@ class Main(Gtk.ApplicationWindow):
         box_top.pack_start(label1, True, True, 0)
         if text2:
             box_top.pack_start(label2, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
+        box_bottom.pack_start(button_ok, True, True, 0)
 
         content_area.add(box_top)
         content_area.add(box_bottom)
@@ -3137,9 +3134,10 @@ class Main(Gtk.ApplicationWindow):
 
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
-        # Initialize the Settings dialog
-        super().__init__(title=_("Settings"), transient_for=parent, modal=True)
+        super().__init__(title=_("Settings"), transient_for=parent)
+        self.set_modal(True)
         self.set_resizable(False)
+
         self.parent = parent
         self.logging_warning = False
         self.modified = False
@@ -3261,12 +3259,10 @@ class Settings(Gtk.Dialog):
 
         self.lang_codes = {}
 
-        # Widgets for Interface mode
         self.label_language = Gtk.Label(label=_("Language"))
         self.label_language.set_halign(Gtk.Align.START)
         self.combobox_language = Gtk.ComboBoxText()
 
-        # Widgets for Interface mode
         self.label_interface = Gtk.Label(label=_("Interface Mode"))
         self.label_interface.set_halign(Gtk.Align.START)
         self.combobox_interface = Gtk.ComboBoxText()
@@ -3275,12 +3271,10 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.append("Blocks", _("Blocks"))
         self.combobox_interface.append("Banners", _("Banners"))
 
-        # Create checkbox for 'Start maximized' option
         self.checkbox_start_maximized = Gtk.CheckButton(label=_("Start maximized"))
         self.checkbox_start_maximized.set_active(False)
         self.checkbox_start_maximized.connect("toggled", self.on_checkbox_toggled, "maximized")
 
-        # Create checkbox for 'Start fullscreen' option
         self.checkbox_start_fullscreen = Gtk.CheckButton(label=_("Start in fullscreen"))
         self.checkbox_start_fullscreen.set_active(False)
         self.checkbox_start_fullscreen.connect("toggled", self.on_checkbox_toggled, "fullscreen")
@@ -3292,7 +3286,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_smaller_banners = Gtk.CheckButton(label=_("Smaller banners"))
         self.checkbox_smaller_banners.set_active(False)
 
-        # Widgets for prefix
         self.label_default_prefix = Gtk.Label(label=_("Default Prefixes Location"))
         self.label_default_prefix.set_halign(Gtk.Align.START)
 
@@ -3326,7 +3319,6 @@ class Settings(Gtk.Dialog):
         self.label_default_prefix_tools.set_margin_end(10)
         self.label_default_prefix_tools.set_margin_top(10)
 
-        # Widgets for runner
         self.label_runner = Gtk.Label(label=_("Default Proton"))
         self.label_runner.set_halign(Gtk.Align.START)
         self.combobox_runner = Gtk.ComboBoxText()
@@ -3338,33 +3330,26 @@ class Settings(Gtk.Dialog):
         self.label_miscellaneous.set_halign(Gtk.Align.START)
         self.label_miscellaneous.set_margin_start(10)
         self.label_miscellaneous.set_margin_end(10)
-        #self.label_miscellaneous.set_margin_top(10)
 
-        # Create checkbox for 'Use discrete GPU' option
         self.checkbox_discrete_gpu = Gtk.CheckButton(label=_("Use discrete GPU"))
 
-        # Create checkbox for 'Close after launch' option
         self.checkbox_close_after_launch = Gtk.CheckButton(label=_("Close when running a game/app"))
 
-        # Create checkbox for 'System tray' option
         self.checkbox_system_tray = Gtk.CheckButton(label=_("System tray icon"))
         self.checkbox_system_tray.connect("toggled", self.on_checkbox_system_tray_toggled)
 
-        # Create checkbox for 'Start on boot' option
         self.checkbox_start_boot = Gtk.CheckButton(label=_("Start on boot"))
         self.checkbox_start_boot.set_sensitive(False)
 
         self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
         self.checkbox_mono_icon.set_sensitive(False)
 
-        # Create checkbox for 'Splash screen' option
         self.checkbox_splash_disable = Gtk.CheckButton(label=_("Disable splash window"))
         self.checkbox_splash_disable.set_active(False)
 
         self.checkbox_disable_updates = Gtk.CheckButton(label=_("Disable automatic updates"))
         self.checkbox_disable_updates.set_active(False)
 
-        # Create checkbox for 'Enable logging' option
         self.checkbox_enable_logging = Gtk.CheckButton(label=_("Enable logging"))
         self.checkbox_enable_logging.set_active(False)
 
@@ -3383,23 +3368,19 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
 
-        # Button Winetricks
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
         self.button_winetricks_default.connect("clicked", self.on_button_winetricks_default_clicked)
         self.button_winetricks_default.set_size_request(120, -1)
 
-        # Button Winecfg
         self.button_winecfg_default = Gtk.Button(label="Winecfg")
         self.button_winecfg_default.connect("clicked", self.on_button_winecfg_default_clicked)
         self.button_winecfg_default.set_size_request(120, -1)
 
-        # Button for Run
         self.button_run_default = Gtk.Button(label=_("Run"))
         self.button_run_default.set_size_request(120, -1)
         self.button_run_default.connect("clicked", self.on_button_run_default_clicked)
         self.button_run_default.set_tooltip_text(_("Run a file inside the prefix"))
 
-        # Checkboxes for optional features
         self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
         self.checkbox_mangohud.set_tooltip_text(
             _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
@@ -3422,12 +3403,10 @@ class Settings(Gtk.Dialog):
         button_paypal.connect("clicked", self.on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
 
-        # Button Cancel
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
         self.button_cancel.set_size_request(150, -1)
 
-        # Button Ok
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
@@ -3438,11 +3417,9 @@ class Settings(Gtk.Dialog):
         self.label_settings.set_margin_end(10)
         self.label_settings.set_margin_top(10)
 
-        # Button Backup
         button_backup = Gtk.Button(label=_("Backup"))
         button_backup.connect("clicked", self.on_button_backup_clicked)
 
-        # Button Restore
         button_restore = Gtk.Button(label=_("Restore"))
         button_restore.connect("clicked", self.on_button_restore_clicked)
 
@@ -3520,7 +3497,6 @@ class Settings(Gtk.Dialog):
         grid_prefix.set_column_spacing(10)
         grid_prefix.set_margin_start(10)
         grid_prefix.set_margin_end(10)
-        #grid_prefix.set_margin_top(10)
         grid_prefix.set_margin_bottom(10)
 
         grid_runner = Gtk.Grid()
@@ -3568,7 +3544,6 @@ class Settings(Gtk.Dialog):
         grid_envar.set_column_spacing(10)
         grid_envar.set_margin_start(10)
         grid_envar.set_margin_end(10)
-        #grid_envar.set_margin_top(10)
         grid_envar.set_margin_bottom(10)
 
         grid_interface_mode = Gtk.Grid()
@@ -3716,10 +3691,8 @@ class Settings(Gtk.Dialog):
         self.populate_languages()
         self.load_config()
 
-        self.show_all()
         self.on_combobox_interface_changed(self.combobox_interface)
 
-        # Check if optional features are available and enable/disable accordingly
         self.mangohud_enabled = os.path.exists(mangohud_dir)
         if not self.mangohud_enabled:
             self.checkbox_mangohud.set_sensitive(False)
@@ -3733,6 +3706,8 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
         self.track_modifications(self.box)
+
+        self.show_all()
 
     def on_envar_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Delete:
@@ -4284,24 +4259,21 @@ class Settings(Gtk.Dialog):
         filechooser.destroy()
 
     def show_warning_dialog_settings(self, parent, title, buttons):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent, modal=True)
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label(label=title)
         label.set_halign(Gtk.Align.CENTER)
 
-        button_ok = Gtk.Button(label=_("Ok"))
-        button_ok.set_size_request(150, -1)
-        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
+        button_confirm = Gtk.Button(label=_("Yes"))
+        button_confirm.set_size_request(150, -1)
+        button_confirm.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
         button_no.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
-
-        button_yes = Gtk.Button(label=_("Yes"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         content_area = dialog.get_content_area()
 
@@ -4320,18 +4292,17 @@ class Settings(Gtk.Dialog):
 
         if buttons:
             box_bottom.pack_start(button_no, True, True, 0)
-            box_bottom.pack_start(button_yes, True, True, 0)
         else:
-            box_bottom.pack_start(button_ok, True, True, 0)
+            button_confirm.set_label(_("Ok"))
+
+        box_bottom.pack_start(button_confirm, True, True, 0)
 
         content_area.add(box_top)
         content_area.add(box_bottom)
 
         dialog.show_all()
-
         response = dialog.run()
         dialog.destroy()
-
         return response == Gtk.ResponseType.OK
 
     def on_button_kofi_clicked(self, widget):
@@ -4553,7 +4524,8 @@ class Game:
 
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
-        super().__init__(title=_("Duplicate %s") % title, transient_for=parent, modal=True)
+        super().__init__(title=_("Duplicate %s") % title, transient_for=parent)
+        self.set_modal(True)
         self.set_resizable(False)
 
         label_title = Gtk.Label(label=_("Title"))
@@ -4598,9 +4570,10 @@ class DuplicateDialog(Gtk.Dialog):
 
         self.show_all()
 
-class ConfirmationDialog(Gtk.Dialog):
+class DeleteDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix, runner):
-        super().__init__(title=_("Delete %s") % title, transient_for=parent, modal=True)
+        super().__init__(title=_("Delete %s") % title, transient_for=parent)
+        self.set_modal(True)
         self.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
@@ -4676,8 +4649,9 @@ class AddGame(Gtk.Dialog):
     def __init__(self, parent, game_running2, file_path, interface_mode):
         # Initialize the AddGame dialog
         super().__init__(title=_("New Game/App"), parent=parent)
-        self.set_resizable(False)
         self.set_modal(True)
+        self.set_resizable(False)
+
         self.parent_window = parent
         self.interface_mode = interface_mode
         self.updated_steam_id = None
@@ -5280,6 +5254,7 @@ class AddGame(Gtk.Dialog):
 
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
 
         frame = Gtk.Frame()
@@ -5398,6 +5373,7 @@ class AddGame(Gtk.Dialog):
 
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
 
         frame = Gtk.Frame()
@@ -5619,13 +5595,8 @@ class AddGame(Gtk.Dialog):
         self.set_sensitive(True)
 
     def on_load_url(self, widget):
-        self.set_sensitive(False)
-
-        dialog = Gtk.Dialog(
-            title=_("Enter the image URL"),
-            transient_for=self,
-            modal=True
-        )
+        dialog = Gtk.Dialog(title=_("Enter the image URL"), transient_for=self)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
 
         entry = Gtk.Entry()
@@ -5690,11 +5661,11 @@ class AddGame(Gtk.Dialog):
                     continue
 
         dialog.destroy()
-        self.set_sensitive(True)
 
     def show_invalid_image_dialog(self):
-        dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
-        dialog_image.set_resizable(False)
+        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=self)
+        dialog.set_modal(True)
+        dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
         label = Gtk.Label(label=_("The selected file is not a valid image."))
@@ -5705,9 +5676,9 @@ class AddGame(Gtk.Dialog):
 
         button_yes = Gtk.Button(label=_("Ok"))
         button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
-        content_area = dialog_image.get_content_area()
+        content_area = dialog.get_content_area()
         content_area.set_border_width(0)
         content_area.set_halign(Gtk.Align.CENTER)
         content_area.set_valign(Gtk.Align.CENTER)
@@ -5732,9 +5703,9 @@ class AddGame(Gtk.Dialog):
         content_area.add(box_top)
         content_area.add(box_bottom)
 
-        dialog_image.show_all()
-        dialog_image.run()
-        dialog_image.destroy()
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def get_banner(self):
         import requests
@@ -6316,8 +6287,9 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
-                dialog_image.set_resizable(False)
+                dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=self)
+                dialog.set_modal(True)
+                dialog.set_resizable(False)
                 subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
                 label = Gtk.Label()
@@ -6330,9 +6302,9 @@ class AddGame(Gtk.Dialog):
 
                 button_yes = Gtk.Button(label=_("Ok"))
                 button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+                button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
-                content_area = dialog_image.get_content_area()
+                content_area = dialog.get_content_area()
                 content_area.set_border_width(0)
                 content_area.set_halign(Gtk.Align.CENTER)
                 content_area.set_valign(Gtk.Align.CENTER)
@@ -6357,9 +6329,9 @@ class AddGame(Gtk.Dialog):
                 content_area.add(box_top)
                 content_area.add(box_bottom)
 
-                dialog_image.show_all()
-                dialog_image.run()
-                dialog_image.destroy()
+                dialog.show_all()
+                dialog.run()
+                dialog.destroy()
             else:
                 shutil.copyfile(file_path, self.icon_temp)
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
