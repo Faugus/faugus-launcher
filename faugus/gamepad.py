@@ -1,6 +1,6 @@
 import pygame
 from gi.repository import GLib, Gtk
-
+from faugus.keyboard import *
 
 def get_button_map(joy):
     name = joy.get_name().lower()
@@ -114,12 +114,24 @@ def poll_gamepad(self):
             is_dialog_active = isinstance(win, Gtk.Dialog)
 
             if event.button == btn["confirm"]:
+                win = get_active_window()
+                focused = win.get_focus() if win else None
+
+                combo = find_combobox(focused)
+
+                if combo:
+                    model = combo.get_model()
+                    if model:
+                        count = model.iter_n_children(None)
+                        current = combo.get_active()
+                        combo.set_active((current + 1) % count if count >= 0 else 0)
+                    continue
+
                 activate_focused_widget(self)
 
             elif event.button == btn["back"]:
                 if is_dialog_active:
                     win.response(Gtk.ResponseType.CANCEL)
-                    win.destroy()
 
             elif not is_dialog_active:
                 if event.button == btn["square"]:
@@ -146,6 +158,13 @@ def poll_gamepad(self):
                     self.on_button_bye_clicked(None)
 
     return True
+
+def find_combobox(widget):
+    while widget:
+        if isinstance(widget, Gtk.ComboBox):
+            return widget
+        widget = widget.get_parent()
+    return None
 
 def handle_menu_navigation(self, event, btn=None):
     items = self.context_menu.get_children()
@@ -191,7 +210,6 @@ def navigate_gamepad(direction):
     if active_window:
         active_window.child_focus(direction)
 
-
 def activate_focused_widget(self):
     active_window = get_active_window()
     if not active_window:
@@ -199,6 +217,13 @@ def activate_focused_widget(self):
 
     focused = active_window.get_focus()
     if not focused:
+        return
+
+    if isinstance(focused, Gtk.Entry):
+        parent = focused.get_toplevel()
+        dialog = VirtualKeyboard(parent, focused)
+        dialog.connect("destroy", lambda *a: parent.present())
+        dialog.show_all()
         return
 
     if isinstance(focused, Gtk.Button):
@@ -216,7 +241,6 @@ def activate_focused_widget(self):
             self.running_dialog(game.title)
         else:
             self.on_button_play_clicked()
-
 
 def get_active_window():
     for window in Gtk.Window.list_toplevels():

@@ -4,6 +4,7 @@ py.install_sources(
   'dark_theme.py',
   'ea_fix.py',
   'gamepad.py',
+  'keyboard.py',
   'language_config.py',
   'launcher.py',
   'path_manager.py',

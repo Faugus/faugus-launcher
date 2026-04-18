@@ -743,7 +743,9 @@ class Main(Gtk.ApplicationWindow):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
         dialog.set_modal(True)
         dialog.set_resizable(False)
-        dialog.set_default_size(300,-1)
+        dialog.set_default_size(300, -1)
+
+        dialog.connect("response", lambda d, rid: d.destroy())
 
         content = dialog.get_content_area()
 
@@ -755,8 +757,10 @@ class Main(Gtk.ApplicationWindow):
 
         shutdown_btn = Gtk.Button(label=_("Shut down"))
         shutdown_btn.connect("clicked", lambda w: (self.on_shutdown(w), dialog.destroy()))
+
         reboot_btn = Gtk.Button(label=_("Reboot"))
         reboot_btn.connect("clicked", lambda w: (self.on_reboot(w), dialog.destroy()))
+
         close_btn = Gtk.Button(label=_("Close"))
         close_btn.connect("clicked", lambda w: (self.on_close_fullscreen(w), dialog.destroy()))
 
