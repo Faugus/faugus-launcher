@@ -219,8 +219,6 @@ class Main(Gtk.ApplicationWindow):
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-        self.load_config()
-
         self.context_menu = Gtk.Menu()
 
         self.menu_title = Gtk.MenuItem(label="")
@@ -229,7 +227,6 @@ class Main(Gtk.ApplicationWindow):
 
         self.menu_playtime = Gtk.MenuItem(label="")
         self.menu_playtime.set_sensitive(False)
-        self.context_menu.append(self.menu_playtime)
 
         self.context_menu.append(Gtk.SeparatorMenuItem())
 
@@ -271,9 +268,8 @@ class Main(Gtk.ApplicationWindow):
 
         self.menu_show_logs = Gtk.MenuItem(label=_("Show logs"))
         self.menu_show_logs.connect("activate", self.on_context_show_logs)
-        self.context_menu.append(self.menu_show_logs)
 
-        self.context_menu.show_all()
+        self.load_config()
 
         if self.interface_mode == "List":
             self.small_interface()
@@ -463,8 +459,25 @@ class Main(Gtk.ApplicationWindow):
         self.get_application().quit()
 
     def select_first_child(self):
-        if self.flowbox.get_children():
-            self.flowbox.select_child(self.flowbox.get_children()[0])
+        children = self.flowbox.get_children()
+        if children:
+            first = children[0]
+            self.flowbox.grab_focus()
+            self.flowbox.select_child(first)
+            first.grab_focus()
+            self.flowbox.emit("child-activated", first)
+
+    def select_game_by_title(self, title):
+        for child in self.flowbox.get_children():
+            hbox = child.get_children()[0]
+            game_label = hbox.get_children()[1]
+
+            if game_label.get_text() == title:
+                self.flowbox.grab_focus()
+                self.flowbox.select_child(child)
+                child.grab_focus()
+                self.flowbox.emit("child-activated", child)
+                break
 
     def small_interface(self):
         self.set_default_size(-1, 610)
@@ -784,11 +797,18 @@ class Main(Gtk.ApplicationWindow):
                     if isinstance(item, dict) and item.get("gameid") == game.gameid:
                         game.playtime = item.get("playtime", 0)
                         formatted = self.format_playtime(game.playtime)
+                        children = self.context_menu.get_children()
+
                         if not formatted:
-                            self.menu_playtime.hide()
+                            if self.menu_playtime in children:
+                                self.context_menu.remove(self.menu_playtime)
                         else:
-                            self.menu_playtime.show()
+                            if self.menu_playtime in children:
+                                self.context_menu.remove(self.menu_playtime)
+
+                            self.context_menu.insert(self.menu_playtime, 1)
                             self.menu_playtime.get_child().set_text(formatted)
+
                         break
 
                 if game.protonfix:
@@ -802,15 +822,12 @@ class Main(Gtk.ApplicationWindow):
                     self.log_file_path = f"{logs_dir}/{game.gameid}/steam-0.log"
                 self.umu_log_file_path = f"{logs_dir}/{game.gameid}/umu.log"
 
-                if self.enable_logging:
-                    self.menu_show_logs.set_visible(True)
+                if self.context_menu:
                     if os.path.exists(self.log_file_path):
                         self.menu_show_logs.set_sensitive(True)
                         self.current_title = title
                     else:
                         self.menu_show_logs.set_sensitive(False)
-                else:
-                    self.menu_show_logs.set_visible(False)
 
                 if game.hidden:
                     self.menu_hide.get_child().set_text(_("Remove from hidden"))
@@ -860,9 +877,11 @@ class Main(Gtk.ApplicationWindow):
                     self.context_menu.popup_at_widget(
                         widget,
                         Gdk.Gravity.CENTER,
-                        Gdk.Gravity.CENTER,
+                        Gdk.Gravity.NORTH,
                         None
                     )
+
+                self.context_menu.show_all()
 
     def format_playtime(self, seconds):
         if not seconds:
@@ -1452,6 +1471,13 @@ class Main(Gtk.ApplicationWindow):
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
+
+        if self.enable_logging:
+            if self.menu_show_logs not in self.context_menu.get_children():
+                self.context_menu.append(self.menu_show_logs)
+        else:
+            if self.menu_show_logs in self.context_menu.get_children():
+                self.context_menu.remove(self.menu_show_logs)
 
     def load_games(self):
         try:
@@ -2701,16 +2727,6 @@ class Main(Gtk.ApplicationWindow):
             threading.Thread(target=start_download).start()
 
             return file_path
-
-    def select_game_by_title(self, title):
-        # Selects an item from the FlowBox based on the title
-        for child in self.flowbox.get_children():
-            hbox = child.get_children()[0]  # The first item is the hbox containing the label
-            game_label = hbox.get_children()[1]  # The second item is the title label
-            if game_label.get_text() == title:
-                # Selects the child in the FlowBox
-                self.flowbox.select_child(child)
-                break
 
     def on_edit_dialog_response(self, dialog, response_id, edit_game_dialog, game):
         # Handle edit dialog response

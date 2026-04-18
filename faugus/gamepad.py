@@ -129,6 +129,12 @@ def poll_gamepad(self):
                     focused = self.get_focus()
                     if isinstance(focused, Gtk.FlowBoxChild):
                         self.on_item_right_click(focused, None)
+                        items = self.context_menu.get_children()
+                        for i, item in enumerate(items):
+                            if item == self.menu_play:
+                                self.menu_index = i
+                                self.context_menu.select_item(item)
+                                break
 
                 elif event.button == btn["lb"]:
                     self.on_button_add_clicked(None)
@@ -149,23 +155,36 @@ def handle_menu_navigation(self, event, btn=None):
     if not hasattr(self, "menu_index"):
         self.menu_index = 0
 
+    def is_valid(item):
+        return (
+            isinstance(item, Gtk.MenuItem)
+            and not isinstance(item, Gtk.SeparatorMenuItem)
+            and item.get_sensitive()
+        )
+
+    def move(step):
+        for _ in range(len(items)):
+            self.menu_index = (self.menu_index + step) % len(items)
+            if is_valid(items[self.menu_index]):
+                break
+
     if event.type == pygame.JOYHATMOTION:
         x, y = event.value
 
         if y == -1:
-            self.menu_index = (self.menu_index + 1) % len(items)
+            move(1)
         elif y == 1:
-            self.menu_index = (self.menu_index - 1) % len(items)
+            move(-1)
 
         self.context_menu.select_item(items[self.menu_index])
 
     elif event.type == pygame.JOYBUTTONDOWN and btn:
         if event.button == btn["confirm"]:
-            items[self.menu_index].activate()
+            if is_valid(items[self.menu_index]):
+                items[self.menu_index].activate()
 
         elif event.button == btn["back"]:
             self.context_menu.popdown()
-
 
 def navigate_gamepad(direction):
     active_window = get_active_window()
