@@ -1,6 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Faugus Launcher
+Comment=Manage and play your Windows and Linux games easily
+Comment[pt_BR]=Gerencie e jogue seus jogos de Windows e Linux facilmente
 Exec=@EXEC@ %f
 MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
 Icon=@ICON@
