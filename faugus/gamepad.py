@@ -289,7 +289,27 @@ def activate_focused_widget(self):
         dialog.show_all()
 
     elif isinstance(focused, Gtk.Button):
+        label = focused.get_label() if hasattr(focused, "get_label") else None
         focused.emit("clicked")
+
+        if label in ("Shift", "Caps", "?123", "ABC"):
+            def restore_focus():
+                win = get_active_window()
+                if not win: return
+                target = {"?123": "ABC", "ABC": "?123"}.get(label, label)
+
+                def find_and_focus(w):
+                    if isinstance(w, Gtk.Button) and w.get_label() == target:
+                        w.grab_focus()
+                        return True
+                    if isinstance(w, Gtk.Container):
+                        for c in w.get_children():
+                            if find_and_focus(c): return True
+                    return False
+
+                find_and_focus(win)
+
+            GLib.idle_add(restore_focus)
 
     elif isinstance(focused, Gtk.CheckButton):
         focused.set_active(not focused.get_active())

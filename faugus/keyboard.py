@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
 LAYOUT_LOWER = [
-    [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Backspace", 2)],
+    [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
     [("q", 1), ("w", 1), ("e", 1), ("r", 1), ("t", 1), ("y", 1), ("u", 1), ("i", 1), ("o", 1), ("p", 1), ("[", 1), ("]", 1), ("Enter", 2)],
     [("Caps", 2), ("a", 1), ("s", 1), ("d", 1), ("f", 1), ("g", 1), ("h", 1), ("j", 1), ("k", 1), ("l", 1), (";", 1), ("'", 1), ("\\", 1)],
     [("Shift", 2), ("z", 1), ("x", 1), ("c", 1), ("v", 1), ("b", 1), ("n", 1), ("m", 1), (",", 1), (".", 1), ("/", 1), ("?123", 2)],
@@ -11,7 +11,7 @@ LAYOUT_LOWER = [
 ]
 
 LAYOUT_SHIFT = [
-    [("!", 1), ("@", 1), ("#", 1), ("$", 1), ("%", 1), ("^", 1), ("&", 1), ("*", 1), ("(", 1), (")", 1), ("_", 1), ("+", 1), ("Backspace", 2)],
+    [("!", 1), ("@", 1), ("#", 1), ("$", 1), ("%", 1), ("^", 1), ("&", 1), ("*", 1), ("(", 1), (")", 1), ("_", 1), ("+", 1), ("Back", 2)],
     [("Q", 1), ("W", 1), ("E", 1), ("R", 1), ("T", 1), ("Y", 1), ("U", 1), ("I", 1), ("O", 1), ("P", 1), ("{", 1), ("}", 1), ("Enter", 2)],
     [("Caps", 2), ("A", 1), ("S", 1), ("D", 1), ("F", 1), ("G", 1), ("H", 1), ("J", 1), ("K", 1), ("L", 1), (":", 1), ("\"", 1), ("|", 1)],
     [("Shift", 2), ("Z", 1), ("X", 1), ("C", 1), ("V", 1), ("B", 1), ("N", 1), ("M", 1), ("<", 1), (">", 1), ("?", 1), ("?123", 2)],
@@ -19,7 +19,7 @@ LAYOUT_SHIFT = [
 ]
 
 LAYOUT_SYMBOLS = [
-    [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Backspace", 2)],
+    [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
     [("!", 1), ("@", 1), ("#", 1), ("$", 1), ("%", 1), ("^", 1), ("&", 1), ("*", 1), ("(", 1), (")", 1), ("_", 1), ("+", 1), ("Enter", 2)],
     [("Caps", 2), ("~", 1), ("`", 1), ("|", 1), ("•", 1), ("√", 1), ("π", 1), ("÷", 1), ("×", 1), ("{", 1), ("}", 1), ("°", 1), ("£", 1)],
     [("ABC", 2), ("¢", 1), ("€", 1), ("¥", 1), ("^", 1), ("°", 1), ("=", 1), ("[", 1), ("]", 1), ("\\", 1), ("/", 1), ("ABC", 2)],
@@ -34,17 +34,16 @@ class VirtualKeyboard(Gtk.Dialog):
         self.mode = "lower"
         self.original_text = self.entry.get_text()
 
-        self.set_default_size(800, 450)
+        #self.set_default_size(800, 450)
         self.set_resizable(False)
         self.get_style_context().add_class("tv-keyboard")
         self.apply_css()
 
         vbox = self.get_content_area()
-        vbox.set_spacing(15)
-        vbox.set_margin_start(15)
-        vbox.set_margin_end(15)
-        vbox.set_margin_top(15)
-        vbox.set_margin_bottom(15)
+        vbox.set_spacing(10)
+        vbox.set_margin_start(10)
+        vbox.set_margin_end(10)
+        vbox.set_margin_top(10)
 
         self.display_entry = Gtk.Entry()
         self.display_entry.set_text(self.entry.get_text())
@@ -64,20 +63,16 @@ class VirtualKeyboard(Gtk.Dialog):
     def apply_css(self):
         css = b"""
         .tv-keyboard button {
-            font-size: 16px;
             font-weight: bold;
-            min-height: 50px;
-            min-width: 50px;
+            min-height: 40px;
+            min-width: 40px;
             border-radius: 8px;
         }
         .tv-keyboard button:focus {
-            background-color: #3584e4;
-            color: white;
-            box-shadow: 0 0 5px 2px rgba(53, 132, 228, 0.5);
+            background-color: alpha(@theme_selected_bg_color, 1);
         }
         .tv-keyboard entry {
-            font-size: 16px;
-            min-height: 50px;
+            min-height: 40px;
             border-radius: 8px;
         }
         """
@@ -118,7 +113,7 @@ class VirtualKeyboard(Gtk.Dialog):
                    (label in ("?123", "ABC") and self.mode == "symbols"):
                     btn.get_style_context().add_class("suggested-action")
 
-                if label == "Backspace":
+                if label == "Back":
                     btn.connect("clicked", self.on_backspace)
                 elif label == "Enter":
                     btn.connect("clicked", self.on_enter)
