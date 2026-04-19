@@ -421,6 +421,7 @@ class ProtonDownloader(Gtk.Dialog):
                 GLib.idle_add(self.progress_label.set_text, _("Error during download"))
             finally:
                 GLib.idle_add(self.enable_all_buttons)
+                GLib.idle_add(button.grab_focus)
 
         threading.Thread(target=worker, daemon=True).start()
 

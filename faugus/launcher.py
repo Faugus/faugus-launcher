@@ -1014,7 +1014,6 @@ class Main(Gtk.ApplicationWindow):
             return
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -3953,30 +3952,21 @@ class Settings(Gtk.Dialog):
                     f.write(val + "\n")
 
     def on_button_proton_manager_clicked(self, widget):
-        self.set_sensitive(False)
         current_runner = self.combobox_runner.get_active_text()
 
-        def run_command():
-            process = subprocess.Popen([sys.executable, "-m", "faugus.proton_manager"])
-            process.wait()
+        from faugus.proton_manager import ProtonDownloader
+        dialog = ProtonDownloader()
+        dialog.run()
+        dialog.destroy()
 
-            GLib.idle_add(self.set_sensitive, True)
-            GLib.idle_add(self.parent.set_sensitive, True)
+        self.combobox_runner.remove_all()
+        self.populate_combobox_with_runners()
 
-            GLib.idle_add(lambda: self.combobox_runner.remove_all())
-            GLib.idle_add(self.populate_combobox_with_runners)
-
-            def restore_selection():
-                if current_runner:
-                    for i, text in enumerate(self.combobox_runner.get_model()):
-                        if text[0] == current_runner:
-                            self.combobox_runner.set_active(i)
-                            break
-
-            GLib.idle_add(restore_selection)
-
-        command_thread = threading.Thread(target=run_command)
-        command_thread.start()
+        if current_runner:
+            for i, text in enumerate(self.combobox_runner.get_model()):
+                if text[0] == current_runner:
+                    self.combobox_runner.set_active(i)
+                    break
 
     def track_modifications(self, container):
         for child in container.get_children():
@@ -4068,14 +4058,12 @@ class Settings(Gtk.Dialog):
 
     def on_button_run_default_clicked(self, widget):
         self.check_modified()
-        self.set_sensitive(False)
 
         self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
 
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -4131,7 +4119,6 @@ class Settings(Gtk.Dialog):
             def run_command():
                 process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
                 process.wait()
-                GLib.idle_add(self.set_sensitive, True)
 
             threading.Thread(target=run_command, daemon=True).start()
         else:
@@ -4170,7 +4157,6 @@ class Settings(Gtk.Dialog):
 
         filechooser = Gtk.FileChooserNative(
             title=_("Save the backup file as..."),
-            transient_for=self,
             action=Gtk.FileChooserAction.SAVE,
             accept_label=_("Save"),
             cancel_label=_("Cancel"),
@@ -4203,7 +4189,6 @@ class Settings(Gtk.Dialog):
     def on_button_restore_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select a backup file to restore"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -4316,7 +4301,6 @@ class Settings(Gtk.Dialog):
     def on_button_search_prefix_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select a prefix location"),
-            transient_for=self,
             action=Gtk.FileChooserAction.SELECT_FOLDER,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -4339,7 +4323,6 @@ class Settings(Gtk.Dialog):
     def on_button_search_lossless_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select the Lossless.dll file"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -5553,8 +5536,6 @@ class AddGame(Gtk.Dialog):
             self.image_banner2.set_from_pixbuf(pixbuf)
 
     def on_load_file(self, widget):
-        self.set_sensitive(False)
-
         def is_valid_image(file_path):
             try:
                 pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
@@ -5564,7 +5545,6 @@ class AddGame(Gtk.Dialog):
 
         filechooser = Gtk.FileChooserNative(
             title=_("Select an image for the banner"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -5592,7 +5572,6 @@ class AddGame(Gtk.Dialog):
                 self.update_image_banner()
 
         filechooser.destroy()
-        self.set_sensitive(True)
 
     def on_load_url(self, widget):
         dialog = Gtk.Dialog(title=_("Enter the image URL"), transient_for=self)
@@ -5753,7 +5732,6 @@ class AddGame(Gtk.Dialog):
     def on_button_search_addapp_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select an additional application"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -6126,16 +6104,12 @@ class AddGame(Gtk.Dialog):
         self.default_prevent_sleep = cfg.config.get('prevent-sleep') == 'True'
 
     def on_button_run_clicked(self, widget):
-        self.set_sensitive(False)
-
         validation_result = self.validate_fields(entry="prefix")
         if not validation_result:
-            self.set_sensitive(True)
             return
 
         filechooser = Gtk.FileChooserNative(
             title=_("Select a file to run inside the prefix"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -6193,14 +6167,9 @@ class AddGame(Gtk.Dialog):
             def run_command():
                 process = subprocess.Popen(cmd, cwd=cwd if cwd else None)
                 process.wait()
-                GLib.idle_add(self.set_sensitive, True)
-                GLib.idle_add(self.parent_window.set_sensitive, True)
 
             command_thread = threading.Thread(target=run_command)
             command_thread.start()
-
-        else:
-            self.set_sensitive(True)
 
         filechooser.destroy()
 
@@ -6222,11 +6191,8 @@ class AddGame(Gtk.Dialog):
         return image
 
     def on_button_shortcut_icon_clicked(self, widget):
-        self.set_sensitive(False)
-
         validation_result = self.validate_fields(entry="path")
         if not validation_result:
-            self.set_sensitive(True)
             return
 
         path = self.entry_path.get_text()
@@ -6344,7 +6310,6 @@ class AddGame(Gtk.Dialog):
 
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
-        self.set_sensitive(True)
 
     def find_largest_resolution(self, directory):
         largest_image = None
@@ -6493,7 +6458,6 @@ class AddGame(Gtk.Dialog):
 
         filechooser = Gtk.FileChooserNative(
             title=_("Select the game's .exe"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
@@ -6566,7 +6530,6 @@ class AddGame(Gtk.Dialog):
     def on_button_search_prefix_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select a prefix location"),
-            transient_for=self,
             action=Gtk.FileChooserAction.SELECT_FOLDER,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
