@@ -30,12 +30,10 @@ def poll_gamepad(self):
             self.joystick = pygame.joystick.Joystick(event.device_index)
             self.joystick.init()
             self.button_map = get_button_map(self.joystick)
-            print(f"Gamepad conectado: {self.joystick.get_name()}")
             continue
 
         elif event.type == pygame.JOYDEVICEREMOVED:
             if self.joystick and self.joystick.get_instance_id() == event.instance_id:
-                print("Gamepad desconectado.")
                 self.joystick.quit()
                 self.joystick = None
                 self.button_map = None
@@ -197,6 +195,46 @@ def find_combobox(widget):
         widget = widget.get_parent()
     return None
 
+def get_parent_by_type(widget, widget_type):
+    parent = widget.get_parent()
+    while parent:
+        if isinstance(parent, widget_type):
+            return parent
+        parent = parent.get_parent()
+    return None
+
+def find_widget_by_type(container, widget_type):
+    if isinstance(container, widget_type) and container.get_visible():
+        return container
+    if isinstance(container, Gtk.Container):
+        for child in container.get_children():
+            res = find_widget_by_type(child, widget_type)
+            if res:
+                return res
+    return None
+
+def find_main_treeview(container):
+    if isinstance(container, Gtk.PlacesSidebar):
+        return None
+    if isinstance(container, Gtk.TreeView) and container.get_visible():
+        return container
+    if hasattr(container, "get_children"):
+        for child in container.get_children():
+            res = find_main_treeview(child)
+            if res:
+                return res
+    return None
+
+def focus_first_button(container):
+    if isinstance(container, Gtk.Button) and container.get_visible() and container.get_sensitive():
+        container.grab_focus()
+        return True
+    if isinstance(container, Gtk.Container):
+        for child in container.get_children():
+            if focus_first_button(child):
+                return True
+    return False
+
 def handle_menu_navigation(self, event, btn):
     items = self.context_menu.get_children()
     if not items:
@@ -238,6 +276,151 @@ def navigate_gamepad(direction):
     is_horizontal = direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)
     is_vertical = direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN)
 
+    if isinstance(active_window, Gtk.FileChooserDialog):
+        header = find_widget_by_type(active_window, Gtk.HeaderBar)
+        sidebar = find_widget_by_type(active_window, Gtk.PlacesSidebar)
+        tree = find_main_treeview(active_window)
+
+        in_sidebar = sidebar and (focused == sidebar or get_parent_by_type(focused, Gtk.PlacesSidebar) == sidebar)
+        in_header = header and (focused == header or get_parent_by_type(focused, Gtk.HeaderBar) == header)
+        in_tree = tree and (focused == tree or get_parent_by_type(focused, Gtk.TreeView) == tree) and not in_sidebar
+
+        in_pathbar = False
+        if isinstance(focused, (Gtk.ToggleButton, Gtk.Button)) and not in_header and not in_sidebar:
+            in_pathbar = True
+
+        in_footer = not in_sidebar and not in_header and not in_tree and not in_pathbar
+
+        def try_focus_pathbar():
+            def search(w):
+                if isinstance(w, (Gtk.ToggleButton, Gtk.Button)) and w.get_visible() and w.get_sensitive():
+                    p = w.get_parent()
+                    while p:
+                        if p in (header, sidebar): break
+                        p = p.get_parent()
+                    else:
+                        w.grab_focus()
+                        return True
+                if hasattr(w, "get_children"):
+                    for c in w.get_children():
+                        if search(c): return True
+                return False
+            return search(active_window)
+
+        if in_sidebar:
+            if direction == Gtk.DirectionType.RIGHT:
+                if tree:
+                    tree.grab_focus()
+                    path, _ = tree.get_cursor()
+                    if not path and len(tree.get_model()) > 0:
+                        tree.set_cursor(Gtk.TreePath(0))
+                    return
+
+            elif direction == Gtk.DirectionType.UP:
+                listbox = find_widget_by_type(sidebar, Gtk.ListBox) if sidebar else None
+                if listbox:
+                    row = listbox.get_selected_row()
+                    if row and row.get_index() > 0:
+                        prev_row = listbox.get_row_at_index(row.get_index() - 1)
+                        if prev_row:
+                            prev_row.grab_focus()
+                            listbox.select_row(prev_row)
+                            return
+
+                if try_focus_pathbar():
+                    return
+                if header:
+                    focus_first_button(header)
+                    return
+
+            elif direction == Gtk.DirectionType.DOWN:
+                listbox = find_widget_by_type(sidebar, Gtk.ListBox) if sidebar else None
+                if listbox:
+                    row = listbox.get_selected_row()
+                    if row:
+                        next_row = listbox.get_row_at_index(row.get_index() + 1)
+                        if next_row:
+                            next_row.grab_focus()
+                            listbox.select_row(next_row)
+                            return
+
+        elif in_tree:
+            if direction == Gtk.DirectionType.LEFT:
+                if sidebar:
+                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
+                    if listbox:
+                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
+                        if row:
+                            row.grab_focus()
+                            listbox.select_row(row)
+                            return
+                    sidebar.grab_focus()
+                    return
+
+            elif direction == Gtk.DirectionType.UP:
+                path, _ = tree.get_cursor()
+                if not path or path.get_indices()[0] <= 0:
+                    if try_focus_pathbar():
+                        return
+                    if header:
+                        focus_first_button(header)
+                        return
+
+        elif in_pathbar:
+            if direction == Gtk.DirectionType.UP:
+                if header:
+                    focus_first_button(header)
+                    return
+            elif direction == Gtk.DirectionType.DOWN:
+                if tree:
+                    tree.grab_focus()
+                    path, _ = tree.get_cursor()
+                    if not path and len(tree.get_model()) > 0:
+                        tree.set_cursor(Gtk.TreePath(0))
+                    return
+            elif direction == Gtk.DirectionType.LEFT:
+                if sidebar:
+                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
+                    if listbox:
+                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
+                        if row:
+                            row.grab_focus()
+                            listbox.select_row(row)
+                            return
+                    sidebar.grab_focus()
+                    return
+
+        elif in_header:
+            if direction == Gtk.DirectionType.DOWN:
+                if try_focus_pathbar():
+                    return
+                if tree:
+                    tree.grab_focus()
+                    path, _ = tree.get_cursor()
+                    if not path and len(tree.get_model()) > 0:
+                        tree.set_cursor(Gtk.TreePath(0))
+                    return
+
+        elif in_footer:
+            if direction == Gtk.DirectionType.UP:
+                if tree:
+                    tree.grab_focus()
+                    path, _ = tree.get_cursor()
+                    if not path and len(tree.get_model()) > 0:
+                        tree.set_cursor(Gtk.TreePath(0))
+                    return
+            elif direction == Gtk.DirectionType.LEFT:
+                if sidebar:
+                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
+                    if listbox:
+                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
+                        if row:
+                            row.grab_focus()
+                            listbox.select_row(row)
+                            return
+                    sidebar.grab_focus()
+                    return
+
     if isinstance(focused, Gtk.TreeView):
         model = focused.get_model()
         path, _ = focused.get_cursor()
@@ -258,7 +441,7 @@ def navigate_gamepad(direction):
                     focused.scroll_to_cell(new_path, None, False, 0.0, 0.0)
                 else:
                     active_window.child_focus(Gtk.DirectionType.TAB_BACKWARD if direction == Gtk.DirectionType.UP else Gtk.DirectionType.TAB_FORWARD)
-                return
+            return
 
     elif is_horizontal:
         dir_str = "right" if direction == Gtk.DirectionType.RIGHT else "left"
