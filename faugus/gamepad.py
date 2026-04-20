@@ -1,3 +1,4 @@
+import time
 import pygame
 from gi.repository import GLib, Gtk
 from faugus.keyboard import VirtualKeyboard
@@ -22,6 +23,12 @@ def init_gamepad(self):
     self.can_move_x = True
     self.can_move_y = True
 
+    self.held_direction = None
+    self.hold_start_time = 0
+    self.last_repeat_time = 0
+    self.repeat_delay = 0.5
+    self.repeat_interval = 0.1
+
     GLib.timeout_add(50, lambda: poll_gamepad(self))
 
 def poll_gamepad(self):
@@ -42,51 +49,82 @@ def poll_gamepad(self):
         if not self.joystick or not self.button_map:
             continue
 
-        if getattr(self, "context_menu", None) and self.context_menu.get_visible():
-            handle_menu_navigation(self, event, self.button_map)
-            continue
+        menu_visible = getattr(self, "context_menu", None) and self.context_menu.get_visible()
 
         if event.type == pygame.JOYHATMOTION:
-            _handle_hat_motion(event.value)
+            _handle_hat_motion(self, event.value)
 
         elif event.type == pygame.JOYAXISMOTION:
             _handle_axis_motion(self, event)
 
         elif event.type == pygame.JOYBUTTONDOWN:
-            _handle_button_down(self, event.button)
+            if menu_visible:
+                handle_menu_navigation(self, event, self.button_map)
+            else:
+                _handle_button_down(self, event.button)
+
+    if getattr(self, "held_direction", None) is not None:
+        now = time.time()
+        if now - self.hold_start_time >= self.repeat_delay:
+            if now - self.last_repeat_time >= self.repeat_interval:
+                _dispatch_navigation(self, self.held_direction)
+                self.last_repeat_time = now
 
     return True
 
-def _handle_hat_motion(value):
-    x, y = value
-    if y == 1: navigate_gamepad(Gtk.DirectionType.UP)
-    elif y == -1: navigate_gamepad(Gtk.DirectionType.DOWN)
+def _set_held_direction(self, direction):
+    if direction is not None:
+        if getattr(self, "held_direction", None) != direction:
+            self.held_direction = direction
+            self.hold_start_time = time.time()
+            self.last_repeat_time = time.time()
+            _dispatch_navigation(self, direction)
+    else:
+        self.held_direction = None
 
-    if x == -1: navigate_gamepad(Gtk.DirectionType.LEFT)
-    elif x == 1: navigate_gamepad(Gtk.DirectionType.RIGHT)
+def _dispatch_navigation(self, direction):
+    if getattr(self, "context_menu", None) and self.context_menu.get_visible():
+        _navigate_context_menu(self, direction)
+    else:
+        navigate_gamepad(direction)
+
+def _handle_hat_motion(self, value):
+    x, y = value
+    direction = None
+
+    if y == 1: direction = Gtk.DirectionType.UP
+    elif y == -1: direction = Gtk.DirectionType.DOWN
+    elif x == -1: direction = Gtk.DirectionType.LEFT
+    elif x == 1: direction = Gtk.DirectionType.RIGHT
+
+    _set_held_direction(self, direction)
 
 def _handle_axis_motion(self, event):
     if event.axis == 1:
         if self.can_move_y:
             if event.value < -self.axis_threshold:
-                navigate_gamepad(Gtk.DirectionType.UP)
+                _set_held_direction(self, Gtk.DirectionType.UP)
                 self.can_move_y = False
             elif event.value > self.axis_threshold:
-                navigate_gamepad(Gtk.DirectionType.DOWN)
+                _set_held_direction(self, Gtk.DirectionType.DOWN)
                 self.can_move_y = False
         elif abs(event.value) < self.reset_threshold:
             self.can_move_y = True
+            if getattr(self, "held_direction", None) in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
+                _set_held_direction(self, None)
 
     elif event.axis == 0:
         if self.can_move_x:
             if event.value < -self.axis_threshold:
-                navigate_gamepad(Gtk.DirectionType.LEFT)
+                _set_held_direction(self, Gtk.DirectionType.LEFT)
                 self.can_move_x = False
             elif event.value > self.axis_threshold:
-                navigate_gamepad(Gtk.DirectionType.RIGHT)
+                _set_held_direction(self, Gtk.DirectionType.RIGHT)
                 self.can_move_x = False
         elif abs(event.value) < self.reset_threshold:
             self.can_move_x = True
+            if getattr(self, "held_direction", None) in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
+                _set_held_direction(self, None)
 
 def _handle_button_down(self, button):
     win = get_active_window()
@@ -235,7 +273,7 @@ def focus_first_button(container):
                 return True
     return False
 
-def handle_menu_navigation(self, event, btn):
+def _navigate_context_menu(self, direction):
     items = self.context_menu.get_children()
     if not items:
         return
@@ -251,13 +289,24 @@ def handle_menu_navigation(self, event, btn):
             if is_valid(items[self.menu_index]):
                 break
 
-    if event.type == pygame.JOYHATMOTION:
-        y = event.value[1]
-        if y == -1: move(1)
-        elif y == 1: move(-1)
-        self.context_menu.select_item(items[self.menu_index])
+    if direction == Gtk.DirectionType.DOWN:
+        move(1)
+    elif direction == Gtk.DirectionType.UP:
+        move(-1)
 
-    elif event.type == pygame.JOYBUTTONDOWN:
+    self.context_menu.select_item(items[self.menu_index])
+
+def handle_menu_navigation(self, event, btn):
+    items = self.context_menu.get_children()
+    if not items:
+        return
+
+    self.menu_index = getattr(self, "menu_index", 0)
+
+    def is_valid(item):
+        return isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive()
+
+    if event.type == pygame.JOYBUTTONDOWN:
         if event.button == btn["confirm"]:
             item = items[self.menu_index]
             if is_valid(item):
