@@ -88,14 +88,17 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.3-1" date="2026-04-17">
+    <release version="1.18.4-1" date="2026-04-20">
       <description>
         <ul>
-          <li>Added gamepad navigation support.</li>
-          <li>Now allows relative path for default prefix and Lossless location.</li>
-          <li>Updated Splash window messages handling.</li>
-          <li>Fixed Proton-CachyOS (System) not working with tools.</li>
-          <li>Updated Portuguese translation.</li>
+          <li>Now all widgets are navigable with the gamepad.</li>
+          <li>Holding a directional button on the gamepad quickly navigates through widgets.</li>
+          <li>Added a virtual keyboard for gamepad navigation.</li>
+          <li>Added a description for the app menu shortcut.</li>
+          <li>Fixed app icon not showing on ancient desktop environments.</li>
+          <li>Added License for assets.</li>
+          <li>Now using a svg app icon for better desktop integration.</li>
+          <li>Updated Dutch translation.</li>
         </ul>
       </description>
     </release>
