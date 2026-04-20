@@ -130,6 +130,7 @@ def format_title(title):
 class CreateShortcut(Gtk.Window):
     def __init__(self, file_path):
         super().__init__(title="Faugus Launcher")
+        self.set_wmclass("faugus-launcher", "faugus-launcher")
         self.file_path = file_path
         self.set_resizable(False)
 

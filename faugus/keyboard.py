@@ -29,6 +29,7 @@ LAYOUT_SYMBOLS = [
 class VirtualKeyboard(Gtk.Dialog):
     def __init__(self, parent, entry):
         super().__init__(title="Faugus Launcher", transient_for=parent, modal=True)
+        self.set_wmclass("faugus-launcher", "faugus-launcher")
 
         self.entry = entry
         self.mode = "lower"

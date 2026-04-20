@@ -527,6 +527,7 @@ class FaugusRun:
 
     def show_splash(self):
         self.splash_window = Gtk.Window(title="Faugus Launcher")
+        self.splash_window.set_wmclass("faugus-launcher", "faugus-launcher")
         self.splash_window.set_decorated(False)
         self.splash_window.set_resizable(False)
         self.splash_window.set_default_size(280, -1)

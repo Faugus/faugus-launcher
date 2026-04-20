@@ -70,6 +70,7 @@ class ConfigManager:
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
         super().__init__(title=_("Faugus Proton Manager"))
+        self.set_wmclass("faugus-launcher", "faugus-launcher")
         self.set_resizable(False)
         self.set_modal(True)
 

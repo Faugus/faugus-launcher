@@ -169,6 +169,7 @@ class Main(Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title="Faugus Launcher")
         self.connect("delete-event", self.on_close)
+        self.set_wmclass("faugus-launcher", "faugus-launcher")
         print(f"Faugus Launcher {VERSION}")
 
         self.start_maximized = False
