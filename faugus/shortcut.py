@@ -18,7 +18,7 @@ from faugus.config_manager import *
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
@@ -29,7 +29,7 @@ if IS_FLATPAK:
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
     app_dir = PathManager.user_data('applications')
-    faugus_png = PathManager.get_icon('faugus-launcher.png')
+    faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0

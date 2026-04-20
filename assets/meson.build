@@ -4,7 +4,6 @@ install_data(
 )
 
 install_data(
-  'faugus-mono.svg',
   'faugus-battlenet.png',
   'faugus-ea.png',
   'faugus-epic-games.png',
@@ -24,19 +23,14 @@ install_data(
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'actions',
 )
 
-icon_sizes = ['16', '32', '64', '128', '256']
+install_data(
+  'faugus-launcher.svg',
+  'faugus-mono.svg',
+  install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
+)
 
-foreach size : icon_sizes
-  res = size + 'x' + size
-
-  install_data(
-    res / 'faugus-launcher.png',
-    install_dir: get_option('datadir') / 'icons' / 'hicolor' / res / 'apps',
-  )
-
-  install_data(
-    res / 'faugus-launcher.png',
-    install_dir: get_option('datadir') / 'icons' / 'hicolor' / res / 'apps',
-    rename: 'io.github.Faugus.faugus-launcher.png',
-  )
-endforeach
+install_data(
+  'faugus-launcher.svg',
+  install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
+  rename: 'io.github.Faugus.faugus-launcher.svg',
+)

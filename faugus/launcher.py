@@ -41,7 +41,7 @@ proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cach
 
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     tray_icon = 'io.github.Faugus.faugus-launcher'
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
@@ -59,8 +59,8 @@ if IS_FLATPAK:
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
     app_dir = PathManager.user_data('applications')
-    faugus_png = PathManager.get_icon('faugus-launcher.png')
-    tray_icon = PathManager.get_icon('faugus-launcher.png')
+    faugus_png = PathManager.get_icon('faugus-launcher.svg')
+    tray_icon = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0

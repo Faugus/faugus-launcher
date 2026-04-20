@@ -25,11 +25,11 @@ from faugus.steam_setup import IS_STEAM_FLATPAK
 
 if IS_FLATPAK:
     share_dir = os.path.expanduser('~/.local/share')
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.png')
+    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:
     share_dir = PathManager.user_data()
-    faugus_png = PathManager.get_icon('faugus-launcher.png')
+    faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
