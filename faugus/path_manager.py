@@ -36,6 +36,7 @@ class PathManager:
     def get_icon(icon_name):
         icon_paths = [
             PathManager.user_data('icons', icon_name),
+            PathManager.system_data('icons/hicolor/256x256/apps', icon_name),
             PathManager.system_data('icons/hicolor/scalable/apps', icon_name),
             PathManager.system_data('icons', icon_name)
         ]
