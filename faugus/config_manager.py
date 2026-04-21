@@ -36,6 +36,7 @@ class ConfigManager:
             'donate-last': '',
             'playtime': 0,
             'gamepad-navigation': 'False',
+            'start-minimized': 'False',
         }
 
         self.config = {}

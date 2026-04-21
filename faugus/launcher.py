@@ -1752,7 +1752,7 @@ class Main(Gtk.ApplicationWindow):
                     settings_dialog.logging_warning = True
 
             settings_dialog.update_config_file()
-            self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active())
+            self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
 
             if settings_dialog.checkbox_system_tray.get_active():
                 self.system_tray = True
@@ -1806,41 +1806,38 @@ class Main(Gtk.ApplicationWindow):
         else:
             return True
 
-    def manage_autostart_file(self, checkbox_start_boot):
-        # Define the path for the autostart file
+    def manage_autostart_file(self, start_boot, start_minimized):
         autostart_path = os.path.expanduser('~/.config/autostart/faugus-launcher.desktop')
         autostart_dir = os.path.dirname(autostart_path)
 
-        # Ensure the autostart directory exists
         if not os.path.exists(autostart_dir):
             os.makedirs(autostart_dir)
 
-        if checkbox_start_boot:
-            # Create the autostart file if it does not exist
-            if not os.path.exists(autostart_path):
-                with open(autostart_path, "w") as f:
-                    if IS_FLATPAK:
-                        f.write(
-                            "[Desktop Entry]\n"
-                            "Categories=Utility;\n"
-                            "Exec=flatpak run io.github.Faugus.faugus-launcher --hide\n"
-                            "Icon=io.github.Faugus.faugus-launcher\n"
-                            "MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit\n"
-                            "Name=Faugus Launcher\n"
-                            "Type=Application\n"
-                        )
-                    else:
-                        f.write(
-                            "[Desktop Entry]\n"
-                            "Categories=Utility;\n"
-                            "Exec=faugus-launcher --hide\n"
-                            "Icon=faugus-launcher\n"
-                            "MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit\n"
-                            "Name=Faugus Launcher\n"
-                            "Type=Application\n"
-                        )
+        if start_boot:
+            hide_arg = " --hide" if start_minimized else ""
+
+            with open(autostart_path, "w") as f:
+                if IS_FLATPAK:
+                    f.write(
+                        "[Desktop Entry]\n"
+                        "Type=Application\n"
+                        "Name=Faugus Launcher\n"
+                        f"Exec=flatpak run io.github.Faugus.faugus-launcher{hide_arg}\n"
+                        "Icon=io.github.Faugus.faugus-launcher\n"
+                        "Categories=Game;\n"
+                        "StartupWMClass=faugus-launcher\n"
+                    )
+                else:
+                    f.write(
+                        "[Desktop Entry]\n"
+                        "Type=Application\n"
+                        "Name=Faugus Launcher\n"
+                        f"Exec=faugus-launcher{hide_arg}\n"
+                        "Icon=faugus-launcher\n"
+                        "Categories=Game;\n"
+                        "StartupWMClass=faugus-launcher\n"
+                    )
         else:
-            # Delete the autostart file if it exists
             if os.path.exists(autostart_path):
                 os.remove(autostart_path)
 
@@ -3335,11 +3332,13 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_close_after_launch = Gtk.CheckButton(label=_("Close when running a game/app"))
 
+        self.checkbox_start_boot = Gtk.CheckButton(label=_("Start on boot"))
+
         self.checkbox_system_tray = Gtk.CheckButton(label=_("System tray icon"))
         self.checkbox_system_tray.connect("toggled", self.on_checkbox_system_tray_toggled)
 
-        self.checkbox_start_boot = Gtk.CheckButton(label=_("Start on boot"))
-        self.checkbox_start_boot.set_sensitive(False)
+        self.checkbox_start_minimized = Gtk.CheckButton(label=_("Start minimized to tray"))
+        self.checkbox_start_minimized.set_sensitive(False)
 
         self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
         self.checkbox_mono_icon.set_sensitive(False)
@@ -3616,18 +3615,19 @@ class Settings(Gtk.Dialog):
         grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
         self.button_clearlogs.set_hexpand(True)
 
-        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 2, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 0, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 1, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 2, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 3, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
         grid_miscellaneous.attach(self.checkbox_start_boot, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 12, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 13, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3657,11 +3657,11 @@ class Settings(Gtk.Dialog):
 
         box_mid.pack_start(self.label_miscellaneous, False, False, 0)
         box_mid.pack_start(grid_miscellaneous, False, False, 0)
-        box_mid.pack_start(grid_logs, False, False, 0)
         box_mid.pack_end(grid_support, False, False, 0)
         box_mid.pack_end(self.label_support, False, False, 0)
 
         box_right.pack_start(grid_envar, False, False, 0)
+        box_right.pack_start(grid_logs, False, False, 0)
         box_right.pack_start(grid_interface_mode, False, False, 0)
         box_right.pack_start(self.grid_big_interface, False, False, 0)
         box_right.pack_end(grid_backup, False, False, 0)
@@ -3691,6 +3691,7 @@ class Settings(Gtk.Dialog):
         self.populate_languages()
         self.load_config()
 
+        self.show_all()
         self.on_combobox_interface_changed(self.combobox_interface)
 
         self.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -3706,8 +3707,6 @@ class Settings(Gtk.Dialog):
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
         self.track_modifications(self.box)
-
-        self.show_all()
 
     def on_envar_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Delete:
@@ -3825,12 +3824,10 @@ class Settings(Gtk.Dialog):
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
-            self.checkbox_start_boot.set_active(False)
-            self.checkbox_start_boot.set_sensitive(False)
-            self.checkbox_mono_icon.set_active(False)
+            self.checkbox_start_minimized.set_sensitive(False)
             self.checkbox_mono_icon.set_sensitive(False)
         else:
-            self.checkbox_start_boot.set_sensitive(True)
+            self.checkbox_start_minimized.set_sensitive(True)
             self.checkbox_mono_icon.set_sensitive(True)
 
     def on_checkbox_wayland_driver_toggled(self, widget):
@@ -3936,6 +3933,7 @@ class Settings(Gtk.Dialog):
         config.set_value("smaller-banners", self.checkbox_smaller_banners.get_active())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
+        config.set_value("start-minimized", self.checkbox_start_minimized.get_active())
         config.save_config()
 
         self.set_sensitive(False)
@@ -3993,6 +3991,7 @@ class Settings(Gtk.Dialog):
                     return
                 self.update_envar_file()
                 self.update_config_file()
+                self.parent.manage_autostart_file(self.checkbox_start_boot.get_active(), self.checkbox_start_minimized.get_active())
                 if self.checkbox_system_tray.get_active():
                     self.parent.system_tray = True
                 else:
@@ -4008,7 +4007,6 @@ class Settings(Gtk.Dialog):
         self.check_modified()
         self.set_sensitive(False)
 
-        self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
         command_parts = []
 
@@ -4035,7 +4033,6 @@ class Settings(Gtk.Dialog):
         self.check_modified()
         self.set_sensitive(False)
 
-        self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
         command_parts = []
 
@@ -4059,8 +4056,6 @@ class Settings(Gtk.Dialog):
 
     def on_button_run_default_clicked(self, widget):
         self.check_modified()
-
-        self.parent.manage_autostart_file(self.checkbox_start_boot.get_active())
         default_runner = self.get_default_runner()
 
         filechooser = Gtk.FileChooserNative(
@@ -4374,6 +4369,7 @@ class Settings(Gtk.Dialog):
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
+        start_minimized = cfg.config.get('start-minimized', 'False') == 'True'
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
@@ -4415,6 +4411,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_hdr.set_active(enable_hdr)
         self.checkbox_enable_wow64.set_active(enable_wow64)
         self.combobox_interface.set_active_id(self.interface_mode)
+        self.checkbox_start_minimized.set_active(start_minimized)
 
         model_language = self.combobox_language.get_model()
         index_language = 0
