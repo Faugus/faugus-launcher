@@ -69,7 +69,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/564d6eb/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/30c7f02/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -82,17 +82,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.4-1" date="2026-04-20">
+    <release version="1.18.5-1" date="2026-04-21">
       <description>
         <ul>
-          <li>Now all widgets are navigable with the gamepad.</li>
-          <li>Holding a directional button on the gamepad quickly navigates through widgets.</li>
-          <li>Added a virtual keyboard for gamepad navigation.</li>
-          <li>Added a description for the app menu shortcut.</li>
-          <li>Fixed app icon not showing on ancient desktop environments.</li>
-          <li>Added License for assets.</li>
-          <li>Now using a svg app icon for better desktop integration.</li>
-          <li>Updated Dutch translation.</li>
+          <li>Hotfix: launcher not being installed due to recent changes.</li>
+          <li>Separated start on boot from system tray icon.</li>
         </ul>
       </description>
     </release>
