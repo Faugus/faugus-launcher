@@ -1,24 +1,33 @@
 import json
 import os
+import re
 
 from faugus.path_manager import *
 
 games_json = PathManager.user_config('faugus-launcher/games.json')
 
 def update_ea_path(prefix):
-    new_path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
+    ea_base_dir = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop"
+    new_path = f"{ea_base_dir}/EA Desktop/EALauncher.exe"
 
-    try:
-        with open(os.path.join(prefix, "drive_c", "ProgramData", "EA Desktop", "machine.ini"), "r") as machine_ini:
-            for l in machine_ini.readlines():
-                if "machine.telemetry.updatestats" in l:
-                    launcher_version = json.loads(l.split("=")[1])["version"]
-                    new_path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/{launcher_version}/EA Desktop/EALauncher.exe"
-                    break
-    except FileNotFoundError:
-        print("machine.ini not found")
-    except KeyError:
-        print("version not found in updatestats")
+    if os.path.exists(ea_base_dir):
+        try:
+            folders = [f for f in os.listdir(ea_base_dir) if os.path.isdir(os.path.join(ea_base_dir, f))]
+
+            versions = []
+            for folder in folders:
+                numbers = [int(n) for n in re.findall(r'\d+', folder)]
+                if numbers and folder[0].isdigit():
+                    versions.append((numbers, folder))
+
+            if versions:
+                versions.sort(key=lambda x: x[0], reverse=True)
+                folder_version = versions[0][1]
+                new_path = f"{ea_base_dir}/{folder_version}/EA Desktop/EALauncher.exe"
+                print(f"Latest version found: {folder_version}")
+
+        except Exception as e:
+            print(f"Error fetching version in folder: {e}")
 
     if os.path.exists(games_json):
         try:
