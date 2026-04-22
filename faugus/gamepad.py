@@ -153,7 +153,7 @@ def _handle_button_down(self, button):
         elif button == btn["rb"]:
             self.on_button_settings_clicked(None)
         elif button == btn["start"]:
-            GLib.idle_add(lambda: self.on_button_bye_clicked(None))
+            GLib.idle_add(lambda: self.show_power_menu(None))
 
 def _handle_treeview_confirm(treeview):
     path, column = treeview.get_cursor()

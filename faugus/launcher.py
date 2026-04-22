@@ -444,12 +444,8 @@ class Main(Gtk.ApplicationWindow):
         if self.interface_mode != "List":
             if self.fullscreen_activated:
                 self.fullscreen_activated = True
-                self.grid_corner.set_visible(True)
-                self.grid_left.set_margin_start(70)
             else:
                 self.fullscreen_activated = False
-                self.grid_corner.set_visible(False)
-                self.grid_left.set_margin_start(0)
         self.present()
 
     def on_quit(self, *_):
@@ -621,17 +617,6 @@ class Main(Gtk.ApplicationWindow):
         button_kill.set_margin_top(10)
         button_kill.set_margin_bottom(10)
 
-        # Create button for exiting
-        button_bye = Gtk.Button()
-        button_bye.connect("clicked", self.on_button_bye_clicked)
-        button_bye.set_can_focus(False)
-        button_bye.set_size_request(50, 50)
-        button_bye.set_image(Gtk.Image.new_from_icon_name("faugus-exit-symbolic", Gtk.IconSize.BUTTON))
-        button_bye.set_margin_start(10)
-        button_bye.set_margin_top(10)
-        button_bye.set_margin_bottom(10)
-        button_bye.set_margin_end(10)
-
         # Create button for settings
         button_settings = Gtk.Button()
         button_settings.connect("clicked", self.on_button_settings_clicked)
@@ -681,9 +666,6 @@ class Main(Gtk.ApplicationWindow):
         grid_right.add(button_kill)
         grid_right.add(self.button_play)
 
-        self.grid_corner = Gtk.Grid()
-        self.grid_corner.add(button_bye)
-
         # Create scrolled window for game list
         scroll_box = Gtk.ScrolledWindow()
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -721,7 +703,6 @@ class Main(Gtk.ApplicationWindow):
         self.box_bottom.pack_start(self.grid_left, True, True, 0)
         self.box_bottom.pack_start(grid_middle, False, False, 0)
         self.box_bottom.pack_start(grid_right, True, True, 0)
-        self.box_bottom.pack_end(self.grid_corner, False, False, 0)
 
         self.box_main.pack_start(self.box_top, True, True, 0)
         self.box_main.pack_end(self.box_bottom, False, True, 0)
@@ -733,14 +714,10 @@ class Main(Gtk.ApplicationWindow):
         self.show_all()
         if self.start_fullscreen:
             self.fullscreen_activated = True
-            self.grid_corner.set_visible(True)
-            self.grid_left.set_margin_start(70)
         else:
             self.fullscreen_activated = False
-            self.grid_corner.set_visible(False)
-            self.grid_left.set_margin_start(0)
 
-    def on_button_bye_clicked(self, widget):
+    def show_power_menu(self, widget):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
         dialog.set_modal(True)
         dialog.set_resizable(False)
@@ -1364,14 +1341,14 @@ class Main(Gtk.ApplicationWindow):
                 if self.get_window().get_state() & Gdk.WindowState.FULLSCREEN:
                     self.fullscreen_activated = False
                     self.unfullscreen()
-                    self.grid_corner.set_visible(False)
-                    self.grid_left.set_margin_start(0)
                 else:
                     self.fullscreen_activated = True
                     self.fullscreen()
-                    self.grid_corner.set_visible(True)
-                    self.grid_left.set_margin_start(70)
                 return True
+
+        if event.keyval == Gdk.KEY_Escape and getattr(self, 'fullscreen_activated', False):
+            self.show_power_menu(widget)
+            return True
 
         game = self.selected()
         if not game:
@@ -2644,12 +2621,8 @@ class Main(Gtk.ApplicationWindow):
             if self.interface_mode != "List":
                 if self.fullscreen_activated:
                     self.fullscreen_activated = True
-                    self.grid_corner.set_visible(True)
-                    self.grid_left.set_margin_start(70)
                 else:
                     self.fullscreen_activated = False
-                    self.grid_corner.set_visible(False)
-                    self.grid_left.set_margin_start(0)
             return False
 
         return True
@@ -3037,12 +3010,8 @@ class Main(Gtk.ApplicationWindow):
         if self.interface_mode != "List":
             if self.fullscreen_activated:
                 self.fullscreen_activated = True
-                self.grid_corner.set_visible(True)
-                self.grid_left.set_margin_start(70)
             else:
                 self.fullscreen_activated = False
-                self.grid_corner.set_visible(False)
-                self.grid_left.set_margin_start(0)
 
     def save_games(self):
         try:
