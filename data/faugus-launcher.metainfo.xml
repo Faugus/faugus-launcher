@@ -82,7 +82,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.6-1" date="2026-04-25">
+    <release version="1.18.7-1" date="2026-04-25">
       <description>
         <ul>
           <li>Fixed multiple icons showing in the system tray.</li>
