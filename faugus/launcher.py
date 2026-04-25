@@ -72,13 +72,6 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-epic_icon = PathManager.get_icon('faugus-epic-games.png')
-battle_icon = PathManager.get_icon('faugus-battlenet.png')
-ubisoft_icon = PathManager.get_icon('faugus-ubisoft-connect.png')
-ea_icon = PathManager.get_icon('faugus-ea.png')
-rockstar_icon = PathManager.get_icon('faugus-rockstar.png')
-wargaming_icon = PathManager.get_icon('faugus-wargaming.png')
-
 launcher_path = PathManager.find_binary('faugus-launcher')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 mangohud_dir = PathManager.find_binary('mangohud')
@@ -2519,69 +2512,39 @@ class Main(Gtk.ApplicationWindow):
         self.label_download2.set_visible(False)
         self.label_download2.set_size_request(256, -1)
 
-        self.button_finish_install = Gtk.Button(label=_("Finish installation"))
-        self.button_finish_install.connect("clicked", self.on_button_finish_install_clicked)
-        self.button_finish_install.set_size_request(150, -1)
-        self.button_finish_install.set_halign(Gtk.Align.CENTER)
-
         if launcher == "battle":
-            image_path = battle_icon
             self.label_download.set_text(_("Downloading") + " Battle.net...")
             self.download_launcher("battle", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "ea":
-            image_path = ea_icon
             self.label_download.set_text(_("Downloading") + " EA App...")
             self.download_launcher("ea", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "epic":
-            image_path = epic_icon
             self.label_download.set_text(_("Downloading") + " Epic Games...")
             self.download_launcher("epic", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "ubisoft":
-            image_path = ubisoft_icon
             self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
             self.download_launcher("ubisoft", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "rockstar":
-            image_path = rockstar_icon
             self.label_download.set_text(_("Downloading") + " Rockstar Launcher...")
             self.download_launcher("rockstar", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
         elif launcher == "wargaming":
-            image_path = wargaming_icon
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
             self.download_launcher("wargaming", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
-        else:
-            image_path = faugus_png
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-        pixbuf = pixbuf.scale_simple(128, 128, GdkPixbuf.InterpType.BILINEAR)
-
-        image = Gtk.Image.new_from_pixbuf(pixbuf)
-        image.set_margin_top(20)
-        image.set_margin_start(20)
-        image.set_margin_end(20)
-        image.set_margin_bottom(20)
-
-        grid_launcher.attach(image, 0, 0, 1, 1)
         grid_launcher.attach(grid_labels, 0, 1, 1, 1)
-
         grid_labels.attach(self.label_download, 0, 0, 1, 1)
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
         grid_labels.attach(self.label_download2, 0, 2, 1, 1)
-        #grid_labels.attach(self.button_finish_install, 0, 3, 1, 1)
 
         self.box_main.add(self.box_launcher)
         self.box_main.remove(self.box_top)
         self.box_main.remove(self.box_bottom)
         self.box_main.show_all()
-        #self.button_finish_install.set_visible(False)
-
-    def on_button_finish_install_clicked(self):
-        self.on_button_kill_clicked(widget)
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
         retcode = processo.poll()
@@ -2599,6 +2562,11 @@ class Main(Gtk.ApplicationWindow):
                 game.path = update_ea_path(game.prefix)
 
             if os.path.exists(game.path):
+                extracted_icon = self.extract_best_icon(game.path, game.gameid)
+
+                if extracted_icon:
+                    icon_temp = extracted_icon
+                    icon_final = icon_temp
                 print(f"{title} installed.")
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
@@ -2626,6 +2594,49 @@ class Main(Gtk.ApplicationWindow):
             return False
 
         return True
+
+    def extract_best_icon(self, exe_path, gameid):
+        icons_dir = PathManager.user_config('faugus-launcher/icons')
+        tmp_dir = PathManager.user_config('faugus-launcher/icon_extract')
+
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        os.makedirs(tmp_dir, exist_ok=True)
+        os.makedirs(icons_dir, exist_ok=True)
+
+        extracted = os.path.join(tmp_dir, "icon.ico")
+
+        if subprocess.run(["icoextract", exe_path, extracted],
+                        capture_output=True).returncode != 0:
+            return None
+
+        magick = shutil.which("magick") or shutil.which("convert")
+        if not magick:
+            return None
+
+        subprocess.run([magick, extracted, os.path.join(tmp_dir, "icon_%d.png")])
+        os.remove(extracted)
+
+        best, size = None, 0
+
+        for f in Path(tmp_dir).glob("*.png"):
+            r = subprocess.run(
+                [magick, "identify", "-format", "%wx%h", str(f)],
+                capture_output=True, text=True
+            )
+
+            if r.returncode == 0 and r.stdout:
+                w, h = map(int, r.stdout.strip().split("x"))
+                if w * h > size:
+                    best, size = str(f), w * h
+
+        if not best:
+            return None
+
+        final = os.path.join(icons_dir, f"{gameid}.ico")
+        subprocess.run([magick, best, final])
+
+        shutil.rmtree(tmp_dir)
+        return final
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
@@ -5741,32 +5752,39 @@ class AddGame(Gtk.Dialog):
             self.checkbox_shortcut_appmenu.set_active(False)
             self.checkbox_shortcut_steam.set_active(False)
             self.entry_protonfix.set_text("")
-            self.entry_launch_arguments.set_text("")
             self.entry_game_arguments.set_text("")
             self.checkbox_mangohud.set_active(self.default_mangohud)
             self.checkbox_gamemode.set_active(self.default_gamemode)
             self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
             self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
-            self.addapp_enabled = False
-            self.addapp = ""
-            self.addapp_delay = ""
-            self.addapp_first = False
-            self.lossless_enabled = False
-            self.lossless_multiplier = 1
-            self.lossless_flow = 100
-            self.lossless_performance = False
-            self.lossless_hdr = False
-            self.lossless_present = "VSync/FIFO"
-            self.combobox_steam_title.get_style_context().remove_class("combobox")
-            self.entry_title.get_style_context().remove_class("entry")
-            self.entry_prefix.get_style_context().remove_class("entry")
-            self.entry_path.get_style_context().remove_class("entry")
+
+            for w in (self.combobox_steam_title, self.entry_title,
+                    self.entry_prefix, self.entry_path):
+                w.get_style_context().remove_class("entry")
 
         cleanup_fields()
 
+        self.grid_title.set_visible(False)
+        self.grid_steam_title.set_visible(False)
+        self.grid_path.set_visible(False)
+        self.grid_runner.set_visible(False)
+        self.grid_prefix.set_visible(False)
+        self.button_winetricks.set_visible(False)
+        self.button_winecfg.set_visible(False)
+        self.button_run.set_visible(False)
+        self.grid_protonfix.set_visible(False)
+        self.grid_addapp.set_visible(False)
+        self.checkbox_disable_hidraw.set_visible(False)
+        self.checkbox_prevent_sleep.set_visible(True)
+        self.checkbox_shortcut_steam.set_visible(True)
+        self.grid_page2.set_visible(True)
+        self.tab_box2.set_visible(True)
+        self.notebook.set_show_tabs(True)
+        self.button_shortcut_icon.set_visible(True)
+        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+
         if active_id == "windows":
             self.grid_title.set_visible(True)
-            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
@@ -5776,212 +5794,63 @@ class AddGame(Gtk.Dialog):
             self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        if active_id == "linux":
+            self.button_shortcut_icon.set_visible(True)
+
+        elif active_id == "linux":
             self.grid_title.set_visible(True)
-            self.grid_steam_title.set_visible(False)
             self.grid_path.set_visible(True)
-            self.grid_runner.set_visible(False)
-            self.grid_prefix.set_visible(False)
-            self.button_winetricks.set_visible(False)
-            self.button_winecfg.set_visible(False)
-            self.button_run.set_visible(False)
-            self.grid_protonfix.set_visible(False)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(False)
-            self.checkbox_disable_hidraw.set_active(False)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        if active_id == "steam":
-            self.grid_title.set_visible(False)
+            self.button_shortcut_icon.set_visible(True)
+
+        elif active_id == "steam":
             self.grid_steam_title.set_visible(True)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(False)
-            self.grid_prefix.set_visible(False)
-            self.button_winetricks.set_visible(False)
-            self.button_winecfg.set_visible(False)
-            self.button_run.set_visible(False)
-            self.grid_protonfix.set_visible(False)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(False)
-            self.checkbox_disable_hidraw.set_active(False)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
             self.checkbox_shortcut_steam.set_visible(False)
             self.grid_page2.set_visible(False)
             self.tab_box2.set_visible(False)
             self.notebook.set_show_tabs(False)
-        elif active_id == "battle":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
+            self.button_shortcut_icon.set_visible(True)
+
+        else:
             self.grid_runner.set_visible(True)
             self.grid_prefix.set_visible(True)
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
             self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1 PROTON_ENABLE_WAYLAND=0")
+            self.button_shortcut_icon.set_visible(False)
+
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe")
-            shutil.copyfile(battle_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        elif active_id == "ea":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(True)
-            self.grid_prefix.set_visible(True)
-            self.button_winetricks.set_visible(True)
-            self.button_winecfg.set_visible(True)
-            self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
-            self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe")
-            shutil.copyfile(ea_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        elif active_id == "epic":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(True)
-            self.grid_prefix.set_visible(True)
-            self.button_winetricks.set_visible(True)
-            self.button_winecfg.set_visible(True)
-            self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe")
-            shutil.copyfile(epic_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        elif active_id == "ubisoft":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(True)
-            self.grid_prefix.set_visible(True)
-            self.button_winetricks.set_visible(True)
-            self.button_winecfg.set_visible(True)
-            self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
-            self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe")
-            shutil.copyfile(ubisoft_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        elif active_id == "rockstar":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(True)
-            self.grid_prefix.set_visible(True)
-            self.button_winetricks.set_visible(True)
-            self.button_winecfg.set_visible(True)
-            self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
-            self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe")
-            shutil.copyfile(rockstar_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
-        elif active_id == "wargaming":
-            self.grid_title.set_visible(False)
-            self.grid_steam_title.set_visible(False)
-            self.grid_path.set_visible(False)
-            self.grid_runner.set_visible(True)
-            self.grid_prefix.set_visible(True)
-            self.button_winetricks.set_visible(True)
-            self.button_winecfg.set_visible(True)
-            self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
-            self.grid_addapp.set_visible(False)
-            self.checkbox_disable_hidraw.set_visible(True)
-            self.checkbox_prevent_sleep.set_visible(True)
-            self.entry_title.set_text(self.combobox_launcher.get_active_text())
-            self.entry_path.set_text(
-                f"{self.entry_prefix.get_text()}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe")
-            shutil.copyfile(wargaming_icon, os.path.expanduser(self.icon_temp))
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-            scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-            image = Gtk.Image.new_from_file(self.icon_temp)
-            image.set_from_pixbuf(scaled_pixbuf)
-            self.button_shortcut_icon.set_image(image)
-            self.checkbox_shortcut_steam.set_visible(True)
-            self.grid_page2.set_visible(True)
-            self.tab_box2.set_visible(True)
-            self.notebook.set_show_tabs(True)
+
+            if active_id == "battle":
+                self.entry_launch_arguments.set_text("WINE_SIMULATE_WRITECOPY=1 PROTON_ENABLE_WAYLAND=0")
+                path = "drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
+
+            elif active_id == "ea":
+                self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
+                path = "drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
+
+            elif active_id == "epic":
+                path = "drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
+
+            elif active_id == "ubisoft":
+                self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
+                path = "drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+
+            elif active_id == "rockstar":
+                self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
+                path = "drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+
+            elif active_id == "wargaming":
+                path = "drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
+
+            else:
+                path = ""
+
+            if path:
+                self.entry_path.set_text(f"{self.entry_prefix.get_text()}/{path}")
+
         if self.interface_mode == "Banners":
-            if self.entry_title.get_text() != "":
+            if self.entry_title.get_text():
                 self.get_banner()
             else:
                 shutil.copyfile(faugus_banner, self.banner_path_temp)

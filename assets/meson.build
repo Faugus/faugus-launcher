@@ -4,16 +4,6 @@ install_data(
 )
 
 install_data(
-  'faugus-battlenet.png',
-  'faugus-ea.png',
-  'faugus-epic-games.png',
-  'faugus-ubisoft-connect.png',
-  'faugus-rockstar.png',
-  'faugus-wargaming.png',
-  install_dir: get_option('datadir') / 'icons' / 'hicolor' / '256x256' / 'apps',
-)
-
-install_data(
   'faugus-add-symbolic.svg',
   'faugus-exit-symbolic.svg',
   'faugus-kill-symbolic.svg',
