@@ -88,11 +88,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.5-1" date="2026-04-21">
+    <release version="1.18.6-1" date="2026-04-25">
       <description>
         <ul>
-          <li>Hotfix: launcher not being installed due to recent changes.</li>
-          <li>Separated start on boot from system tray icon.</li>
+          <li>Fixed multiple icons showing in the system tray.</li>
+          <li>Removed launchers icons to prevent copyright issues.</li>
+          <li>Now the power menu is opened by pressing ESC.</li>
         </ul>
       </description>
     </release>
