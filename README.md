@@ -6,6 +6,20 @@ A simple and lightweight app for running Windows games using [UMU-Launcher](http
 <a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/assets/paypal.png width="155" height="35"/></a>
 
 # Installation
+## NixOS (nixpkgs)
+```
+# Edit this file:
+sudo nano /etc/nixos/configuration.nix
+
+# Add faugus-launcher in system packages:
+environment.systemPackages = with pkgs; [
+  faugus-launcher
+];
+
+# Rebuild:
+sudo nixos-rebuild switch
+```
+
 ## Arch-based distributions (AUR)
 ```
 yay -S --noconfirm faugus-launcher
