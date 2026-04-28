@@ -88,12 +88,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.7-1" date="2026-04-25">
+    <release version="1.18.8-1" date="2026-04-28">
       <description>
         <ul>
-          <li>Fixed multiple icons showing in the system tray.</li>
-          <li>Removed launchers icons to prevent copyright issues.</li>
-          <li>Now the power menu is opened by pressing ESC.</li>
+          <li>Fixed gamepad interacting with the app while a game is running.</li>
+          <li>Fixed splash window would not close when upgrading DLSS or FSR.</li>
+          <li>Updated German translation.</li>
         </ul>
       </description>
     </release>
