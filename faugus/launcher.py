@@ -2186,7 +2186,7 @@ class Main(Gtk.ApplicationWindow):
             pass  # Ignore if the file doesn't exist yet
 
     def show_warning_dialog_main(self, parent, text1, text2):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent)
+        dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -3111,7 +3111,7 @@ class Main(Gtk.ApplicationWindow):
 
 class Settings(Gtk.Dialog):
     def __init__(self, parent):
-        super().__init__(title=_("Settings"), transient_for=parent)
+        super().__init__(title=_("Settings"))
         self.set_modal(True)
         self.set_resizable(False)
 
@@ -4220,7 +4220,7 @@ class Settings(Gtk.Dialog):
         filechooser.destroy()
 
     def show_warning_dialog_settings(self, parent, title, buttons):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=parent)
+        dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -4485,7 +4485,7 @@ class Game:
 
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
-        super().__init__(title=_("Duplicate %s") % title, transient_for=parent)
+        super().__init__(title=_("Duplicate %s") % title)
         self.set_modal(True)
         self.set_resizable(False)
 
@@ -4533,7 +4533,7 @@ class DuplicateDialog(Gtk.Dialog):
 
 class DeleteDialog(Gtk.Dialog):
     def __init__(self, parent, title, prefix, runner):
-        super().__init__(title=_("Delete %s") % title, transient_for=parent)
+        super().__init__(title=_("Delete %s") % title)
         self.set_modal(True)
         self.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -5552,7 +5552,7 @@ class AddGame(Gtk.Dialog):
         filechooser.destroy()
 
     def on_load_url(self, widget):
-        dialog = Gtk.Dialog(title=_("Enter the image URL"), transient_for=self)
+        dialog = Gtk.Dialog(title=_("Enter the image URL"))
         dialog.set_modal(True)
         dialog.set_resizable(False)
 
@@ -5620,7 +5620,7 @@ class AddGame(Gtk.Dialog):
         dialog.destroy()
 
     def show_invalid_image_dialog(self):
-        dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=self)
+        dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
         subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
@@ -6089,7 +6089,7 @@ class AddGame(Gtk.Dialog):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                dialog = Gtk.Dialog(title="Faugus Launcher", transient_for=self)
+                dialog = Gtk.Dialog(title="Faugus Launcher")
                 dialog.set_modal(True)
                 dialog.set_resizable(False)
                 subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])

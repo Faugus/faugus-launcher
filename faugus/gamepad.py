@@ -32,6 +32,9 @@ def init_gamepad(self):
     GLib.timeout_add(50, lambda: poll_gamepad(self))
 
 def poll_gamepad(self):
+    active_win = get_active_window()
+    is_focused = active_win is not None
+
     for event in pygame.event.get():
         if event.type == pygame.JOYDEVICEADDED:
             self.joystick = pygame.joystick.Joystick(event.device_index)
@@ -49,6 +52,10 @@ def poll_gamepad(self):
         if not self.joystick or not self.button_map:
             continue
 
+        if not is_focused:
+            self.held_direction = None
+            continue
+
         menu_visible = getattr(self, "context_menu", None) and self.context_menu.get_visible()
 
         if event.type == pygame.JOYHATMOTION:
@@ -63,7 +70,9 @@ def poll_gamepad(self):
             else:
                 _handle_button_down(self, event.button)
 
-    if getattr(self, "held_direction", None) is not None:
+    if not is_focused:
+        self.held_direction = None
+    elif getattr(self, "held_direction", None) is not None:
         now = time.time()
         if now - self.hold_start_time >= self.repeat_delay:
             if now - self.last_repeat_time >= self.repeat_interval:
