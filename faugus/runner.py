@@ -636,7 +636,7 @@ class FaugusRun:
         except:
             return
 
-        ignore = ("bash", "sh", "systemd-inhibit")
+        ignore = ("bash")
 
         while True:
             try:
