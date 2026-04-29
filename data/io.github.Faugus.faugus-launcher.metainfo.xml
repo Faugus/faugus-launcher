@@ -88,12 +88,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.8-1" date="2026-04-28">
+    <release version="1.18.9-1" date="2026-04-29">
       <description>
         <ul>
-          <li>Fixed gamepad interacting with the app while a game is running.</li>
-          <li>Fixed splash window would not close when upgrading DLSS or FSR.</li>
-          <li>Updated German translation.</li>
+          <li>Fighting the splash window again. Should be ok now.</li>
+          <li>Simplified and made launcher script posix.</li>
         </ul>
       </description>
     </release>
