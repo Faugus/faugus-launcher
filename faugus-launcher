@@ -4,5 +4,5 @@ case "$1" in
 	--shortcut) exec /usr/bin/python3 -m faugus.shortcut "$2";;
 	--game)     exec /usr/bin/python3 -m faugus.runner --game "$2";;
 	--run)      exec /usr/bin/python3 -m faugus.runner "$2";;
-	*)          exec /usr/bin/python3 -m faugus.launcher "$1";;
+	*)          exec /usr/bin/python3 -m faugus.launcher "$@";;
 esac
