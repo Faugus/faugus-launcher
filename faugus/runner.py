@@ -636,7 +636,7 @@ class FaugusRun:
         except:
             return
 
-        ignore = ("bash")
+        ignore = ("bash", "sh", "python")
 
         while True:
             try:
