@@ -105,7 +105,7 @@ class FaugusRun:
                     self.cfg.save_config()
 
         if not self.splash_disable and not self.disable_updates:
-            self.show_splash()
+            GLib.idle_add(self.show_splash)
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
         set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
@@ -583,52 +583,56 @@ class FaugusRun:
         self.log_window.show_all()
 
     def check_game_output(self, clean_line):
-        if (
-            "Downloading" in clean_line
-            or "Updating BattlEye..." in clean_line
-            or "Updating Easy Anti-Cheat..." in clean_line
-            or "Updating UMU-Launcher..." in clean_line
-        ):
-            if self.splash_window is None:
-                self.show_splash()
-
-        component = None
-
-        if "Components are up to date" in clean_line:
-            if self.splash_window:
-                self.label.set_text(_("Components are up to date"))
-            return
-
-        if "UMU-Launcher" in clean_line:
-            component = "UMU-Launcher"
-        elif "BattlEye" in clean_line:
-            component = "BattlEye"
-        elif "Easy Anti-Cheat" in clean_line:
-            component = "Easy Anti-Cheat"
-        elif "UMU-Proton" in clean_line:
-            component = "UMU-Proton"
-        elif "GE-Proton" in clean_line:
-            component = "GE-Proton"
-        elif "Proton-EM" in clean_line:
-            component = "Proton-EM"
-        elif "Proton-CachyOS" in clean_line:
-            component = "Proton-CachyOS"
-        elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
-            component = "Steam Runtime"
-
-        if component and self.splash_window:
-            if "Updating" in clean_line:
-                self.label.set_text(_("Updating") + f" {component}...")
-            elif "Downloading" in clean_line:
-                self.label.set_text(_("Downloading") + f" {component}...")
-            elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-                self.label.set_text(_("Extracting") + f" {component}...")
-            elif (
-                "is up to date" in clean_line
-                or "mtree is OK" in clean_line
-                or ("->" in clean_line and component in clean_line)
+        def update_ui():
+            if (
+                "Downloading" in clean_line
+                or "Updating BattlEye..." in clean_line
+                or "Updating Easy Anti-Cheat..." in clean_line
+                or "Updating UMU-Launcher..." in clean_line
             ):
-                self.label.set_text(f"{component} " + _("is up to date"))
+                if self.splash_window is None:
+                    self.show_splash()
+
+            component = None
+
+            if "Components are up to date" in clean_line:
+                if self.splash_window:
+                    self.label.set_text("Components are up to date")
+                return False
+
+            if "UMU-Launcher" in clean_line:
+                component = "UMU-Launcher"
+            elif "BattlEye" in clean_line:
+                component = "BattlEye"
+            elif "Easy Anti-Cheat" in clean_line:
+                component = "Easy Anti-Cheat"
+            elif "UMU-Proton" in clean_line:
+                component = "UMU-Proton"
+            elif "GE-Proton" in clean_line:
+                component = "GE-Proton"
+            elif "Proton-EM" in clean_line:
+                component = "Proton-EM"
+            elif "Proton-CachyOS" in clean_line:
+                component = "Proton-CachyOS"
+            elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
+                component = "Steam Runtime"
+
+            if component and self.splash_window:
+                if "Updating" in clean_line:
+                    self.label.set_text("Updating " + f"{component}...")
+                elif "Downloading" in clean_line:
+                    self.label.set_text("Downloading " + f"{component}...")
+                elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
+                    self.label.set_text("Extracting " + f"{component}...")
+                elif (
+                    "is up to date" in clean_line
+                    or "mtree is OK" in clean_line
+                    or ("->" in clean_line and component in clean_line)
+                ):
+                    self.label.set_text(f"{component} is up to date")
+            return False
+
+        GLib.idle_add(update_ui)
 
     def _watch_game_process(self):
         import psutil
