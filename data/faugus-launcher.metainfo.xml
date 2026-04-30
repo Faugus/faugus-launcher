@@ -82,11 +82,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.9-1" date="2026-04-29">
+    <release version="1.18.10-1" date="2026-04-30">
       <description>
         <ul>
-          <li>Fighting the splash window again. Should be ok now.</li>
-          <li>Simplified and made launcher script posix.</li>
+          <li>Added a workaround to prevent white/black screen with Nvidia Optimus laptops.</li>
+          <li>Attempt to fix the runner silent crash.</li>
+          <li>Updated Flatpak platform to GNOME 50.</li>
+          <li>Added Vulkan Tools to Flatpak.</li>
+          <li>Added Norwegian (Bokmål) translation.</li>
         </ul>
       </description>
     </release>
