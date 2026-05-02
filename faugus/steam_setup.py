@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from pathlib import Path
+from faugus.path_manager import PathManager
 from gi.repository import GdkPixbuf
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -50,9 +51,9 @@ def detect_steam_version():
 def detect_steam_folder():
     steam_version = detect_steam_version()
     if steam_version == "flatpak":
-        return (Path.home() / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam", True)
+        return (Path(PathManager.user_home(".var/app/com.valvesoftware.Steam/.steam/steam")), True)
     if steam_version == "native":
-        return (Path.home() / ".steam" / "steam", False)
+        return (Path(PathManager.user_home(".steam/steam")), False)
     return (None, False)
 
 steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()

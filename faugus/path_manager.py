@@ -3,7 +3,17 @@
 import os
 from pathlib import Path
 
+IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+
 class PathManager:
+    @staticmethod
+    def user_home(*relative_paths):
+        if IS_FLATPAK:
+            home_dir = Path(os.getenv('HOST_HOME', Path.home()))
+        else:
+            home_dir = Path(os.getenv('HOME', Path.home()))
+        return str(home_dir.joinpath(*relative_paths))
+
     @staticmethod
     def system_data(*relative_paths):
         xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
@@ -42,4 +52,9 @@ class PathManager:
         for path in icon_paths:
             if Path(path).exists():
                 return path
-        return icon_paths[-1]  # Fallback
+        return icon_paths[-1]
+
+    @staticmethod
+    def get_compatibilitytools():
+        compatibilitytools_folder = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local/share/Steam/compatibilitytools.d'))
+        return str(compatibilitytools_folder)

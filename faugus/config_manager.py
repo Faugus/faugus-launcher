@@ -1,7 +1,7 @@
 from faugus.language_config import *
 
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = str(Path.home() / 'Faugus')
+prefixes_dir = PathManager.user_home('Faugus')
 
 class ConfigManager:
     def __init__(self):

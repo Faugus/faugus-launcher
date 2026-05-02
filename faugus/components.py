@@ -5,11 +5,11 @@ import requests
 import tarfile
 import shutil
 
+from faugus.path_manager import PathManager
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
-xdg_data_home = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
-UMU_INSTALL_DIR = os.path.join(xdg_data_home, "faugus-launcher")
+UMU_INSTALL_DIR = PathManager.user_data('faugus-launcher')
 UMU_VERSION_FILE = os.path.join(UMU_INSTALL_DIR, "version.txt")
 UMU_BIN_PATH = os.path.join(UMU_INSTALL_DIR, "umu-run")
 
@@ -62,12 +62,9 @@ def update_umu():
     else:
         print("UMU-Launcher is up to date.", flush=True)
 
-
-config_dir = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~/.config'))
-
 BE_URL = "https://github.com/Faugus/components/releases/download/{}/be.tar.gz"
 EAC_URL = "https://github.com/Faugus/components/releases/download/{}/eac.tar.gz"
-DOWNLOAD_DIR = f"{config_dir}/faugus-launcher/components"
+DOWNLOAD_DIR = PathManager.user_config('faugus-launcher/components')
 REPO_URL = "https://api.github.com/repos/Faugus/components/releases/latest"
 VERSION_FILE = f"{DOWNLOAD_DIR}/version.txt"
 

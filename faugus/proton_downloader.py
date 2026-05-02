@@ -5,10 +5,11 @@ import tarfile
 import urllib.request
 import shutil
 import argparse
+
 from pathlib import Path
+from faugus.path_manager import PathManager
 
-
-STEAM_COMPAT_DIR = Path.home() / ".local/share/Steam/compatibilitytools.d"
+STEAM_COMPAT_DIR = Path(PathManager.get_compatibilitytools())
 
 CONFIGS = {
     "ge": {

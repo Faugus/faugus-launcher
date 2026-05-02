@@ -28,7 +28,7 @@ IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = str(Path.home() / 'Faugus')
+prefixes_dir = PathManager.user_home('Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
@@ -40,16 +40,14 @@ faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 if IS_FLATPAK:
-    app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     tray_icon = 'io.github.Faugus.faugus-launcher'
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
-
-    mono_dest = Path(os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg'))
+    mono_dest = Path(PathManager.user_data('faugus-launcher/faugus-mono.svg'))
     mono_dest.parent.mkdir(parents=True, exist_ok=True)
     if not mono_dest.exists():
         shutil.copy(faugus_mono_icon, mono_dest)
-    faugus_mono_icon = os.path.expanduser('~/.local/share/faugus-launcher/faugus-mono.svg')
+    faugus_mono_icon = PathManager.user_data('faugus-launcher/faugus-mono.svg')
     lsfgvk_possible_paths = [
         Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
@@ -58,7 +56,6 @@ if IS_FLATPAK:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
-    app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     tray_icon = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
@@ -72,6 +69,7 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
+app_dir = PathManager.user_data('applications')
 launcher_path = PathManager.find_binary('faugus-launcher')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 mangohud_dir = PathManager.find_binary('mangohud')
@@ -83,20 +81,15 @@ faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
+compatibility_dir = Path(PathManager.get_compatibilitytools())
+os.makedirs(compatibility_dir, exist_ok=True)
+
 faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
 
-def get_desktop_dir():
-    try:
-        desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
-        return desktop_dir
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("xdg-user-dir not found or failed; falling back to ~/Desktop")
-        return str(Path.home() / 'Desktop')
-
-desktop_dir = get_desktop_dir()
+desktop_dir = PathManager.user_home('Desktop')
 
 try:
     translation = gettext.translation(
@@ -1777,7 +1770,7 @@ class Main(Gtk.ApplicationWindow):
             return True
 
     def manage_autostart_file(self, start_boot, start_minimized):
-        autostart_path = os.path.expanduser('~/.config/autostart/faugus-launcher.desktop')
+        autostart_path = PathManager.user_home('autostart/faugus-launcher.desktop')
         autostart_dir = os.path.dirname(autostart_path)
 
         if not os.path.exists(autostart_dir):
@@ -3824,23 +3817,17 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
-        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
+        if os.path.exists(proton_cachyos):
             self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        # Path to the directory containing the folders
-        if IS_FLATPAK:
-            runner_path = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
-        else:
-            runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
-            if os.path.exists(runner_path):
+            if os.path.exists(compatibility_dir):
                 # List to hold version directories
                 versions = []
                 # Iterate over the folders in the directory
-                for entry in os.listdir(runner_path):
-                    entry_path = os.path.join(runner_path, entry)
+                for entry in os.listdir(compatibility_dir):
+                    entry_path = os.path.join(compatibility_dir, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
                     if (
                         os.path.isdir(entry_path)
@@ -5876,23 +5863,17 @@ class AddGame(Gtk.Dialog):
         self.combobox_runner.append_text("Proton-EM Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
-        if os.path.exists("/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/"):
+        if os.path.exists(proton_cachyos):
             self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        # Path to the directory containing the folders
-        if IS_FLATPAK:
-            runner_path = Path(os.path.expanduser("~/.local/share/Steam/compatibilitytools.d"))
-        else:
-            runner_path = f'{share_dir}/Steam/compatibilitytools.d/'
 
         try:
             # Check if the directory exists
-            if os.path.exists(runner_path):
+            if os.path.exists(compatibility_dir):
                 # List to hold version directories
                 versions = []
                 # Iterate over the folders in the directory
-                for entry in os.listdir(runner_path):
-                    entry_path = os.path.join(runner_path, entry)
+                for entry in os.listdir(compatibility_dir):
+                    entry_path = os.path.join(compatibility_dir, entry)
                     # Add to list only if it's a directory and not "UMU-Latest"
                     if (
                         os.path.isdir(entry_path)

@@ -14,10 +14,10 @@ from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from PIL import Image
 from faugus.dark_theme import *
 from faugus.config_manager import *
+from faugus.steam_setup import lossless_dll
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
-    app_dir = str(Path.home() / '.local/share/applications')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
     lsfgvk_possible_paths = [
@@ -28,7 +28,6 @@ if IS_FLATPAK:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
-    app_dir = PathManager.user_data('applications')
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
@@ -40,41 +39,18 @@ else:
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
+
+app_dir = PathManager.user_data('applications')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-prefixes_dir = str(Path.home() / 'Faugus')
+prefixes_dir = PathManager.user_home('Faugus')
 mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 launcher_path = PathManager.find_binary('faugus-launcher')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-
-def get_desktop_dir():
-    try:
-        desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
-        return desktop_dir
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        print("xdg-user-dir not found or failed; falling back to ~/Desktop")
-        return str(Path.home() / 'Desktop')
-
-desktop_dir = get_desktop_dir()
-
-def find_lossless_dll():
-    possible_common_locations = [
-        Path.home() / '.local' / 'share' / 'Steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'steam' / 'steamapps' / 'common',
-        Path.home() / '.steam' / 'root' / 'steamapps' / 'common',
-        Path.home() / 'SteamLibrary' / 'steamapps' / 'common',
-        Path(os.path.expanduser('~/.var/app/com.valvesoftware.Steam/.steam/steamapps/common/'))
-    ]
-
-    for location in possible_common_locations:
-        dll_candidate = location / 'Lossless Scaling' / 'Lossless.dll'
-        if dll_candidate.exists():
-            return str(dll_candidate)
-
-    return ""
+desktop_dir = PathManager.user_home('Desktop')
 
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
@@ -372,9 +348,8 @@ class CreateShortcut(Gtk.Window):
             self.checkbox_gamemode.set_active(False)
             self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
 
-        lossless_dll_path = find_lossless_dll()
         if os.path.exists(lsfgvk_path):
-            if lossless_dll_path or os.path.exists(self.lossless_location):
+            if lossless_dll or os.path.exists(self.lossless_location):
                 self.button_lossless.set_sensitive(True)
             else:
                 self.button_lossless.set_sensitive(False)

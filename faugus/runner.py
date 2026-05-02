@@ -24,11 +24,9 @@ IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 from faugus.steam_setup import IS_STEAM_FLATPAK
 
 if IS_FLATPAK:
-    share_dir = os.path.expanduser('~/.local/share')
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:
-    share_dir = PathManager.user_data()
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
@@ -37,14 +35,14 @@ config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_json = PathManager.user_config('faugus-launcher/games.json')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = str(Path.home() / 'Faugus')
+prefixes_dir = PathManager.user_home('Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
 be_dir = PathManager.user_config("faugus-launcher/components/be")
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
-compatibility_dir = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
 try:
@@ -176,23 +174,23 @@ class FaugusRun:
             if protonpath == "Steam":
                 pass
             else:
-                protonpath_path = Path(share_dir) / 'Steam/compatibilitytools.d' / protonpath
+                protonpath_path = compatibility_dir / protonpath
                 if not protonpath_path.is_dir():
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
-            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-EM Latest"
+            steam_compat_dir = compatibility_dir / "Proton-EM Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
-            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-GE Latest"
+            steam_compat_dir = compatibility_dir / "Proton-GE Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         if protonpath == "Proton-CachyOS Latest":
             self.proton_latest = "--cachyos"
-            steam_compat_dir = Path.home() / ".local/share/Steam/compatibilitytools.d" / "Proton-CachyOS Latest"
+            steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         self.components_exists = (
