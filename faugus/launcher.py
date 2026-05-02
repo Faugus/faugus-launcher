@@ -3977,6 +3977,7 @@ class Settings(Gtk.Dialog):
         default_runner = self.get_default_runner()
         command_parts = []
 
+        command_parts.append(f"PROTON_ENABLE_WAYLAND=0")
         command_parts.append(f"GAMEID=winetricks-gui")
         command_parts.append(f"STORE=none")
         if default_runner:
@@ -6241,6 +6242,7 @@ class AddGame(Gtk.Dialog):
             command_parts.append(f"LOG_DIR={title_formatted}")
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
+        command_parts.append(f"PROTON_ENABLE_WAYLAND=0")
         command_parts.append(f"GAMEID=winetricks-gui")
         command_parts.append(f"STORE=none")
         if runner:
