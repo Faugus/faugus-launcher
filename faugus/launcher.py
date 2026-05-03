@@ -2676,7 +2676,7 @@ class Main(Gtk.ApplicationWindow):
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
                 elif launcher == "epic":
                     self.label_download2.set_text("")
-                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
@@ -5817,6 +5817,7 @@ class AddGame(Gtk.Dialog):
                 path = "drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
 
             elif active_id == "epic":
+                self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0")
                 path = "drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
 
             elif active_id == "ubisoft":
