@@ -82,14 +82,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.10-1" date="2026-04-30">
+    <release version="1.18.11-1" date="2026-05-03">
       <description>
         <ul>
-          <li>Added a workaround to prevent white/black screen with Nvidia Optimus laptops.</li>
-          <li>Attempt to fix the runner silent crash.</li>
-          <li>Updated Flatpak platform to GNOME 50.</li>
-          <li>Added Vulkan Tools to Flatpak.</li>
-          <li>Added Norwegian (Bokmål) translation.</li>
+          <li>Disabled the Wayland driver for Epic launcher.</li>
+          <li>Fixed virtual keyboard losing focus when using shift.</li>
+          <li>Fixed blank splash window showing when updating DLSS/FSR.</li>
+          <li>Updated paths to properly use xdg portal.</li>
         </ul>
       </description>
     </release>
