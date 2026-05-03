@@ -581,6 +581,8 @@ class FaugusRun:
         self.log_window.show_all()
 
     def check_game_output(self, clean_line):
+        if "Downloading upscaler file" in clean_line:
+            return False
         def update_ui():
             if (
                 "Downloading" in clean_line
