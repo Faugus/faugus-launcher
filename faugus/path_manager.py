@@ -56,5 +56,5 @@ class PathManager:
 
     @staticmethod
     def get_compatibilitytools():
-        compatibilitytools_folder = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local/share/Steam/compatibilitytools.d'))
+        compatibilitytools_folder = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local/share') / 'Steam/compatibilitytools.d')
         return str(compatibilitytools_folder)
