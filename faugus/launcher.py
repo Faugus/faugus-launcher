@@ -1770,7 +1770,7 @@ class Main(Gtk.ApplicationWindow):
             return True
 
     def manage_autostart_file(self, start_boot, start_minimized):
-        autostart_path = PathManager.user_home('autostart/faugus-launcher.desktop')
+        autostart_path = PathManager.user_home('.config/autostart/faugus-launcher.desktop')
         autostart_dir = os.path.dirname(autostart_path)
 
         if not os.path.exists(autostart_dir):
