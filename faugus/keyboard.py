@@ -35,7 +35,6 @@ class VirtualKeyboard(Gtk.Dialog):
         self.mode = "lower"
         self.original_text = self.entry.get_text()
 
-        #self.set_default_size(800, 450)
         self.set_resizable(False)
         self.get_style_context().add_class("tv-keyboard")
         self.apply_css()
@@ -109,6 +108,9 @@ class VirtualKeyboard(Gtk.Dialog):
                 btn.set_hexpand(True)
                 btn.set_vexpand(True)
 
+                btn.grid_col = col_offset
+                btn.grid_row = r
+
                 if (label == "Shift" and self.mode == "shift") or \
                    (label == "Caps" and self.mode == "caps") or \
                    (label in ("?123", "ABC") and self.mode == "symbols"):
@@ -142,10 +144,18 @@ class VirtualKeyboard(Gtk.Dialog):
         new_text = text + char
         self.display_entry.set_text(new_text)
         self.display_entry.set_position(len(new_text))
+
         if self.mode == "shift":
+            col = getattr(button, 'grid_col', 0)
+            row = getattr(button, 'grid_row', 0)
+
             self.mode = "lower"
             self.build_keys()
             self.show_all()
+
+            new_btn = self.grid.get_child_at(col, row)
+            if new_btn:
+                new_btn.grab_focus()
 
     def on_backspace(self, button):
         text = self.display_entry.get_text()
@@ -155,21 +165,37 @@ class VirtualKeyboard(Gtk.Dialog):
             self.display_entry.set_position(len(new_text))
 
     def on_toggle_mode(self, button, mode_type):
+        col = getattr(button, 'grid_col', 0)
+        row = getattr(button, 'grid_row', 0)
+
         target_mode = mode_type.lower()
         if self.mode == target_mode:
             self.mode = "lower"
         else:
             self.mode = target_mode
+
         self.build_keys()
         self.show_all()
 
+        new_btn = self.grid.get_child_at(col, row)
+        if new_btn:
+            new_btn.grab_focus()
+
     def on_toggle_symbols(self, button):
+        col = getattr(button, 'grid_col', 0)
+        row = getattr(button, 'grid_row', 0)
+
         if self.mode == "symbols":
             self.mode = "lower"
         else:
             self.mode = "symbols"
+
         self.build_keys()
         self.show_all()
+
+        new_btn = self.grid.get_child_at(col, row)
+        if new_btn:
+            new_btn.grab_focus()
 
     def on_clear(self, button):
         self.display_entry.set_text("")
