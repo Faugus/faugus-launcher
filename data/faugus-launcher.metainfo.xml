@@ -82,13 +82,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.11-1" date="2026-05-03">
+    <release version="1.18.12-1" date="2026-05-03">
       <description>
         <ul>
-          <li>Disabled the Wayland driver for Epic launcher.</li>
-          <li>Fixed virtual keyboard losing focus when using shift.</li>
-          <li>Fixed blank splash window showing when updating DLSS/FSR.</li>
-          <li>Updated paths to properly use xdg portal.</li>
+          <li>Hotfix compatibilitytools detection.</li>
         </ul>
       </description>
     </release>
