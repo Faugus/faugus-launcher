@@ -361,11 +361,13 @@ class ProtonDownloader(Gtk.Dialog):
 
         def worker():
             try:
+                STEAM_COMPATIBILITY_PATH.mkdir(parents=True, exist_ok=True)
+                tar_file_path = os.path.join(STEAM_COMPATIBILITY_PATH, filename)
+
                 response = requests.get(url, stream=True, timeout=30)
                 response.raise_for_status()
                 total_size = int(response.headers.get("content-length", 0))
                 downloaded_size = 0
-                tar_file_path = os.path.join(os.getcwd(), filename)
 
                 with open(tar_file_path, "wb") as f:
                     for chunk in response.iter_content(chunk_size=1024*64):
@@ -381,33 +383,18 @@ class ProtonDownloader(Gtk.Dialog):
                 GLib.idle_add(self.progress_bar.set_fraction, 0)
 
                 mode = 'r:xz' if tar_file_path.endswith('.tar.xz') else 'r:gz'
-                temp_dir = os.path.join(STEAM_COMPATIBILITY_PATH, f"temp_{tag_name}")
-                os.makedirs(temp_dir, exist_ok=True)
 
                 with tarfile.open(tar_file_path, mode) as tar:
                     members = tar.getmembers()
                     total_members = len(members)
+
                     for i, member in enumerate(members):
-                        tar.extract(member, path=temp_dir, filter="fully_trusted")
+                        tar.extract(member, path=STEAM_COMPATIBILITY_PATH, filter="fully_trusted")
                         if i % 10 == 0:
                             progress = (i + 1) / total_members
                             GLib.idle_add(self.progress_bar.set_fraction, progress)
                             GLib.idle_add(self.progress_bar.set_text, f"{int(progress * 100)}%")
 
-                extracted_dir = None
-                for item in os.listdir(temp_dir):
-                    item_path = os.path.join(temp_dir, item)
-                    if os.path.isdir(item_path):
-                        extracted_dir = item_path
-                        break
-
-                if extracted_dir:
-                    final_dir = os.path.join(STEAM_COMPATIBILITY_PATH, os.path.basename(extracted_dir))
-                    if os.path.exists(final_dir):
-                        shutil.rmtree(final_dir)
-                    shutil.move(extracted_dir, STEAM_COMPATIBILITY_PATH)
-
-                shutil.rmtree(temp_dir)
                 if os.path.exists(tar_file_path):
                     os.remove(tar_file_path)
 
@@ -416,7 +403,7 @@ class ProtonDownloader(Gtk.Dialog):
                 GLib.idle_add(self.progress_label.set_visible, False)
 
             except Exception as e:
-                print(f"Error during download: {e}")
+                print(f"Error during download/extraction: {e}")
                 GLib.idle_add(self.update_button, button, _("Download"))
                 GLib.idle_add(self.progress_label.set_text, _("Error during download"))
             finally:
