@@ -870,7 +870,7 @@ def build_launch_command(game):
         if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
             command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     if launch_arguments:
-        command_parts.append(launch_arguments)
+        command_parts.append(os.path.expanduser(launch_arguments))
     if gamemode:
         command_parts.append("gamemoderun")
     if mangohud:
