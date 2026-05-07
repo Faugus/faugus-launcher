@@ -3,87 +3,101 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 20:50-0300\n"
-"PO-Revision-Date: 2025-05-26 23:23-0300\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-03-30 23:20-0300\n"
+"PO-Revision-Date: 2026-05-06 00:00-0300\n"
+"Last-Translator: Gregorio Lautaro Troncoso <>\n"
+"Language-Team: Spanish <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: /usr/bin/faugus-run:126
-#, python-brace-format
-msgid "{path} was not found."
-msgstr "{path} no encontrado."
+#: /usr/bin/faugus-run:132
+msgid "Starting Steam game..."
+msgstr "Iniciando juego de Steam..."
 
-#: /usr/bin/faugus-run:130
+#: /usr/bin/faugus-run:359
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "¿Disfrutas Faugus Launcher?"
+
+#: /usr/bin/faugus-run:363
+msgid "Please consider donating"
+msgstr "Por favor, considera donar"
+
+#: /usr/bin/faugus-run:375
+msgid "Never show this message again"
+msgstr "No mostrar este mensaje de nuevo"
+
+#: /usr/bin/faugus-run:385
+msgid "Continue"
+msgstr "Continuar"
+
+#: /usr/bin/faugus-run:442
+msgid "Internet connection error."
+msgstr "Error de conexión a internet."
+
+#: /usr/bin/faugus-run:446
+msgid "%s was not found."
+msgstr "%s no fue encontrado."
+
+#: /usr/bin/faugus-run:450
 msgid "Please install it or use another Proton version."
 msgstr "Por favor, instálalo o usa otra versión de Proton."
 
-#: /usr/bin/faugus-run:133 /usr/bin/faugus-run:513
+#: /usr/bin/faugus-run:457 /usr/bin/faugus-run:697
 msgid "Ok"
-msgstr "Ok"
+msgstr "Aceptar"
 
-#: /usr/bin/faugus-run:362
-#, python-brace-format
-msgid "Using {path}"
-msgstr "Usando {path}"
-
-#: /usr/bin/faugus-run:433
-msgid "Updating BattlEye..."
-msgstr "Actualizando BattlEye…"
-
-#: /usr/bin/faugus-run:435
-msgid "Updating Easy Anti-Cheat..."
-msgstr "Actualizando Easy Anti-Cheat…"
-
-#: /usr/bin/faugus-run:437
+#: /usr/bin/faugus-run:599
 msgid "Components are up to date"
 msgstr "Los componentes están actualizados"
 
-#: /usr/bin/faugus-run:439
-msgid "Downloading GE-Proton..."
-msgstr "Descargando GE-Proton…"
+#: /usr/bin/faugus-run:621
+msgid "Updating"
+msgstr "Actualizando"
 
-#: /usr/bin/faugus-run:441
-msgid "Downloading UMU-Proton..."
-msgstr "Descargando UMU-Proton…"
+#: /usr/bin/faugus-run:623
+msgid "Downloading"
+msgstr "Descargando"
 
-#: /usr/bin/faugus-run:443
-msgid "Downloading Steam Runtime..."
-msgstr "Descargando Steam Runtime…"
+#: /usr/bin/faugus-run:625
+msgid "Extracting"
+msgstr "Extrayendo"
 
-#: /usr/bin/faugus-run:445
-msgid "Extracting Steam Runtime..."
-msgstr "Extrayendo Steam Runtime…"
+#: /usr/bin/faugus-run:631
+msgid "is up to date"
+msgstr "está actualizado"
 
-#: /usr/bin/faugus-run:447
-msgid "Extracting GE-Proton..."
-msgstr "Extrayendo GE-Proton…"
-
-#: /usr/bin/faugus-run:449
-msgid "Extracting UMU-Proton..."
-msgstr "Extrayendo UMU-Proton…"
-
-#: /usr/bin/faugus-run:451 /usr/bin/faugus-run:457
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton está actualizado"
-
-#: /usr/bin/faugus-run:453 /usr/bin/faugus-run:459
-msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton está actualizado"
-
-#: /usr/bin/faugus-run:455 /usr/bin/faugus-run:461
-msgid "Steam Runtime is up to date"
-msgstr "Steam Runtime está actualizado"
-
-#: /usr/bin/faugus-run:510
+#: /usr/bin/faugus-run:694
 msgid "The keys and values were successfully added to the registry."
 msgstr "Las claves y los valores se agregaron correctamente al registro."
+
+#, python-brace-format
+#~ msgid "Using {path}"
+#~ msgstr "Usando {path}"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Actualizando BattlEye…"
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Actualizando Easy Anti-Cheat…"
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Descargando UMU-Proton…"
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Descargando Steam Runtime…"
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Extrayendo UMU-Proton…"
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton está actualizado"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime está actualizado"

@@ -3,70 +3,80 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 21:03-0300\n"
-"PO-Revision-Date: 2025-05-26 19:14-0600\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-03-30 20:06-0300\n"
+"PO-Revision-Date: 2026-05-06 00:00-0300\n"
+"Last-Translator: Gregorio Lautaro Troncoso <>\n"
+"Language-Team: Spanish <>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: /usr/bin/faugus-proton-manager:76
-msgid "Faugus GE-Proton Manager"
-msgstr "Faugus Gestor de GE-Proton"
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Gestor de Proton"
 
-#: /usr/bin/faugus-proton-manager:153
-msgid "Error fetching releases:"
-msgstr "Error al obtener las versiones:"
-
-#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:242
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
 msgid "Remove"
 msgstr "Eliminar"
 
-#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:267
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
 msgid "Download"
 msgstr "Descargar"
 
-#: /usr/bin/faugus-proton-manager:205
-msgid "Downloading"
-msgstr "Descargando"
-
-#: /usr/bin/faugus-proton-manager:208
+#: /usr/bin/faugus-proton-manager:351
 msgid "Downloading..."
-msgstr "Descargando…"
+msgstr "Descargando..."
 
-#: /usr/bin/faugus-proton-manager:209
-#, python-brace-format
-msgid "Downloading {tag}..."
-msgstr "Descargando {tag}…"
+#: /usr/bin/faugus-proton-manager:353
+msgid "Downloading %s..."
+msgstr "Descargando %s..."
 
-#: /usr/bin/faugus-proton-manager:234
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+msgid "Extracting %s..."
+msgstr "Extrayendo %s..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "Error durante la descarga"
+
+#: /usr/bin/faugus-proton-manager:428
 msgid "Extracting..."
-msgstr "Extrayendo…"
+msgstr "Extrayendo..."
 
-#: /usr/bin/faugus-proton-manager:235
-#, python-brace-format
-msgid "Extracting {tag}..."
-msgstr "Extrayendo {tag}…"
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "Error durante la extracción"
 
-#: /usr/bin/faugus-proton-manager:257
-#, python-brace-format
-msgid "Extracting... {percent}%"
-msgstr "Extrayendo… {percent}%"
+#~ msgid "Error fetching releases:"
+#~ msgstr "Error al obtener las versiones:"
 
-#: /usr/bin/faugus-proton-manager:260
-#, python-brace-format
-msgid "Failed to extract {tar_file_path}: {error}"
-msgstr "Error al extraer: {tar_file_path}: {error}"
+#~ msgid "Downloading"
+#~ msgstr "Descargando"
 
-#: /usr/bin/faugus-proton-manager:269
 #, python-brace-format
-msgid "Failed to remove {version_path}: {error}"
-msgstr "Error al eliminar {version_path}: {error}"
+#~ msgid "Downloading {tag}..."
+#~ msgstr "Descargando {tag}…"
+
+#, python-brace-format
+#~ msgid "Extracting {tag}..."
+#~ msgstr "Extrayendo {tag}…"
+
+#, python-brace-format
+#~ msgid "Extracting... {percent}%"
+#~ msgstr "Extrayendo… {percent}%"
+
+#, python-brace-format
+#~ msgid "Failed to extract {tar_file_path}: {error}"
+#~ msgstr "Error al extraer: {tar_file_path}: {error}"
+
+#, python-brace-format
+#~ msgid "Failed to remove {version_path}: {error}"
+#~ msgstr "Error al eliminar {version_path}: {error}"
