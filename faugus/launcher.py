@@ -6807,7 +6807,7 @@ def update_games_json():
 
         if "favorite" in game:
             if game["favorite"] == True:
-                game["category"] = _("Favorites")
+                game["category"] = False
 
             game.pop("favorite")
             changed = True

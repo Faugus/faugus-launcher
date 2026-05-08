@@ -979,6 +979,13 @@ def update_games_json():
             game["runner"] = "Proton-CachyOS (System)"
             changed = True
 
+        if "favorite" in game:
+            if game["favorite"] == True:
+                game["category"] = False
+
+            game.pop("favorite")
+            changed = True
+
     if changed:
         with open(games_json, "w", encoding="utf-8") as f:
             json.dump(games, f, indent=4, ensure_ascii=False)
