@@ -40,7 +40,7 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = PathManager.user_data('applications')
+app_dir = Path(PathManager.get_applications())
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 prefixes_dir = PathManager.user_home('Faugus')

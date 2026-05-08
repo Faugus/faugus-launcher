@@ -69,7 +69,7 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = PathManager.user_data('applications')
+app_dir = Path(PathManager.get_applications())
 launcher_path = PathManager.find_binary('faugus-launcher')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 mangohud_dir = PathManager.find_binary('mangohud')
