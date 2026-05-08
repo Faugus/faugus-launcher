@@ -88,12 +88,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.19.1-1" date="2026-05-08">
+    <release version="1.19.2-1" date="2026-05-08">
       <description>
         <ul>
+          <li>Fixed app menu shortcut path.</li>
           <li>Removed Favorites.</li>
-          <li>Now allows relative paths in launch argurments.</li>
+          <li>Now allows relative paths in launch arguments.</li>
           <li>Updated Spanish translation.</li>
+          <li>Updated Italian translation.</li>
           <li>Updated Portuguese translation.</li>
           <li>Added Categories menu.</li>
         </ul>
