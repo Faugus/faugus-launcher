@@ -1,6 +1,6 @@
 import time
 import pygame
-from gi.repository import GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk
 from faugus.keyboard import VirtualKeyboard
 
 def get_button_map(joy):
@@ -29,6 +29,8 @@ def init_gamepad(self):
     self.repeat_delay = 0.5
     self.repeat_interval = 0.1
 
+    self.active_menu_stack = []
+
     GLib.timeout_add(50, lambda: poll_gamepad(self))
 
 def poll_gamepad(self):
@@ -56,7 +58,13 @@ def poll_gamepad(self):
             self.held_direction = None
             continue
 
-        menu_visible = getattr(self, "context_menu", None) and self.context_menu.get_visible()
+        menu_visible = False
+        if getattr(self, "active_menu_stack", []):
+            base_menu = self.active_menu_stack[0]["menu"]
+            if base_menu.get_visible():
+                menu_visible = True
+            else:
+                self.active_menu_stack = []
 
         if event.type == pygame.JOYHATMOTION:
             _handle_hat_motion(self, event.value)
@@ -92,7 +100,7 @@ def _set_held_direction(self, direction):
         self.held_direction = None
 
 def _dispatch_navigation(self, direction):
-    if getattr(self, "context_menu", None) and self.context_menu.get_visible():
+    if getattr(self, "active_menu_stack", []) and self.active_menu_stack[0]["menu"].get_visible():
         _navigate_context_menu(self, direction)
     else:
         navigate_gamepad(direction)
@@ -205,15 +213,43 @@ def _open_keyboard_for_treeview(path, column, renderer, treeview):
 
 def _open_context_menu(self):
     focused = self.get_focus()
+    active_menu = None
+
     if isinstance(focused, Gtk.FlowBoxChild):
         self.on_item_right_click(focused, None)
-        items = self.context_menu.get_children()
+        active_menu = getattr(self, "context_menu", None)
 
+    elif isinstance(focused, Gtk.ListBoxRow):
+        listbox = focused.get_parent()
+        listbox.select_row(focused)
+
+        menu = getattr(self, "category_context_menu", None)
+        if menu:
+            menu.popup_at_widget(focused, Gdk.Gravity.CENTER, Gdk.Gravity.CENTER, None)
+            active_menu = menu
+
+    if not active_menu:
+        return
+
+    items = active_menu.get_children()
+    if not items:
+        return
+
+    self.active_menu_stack = [{"menu": active_menu, "index": 0}]
+
+    menu_play = getattr(self, "menu_play", None)
+    selected_index = 0
+
+    if menu_play in items:
+        selected_index = items.index(menu_play)
+    else:
         for i, item in enumerate(items):
-            if item == self.menu_play:
-                self.menu_index = i
-                self.context_menu.select_item(item)
+            if isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive():
+                selected_index = i
                 break
+
+    self.active_menu_stack[0]["index"] = selected_index
+    active_menu.select_item(items[selected_index])
 
 def adjust_widget_value(widget, direction):
     combo = find_combobox(widget)
@@ -283,52 +319,103 @@ def focus_first_button(container):
     return False
 
 def _navigate_context_menu(self, direction):
-    items = self.context_menu.get_children()
+    if not getattr(self, "active_menu_stack", None) or not self.active_menu_stack:
+        self.active_menu_stack = [{"menu": self.context_menu, "index": 0}]
+
+    current_state = self.active_menu_stack[-1]
+    menu = current_state["menu"]
+    items = menu.get_children()
     if not items:
         return
-
-    self.menu_index = getattr(self, "menu_index", 0)
 
     def is_valid(item):
         return isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive()
 
-    def move(step):
+    if direction in (Gtk.DirectionType.DOWN, Gtk.DirectionType.UP):
+        step = 1 if direction == Gtk.DirectionType.DOWN else -1
         for _ in range(len(items)):
-            self.menu_index = (self.menu_index + step) % len(items)
-            if is_valid(items[self.menu_index]):
+            current_state["index"] = (current_state["index"] + step) % len(items)
+            if is_valid(items[current_state["index"]]):
                 break
+        menu.select_item(items[current_state["index"]])
 
-    if direction == Gtk.DirectionType.DOWN:
-        move(1)
-    elif direction == Gtk.DirectionType.UP:
-        move(-1)
+    elif direction == Gtk.DirectionType.RIGHT:
+        item = items[current_state["index"]]
+        submenu = item.get_submenu()
+        if submenu:
+            sub_items = submenu.get_children()
+            sub_index = 0
+            for i, sub_item in enumerate(sub_items):
+                if is_valid(sub_item):
+                    sub_index = i
+                    break
+            self.active_menu_stack.append({"menu": submenu, "index": sub_index})
+            menu.select_item(item)
+            submenu.select_item(sub_items[sub_index])
 
-    self.context_menu.select_item(items[self.menu_index])
+    elif direction == Gtk.DirectionType.LEFT:
+        if len(self.active_menu_stack) > 1:
+            self.active_menu_stack.pop()
+            parent_state = self.active_menu_stack[-1]
+            parent_menu = parent_state["menu"]
+            parent_item = parent_menu.get_children()[parent_state["index"]]
+            parent_menu.select_item(parent_item)
 
 def handle_menu_navigation(self, event, btn):
-    items = self.context_menu.get_children()
-    if not items:
+    if not getattr(self, "active_menu_stack", None) or not self.active_menu_stack:
         return
 
-    self.menu_index = getattr(self, "menu_index", 0)
+    if event.type != pygame.JOYBUTTONDOWN:
+        return
+
+    current_state = self.active_menu_stack[-1]
+    menu = current_state["menu"]
+    items = menu.get_children()
+    if not items:
+        return
 
     def is_valid(item):
         return isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive()
 
-    if event.type == pygame.JOYBUTTONDOWN:
-        if event.button == btn["confirm"]:
-            item = items[self.menu_index]
-            if is_valid(item):
+    if event.button == btn["confirm"]:
+        item = items[current_state["index"]]
+        if is_valid(item):
+            submenu = item.get_submenu()
+            if submenu:
+                sub_items = submenu.get_children()
+                sub_index = 0
+                for i, sub_item in enumerate(sub_items):
+                    if is_valid(sub_item):
+                        sub_index = i
+                        break
+                self.active_menu_stack.append({"menu": submenu, "index": sub_index})
+                menu.select_item(item)
+                submenu.select_item(sub_items[sub_index])
+            else:
                 GLib.idle_add(item.activate)
+                base_menu = self.active_menu_stack[0]["menu"]
+                base_menu.popdown()
+                self.active_menu_stack = []
 
-        elif event.button == btn["back"]:
-            self.context_menu.popdown()
+    elif event.button == btn["back"]:
+        if len(self.active_menu_stack) > 1:
+            self.active_menu_stack.pop()
+            parent_state = self.active_menu_stack[-1]
+            parent_menu = parent_state["menu"]
+            parent_item = parent_menu.get_children()[parent_state["index"]]
+            parent_menu.select_item(parent_item)
+        else:
+            base_menu = self.active_menu_stack[0]["menu"]
+            base_menu.popdown()
+            self.active_menu_stack = []
 
 def navigate_gamepad(direction):
     active_window = get_active_window()
     focused = active_window.get_focus() if active_window else None
 
     if not focused:
+        if active_window:
+            active_window.child_focus(Gtk.DirectionType.TAB_FORWARD)
         return
 
     is_horizontal = direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)

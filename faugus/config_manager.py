@@ -37,6 +37,7 @@ class ConfigManager:
             'playtime': 0,
             'gamepad-navigation': 'False',
             'start-minimized': 'False',
+            'show-categories': 'False',
         }
 
         self.config = {}

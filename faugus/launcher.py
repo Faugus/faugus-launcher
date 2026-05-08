@@ -77,6 +77,7 @@ gamemoderun = PathManager.find_binary('gamemoderun')
 
 games_json = PathManager.user_config('faugus-launcher/games.json')
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
+categories_file = PathManager.user_config('faugus-launcher/categories.txt')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
@@ -196,11 +197,39 @@ class Main(Gtk.ApplicationWindow):
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
-            .hbox-favorite {
-                background-color: alpha(@theme_selected_bg_color, 0.25);
+            flowboxchild:selected {
+                background: transparent;
             }
-            .hbox-normal {
+            .game {
                 background-color: alpha(@theme_base_color, 0.5);
+                border: 4px solid transparent;
+                color: @theme_text_color;
+            }
+            flowboxchild:selected .game {
+                background-color: alpha(@theme_base_color, 0.5);
+                border-color: @theme_selected_bg_color;
+            }
+            flowboxchild:selected:focus .game {
+                background-color: @theme_selected_bg_color;
+                border-color: transparent;
+            }
+            .banner-border {
+                border: 4px solid @theme_bg_color;
+            }
+            .category-list {
+                background-color: alpha(@theme_base_color, 0.5);
+            }
+            .category-list row {
+                background-color: transparent;
+                color: @theme_text_color;
+                border: 4px solid transparent;
+            }
+            .category-list row:selected {
+                background-color: transparent;
+                border: 4px solid @theme_selected_bg_color;
+            }
+            .category-list row:selected:focus {
+                background-color: @theme_selected_bg_color;
             }
         """)
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
@@ -237,9 +266,10 @@ class Main(Gtk.ApplicationWindow):
         self.menu_hide.connect("activate", self.on_context_menu_hide)
         self.context_menu.append(self.menu_hide)
 
-        self.menu_favorite = Gtk.MenuItem(label=_("Add to favorites"))
-        self.menu_favorite.connect("activate", self.on_context_menu_favorite)
-        self.context_menu.append(self.menu_favorite)
+        self.menu_category = Gtk.MenuItem(label=_("Category"))
+        self.submenu_category = Gtk.Menu()
+        self.menu_category.set_submenu(self.submenu_category)
+        self.context_menu.append(self.menu_category)
 
         self.menu_game_location = Gtk.MenuItem(label=_("Open game location"))
         self.menu_game_location.connect("activate", self.on_context_menu_game_location)
@@ -259,24 +289,24 @@ class Main(Gtk.ApplicationWindow):
         self.load_config()
 
         if self.interface_mode == "List":
-            self.small_interface()
+            self.setup_interface()
         if self.interface_mode == "Blocks":
             if self.start_maximized:
                 self.maximize()
             if self.start_fullscreen:
                 self.fullscreen()
                 self.fullscreen_activated = True
-            self.big_interface()
+            self.setup_interface(True)
         if self.interface_mode == "Banners":
             if self.start_maximized:
                 self.maximize()
             if self.start_fullscreen:
                 self.fullscreen()
                 self.fullscreen_activated = True
-            self.big_interface()
+            self.setup_interface(True)
         if not self.interface_mode:
             self.interface_mode = "List"
-            self.small_interface()
+            self.setup_interface()
 
         self.flowbox.connect("button-press-event", self.on_item_right_click)
         self.flowbox.connect("selected-children-changed", lambda *_: self.update_icon())
@@ -442,13 +472,13 @@ class Main(Gtk.ApplicationWindow):
         self.get_application().quit()
 
     def select_first_child(self):
-        children = self.flowbox.get_children()
-        if children:
-            first = children[0]
-            self.flowbox.grab_focus()
-            self.flowbox.select_child(first)
-            first.grab_focus()
-            self.flowbox.emit("child-activated", first)
+        for child in self.flowbox.get_children():
+            if child.get_child_visible():
+                self.flowbox.grab_focus()
+                self.flowbox.select_child(child)
+                child.grab_focus()
+                self.flowbox.emit("child-activated", child)
+                break
 
     def select_game_by_title(self, title):
         for child in self.flowbox.get_children():
@@ -462,246 +492,483 @@ class Main(Gtk.ApplicationWindow):
                 self.flowbox.emit("child-activated", child)
                 break
 
-    def small_interface(self):
-        self.set_default_size(-1, 610)
-        self.set_resizable(False)
-        self.big_interface_active = False
-
-        # Create main box and its components
-        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box_bottom = Gtk.Box()
-
-        # Create buttons for adding, editing, and deleting games
-        self.button_add = Gtk.Button()
-        self.button_add.connect("clicked", self.on_button_add_clicked)
-        self.button_add.set_can_focus(False)
-        self.button_add.set_size_request(50, 50)
-        self.button_add.set_image(Gtk.Image.new_from_icon_name("faugus-add-symbolic", Gtk.IconSize.BUTTON))
-        self.button_add.set_margin_top(10)
-        self.button_add.set_margin_start(10)
-        self.button_add.set_margin_bottom(10)
-
-        # Create button for killing processes
-        button_kill = Gtk.Button()
-        button_kill.connect("clicked", self.on_button_kill_clicked)
-        button_kill.set_can_focus(False)
-        button_kill.set_tooltip_text(_("Force close all running games"))
-        button_kill.set_size_request(50, 50)
-        button_kill.set_image(Gtk.Image.new_from_icon_name("faugus-kill-symbolic", Gtk.IconSize.BUTTON))
-        button_kill.set_margin_top(10)
-        button_kill.set_margin_end(10)
-        button_kill.set_margin_bottom(10)
-
-        # Create button for settings
-        button_settings = Gtk.Button()
-        button_settings.connect("clicked", self.on_button_settings_clicked)
-        button_settings.set_can_focus(False)
-        button_settings.set_size_request(50, 50)
-        button_settings.set_image(Gtk.Image.new_from_icon_name("faugus-settings-symbolic", Gtk.IconSize.BUTTON))
-        button_settings.set_margin_top(10)
-        button_settings.set_margin_start(10)
-        button_settings.set_margin_bottom(10)
-
-        # Create button for launching games
-        self.button_play = Gtk.Button()
-        self.button_play.connect("clicked", self.on_button_play_clicked)
-        self.button_play.set_can_focus(False)
-        self.button_play.set_size_request(50, 50)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-        self.button_play.set_margin_top(10)
-        self.button_play.set_margin_end(10)
-        self.button_play.set_margin_bottom(10)
-
-        self.entry_search = Gtk.Entry()
-        self.entry_search.set_placeholder_text(_("Search..."))
-        self.entry_search.connect("changed", self.on_search_changed)
-        self.entry_search.set_can_focus(False)
-
-        self.entry_search.set_size_request(170, 50)
-        self.entry_search.set_margin_top(10)
-        self.entry_search.set_margin_start(10)
-        self.entry_search.set_margin_bottom(10)
-        self.entry_search.set_margin_end(10)
-
-        # Create scrolled window for game list
-        scroll_box = Gtk.ScrolledWindow()
-        scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll_box.set_margin_start(10)
-        scroll_box.set_margin_top(10)
-        scroll_box.set_margin_end(10)
-
-        self.flowbox = Gtk.FlowBox()
-        self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
-        self.flowbox.set_halign(Gtk.Align.FILL)
-        self.flowbox.set_valign(Gtk.Align.START)
-        self.flowbox.connect('button-release-event', self.on_item_release_event)
-
-        def sort_games(child1, child2, _):
-            g1 = child1.game
-            g2 = child2.game
-
-            if g1.favorite and not g2.favorite:
-                return -1
-            if not g1.favorite and g2.favorite:
-                return 1
-
-            return (g1.title > g2.title) - (g1.title < g2.title)
-
-        self.flowbox.set_sort_func(sort_games, None)
-
-        scroll_box.add(self.flowbox)
-        self.load_games()
-
-        # Pack left and scrolled box into the top box
-        self.box_top.pack_start(scroll_box, True, True, 0)
-
-        # Pack buttons and other components into the bottom box
-        self.box_bottom.pack_start(self.button_add, False, False, 0)
-        self.box_bottom.pack_start(button_settings, False, False, 0)
-        self.box_bottom.pack_start(self.entry_search, True, True, 0)
-        self.box_bottom.pack_end(self.button_play, False, False, 0)
-        self.box_bottom.pack_end(button_kill, False, False, 0)
-
-        # Pack top and bottom boxes into the main box
-        self.box_main.pack_start(self.box_top, True, True, 0)
-        self.box_main.pack_end(self.box_bottom, False, True, 0)
-        self.add(self.box_main)
-
-        self.select_first_child()
-
-        self.connect("key-press-event", self.on_key_press_event)
-        self.show_all()
-
-    def big_interface(self):
-        self.set_default_size(1280, 720)
-        self.set_resizable(True)
-        self.big_interface_active = True
-
-        # Create main box and its components
-        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box_top = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.box_bottom = Gtk.Box()
-
-        # Create buttons for adding, editing, and deleting games
-        self.button_add = Gtk.Button()
-        self.button_add.connect("clicked", self.on_button_add_clicked)
-        self.button_add.set_can_focus(False)
-        self.button_add.set_size_request(50, 50)
-        self.button_add.set_image(Gtk.Image.new_from_icon_name("faugus-add-symbolic", Gtk.IconSize.BUTTON))
-        self.button_add.set_margin_top(10)
-        self.button_add.set_margin_start(10)
-        self.button_add.set_margin_bottom(10)
-
-        # Create button for killing processes
-        button_kill = Gtk.Button()
-        button_kill.connect("clicked", self.on_button_kill_clicked)
-        button_kill.set_can_focus(False)
-        button_kill.set_tooltip_text(_("Force close all running games"))
-        button_kill.set_size_request(50, 50)
-        button_kill.set_image(Gtk.Image.new_from_icon_name("faugus-kill-symbolic", Gtk.IconSize.BUTTON))
-        button_kill.set_margin_top(10)
-        button_kill.set_margin_bottom(10)
-
-        # Create button for settings
-        button_settings = Gtk.Button()
-        button_settings.connect("clicked", self.on_button_settings_clicked)
-        button_settings.set_can_focus(False)
-        button_settings.set_size_request(50, 50)
-        button_settings.set_image(Gtk.Image.new_from_icon_name("faugus-settings-symbolic", Gtk.IconSize.BUTTON))
-        button_settings.set_margin_top(10)
-        button_settings.set_margin_start(10)
-        button_settings.set_margin_bottom(10)
-
-        # Create button for launching games
-        self.button_play = Gtk.Button()
-        self.button_play.connect("clicked", self.on_button_play_clicked)
-        self.button_play.set_can_focus(False)
-        self.button_play.set_size_request(50, 50)
-        self.button_play.set_image(Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON))
-        self.button_play.set_margin_top(10)
-        self.button_play.set_margin_start(10)
-        self.button_play.set_margin_end(10)
-        self.button_play.set_margin_bottom(10)
-
-        self.entry_search = Gtk.Entry()
-        self.entry_search.set_placeholder_text(_("Search..."))
-        self.entry_search.connect("changed", self.on_search_changed)
-        self.entry_search.set_can_focus(False)
-
-        self.entry_search.set_size_request(170, 50)
-        self.entry_search.set_margin_top(10)
-        self.entry_search.set_margin_start(10)
-        self.entry_search.set_margin_bottom(10)
-        self.entry_search.set_margin_end(10)
-
-        self.grid_left = Gtk.Grid()
-        self.grid_left.set_hexpand(True)
-        self.grid_left.set_halign(Gtk.Align.END)
-
-        self.grid_left.add(self.button_add)
-        self.grid_left.add(button_settings)
-
-        grid_middle = Gtk.Grid()
-        grid_middle.add(self.entry_search)
-
-        grid_right = Gtk.Grid()
-        grid_right.set_hexpand(True)
-        grid_right.set_halign(Gtk.Align.START)
-
-        grid_right.add(button_kill)
-        grid_right.add(self.button_play)
-
-        # Create scrolled window for game list
-        scroll_box = Gtk.ScrolledWindow()
-        scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll_box.set_margin_top(10)
-        scroll_box.set_margin_end(10)
-        scroll_box.set_margin_start(10)
-        scroll_box.set_margin_bottom(10)
-
-        self.flowbox = Gtk.FlowBox()
-        self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
-        self.flowbox.set_halign(Gtk.Align.CENTER)
-        self.flowbox.set_valign(Gtk.Align.CENTER)
-        self.flowbox.set_min_children_per_line(2)
-        self.flowbox.set_max_children_per_line(20)
-        self.flowbox.connect('button-release-event', self.on_item_release_event)
-
-        def sort_games(child1, child2, _):
-            g1 = child1.game
-            g2 = child2.game
-
-            if g1.favorite and not g2.favorite:
-                return -1
-            if not g1.favorite and g2.favorite:
-                return 1
-
-            return (g1.title > g2.title) - (g1.title < g2.title)
-
-        self.flowbox.set_sort_func(sort_games, None)
-
-        scroll_box.add(self.flowbox)
-        self.load_games()
-
-        self.box_top.pack_start(scroll_box, True, True, 0)
-
-        self.box_bottom.pack_start(self.grid_left, True, True, 0)
-        self.box_bottom.pack_start(grid_middle, False, False, 0)
-        self.box_bottom.pack_start(grid_right, True, True, 0)
-
-        self.box_main.pack_start(self.box_top, True, True, 0)
-        self.box_main.pack_end(self.box_bottom, False, True, 0)
-        self.add(self.box_main)
-
-        self.select_first_child()
-
-        self.connect("key-press-event", self.on_key_press_event)
-        self.show_all()
-        if self.start_fullscreen:
-            self.fullscreen_activated = True
+    def setup_interface(self, is_big=False):
+        if is_big:
+            self.set_default_size(1280, 720)
+            self.set_resizable(True)
+            top_orientation = Gtk.Orientation.HORIZONTAL
         else:
-            self.fullscreen_activated = False
+            self.set_default_size(-1, 610)
+            self.set_resizable(False)
+            top_orientation = Gtk.Orientation.VERTICAL
+
+        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_top = Gtk.Box(orientation=top_orientation)
+        self.box_bottom = Gtk.Box()
+
+        def create_button(icon_name, callback, tooltip=None):
+            btn = Gtk.Button()
+            btn.connect("clicked", callback)
+            btn.set_size_request(50, 50)
+            btn.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON))
+            if tooltip:
+                btn.set_tooltip_text(tooltip)
+            return btn
+
+        self.button_add = create_button("faugus-add-symbolic", self.on_button_add_clicked)
+        button_settings = create_button("faugus-settings-symbolic", self.on_button_settings_clicked)
+        button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Force close all running games"))
+        self.button_play = create_button("faugus-play-symbolic", self.on_button_play_clicked)
+
+        self.entry_search = Gtk.Entry()
+        self.entry_search.set_placeholder_text(_("Search..."))
+        self.entry_search.connect("changed", self.on_search_changed)
+        self.entry_search.set_size_request(170, 50)
+
+        scroll_box = Gtk.ScrolledWindow()
+        scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll_box.set_margin_top(10)
+        scroll_box.set_margin_bottom(10)
+        scroll_box.set_margin_start(10)
+        scroll_box.set_margin_end(10)
+
+        self.flowbox = Gtk.FlowBox()
+        self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        self.flowbox.connect('button-release-event', self.on_item_release_event)
+
+        if is_big:
+            self.flowbox.set_halign(Gtk.Align.CENTER)
+            self.flowbox.set_valign(Gtk.Align.CENTER)
+            self.flowbox.set_min_children_per_line(2)
+            self.flowbox.set_max_children_per_line(20)
+        else:
+            self.flowbox.set_halign(Gtk.Align.FILL)
+            self.flowbox.set_valign(Gtk.Align.START)
+
+        def sort_games(child1, child2, user_data):
+            g1, g2 = child1.game, child2.game
+            return (g1.title > g2.title) - (g1.title < g2.title)
+
+        self.current_category = None
+
+        def filter_games(child, user_data):
+            game = child.game
+            search_text = self.entry_search.get_text().lower()
+            matches_search = search_text in game.title.lower() if search_text else True
+            matches_category = True
+
+            if self.show_categories and self.current_category and self.current_category != _("None"):
+                game_cat = getattr(game, 'category', _("None"))
+                matches_category = (game_cat == self.current_category)
+
+            return matches_search and matches_category
+
+        self.flowbox.set_sort_func(sort_games, None)
+        self.flowbox.set_filter_func(filter_games, None)
+        scroll_box.add(self.flowbox)
+        self.load_games()
+
+        if self.show_categories:
+            scroll_box.set_size_request(350, -1)
+
+            main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            main_hbox.pack_start(scroll_box, True, True, 0)
+
+            sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            sidebar.set_size_request(220, -1)
+            sidebar.set_margin_top(10)
+            sidebar.set_margin_end(10)
+
+            cat_scroll = Gtk.ScrolledWindow()
+            cat_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
+            self.listbox_categories = Gtk.ListBox()
+            self.listbox_categories.connect("row-selected", self.on_category_selected)
+            self.listbox_categories.connect("button-press-event", self.on_category_right_click)
+            self.listbox_categories.get_style_context().add_class("category-list")
+            self.listbox_categories.set_margin_bottom(5)
+            cat_scroll.add(self.listbox_categories)
+            sidebar.pack_start(cat_scroll, True, True, 3)
+
+            self.category_context_menu = Gtk.Menu()
+            menu_add_cat = Gtk.MenuItem(label=_("New"))
+            menu_add_cat.connect("activate", self.on_add_category_clicked)
+            self.category_context_menu.append(menu_add_cat)
+
+            self.menu_edit_cat = Gtk.MenuItem(label=_("Edit"))
+            self.menu_edit_cat.connect("activate", self.on_edit_category_clicked)
+            self.category_context_menu.append(self.menu_edit_cat)
+
+            self.menu_remove_cat = Gtk.MenuItem(label=_("Remove"))
+            self.menu_remove_cat.connect("activate", self.on_remove_category_clicked)
+            self.category_context_menu.append(self.menu_remove_cat)
+            self.category_context_menu.show_all()
+
+            grid_controls = Gtk.Grid()
+            grid_controls.set_column_spacing(10)
+            grid_controls.set_row_spacing(10)
+            grid_controls.set_halign(Gtk.Align.CENTER)
+            grid_controls.set_margin_bottom(10)
+
+            grid_controls.attach(self.entry_search, 0, 0, 4, 1)
+            grid_controls.attach(self.button_add,   0, 1, 1, 1)
+            grid_controls.attach(button_settings,   1, 1, 1, 1)
+            grid_controls.attach(button_kill,       2, 1, 1, 1)
+            grid_controls.attach(self.button_play,  3, 1, 1, 1)
+
+            sidebar.pack_end(grid_controls, False, False, 0)
+            main_hbox.pack_start(sidebar, False, False, 0)
+
+            self.box_main.pack_start(main_hbox, True, True, 0)
+
+            if hasattr(self, 'populate_categories'):
+                self.populate_categories()
+            row = self.listbox_categories.get_row_at_index(0)
+            if row:
+                self.listbox_categories.select_row(row)
+        else:
+            self.box_top.pack_start(scroll_box, True, True, 0)
+
+            grid_controls = Gtk.Grid()
+            grid_controls.set_column_spacing(10)
+            grid_controls.set_margin_top(10)
+            grid_controls.set_margin_bottom(10)
+            grid_controls.set_margin_start(10)
+            grid_controls.set_margin_end(10)
+
+            if is_big:
+                grid_controls.set_halign(Gtk.Align.CENTER)
+            else:
+                self.entry_search.set_hexpand(True)
+
+            grid_controls.attach(self.button_add,   0, 0, 1, 1)
+            grid_controls.attach(button_settings,   1, 0, 1, 1)
+            grid_controls.attach(self.entry_search, 2, 0, 1, 1)
+            grid_controls.attach(button_kill,       3, 0, 1, 1)
+            grid_controls.attach(self.button_play,  4, 0, 1, 1)
+
+            self.box_bottom.pack_start(grid_controls, True, True, 0)
+
+            self.box_main.pack_start(self.box_top, True, True, 0)
+            self.box_main.pack_end(self.box_bottom, False, True, 0)
+
+        self.add(self.box_main)
+
+        self.select_first_child()
+        self.connect("key-press-event", self.on_key_press_event)
+        self.show_all()
+
+        if is_big:
+            self.fullscreen_activated = getattr(self, 'start_fullscreen', False)
+
+    def on_category_right_click(self, widget, event):
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == Gdk.BUTTON_SECONDARY:
+            row = widget.get_row_at_y(int(event.y))
+            if row:
+                widget.select_row(row)
+
+            show_options = False
+            if row:
+                cat_name = getattr(row, 'category_name', None)
+                if cat_name and cat_name != _("None"):
+                    show_options = True
+
+            self.menu_edit_cat.set_visible(show_options)
+            self.menu_remove_cat.set_visible(show_options)
+
+            self.category_context_menu.popup_at_pointer(event)
+            return True
+        return False
+
+    def populate_categories(self):
+        for child in self.listbox_categories.get_children():
+            self.listbox_categories.remove(child)
+
+        categories = []
+        if os.path.exists(categories_file):
+            with open(categories_file, "r", encoding="utf-8") as f:
+                categories = [line.strip() for line in f if line.strip()]
+
+        categories = sorted(categories, key=str.lower)
+
+        row_all = Gtk.ListBoxRow()
+        row_all.set_size_request(-1, 50)
+
+        lbl_all = Gtk.Label(label=_("All"), xalign=0)
+        lbl_all.set_margin_start(10)
+
+        row_all.add(lbl_all)
+        row_all.category_name = _("None")
+        self.listbox_categories.add(row_all)
+
+        for cat in categories:
+            row = Gtk.ListBoxRow()
+            row.set_size_request(-1, 50)
+
+            lbl = Gtk.Label(label=cat, xalign=0)
+            lbl.set_margin_start(10)
+
+            row.add(lbl)
+            row.category_name = cat
+            self.listbox_categories.add(row)
+
+        self.listbox_categories.show_all()
+
+    def on_category_selected(self, listbox, row):
+        if row is None:
+            self.current_category = None
+        else:
+            self.current_category = getattr(row, 'category_name', None)
+
+        self.flowbox.invalidate_filter()
+
+    def _save_categories(self, categories):
+        os.makedirs(os.path.dirname(categories_file), exist_ok=True)
+
+        with open(categories_file, "w", encoding="utf-8") as f:
+            for cat in categories:
+                f.write(f"{cat}\n")
+
+    def _get_current_categories(self):
+        if os.path.exists(categories_file):
+            with open(categories_file, "r", encoding="utf-8") as f:
+                return [line.strip() for line in f if line.strip()]
+
+        return []
+
+    def on_add_category_clicked(self, widget):
+        row = Gtk.ListBoxRow()
+        entry = Gtk.Entry()
+        row.add(entry)
+
+        row.category_name = None
+        row.is_temporary = True
+
+        self.listbox_categories.add(row)
+        self.listbox_categories.show_all()
+        self.listbox_categories.select_row(row)
+
+        entry.grab_focus()
+
+        finished = False
+
+        def finish_add():
+            nonlocal finished
+
+            if finished:
+                return False
+
+            finished = True
+
+            new_cat = entry.get_text().strip()
+
+            if not new_cat:
+                if row.get_parent():
+                    self.listbox_categories.remove(row)
+
+                return False
+
+            categories = self._get_current_categories()
+
+            if new_cat in categories:
+                if row.get_parent():
+                    self.listbox_categories.remove(row)
+
+                return False
+
+            categories.append(new_cat)
+
+            self._save_categories(categories)
+
+            self.populate_categories()
+
+            for child in self.listbox_categories.get_children():
+                if getattr(child, "category_name", None) == new_cat:
+                    self.listbox_categories.select_row(child)
+                    break
+
+            return False
+
+        entry.connect("activate", lambda e: finish_add())
+
+        def on_focus_out(entry, event):
+            widget = Gtk.get_event_widget(event)
+
+            if widget and (
+                widget == entry
+                or entry.is_ancestor(widget)
+            ):
+                return False
+
+            GLib.idle_add(finish_add)
+
+            return False
+
+        entry.connect("focus-out-event", on_focus_out)
+
+    def on_edit_category_clicked(self, widget):
+        selected_row = self.listbox_categories.get_selected_row()
+
+        if not selected_row:
+            return
+
+        old_cat = getattr(selected_row, 'category_name', None)
+
+        if not old_cat or old_cat == _("None"):
+            return
+
+        old_child = selected_row.get_child()
+
+        if isinstance(old_child, Gtk.Entry):
+            return
+
+        old_label = old_child.get_text()
+
+        selected_row.remove(old_child)
+
+        entry = Gtk.Entry()
+        entry.set_text(old_label)
+
+        selected_row.add(entry)
+
+        self.listbox_categories.show_all()
+
+        entry.grab_focus()
+        entry.set_position(-1)
+
+        finished = False
+
+        def restore_label(text):
+            current_child = selected_row.get_child()
+
+            if current_child:
+                selected_row.remove(current_child)
+
+            label = Gtk.Label(label=text, xalign=0)
+            label.set_margin_start(10)
+
+            selected_row.add(label)
+            selected_row.category_name = text
+
+            self.listbox_categories.show_all()
+
+        def finish_edit():
+            nonlocal finished
+
+            if finished:
+                return False
+
+            finished = True
+
+            new_cat = entry.get_text().strip()
+
+            if not new_cat or new_cat == old_cat:
+                restore_label(old_label)
+                return False
+
+            categories = self._get_current_categories()
+
+            if new_cat in categories:
+                restore_label(old_label)
+                return False
+
+            if old_cat in categories:
+                idx = categories.index(old_cat)
+                categories[idx] = new_cat
+
+                self._save_categories(categories)
+
+                try:
+                    with open(games_json, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+
+                    changed = False
+
+                    for item in data:
+                        if item.get("category") == old_cat:
+                            item["category"] = new_cat
+                            changed = True
+
+                    if changed:
+                        with open(games_json, "w", encoding="utf-8") as f:
+                            json.dump(data, f, indent=4, ensure_ascii=False)
+
+                        for flowbox_child in self.flowbox.get_children():
+                            if (
+                                hasattr(flowbox_child, "game")
+                                and getattr(flowbox_child.game, "category", None) == old_cat
+                            ):
+                                flowbox_child.game.category = new_cat
+
+                except Exception:
+                    pass
+
+                self.populate_categories()
+                self.flowbox.invalidate_filter()
+
+                for row in self.listbox_categories.get_children():
+                    if getattr(row, "category_name", None) == new_cat:
+                        self.listbox_categories.select_row(row)
+                        break
+
+            return False
+
+        entry.connect("activate", lambda e: finish_edit())
+
+        entry.connect(
+            "focus-out-event",
+            lambda e, ev: GLib.idle_add(finish_edit)
+        )
+
+    def on_remove_category_clicked(self, widget):
+        selected_row = self.listbox_categories.get_selected_row()
+
+        if not selected_row:
+            return
+
+        cat_to_remove = getattr(selected_row, 'category_name', None)
+
+        if not cat_to_remove or cat_to_remove == _("None"):
+            return
+
+        categories = self._get_current_categories()
+
+        if cat_to_remove in categories:
+            categories.remove(cat_to_remove)
+            self._save_categories(categories)
+
+            try:
+                with open(games_json, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+
+                changed = False
+
+                for item in data:
+                    if item.get("category") == cat_to_remove:
+                        item.pop("category", None)
+                        changed = True
+
+                if changed:
+                    with open(games_json, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=4, ensure_ascii=False)
+
+                    for child in self.flowbox.get_children():
+                        if (
+                            hasattr(child, "game")
+                            and getattr(child.game, "category", None) == cat_to_remove
+                        ):
+                            child.game.category = None
+
+            except Exception:
+                pass
+
+            self.populate_categories()
+            self.flowbox.invalidate_filter()
+
+            row = self.listbox_categories.get_row_at_index(0)
+
+            if row:
+                self.listbox_categories.select_row(row)
 
     def show_power_menu(self, widget):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
@@ -761,9 +1028,9 @@ class Main(Gtk.ApplicationWindow):
                 with open(games_json, "r") as f:
                     data = json.load(f)
 
-                for item in data:
-                    if isinstance(item, dict) and item.get("gameid") == game.gameid:
-                        game.playtime = item.get("playtime", 0)
+                for item_data in data:
+                    if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
+                        game.playtime = item_data.get("playtime", 0)
                         formatted = self.format_playtime(game.playtime)
                         children = self.context_menu.get_children()
 
@@ -802,10 +1069,31 @@ class Main(Gtk.ApplicationWindow):
                 else:
                     self.menu_hide.get_child().set_text(_("Hide"))
 
-                if game.favorite:
-                    self.menu_favorite.get_child().set_text(_("Remove from favorites"))
-                else:
-                    self.menu_favorite.get_child().set_text(_("Add to favorites"))
+                for child in self.submenu_category.get_children():
+                    self.submenu_category.remove(child)
+
+                categories_file = PathManager.user_config('faugus-launcher/categories.txt')
+                categories = []
+
+                if os.path.exists(categories_file):
+                    with open(categories_file, "r", encoding="utf-8") as f:
+                        categories = sorted(
+                            [line.strip() for line in f if line.strip()],
+                            key=str.lower
+                        )
+
+                categories.insert(0, _("None"))
+
+                current_cat = getattr(game, 'category', _("None"))
+                if not current_cat:
+                    current_cat = _("None")
+
+                for cat in categories:
+                    label_text = f"✓ {cat}" if cat == current_cat else f"   {cat}"
+
+                    menu_item = Gtk.MenuItem(label=label_text)
+                    menu_item.connect("activate", self.on_context_menu_category, cat, game.gameid)
+                    self.submenu_category.append(menu_item)
 
                 if game.runner == "Steam":
                     self.menu_duplicate.set_visible(False)
@@ -927,25 +1215,22 @@ class Main(Gtk.ApplicationWindow):
         self.update_list()
         self.select_first_child()
 
-    def on_context_menu_favorite(self, menu_item):
-        selected = self.flowbox.get_selected_children()
-        if not selected:
-            return
-
-        game = selected[0].game
-        if not game:
-            return
-
-        selected_gameid = game.gameid
-
+    def on_context_menu_category(self, menu_item, category_name, selected_gameid):
         try:
             with open(games_json, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             for item in data:
-                if item.get("gameid") == game.gameid:
-                    item["favorite"] = not item.get("favorite", False)
-                    game.favorite = item["favorite"]
+                if item.get("gameid") == selected_gameid:
+                    if category_name == _("None"):
+                        item.pop("category", None)
+                    else:
+                        item["category"] = category_name
+
+                    for child in self.flowbox.get_children():
+                        if hasattr(child, "game") and child.game.gameid == selected_gameid:
+                            child.game.category = item.get("category")
+                            break
                     break
 
             with open(games_json, "w", encoding="utf-8") as f:
@@ -954,7 +1239,7 @@ class Main(Gtk.ApplicationWindow):
         except Exception as e:
             return
 
-        self.update_list()
+        self.flowbox.invalidate_filter()
 
         for child in self.flowbox.get_children():
             if hasattr(child, "game") and child.game.gameid == selected_gameid:
@@ -1233,7 +1518,7 @@ class Main(Gtk.ApplicationWindow):
             "playtime": game.playtime,
             "hidden": game.hidden,
             "prevent_sleep": game.prevent_sleep,
-            "favorite": game.favorite,
+            "category": game.category,
         }
 
         games = []
@@ -1339,13 +1624,20 @@ class Main(Gtk.ApplicationWindow):
         game = self.selected()
         if not game:
             return
+
         gameid = game.gameid
         title = game.title
 
         selected = self.flowbox.get_selected_children()
-        if selected:
-            child = selected[0]
+
+        if not selected:
+            return
+
+        child = selected[0]
         current_focus = self.get_focus()
+
+        if not child.is_focus():
+            return
 
         if event.keyval in (Gdk.KEY_Up, Gdk.KEY_Down, Gdk.KEY_Left, Gdk.KEY_Right):
             if current_focus not in self.flowbox.get_children():
@@ -1356,22 +1648,25 @@ class Main(Gtk.ApplicationWindow):
                 self.running_dialog(title)
             else:
                 self.on_button_play_clicked()
-        elif event.keyval == Gdk.KEY_Delete:
+
+        if event.keyval == Gdk.KEY_Delete:
             self.on_button_delete_clicked()
 
-        if event.string:
-            if event.string.isprintable():
-                self.entry_search.grab_focus()
-                current_text = self.entry_search.get_text()
-                new_text = current_text + event.string
-                self.entry_search.set_text(new_text)
-                self.entry_search.set_position(len(new_text))
-            elif event.keyval == Gdk.KEY_BackSpace:
-                self.entry_search.grab_focus()
-                current_text = self.entry_search.get_text()
-                new_text = current_text[:-1]
-                self.entry_search.set_text(new_text)
-                self.entry_search.set_position(len(new_text))
+        if event.keyval == Gdk.KEY_Tab:
+            current_focus = self.get_focus()
+
+            if current_focus in self.flowbox.get_children():
+                row = self.listbox_categories.get_selected_row()
+
+                if row:
+                    row.grab_focus()
+
+            else:
+                selected = self.flowbox.get_selected_children()
+
+                if selected:
+                    selected[0].grab_focus()
+
             return True
 
         return False
@@ -1438,6 +1733,7 @@ class Main(Gtk.ApplicationWindow):
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
+        self.show_categories = cfg.config.get('show-categories', 'False') == 'True'
 
         if self.enable_logging:
             if self.menu_show_logs not in self.context_menu.get_children():
@@ -1480,7 +1776,7 @@ class Main(Gtk.ApplicationWindow):
                         game_data.get("playtime", 0),
                         game_data.get("hidden", False),
                         game_data.get("prevent_sleep", False),
-                        game_data.get("favorite", False)
+                        game_data.get("category", False)
                     )
 
                     if not self.show_hidden and game.hidden:
@@ -1509,10 +1805,7 @@ class Main(Gtk.ApplicationWindow):
         if self.interface_mode == "Banners":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        if game.favorite:
-            hbox.get_style_context().add_class("hbox-favorite")
-        else:
-            hbox.get_style_context().add_class("hbox-normal")
+        hbox.get_style_context().add_class("game")
 
         game_icon = f'{icons_dir}/{game.gameid}.ico'
         if not os.path.isfile(game_icon):
@@ -1580,6 +1873,7 @@ class Main(Gtk.ApplicationWindow):
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
         if self.interface_mode == "Banners":
+            hbox.get_style_context().add_class("banner-border")
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
@@ -1674,19 +1968,12 @@ class Main(Gtk.ApplicationWindow):
         return os.path.exists(game.path)
 
     def on_search_changed(self, entry):
-        search_text = entry.get_text().lower()
-        first_visible = None
+        self.flowbox.invalidate_filter()
 
         for child in self.flowbox.get_children():
-            game = child.game
-            is_match = search_text in game.title.lower()
-
-            child.set_visible(is_match)
-            if is_match and first_visible is None:
-                first_visible = child
-
-        if first_visible:
-            self.flowbox.select_child(first_visible)
+            if child.get_visible():
+                self.flowbox.select_child(child)
+                break
 
     def on_button_settings_clicked(self, widget):
         # Handle add button click event
@@ -1740,6 +2027,9 @@ class Main(Gtk.ApplicationWindow):
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
+                if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 settings_dialog.update_envar_file()
@@ -2270,7 +2560,7 @@ class Main(Gtk.ApplicationWindow):
             lossless_present = add_game_dialog.lossless_present
             playtime = 0
             hidden = False
-            favorite = False
+            category = False
 
             if launcher_id == "battle":
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
@@ -2349,7 +2639,7 @@ class Main(Gtk.ApplicationWindow):
                 playtime,
                 hidden,
                 prevent_sleep,
-                favorite,
+                category,
             )
 
             # Determine the state of the shortcut checkbox
@@ -2408,7 +2698,7 @@ class Main(Gtk.ApplicationWindow):
                 "playtime": playtime,
                 "hidden": hidden,
                 "prevent_sleep": prevent_sleep,
-                "favorite": favorite,
+                "category": category,
             }
 
             games = []
@@ -3066,7 +3356,7 @@ class Main(Gtk.ApplicationWindow):
                     "playtime": game.playtime,
                     "hidden": hidden,
                     "prevent_sleep": game.prevent_sleep,
-                    "favorite": game.favorite,
+                    "category": game.category,
                 }
 
             new_games_data.append(game_data)
@@ -3124,6 +3414,12 @@ class Settings(Gtk.Dialog):
         .kofi {
             color: white;
             background: #1AC0FF;
+        }
+        .envar-list {
+            background-color: alpha(@theme_base_color, 0.5);
+        }
+        .envar-list row {
+            background-color: transparent;
         }
         """
         css_provider.load_from_data(css.encode('utf-8'))
@@ -3325,6 +3621,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_logging = Gtk.CheckButton(label=_("Enable logging"))
         self.checkbox_enable_logging.set_active(False)
 
+        self.checkbox_show_categories = Gtk.CheckButton(label=_("Show categories menu"))
+
         self.checkbox_show_hidden = Gtk.CheckButton(label=_("Show hidden games"))
         self.checkbox_show_hidden.set_tooltip_text(_("Press Ctrl+H to show/hide games."))
 
@@ -3409,6 +3707,7 @@ class Settings(Gtk.Dialog):
         treeview.set_has_tooltip(True)
         treeview.connect("query-tooltip", self.on_query_tooltip)
         treeview.connect("key-press-event", self.on_envar_key_press)
+        treeview.get_style_context().add_class("envar-list")
 
         renderer = Gtk.CellRendererText()
         renderer.set_property("editable", True)
@@ -3592,15 +3891,16 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 1, 1, 1)
         grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_categories, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 13, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -3901,6 +4201,7 @@ class Settings(Gtk.Dialog):
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("start-minimized", self.checkbox_start_minimized.get_active())
+        config.set_value("show-categories", self.checkbox_show_categories.get_active())
         config.save_config()
 
         self.set_sensitive(False)
@@ -4337,6 +4638,7 @@ class Settings(Gtk.Dialog):
         self.language = cfg.config.get('language', '')
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
         start_minimized = cfg.config.get('start-minimized', 'False') == 'True'
+        show_categories = cfg.config.get('show-categories', 'False') == 'True'
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
@@ -4379,6 +4681,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_wow64.set_active(enable_wow64)
         self.combobox_interface.set_active_id(self.interface_mode)
         self.checkbox_start_minimized.set_active(start_minimized)
+        self.checkbox_show_categories.set_active(show_categories)
 
         model_language = self.combobox_language.get_model()
         index_language = 0
@@ -4439,7 +4742,7 @@ class Game:
         playtime,
         hidden,
         prevent_sleep,
-        favorite,
+        category,
     ):
         self.gameid = gameid
         self.title = title
@@ -4467,7 +4770,7 @@ class Game:
         self.playtime = playtime
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
-        self.favorite = favorite
+        self.category = category
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -6500,6 +6803,13 @@ def update_games_json():
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+        if "favorite" in game:
+            if game["favorite"] == True:
+                game["category"] = _("Favorites")
+
+            game.pop("favorite")
             changed = True
 
     if changed:
