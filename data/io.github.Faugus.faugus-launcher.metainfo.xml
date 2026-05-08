@@ -75,7 +75,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/30c7f02/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/22345b7/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -88,10 +88,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.18.12-1" date="2026-05-03">
+    <release version="1.19.1-1" date="2026-05-08">
       <description>
         <ul>
-          <li>Hotfix compatibilitytools detection.</li>
+          <li>Removed Favorites.</li>
+          <li>Now allows relative paths in launch argurments.</li>
+          <li>Updated Spanish translation.</li>
+          <li>Updated Portuguese translation.</li>
+          <li>Added Categories menu.</li>
         </ul>
       </description>
     </release>
