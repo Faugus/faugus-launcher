@@ -2465,6 +2465,9 @@ class Main(Gtk.ApplicationWindow):
             self.remove_steam_shortcut(title)
             self.remove_banner_icon(game)
 
+            if os.path.exists(game.addapp_bat):
+                os.remove(game.addapp_bat)
+
             self._deleted_gameid = gameid
             self.save_games()
             self.update_list()
@@ -3331,8 +3334,7 @@ class Main(Gtk.ApplicationWindow):
     def remove_shortcut(self, game, shortcut):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
         desktop_shortcut_path = f"{desktop_dir}/{game.gameid}.desktop"
-        if os.path.exists(game.addapp_bat):
-            os.remove(game.addapp_bat)
+
         if shortcut == "appmenu":
             if os.path.exists(applications_shortcut_path):
                 os.remove(applications_shortcut_path)
