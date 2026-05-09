@@ -558,8 +558,19 @@ class Main(Gtk.ApplicationWindow):
             matches_category = True
 
             if self.show_categories and self.current_category and self.current_category != _("None"):
-                game_cat = getattr(game, 'category', _("None"))
-                matches_category = (game_cat == self.current_category)
+                raw_cat = getattr(game, 'category', [])
+
+                if isinstance(raw_cat, str):
+                    game_cats = [raw_cat]
+                elif isinstance(raw_cat, list):
+                    game_cats = raw_cat
+                else:
+                    game_cats = []
+
+                if not game_cats:
+                    game_cats = [_("None")]
+
+                matches_category = (self.current_category in game_cats)
 
             return matches_search and matches_category
 
@@ -885,8 +896,14 @@ class Main(Gtk.ApplicationWindow):
                     changed = False
 
                     for item in data:
-                        if item.get("category") == old_cat:
-                            item["category"] = new_cat
+                        raw_cat = item.get("category", [])
+
+                        if isinstance(raw_cat, str) and raw_cat == old_cat:
+                            item["category"] = [new_cat]
+                            changed = True
+                        elif isinstance(raw_cat, list) and old_cat in raw_cat:
+                            raw_cat = [new_cat if c == old_cat else c for c in raw_cat]
+                            item["category"] = list(dict.fromkeys(raw_cat))
                             changed = True
 
                     if changed:
@@ -894,11 +911,13 @@ class Main(Gtk.ApplicationWindow):
                             json.dump(data, f, indent=4, ensure_ascii=False)
 
                         for flowbox_child in self.flowbox.get_children():
-                            if (
-                                hasattr(flowbox_child, "game")
-                                and getattr(flowbox_child.game, "category", None) == old_cat
-                            ):
-                                flowbox_child.game.category = new_cat
+                            if hasattr(flowbox_child, "game"):
+                                child_cat = getattr(flowbox_child.game, "category", [])
+                                if isinstance(child_cat, str) and child_cat == old_cat:
+                                    flowbox_child.game.category = [new_cat]
+                                elif isinstance(child_cat, list) and old_cat in child_cat:
+                                    child_cat = [new_cat if c == old_cat else c for c in child_cat]
+                                    flowbox_child.game.category = list(dict.fromkeys(child_cat))
 
                 except Exception:
                     pass
@@ -944,8 +963,17 @@ class Main(Gtk.ApplicationWindow):
                 changed = False
 
                 for item in data:
-                    if item.get("category") == cat_to_remove:
+                    raw_cat = item.get("category", [])
+
+                    if isinstance(raw_cat, str) and raw_cat == cat_to_remove:
                         item.pop("category", None)
+                        changed = True
+                    elif isinstance(raw_cat, list) and cat_to_remove in raw_cat:
+                        raw_cat.remove(cat_to_remove)
+                        if not raw_cat:
+                            item.pop("category", None)
+                        else:
+                            item["category"] = raw_cat
                         changed = True
 
                 if changed:
@@ -953,11 +981,13 @@ class Main(Gtk.ApplicationWindow):
                         json.dump(data, f, indent=4, ensure_ascii=False)
 
                     for child in self.flowbox.get_children():
-                        if (
-                            hasattr(child, "game")
-                            and getattr(child.game, "category", None) == cat_to_remove
-                        ):
-                            child.game.category = None
+                        if hasattr(child, "game"):
+                            child_cat = getattr(child.game, "category", [])
+                            if isinstance(child_cat, str) and child_cat == cat_to_remove:
+                                child.game.category = []
+                            elif isinstance(child_cat, list) and cat_to_remove in child_cat:
+                                child_cat.remove(cat_to_remove)
+                                child.game.category = child_cat
 
             except Exception:
                 pass
@@ -1084,12 +1114,19 @@ class Main(Gtk.ApplicationWindow):
 
                 categories.insert(0, _("None"))
 
-                current_cat = getattr(game, 'category', _("None"))
-                if not current_cat:
-                    current_cat = _("None")
+                raw_cat = getattr(game, 'category', [])
+                if isinstance(raw_cat, str):
+                    current_cats = [raw_cat]
+                elif isinstance(raw_cat, list):
+                    current_cats = raw_cat
+                else:
+                    current_cats = []
+
+                if not current_cats:
+                    current_cats = [_("None")]
 
                 for cat in categories:
-                    label_text = f"✓ {cat}" if cat == current_cat else f"   {cat}"
+                    label_text = f"✓ {cat}" if cat in current_cats else f"   {cat}"
 
                     menu_item = Gtk.MenuItem(label=label_text)
                     menu_item.connect("activate", self.on_context_menu_category, cat, game.gameid)
@@ -1222,14 +1259,30 @@ class Main(Gtk.ApplicationWindow):
 
             for item in data:
                 if item.get("gameid") == selected_gameid:
+                    raw_cat = item.get("category", [])
+                    if isinstance(raw_cat, str):
+                        current_cats = [raw_cat]
+                    elif isinstance(raw_cat, list):
+                        current_cats = raw_cat.copy()
+                    else:
+                        current_cats = []
+
                     if category_name == _("None"):
+                        current_cats = []
+                    else:
+                        if category_name in current_cats:
+                            current_cats.remove(category_name)
+                        else:
+                            current_cats.append(category_name)
+
+                    if not current_cats:
                         item.pop("category", None)
                     else:
-                        item["category"] = category_name
+                        item["category"] = current_cats
 
                     for child in self.flowbox.get_children():
                         if hasattr(child, "game") and child.game.gameid == selected_gameid:
-                            child.game.category = item.get("category")
+                            child.game.category = current_cats if current_cats else None
                             break
                     break
 
