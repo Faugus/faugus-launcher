@@ -171,9 +171,9 @@ class FaugusRun:
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
-            if protonpath == "Linux-Native":
+            elif protonpath == "Linux-Native":
                 pass
-            if protonpath == "Steam":
+            elif protonpath == "Steam":
                 pass
             else:
                 protonpath_path = compatibility_dir / protonpath
@@ -474,6 +474,7 @@ class FaugusRun:
         sys.exit()
 
     def extract_env_from_message(self):
+
         tokens = shlex.split(self.message, posix=True)
         new_tokens = []
 
@@ -488,6 +489,7 @@ class FaugusRun:
             new_tokens.append(token)
 
         self.message = " ".join(shlex.quote(t) for t in new_tokens)
+
 
     def load_env_from_file(self, filename=envar_dir):
         env_from_file = {}
@@ -813,6 +815,9 @@ def build_launch_command(game):
     lossless_performance = game.get("lossless_performance", "")
     lossless_hdr = game.get("lossless_hdr", "")
     lossless_present = game.get("lossless_present", "")
+    gamescope = game.get("gamescope", "")
+    fsr41 = game.get("fsr41", "")
+    nvapi = game.get("nvapi", "")
 
     if lossless_performance:
         lossless_performance = 1
@@ -834,6 +839,13 @@ def build_launch_command(game):
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if prevent_sleep:
         command_parts.append("PREVENT_SLEEP=1")
+    if gamescope:
+        command_parts.append("__GAMESCOPE_INTEGRATION_FORCE=1")
+        command_parts.append("__GAMESCOPE_INTEGRATION_GAMER_MODE=1")
+    if fsr41:
+        command_parts.append("FSR4_UPGRADE=1")
+    if nvapi:
+        command_parts.append("NVAPI_OVERRIDE_CONFIG=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
         command_parts.append(f"FAUGUSID={game['gameid']}")
@@ -841,7 +853,7 @@ def build_launch_command(game):
         command_parts.append(f"GAMEID={game['gameid']}")
     if runner:
         if runner == "Linux-Native":
-            command_parts.append('PROTONPATH=umu-sniper')
+            pass # Use host environment for native games/scripts
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={proton_cachyos}")
@@ -878,7 +890,7 @@ def build_launch_command(game):
     if mangohud and os.path.exists(mangohud_dir):
         command_parts.append("mangohud")
 
-    if runner != "Steam":
+    if runner != "Steam" and runner != "Linux-Native":
         command_parts.append(f"'{umu_run}'")
 
     if addapp_checkbox == "addapp_enabled":

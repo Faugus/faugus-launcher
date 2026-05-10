@@ -1,6 +1,7 @@
 install_data(
   'faugus-banner.png',
   'faugus-notification.ogg',
+  'bellum.png',
 )
 
 install_data(

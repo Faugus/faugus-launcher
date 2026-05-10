@@ -26,6 +26,7 @@ VERSION = "1.19.2"
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
+bellum_asset_icon = PathManager.system_data('faugus-launcher/bellum.png')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = PathManager.user_home('Faugus')
@@ -2395,6 +2396,21 @@ class Main(Gtk.ApplicationWindow):
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
 
+            if getattr(game, "gamescope", False) == True:
+                edit_game_dialog.checkbox_gamescope.set_active(True)
+            else:
+                edit_game_dialog.checkbox_gamescope.set_active(False)
+
+            if getattr(game, "fsr41", False) == True:
+                edit_game_dialog.checkbox_fsr41.set_active(True)
+            else:
+                edit_game_dialog.checkbox_fsr41.set_active(False)
+
+            if getattr(game, "nvapi", False) == True:
+                edit_game_dialog.checkbox_nvapi.set_active(True)
+            else:
+                edit_game_dialog.checkbox_nvapi.set_active(False)
+
             self.updated_steam_id = detect_steam_id()
             if self.updated_steam_id is not None:
                 if self.check_steam_shortcut(title):
@@ -2667,6 +2683,8 @@ class Main(Gtk.ApplicationWindow):
                 path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
             if launcher_id == "wargaming":
                 path = f"{prefix}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
+            if launcher_id == "bellum":
+                path = "/usr/local/bin/Bellum"
 
             title_formatted = format_title(title)
 
@@ -2685,7 +2703,7 @@ class Main(Gtk.ApplicationWindow):
                 banner = ""
 
             runner = convert_runner(runner)
-            if launcher_id == "linux":
+            if launcher_id in ("linux", "bellum"):
                 runner = "Linux-Native"
             if launcher_id == "steam":
                 runner = "Steam"
@@ -2703,6 +2721,9 @@ class Main(Gtk.ApplicationWindow):
                 disable_hidraw = True if add_game_dialog.checkbox_disable_hidraw.get_active() else ""
                 addapp_checkbox = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
                 prevent_sleep = True if add_game_dialog.checkbox_prevent_sleep.get_active() else ""
+                gamescope = True if add_game_dialog.checkbox_gamescope.get_active() else ""
+                fsr41 = True if add_game_dialog.checkbox_fsr41.get_active() else ""
+                nvapi = True if add_game_dialog.checkbox_nvapi.get_active() else ""
 
             # Create Game object and update UI
             game = Game(
@@ -2729,10 +2750,13 @@ class Main(Gtk.ApplicationWindow):
                 lossless_performance,
                 lossless_hdr,
                 lossless_present,
-                playtime,
-                hidden,
+                0,
+                False,
                 prevent_sleep,
-                category,
+                "",
+                gamescope,
+                fsr41,
+                nvapi,
             )
 
             # Determine the state of the shortcut checkbox
@@ -2742,6 +2766,8 @@ class Main(Gtk.ApplicationWindow):
 
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
+            if launcher_id == "bellum":
+                icon_final = os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/bellum.png")
 
             def check_internet_connection():
                 import socket
@@ -2756,7 +2782,7 @@ class Main(Gtk.ApplicationWindow):
                     self.show_warning_dialog_main(add_game_dialog, _("No internet connection."), "")
                     return True
 
-                if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
+                if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming", "bellum"):
                     add_game_dialog.destroy()
                     self.launcher_screen(
                         title, launcher_id, title_formatted, runner, prefix, umu_run,
@@ -2912,6 +2938,10 @@ class Main(Gtk.ApplicationWindow):
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
             self.download_launcher("wargaming", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
+        elif launcher == "bellum":
+            self.label_download.set_text(_("Downloading") + " Bellum Launcher...")
+            self.download_launcher("bellum", title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+
         grid_launcher.attach(grid_labels, 0, 1, 1, 1)
         grid_labels.attach(self.label_download, 0, 0, 1, 1)
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
@@ -2923,11 +2953,57 @@ class Main(Gtk.ApplicationWindow):
         self.box_main.show_all()
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
+        try:
+            line = processo.stdout.readline()
+            if line:
+                clean_line = line.strip()
+                
+                # Special handling for Bellum progress
+                if game.gameid == "bellum":
+                    GLib.idle_add(self.label_download2.set_text, _("Please be patient while the Bellum Launcher pre-requisites are installed, the Astarte Launcher installer will appear once this is finished."))
+                    
+                    progress_map = {
+                        "Starting precheck phase...": 0.1,
+                        "Starting installation phase...": 0.2,
+                        "Initializing WINEPREFIX": 0.3,
+                        "Installing vcrun2026": 0.4,
+                        "Installing dotnet9": 0.6,
+                        "Installing dxvk": 0.8,
+                        "Starting launcher setup": 0.9,
+                        "Installation completed successfully": 1.0
+                    }
+                    
+                    for key, val in progress_map.items():
+                        if key in clean_line:
+                            GLib.idle_add(self.bar_download.set_fraction, val)
+                            GLib.idle_add(self.bar_download.set_text, f"{int(val * 100)}%")
+                            break
+                
+                # Ignore runner internal messages and warnings for other games
+                elif clean_line and "Warning" not in clean_line and "libayatana" not in clean_line and "Processed message" not in clean_line and "Runner received message" not in clean_line:
+                    snippet = clean_line if len(clean_line) < 60 else "..." + clean_line[-57:]
+                    GLib.idle_add(self.label_download2.set_text, snippet)
+        except (IOError, AttributeError):
+            pass
+
+        # Drain any remaining buffered output before checking exit to prevent race condition
+        # where error output is lost between readline() and poll()
+        try:
+            while True:
+                extra = processo.stdout.readline()
+                if not extra:
+                    break
+        except (IOError, AttributeError):
+            pass
+
         retcode = processo.poll()
 
         if retcode is not None:
-            if os.path.exists(faugus_temp):
-                shutil.rmtree(faugus_temp)
+            if retcode != 0:
+                self.label_download2.set_text(_("Installation failed (exit code %d)! Check ~/.config/faugus-launcher/logs/ for details.") % retcode)
+            else:
+                if os.path.exists(faugus_temp):
+                    shutil.rmtree(faugus_temp)
             self.box_main.pack_start(self.box_top, True, True, 0)
             self.box_main.pack_end(self.box_bottom, False, True, 0)
             self.box_main.remove(self.box_launcher)
@@ -2938,7 +3014,11 @@ class Main(Gtk.ApplicationWindow):
                 game.path = update_ea_path(game.prefix)
 
             if os.path.exists(game.path):
-                extracted_icon = self.extract_best_icon(game.path, game.gameid)
+                if game.gameid == "bellum":
+                    # Use the icon installed by the Go installer
+                    extracted_icon = os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/bellum.png")
+                else:
+                    extracted_icon = self.extract_best_icon(game.path, game.gameid)
 
                 if extracted_icon:
                     icon_temp = extracted_icon
@@ -3020,11 +3100,14 @@ class Main(Gtk.ApplicationWindow):
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
                 "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
                 "rockstar": "https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe",
-                "wargaming": "https://redirect.wargaming.net/WGC/Wargaming_Game_Center_Install_NA.exe"}
+                "wargaming": "https://redirect.wargaming.net/WGC/Wargaming_Game_Center_Install_NA.exe",
+                "bellum": "https://github.com/joepaji/bellum-linux-installer/releases/download/v2.0.0/bellum-installer-linux-amd64-2.0.0.tar.gz"}
 
             file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
                 "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe",
-                "rockstar": "Rockstar-Games-Launcher.exe", "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
+                "rockstar": "Rockstar-Games-Launcher.exe", "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe",
+                "bellum": "bellum-installer.tar.gz"}
+
 
             if launcher not in urls:
                 return None
@@ -3040,6 +3123,7 @@ class Main(Gtk.ApplicationWindow):
                     GLib.idle_add(self.bar_download.set_text, f"{int(percent * 100)}%")
 
             def start_download():
+
                 try:
                     import urllib.request
                     urllib.request.urlretrieve(urls[launcher], file_path, reporthook=report_progress)
@@ -3070,16 +3154,47 @@ class Main(Gtk.ApplicationWindow):
                 elif launcher == "wargaming":
                     self.label_download2.set_text(_("Please close Wargaming to finish the installation."))
                     command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /SILENT"
+                elif launcher == "bellum":
+                    self.label_download.set_text(_("Please wait while Bellum is installed..."))
+                    self.label_download2.set_text(_("Please be patient while the Bellum Launcher pre-requisites are installed, the Astarte Launcher installer will appear once this is finished."))
+                    self.bar_download.set_visible(True)
+                    self.bar_download.set_fraction(0.05)
+                    import tarfile, shutil
+                    with tarfile.open(file_path, "r:gz") as tar:
+                        tar.extractall(path=faugus_temp)
+                    # Find the extracted directory (e.g., bellum-installer-linux-amd64-x.x.x)
+                    extracted_dirs = [d for d in os.listdir(faugus_temp) if d.startswith("bellum-installer-") and os.path.isdir(os.path.join(faugus_temp, d))]
+                    if not extracted_dirs:
+                        raise Exception("Could not find extracted installer directory")
+                    
+                    extracted_dir = os.path.join(faugus_temp, extracted_dirs[0])
+                    installer_bin = os.path.join(extracted_dir, "installer")
+                    os.chmod(installer_bin, 0o755)
+                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} '{installer_bin}' --silent"
+                    if game.fsr41:
+                        command += " --fsr41"
+                
 
                 if runner:
-                    if runner == "Proton-CachyOS (System)":
+                    if runner in ("Proton-CachyOS (System)", "Linux-Native"):
                         command = f"PROTONPATH='{proton_cachyos}' {command}"
                     else:
                         command = f"PROTONPATH='{runner}' {command}"
 
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
-                processo = subprocess.Popen([sys.executable, "-m", "faugus.runner", command])
+
+                processo = subprocess.Popen(
+                    [sys.executable, "-u", "-m", "faugus.runner", command],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+                import fcntl
+                flags = fcntl.fcntl(processo.stdout, fcntl.F_GETFL)
+                fcntl.fcntl(processo.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+                
                 GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
             threading.Thread(target=start_download).start()
@@ -3114,6 +3229,9 @@ class Main(Gtk.ApplicationWindow):
             game.lossless_hdr = edit_game_dialog.lossless_hdr
             game.lossless_present = edit_game_dialog.lossless_present
             game.prevent_sleep = edit_game_dialog.checkbox_prevent_sleep.get_active()
+            game.gamescope = edit_game_dialog.checkbox_gamescope.get_active()
+            game.fsr41 = edit_game_dialog.checkbox_fsr41.get_active()
+            game.nvapi = edit_game_dialog.checkbox_nvapi.get_active()
 
             title_formatted = format_title(game.title)
 
@@ -4835,6 +4953,9 @@ class Game:
         hidden,
         prevent_sleep,
         category,
+        gamescope=False,
+        fsr41=False,
+        nvapi=False,
     ):
         self.gameid = gameid
         self.title = title
@@ -4863,6 +4984,9 @@ class Game:
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
         self.category = category
+        self.gamescope = gamescope
+        self.fsr41 = fsr41
+        self.nvapi = nvapi
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -4969,7 +5093,7 @@ class DeleteDialog(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
 
         box_top.pack_start(label, True, True, 0)
-        if os.path.basename(prefix) != "default" and runner != "Linux-Native" and runner != "Steam":
+        if os.path.basename(prefix) != "default" and runner != "Steam":
             box_top.pack_start(self.checkbox, True, True, 0)
             box_top.pack_start(prefix_label, True, True, 0)
             if pfx_count > 0:
@@ -5270,6 +5394,9 @@ class AddGame(Gtk.Dialog):
         self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
+        self.checkbox_gamescope = Gtk.CheckButton(label=_("Gamescope (Gamer Mode)"))
+        self.checkbox_fsr41 = Gtk.CheckButton(label=_("FSR 4.1 Upgrade"))
+        self.checkbox_nvapi = Gtk.CheckButton(label=_("NVAPI Override"))
 
         # Button for Winecfg
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -5481,6 +5608,12 @@ class AddGame(Gtk.Dialog):
         self.checkbox_prevent_sleep.set_hexpand(True)
         self.grid_tools.attach(self.checkbox_disable_hidraw, 0, 3, 1, 1)
         self.checkbox_disable_hidraw.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_gamescope, 1, 0, 1, 1)
+        self.checkbox_gamescope.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_fsr41, 1, 1, 1, 1)
+        self.checkbox_fsr41.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_nvapi, 1, 2, 1, 1)
+        self.checkbox_nvapi.set_hexpand(True)
         self.grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
         page2.add(self.grid_protonfix)
@@ -6226,6 +6359,20 @@ class AddGame(Gtk.Dialog):
             elif active_id == "wargaming":
                 path = "drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
 
+            elif active_id == "bellum":
+                self.entry_launch_arguments.set_text("PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1")
+                path = "drive_c/users/steamuser/AppData/Local/Astarte Industries/Astarte Launcher/AstarteLauncher.exe"
+                # Use the bundled Bellum icon asset for the preview
+                if os.path.exists(bellum_asset_icon):
+                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon(bellum_asset_icon))
+                    self.button_shortcut_icon.set_visible(True)
+                else:
+                    # Fallback to system icon if asset is missing for some reason
+                    bellum_icon = os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps/bellum.png")
+                    if os.path.exists(bellum_icon):
+                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon(bellum_icon))
+                        self.button_shortcut_icon.set_visible(True)
+
             else:
                 path = ""
 
@@ -6251,6 +6398,7 @@ class AddGame(Gtk.Dialog):
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
+        self.combobox_launcher.append("bellum", "Bellum Launcher")
 
     def populate_combobox_with_runners(self):
         # List of default entries
@@ -6390,10 +6538,12 @@ class AddGame(Gtk.Dialog):
         import webbrowser
         webbrowser.open("https://umu.openwinecomponents.org/")
 
-    def set_image_shortcut_icon(self):
+    def set_image_shortcut_icon(self, image_path=None):
 
-        image_path = faugus_png
-        shutil.copyfile(image_path, self.icon_temp)
+        if image_path:
+            shutil.copyfile(image_path, self.icon_temp)
+        elif not os.path.exists(self.icon_temp):
+            shutil.copyfile(faugus_png, self.icon_temp)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
