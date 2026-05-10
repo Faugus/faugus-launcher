@@ -41,6 +41,8 @@ faugus_notification = PathManager.system_data('faugus-launcher/faugus-notificati
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
 be_dir = PathManager.user_config("faugus-launcher/components/be")
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
+mangohud_dir = PathManager.find_binary('mangohud')
+gamemoderun = PathManager.find_binary('gamemoderun')
 
 compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
@@ -871,9 +873,9 @@ def build_launch_command(game):
             command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     if launch_arguments:
         command_parts.append(os.path.expanduser(launch_arguments))
-    if gamemode:
+    if gamemode and os.path.exists(gamemoderun):
         command_parts.append("gamemoderun")
-    if mangohud:
+    if mangohud and os.path.exists(mangohud_dir):
         command_parts.append("mangohud")
 
     if runner != "Steam":
