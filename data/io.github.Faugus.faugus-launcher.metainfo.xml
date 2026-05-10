@@ -88,16 +88,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.19.2-1" date="2026-05-08">
+    <release version="1.19.3-1" date="2026-05-10">
       <description>
         <ul>
-          <li>Fixed app menu shortcut path.</li>
-          <li>Removed Favorites.</li>
-          <li>Now allows relative paths in launch arguments.</li>
-          <li>Updated Spanish translation.</li>
-          <li>Updated Italian translation.</li>
+          <li>Now games can have multiple categories.</li>
+          <li>Now checks the installation of mangohud and gamemode when running a game.</li>
+          <li>Fixed additional application bat file being removed when editing an entry.</li>
           <li>Updated Portuguese translation.</li>
-          <li>Added Categories menu.</li>
+          <li>Added an option to show Uncategorized games.</li>
         </ul>
       </description>
     </release>
