@@ -230,6 +230,7 @@ class Main(Gtk.ApplicationWindow):
             }
             .category-list row:selected:focus {
                 background-color: @theme_selected_bg_color;
+                outline: none;
             }
         """)
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), self.provider,
