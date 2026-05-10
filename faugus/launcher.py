@@ -567,10 +567,12 @@ class Main(Gtk.ApplicationWindow):
                 else:
                     game_cats = []
 
-                if not game_cats:
-                    game_cats = [_("None")]
-
-                matches_category = (self.current_category in game_cats)
+                if self.current_category == _("Uncategorized"):
+                    matches_category = not game_cats or game_cats == [_("None")]
+                else:
+                    if not game_cats:
+                        game_cats = [_("None")]
+                    matches_category = (self.current_category in game_cats)
 
             return matches_search and matches_category
 
@@ -613,6 +615,13 @@ class Main(Gtk.ApplicationWindow):
             self.menu_remove_cat = Gtk.MenuItem(label=_("Remove"))
             self.menu_remove_cat.connect("activate", self.on_remove_category_clicked)
             self.category_context_menu.append(self.menu_remove_cat)
+
+            self.menu_toggle_uncat = Gtk.CheckMenuItem(label=_("Show Uncategorized"))
+            self.menu_toggle_uncat.set_active(False)
+            self.show_uncategorized = False
+            self.menu_toggle_uncat.connect("toggled", self.on_toggle_uncategorized)
+            self.category_context_menu.append(self.menu_toggle_uncat)
+
             self.category_context_menu.show_all()
 
             grid_controls = Gtk.Grid()
@@ -681,7 +690,7 @@ class Main(Gtk.ApplicationWindow):
             show_options = False
             if row:
                 cat_name = getattr(row, 'category_name', None)
-                if cat_name and cat_name != _("None"):
+                if cat_name and cat_name not in [_("None"), _("Uncategorized")]:
                     show_options = True
 
             self.menu_edit_cat.set_visible(show_options)
@@ -712,6 +721,17 @@ class Main(Gtk.ApplicationWindow):
         row_all.category_name = _("None")
         self.listbox_categories.add(row_all)
 
+        if getattr(self, 'show_uncategorized', False):
+            row_uncat = Gtk.ListBoxRow()
+            row_uncat.set_size_request(-1, 50)
+
+            lbl_uncat = Gtk.Label(label=_("Uncategorized"), xalign=0)
+            lbl_uncat.set_margin_start(10)
+
+            row_uncat.add(lbl_uncat)
+            row_uncat.category_name = _("Uncategorized")
+            self.listbox_categories.add(row_uncat)
+
         for cat in categories:
             row = Gtk.ListBoxRow()
             row.set_size_request(-1, 50)
@@ -724,6 +744,20 @@ class Main(Gtk.ApplicationWindow):
             self.listbox_categories.add(row)
 
         self.listbox_categories.show_all()
+
+    def on_toggle_uncategorized(self, widget):
+        self.show_uncategorized = widget.get_active()
+
+        target_cat = self.current_category
+        if not self.show_uncategorized and target_cat == _("Uncategorized"):
+            target_cat = _("None")
+
+        self.populate_categories()
+
+        for row in self.listbox_categories.get_children():
+            if getattr(row, 'category_name', None) == target_cat:
+                self.listbox_categories.select_row(row)
+                break
 
     def on_category_selected(self, listbox, row):
         if row is None:
@@ -772,8 +806,9 @@ class Main(Gtk.ApplicationWindow):
             finished = True
 
             new_cat = entry.get_text().strip()
+            reserved_names = [_("None"), _("All"), _("Uncategorized")]
 
-            if not new_cat:
+            if not new_cat or new_cat in reserved_names:
                 if row.get_parent():
                     self.listbox_categories.remove(row)
 
@@ -872,8 +907,9 @@ class Main(Gtk.ApplicationWindow):
             finished = True
 
             new_cat = entry.get_text().strip()
+            reserved_names = [_("None"), _("All"), _("Uncategorized")]
 
-            if not new_cat or new_cat == old_cat:
+            if not new_cat or new_cat == old_cat or new_cat in reserved_names:
                 restore_label(old_label)
                 return False
 
