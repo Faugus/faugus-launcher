@@ -36,10 +36,12 @@ msgid "Downloading..."
 msgstr "Descargando..."
 
 #: /usr/bin/faugus-proton-manager:353
+#, python-format
 msgid "Downloading %s..."
 msgstr "Descargando %s..."
 
 #: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
 msgid "Extracting %s..."
 msgstr "Extrayendo %s..."
 
