@@ -131,6 +131,17 @@ def convert_runner(runner):
 
     return runner
 
+class HiDpiMixin:
+    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
+        scale = self.get_scale_factor()
+        if width and height:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+
+        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
+        return surface
+
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
         super().__init__(application_id="io.github.Faugus.faugus-launcher")
@@ -152,7 +163,7 @@ class FaugusApp(Gtk.Application):
 
         self.window.present()
 
-class Main(Gtk.ApplicationWindow):
+class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def __init__(self, app):
         super().__init__(application=app, title="Faugus Launcher")
         self.connect("delete-event", self.on_close)
@@ -1912,11 +1923,8 @@ class Main(Gtk.ApplicationWindow):
         self.flowbox_child.game = game
 
         if self.interface_mode == "List":
-            pixbuf = self.get_pixbuf(game_icon, game)
-            scaled = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
-
-            image = Gtk.Image()
-            image.set_from_pixbuf(scaled)
+            surface = self.get_game_artwork(game_icon, game, 40, 40)
+            image = Gtk.Image.new_from_surface(surface)
 
             self.flowbox_child.image = image
 
@@ -1942,11 +1950,8 @@ class Main(Gtk.ApplicationWindow):
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
-            pixbuf = self.get_pixbuf(game_icon, game)
-            scaled = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
-
-            image = Gtk.Image()
-            image.set_from_pixbuf(scaled)
+            surface = self.get_game_artwork(game_icon, game, 100, 100)
+            image = Gtk.Image.new_from_surface(surface)
 
             self.flowbox_child.image = image
 
@@ -1988,11 +1993,11 @@ class Main(Gtk.ApplicationWindow):
                 banner_path = game.banner
 
             if self.smaller_banners:
-                pixbuf = self.get_pixbuf(banner_path, game, 180, 270)
+                surface = self.get_game_artwork(banner_path, game, 180, 270)
             else:
-                pixbuf = self.get_pixbuf(banner_path, game, 230, 345)
+                surface = self.get_game_artwork(banner_path, game, 230, 345)
 
-            image2.set_from_pixbuf(pixbuf)
+            image2.set_from_surface(surface)
 
             hbox.pack_start(image2, False, False, 0)
             hbox.pack_start(game_label, True, False, 0)
@@ -2011,14 +2016,12 @@ class Main(Gtk.ApplicationWindow):
             game_icon = faugus_png
 
         if hasattr(flowbox_child, "image"):
-            pixbuf = self.get_pixbuf(game_icon, game)
-
             if self.interface_mode == "List":
-                scaled = pixbuf.scale_simple(40, 40, GdkPixbuf.InterpType.BILINEAR)
+                surface = self.get_game_artwork(game_icon, game, 40, 40)
             else:
-                scaled = pixbuf.scale_simple(100, 100, GdkPixbuf.InterpType.BILINEAR)
+                surface = self.get_game_artwork(game_icon, game, 100, 100)
 
-            flowbox_child.image.set_from_pixbuf(scaled)
+            flowbox_child.image.set_from_surface(surface)
 
         if hasattr(flowbox_child, "banner"):
             if game.banner == "" or not os.path.isfile(game.banner):
@@ -2027,24 +2030,24 @@ class Main(Gtk.ApplicationWindow):
                 banner_path = game.banner
 
             if self.smaller_banners:
-                pixbuf = self.get_pixbuf(banner_path, game, 180, 270)
+                surface = self.get_game_artwork(banner_path, game, 180, 270)
             else:
-                pixbuf = self.get_pixbuf(banner_path, game, 230, 345)
+                surface = self.get_game_artwork(banner_path, game, 230, 345)
 
-            flowbox_child.banner.set_from_pixbuf(pixbuf)
+            flowbox_child.banner.set_from_surface(surface)
 
-    def get_pixbuf(self, path, game, width=None, height=None):
+    def get_game_artwork(self, path, game, width=None, height=None):
+        scale = self.get_scale_factor()
         if width and height:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, width, height, False)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), False)
         else:
             pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
 
         if not self.is_game_installed(game):
-            gray = pixbuf.copy()
-            gray.saturate_and_pixelate(gray, 0.0, False)
-            return gray
-
-        return pixbuf
+            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+        
+        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
+        return surface
 
     def is_game_installed(self, game):
         if game.runner == "Steam":
@@ -2367,9 +2370,9 @@ class Main(Gtk.ApplicationWindow):
             if not os.path.isfile(game.banner):
                 game.banner = faugus_banner
             shutil.copyfile(game.banner, edit_game_dialog.banner_path_temp)
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.banner, 260, 390, True)
-            edit_game_dialog.image_banner.set_from_pixbuf(pixbuf)
-            edit_game_dialog.image_banner2.set_from_pixbuf(pixbuf)
+            surface = self.new_surface_from_image(game.banner, 260, 390, True)
+            edit_game_dialog.image_banner.set_from_surface(surface)
+            edit_game_dialog.image_banner2.set_from_surface(surface)
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
@@ -2442,11 +2445,9 @@ class Main(Gtk.ApplicationWindow):
         if not os.path.exists(icon_path):
             icon_temp = faugus_png
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_temp)
-        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
+        surface = self.new_surface_from_image(icon_temp, 50, 50)
 
-        image = Gtk.Image.new_from_file(icon_temp)
-        image.set_from_pixbuf(scaled_pixbuf)
+        image = Gtk.Image.new_from_surface(surface)
 
         return image
 
@@ -4988,7 +4989,7 @@ class DeleteDialog(Gtk.Dialog):
         return self.checkbox.get_active()
 
 
-class AddGame(Gtk.Dialog):
+class AddGame(Gtk.Dialog, HiDpiMixin):
     def __init__(self, parent, game_running2, file_path, interface_mode):
         # Initialize the AddGame dialog
         super().__init__(title=_("New Game/App"), parent=parent)
@@ -5566,9 +5567,9 @@ class AddGame(Gtk.Dialog):
         if interface_mode != "Banners":
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
-        self.image_banner.set_from_pixbuf(pixbuf)
-        self.image_banner2.set_from_pixbuf(pixbuf)
+        surface = self.new_surface_from_image(self.banner_path_temp, 260, 390, True)
+        self.image_banner.set_from_surface(surface)
+        self.image_banner2.set_from_surface(surface)
 
     def on_combobox_steam_changed(self, combobox):
         self.combobox_steam_title.get_style_context().remove_class("combobox")
@@ -5589,10 +5590,8 @@ class AddGame(Gtk.Dialog):
         self.on_entry_focus_out(self.entry_title, None)
 
         shutil.copyfile(icon_path, os.path.expanduser(self.icon_temp))
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-        image = Gtk.Image.new_from_file(self.icon_temp)
-        image.set_from_pixbuf(scaled_pixbuf)
+        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+        image = Gtk.Image.new_from_surface(surface)
         self.button_shortcut_icon.set_image(image)
 
     def on_button_addapp_clicked(self, widget):
@@ -5891,9 +5890,7 @@ class AddGame(Gtk.Dialog):
             self.get_banner()
         else:
             shutil.copyfile(faugus_banner, self.banner_path_temp)
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
-            self.image_banner.set_from_pixbuf(pixbuf)
-            self.image_banner2.set_from_pixbuf(pixbuf)
+            self.update_image_banner()
 
     def on_load_file(self, widget):
         def is_valid_image(file_path):
@@ -6071,18 +6068,16 @@ class AddGame(Gtk.Dialog):
         threading.Thread(target=fetch_banner, daemon=True).start()
 
     def update_image_banner(self):
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
-        self.image_banner.set_from_pixbuf(pixbuf)
-        self.image_banner2.set_from_pixbuf(pixbuf)
+        surface = self.new_surface_from_image(self.banner_path_temp, 260, 390, True)
+        self.image_banner.set_from_surface(surface)
+        self.image_banner2.set_from_surface(surface)
 
     def on_entry_focus_out(self, entry_title, event):
         if entry_title.get_text() != "":
             self.get_banner()
         else:
             shutil.copyfile(faugus_banner, self.banner_path_temp)
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
-            self.image_banner.set_from_pixbuf(pixbuf)
-            self.image_banner2.set_from_pixbuf(pixbuf)
+            self.update_image_banner()
 
     def on_checkbox_addapp_toggled(self, checkbox):
         is_active = checkbox.get_active()
@@ -6237,9 +6232,7 @@ class AddGame(Gtk.Dialog):
                 self.get_banner()
             else:
                 shutil.copyfile(faugus_banner, self.banner_path_temp)
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.banner_path_temp, 260, 390, True)
-                self.image_banner.set_from_pixbuf(pixbuf)
-                self.image_banner2.set_from_pixbuf(pixbuf)
+                self.update_image_banner()
 
     def populate_combobox_with_launchers(self):
         self.combobox_launcher.append("windows", _("Windows Game"))
@@ -6395,11 +6388,8 @@ class AddGame(Gtk.Dialog):
         image_path = faugus_png
         shutil.copyfile(image_path, self.icon_temp)
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-
-        image = Gtk.Image.new_from_file(self.icon_temp)
-        image.set_from_pixbuf(scaled_pixbuf)
+        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+        image = Gtk.Image.new_from_surface(surface)
 
         return image
 
@@ -6513,10 +6503,8 @@ class AddGame(Gtk.Dialog):
                 dialog.destroy()
             else:
                 shutil.copyfile(file_path, self.icon_temp)
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-                scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-                image = Gtk.Image.new_from_file(self.icon_temp)
-                image.set_from_pixbuf(scaled_pixbuf)
+                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                image = Gtk.Image.new_from_surface(surface)
                 self.button_shortcut_icon.set_image(image)
 
         filechooser.destroy()
@@ -6723,10 +6711,8 @@ class AddGame(Gtk.Dialog):
                     largest_image = self.find_largest_resolution(self.icon_directory)
                     shutil.move(largest_image, os.path.expanduser(self.icon_temp))
 
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-                    scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-                    image = Gtk.Image.new_from_file(self.icon_temp)
-                    image.set_from_pixbuf(scaled_pixbuf)
+                    surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                    image = Gtk.Image.new_from_surface(surface)
 
                     self.button_shortcut_icon.set_image(image)
 
