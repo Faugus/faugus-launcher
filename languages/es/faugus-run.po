@@ -42,6 +42,7 @@ msgid "Internet connection error."
 msgstr "Error de conexión a internet."
 
 #: /usr/bin/faugus-run:446
+#, python-format
 msgid "%s was not found."
 msgstr "%s no fue encontrado."
 
