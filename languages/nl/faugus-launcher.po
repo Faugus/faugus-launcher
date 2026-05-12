@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-17 16:23-0300\n"
-"PO-Revision-Date: 2026-04-18 10:53+0200\n"
+"POT-Creation-Date: 2026-05-09 23:11-0300\n"
+"PO-Revision-Date: 2026-05-11 10:40+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -18,217 +18,255 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:236
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:315
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:249
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:328
 msgid "Play"
 msgstr "Spelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:240
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:253
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:611
 msgid "Edit"
 msgstr "Bewerken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:244
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:257
 msgid "Delete"
 msgstr "Verwĳderen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:248
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:261
 msgid "Duplicate"
 msgstr "Klonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:252
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:818
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:265
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1136
 msgid "Hide"
 msgstr "Verbergen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:256
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:823
-msgid "Add to favorites"
-msgstr "Toevoegen aan favorieten"
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:269
+msgid "Category"
+msgstr "Categorie"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:260
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:274
 msgid "Open game location"
 msgstr "Gamelocatie openen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:264
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:278
 msgid "Open prefix location"
 msgstr "Profielmap openen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:268
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:282
 msgid "Run file inside the prefix"
 msgstr "Bestand uitvoeren in profielmap"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:272
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:286
 msgid "Show logs"
 msgstr "Logboek tonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:315
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:328
 msgid "Stop"
 msgstr "Stoppen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:410
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:423
 msgid "Open Faugus Launcher"
 msgstr "Faugus-starter openen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:414
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:427
 msgid "Quit"
 msgstr "Afsluiten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:493
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:604
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:520
 msgid "Force close all running games"
 msgstr "Alle games gedwongen afsluiten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:521
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:643
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:524
 msgid "Search..."
 msgstr "Zoeken…"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:743
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:560
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:571
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:574
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:693
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:721
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:753
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:809
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:863
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:910
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:986
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1151
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1162
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1306
+msgid "None"
+msgstr "Geen"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:570
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:693
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:728
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:732
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:752
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:809
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:910
+msgid "Uncategorized"
+msgstr "Ongecategoriseerd"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:607
+msgid "New"
+msgstr "Nieuw"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:615
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:619
+msgid "Show Uncategorized"
+msgstr "Ongecategoriseerde games tonen"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:717
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:809
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:910
+msgid "All"
+msgstr "Alles"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1053
 msgid "Shut down"
 msgstr "Afsluiten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:745
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1056
 msgid "Reboot"
 msgstr "Herstarten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:747
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1059
 msgid "Close"
 msgstr "Sluiten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:816
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1134
 msgid "Remove from hidden"
 msgstr "Verwijderen uit verborgen games"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:821
-msgid "Remove from favorites"
-msgstr "Verwijderen uit favorieten"
-
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:882
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1230
 msgid "hour"
 msgstr "uur"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:883
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1231
 msgid "hours"
 msgstr "uur"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:884
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1232
 msgid "minute"
 msgstr "minuut"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:885
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1233
 msgid "minutes"
 msgstr "minuten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:993
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4082
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6146
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1354
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4421
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6324
 msgid "Select a file to run inside the prefix"
 msgstr "Kies een bestand om in de profielmap uit te voeren"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:996
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4085
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4213
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4330
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4353
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5573
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5767
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6149
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6277
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6506
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6579
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1356
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4423
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4548
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4660
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4682
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5908
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6095
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6326
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6446
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6674
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6746
 msgid "Open"
 msgstr "Openen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:997
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3406
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4086
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4181
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4214
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4331
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4354
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4544
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4976
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5346
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5482
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5574
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5618
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5768
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6150
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6278
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6507
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6580
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1357
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3767
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4424
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4517
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4549
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4661
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4683
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4878
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5312
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5683
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5820
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5909
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5947
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6096
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6327
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6447
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6675
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6747
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1001
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4090
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5772
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6154
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6514
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1361
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4428
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6100
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6331
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6682
 msgid "Windows files"
 msgstr "Windowsbestanden"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1009
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4098
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5780
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6162
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6522
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1369
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4436
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6108
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6339
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6690
 msgid "All files"
 msgstr "Alle bestanden"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1057
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1417
 #, python-format
 msgid "%s Logs"
 msgstr "%s-logboek"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1096
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1457
 msgid "Copy to clipboard"
 msgstr "Kopiëren naar klembord"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1100
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1461
 msgid "Open file location"
 msgstr "Bestandslocatie openen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1197
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2265
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1556
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2634
 #, python-format
 msgid "%s already exists."
 msgstr "“%s” bestaat al."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1400
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1770
 #, python-format
 msgid "%s is already running."
 msgstr "‘%s’ is al actief."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1403
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2208
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3411
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4274
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4548
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4981
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5351
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5487
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5614
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5686
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6311
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1773
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2577
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3771
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4636
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4882
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5317
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5688
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5825
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5943
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6015
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6481
 msgid "Ok"
 msgstr "Oké"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1719
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2088
 msgid "Proton may generate huge log files."
 msgstr "Let op: Proton kan grote logboeken aanleggen."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1720
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2089
 msgid "Enable logging only when debugging a problem."
 msgstr "Schakel deze functie alléén in voor foutopsporingsdoeleinden."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:1981
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2350
 #, python-format
 msgid "Edit %s"
 msgstr "%s bewerken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2038
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5210
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2407
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5546
 msgid ""
 "Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
 "USERS FOUND."
@@ -236,254 +274,258 @@ msgstr ""
 "Voeg een snelkoppeling toe aan Steam of verwijder deze. Steam dient nadien "
 "te worden herstart. ER ZIJN GEEN STEAM-GEBRUIKERS."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2049
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2418
 #, python-format
 msgid "%s is running. Please close it first."
 msgstr "‘%s’ is actief - sluit de game af."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2128
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2493
 msgid "Failed to remove prefix."
 msgstr "De profielmap kan niet worden verwijderd."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2386
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2755
 msgid "No internet connection."
 msgstr "Er is geen internetverbinding."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2510
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2669
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2879
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3052
 #, python-format
 msgid "Installing %s..."
 msgstr "Bezig met installeren van ‘%s’…"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2521
-msgid "Finish installation"
-msgstr "Installatie afronden"
-
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2528
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2533
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2538
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2543
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2548
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2553
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2891
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2895
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2899
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2903
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2907
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2911
 msgid "Downloading"
 msgstr "Bezig met downloaden…"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2618
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2962
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s is niet geïnstalleerd!"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2663
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3046
 msgid "Download complete"
 msgstr "Downloaden voltooid"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2666
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3049
 #, python-format
 msgid "Error during download: %s"
 msgstr "Er is een fout opgetreden tijdens het downloaden: %s"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2671
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2674
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2684
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3054
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3057
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3067
 msgid "Please close the login window and wait."
 msgstr "Sluit het inlogvenster en wacht."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2683
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3066
 msgid "Please don't change the installation path."
 msgstr "Let op: wijzig de installatielocatie niet."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:2687
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3070
 msgid "Please close Wargaming to finish the installation."
 msgstr "Sluit Wargaming af om de installatie af te ronden."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3121
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3488
 msgid "Settings"
 msgstr "Instellingen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3245
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3619
 msgid "Language"
 msgstr "Taal"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3250
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3623
 msgid "Interface Mode"
 msgstr "Venstermodus"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3254
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3627
 msgid "List"
 msgstr "Lijst"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3255
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3628
 msgid "Blocks"
 msgstr "Blokken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3256
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3629
 msgid "Banners"
 msgstr "Banieren"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3259
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3631
 msgid "Start maximized"
 msgstr "Gemaximaliseerd opstarten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3264
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3635
 msgid "Start in fullscreen"
 msgstr "In schermvullende weergave opstarten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3267
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3638
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter: schermvullende weergave aan/uit"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3269
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3640
 msgid "Show labels"
 msgstr "Labels tonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3272
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3643
 msgid "Smaller banners"
 msgstr "Kleinere banieren"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3276
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3646
 msgid "Default Prefixes Location"
 msgstr "Standaard profielmap"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3280
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4877
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3650
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5213
 msgid "/path/to/the/prefix"
 msgstr "/locatie/van/profiel"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3290
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3660
 msgid "Lossless Scaling Location"
 msgstr "Locatie van schalen zonder kwaliteitsverlies"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3294
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3664
 msgid "/path/to/Lossless.dll"
 msgstr "/locatie/van/Lossless.dll"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3303
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3673
 msgid "Default Prefix Tools"
 msgstr "Standaard profielhulpmiddelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3310
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3679
 msgid "Default Proton"
 msgstr "Standaardproton"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3314
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3683
 msgid "Proton Manager"
 msgstr "Proton-beheer"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3317
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3686
 msgid "Miscellaneous"
 msgstr "Overig"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3324
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3691
 msgid "Use discrete GPU"
 msgstr "Losse gpu gebruiken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3327
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3693
 msgid "Close when running a game/app"
 msgstr "Sluiten na starten van game/programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3330
-msgid "System tray icon"
-msgstr "Systeemvakpictogram"
-
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3334
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3695
 msgid "Start on boot"
 msgstr "Automatisch opstarten"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3337
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3697
+msgid "System tray icon"
+msgstr "Systeemvakpictogram"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3700
+msgid "Start minimized to tray"
+msgstr "Geminimaliseerd is systeemvak starten"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3703
 msgid "Monochrome icon"
 msgstr "Monochroom pictogram"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3341
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3706
 msgid "Disable splash window"
 msgstr "Opstartvenster tonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3344
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3709
 msgid "Disable automatic updates"
 msgstr "Automatische updates uitschakelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3348
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3712
 msgid "Enable logging"
 msgstr "Logboek bijhouden"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3351
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3715
+msgid "Show categories menu"
+msgstr "Categoriemenu tonen"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3717
 msgid "Show hidden games"
 msgstr "Verborgen games tonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3352
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3718
 msgid "Press Ctrl+H to show/hide games."
 msgstr "Druk op Ctrl+H om games te tonen/verbergen."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3354
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3720
 msgid "Gamepad navigation"
 msgstr "Gamepadnavigatie"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3357
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3723
 msgid "Use Wayland driver (experimental)"
 msgstr "Wayland-stuurprogramma gebruiken (experimenteel)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3361
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3727
 msgid "Enable HDR (experimental)"
 msgstr "Hdr gebruiken (experimenteel)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3364
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3730
 msgid "Enable WOW64 (experimental)"
 msgstr "WOW64 gebruiken (experimenteel)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3377
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4948
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3740
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5284
 msgid "Run"
 msgstr "Uitvoeren"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3380
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4951
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3743
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5287
 msgid "Run a file inside the prefix"
 msgstr "Voer een bestand in de profielmap uit"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3385
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4931
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3747
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5267
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 msgstr ""
 "Toont een zwevend venster waarop het aantal fps, de temperaturen, cpu-/gpu-"
 "belasting en dergelijke wordt bijgehouden."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3387
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4933
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3749
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5269
 msgid "Tweaks your system to improve performance."
 msgstr "Verbetert de prestaties van je systeem."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3388
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4934
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3750
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5270
 msgid "Disable Hidraw"
 msgstr "Hidraw uitschakelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3389
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4935
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3751
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5271
 msgid "Prevent Sleep"
 msgstr "Slaapstand onderdrukken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3391
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3753
 msgid "Support the Project"
 msgstr "Project ondersteunen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3415
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3775
 msgid "Backup/Restore Settings"
 msgstr "Reservekopieën en herstel"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3422
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3781
 msgid "Backup"
 msgstr "Reservekopie maken"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3426
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3784
 msgid "Restore"
 msgstr "Herstellen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3433
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3791
 msgid "Global Environment Variables"
 msgstr "Omgevingsvariabelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3708
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5198
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4066
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5534
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
@@ -491,154 +533,154 @@ msgstr ""
 "Toont een zwevend venster waarop het aantal fps, de temperaturen, cpu-/gpu-"
 "belasting en dergelijke wordt bijgehouden. NIET GEÏNSTALLEERD."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3714
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5204
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4072
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5540
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
 msgstr "Verbetert de prestaties van je systeem. NIET GEÏNSTALLEERD."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3752
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4110
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Logboeken wissen (%s)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:3755
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4113
 msgid "Clear Logs"
 msgstr "Logboeken wissen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4003
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4346
 msgid "Do you want to save the changes?"
 msgstr "Wil je de wijzigingen opslaan?"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4149
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4486
 msgid "Prefixes and runners will not be backed up!"
 msgstr "Let op: profielen en starters worden niet meegenomen!"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4177
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4514
 msgid "Save the backup file as..."
 msgstr "Reservekopiebestand opslaan als…"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4180
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4516
 msgid "Save"
 msgstr "Opslaan"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4210
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4546
 msgid "Select a backup file to restore"
 msgstr "Kies een reservekopiebestand"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4218
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4553
 msgid "ZIP files"
 msgstr "Zipbestanden"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4229
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4239
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4564
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4574
 msgid "This is not a valid Faugus Launcher backup file."
 msgstr "Het gekozen bestand is geen geldig reservekopiebestand."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4242
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4577
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Weet je zeker dat je de instellingen wilt overschrijven?"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4278
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4606
-msgid "No"
-msgstr "Nee"
-
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4282
 #: /usr/lib/python3.14/site-packages/faugus/launcher.py:4610
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4945
 msgid "Yes"
 msgstr "Ja"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4327
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6576
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4614
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4941
+msgid "No"
+msgstr "Nee"
+
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4658
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6744
 msgid "Select a prefix location"
 msgstr "Kies een profielmap"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4350
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4680
 msgid "Select the Lossless.dll file"
 msgstr "Kies het Lossless.dll-bestand"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4536
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4869
 #, python-format
 msgid "Duplicate %s"
 msgstr "‘%s’ klonen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4539
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4829
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4847
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4873
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5165
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5183
 msgid "Title"
 msgstr "Titel"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4542
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4853
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4876
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5189
 msgid "Game Title"
 msgstr "Gamenaam"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4583
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4917
 #, python-format
 msgid "Delete %s"
 msgstr "‘%s’ verwĳderen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4588
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4923
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Weet je zeker dat je ‘%s’ wilt verwijderen?"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4598
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4933
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "WAARSCHUWING: dit profiel wordt door %d andere games gebruikt."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4600
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4935
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "WAARSCHUWING: dit profiel wordt door 1 andere game gebruikt."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4614
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4949
 msgid "Also remove the prefix:"
 msgstr "Profielmap eveneens verwijderen:"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4658
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4993
 msgid "New Game/App"
 msgstr "Nieuwe game/programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4858
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5288
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5194
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5625
 msgid "Path"
 msgstr "Locatie"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4864
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5200
 msgid "/path/to/the/exe"
 msgstr "/locatie/van/uitvoerbaarbestand"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4873
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5209
 msgid "Prefix"
 msgstr "Profielmap"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4886
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5222
 msgid "Proton"
 msgstr "Proton"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4904
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5240
 msgid "Launch Arguments"
 msgstr "Opstartopties"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4907
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5243
 msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 msgstr "bijv.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4912
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5248
 msgid "Game Arguments"
 msgstr "Gameopties"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4915
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5251
 msgid "e.g.: -d3d11 -fullscreen"
 msgstr "bijv.: -d3d11 -fullscreen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4919
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5262
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5255
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5598
 msgid "Additional Application"
 msgstr "Aanvullend programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4922
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5258
 msgid ""
 "Additional application to run with the game, like Cheat Engine, Trainers, "
 "Mods..."
@@ -646,67 +688,67 @@ msgstr ""
 "Een programma dat tegelijk met de game moet worden gestart, bijvoorbeeld een "
 "cheathulpmiddel, trainers, mods, etc."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4925
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5380
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5261
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5717
 msgid "Lossless Scaling Frame Generation"
 msgstr "Frames genereren zonder kwaliteitsverlies"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4954
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5290
 msgid "Shortcut"
 msgstr "Snelkoppeling"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4959
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5295
 msgid "Desktop"
 msgstr "Bureaublad"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4961
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5297
 msgid "Add or remove a shortcut from the Desktop."
 msgstr "Voeg een snelkoppeling toe aan het bureaublad of verwijder deze."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4962
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5298
 msgid "App Menu"
 msgstr "Programmastarter"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4964
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5300
 msgid "Add or remove a shortcut from the Application Menu."
 msgstr "Voeg een snelkoppeling toe aan de programmastarter of verwijder deze."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4965
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5301
 msgid "Steam"
 msgstr "Steam"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4967
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5303
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
 msgstr ""
 "Voeg een snelkoppeling toe aan Steam of verwijder deze. Steam dient nadien "
 "te worden herstart."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:4973
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6274
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5309
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6443
 msgid "Select an icon for the shortcut"
 msgstr "Kies een snelkoppelingspictogram"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5024
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5360
 msgid "Refresh"
 msgstr "Herladen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5028
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5364
 msgid "Load from file"
 msgstr "Laden uit bestand"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5032
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5368
 msgid "Load from URL"
 msgstr "Laden van url"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5040
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5376
 msgid "Game/App"
 msgstr "Game/Programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5056
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5392
 msgid "Tools"
 msgstr "Hulpmiddelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5218
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5554
 msgid ""
 "Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
 "and set the location."
@@ -714,110 +756,119 @@ msgstr ""
 "Lossless.dll is niet aangetroffen. Als dit bestand bestaat, stel dan de "
 "locatie ervan in in de instellingen."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5221
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5557
 msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
 msgstr ""
 "De Vulkan-laag voor schalen zonder kwaliteitsverlies is niet geïnstalleerd."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5284
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5404
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5621
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5742
 msgid "Enable"
 msgstr "Inschakelen"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5293
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5630
 msgid "/path/to/the/app"
 msgstr "/locatie/van/programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5303
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5640
 msgid "Delay (seconds)"
 msgstr "Wachttijd (in seconden)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5320
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5657
 msgid "Run the application first"
 msgstr "Start eerst het programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5408
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5746
 msgid "Multiplier"
 msgstr "Vermenigvuldiging"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5413
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5751
 msgid "Multiply the FPS."
 msgstr "Vermenigvuldig het aantal fps."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5415
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5753
 msgid "Flow Scale"
 msgstr "Vloeiendheidsschaal"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5422
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5760
 msgid "Lower the internal motion estimation resolution."
 msgstr "Verlaag de resolutie van bewegingen."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5424
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5762
 msgid "Performance Mode"
 msgstr "Prestatiemodus"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5425
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5763
 msgid "Massively improve performance at the cost of quality."
 msgstr "Verbeter de prestaties, ten koste van de kwaliteit."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5428
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5766
 msgid "HDR Mode"
 msgstr "Hdr-modus"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5429
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5767
 msgid "Enable special HDR-only behavior."
 msgstr "Schakel hdr-functies in."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5432
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5770
 msgid "Present Mode (Experimental)"
 msgstr "Presenteermodus (experimenteel)"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5436
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5774
 msgid "Override the present mode."
 msgstr "Dwing de presenteermodus af."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5570
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5906
 msgid "Select an image for the banner"
 msgstr "Kies een banierbestand"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5578
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6282
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5913
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6451
 msgid "Image files"
 msgstr "Afbeeldingsbestanden"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5605
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5936
 msgid "Enter the image URL"
 msgstr "Voer de afbeeldingsurl in"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5680
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6304
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6009
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6474
 msgid "The selected file is not a valid image."
 msgstr "Het gekozen bestand is geen geldig afbeeldingsbestand."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5683
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6308
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6012
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6478
 msgid "Please choose another one."
 msgstr "Kies een ander bestand."
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:5764
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6093
 msgid "Select an additional application"
 msgstr "Kies een aanvullend programma"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6057
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6244
 msgid "Windows Game"
 msgstr "Windowsgame"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6058
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6245
 msgid "Linux Game"
 msgstr "Linuxgame"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6059
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6246
 msgid "Steam Game"
 msgstr "Steam-game"
 
-#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6503
+#: /usr/lib/python3.14/site-packages/faugus/launcher.py:6672
 msgid "Select the game's .exe"
 msgstr "Kies het .exe-bestand van de game"
+
+#~ msgid "Add to favorites"
+#~ msgstr "Toevoegen aan favorieten"
+
+#~ msgid "Remove from favorites"
+#~ msgstr "Verwijderen uit favorieten"
+
+#~ msgid "Finish installation"
+#~ msgstr "Installatie afronden"
 
 #~ msgid "Only works with GE-Proton10 or Proton-EM-10."
 #~ msgstr "Let op: hiervoor is GE-Proton10 of Proton-EM-10 vereist."
