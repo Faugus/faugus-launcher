@@ -1169,6 +1169,8 @@ class Main(Gtk.ApplicationWindow):
                     menu_item.connect("activate", self.on_context_menu_category, cat, game.gameid)
                     self.submenu_category.append(menu_item)
 
+                self.context_menu.show_all()
+
                 if game.runner == "Steam":
                     self.menu_duplicate.set_visible(False)
                     self.menu_game_location.set_visible(False)
@@ -1210,8 +1212,6 @@ class Main(Gtk.ApplicationWindow):
                         Gdk.Gravity.NORTH,
                         None
                     )
-
-                self.context_menu.show_all()
 
     def format_playtime(self, seconds):
         if not seconds:
@@ -3620,6 +3620,7 @@ class Settings(Gtk.Dialog):
         self.label_language = Gtk.Label(label=_("Language"))
         self.label_language.set_halign(Gtk.Align.START)
         self.combobox_language = Gtk.ComboBoxText()
+        self.combobox_language.set_wrap_width(4)
 
         self.label_interface = Gtk.Label(label=_("Interface Mode"))
         self.label_interface.set_halign(Gtk.Align.START)
@@ -4145,17 +4146,22 @@ class Settings(Gtk.Dialog):
 
     def populate_languages(self):
         self.combobox_language.remove_all()
-        self.combobox_language.append_text("English")
 
-        if not os.path.isdir(LOCALE_DIR):
-            return
+        available_langs = [("English", "en_US")]
 
-        for lang in sorted(os.listdir(LOCALE_DIR)):
-            mo_file = os.path.join(LOCALE_DIR, lang, "LC_MESSAGES", "faugus-launcher.mo")
-            if os.path.isfile(mo_file):
-                lang_name = self.LANG_NAMES.get(lang, lang)
-                self.combobox_language.append_text(lang_name)
-                self.lang_codes[lang_name] = lang
+        if os.path.isdir(LOCALE_DIR):
+            for lang in os.listdir(LOCALE_DIR):
+                mo_file = os.path.join(LOCALE_DIR, lang, "LC_MESSAGES", "faugus-launcher.mo")
+                if os.path.isfile(mo_file):
+                    lang_name = self.LANG_NAMES.get(lang, lang)
+                    if lang != "en_US":
+                        available_langs.append((lang_name, lang))
+
+        available_langs.sort(key=lambda x: x[0])
+
+        for lang_name, lang_code in available_langs:
+            self.combobox_language.append_text(lang_name)
+            self.lang_codes[lang_name] = lang_code
 
         self.combobox_language.set_active(0)
 
