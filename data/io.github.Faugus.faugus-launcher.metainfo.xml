@@ -88,14 +88,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.19.3-1" date="2026-05-10">
+    <release version="1.19.4-1" date="2026-05-13">
       <description>
         <ul>
-          <li>Now games can have multiple categories.</li>
-          <li>Now checks the installation of mangohud and gamemode when running a game.</li>
-          <li>Fixed additional application bat file being removed when editing an entry.</li>
-          <li>Updated Portuguese translation.</li>
-          <li>Added an option to show Uncategorized games.</li>
+          <li>Fixed blurry icon/banner on high DPI display.</li>
+          <li>Fixed context menu not showing properly sometimes.</li>
+          <li>Fixed Desktop path for other languages.</li>
+          <li>Updated Italian translation.</li>
+          <li>Updated Dutch translation.</li>
+          <li>Updated Spanish translation.</li>
         </ul>
       </description>
     </release>
