@@ -65,3 +65,23 @@ class PathManager:
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
         compatibilitytools_folder = base_dir / 'applications'
         return str(compatibilitytools_folder)
+
+    @staticmethod
+    def user_desktop():
+        config_file = Path(PathManager.user_config('user-dirs.dirs'))
+
+        if config_file.exists():
+            with open(config_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.startswith('XDG_DESKTOP_DIR='):
+                        value = line.split('=', 1)[1].strip().strip('"')
+
+                        if value.startswith('$HOME/'):
+                            relative_path = value.replace('$HOME/', '')
+                            return PathManager.user_home(relative_path)
+                        elif value == '$HOME':
+                            return PathManager.user_home()
+
+                        return value
+
+        return PathManager.user_home('Desktop')

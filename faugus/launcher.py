@@ -90,7 +90,7 @@ faugus_backup = False
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
 
-desktop_dir = PathManager.user_home('Desktop')
+desktop_dir = PathManager.user_desktop()
 
 try:
     translation = gettext.translation(

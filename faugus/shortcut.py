@@ -50,7 +50,7 @@ umu_run = PathManager.user_data('faugus-launcher/umu-run')
 launcher_path = PathManager.find_binary('faugus-launcher')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-desktop_dir = PathManager.user_home('Desktop')
+desktop_dir = PathManager.user_desktop()
 
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
