@@ -208,24 +208,39 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
+            .game {
+                background-color: alpha(@theme_base_color, 0.5);
+                color: @theme_text_color;
+            }
             flowboxchild:selected {
                 background: transparent;
             }
-            .game {
-                background-color: alpha(@theme_base_color, 0.5);
-                border: 4px solid transparent;
-                color: @theme_text_color;
-            }
             flowboxchild:selected .game {
-                background-color: alpha(@theme_base_color, 0.5);
-                border-color: @theme_selected_bg_color;
+                background-color: alpha(@theme_selected_bg_color, 0.5);
             }
             flowboxchild:selected:focus .game {
                 background-color: @theme_selected_bg_color;
-                border-color: transparent;
+                color: @theme_bg_color;
             }
-            .banner-border {
-                border: 4px solid @theme_bg_color;
+            .banner-container {
+                border: 8px solid transparent;
+                padding: 0px;
+            }
+            flowboxchild.banner-container:selected {
+                border-color: alpha(@theme_selected_bg_color, 0.5);
+            }
+            flowboxchild.banner-container:selected:focus {
+                border-color: @theme_selected_bg_color;
+            }
+            .banner-overlay {
+                background-image: none;
+                background-color: transparent;
+            }
+            flowboxchild:selected .banner-overlay {
+                background-image: linear-gradient(to top, alpha(@theme_selected_bg_color, 0.5), transparent);
+            }
+            flowboxchild:selected:focus .banner-overlay {
+                background-image: linear-gradient(to top, alpha(@theme_selected_bg_color, 1), transparent);
             }
             .category-list {
                 background-color: alpha(@theme_base_color, 0.5);
@@ -233,14 +248,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             .category-list row {
                 background-color: transparent;
                 color: @theme_text_color;
-                border: 4px solid transparent;
             }
             .category-list row:selected {
-                background-color: transparent;
-                border: 4px solid @theme_selected_bg_color;
+                background-color: alpha(@theme_selected_bg_color, 0.5);
             }
             .category-list row:selected:focus {
                 background-color: @theme_selected_bg_color;
+                color: @theme_bg_color;
                 outline: none;
             }
         """)
@@ -1968,7 +1982,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
         if self.interface_mode == "Banners":
-            hbox.get_style_context().add_class("banner-border")
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
@@ -1999,11 +2012,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             image2.set_from_surface(surface)
 
-            hbox.pack_start(image2, False, False, 0)
-            hbox.pack_start(game_label, True, False, 0)
+            if self.show_labels:
+                overlay = Gtk.Overlay()
+                overlay.add(image2)
 
-            if not self.show_labels:
+                color_box = Gtk.Box()
+                color_box.get_style_context().add_class("banner-overlay")
+                overlay.add_overlay(color_box)
+
+                hbox.pack_start(overlay, False, False, 0)
+            else:
+                self.flowbox_child.get_style_context().add_class("banner-container")
+                hbox.pack_start(image2, False, False, 0)
                 game_label.set_no_show_all(True)
+
+            hbox.pack_start(game_label, True, False, 0)
 
         self.flowbox_child.add(hbox)
         self.flowbox.add(self.flowbox_child)
@@ -2045,7 +2068,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if not self.is_game_installed(game):
             pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-        
+
         surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
         return surface
 
