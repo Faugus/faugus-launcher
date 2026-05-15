@@ -168,7 +168,22 @@ class FaugusRun:
                 set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
+        if protonpath == "Proton-EM Latest":
+            self.proton_latest = "--em"
+            steam_compat_dir = compatibility_dir / "Proton-EM Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        elif protonpath == "Proton-GE Latest":
+            self.proton_latest = "--ge"
+            steam_compat_dir = compatibility_dir / "Proton-GE Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        elif protonpath == "Proton-CachyOS Latest":
+            self.proton_latest = "--cachyos"
+            steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        elif protonpath and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -181,20 +196,6 @@ class FaugusRun:
                 if not protonpath_path.is_dir():
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
-        if protonpath == "Proton-EM Latest":
-            self.proton_latest = "--em"
-            steam_compat_dir = compatibility_dir / "Proton-EM Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
-
-        if protonpath == "Proton-GE Latest":
-            self.proton_latest = "--ge"
-            steam_compat_dir = compatibility_dir / "Proton-GE Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
-
-        if protonpath == "Proton-CachyOS Latest":
-            self.proton_latest = "--cachyos"
-            steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
 
         self.components_exists = (
             os.path.exists(eac_dir) and
