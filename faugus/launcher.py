@@ -174,6 +174,11 @@ def populate_combobox_with_runners(combobox_runner):
     except Exception as e:
         print(f"Error accessing the directory: {e}")
 
+    # Search for Proton installed by Steam
+    for d in os.scandir(os.path.join(PathManager.get_steam(), "steamapps", "common")):
+        if d.is_dir and d.name.startswith("Proton"):
+            combobox_runner.append_text(f"Steam-{d.name}")
+
     # Set the active item, if desired
     combobox_runner.set_active(0)
 

@@ -183,6 +183,13 @@ class FaugusRun:
             steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
+        elif protonpath.startswith("Steam-"):
+            steam_proton_path = os.path.join(PathManager.get_steam(), "steamapps", "common", protonpath[6:])
+            self.proton_exists = os.path.isdir(steam_proton_path)
+            if self.proton_exists:
+                set_env("PROTONPATH", steam_proton_path)
+
+
         elif protonpath and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()

@@ -55,9 +55,14 @@ class PathManager:
         return icon_paths[-1]
 
     @staticmethod
-    def get_compatibilitytools():
+    def get_steam():
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
-        compatibilitytools_folder = base_dir / 'Steam' / 'compatibilitytools.d'
+        steam_folder = base_dir / 'Steam'
+        return str(steam_folder)
+
+    @staticmethod
+    def get_compatibilitytools():
+        compatibilitytools_folder = os.path.join(PathManager.get_steam(), 'compatibilitytools.d')
         return str(compatibilitytools_folder)
 
     @staticmethod
