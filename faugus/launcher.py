@@ -231,6 +231,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             flowboxchild.banner-container:selected:focus {
                 border-color: @theme_selected_bg_color;
+                box-shadow: 0 0 5px 0 @theme_selected_bg_color;
             }
             .banner-overlay {
                 background-image: none;
