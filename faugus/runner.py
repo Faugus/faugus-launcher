@@ -95,7 +95,6 @@ class FaugusRun:
         sys.exit(0)
 
     def start_process(self):
-        print(self.message)
         if self.show_donate:
             if self.playtime >= 7200:
                 current_month = GLib.DateTime.new_now_local().format("%Y-%m")
