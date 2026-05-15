@@ -131,6 +131,56 @@ def convert_runner(runner):
 
     return runner
 
+def populate_combobox_with_runners(combobox_runner):
+    # List of default entries
+    combobox_runner.append_text("Proton-CachyOS Latest (default)")
+    combobox_runner.append_text("GE-Proton Latest")
+    combobox_runner.append_text("Proton-EM Latest")
+    combobox_runner.append_text("UMU-Proton Latest")
+
+    if os.path.exists(proton_cachyos):
+        combobox_runner.append_text("Proton-CachyOS (System)")
+
+    try:
+        # Check if the directory exists
+        if os.path.exists(compatibility_dir):
+            # List to hold version directories
+            versions = []
+            # Iterate over the folders in the directory
+            for entry in os.listdir(compatibility_dir):
+                entry_path = os.path.join(compatibility_dir, entry)
+                # Add to list only if it's a directory and not "UMU-Latest"
+                if (
+                    os.path.isdir(entry_path)
+                    and entry not in ("UMU-Latest", "LegacyRuntime")
+                    and not entry.startswith("Proton-GE Latest")
+                    and not entry.startswith("Proton-EM Latest")
+                    and not entry.startswith("Proton-CachyOS Latest")
+                ):
+                    versions.append(entry)
+
+            # Sort versions in descending order
+            def version_key(v):
+                cleaned = re.sub(r'^[^\d]+', '', v)
+                parts = re.split(r'(\d+)', cleaned)
+                return [int(p) if p.isdigit() else p for p in parts]
+
+            versions.sort(key=version_key, reverse=True)
+
+            # Add sorted versions to ComboBox
+            for version in versions:
+                combobox_runner.append_text(version)
+
+    except Exception as e:
+        print(f"Error accessing the directory: {e}")
+
+    # Set the active item, if desired
+    combobox_runner.set_active(0)
+
+    cell_renderer = combobox_runner.get_cells()[0]
+    cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+    cell_renderer.set_property("max-width-chars", 20)
+
 class HiDpiMixin:
     def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
         scale = self.get_scale_factor()
@@ -4078,7 +4128,7 @@ class Settings(Gtk.Dialog):
         self.box.add(frame)
         self.box.add(box_bottom)
 
-        self.populate_combobox_with_runners()
+        populate_combobox_with_runners(self.combobox_runner)
         self.populate_languages()
         self.load_config()
 
@@ -4233,56 +4283,6 @@ class Settings(Gtk.Dialog):
         else:
             self.checkbox_enable_hdr.set_sensitive(True)
 
-    def populate_combobox_with_runners(self):
-        # List of default entries
-        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("GE-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-
-        if os.path.exists(proton_cachyos):
-            self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        try:
-            # Check if the directory exists
-            if os.path.exists(compatibility_dir):
-                # List to hold version directories
-                versions = []
-                # Iterate over the folders in the directory
-                for entry in os.listdir(compatibility_dir):
-                    entry_path = os.path.join(compatibility_dir, entry)
-                    # Add to list only if it's a directory and not "UMU-Latest"
-                    if (
-                        os.path.isdir(entry_path)
-                        and entry not in ("UMU-Latest", "LegacyRuntime")
-                        and not entry.startswith("Proton-GE Latest")
-                        and not entry.startswith("Proton-EM Latest")
-                        and not entry.startswith("Proton-CachyOS Latest")
-                    ):
-                        versions.append(entry)
-
-                # Sort versions in descending order
-                def version_key(v):
-                    cleaned = re.sub(r'^[^\d]+', '', v)
-                    parts = re.split(r'(\d+)', cleaned)
-                    return [int(p) if p.isdigit() else p for p in parts]
-
-                versions.sort(key=version_key, reverse=True)
-
-                # Add sorted versions to ComboBox
-                for version in versions:
-                    self.combobox_runner.append_text(version)
-
-        except Exception as e:
-            print(f"Error accessing the directory: {e}")
-
-        # Set the active item, if desired
-        self.combobox_runner.set_active(0)
-
-        cell_renderer = self.combobox_runner.get_cells()[0]
-        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
-        cell_renderer.set_property("max-width-chars", 20)
-
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
             entry.get_style_context().remove_class("entry")
@@ -4350,7 +4350,7 @@ class Settings(Gtk.Dialog):
         dialog.destroy()
 
         self.combobox_runner.remove_all()
-        self.populate_combobox_with_runners()
+        populate_combobox_with_runners(self.combobox_runner)
 
         if current_runner:
             for i, text in enumerate(self.combobox_runner.get_model()):
@@ -5539,7 +5539,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.combobox_steam_title.connect("changed", self.on_combobox_steam_changed)
 
-        self.populate_combobox_with_runners()
+        populate_combobox_with_runners(self.combobox_runner)
 
         model = self.combobox_runner.get_model()
         index_to_activate = 0
@@ -6274,56 +6274,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
-
-    def populate_combobox_with_runners(self):
-        # List of default entries
-        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("GE-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-
-        if os.path.exists(proton_cachyos):
-            self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        try:
-            # Check if the directory exists
-            if os.path.exists(compatibility_dir):
-                # List to hold version directories
-                versions = []
-                # Iterate over the folders in the directory
-                for entry in os.listdir(compatibility_dir):
-                    entry_path = os.path.join(compatibility_dir, entry)
-                    # Add to list only if it's a directory and not "UMU-Latest"
-                    if (
-                        os.path.isdir(entry_path)
-                        and entry not in ("UMU-Latest", "LegacyRuntime")
-                        and not entry.startswith("Proton-GE Latest")
-                        and not entry.startswith("Proton-EM Latest")
-                        and not entry.startswith("Proton-CachyOS Latest")
-                    ):
-                        versions.append(entry)
-
-                # Sort versions in descending order
-                def version_key(v):
-                    cleaned = re.sub(r'^[^\d]+', '', v)
-                    parts = re.split(r'(\d+)', cleaned)
-                    return [int(p) if p.isdigit() else p for p in parts]
-
-                versions.sort(key=version_key, reverse=True)
-
-                # Add sorted versions to ComboBox
-                for version in versions:
-                    self.combobox_runner.append_text(version)
-
-        except Exception as e:
-            print(f"Error accessing the directory: {e}")
-
-        # Set the active item, if desired
-        self.combobox_runner.set_active(0)
-
-        cell_renderer = self.combobox_runner.get_cells()[0]
-        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
-        cell_renderer.set_property("max-width-chars", 20)
 
     def on_entry_changed(self, widget, entry):
         if entry.get_text():
