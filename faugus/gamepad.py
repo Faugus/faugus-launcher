@@ -1,3 +1,4 @@
+import os
 import time
 import pygame
 from gi.repository import Gdk, GLib, Gtk
@@ -12,6 +13,9 @@ def get_button_map(joy):
     return {"confirm": 0, "back": 1, "square": 2, "triangle": 3, "lb": 4, "rb": 5, "start": 7, "start_alt": 6}
 
 def init_gamepad(self):
+    os.environ["SDL_VIDEODRIVER"] = "dummy"
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
+
     pygame.init()
     pygame.joystick.init()
 
@@ -36,6 +40,10 @@ def init_gamepad(self):
 def poll_gamepad(self):
     active_win = get_active_window()
     is_focused = active_win is not None
+    is_running = hasattr(self, "running") and bool(self.running)
+
+    if is_running:
+        self.held_direction = None
 
     for event in pygame.event.get():
         if event.type == pygame.JOYDEVICEADDED:
@@ -54,7 +62,7 @@ def poll_gamepad(self):
         if not self.joystick or not self.button_map:
             continue
 
-        if not is_focused:
+        if is_running or not is_focused:
             self.held_direction = None
             continue
 
@@ -78,7 +86,7 @@ def poll_gamepad(self):
             else:
                 _handle_button_down(self, event.button)
 
-    if not is_focused:
+    if not is_focused or is_running:
         self.held_direction = None
     elif getattr(self, "held_direction", None) is not None:
         now = time.time()
@@ -655,6 +663,6 @@ def activate_focused_widget(self):
 
 def get_active_window():
     for window in Gtk.Window.list_toplevels():
-        if window.is_active():
+        if window.is_active() and window.get_property("has-toplevel-focus"):
             return window
     return None
