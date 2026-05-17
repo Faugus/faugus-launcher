@@ -233,15 +233,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border-color: @theme_selected_bg_color;
                 box-shadow: 0 0 5px 0 @theme_selected_bg_color;
             }
-            .banner-overlay {
-                background-image: none;
-                background-color: transparent;
+            .launch-overlay {
+                background-color: @theme_text_color;
+                opacity: 0;
+                transition: opacity 0.8s ease-out;
             }
-            flowboxchild:selected .banner-overlay {
-                background-image: linear-gradient(to top, alpha(@theme_selected_bg_color, 0.5), transparent);
-            }
-            flowboxchild:selected:focus .banner-overlay {
-                background-image: linear-gradient(to top, alpha(@theme_selected_bg_color, 1), transparent);
+            .launch-overlay.playing {
+                opacity: 0.5;
+                transition: opacity 0.05s ease-in;
             }
             .category-list {
                 background-color: alpha(@theme_base_color, 0.5);
@@ -367,9 +366,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return None
 
         child = selected[0]
-        box = child.get_child()
-        label = box.get_children()[1]
+        root_widget = child.get_child()
 
+        if isinstance(root_widget, Gtk.Overlay):
+            box = root_widget.get_child()
+        else:
+            box = root_widget
+
+        label = box.get_children()[1]
         title = label.get_text()
 
         for game in self.games:
@@ -509,10 +513,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def select_game_by_title(self, title):
         for child in self.flowbox.get_children():
-            hbox = child.get_children()[0]
-            game_label = hbox.get_children()[1]
-
-            if game_label.get_text() == title:
+            if hasattr(child, 'game') and child.game and child.game.title == title:
                 self.flowbox.grab_focus()
                 self.flowbox.select_child(child)
                 child.grab_focus()
@@ -1937,6 +1938,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox_child = Gtk.FlowBoxChild()
         self.flowbox_child.game = game
 
+        anim_box = Gtk.Box()
+        anim_box.get_style_context().add_class("launch-overlay")
+        anim_box.set_hexpand(True)
+        anim_box.set_vexpand(True)
+        self.flowbox_child.anim_box = anim_box
+
         if self.interface_mode == "List":
             surface = self.get_game_artwork(game_icon, game, 40, 40)
             image = Gtk.Image.new_from_surface(surface)
@@ -2013,23 +2020,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             image2.set_from_surface(surface)
 
-            if self.show_labels:
-                overlay = Gtk.Overlay()
-                overlay.add(image2)
+            hbox.pack_start(image2, False, False, 0)
 
-                color_box = Gtk.Box()
-                color_box.get_style_context().add_class("banner-overlay")
-                overlay.add_overlay(color_box)
+            self.flowbox_child.get_style_context().add_class("banner-container")
 
-                hbox.pack_start(overlay, False, False, 0)
-            else:
-                self.flowbox_child.get_style_context().add_class("banner-container")
-                hbox.pack_start(image2, False, False, 0)
+            if not self.show_labels:
                 game_label.set_no_show_all(True)
 
             hbox.pack_start(game_label, True, False, 0)
 
-        self.flowbox_child.add(hbox)
+        overlay = Gtk.Overlay()
+        overlay.add(hbox)
+        overlay.add_overlay(anim_box)
+        try:
+            overlay.set_overlay_pass_through(anim_box, True)
+        except AttributeError:
+            pass
+        self.flowbox_child.add(overlay)
+
         self.flowbox.add(self.flowbox_child)
 
     def update_game_visual(self, flowbox_child):
@@ -2226,8 +2234,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         selected = self.flowbox.get_selected_children()
-        child = selected[0]
-        self.update_game_visual(child)
+        if selected:
+            child = selected[0]
+            self.update_game_visual(child)
+
+            if hasattr(child, 'anim_box') and child.anim_box:
+                child.anim_box.get_style_context().add_class("playing")
+
+                def remove_anim():
+                    child.anim_box.get_style_context().remove_class("playing")
+                    return False
+                GLib.timeout_add(150, remove_anim)
 
         button = widget or self.button_play
         gameid = game.gameid
@@ -2247,7 +2264,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             )
             return
 
-        # STOP
         if gameid in self.running:
             try:
                 os.kill(self.running[gameid], signal.SIGUSR1)
@@ -2260,7 +2276,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
             return
 
-        # PLAY
         self.update_latest_games_file(game.gameid)
         cmd = (sys.executable, "-m", "faugus.runner", "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
