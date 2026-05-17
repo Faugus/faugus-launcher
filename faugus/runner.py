@@ -128,11 +128,21 @@ class FaugusRun:
 
         if os.environ.get("PROTONPATH") == "Steam":
             subprocess.Popen(self.message, shell=True)
-            if self.splash_window:
-                self.label.set_text(_("Starting Steam game..."))
-                time.sleep(5)
-            Gtk.main_quit()
-            sys.exit()
+
+            def update_ui():
+                if self.splash_window:
+                    self.label.set_text(_("Starting Steam game..."))
+                return False
+
+            GLib.idle_add(update_ui)
+
+            def close_app():
+                Gtk.main_quit()
+                sys.exit()
+                return False
+
+            GLib.timeout_add(5000, close_app)
+            return
 
         self.start_time = time.time()
 
