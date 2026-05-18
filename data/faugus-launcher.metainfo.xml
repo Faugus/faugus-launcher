@@ -82,15 +82,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.19.4-1" date="2026-05-13">
+    <release version="1.19.5-1" date="2026-05-18">
       <description>
         <ul>
-          <li>Fixed blurry icon/banner on high DPI display.</li>
-          <li>Fixed context menu not showing properly sometimes.</li>
-          <li>Fixed Desktop path for other languages.</li>
-          <li>Updated Italian translation.</li>
-          <li>Updated Dutch translation.</li>
-          <li>Updated Spanish translation.</li>
+          <li>Some changes have been made to the UI.</li>
+          <li>Fixed splash window missing when running a Steam game.</li>
+          <li>With gamepad navigation, the gamepad now only works in the app if no game is running.</li>
         </ul>
       </description>
     </release>
