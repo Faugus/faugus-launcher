@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-22 16:21-0300\n"
-"PO-Revision-Date: 2026-03-26 00:08+0800\n"
+"PO-Revision-Date: 2026-05-18 21:25+0800\n"
 "Last-Translator: skyhighcaterpie\n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -24,7 +24,7 @@ msgstr "Steamのゲームを起動しています..."
 
 #: /usr/bin/faugus-run:367
 msgid "Are you enjoying Faugus Launcher?"
-msgstr "Faugus Launcherを楽しんでいますか？"
+msgstr "Faugusランチャーを楽しんでいますか？"
 
 #: /usr/bin/faugus-run:371
 msgid "Please consider donating"
