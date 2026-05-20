@@ -998,6 +998,13 @@ def update_games_json():
             game.pop("favorite")
             changed = True
 
+        if "icon" not in game and "banner" in game and isinstance(game["banner"], str):
+            banner_path = game["banner"]
+            icon_path = banner_path.replace("/banners/", "/icons/")
+            icon_path = os.path.splitext(icon_path)[0] + ".ico"
+            game["icon"] = icon_path
+            changed = True
+
     if changed:
         with open(games_json, "w", encoding="utf-8") as f:
             json.dump(games, f, indent=4, ensure_ascii=False)

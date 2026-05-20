@@ -1589,19 +1589,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         title_formatted_old = format_title(game.title)
         title_formatted = format_title(new_title)
 
-        icon = f"{icons_dir}/{title_formatted_old}.ico"
-        banner = game.banner
-
+        icon = game.icon
         new_icon = f"{icons_dir}/{title_formatted}.ico"
-        new_banner = f"{banners_dir}/{title_formatted}.png"
-        new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
-
         if os.path.exists(icon):
             shutil.copyfile(icon, new_icon)
 
+        banner = game.banner
+        new_banner = f"{banners_dir}/{title_formatted}.png"
         if os.path.exists(banner):
             shutil.copyfile(banner, new_banner)
 
+        new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
         if os.path.exists(game.addapp_bat):
             shutil.copyfile(game.addapp_bat, new_addapp_bat)
 
@@ -1636,6 +1634,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             "hidden": game.hidden,
             "prevent_sleep": game.prevent_sleep,
             "category": game.category,
+            "icon": game.icon,
         }
 
         games = []
@@ -1893,7 +1892,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         game_data.get("playtime", 0),
                         game_data.get("hidden", False),
                         game_data.get("prevent_sleep", False),
-                        game_data.get("category", False)
+                        game_data.get("category", False),
+                        game_data.get("icon", "")
                     )
 
                     if not self.show_hidden and game.hidden:
@@ -1924,7 +1924,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         hbox.get_style_context().add_class("game")
 
-        game_icon = f'{icons_dir}/{game.gameid}.ico'
+        game_icon = game.icon
         if not os.path.isfile(game_icon):
             game_icon = faugus_png
 
@@ -2008,10 +2008,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
-            if game.banner == "" or not os.path.isfile(game.banner):
+            banner_path = game.banner
+            if not os.path.isfile(game.banner):
                 banner_path = faugus_banner
-            else:
-                banner_path = game.banner
 
             if self.smaller_banners:
                 surface = self.get_game_artwork(banner_path, game, 180, 270)
@@ -2043,11 +2042,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def update_game_visual(self, flowbox_child):
         game = flowbox_child.game
 
-        game_icon = f'{icons_dir}/{game.gameid}.ico'
-        if not os.path.isfile(game_icon):
-            game_icon = faugus_png
-
         if hasattr(flowbox_child, "image"):
+            game_icon = game.icon
+            if not os.path.isfile(game_icon):
+                game_icon = faugus_png
+
             if self.interface_mode == "List":
                 surface = self.get_game_artwork(game_icon, game, 40, 40)
             else:
@@ -2056,10 +2055,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             flowbox_child.image.set_from_surface(surface)
 
         if hasattr(flowbox_child, "banner"):
-            if game.banner == "" or not os.path.isfile(game.banner):
+            banner_path = game.banner
+            if not os.path.isfile(game.banner):
                 banner_path = faugus_banner
-            else:
-                banner_path = game.banner
 
             if self.smaller_banners:
                 surface = self.get_game_artwork(banner_path, game, 180, 270)
@@ -2406,12 +2404,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.lossless_hdr = game.lossless_hdr
             edit_game_dialog.lossless_present = game.lossless_present
 
-            if not os.path.isfile(game.banner):
-                game.banner = faugus_banner
-            shutil.copyfile(game.banner, edit_game_dialog.banner_path_temp)
-            surface = self.new_surface_from_image(game.banner, 260, 390, True)
+            banner_path = game.banner
+            if not os.path.isfile(banner_path):
+                banner_path = faugus_banner
+
+            shutil.copyfile(banner_path, edit_game_dialog.banner_path_temp)
+            surface = self.new_surface_from_image(banner_path, 260, 390, True)
             edit_game_dialog.image_banner.set_from_surface(surface)
             edit_game_dialog.image_banner2.set_from_surface(surface)
+
+            icon_path = game.icon
+            if not os.path.isfile(icon_path):
+                icon_path = faugus_png
+
+            shutil.copyfile(icon_path, edit_game_dialog.icon_temp)
+            surface = self.new_surface_from_image(icon_path, 50, 50)
+            image = Gtk.Image.new_from_surface(surface)
+            edit_game_dialog.button_shortcut_icon.set_image(image)
 
             mangohud_enabled = os.path.exists(mangohud_dir)
             if mangohud_enabled:
@@ -2451,8 +2460,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             edit_game_dialog.check_existing_shortcut()
 
-            image = self.set_image_shortcut_icon(game.title, edit_game_dialog.icons_path, edit_game_dialog.icon_temp)
-            edit_game_dialog.button_shortcut_icon.set_image(image)
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
@@ -2472,23 +2479,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             except SyntaxError:
                 return False
         return False
-
-    def set_image_shortcut_icon(self, title, icons_path, icon_temp):
-        title_formatted = format_title(title)
-
-        # Check if the icon file exists
-        icon_path = os.path.join(icons_path, f"{title_formatted}.ico")
-
-        if os.path.exists(icon_path):
-            shutil.copyfile(icon_path, icon_temp)
-        if not os.path.exists(icon_path):
-            icon_temp = faugus_png
-
-        surface = self.new_surface_from_image(icon_temp, 50, 50)
-
-        image = Gtk.Image.new_from_surface(surface)
-
-        return image
 
     def on_button_delete_clicked(self, *_):
         self.reload_playtimes()
@@ -2724,6 +2714,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 banner = ""
 
+            icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
+            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
+            icon = icon_final
+
             runner = convert_runner(runner)
             if launcher_id == "linux":
                 runner = "Linux-Native"
@@ -2773,15 +2767,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 hidden,
                 prevent_sleep,
                 category,
+                icon,
             )
 
             # Determine the state of the shortcut checkbox
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
             appmenu_shortcut_state = add_game_dialog.checkbox_shortcut_appmenu.get_active()
             steam_shortcut_state = add_game_dialog.checkbox_shortcut_steam.get_active()
-
-            icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
-            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
 
             def check_internet_connection():
                 import socket
@@ -2832,6 +2824,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 "hidden": hidden,
                 "prevent_sleep": prevent_sleep,
                 "category": category,
+                "icon": icon,
             }
 
             games = []
@@ -3171,14 +3164,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 except subprocess.CalledProcessError as e:
                     print(f"Error resizing banner: {e}")
 
+            icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
+            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
+            game.icon = icon_final
+
             game.runner = convert_runner(game.runner)
             if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
             if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
                 game.runner = "Steam"
-
-            icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
-            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
 
             # Determine the state of the shortcut checkbox
             desktop_shortcut_state = edit_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -3489,6 +3483,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     "hidden": hidden,
                     "prevent_sleep": game.prevent_sleep,
                     "category": game.category,
+                    "icon": game.icon,
                 }
 
             new_games_data.append(game_data)
@@ -4881,6 +4876,7 @@ class Game:
         hidden,
         prevent_sleep,
         category,
+        icon,
     ):
         self.gameid = gameid
         self.title = title
@@ -4909,6 +4905,7 @@ class Game:
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
         self.category = category
+        self.icon = icon
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -6429,7 +6426,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         webbrowser.open("https://umu.openwinecomponents.org/")
 
     def set_image_shortcut_icon(self):
-
         image_path = faugus_png
         shutil.copyfile(image_path, self.icon_temp)
 
@@ -6933,6 +6929,13 @@ def update_games_json():
                 game["category"] = False
 
             game.pop("favorite")
+            changed = True
+
+        if "icon" not in game and "banner" in game and isinstance(game["banner"], str):
+            banner_path = game["banner"]
+            icon_path = banner_path.replace("/banners/", "/icons/")
+            icon_path = os.path.splitext(icon_path)[0] + ".ico"
+            game["icon"] = icon_path
             changed = True
 
     if changed:
