@@ -219,7 +219,7 @@ class BackupWindow(Gtk.Dialog):
         self.main_box.pack_start(self.btn_manual, False, False, 0)
 
         self.box_switch = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.check_auto = Gtk.CheckButton(label=_("Automatic Backups"))
+        self.check_auto = Gtk.CheckButton(label=_("Automatic Backup"))
         self.check_auto.set_margin_top(10)
         is_enabled = self.config.get('backup-auto-enabled', 'False') == 'True'
         self.check_auto.set_active(is_enabled)
