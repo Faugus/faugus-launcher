@@ -82,12 +82,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.19.5-1" date="2026-05-18">
+    <release version="1.20.1-1" date="2026-05-23">
       <description>
         <ul>
-          <li>Some changes have been made to the UI.</li>
-          <li>Fixed splash window missing when running a Steam game.</li>
-          <li>With gamepad navigation, the gamepad now only works in the app if no game is running.</li>
+          <li>Reworked game icon.</li>
+          <li>Added the flash animation for the main buttons as well.</li>
+          <li>Now updates EA App shortcuts when EA App updates itself.</li>
+          <li>Removed Gamepad Navigation workaround that could prevent a game from running.</li>
+          <li>Updated Japanese translation.</li>
+          <li>Updated Portuguese translation.</li>
+          <li>Reworked the backup system.</li>
         </ul>
       </description>
     </release>
