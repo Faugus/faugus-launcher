@@ -167,13 +167,13 @@ def _handle_button_down(self, button):
 
     elif not is_dialog_active:
         if button == btn["square"]:
-            self.on_button_kill_clicked(None)
+            self.button_kill.emit("clicked")
         elif button == btn["triangle"]:
             _open_context_menu(self)
         elif button == btn["lb"]:
-            self.on_button_add_clicked(None)
+            self.button_add.emit("clicked")
         elif button == btn["rb"]:
-            self.on_button_settings_clicked(None)
+            self.button_settings.emit("clicked")
         elif button == btn["start"]:
             GLib.idle_add(lambda: self.show_power_menu(None))
 
@@ -656,7 +656,7 @@ def activate_focused_widget(self):
             if game.gameid in self.running:
                 self.running_dialog(game.title)
             else:
-                self.on_button_play_clicked()
+                self.button_play.emit("clicked")
 
 def get_active_window():
     for window in Gtk.Window.list_toplevels():
