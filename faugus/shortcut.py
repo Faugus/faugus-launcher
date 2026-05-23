@@ -41,7 +41,7 @@ else:
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 app_dir = Path(PathManager.get_applications())
-icons_dir = PathManager.user_config('faugus-launcher/icons')
+icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 prefixes_dir = PathManager.user_home('Faugus')
 mangohud_dir = PathManager.find_binary('mangohud')
@@ -367,11 +367,9 @@ class CreateShortcut(Gtk.Window):
             os.makedirs(self.icon_directory)
 
         try:
-            # Attempt to extract the icon
             command = f'icoextract "{file_path}" "{self.icon_extracted}"'
             result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-            # Check if there was an error in executing the command
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
                     print("The file does not contain icons.")
@@ -379,9 +377,9 @@ class CreateShortcut(Gtk.Window):
                 else:
                     print(f"Error extracting icon: {result.stderr}")
             else:
-                # Convert the extracted icon to PNG
                 command_magick = shutil.which("magick") or shutil.which("convert")
-                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
+
                 if os.path.isfile(self.icon_extracted):
                     os.remove(self.icon_extracted)
 
@@ -954,7 +952,7 @@ class CreateShortcut(Gtk.Window):
                     print(f"Error extracting icon: {result.stderr}")
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
-                os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
                 if os.path.isfile(self.icon_extracted):
                     os.remove(self.icon_extracted)
 

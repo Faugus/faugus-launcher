@@ -3064,7 +3064,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return None
 
         final = os.path.join(icons_dir, f"{gameid}.ico")
-        subprocess.run([magick, best, final])
+        subprocess.run([magick, best, "-resize", "256x256!", final], check=True)
 
         shutil.rmtree(tmp_dir)
         return final
@@ -6427,7 +6427,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         print(f"Error extracting icon: {result.stderr}")
                 else:
                     command_magick = shutil.which("magick") or shutil.which("convert")
-                    os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
                     if os.path.isfile(self.icon_extracted):
                         os.remove(self.icon_extracted)
 
@@ -6714,7 +6714,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         print(f"Error extracting icon: {result.stderr}")
                 else:
                     command_magick = shutil.which("magick") or shutil.which("convert")
-                    os.system(f'{command_magick} "{self.icon_extracted}" "{self.icon_converted}"')
+                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
 
                     if os.path.isfile(self.icon_extracted):
                         os.remove(self.icon_extracted)
