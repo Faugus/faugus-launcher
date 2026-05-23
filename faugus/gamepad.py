@@ -13,9 +13,6 @@ def get_button_map(joy):
     return {"confirm": 0, "back": 1, "square": 2, "triangle": 3, "lb": 4, "rb": 5, "start": 7, "start_alt": 6}
 
 def init_gamepad(self):
-    os.environ["SDL_VIDEODRIVER"] = "dummy"
-    os.environ["SDL_AUDIODRIVER"] = "dummy"
-
     pygame.init()
     pygame.joystick.init()
 
