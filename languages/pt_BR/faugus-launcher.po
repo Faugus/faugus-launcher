@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-23 17:11-0300\n"
-"PO-Revision-Date: 2026-05-23 17:16-0300\n"
+"POT-Creation-Date: 2026-05-23 17:20-0300\n"
+"PO-Revision-Date: 2026-05-23 17:21-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -862,8 +862,8 @@ msgid "Backup now"
 msgstr "Fazer backup agora"
 
 #: /usr/lib/python3.14/site-packages/faugus/backup.py:222
-msgid "Automatic Backups"
-msgstr "Backups Automáticos"
+msgid "Automatic Backup"
+msgstr "Backup Automático"
 
 #: /usr/lib/python3.14/site-packages/faugus/backup.py:231
 msgid "Daily"
