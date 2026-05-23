@@ -1,4 +1,5 @@
 py.install_sources(
+  'backup.py',
   'components.py',
   'config_manager.py',
   'dark_theme.py',

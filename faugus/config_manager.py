@@ -38,6 +38,11 @@ class ConfigManager:
             'gamepad-navigation': 'False',
             'start-minimized': 'False',
             'show-categories': 'False',
+            'backup-auto-enabled': 'False',
+            'backup-frequency': 'daily',
+            'backup-target-day': '0',
+            'backup-dest-dir': '',
+            'backup-last-date': '',
         }
 
         self.config = {}

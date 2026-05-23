@@ -242,6 +242,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 opacity: 0.5;
                 transition: opacity 0.05s ease-in;
             }
+            button.flash-btn {
+                transition: background-color 0.3s ease-out, opacity 0.3s ease-out;
+            }
+            button.flash-btn.flashing {
+                background-color: alpha(@theme_text_color, 0.3);
+                opacity: 0.5;
+                transition: background-color 0.05s ease-in, opacity 0.05s ease-in;
+            }
             .category-list {
                 background-color: alpha(@theme_base_color, 0.5);
             }
@@ -536,7 +544,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def create_button(icon_name, callback, tooltip=None):
             btn = Gtk.Button()
+            btn.get_style_context().add_class("flash-btn")
+
+            def trigger_flash(widget):
+                style_ctx = widget.get_style_context()
+                style_ctx.add_class("flashing")
+
+                def remove_flash():
+                    style_ctx.remove_class("flashing")
+                    return False
+
+                GLib.timeout_add(50, remove_flash)
+
+            btn.connect("clicked", trigger_flash)
             btn.connect("clicked", callback)
+
             btn.set_size_request(50, 50)
             btn.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON))
             if tooltip:
@@ -544,8 +566,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return btn
 
         self.button_add = create_button("faugus-add-symbolic", self.on_button_add_clicked)
-        button_settings = create_button("faugus-settings-symbolic", self.on_button_settings_clicked)
-        button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Force close all running games"))
+        self.button_settings = create_button("faugus-settings-symbolic", self.on_button_settings_clicked)
+        self.button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Force close all running games"))
         self.button_play = create_button("faugus-play-symbolic", self.on_button_play_clicked)
 
         self.entry_search = Gtk.Entry()
@@ -660,8 +682,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             grid_controls.attach(self.entry_search, 0, 0, 4, 1)
             grid_controls.attach(self.button_add,   0, 1, 1, 1)
-            grid_controls.attach(button_settings,   1, 1, 1, 1)
-            grid_controls.attach(button_kill,       2, 1, 1, 1)
+            grid_controls.attach(self.button_settings,   1, 1, 1, 1)
+            grid_controls.attach(self.button_kill,       2, 1, 1, 1)
             grid_controls.attach(self.button_play,  3, 1, 1, 1)
 
             sidebar.pack_end(grid_controls, False, False, 0)
@@ -690,9 +712,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.entry_search.set_hexpand(True)
 
             grid_controls.attach(self.button_add,   0, 0, 1, 1)
-            grid_controls.attach(button_settings,   1, 0, 1, 1)
+            grid_controls.attach(self.button_settings,   1, 0, 1, 1)
             grid_controls.attach(self.entry_search, 2, 0, 1, 1)
-            grid_controls.attach(button_kill,       3, 0, 1, 1)
+            grid_controls.attach(self.button_kill,       3, 0, 1, 1)
             grid_controls.attach(self.button_play,  4, 0, 1, 1)
 
             self.box_bottom.pack_start(grid_controls, True, True, 0)
@@ -4524,64 +4546,12 @@ class Settings(Gtk.Dialog):
     def on_button_backup_clicked(self, widget):
         self.check_modified()
 
-        self.response(Gtk.ResponseType.OK)
-        self.show_warning_dialog_settings(self, _("Prefixes and runners will not be backed up!"), False)
+        from faugus.backup import BackupWindow
 
-        items = ["banners", "games-backup", "icons", "config.ini", "envar.txt", "games.json", "latest-games.txt"]
+        self.destroy()
 
-        temp_dir = os.path.join(faugus_launcher_dir, "temp-backup")
-        os.makedirs(temp_dir, exist_ok=True)
-
-        for item in items:
-            src = os.path.join(faugus_launcher_dir, item)
-            dst = os.path.join(temp_dir, item)
-            if os.path.isdir(src):
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            elif os.path.isfile(src):
-                os.makedirs(os.path.dirname(dst), exist_ok=True)
-                shutil.copy2(src, dst)
-
-        marker_path = os.path.join(temp_dir, ".faugus_marker")
-        with open(marker_path, "w") as f:
-            f.write("faugus-launcher-backup")
-
-        current_date = os.popen("date +%Y-%m-%d").read().strip()
-        zip_filename = f"faugus-launcher-{current_date}"
-        zip_path = os.path.join(faugus_launcher_dir, zip_filename)
-
-        shutil.make_archive(zip_path, "zip", temp_dir)
-        shutil.rmtree(temp_dir)
-
-        filechooser = Gtk.FileChooserNative(
-            title=_("Save the backup file as..."),
-            action=Gtk.FileChooserAction.SAVE,
-            accept_label=_("Save"),
-            cancel_label=_("Cancel"),
-        )
-
-        filechooser.set_current_folder(os.path.expanduser("~"))
-        filechooser.set_current_name(f"{zip_filename}.zip")
-
-        response = filechooser.run()
-
-        if response == Gtk.ResponseType.ACCEPT:
-            dest = filechooser.get_filename()
-
-            if not dest.endswith(".zip"):
-                dest += ".zip"
-
-            try:
-                if os.path.exists(dest):
-                    os.remove(dest)
-
-                shutil.copy2(zip_path + ".zip", dest)
-                print(f"Backup saved at: {dest}")
-            except Exception as e:
-                print(f"Error saving backup: {e}")
-
-        filechooser.destroy()
-
-        os.remove(zip_path + ".zip")
+        backup_win = BackupWindow(None, faugus_launcher_dir)
+        backup_win.show_all()
 
     def on_button_restore_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
