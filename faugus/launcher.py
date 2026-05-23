@@ -3064,7 +3064,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return None
 
         final = os.path.join(icons_dir, f"{gameid}.ico")
-        subprocess.run([magick, best, "-resize", "256x256!", final], check=True)
+        subprocess.run([magick, best, "-resize", "256x256!", f"png:{final}"], check=True)
 
         shutil.rmtree(tmp_dir)
         return final
