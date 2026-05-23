@@ -3,10 +3,12 @@ import shutil
 import sys
 import time
 import calendar
+import gettext
 from datetime import datetime, timedelta
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
+from faugus.language_config import *
 
 def load_config(faugus_dir):
     config = {}
@@ -146,6 +148,14 @@ def daemon_mode(faugus_dir):
             pass
         time.sleep(14400)
 
+try:
+    translation = gettext.translation('faugus-launcher', localedir=LOCALE_DIR, languages=[lang])
+    translation.install()
+    _ = translation.gettext
+except FileNotFoundError:
+    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
+    _ = gettext.gettext
+
 class BackupWindow(Gtk.Dialog):
     def __init__(self, parent, faugus_dir):
         super().__init__(title=_("Backup Settings"), transient_for=parent)
@@ -182,13 +192,13 @@ class BackupWindow(Gtk.Dialog):
         self.frame.add(self.main_box)
         self.root_box.pack_start(self.frame, True, True, 0)
 
-        self.lbl_path = Gtk.Label(label=_("Backup Path"))
+        self.lbl_path = Gtk.Label(label=_("Backup Destination"))
         self.lbl_path.set_halign(Gtk.Align.START)
         self.main_box.pack_start(self.lbl_path, False, False, 0)
 
         dest_dir = self.config.get('backup-dest-dir', '')
         if not dest_dir:
-            dest_dir = os.path.expanduser("~")
+            dest_dir = os.path.expanduser(PathManager.user_home('Faugus Backup'))
 
         self.box_dest = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.entry_dest = Gtk.Entry()
@@ -267,8 +277,8 @@ class BackupWindow(Gtk.Dialog):
         self.lbl_last_backup.set_margin_top(10)
         self.main_box.pack_start(self.lbl_last_backup, False, False, 0)
 
-        self.lbl_warning = Gtk.Label(label=_("Prefixes and runners will not be backed up!"))
-        self.lbl_warning.set_markup(f'<span color="red">{_("Prefixes and runners will not be backed up!")}</span>')
+        self.lbl_warning = Gtk.Label(label=_("Prefixes and Protons will not be backed up!"))
+        self.lbl_warning.set_markup(f'<span color="red">{_("Prefixes and Protons will not be backed up!")}</span>')
         self.main_box.pack_start(self.lbl_warning, False, False, 0)
 
         self.btn_cancel = Gtk.Button(label=_("Cancel"))
@@ -336,9 +346,9 @@ class BackupWindow(Gtk.Dialog):
 
     def on_browse_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
-            title=_("Select Backup Destination"),
+            title=_("Select the backup destination"),
             action=Gtk.FileChooserAction.SELECT_FOLDER,
-            accept_label=_("Select"),
+            accept_label=_("Open"),
             cancel_label=_("Cancel")
         )
         filechooser.set_transient_for(self)
