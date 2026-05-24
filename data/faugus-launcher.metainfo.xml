@@ -82,7 +82,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.20.1-1" date="2026-05-23">
+    <release version="1.20.2-1" date="2026-05-24">
       <description>
         <ul>
           <li>Reworked game icon.</li>
@@ -90,6 +90,7 @@
           <li>Now updates EA App shortcuts when EA App updates itself.</li>
           <li>Removed Gamepad Navigation workaround that could prevent a game from running.</li>
           <li>Updated Japanese translation.</li>
+          <li>Updated Italian translation.</li>
           <li>Updated Portuguese translation.</li>
           <li>Reworked the backup system.</li>
         </ul>
