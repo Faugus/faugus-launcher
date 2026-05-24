@@ -6889,6 +6889,7 @@ def update_games_json():
         return
 
     changed = False
+
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
@@ -6901,12 +6902,14 @@ def update_games_json():
             game.pop("favorite")
             changed = True
 
-        if "icon" not in game and "banner" in game and isinstance(game["banner"], str):
-            banner_path = game["banner"]
-            icon_path = banner_path.replace("/banners/", "/icons/")
-            icon_path = os.path.splitext(icon_path)[0] + ".ico"
-            game["icon"] = icon_path
-            changed = True
+        game_id = game.get("gameid")
+
+        if game_id:
+            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+
+            if game.get("icon") != new_icon_path:
+                game["icon"] = new_icon_path
+                changed = True
 
     if changed:
         with open(games_json, "w", encoding="utf-8") as f:
