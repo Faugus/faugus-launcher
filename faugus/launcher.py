@@ -634,8 +634,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.show_categories:
             scroll_box.set_size_request(350, -1)
 
-            main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            main_hbox.pack_start(scroll_box, True, True, 0)
+            self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            self.main_hbox.pack_start(scroll_box, True, True, 0)
 
             sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             sidebar.set_size_request(220, -1)
@@ -687,9 +687,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             grid_controls.attach(self.button_play,  3, 1, 1, 1)
 
             sidebar.pack_end(grid_controls, False, False, 0)
-            main_hbox.pack_start(sidebar, False, False, 0)
+            self.main_hbox.pack_start(sidebar, False, False, 0)
 
-            self.box_main.pack_start(main_hbox, True, True, 0)
+            self.box_main.pack_start(self.main_hbox, True, True, 0)
 
             if hasattr(self, 'populate_categories'):
                 self.populate_categories()
@@ -2973,9 +2973,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
         grid_labels.attach(self.label_download2, 0, 2, 1, 1)
 
+        if self.show_categories:
+            self.box_main.remove(self.main_hbox)
+        else:
+            self.box_main.remove(self.box_top)
+            self.box_main.remove(self.box_bottom)
         self.box_main.add(self.box_launcher)
-        self.box_main.remove(self.box_top)
-        self.box_main.remove(self.box_bottom)
         self.box_main.show_all()
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
@@ -2984,10 +2987,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if retcode is not None:
             if os.path.exists(faugus_temp):
                 shutil.rmtree(faugus_temp)
-            self.box_main.pack_start(self.box_top, True, True, 0)
-            self.box_main.pack_end(self.box_bottom, False, True, 0)
             self.box_main.remove(self.box_launcher)
             self.box_launcher.destroy()
+            if self.show_categories:
+                self.box_main.add(self.main_hbox)
+            else:
+                self.box_main.pack_start(self.box_top, True, True, 0)
+                self.box_main.pack_end(self.box_bottom, False, True, 0)
             self.box_main.show_all()
 
             if game.gameid == "ea-app":
