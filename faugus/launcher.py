@@ -2362,6 +2362,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         file_path = ""
         # Handle add button click event
         add_game_dialog = AddGame(self, self.running, file_path, self.interface_mode)
+        add_game_dialog.combobox_steam_title.connect("changed", add_game_dialog.on_combobox_steam_changed)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
@@ -5519,8 +5520,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.set_active_id("windows")
         self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
-        self.combobox_steam_title.connect("changed", self.on_combobox_steam_changed)
-
         self.populate_combobox_with_runners()
 
         model = self.combobox_runner.get_model()
@@ -6146,6 +6145,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.checkbox_gamemode.set_active(self.default_gamemode)
             self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
             self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
+            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+            shutil.copyfile(faugus_banner, self.banner_path_temp)
+            self.update_image_banner()
 
             for w in (self.combobox_steam_title, self.entry_title,
                     self.entry_prefix, self.entry_path):
@@ -6170,7 +6172,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_box2.set_visible(True)
         self.notebook.set_show_tabs(True)
         self.button_shortcut_icon.set_visible(True)
-        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
         if active_id == "windows":
             self.grid_title.set_visible(True)
@@ -6242,9 +6243,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if self.interface_mode == "Banners":
             if self.entry_title.get_text():
                 self.get_banner()
-            else:
-                shutil.copyfile(faugus_banner, self.banner_path_temp)
-                self.update_image_banner()
 
     def populate_combobox_with_launchers(self):
         self.combobox_launcher.append("windows", _("Windows Game"))
