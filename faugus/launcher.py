@@ -170,10 +170,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.set_wmclass("faugus-launcher", "faugus-launcher")
         print(f"Faugus Launcher {VERSION}")
 
-        self.start_maximized = False
-        self.start_fullscreen = False
         self.fullscreen_activated = False
-
         self.system_tray = False
         self.indicator = False
         self.start_boot = False
@@ -325,16 +322,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode == "List":
             self.setup_interface()
         if self.interface_mode == "Blocks":
-            if self.start_maximized:
+            if self.window_behavior == "Maximized":
                 self.maximize()
-            if self.start_fullscreen:
+            if self.window_behavior == "Fullscreen":
                 self.fullscreen()
                 self.fullscreen_activated = True
             self.setup_interface(True)
         if self.interface_mode == "Banners":
-            if self.start_maximized:
+            if self.window_behavior == "Maximized":
                 self.maximize()
-            if self.start_fullscreen:
+            if self.window_behavior == "Fullscreen":
                 self.fullscreen()
                 self.fullscreen_activated = True
             self.setup_interface(True)
@@ -483,6 +480,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.on_button_play_clicked(None, game)
 
     def on_close(self, *_):
+        if self.window_behavior == "Remember":
+            width, height = self.get_size()
+            config = ConfigManager()
+            config.set_value("width", width)
+            config.set_value("height", height)
+            config.save_config()
+
         if self.system_tray:
             self.hide()
             return True
@@ -533,6 +537,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.set_default_size(1280, 720)
             self.set_resizable(True)
             top_orientation = Gtk.Orientation.HORIZONTAL
+            if self.window_behavior == "Remember":
+                self.resize(self.window_width, self.window_height)
         else:
             self.set_default_size(-1, 610)
             self.set_resizable(False)
@@ -701,7 +707,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             grid_controls = Gtk.Grid()
             grid_controls.set_column_spacing(10)
-            grid_controls.set_margin_top(10)
+            #grid_controls.set_margin_top(10)
             grid_controls.set_margin_bottom(10)
             grid_controls.set_margin_start(10)
             grid_controls.set_margin_end(10)
@@ -1859,9 +1865,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
         self.disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
-        self.start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
-        self.start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
         self.smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
@@ -1872,6 +1876,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         self.show_categories = cfg.config.get('show-categories', 'False') == 'True'
+        self.window_behavior = cfg.config.get('window-behavior', '')
+        self.window_width = int(cfg.config.get('width', 1280))
+        self.window_height = int(cfg.config.get('height', 720))
 
         if self.enable_logging:
             if self.menu_show_logs not in self.context_menu.get_children():
@@ -3694,14 +3701,12 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.append("Blocks", _("Blocks"))
         self.combobox_interface.append("Banners", _("Banners"))
 
-        self.checkbox_start_maximized = Gtk.CheckButton(label=_("Start maximized"))
-        self.checkbox_start_maximized.set_active(False)
-        self.checkbox_start_maximized.connect("toggled", self.on_checkbox_toggled, "maximized")
-
-        self.checkbox_start_fullscreen = Gtk.CheckButton(label=_("Start in fullscreen"))
-        self.checkbox_start_fullscreen.set_active(False)
-        self.checkbox_start_fullscreen.connect("toggled", self.on_checkbox_toggled, "fullscreen")
-        self.checkbox_start_fullscreen.set_tooltip_text(_("Alt+Enter toggles fullscreen"))
+        self.combobox_window_behavior = Gtk.ComboBoxText()
+        self.combobox_window_behavior.append("None", _("Default window size"))
+        self.combobox_window_behavior.append("Remember", _("Remember window size"))
+        self.combobox_window_behavior.append("Maximized", _("Start maximized"))
+        self.combobox_window_behavior.append("Fullscreen", _("Start in fullscreen"))
+        self.combobox_window_behavior.set_tooltip_text(_("Alt+Enter toggles fullscreen"))
 
         self.checkbox_show_labels = Gtk.CheckButton(label=_("Show labels"))
         self.checkbox_show_labels.set_active(False)
@@ -4070,10 +4075,10 @@ class Settings(Gtk.Dialog):
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
 
-        self.grid_big_interface.attach(self.checkbox_start_maximized, 0, 0, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_start_fullscreen, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_show_labels, 0, 2, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_smaller_banners, 0, 3, 1, 1)
+        self.grid_big_interface.attach(self.combobox_window_behavior, 0, 0, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_show_labels, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_smaller_banners, 0, 2, 1, 1)
+        self.combobox_window_behavior.set_hexpand(True)
 
         grid_support.attach(button_kofi, 0, 1, 1, 1)
         grid_support.attach(button_paypal, 1, 1, 1, 1)
@@ -4237,13 +4242,6 @@ class Settings(Gtk.Dialog):
             tooltip.set_text(widget.get_tooltip_text())
         return True
 
-    def on_checkbox_toggled(self, checkbox, option):
-        if checkbox.get_active():
-            if option == "maximized":
-                self.checkbox_start_fullscreen.set_active(False)
-            elif option == "fullscreen":
-                self.checkbox_start_maximized.set_active(False)
-
     def on_combobox_interface_changed(self, combobox):
         active_id = combobox.get_active_id()
         if active_id == "List":
@@ -4356,14 +4354,13 @@ class Settings(Gtk.Dialog):
         config.set_value("enable-hdr", self.checkbox_enable_hdr.get_active())
         config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
-        config.set_value("start-maximized", self.checkbox_start_maximized.get_active())
-        config.set_value("start-fullscreen", self.checkbox_start_fullscreen.get_active())
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
         config.set_value("smaller-banners", self.checkbox_smaller_banners.get_active())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("start-minimized", self.checkbox_start_minimized.get_active())
         config.set_value("show-categories", self.checkbox_show_categories.get_active())
+        config.set_value("window-behavior", self.combobox_window_behavior.get_active_id())
         config.save_config()
 
         self.set_sensitive(False)
@@ -4734,9 +4731,7 @@ class Settings(Gtk.Dialog):
         system_tray = cfg.config.get('system-tray', 'False') == 'True'
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
-        start_maximized = cfg.config.get('start-maximized', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
-        start_fullscreen = cfg.config.get('start-fullscreen', 'False') == 'True'
         show_labels = cfg.config.get('show-labels', 'False') == 'True'
         smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
@@ -4749,6 +4744,7 @@ class Settings(Gtk.Dialog):
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
         start_minimized = cfg.config.get('start-minimized', 'False') == 'True'
         show_categories = cfg.config.get('show-categories', 'False') == 'True'
+        window_behavior = cfg.config.get('window-behavior', '')
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
@@ -4779,8 +4775,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_system_tray.set_active(system_tray)
         self.checkbox_start_boot.set_active(self.start_boot)
         self.checkbox_mono_icon.set_active(self.mono_icon)
-        self.checkbox_start_maximized.set_active(start_maximized)
-        self.checkbox_start_fullscreen.set_active(start_fullscreen)
         self.checkbox_show_labels.set_active(show_labels)
         self.checkbox_smaller_banners.set_active(smaller_banners)
         self.checkbox_enable_logging.set_active(enable_logging)
@@ -4792,6 +4786,7 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.set_active_id(self.interface_mode)
         self.checkbox_start_minimized.set_active(start_minimized)
         self.checkbox_show_categories.set_active(show_categories)
+        self.combobox_window_behavior.set_active_id(window_behavior)
 
         model_language = self.combobox_language.get_model()
         index_language = 0

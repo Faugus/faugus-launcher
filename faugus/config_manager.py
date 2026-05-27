@@ -20,8 +20,6 @@ class ConfigManager:
             'start-boot': 'False',
             'mono-icon': 'False',
             'interface-mode': 'List',
-            'start-maximized': 'False',
-            'start-fullscreen': 'False',
             'show-labels': 'False',
             'smaller-banners': 'False',
             'enable-logging': 'False',
@@ -43,6 +41,9 @@ class ConfigManager:
             'backup-target-day': '0',
             'backup-dest-dir': '',
             'backup-last-date': '',
+            'window-behavior': 'None',
+            'width': '1280',
+            'height': '720',
         }
 
         self.config = {}
