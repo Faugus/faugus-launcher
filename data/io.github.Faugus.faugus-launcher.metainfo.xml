@@ -88,17 +88,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.20.3-1" date="2026-05-24">
+    <release version="1.20.4-1" date="2026-05-27">
       <description>
         <ul>
-          <li>Reworked game icon.</li>
-          <li>Added the flash animation for the main buttons as well.</li>
-          <li>Now updates EA App shortcuts when EA App updates itself.</li>
-          <li>Removed Gamepad Navigation workaround that could prevent a game from running.</li>
-          <li>Updated Japanese translation.</li>
-          <li>Updated Italian translation.</li>
+          <li>Added an option for Blocks/Banners to remember the window size.</li>
+          <li>Fixed launchers installation breaking the UI.</li>
+          <li>Now properly updates the banner when adding a game.</li>
           <li>Updated Portuguese translation.</li>
-          <li>Reworked the backup system.</li>
         </ul>
       </description>
     </release>
