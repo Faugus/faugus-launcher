@@ -112,8 +112,12 @@ class FaugusRun:
 
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
-            output = subprocess.getoutput("vulkaninfo --summary | grep -m 1 deviceName")
-            print(f"GPU: {output.split('=')[1].strip()}")
+            subprocess.run(
+                    ["vulkaninfo"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=False
+                )
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
             if self.enable_hdr:
