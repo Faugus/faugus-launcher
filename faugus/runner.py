@@ -113,7 +113,7 @@ class FaugusRun:
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
             subprocess.run(
-                    ["vulkaninfo"],
+                    ["vulkaninfo", "--summary"],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
                     check=False
