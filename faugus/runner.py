@@ -31,11 +31,8 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_json = PathManager.user_config('faugus-launcher/games.json')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = PathManager.user_home('Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
