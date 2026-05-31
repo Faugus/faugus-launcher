@@ -70,7 +70,6 @@ class FaugusRun:
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
-        self._env_set = set()
 
         self.load_config()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
@@ -533,7 +532,6 @@ class FaugusRun:
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = self.cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
-        self.language = self.cfg.config.get('language', '')
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
