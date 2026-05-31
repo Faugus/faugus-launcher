@@ -43,12 +43,10 @@ else:
 app_dir = Path(PathManager.get_applications())
 icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-prefixes_dir = PathManager.user_home('Faugus')
 mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 launcher_path = PathManager.find_binary('faugus-launcher')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 desktop_dir = PathManager.user_desktop()
 
