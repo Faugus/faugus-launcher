@@ -4998,11 +4998,6 @@ class DeleteDialog(Gtk.Dialog):
 
         self.show_all()
 
-    def get_remove_prefix_state(self):
-        # Get the state of the checkbox
-        return self.checkbox.get_active()
-
-
 class AddGame(Gtk.Dialog, HiDpiMixin):
     def __init__(self, parent, game_running2, file_path, interface_mode):
         # Initialize the AddGame dialog
