@@ -6091,11 +6091,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             shutil.copyfile(faugus_banner, self.banner_path_temp)
             self.update_image_banner()
 
-    def on_checkbox_addapp_toggled(self, checkbox):
-        is_active = checkbox.get_active()
-        self.entry_addapp.set_sensitive(is_active)
-        self.button_search_addapp.set_sensitive(is_active)
-
     def on_button_search_addapp_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select an additional application"),
