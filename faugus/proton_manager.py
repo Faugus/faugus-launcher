@@ -412,65 +412,6 @@ class ProtonDownloader(Gtk.Dialog):
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def extract_tar_and_update_button(self, tar_file_path, tag_name, button):
-        button.set_label(_("Extracting..."))
-        display_tag_name = f"proton-{tag_name}" if tag_name.startswith("EM-") else tag_name
-        self.progress_label.set_text(_("Extracting %s...") % display_tag_name)
-        self.progress_bar.set_fraction(0)
-        self.progress_bar.set_text("0%")
-
-        while Gtk.events_pending():
-            Gtk.main_iteration_do(False)
-
-        mode = 'r:xz' if tar_file_path.endswith('.tar.xz') else 'r:gz'
-
-        try:
-            with tarfile.open(tar_file_path, mode) as tar:
-                total_members = len(tar.getmembers())
-                extracted_members = 0
-
-                temp_dir = os.path.join(STEAM_COMPATIBILITY_PATH, f"temp_{tag_name}")
-                os.makedirs(temp_dir, exist_ok=True)
-
-                for member in tar.getmembers():
-                    tar.extract(member, path=temp_dir, filter="fully_trusted")
-                    extracted_members += 1
-                    progress = extracted_members / total_members
-                    self.progress_bar.set_fraction(progress)
-                    self.progress_bar.set_text(f"{int(progress * 100)}%")
-
-                    while Gtk.events_pending():
-                        Gtk.main_iteration_do(False)
-
-                extracted_dir = None
-                for item in os.listdir(temp_dir):
-                    item_path = os.path.join(temp_dir, item)
-                    if os.path.isdir(item_path):
-                        extracted_dir = item_path
-                        break
-
-                if extracted_dir:
-                    final_dir = os.path.join(STEAM_COMPATIBILITY_PATH, os.path.basename(extracted_dir))
-                    if os.path.exists(final_dir):
-                        shutil.rmtree(final_dir)
-                    shutil.move(extracted_dir, STEAM_COMPATIBILITY_PATH)
-
-                shutil.rmtree(temp_dir)
-
-            os.remove(tar_file_path)
-
-            self.update_button(button, _("Remove"))
-            self.progress_bar.set_visible(False)
-            self.progress_label.set_visible(False)
-
-        except Exception as e:
-            print(f"Error during extraction: {e}")
-            self.progress_label.set_text(_("Error during extraction"))
-            self.update_button(button, _("Download"))
-        finally:
-            self.enable_all_buttons()
-            button.set_sensitive(True)
-
     def on_remove_clicked(self, widget, release):
         version_path = self.get_installed_path(release["tag_name"])
         if version_path and os.path.exists(version_path):
