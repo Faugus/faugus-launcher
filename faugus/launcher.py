@@ -3576,12 +3576,6 @@ class Settings(Gtk.Dialog):
             color: white;
             background: #1AC0FF;
         }
-        .envar-list {
-            background-color: alpha(@theme_base_color, 0.5);
-        }
-        .envar-list row {
-            background-color: transparent;
-        }
         """
         css_provider.load_from_data(css.encode('utf-8'))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
@@ -3867,7 +3861,6 @@ class Settings(Gtk.Dialog):
         treeview.set_has_tooltip(True)
         treeview.connect("query-tooltip", self.on_query_tooltip)
         treeview.connect("key-press-event", self.on_envar_key_press)
-        treeview.get_style_context().add_class("envar-list")
 
         renderer = Gtk.CellRendererText()
         renderer.set_property("editable", True)
