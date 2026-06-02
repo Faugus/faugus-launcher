@@ -31,11 +31,8 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_json = PathManager.user_config('faugus-launcher/games.json')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = PathManager.user_home('Faugus')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
@@ -73,7 +70,6 @@ class FaugusRun:
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
-        self._env_set = set()
 
         self.load_config()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
@@ -536,7 +532,6 @@ class FaugusRun:
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_hdr = self.cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
-        self.language = self.cfg.config.get('language', '')
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
