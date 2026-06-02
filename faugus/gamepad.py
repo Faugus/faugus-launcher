@@ -1,4 +1,3 @@
-import os
 import time
 import pygame
 from gi.repository import Gdk, GLib, Gtk
