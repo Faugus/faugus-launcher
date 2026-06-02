@@ -367,8 +367,7 @@ class CreateShortcut(Gtk.Window):
             os.makedirs(self.icon_directory)
 
         try:
-            command = f'icoextract "{file_path}" "{self.icon_extracted}"'
-            result = subprocess.run(command, shell=True, text=True, capture_output=True)
+            result = subprocess.run(['icoextract', file_path, self.icon_extracted], text=True, capture_output=True)
 
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
@@ -941,8 +940,7 @@ class CreateShortcut(Gtk.Window):
             os.makedirs(self.icon_directory)
 
         try:
-            command = f'icoextract "{path}" "{self.icon_extracted}"'
-            result = subprocess.run(command, shell=True, text=True, capture_output=True)
+            result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
 
             if result.returncode != 0:
                 if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
