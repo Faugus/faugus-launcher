@@ -4998,11 +4998,6 @@ class DeleteDialog(Gtk.Dialog):
 
         self.show_all()
 
-    def get_remove_prefix_state(self):
-        # Get the state of the checkbox
-        return self.checkbox.get_active()
-
-
 class AddGame(Gtk.Dialog, HiDpiMixin):
     def __init__(self, parent, game_running2, file_path, interface_mode):
         # Initialize the AddGame dialog
@@ -6090,11 +6085,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         else:
             shutil.copyfile(faugus_banner, self.banner_path_temp)
             self.update_image_banner()
-
-    def on_checkbox_addapp_toggled(self, checkbox):
-        is_active = checkbox.get_active()
-        self.entry_addapp.set_sensitive(is_active)
-        self.button_search_addapp.set_sensitive(is_active)
 
     def on_button_search_addapp_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
