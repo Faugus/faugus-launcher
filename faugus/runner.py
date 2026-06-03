@@ -147,7 +147,7 @@ class FaugusRun:
         self.start_time = time.time()
 
         # LSFG_LEGACY env is deprecated in LSFG-VK 2.0
-        if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
+        if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK_ENV"):
             if self.lossless_location:
                 set_env("LSFG_DLL_PATH", self.lossless_location) # Deprecated in LSFG-VK v2.0
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
