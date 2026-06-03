@@ -15,6 +15,7 @@ from PIL import Image
 from faugus.dark_theme import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
+from faugus.language_config import get_system_locale, get_language_from_config
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
@@ -49,29 +50,6 @@ umu_run = PathManager.user_data('faugus-launcher/umu-run')
 launcher_path = PathManager.find_binary('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 desktop_dir = PathManager.user_desktop()
-
-def get_system_locale():
-    lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
-    if lang:
-        return lang.split('.')[0]
-
-    try:
-        loc = locale.getdefaultlocale()[0]
-        if loc:
-            return loc
-    except Exception:
-        pass
-
-    return 'en_US'
-
-def get_language_from_config():
-    if os.path.exists(config_file_dir):
-        with open(config_file_dir, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith('language='):
-                    return line.split('=', 1)[1].strip()
-    return None
 
 lang = get_language_from_config()
 if not lang:
