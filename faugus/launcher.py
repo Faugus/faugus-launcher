@@ -2569,7 +2569,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.select_first_child()
 
     def reload_playtimes(self):
-        import json
         try:
             with open("games.json", "r", encoding="utf-8") as f:
                 games_data = json.load(f)
