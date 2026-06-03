@@ -15,7 +15,6 @@ from PIL import Image
 from faugus.dark_theme import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
-from faugus.language_config import lang, LOCALE_DIR, get_system_locale, get_language_from_config
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
