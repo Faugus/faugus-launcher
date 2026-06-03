@@ -1612,7 +1612,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             )
             return
 
-        title_formatted_old = format_title(game.title)
         title_formatted = format_title(new_title)
 
         icon = game.icon
@@ -1704,8 +1703,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game = self.selected()
         gameid = game.gameid
         title = game.title
-
-        current_focus = self.get_focus()
 
         if gameid in self.running:
             self.running_dialog(title)

@@ -6,7 +6,6 @@ from faugus.path_manager import PathManager
 from gi.repository import GdkPixbuf
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
-IS_STEAM_FLATPAK = None
 
 def has_steam_flatpak():
     try:
@@ -59,7 +58,6 @@ def detect_steam_folder():
 steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()
 userdata = steam_folder / "userdata" if steam_folder else None
 library = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
-steamapps = steam_folder / "steamapps" if steam_folder else None
 librarycache = steam_folder / "appcache/librarycache" if steam_folder else None
 
 lossless_dll = (
