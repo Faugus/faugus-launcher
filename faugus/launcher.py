@@ -5855,19 +5855,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog.destroy()
         return response
 
-    def check_steam_shortcut(self, title):
-        if os.path.exists(steam_shortcuts_path):
-            try:
-                with open(steam_shortcuts_path, 'rb') as f:
-                    shortcuts = vdf.binary_load(f)
-                for game in shortcuts["shortcuts"].values():
-                    if isinstance(game, dict) and "AppName" in game and game["AppName"] == title:
-                        return True
-                return False
-            except SyntaxError:
-                return False
-        return False
-
     def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
         current_text = widget.get_text()
         if current_text.strip():
