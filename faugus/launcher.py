@@ -1445,8 +1445,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 command_parts.append(f"LOG_DIR={title_formatted}")
             if prefix:
                 command_parts.append(f"WINEPREFIX='{prefix}'")
-            if title_formatted:
-                command_parts.append(f"GAMEID={title_formatted}")
             if runner:
                 if runner == "Proton-CachyOS (System)":
                     command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -3116,23 +3114,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.label_download.set_text(_("Installing %s...") % title)
                 if launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
+                    command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
                     self.label_download2.set_text(_("Please close the login window and wait."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} '{file_path}' /S"
                 elif launcher == "epic":
                     self.label_download2.set_text("")
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} msiexec /i '{file_path}' /passive"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} msiexec /i '{file_path}' /passive"
                 elif launcher == "ubisoft":
                     self.label_download2.set_text("")
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /S"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} '{file_path}' /S"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait."))
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}'"
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} '{file_path}'"
                 elif launcher == "wargaming":
                     self.label_download2.set_text(_("Please close Wargaming to finish the installation."))
-                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' GAMEID={title_formatted} {umu_run} '{file_path}' /SILENT"
+                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {umu_run} '{file_path}' /SILENT"
 
                 if runner:
                     if runner == "Proton-CachyOS (System)":
@@ -4450,7 +4448,6 @@ class Settings(Gtk.Dialog):
         default_runner = self.get_default_runner()
         command_parts = []
 
-        command_parts.append(f"GAMEID=default")
         if default_runner:
             if default_runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -4505,8 +4502,6 @@ class Settings(Gtk.Dialog):
             command_parts = []
 
             if not escaped_file_run.endswith(".reg"):
-                if escaped_file_run:
-                    command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS (System)":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -4514,8 +4509,6 @@ class Settings(Gtk.Dialog):
                         command_parts.append(f"PROTONPATH='{default_runner}'")
                 command_parts.append(f"'{umu_run}' '{escaped_file_run}'")
             else:
-                if escaped_file_run:
-                    command_parts.append(f"GAMEID=default")
                 if default_runner:
                     if default_runner == "Proton-CachyOS (System)":
                         command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -6330,8 +6323,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 command_parts.append(f"LOG_DIR={title_formatted}")
             if prefix:
                 command_parts.append(f"WINEPREFIX='{prefix}'")
-            if title_formatted:
-                command_parts.append(f"GAMEID={title_formatted}")
             if runner:
                 if runner == "Proton-CachyOS (System)":
                     command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -6550,8 +6541,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             command_parts.append(f"LOG_DIR='{title_formatted}'")
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
-        if title_formatted:
-            command_parts.append(f"GAMEID={title_formatted}")
         if runner:
             if runner == "Proton-CachyOS (System)":
                 command_parts.append(f"PROTONPATH='{proton_cachyos}'")
@@ -6808,7 +6797,6 @@ def run_file(file_path):
     if prevent_sleep:
         command_parts.append("PREVENT_SLEEP=1")
     command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
-    command_parts.append("GAMEID=default")
     if default_runner:
         if default_runner == "Proton-CachyOS (System)":
             command_parts.append(f'PROTONPATH="{proton_cachyos}"')

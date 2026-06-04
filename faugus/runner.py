@@ -172,9 +172,8 @@ class FaugusRun:
                 else:
                     set_env("PROTONPATH", f"{self.default_runner}")
 
-        if os.environ.get("GAMEID") != "winetricks-gui":
-            if "umu" not in os.environ.get("GAMEID", "") and not (os.environ.get("GAMEID", "").isnumeric()):
-                set_env("PROTONFIXES_DISABLE", "1")
+        if not os.environ.get("GAMEID"):
+            set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
@@ -764,10 +763,7 @@ class FaugusRun:
         self.cfg.save_config()
         self.release_prefix()
 
-        if os.environ.get("FAUGUSID"):
-            game_id = os.environ.get("FAUGUSID")
-        else:
-            game_id = os.environ.get("GAMEID")
+        game_id = os.environ.get("FAUGUSID")
 
         if game_id and os.path.exists(games_json):
             try:
@@ -843,11 +839,10 @@ def build_launch_command(game):
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if prevent_sleep:
         command_parts.append("PREVENT_SLEEP=1")
+    if gameid:
+        command_parts.append(f"FAUGUSID={gameid}")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
-        command_parts.append(f"FAUGUSID={game['gameid']}")
-    else:
-        command_parts.append(f"GAMEID={game['gameid']}")
     if runner:
         if runner == "Linux-Native":
             command_parts.append('PROTONPATH=umu-sniper')

@@ -789,8 +789,6 @@ class CreateShortcut(Gtk.Window):
             command_parts.append("PREVENT_SLEEP=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
-        else:
-            command_parts.append(f'GAMEID={title_formatted}')
         if launch_arguments:
             command_parts.append(launch_arguments)
         if lossless_enabled:
