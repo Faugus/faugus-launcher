@@ -2,7 +2,6 @@ py.install_sources(
   'backup.py',
   'components.py',
   'config_manager.py',
-  'dark_theme.py',
   'ea_fix.py',
   'gamepad.py',
   'keyboard.py',
@@ -14,5 +13,6 @@ py.install_sources(
   'runner.py',
   'shortcut.py',
   'steam_setup.py',
+  'utils.py',
   subdir: 'faugus',
 )

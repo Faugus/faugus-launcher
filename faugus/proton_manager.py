@@ -10,7 +10,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.dark_theme import *
+from faugus.utils import apply_dark_theme
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:

@@ -17,7 +17,7 @@ gi.require_version('AyatanaAppIndicator3', '0.1')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Pango
 from PIL import Image
 from faugus.config_manager import *
-from faugus.dark_theme import *
+from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 
@@ -117,17 +117,6 @@ def convert_runner(runner):
         return "UMU-Proton Latest"
 
     return runner
-
-class HiDpiMixin:
-    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
-        scale = self.get_scale_factor()
-        if width and height:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
-        else:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
-
-        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
-        return surface
 
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
@@ -403,7 +392,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def save_running(self):
-        with open(self.running_games, "w") as f:
+        with open(running_games, "w") as f:
             json.dump(self.running, f)
 
     def load_tray_icon(self):

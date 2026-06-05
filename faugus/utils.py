@@ -1,5 +1,5 @@
 import os
-from gi.repository import Gtk, Gio, GLib
+from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 def apply_dark_theme():
@@ -26,3 +26,14 @@ def apply_dark_theme():
             is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
         if is_dark_theme:
             Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+
+class HiDpiMixin:
+    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
+        scale = self.get_scale_factor()
+        if width and height:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+
+        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
+        return surface

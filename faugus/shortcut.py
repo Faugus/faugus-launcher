@@ -11,7 +11,7 @@ gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from PIL import Image
-from faugus.dark_theme import *
+from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
 
@@ -55,17 +55,6 @@ def format_title(title):
     title = re.sub(r"[^\w\s-]", "", title)
     title = re.sub(r"\s+", "-", title)
     return title
-
-class HiDpiMixin:
-    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
-        scale = self.get_scale_factor()
-        if width and height:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
-        else:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
-
-        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
-        return surface
 
 class CreateShortcut(Gtk.Window, HiDpiMixin):
     def __init__(self, file_path):

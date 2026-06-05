@@ -13,10 +13,10 @@ import fcntl
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
+from gi.repository import Gtk, Gdk, GLib
 from threading import Thread
 from faugus.config_manager import *
-from faugus.dark_theme import *
+from faugus.utils import *
 from faugus.ea_fix import *
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -50,7 +50,7 @@ def set_env(key, value):
     os.environ[key] = value
     _env_set.add(key)
 
-class FaugusRun:
+class FaugusRun(HiDpiMixin):
     def __init__(self, message, command=None):
         self.message = message
         self.command = command
@@ -62,6 +62,11 @@ class FaugusRun:
 
         self.load_config()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
+
+    def get_scale_factor(self):
+        if hasattr(self, "_scale_widget") and self._scale_widget:
+            return self._scale_widget.get_scale_factor()
+        return 1
 
     def run(self):
         def run_process():
@@ -350,9 +355,9 @@ class FaugusRun:
         box_top.set_margin_bottom(20)
 
         image_path = faugus_png
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-        pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
-        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self._scale_widget = dialog
+        surface = self.new_surface_from_image(image_path, 75, 75)
+        image = Gtk.Image.new_from_surface(surface)
 
         label = Gtk.Label(label=_("Are you enjoying Faugus Launcher?"))
         label.set_halign(Gtk.Align.CENTER)
@@ -541,10 +546,9 @@ class FaugusRun:
         frame.add(grid)
 
         image_path = faugus_png
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
-        pixbuf = pixbuf.scale_simple(75, 75, GdkPixbuf.InterpType.BILINEAR)
-
-        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self._scale_widget = self.splash_window
+        surface = self.new_surface_from_image(image_path, 75, 75)
+        image = Gtk.Image.new_from_surface(surface)
         image.set_margin_top(20)
         image.set_margin_start(20)
         image.set_margin_end(20)
