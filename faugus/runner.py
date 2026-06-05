@@ -545,7 +545,11 @@ class FaugusRun(HiDpiMixin):
         grid.set_valign(Gtk.Align.CENTER)
         frame.add(grid)
 
-        image_path = faugus_png
+        game_icon = os.environ.get("SPLASHICON")
+        if game_icon and os.path.exists(game_icon):
+            image_path = game_icon
+        else:
+            image_path = faugus_png
         self._scale_widget = self.splash_window
         surface = self.new_surface_from_image(image_path, 75, 75)
         image = Gtk.Image.new_from_surface(surface)
@@ -811,6 +815,7 @@ def build_launch_command(game):
     lossless_performance = game.get("lossless_performance", "")
     lossless_hdr = game.get("lossless_hdr", "")
     lossless_present = game.get("lossless_present", "")
+    icon = game.get("icon", "")
 
     if lossless_performance:
         lossless_performance = 1
@@ -826,6 +831,8 @@ def build_launch_command(game):
 
     command_parts = []
 
+    if icon:
+        command_parts.append(f"SPLASHICON={icon}")
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
         command_parts.append(f"FAUGUSID={gameid}")
