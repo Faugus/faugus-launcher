@@ -403,7 +403,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def save_running(self):
-        json.dump(self.running, open(running_games, "w"))
+        with open(self.running_games, "w") as f:
+            json.dump(self.running, f)
 
     def load_tray_icon(self):
         if not self.system_tray:
