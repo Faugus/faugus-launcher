@@ -835,12 +835,11 @@ def build_launch_command(game):
 
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
+        command_parts.append(f"FAUGUSID={gameid}")
     if disable_hidraw:
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if prevent_sleep:
         command_parts.append("PREVENT_SLEEP=1")
-    if gameid:
-        command_parts.append(f"FAUGUSID={gameid}")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     if runner:
