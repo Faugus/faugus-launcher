@@ -30,8 +30,13 @@ CONFIGS = {
         "api": "https://api.github.com/repos/CachyOS/proton-cachyos/releases/latest",
         "archive_ext": "x86_64.tar.xz",
     },
+    "dw": {
+        "label": "DW-Proton",
+        "dir": "DW-Proton Latest",
+        "api": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases/latest",
+        "archive_ext": "x86_64.tar.xz",
+    },
 }
-
 
 def get_latest_tag_and_url(api, archive_ext):
     try:
@@ -50,7 +55,6 @@ def get_latest_tag_and_url(api, archive_ext):
 
     return data["tag_name"], asset["browser_download_url"]
 
-
 def get_installed_version(proton_dir):
     version_file = proton_dir / "version"
     if not version_file.exists():
@@ -62,7 +66,6 @@ def get_installed_version(proton_dir):
 
     return parts[1]
 
-
 def normalize_version(v):
     if not v:
         return None
@@ -73,10 +76,11 @@ def normalize_version(v):
          .replace("Proton-EM-", "")
          .replace("EM-", "")
          .replace("cachyos-", "")
+         .replace("dwproton-", "")
+         .replace("DW-Proton-", "")
          .rstrip("+")
          .strip("-")
     )
-
 
 def rewrite_compatibilitytool_vdf(proton_dir, display_name):
     (proton_dir / "compatibilitytool.vdf").write_text(
@@ -95,7 +99,6 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
 }}
 '''
     )
-
 
 def install_proton_latest(proton_dir, url, label):
     archive = STEAM_COMPAT_DIR / url.split("/")[-1]
@@ -123,7 +126,6 @@ def install_proton_latest(proton_dir, url, label):
     extracted.rename(proton_dir)
     shutil.rmtree(tmp)
 
-
 def ensure_latest(kind):
     cfg = CONFIGS[kind]
 
@@ -143,13 +145,13 @@ def ensure_latest(kind):
     install_proton_latest(proton_dir, url, cfg["label"])
     rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
-
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--ge", action="store_true")
     group.add_argument("--em", action="store_true")
     group.add_argument("--cachyos", action="store_true")
+    group.add_argument("--dw", action="store_true")
     args = parser.parse_args()
 
     if args.ge:
@@ -158,7 +160,8 @@ def main():
         ensure_latest("em")
     if args.cachyos:
         ensure_latest("cachyos")
-
+    if args.dw:
+        ensure_latest("dw")
 
 if __name__ == "__main__":
     main()

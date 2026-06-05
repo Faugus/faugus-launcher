@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 import requests
 import gi
 import tarfile
 import shutil
 import threading
+from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
 
@@ -97,7 +99,6 @@ class ProtonDownloader(Gtk.Dialog):
         self.notebook.set_hexpand(True)
         frame.add(self.notebook)
 
-        # Tab 1: CachyOS Proton
         self.grid_cachyos = Gtk.Grid()
         self.grid_cachyos.set_hexpand(True)
         self.grid_cachyos.set_row_spacing(5)
@@ -119,7 +120,6 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_cachyos.show_all()
         self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
 
-        # Tab 2: GE-Proton
         self.grid_ge = Gtk.Grid()
         self.grid_ge.set_hexpand(True)
         self.grid_ge.set_row_spacing(5)
@@ -141,7 +141,6 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_ge.show_all()
         self.notebook.append_page(scroll_ge, tab_box_ge)
 
-        # Tab 3: Proton-EM
         self.grid_em = Gtk.Grid()
         self.grid_em.set_hexpand(True)
         self.grid_em.set_row_spacing(5)
@@ -162,6 +161,27 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_em.set_hexpand(True)
         tab_box_em.show_all()
         self.notebook.append_page(scroll_em, tab_box_em)
+
+        self.grid_dw = Gtk.Grid()
+        self.grid_dw.set_hexpand(True)
+        self.grid_dw.set_row_spacing(5)
+        self.grid_dw.set_column_spacing(10)
+        scroll_dw = Gtk.ScrolledWindow()
+        scroll_dw.set_size_request(400, 400)
+        scroll_dw.set_margin_top(10)
+        scroll_dw.set_margin_bottom(10)
+        scroll_dw.set_margin_start(10)
+        scroll_dw.set_margin_end(10)
+        scroll_dw.add(self.grid_dw)
+
+        tab_box_dw = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_label_dw = Gtk.Label(label="DW-Proton")
+        tab_label_dw.set_width_chars(15)
+        tab_label_dw.set_xalign(0.5)
+        tab_box_dw.pack_start(tab_label_dw, True, True, 0)
+        tab_box_dw.set_hexpand(True)
+        tab_box_dw.show_all()
+        self.notebook.append_page(scroll_dw, tab_box_dw)
 
         self.load_config()
         self.get_releases()
@@ -184,6 +204,10 @@ class ProtonDownloader(Gtk.Dialog):
 
         threading.Thread(target=self.fetch_releases_from_url,
                          args=("https://api.github.com/repos/CachyOS/proton-cachyos/releases", self.grid_cachyos),
+                         daemon=True).start()
+
+        threading.Thread(target=self.fetch_releases_from_url,
+                         args=("https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases", self.grid_dw),
                          daemon=True).start()
 
     def fetch_releases_from_url(self, url, grid):
@@ -222,6 +246,10 @@ class ProtonDownloader(Gtk.Dialog):
                         if not tag_name.startswith("cachyos-"):
                             continue
 
+                    elif "dawn.wine" in url:
+                        if not tag_name.startswith("dwproton-"):
+                            continue
+
                     assets = release.get("assets", [])
                     has_valid_asset = any(
                         asset["name"].endswith((".tar.gz", ".tar.xz"))
@@ -242,6 +270,8 @@ class ProtonDownloader(Gtk.Dialog):
             display_tag_name = f"Proton-CachyOS-{tag_name.replace('cachyos-', '')}"
         elif tag_name.startswith("EM-"):
             display_tag_name = f"proton-{tag_name}"
+        elif tag_name.startswith("dwproton-"):
+            display_tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
         else:
             display_tag_name = tag_name
 
@@ -263,27 +293,30 @@ class ProtonDownloader(Gtk.Dialog):
         grid.show_all()
 
     def get_installed_path(self, tag_name):
-            tag_lower = tag_name.lower()
+        tag_lower = tag_name.lower()
 
-            if STEAM_COMPATIBILITY_PATH.exists():
-                for folder in STEAM_COMPATIBILITY_PATH.iterdir():
-                    if not folder.is_dir():
-                        continue
+        if STEAM_COMPATIBILITY_PATH.exists():
+            for folder in STEAM_COMPATIBILITY_PATH.iterdir():
+                if not folder.is_dir():
+                    continue
 
-                    folder_name_lower = folder.name.lower()
+                folder_name_lower = folder.name.lower()
 
-                    if folder_name_lower.endswith(tag_lower):
+                if folder_name_lower.endswith(tag_lower):
+                    return folder
+                if tag_lower.startswith("proton-"):
+                    if folder_name_lower.endswith(tag_lower[len("proton-"):]):
                         return folder
-                    if tag_lower.startswith("proton-"):
-                        if folder_name_lower.endswith(tag_lower[len("proton-"):]):
-                            return folder
+                if "cachyos" in tag_lower:
+                    base_tag = tag_lower.replace("proton-cachyos-", "cachyos-").replace("proton-", "")
+                    if base_tag in folder_name_lower:
+                        return folder
+                if "dw-proton" in tag_lower:
+                    base_tag = tag_lower.replace("dw-proton-", "dwproton-")
+                    if base_tag in folder_name_lower:
+                        return folder
 
-                    if "cachyos" in tag_lower:
-                        base_tag = tag_lower.replace("proton-cachyos-", "cachyos-").replace("proton-", "")
-                        if base_tag in folder_name_lower:
-                            return folder
-
-            return STEAM_COMPATIBILITY_PATH / tag_name
+        return STEAM_COMPATIBILITY_PATH / tag_name
 
     def update_button(self, button, new_label):
         button.set_label(new_label)
@@ -293,6 +326,8 @@ class ProtonDownloader(Gtk.Dialog):
         tag_name = release["tag_name"]
         if tag_name.startswith("EM-"):
             tag_name = f"proton-{tag_name}"
+        elif tag_name.startswith("dwproton-"):
+            tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
 
         version_path = self.get_installed_path(tag_name)
 
@@ -304,42 +339,42 @@ class ProtonDownloader(Gtk.Dialog):
             self.on_download_clicked(widget, release)
 
     def disable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos):
+        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos, self.grid_dw):
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(False)
 
     def enable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos):
+        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos, self.grid_dw):
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(True)
 
     def on_download_clicked(self, widget, release):
-            self.disable_all_buttons()
+        self.disable_all_buttons()
 
-            selected_asset = None
-            for asset in release["assets"]:
-                name = asset["name"]
-                if name.endswith((".tar.gz", ".tar.xz")):
-                    if "cachyos" in name.lower():
-                        if name.endswith("x86_64.tar.xz") or name.endswith("x86_64.tar.gz"):
-                            selected_asset = asset
-                            break
-                    else:
+        selected_asset = None
+        for asset in release["assets"]:
+            name = asset["name"]
+            if name.endswith((".tar.gz", ".tar.xz")):
+                if "cachyos" in name.lower() or "dwproton" in name.lower():
+                    if name.endswith("x86_64.tar.xz") or name.endswith("x86_64.tar.gz"):
                         selected_asset = asset
                         break
+                else:
+                    selected_asset = asset
+                    break
 
-            if selected_asset:
-                self.download_and_extract(
-                    selected_asset["browser_download_url"],
-                    selected_asset["name"],
-                    release["tag_name"],
-                    widget
-                )
-            else:
-                print(release['tag_name'])
-                self.enable_all_buttons()
+        if selected_asset:
+            self.download_and_extract(
+                selected_asset["browser_download_url"],
+                selected_asset["name"],
+                release["tag_name"],
+                widget
+            )
+        else:
+            print(release['tag_name'])
+            self.enable_all_buttons()
 
     def download_and_extract(self, url, filename, tag_name, button):
         button.set_label(_("Downloading..."))
@@ -407,7 +442,11 @@ class ProtonDownloader(Gtk.Dialog):
         threading.Thread(target=worker, daemon=True).start()
 
     def on_remove_clicked(self, widget, release):
-        version_path = self.get_installed_path(release["tag_name"])
+        tag_name = release["tag_name"]
+        if tag_name.startswith("dwproton-"):
+            tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
+
+        version_path = self.get_installed_path(tag_name)
         if version_path and os.path.exists(version_path):
             try:
                 shutil.rmtree(version_path)

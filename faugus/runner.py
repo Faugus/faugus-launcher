@@ -170,7 +170,7 @@ class FaugusRun(HiDpiMixin):
             set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "umu-sniper":
+        if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "DW-Proton Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -196,6 +196,11 @@ class FaugusRun(HiDpiMixin):
         if protonpath == "Proton-CachyOS Latest":
             self.proton_latest = "--cachyos"
             steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
+            self.proton_exists = steam_compat_dir.is_dir()
+
+        if protonpath == "DW-Proton Latest":
+            self.proton_latest = "--dw"
+            steam_compat_dir = compatibility_dir / "DW-Proton Latest"
             self.proton_exists = steam_compat_dir.is_dir()
 
         self.components_exists = (
@@ -621,6 +626,8 @@ class FaugusRun(HiDpiMixin):
                 component = "Proton-EM"
             elif "Proton-CachyOS" in clean_line:
                 component = "Proton-CachyOS"
+            elif "DW-Proton" in clean_line:
+                component = "DW-Proton"
             elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
                 component = "Steam Runtime"
 

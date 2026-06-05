@@ -4236,6 +4236,7 @@ class Settings(Gtk.Dialog):
         self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
         self.combobox_runner.append_text("GE-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("DW-Proton Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
         if os.path.exists(proton_cachyos):
@@ -4255,6 +4256,7 @@ class Settings(Gtk.Dialog):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("DW-Proton Latest")
                         and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
@@ -6194,6 +6196,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
         self.combobox_runner.append_text("GE-Proton Latest")
         self.combobox_runner.append_text("Proton-EM Latest")
+        self.combobox_runner.append_text("DW-Proton Latest")
         self.combobox_runner.append_text("UMU-Proton Latest")
 
         if os.path.exists(proton_cachyos):
@@ -6213,6 +6216,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         and entry not in ("UMU-Latest", "LegacyRuntime")
                         and not entry.startswith("Proton-GE Latest")
                         and not entry.startswith("Proton-EM Latest")
+                        and not entry.startswith("DW-Proton Latest")
                         and not entry.startswith("Proton-CachyOS Latest")
                     ):
                         versions.append(entry)
