@@ -2,7 +2,6 @@
 
 import sys
 import gi
-import gettext
 import shutil
 import subprocess
 import re
@@ -49,17 +48,7 @@ launcher_path = PathManager.find_binary('faugus-launcher')
 faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 desktop_dir = PathManager.user_desktop()
 
-try:
-    translation = gettext.translation(
-        'faugus-launcher',
-        localedir=LOCALE_DIR,
-        languages=[lang] if lang else ['en_US']
-    )
-    translation.install()
-    globals()['_'] = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
-    globals()['_'] = gettext.gettext
+_ = setup_gettext('faugus-launcher')
 
 def format_title(title):
     title = title.strip().lower()

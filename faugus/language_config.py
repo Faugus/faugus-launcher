@@ -1,4 +1,5 @@
 import locale
+import gettext
 
 from faugus.path_manager import *
 
@@ -36,3 +37,16 @@ LOCALE_DIR = (
     if os.path.isdir(PathManager.system_data('locale'))
     else os.path.join(os.path.dirname(__file__), 'locale')
 )
+
+def setup_gettext(domain):
+    try:
+        translation = gettext.translation(
+            domain,
+            localedir=LOCALE_DIR,
+            languages=[lang] if lang else ['en_US']
+        )
+        translation.install()
+        return translation.gettext
+    except FileNotFoundError:
+        gettext.install(domain, localedir=LOCALE_DIR)
+        return gettext.gettext
