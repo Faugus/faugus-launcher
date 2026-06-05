@@ -4,7 +4,6 @@ import requests
 import gi
 import tarfile
 import shutil
-import gettext
 import threading
 
 gi.require_version("Gtk", "3.0")
@@ -23,13 +22,7 @@ STEAM_COMPATIBILITY_PATH = Path(PathManager.get_compatibilitytools())
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 
-try:
-    translation = gettext.translation('faugus-proton-manager', localedir=LOCALE_DIR, languages=[lang])
-    translation.install()
-    _ = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-proton-manager', localedir=LOCALE_DIR)
-    _ = gettext.gettext
+_ = setup_gettext('faugus-proton-manager')
 
 class ConfigManager:
     def __init__(self):
