@@ -3443,19 +3443,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 os.remove(desktop_shortcut_path)
 
     def update_list(self):
-        for child in self.flowbox.get_children():
-            self.flowbox.remove(child)
-
-        self.games.clear()
         self.load_games()
         self.entry_search.set_text("")
         self.show_all()
-
-        if self.interface_mode != "List":
-            if self.fullscreen_activated:
-                self.fullscreen_activated = True
-            else:
-                self.fullscreen_activated = False
 
     def save_games(self):
         try:
