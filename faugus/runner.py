@@ -8,7 +8,6 @@ import re
 import json
 import time
 import shlex
-import gettext
 import signal
 import fcntl
 
@@ -44,17 +43,7 @@ gamemoderun = PathManager.find_binary('gamemoderun')
 compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
-try:
-    translation = gettext.translation(
-        'faugus-run',
-        localedir=LOCALE_DIR,
-        languages=[lang] if lang else ['en_US']
-    )
-    translation.install()
-    globals()['_'] = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-run', localedir=LOCALE_DIR)
-    globals()['_'] = gettext.gettext
+_ = setup_gettext('faugus-run')
 
 _env_set = set()
 def set_env(key, value):

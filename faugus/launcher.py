@@ -9,7 +9,6 @@ import threading
 import gi
 import vdf
 import signal
-import gettext
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
@@ -90,17 +89,7 @@ os.makedirs(faugus_launcher_dir, exist_ok=True)
 
 desktop_dir = PathManager.user_desktop()
 
-try:
-    translation = gettext.translation(
-        'faugus-launcher',
-        localedir=LOCALE_DIR,
-        languages=[lang] if lang else ['en_US']
-    )
-    translation.install()
-    globals()['_'] = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
-    globals()['_'] = gettext.gettext
+_ = setup_gettext('faugus-launcher')
 
 def format_title(title):
     title = title.strip().lower()

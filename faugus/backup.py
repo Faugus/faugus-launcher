@@ -3,7 +3,6 @@ import shutil
 import sys
 import time
 import calendar
-import gettext
 from datetime import datetime, timedelta
 import gi
 gi.require_version('Gtk', '3.0')
@@ -148,13 +147,7 @@ def daemon_mode(faugus_dir):
             pass
         time.sleep(14400)
 
-try:
-    translation = gettext.translation('faugus-launcher', localedir=LOCALE_DIR, languages=[lang])
-    translation.install()
-    _ = translation.gettext
-except FileNotFoundError:
-    gettext.install('faugus-launcher', localedir=LOCALE_DIR)
-    _ = gettext.gettext
+_ = setup_gettext('faugus-launcher')
 
 class BackupWindow(Gtk.Dialog):
     def __init__(self, parent, faugus_dir):
