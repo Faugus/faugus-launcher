@@ -67,7 +67,18 @@ def format_title(title):
     title = re.sub(r"\s+", "-", title)
     return title
 
-class CreateShortcut(Gtk.Window):
+class HiDpiMixin:
+    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
+        scale = self.get_scale_factor()
+        if width and height:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+
+        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
+        return surface
+
+class CreateShortcut(Gtk.Window, HiDpiMixin):
     def __init__(self, file_path):
         super().__init__(title="Faugus Launcher")
         self.set_wmclass("faugus-launcher", "faugus-launcher")
@@ -341,20 +352,45 @@ class CreateShortcut(Gtk.Window):
                     print(f"Error extracting icon: {result.stderr}")
             else:
                 command_magick = shutil.which("magick") or shutil.which("convert")
-                subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
+
+                extract_pattern = os.path.join(self.icon_directory, "frame_%d.png")
+                subprocess.run([command_magick, self.icon_extracted, extract_pattern])
 
                 if os.path.isfile(self.icon_extracted):
                     os.remove(self.icon_extracted)
 
-                largest_image = self.find_largest_resolution(self.icon_directory)
-                shutil.move(largest_image, os.path.expanduser(self.icon_temp))
+                best, size = None, 0
 
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-                scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-                image = Gtk.Image.new_from_file(self.icon_temp)
-                image.set_from_pixbuf(scaled_pixbuf)
+                def get_index(filepath):
+                    match = re.search(r'frame_(\d+)\.png', filepath.name)
+                    return int(match.group(1)) if match else 999
 
-                self.button_shortcut_icon.set_image(image)
+                png_files = sorted(Path(self.icon_directory).glob("frame_*.png"), key=get_index)
+
+                for f in png_files:
+                    r = subprocess.run(
+                        [command_magick, "identify", "-format", "%wx%h", str(f)],
+                        capture_output=True, text=True
+                    )
+
+                    if r.returncode == 0 and r.stdout:
+                        w, h = map(int, r.stdout.strip().split("x"))
+                        current_size = w * h
+
+                        if current_size > size:
+                            best, size = str(f), current_size
+
+                if best:
+                    subprocess.run([command_magick, best, "-resize", "256x256!", self.icon_converted], check=True)
+                    shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
+
+                    surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                    image = Gtk.Image.new_from_surface(surface)
+
+                    self.button_shortcut_icon.set_image(image)
+
+                for f in png_files:
+                    os.remove(f)
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -898,26 +934,27 @@ class CreateShortcut(Gtk.Window):
 
         path = self.file_path
 
-        if not os.path.exists(self.icon_directory):
-            os.makedirs(self.icon_directory)
+        if os.path.isfile(path):
+            if not os.path.exists(self.icon_directory):
+                os.makedirs(self.icon_directory)
 
-        try:
-            result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
+            try:
+                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
 
-            if result.returncode != 0:
-                if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                    print("The file does not contain icons.")
-                    self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                if result.returncode != 0:
+                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
+                        print("The file does not contain icons.")
+                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                    else:
+                        print(f"Error extracting icon: {result.stderr}")
                 else:
-                    print(f"Error extracting icon: {result.stderr}")
-            else:
-                command_magick = shutil.which("magick") or shutil.which("convert")
-                subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
-                if os.path.isfile(self.icon_extracted):
-                    os.remove(self.icon_extracted)
+                    command_magick = shutil.which("magick") or shutil.which("convert")
+                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
+                    if os.path.isfile(self.icon_extracted):
+                        os.remove(self.icon_extracted)
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
         def is_valid_image(file_path):
             try:
@@ -952,8 +989,9 @@ class CreateShortcut(Gtk.Window):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                dialog_image = Gtk.Dialog(title="Faugus Launcher", transient_for=self, modal=True)
-                dialog_image.set_resizable(False)
+                dialog = Gtk.Dialog(title="Faugus Launcher")
+                dialog.set_modal(True)
+                dialog.set_resizable(False)
                 subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
                 label = Gtk.Label()
@@ -966,9 +1004,9 @@ class CreateShortcut(Gtk.Window):
 
                 button_yes = Gtk.Button(label=_("Ok"))
                 button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda x: dialog_image.response(Gtk.ResponseType.YES))
+                button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
-                content_area = dialog_image.get_content_area()
+                content_area = dialog.get_content_area()
                 content_area.set_border_width(0)
                 content_area.set_halign(Gtk.Align.CENTER)
                 content_area.set_valign(Gtk.Align.CENTER)
@@ -993,15 +1031,13 @@ class CreateShortcut(Gtk.Window):
                 content_area.add(box_top)
                 content_area.add(box_bottom)
 
-                dialog_image.show_all()
-                dialog_image.run()
-                dialog_image.destroy()
+                dialog.show_all()
+                dialog.run()
+                dialog.destroy()
             else:
                 shutil.copyfile(file_path, self.icon_temp)
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(self.icon_temp)
-                scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-                image = Gtk.Image.new_from_file(self.icon_temp)
-                image.set_from_pixbuf(scaled_pixbuf)
+                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                image = Gtk.Image.new_from_surface(surface)
                 self.button_shortcut_icon.set_image(image)
 
         filechooser.destroy()

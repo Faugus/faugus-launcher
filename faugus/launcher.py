@@ -3042,8 +3042,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         extracted = os.path.join(tmp_dir, "icon.ico")
 
-        if subprocess.run(["icoextract", exe_path, extracted],
-                        capture_output=True).returncode != 0:
+        if subprocess.run(["icoextract", exe_path, extracted], capture_output=True).returncode != 0:
             return None
 
         magick = shutil.which("magick") or shutil.which("convert")
@@ -3055,7 +3054,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         best, size = None, 0
 
-        for f in Path(tmp_dir).glob("*.png"):
+        def get_index(filepath):
+            match = re.search(r'icon[-_](\d+)\.png', filepath.name)
+            return int(match.group(1)) if match else 999
+
+        png_files = sorted(Path(tmp_dir).glob("*.png"), key=get_index)
+
+        for f in png_files:
             r = subprocess.run(
                 [magick, "identify", "-format", "%wx%h", str(f)],
                 capture_output=True, text=True
@@ -3063,8 +3068,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if r.returncode == 0 and r.stdout:
                 w, h = map(int, r.stdout.strip().split("x"))
-                if w * h > size:
-                    best, size = str(f), w * h
+                current_size = w * h
+
+                if current_size > size:
+                    best, size = str(f), current_size
 
         if not best:
             return None
@@ -6664,18 +6671,45 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         print(f"Error extracting icon: {result.stderr}")
                 else:
                     command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
+
+                    extract_pattern = os.path.join(self.icon_directory, "frame_%d.png")
+                    subprocess.run([command_magick, self.icon_extracted, extract_pattern])
 
                     if os.path.isfile(self.icon_extracted):
                         os.remove(self.icon_extracted)
 
-                    largest_image = self.find_largest_resolution(self.icon_directory)
-                    shutil.move(largest_image, os.path.expanduser(self.icon_temp))
+                    best, size = None, 0
 
-                    surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                    image = Gtk.Image.new_from_surface(surface)
+                    def get_index(filepath):
+                        match = re.search(r'frame_(\d+)\.png', filepath.name)
+                        return int(match.group(1)) if match else 999
 
-                    self.button_shortcut_icon.set_image(image)
+                    png_files = sorted(Path(self.icon_directory).glob("frame_*.png"), key=get_index)
+
+                    for f in png_files:
+                        r = subprocess.run(
+                            [command_magick, "identify", "-format", "%wx%h", str(f)],
+                            capture_output=True, text=True
+                        )
+
+                        if r.returncode == 0 and r.stdout:
+                            w, h = map(int, r.stdout.strip().split("x"))
+                            current_size = w * h
+
+                            if current_size > size:
+                                best, size = str(f), current_size
+
+                    if best:
+                        subprocess.run([command_magick, best, "-resize", "256x256!", self.icon_converted], check=True)
+                        shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
+
+                        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                        image = Gtk.Image.new_from_surface(surface)
+
+                        self.button_shortcut_icon.set_image(image)
+
+                    for f in png_files:
+                        os.remove(f)
 
             except Exception as e:
                 print(f"An error occurred: {e}")
