@@ -6207,7 +6207,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("linux", _("Linux Game"))
         self.combobox_launcher.append("steam", _("Steam Game"))
         self.combobox_launcher.append("battle", "Battle.net")
-        #self.combobox_launcher.append("ea", "EA App")
+        self.combobox_launcher.append("ea", "EA App")
         self.combobox_launcher.append("epic", "Epic Games")
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")

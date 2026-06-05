@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 import vdf
 from pathlib import Path
 
@@ -54,7 +55,8 @@ def update_steam_shortcut(game_title, new_start_dir, new_exe):
 
 def update_ea_path(prefix):
     ea_base_dir = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop"
-    new_path = f"{ea_base_dir}/EA Desktop/EALauncher.exe"
+    target_ea_desktop = f"{ea_base_dir}/EA Desktop"
+    new_path = f"{target_ea_desktop}/EALauncher.exe"
 
     if os.path.exists(ea_base_dir):
         try:
@@ -62,6 +64,9 @@ def update_ea_path(prefix):
 
             versions = []
             for folder in folders:
+                if folder == "EA Desktop":
+                    continue
+
                 numbers = [int(n) for n in re.findall(r'\d+', folder)]
                 if numbers and folder[0].isdigit():
                     versions.append((numbers, folder))
@@ -69,11 +74,25 @@ def update_ea_path(prefix):
             if versions:
                 versions.sort(key=lambda x: x[0], reverse=True)
                 folder_version = versions[0][1]
-                new_path = f"{ea_base_dir}/{folder_version}/EA Desktop/EALauncher.exe"
                 print(f"Latest version found: {folder_version}")
 
+                highest_version_path = os.path.join(ea_base_dir, folder_version)
+                inner_ea_desktop = os.path.join(highest_version_path, "EA Desktop")
+
+                if os.path.exists(inner_ea_desktop):
+                    print(f"Copying files to base EA Desktop directory: {target_ea_desktop}")
+                    shutil.copytree(inner_ea_desktop, target_ea_desktop, dirs_exist_ok=True)
+
+                    for _, v_folder in versions:
+                        version_dir_to_remove = os.path.join(ea_base_dir, v_folder)
+                        try:
+                            print(f"Removing version directory: {version_dir_to_remove}")
+                            shutil.rmtree(version_dir_to_remove)
+                        except Exception as e:
+                            print(f"Error removing directory {version_dir_to_remove}: {e}")
+
         except Exception as e:
-            print(f"Error fetching version in folder: {e}")
+            print(f"Error processing EA directories: {e}")
 
     new_executable_dir = os.path.dirname(new_path)
 
