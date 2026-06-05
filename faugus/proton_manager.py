@@ -274,6 +274,9 @@ class ProtonDownloader(Gtk.Dialog):
 
             if STEAM_COMPATIBILITY_PATH.exists():
                 for folder in STEAM_COMPATIBILITY_PATH.iterdir():
+                    if not folder.is_dir():
+                        continue
+
                     folder_name_lower = folder.name.lower()
 
                     if folder_name_lower.endswith(tag_lower):
