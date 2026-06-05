@@ -111,7 +111,7 @@ class FaugusRun(HiDpiMixin):
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
             if self.enable_hdr:
-                set_env("PROTON_ENABLE_HDR", "1")
+                set_env("DXVK_HDR", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
 
