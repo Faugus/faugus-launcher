@@ -85,3 +85,18 @@ class PathManager:
                         return value
 
         return PathManager.user_home('Desktop')
+
+faugus_launcher_dir = PathManager.user_config('faugus-launcher')
+prefixes_dir = PathManager.user_home('Faugus')
+config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
+logs_dir = PathManager.user_config('faugus-launcher/logs')
+envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
+games_json = PathManager.user_config('faugus-launcher/games.json')
+proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
+umu_run = PathManager.user_data('faugus-launcher/umu-run')
+compatibility_dir = Path(PathManager.get_compatibilitytools())
+mangohud_dir = PathManager.find_binary('mangohud')
+gamemoderun = PathManager.find_binary('gamemoderun')
+launcher_path = PathManager.find_binary('faugus-launcher')
+app_dir = Path(PathManager.get_applications())
+desktop_dir = PathManager.user_desktop()

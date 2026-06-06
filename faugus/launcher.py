@@ -24,15 +24,10 @@ from faugus.ea_fix import *
 VERSION = "1.21.1"
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 backup_dir = PathManager.user_config("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
-proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
@@ -64,28 +59,18 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = Path(PathManager.get_applications())
-launcher_path = PathManager.find_binary('faugus-launcher')
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-
-games_json = PathManager.user_config('faugus-launcher/games.json')
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
 categories_file = PathManager.user_config('faugus-launcher/categories.txt')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
-compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
 faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
-
-desktop_dir = PathManager.user_desktop()
 
 _ = setup_gettext('faugus-launcher')
 

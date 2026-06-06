@@ -19,10 +19,6 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-STEAM_COMPATIBILITY_PATH = Path(PathManager.get_compatibilitytools())
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-
 _ = setup_gettext('faugus-proton-manager')
 
 class ConfigManager:
@@ -294,8 +290,8 @@ class ProtonDownloader(Gtk.Dialog):
     def get_installed_path(self, tag_name):
         tag_lower = tag_name.lower()
 
-        if STEAM_COMPATIBILITY_PATH.exists():
-            for folder in STEAM_COMPATIBILITY_PATH.iterdir():
+        if compatibility_dir.exists():
+            for folder in compatibility_dir.iterdir():
                 if not folder.is_dir():
                     continue
 
@@ -315,7 +311,7 @@ class ProtonDownloader(Gtk.Dialog):
                     if base_tag in folder_name_lower:
                         return folder
 
-        return STEAM_COMPATIBILITY_PATH / tag_name
+        return compatibility_dir / tag_name
 
     def update_button(self, button, new_label):
         button.set_label(new_label)
@@ -389,8 +385,8 @@ class ProtonDownloader(Gtk.Dialog):
 
         def worker():
             try:
-                STEAM_COMPATIBILITY_PATH.mkdir(parents=True, exist_ok=True)
-                tar_file_path = os.path.join(STEAM_COMPATIBILITY_PATH, filename)
+                compatibility_dir.mkdir(parents=True, exist_ok=True)
+                tar_file_path = os.path.join(compatibility_dir, filename)
 
                 response = requests.get(url, stream=True, timeout=30)
                 response.raise_for_status()
@@ -417,7 +413,7 @@ class ProtonDownloader(Gtk.Dialog):
                     total_members = len(members)
 
                     for i, member in enumerate(members):
-                        tar.extract(member, path=STEAM_COMPATIBILITY_PATH, filter="fully_trusted")
+                        tar.extract(member, path=compatibility_dir, filter="fully_trusted")
                         if i % 10 == 0:
                             progress = (i + 1) / total_members
                             GLib.idle_add(self.progress_bar.set_fraction, progress)

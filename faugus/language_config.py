@@ -3,8 +3,6 @@ import gettext
 
 from faugus.path_manager import *
 
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
     if lang:

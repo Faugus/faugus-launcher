@@ -38,13 +38,7 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = Path(PathManager.get_applications())
 icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-launcher_path = PathManager.find_binary('faugus-launcher')
-desktop_dir = PathManager.user_desktop()
 
 _ = setup_gettext('faugus-launcher')
 

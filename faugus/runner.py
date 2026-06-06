@@ -27,17 +27,8 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_json = PathManager.user_config('faugus-launcher/games.json')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
 be_dir = PathManager.user_config("faugus-launcher/components/be")
-proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-
-compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-run')
