@@ -1,9 +1,8 @@
 import os
 import re
 import subprocess
-from faugus.path_manager import PathManager
+from faugus.path_manager import PathManager, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 def apply_dark_theme():
     if IS_FLATPAK:

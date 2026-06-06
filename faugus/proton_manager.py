@@ -14,7 +14,6 @@ from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.utils import apply_dark_theme
 
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:

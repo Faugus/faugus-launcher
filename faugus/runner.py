@@ -18,8 +18,6 @@ from threading import Thread
 from faugus.config_manager import *
 from faugus.utils import *
 from faugus.ea_fix import *
-
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 from faugus.steam_setup import IS_STEAM_FLATPAK
 
 if IS_FLATPAK:

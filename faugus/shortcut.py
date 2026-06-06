@@ -15,7 +15,6 @@ from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
 
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
