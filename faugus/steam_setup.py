@@ -7,37 +7,20 @@ from gi.repository import GdkPixbuf
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
-def has_steam_flatpak():
+def _check_command(cmd):
     try:
-        cmd = ["flatpak", "info", "com.valvesoftware.Steam"]
-
         if IS_FLATPAK:
             cmd = ["flatpak-spawn", "--host"] + cmd
-
-        result = subprocess.run(
-            cmd,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return result.returncode == 0
     except FileNotFoundError:
         return False
+
+def has_steam_flatpak():
+    return _check_command(["flatpak", "info", "com.valvesoftware.Steam"])
 
 def has_steam_native():
-    try:
-        cmd = ["which", "steam"]
-
-        if IS_FLATPAK:
-            cmd = ["flatpak-spawn", "--host"] + cmd
-
-        result = subprocess.run(
-            cmd,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-        return result.returncode == 0
-    except FileNotFoundError:
-        return False
+    return _check_command(["which", "steam"])
 
 def detect_steam_version():
     if has_steam_native():
