@@ -656,21 +656,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         filechooser.set_current_folder(os.path.expanduser("~/"))
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
