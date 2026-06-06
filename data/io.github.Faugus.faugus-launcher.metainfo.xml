@@ -88,13 +88,23 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.20.4-1" date="2026-05-27">
+    <release version="1.21.1-1" date="2026-06-05">
       <description>
         <ul>
-          <li>Added an option for Blocks/Banners to remember the window size.</li>
-          <li>Fixed launchers installation breaking the UI.</li>
-          <li>Now properly updates the banner when adding a game.</li>
-          <li>Updated Portuguese translation.</li>
+          <li>Fixed an issue that prevented games from running with the Nouveau and NVK drivers.</li>
+          <li>Removed a visual effect that was causing visibility issues in the Global Environment Variables section.</li>
+          <li>Removed the old GAMEID logic. This fixes some Protonfixes not being applied.</li>
+          <li>Fixed an issue that caused Proton Manager to freeze when a Proton installation failed to finish.</li>
+          <li>Another attempt to fix the EA App issue.</li>
+          <li>Now extracts the best resolution icon from the executable.</li>
+          <li>Fixed missing translations in the splash window.</li>
+          <li>Icons in the shortcut window and splash window now have better resolution.</li>
+          <li>A lot of code refactoring, removal of leftover code, and minor fixes.</li>
+          <li>Updated the Polish translation.</li>
+          <li>Updated the Japanese translation.</li>
+          <li>The HDR option now sets `DXVK_HDR=1` instead of `PROTON_ENABLE_HDR=1`.</li>
+          <li>The splash window now displays the game's icon instead of the Faugus icon.</li>
+          <li>Added support for DW-Proton.</li>
         </ul>
       </description>
     </release>
