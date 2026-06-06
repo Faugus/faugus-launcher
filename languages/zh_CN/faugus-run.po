@@ -8,94 +8,107 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-11 19:48-0300\n"
-"PO-Revision-Date: 2025-07-18 00:06+0800\n"
+"POT-Creation-Date: 2026-03-30 23:20-0300\n"
+"PO-Revision-Date: 2026-06-06 12:41+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.9\n"
 
-#: /usr/bin/faugus-run:212
+#: /usr/bin/faugus-run:132
+msgid "Starting Steam game..."
+msgstr "启动 Steam 游戏……"
+
+#: /usr/bin/faugus-run:359
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "你觉得 Faugus 启动器的体验如何?"
+
+#: /usr/bin/faugus-run:363
+msgid "Please consider donating"
+msgstr "请考虑赞助支持"
+
+#: /usr/bin/faugus-run:375
+msgid "Never show this message again"
+msgstr "不再显示此消息"
+
+#: /usr/bin/faugus-run:385
+msgid "Continue"
+msgstr "继续"
+
+#: /usr/bin/faugus-run:442
+msgid "Internet connection error."
+msgstr "网络连接错误"
+
+#: /usr/bin/faugus-run:446
 #, python-format
 msgid "%s was not found."
-msgstr "未找到%s。"
+msgstr "未找到 %s"
 
-#: /usr/bin/faugus-run:216
+#: /usr/bin/faugus-run:450
 msgid "Please install it or use another Proton version."
-msgstr "请安装或使用其他版本的Proton。"
+msgstr "请安装或使用其他版本的 Proton"
 
-#: /usr/bin/faugus-run:219 /usr/bin/faugus-run:632
+#: /usr/bin/faugus-run:457 /usr/bin/faugus-run:697
 msgid "Ok"
 msgstr "好"
 
-#: /usr/bin/faugus-run:473
-#, python-format
-msgid "Using %s"
-msgstr "正使用%s"
-
-#: /usr/bin/faugus-run:548
-msgid "Updating BattlEye..."
-msgstr "正在更新BattlEye……"
-
-#: /usr/bin/faugus-run:550
-msgid "Updating Easy Anti-Cheat..."
-msgstr "正在更新Easy Anti-Cheat……"
-
-#: /usr/bin/faugus-run:552
+#: /usr/bin/faugus-run:599
 msgid "Components are up to date"
 msgstr "组件已是最新"
 
-#: /usr/bin/faugus-run:554
-msgid "Downloading GE-Proton..."
-msgstr "正在下载GE-Proton……"
+#: /usr/bin/faugus-run:621
+msgid "Updating"
+msgstr "更新中"
 
-#: /usr/bin/faugus-run:556
-msgid "Downloading UMU-Proton..."
-msgstr "正在下载UMU-Proton……"
+#: /usr/bin/faugus-run:623
+msgid "Downloading"
+msgstr "下载中"
 
-#: /usr/bin/faugus-run:558
-msgid "Downloading Steam Runtime..."
-msgstr " 正在下载Steam Runtime……"
+#: /usr/bin/faugus-run:625
+msgid "Extracting"
+msgstr "解压中"
 
-#: /usr/bin/faugus-run:560
-msgid "Extracting Steam Runtime..."
-msgstr "正在解压Steam Runtime……"
+#: /usr/bin/faugus-run:631
+msgid "is up to date"
+msgstr "是最新的"
 
-#: /usr/bin/faugus-run:562
-msgid "Extracting GE-Proton..."
-msgstr "正在解压GE-Proton……"
-
-#: /usr/bin/faugus-run:564
-msgid "Extracting UMU-Proton..."
-msgstr "正在解压UMU-Proton……"
-
-#: /usr/bin/faugus-run:566 /usr/bin/faugus-run:572
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton已是最新"
-
-#: /usr/bin/faugus-run:568 /usr/bin/faugus-run:574
-msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton已是最新"
-
-#: /usr/bin/faugus-run:570 /usr/bin/faugus-run:576
-msgid "Steam Runtime is up to date"
-msgstr "Steam Runtime已是最新"
-
-#: /usr/bin/faugus-run:578
-msgid "Downloading Proton-EM..."
-msgstr "正在下载Proton-EM……"
-
-#: /usr/bin/faugus-run:580
-msgid "Extracting Proton-EM..."
-msgstr "正在解压Proton-EM……"
-
-#: /usr/bin/faugus-run:582
-msgid "Proton-EM is up to date"
-msgstr "Proton-EM已是最新"
-
-#: /usr/bin/faugus-run:629
+#: /usr/bin/faugus-run:694
 msgid "The keys and values were successfully added to the registry."
-msgstr "键值均已成功添加至注册表。"
+msgstr "键值均已成功添加至注册表"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "正使用%s"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "正在更新BattlEye……"
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "正在更新Easy Anti-Cheat……"
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "正在下载UMU-Proton……"
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr " 正在下载Steam Runtime……"
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "正在解压UMU-Proton……"
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton已是最新"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime已是最新"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "正在下载Proton-EM……"
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "正在解压Proton-EM……"
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM已是最新"
