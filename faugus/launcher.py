@@ -91,12 +91,6 @@ desktop_dir = PathManager.user_desktop()
 
 _ = setup_gettext('faugus-launcher')
 
-def format_title(title):
-    title = title.strip().lower()
-    title = re.sub(r"[^\w\s-]", "", title)
-    title = re.sub(r"\s+", "-", title)
-    return title
-
 def convert_runner(runner):
     if runner == "Proton-CachyOS Latest":
         return "Proton-CachyOS Latest (default)"

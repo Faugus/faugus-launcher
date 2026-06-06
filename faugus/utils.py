@@ -1,4 +1,5 @@
 import os
+import re
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
@@ -37,3 +38,9 @@ class HiDpiMixin:
 
         surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
         return surface
+
+def format_title(title):
+    title = title.strip().lower()
+    title = re.sub(r"[^\w\s-]", "", title)
+    title = re.sub(r"\s+", "-", title)
+    return title
