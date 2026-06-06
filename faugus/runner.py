@@ -857,27 +857,7 @@ def build_launch_command(game):
             command_parts.append(f"PROTONPATH='{runner}'")
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
-    if lossless_enabled:
-        command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
-        command_parts.append("LSFGVK_ENV=1")
-        if lossless_multiplier:
-            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
-        if lossless_flow:
-            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
-        if lossless_performance:
-            command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
-            command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
-        else:
-            command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
-            command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
-        if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
-            command_parts.append("LSFG_HDR_MODE=1")
-        else:
-            command_parts.append("LSFG_HDR_MODE=0")
-        if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
+    command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
     if launch_arguments:
         command_parts.append(os.path.expanduser(launch_arguments))
     if gamemode and os.path.exists(gamemoderun):
