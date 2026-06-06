@@ -1,5 +1,7 @@
 import os
 import re
+import subprocess
+from faugus.path_manager import PathManager
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
@@ -61,4 +63,9 @@ def add_windows_file_filters(filechooser):
     filechooser.add_filter(windows_filter)
     filechooser.add_filter(all_files_filter)
     filechooser.set_filter(windows_filter)
+    
+_FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
+
+def play_notification_sound():
+    subprocess.Popen(["canberra-gtk-play", "-f", _FAUGUS_NOTIFICATION])
     

@@ -45,7 +45,6 @@ mangohud_dir = PathManager.find_binary('mangohud')
 gamemoderun = PathManager.find_binary('gamemoderun')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 launcher_path = PathManager.find_binary('faugus-launcher')
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 desktop_dir = PathManager.user_desktop()
 
 _ = setup_gettext('faugus-launcher')
@@ -950,7 +949,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 dialog = Gtk.Dialog(title="Faugus Launcher")
                 dialog.set_modal(True)
                 dialog.set_resizable(False)
-                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+                play_notification_sound()
 
                 label = Gtk.Label()
                 label.set_label(_("The selected file is not a valid image."))
@@ -1027,3 +1026,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    

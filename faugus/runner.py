@@ -33,7 +33,6 @@ umu_run = PathManager.user_data('faugus-launcher/umu-run')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_json = PathManager.user_config('faugus-launcher/games.json')
 logs_dir = PathManager.user_config('faugus-launcher/logs')
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
 be_dir = PathManager.user_config("faugus-launcher/components/be")
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
@@ -321,7 +320,7 @@ class FaugusRun(HiDpiMixin):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -431,7 +430,7 @@ class FaugusRun(HiDpiMixin):
     def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
