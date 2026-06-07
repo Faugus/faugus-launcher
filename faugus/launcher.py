@@ -364,31 +364,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return None
 
     def check_running(self):
-        if not isinstance(self.running, dict):
-            self.running = {}
-
         changed = False
-
+    
         for gameid, proc in list(self.processes.items()):
             if proc.poll() is not None:
-                self.processes.pop(gameid, None)
+                del self.processes[gameid]
                 self.running.pop(gameid, None)
                 changed = True
-
+    
         for gameid, pid in list(self.running.items()):
             if gameid not in self.processes:
                 try:
                     if isinstance(pid, dict):
                         pid = next(iter(pid.values()))
                     os.kill(pid, 0)
-                except ProcessLookupError:
-                    self.running.pop(gameid)
+                except OSError:
+                    del self.running[gameid]
                     changed = True
-
+    
         if changed:
             self.save_running()
-
-        self.update_icon()
+    
+        if self.running or changed:
+            self.update_icon()
+    
         return True
 
     def save_running(self):
