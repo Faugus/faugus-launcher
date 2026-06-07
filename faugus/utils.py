@@ -95,3 +95,9 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
         parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     return parts
     
+def is_valid_image(file_path):
+    try:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+        return pixbuf is not None
+    except Exception:
+        return False

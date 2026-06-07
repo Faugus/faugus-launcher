@@ -886,13 +886,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             except Exception as e:
                 print(f"An error occurred: {e}")
 
-        def is_valid_image(file_path):
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-                return pixbuf is not None
-            except Exception:
-                return False
-
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
             self,
