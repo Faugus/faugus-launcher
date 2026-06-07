@@ -2,10 +2,8 @@ import os
 import subprocess
 
 from pathlib import Path
-from faugus.path_manager import PathManager
+from faugus.path_manager import PathManager, IS_FLATPAK
 from gi.repository import GdkPixbuf
-
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 def _check_command(cmd):
     try:

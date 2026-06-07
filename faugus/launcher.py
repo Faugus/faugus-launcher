@@ -22,19 +22,12 @@ from faugus.steam_setup import *
 from faugus.ea_fix import *
 
 VERSION = "1.21.1"
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 backup_dir = PathManager.user_config("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
-proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
@@ -66,20 +59,12 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = Path(PathManager.get_applications())
-launcher_path = PathManager.find_binary('faugus-launcher')
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-
-games_json = PathManager.user_config('faugus-launcher/games.json')
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
 categories_file = PathManager.user_config('faugus-launcher/categories.txt')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
-compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
 faugus_backup = False
@@ -87,15 +72,7 @@ faugus_backup = False
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
 
-desktop_dir = PathManager.user_desktop()
-
 _ = setup_gettext('faugus-launcher')
-
-def format_title(title):
-    title = title.strip().lower()
-    title = re.sub(r"[^\w\s-]", "", title)
-    title = re.sub(r"\s+", "-", title)
-    return title
 
 def convert_runner(runner):
     if runner == "Proton-CachyOS Latest":
@@ -364,31 +341,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return None
 
     def check_running(self):
-        if not isinstance(self.running, dict):
-            self.running = {}
-
         changed = False
-
+    
         for gameid, proc in list(self.processes.items()):
             if proc.poll() is not None:
-                self.processes.pop(gameid, None)
+                del self.processes[gameid]
                 self.running.pop(gameid, None)
                 changed = True
-
+    
         for gameid, pid in list(self.running.items()):
             if gameid not in self.processes:
                 try:
                     if isinstance(pid, dict):
                         pid = next(iter(pid.values()))
                     os.kill(pid, 0)
-                except ProcessLookupError:
-                    self.running.pop(gameid)
+                except OSError:
+                    del self.running[gameid]
                     changed = True
-
+    
         if changed:
             self.save_running()
-
-        self.update_icon()
+    
+        if self.running or changed:
+            self.update_icon()
+    
         return True
 
     def save_running(self):
@@ -1390,21 +1366,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             cancel_label=_("Cancel"),
         )
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -1791,7 +1753,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
         dialog.set_modal(True)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         label = Gtk.Label()
         label.set_label(_("%s is already running.") % title)
@@ -2596,7 +2558,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         label1 = Gtk.Label()
         label1.set_label(text1)
@@ -4454,21 +4416,7 @@ class Settings(Gtk.Dialog):
             cancel_label=_("Cancel"),
         )
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -4576,7 +4524,7 @@ class Settings(Gtk.Dialog):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         label = Gtk.Label(label=title)
         label.set_halign(Gtk.Align.CENTER)
@@ -4891,7 +4839,7 @@ class DeleteDialog(Gtk.Dialog):
         super().__init__(title=_("Delete %s") % title)
         self.set_modal(True)
         self.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         label = Gtk.Label()
         label.set_label(_("Are you sure you want to delete %s?") % title)
@@ -5954,7 +5902,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_modal(True)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         label = Gtk.Label(label=_("The selected file is not a valid image."))
         label.set_halign(Gtk.Align.CENTER)
@@ -6039,21 +5987,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             cancel_label=_("Cancel"),
         )
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -6269,21 +6203,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             cancel_label=_("Cancel"),
         )
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -6403,7 +6323,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 dialog = Gtk.Dialog(title="Faugus Launcher")
                 dialog.set_modal(True)
                 dialog.set_resizable(False)
-                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+                play_notification_sound()
 
                 label = Gtk.Label()
                 label.set_label(_("The selected file is not a valid image."))
@@ -6609,21 +6529,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         filechooser.set_current_folder(initial_folder)
 
         if self.combobox_launcher.get_active_id() != "linux":
-            windows_filter = Gtk.FileFilter()
-            windows_filter.set_name(_("Windows files"))
-            windows_filter.add_pattern("*.exe")
-            windows_filter.add_pattern("*.msi")
-            windows_filter.add_pattern("*.bat")
-            windows_filter.add_pattern("*.lnk")
-            windows_filter.add_pattern("*.reg")
-
-            all_files_filter = Gtk.FileFilter()
-            all_files_filter.set_name(_("All files"))
-            all_files_filter.add_pattern("*")
-
-            filechooser.add_filter(windows_filter)
-            filechooser.add_filter(all_files_filter)
-            filechooser.set_filter(windows_filter)
+            add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -6889,3 +6795,4 @@ def prefixes_count(prefix):
 if __name__ == "__main__":
     update_games_json()
     main()
+    
