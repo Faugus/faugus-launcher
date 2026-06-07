@@ -8,10 +8,6 @@ from pathlib import Path
 from faugus.path_manager import *
 from faugus.steam_setup import steam_shortcuts_path
 
-games_json = PathManager.user_config('faugus-launcher/games.json')
-app_dir = Path(PathManager.get_applications())
-desktop_dir = PathManager.user_desktop()
-
 def update_desktop_path(shortcut_path, new_dir_path):
     try:
         with open(shortcut_path, 'r', encoding='utf-8') as f:

@@ -15,7 +15,6 @@ from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
 
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -39,22 +38,9 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-app_dir = Path(PathManager.get_applications())
 icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-launcher_path = PathManager.find_binary('faugus-launcher')
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-desktop_dir = PathManager.user_desktop()
 
 _ = setup_gettext('faugus-launcher')
-
-def format_title(title):
-    title = title.strip().lower()
-    title = re.sub(r"[^\w\s-]", "", title)
-    title = re.sub(r"\s+", "-", title)
-    return title
 
 class CreateShortcut(Gtk.Window, HiDpiMixin):
     def __init__(self, file_path):
@@ -662,21 +648,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         filechooser.set_current_folder(os.path.expanduser("~/"))
 
-        windows_filter = Gtk.FileFilter()
-        windows_filter.set_name(_("Windows files"))
-        windows_filter.add_pattern("*.exe")
-        windows_filter.add_pattern("*.msi")
-        windows_filter.add_pattern("*.bat")
-        windows_filter.add_pattern("*.lnk")
-        windows_filter.add_pattern("*.reg")
-
-        all_files_filter = Gtk.FileFilter()
-        all_files_filter.set_name(_("All files"))
-        all_files_filter.add_pattern("*")
-
-        filechooser.add_filter(windows_filter)
-        filechooser.add_filter(all_files_filter)
-        filechooser.set_filter(windows_filter)
+        add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
@@ -805,27 +777,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             command_parts.append(f'GAMEID={protonfix}')
         if launch_arguments:
             command_parts.append(launch_arguments)
-        if lossless_enabled:
-            command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
-            command_parts.append("LSFGVK_ENV=1")
-            if lossless_multiplier:
-                command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
-                command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
-            if lossless_flow:
-                command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
-                command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
-            if lossless_performance:
-                command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
-                command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
-            else:
-                command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
-                command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
-            if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
-                command_parts.append("LSFG_HDR_MODE=1")
-            else:
-                command_parts.append("LSFG_HDR_MODE=0")
-            if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
-                command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
+        command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
         if gamemode:
             command_parts.append("gamemoderun")
         if mangohud:
@@ -970,7 +922,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 dialog = Gtk.Dialog(title="Faugus Launcher")
                 dialog.set_modal(True)
                 dialog.set_resizable(False)
-                subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+                play_notification_sound()
 
                 label = Gtk.Label()
                 label.set_label(_("The selected file is not a valid image."))
@@ -1047,3 +999,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    

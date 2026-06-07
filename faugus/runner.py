@@ -18,8 +18,6 @@ from threading import Thread
 from faugus.config_manager import *
 from faugus.utils import *
 from faugus.ea_fix import *
-
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 from faugus.steam_setup import IS_STEAM_FLATPAK
 
 if IS_FLATPAK:
@@ -29,18 +27,8 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_json = PathManager.user_config('faugus-launcher/games.json')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")
 be_dir = PathManager.user_config("faugus-launcher/components/be")
-proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-
-compatibility_dir = Path(PathManager.get_compatibilitytools())
 os.makedirs(compatibility_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-run')
@@ -318,7 +306,7 @@ class FaugusRun(HiDpiMixin):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_decorated(False)
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         css_provider = Gtk.CssProvider()
         css = """
@@ -428,7 +416,7 @@ class FaugusRun(HiDpiMixin):
     def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
         dialog.set_resizable(False)
-        subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+        play_notification_sound()
 
         content_area = dialog.get_content_area()
         content_area.set_border_width(0)
@@ -857,27 +845,7 @@ def build_launch_command(game):
             command_parts.append(f"PROTONPATH='{runner}'")
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
-    if lossless_enabled:
-        command_parts.append("LSFG_LEGACY=1") # Deprecated in LSFG-VK v2.0
-        command_parts.append("LSFGVK_ENV=1")
-        if lossless_multiplier:
-            command_parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}") # Deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
-        if lossless_flow:
-            command_parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}") # Deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
-        if lossless_performance:
-            command_parts.append("LSFG_PERFORMANCE_MODE=1") # Deprecated in LSFG-VK v2.0
-            command_parts.append("LSFGVK_PERFORMANCE_MODE=1")
-        else:
-            command_parts.append("LSFG_PERFORMANCE_MODE=0") # Deprecated in LSFG-VK v2.0
-            command_parts.append("LSFGVK_PERFORMANCE_MODE=0")
-        if lossless_hdr: # HDR mode env is deprecated in LSFG-VK v2.0
-            command_parts.append("LSFG_HDR_MODE=1")
-        else:
-            command_parts.append("LSFG_HDR_MODE=0")
-        if lossless_present: # Experimental present mode env is deprecated in LSFG-VK v2.0
-            command_parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
+    command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
     if launch_arguments:
         command_parts.append(os.path.expanduser(launch_arguments))
     if gamemode and os.path.exists(gamemoderun):

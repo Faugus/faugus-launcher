@@ -8,8 +8,6 @@ import vdf
 from faugus.path_manager import *
 from faugus.steam_setup import *
 
-IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
-
 if IS_FLATPAK:
     app_dir = str(Path.home() / '.local/share/applications')
 else:
