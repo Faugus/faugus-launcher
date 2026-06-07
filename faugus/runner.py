@@ -147,10 +147,7 @@ class FaugusRun(HiDpiMixin):
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
         if self.enable_logging:
-            if os.environ.get("LOG_DIR"):
-                self.log_dir = os.environ.get("LOG_DIR")
-            else:
-                self.log_dir = "default"
+            self.log_dir = os.environ.get("LOG_DIR") or "default"
 
         if not os.environ.get("PROTONPATH") == "umu-sniper":
             if self.enable_logging:
