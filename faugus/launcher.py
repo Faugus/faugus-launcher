@@ -3644,7 +3644,7 @@ class Settings(Gtk.Dialog):
         self.entry_default_prefix = Gtk.Entry()
         self.entry_default_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_default_prefix.set_has_tooltip(True)
-        self.entry_default_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_default_prefix.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_default_prefix.connect("changed", on_entry_changed, self.entry_default_prefix)
 
         self.button_search_prefix = Gtk.Button()
@@ -3658,7 +3658,7 @@ class Settings(Gtk.Dialog):
         self.entry_lossless = Gtk.Entry()
         self.entry_lossless.set_tooltip_text(_("/path/to/Lossless.dll"))
         self.entry_lossless.set_has_tooltip(True)
-        self.entry_lossless.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_lossless.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_search_lossless = Gtk.Button()
         self.button_search_lossless.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -4156,14 +4156,6 @@ class Settings(Gtk.Dialog):
             self.lang_codes[lang_name] = lang_code
 
         self.combobox_language.set_active(0)
-
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
 
     def on_combobox_interface_changed(self, combobox):
         active_id = combobox.get_active_id()
@@ -5101,7 +5093,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text(_("Game Title"))
         self.entry_title.set_has_tooltip(True)
-        self.entry_title.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         # Widgets for path
         self.label_path = Gtk.Label(label=_("Path"))
@@ -5112,7 +5104,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
         self.entry_path.set_has_tooltip(True)
-        self.entry_path.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search = Gtk.Button()
         self.button_search.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search.connect("clicked", self.on_button_search_clicked)
@@ -5125,7 +5117,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_prefix.connect("changed", on_entry_changed, self.entry_prefix)
         self.entry_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_prefix.set_has_tooltip(True)
-        self.entry_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_prefix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
@@ -5142,7 +5134,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_protonfix = Gtk.Entry()
         self.entry_protonfix.set_tooltip_text("UMU ID")
         self.entry_protonfix.set_has_tooltip(True)
-        self.entry_protonfix.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_protonfix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(
             Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -5155,7 +5147,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_launch_arguments = Gtk.Entry()
         self.entry_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
         self.entry_launch_arguments.set_has_tooltip(True)
-        self.entry_launch_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_launch_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         # Widgets for game arguments
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
@@ -5163,7 +5155,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
         self.entry_game_arguments.set_has_tooltip(True)
-        self.entry_game_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_game_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
@@ -5538,7 +5530,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_addapp.set_text(addapp)
         self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
         self.entry_addapp.set_has_tooltip(True)
-        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_addapp.set_hexpand(True)
 
         button_search_addapp = Gtk.Button()
@@ -5769,14 +5761,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         dialog.destroy()
         return response
-
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
 
     def on_image_clicked(self, widget, event):
         self.menu.popup_at_pointer(event)
@@ -6773,3 +6757,4 @@ def prefixes_count(prefix):
 if __name__ == "__main__":
     update_games_json()
     main()
+    

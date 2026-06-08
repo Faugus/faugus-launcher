@@ -105,3 +105,11 @@ def is_valid_image(file_path):
 def on_entry_changed(widget, entry):
     if entry.get_text():
         entry.get_style_context().remove_class("entry")
+
+def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
+    current_text = widget.get_text()
+    if current_text.strip():
+        tooltip.set_text(current_text)
+    else:
+        tooltip.set_text(widget.get_tooltip_text())
+    return True

@@ -364,14 +364,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
-
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
         dialog.set_resizable(False)
@@ -406,7 +398,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.entry_addapp.set_text(addapp)
         self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
         self.entry_addapp.set_has_tooltip(True)
-        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_addapp.set_hexpand(True)
 
         button_search_addapp = Gtk.Button()
@@ -988,3 +980,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
