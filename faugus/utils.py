@@ -1,7 +1,10 @@
 import os
 import json
 import re
+import shutil
 import subprocess
+import tempfile
+from pathlib import Path
 from PIL import Image
 from faugus.path_manager import PathManager, IS_FLATPAK, games_json
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
@@ -147,6 +150,64 @@ def find_largest_resolution(directory):
                 except IOError:
                     print(f"Unable to open {file_path}")
     return largest_image
+
+def extract_ico_frames(exe_path, output_path):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_ico = os.path.join(tmpdir, "icon.ico")
+        result = subprocess.run(['icoextract', exe_path, temp_ico], text=True, capture_output=True)
+        if result.returncode != 0:
+            if "NoIconsAvailableError" not in result.stderr and "PEFormatError" not in result.stderr:
+                print(f"Error extracting icon: {result.stderr}")
+            return False
+
+        command_magick = shutil.which("magick") or shutil.which("convert")
+        if not command_magick:
+            return False
+
+        extract_pattern = os.path.join(tmpdir, "frame_%d.png")
+        subprocess.run([command_magick, temp_ico, extract_pattern])
+
+        best, size = None, 0
+
+        def get_index(filepath):
+            match = re.search(r'frame_(\d+)\.png', filepath.name)
+            return int(match.group(1)) if match else 999
+
+        png_files = sorted(Path(tmpdir).glob("frame_*.png"), key=get_index)
+
+        for f in png_files:
+            r = subprocess.run(
+                [command_magick, "identify", "-format", "%wx%h", str(f)],
+                capture_output=True, text=True
+            )
+            if r.returncode == 0 and r.stdout:
+                w, h = map(int, r.stdout.strip().split("x"))
+                current_size = w * h
+                if current_size > size:
+                    best, size = str(f), current_size
+
+        if best:
+            subprocess.run([command_magick, best, "-resize", "256x256!", output_path], check=True)
+            return True
+        return False
+
+
+def extract_ico_simple(exe_path, output_path):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_ico = os.path.join(tmpdir, "icon.ico")
+        result = subprocess.run(['icoextract', exe_path, temp_ico], text=True, capture_output=True)
+        if result.returncode != 0:
+            if "NoIconsAvailableError" not in result.stderr and "PEFormatError" not in result.stderr:
+                print(f"Error extracting icon: {result.stderr}")
+            return False
+
+        command_magick = shutil.which("magick") or shutil.which("convert")
+        if not command_magick:
+            return False
+
+        subprocess.run([command_magick, temp_ico, "-resize", "256x256!", output_path], check=True)
+        return True
+
 
 def on_button_search_protonfix_clicked(widget):
     import webbrowser

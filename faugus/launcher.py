@@ -6214,26 +6214,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         path = self.entry_path.get_text()
 
         if os.path.isfile(path):
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
-
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            if extract_ico_simple(path, self.icon_converted):
+                shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
 
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
@@ -6444,62 +6426,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if response == Gtk.ResponseType.ACCEPT:
             path = filechooser.get_filename()
 
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
-
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-
-                    extract_pattern = os.path.join(self.icon_directory, "frame_%d.png")
-                    subprocess.run([command_magick, self.icon_extracted, extract_pattern])
-
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-                    best, size = None, 0
-
-                    def get_index(filepath):
-                        match = re.search(r'frame_(\d+)\.png', filepath.name)
-                        return int(match.group(1)) if match else 999
-
-                    png_files = sorted(Path(self.icon_directory).glob("frame_*.png"), key=get_index)
-
-                    for f in png_files:
-                        r = subprocess.run(
-                            [command_magick, "identify", "-format", "%wx%h", str(f)],
-                            capture_output=True, text=True
-                        )
-
-                        if r.returncode == 0 and r.stdout:
-                            w, h = map(int, r.stdout.strip().split("x"))
-                            current_size = w * h
-
-                            if current_size > size:
-                                best, size = str(f), current_size
-
-                    if best:
-                        subprocess.run([command_magick, best, "-resize", "256x256!", self.icon_converted], check=True)
-                        shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
-
-                        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                        image = Gtk.Image.new_from_surface(surface)
-
-                        self.button_shortcut_icon.set_image(image)
-
-                    for f in png_files:
-                        os.remove(f)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            if extract_ico_frames(path, os.path.expanduser(self.icon_temp)):
+                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                image = Gtk.Image.new_from_surface(surface)
+                self.button_shortcut_icon.set_image(image)
+            else:
+                self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
             self.entry_path.set_text(path)
 
