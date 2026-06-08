@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-22 10:58-0300\n"
-"PO-Revision-Date: 2026-03-23 11:42+0800\n"
+"POT-Creation-Date: 2026-03-30 20:06-0300\n"
+"PO-Revision-Date: 2026-06-08 11:37+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -25,7 +25,7 @@ msgstr "Faugus Proton 管理員"
 #: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
 #: /usr/bin/faugus-proton-manager:474
 msgid "Remove"
-msgstr "移除"
+msgstr "刪除"
 
 #: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
 #: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
