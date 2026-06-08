@@ -101,3 +101,7 @@ def is_valid_image(file_path):
         return pixbuf is not None
     except Exception:
         return False
+
+def on_entry_changed(widget, entry):
+    if entry.get_text():
+        entry.get_style_context().remove_class("entry")

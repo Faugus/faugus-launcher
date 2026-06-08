@@ -8,6 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from faugus.language_config import *
+from faugus.utils import on_entry_changed
 
 def load_config(faugus_dir):
     config = {}
@@ -195,7 +196,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.box_dest = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.entry_dest = Gtk.Entry()
-        self.entry_dest.connect("changed", self.on_entry_changed, self.entry_dest)
+        self.entry_dest.connect("changed", on_entry_changed, self.entry_dest)
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
         self.btn_browse = Gtk.Button()
@@ -313,10 +314,6 @@ class BackupWindow(Gtk.Dialog):
 
         self.update_ui_state()
         self.show_all()
-
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
 
     def on_check_toggled(self, widget):
         self.update_ui_state()

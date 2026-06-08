@@ -3645,7 +3645,7 @@ class Settings(Gtk.Dialog):
         self.entry_default_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_default_prefix.set_has_tooltip(True)
         self.entry_default_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
-        self.entry_default_prefix.connect("changed", self.on_entry_changed, self.entry_default_prefix)
+        self.entry_default_prefix.connect("changed", on_entry_changed, self.entry_default_prefix)
 
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -4244,10 +4244,6 @@ class Settings(Gtk.Dialog):
         cell_renderer = self.combobox_runner.get_cells()[0]
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
-
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
 
     def update_config_file(self):
         combobox_language = self.combobox_language.get_active_text()
@@ -5100,7 +5096,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", on_entry_changed, self.entry_title)
         if interface_mode == "Banners":
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text(_("Game Title"))
@@ -5111,7 +5107,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_path = Gtk.Label(label=_("Path"))
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
-        self.entry_path.connect("changed", self.on_entry_changed, self.entry_path)
+        self.entry_path.connect("changed", on_entry_changed, self.entry_path)
         if file_path:
             self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
@@ -5126,7 +5122,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_prefix = Gtk.Label(label=_("Prefix"))
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
-        self.entry_prefix.connect("changed", self.on_entry_changed, self.entry_prefix)
+        self.entry_prefix.connect("changed", on_entry_changed, self.entry_prefix)
         self.entry_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_prefix.set_has_tooltip(True)
         self.entry_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
@@ -6170,10 +6166,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
 
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
-
     def load_config(self):
         cfg = ConfigManager()
 
@@ -6781,4 +6773,3 @@ def prefixes_count(prefix):
 if __name__ == "__main__":
     update_games_json()
     main()
-    

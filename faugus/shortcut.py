@@ -80,7 +80,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", on_entry_changed, self.entry_title)
         self.entry_title.set_tooltip_text(_("Game Title"))
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
@@ -846,10 +846,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             shutil.rmtree(self.icon_directory)
         self.destroy()
 
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
-
     def set_image_shortcut_icon(self):
         image_path = faugus_png
 
@@ -992,4 +988,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
