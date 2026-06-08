@@ -18,7 +18,6 @@ class ConfigManager:
             'mono-icon': 'False',
             'interface-mode': 'List',
             'show-labels': 'False',
-            'smaller-banners': 'False',
             'enable-logging': 'False',
             'wayland-driver': 'False',
             'enable-hdr': 'False',
@@ -41,6 +40,7 @@ class ConfigManager:
             'window-behavior': 'None',
             'width': '1280',
             'height': '720',
+            'banner-size': '100',
         }
 
         self.config = {}
