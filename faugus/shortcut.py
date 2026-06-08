@@ -89,7 +89,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(
             Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
         self.label_launch_arguments = Gtk.Label(label=_("Launch Arguments"))
@@ -647,10 +647,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             self.entry_addapp.set_text(filechooser.get_filename())
 
         filechooser.destroy()
-
-    def on_button_search_protonfix_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://umu.openwinecomponents.org/")
 
     def load_config(self):
         cfg = ConfigManager()

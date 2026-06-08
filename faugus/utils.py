@@ -132,3 +132,7 @@ def find_largest_resolution(directory):
                 except IOError:
                     print(f"Unable to open {file_path}")
     return largest_image
+
+def on_button_search_protonfix_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://umu.openwinecomponents.org/")

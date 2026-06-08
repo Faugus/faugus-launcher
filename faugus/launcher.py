@@ -5138,7 +5138,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(
             Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
         # Widgets for launch arguments
@@ -6213,10 +6213,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             command_thread.start()
 
         filechooser.destroy()
-
-    def on_button_search_protonfix_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://umu.openwinecomponents.org/")
 
     def set_image_shortcut_icon(self):
         image_path = faugus_png
