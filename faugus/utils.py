@@ -1,8 +1,9 @@
 import os
+import json
 import re
 import subprocess
 from PIL import Image
-from faugus.path_manager import PathManager, IS_FLATPAK
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 
 def apply_dark_theme():
@@ -144,3 +145,42 @@ def on_button_kofi_clicked(widget):
 def on_button_paypal_clicked(widget):
     import webbrowser
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+
+    icons_dir = PathManager.user_config('faugus-launcher/icons')
+
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+        if "favorite" in game:
+            if game["favorite"] == True:
+                game["category"] = False
+
+            game.pop("favorite")
+            changed = True
+
+        game_id = game.get("gameid")
+
+        if game_id:
+            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+
+            if game.get("icon") != new_icon_path:
+                game["icon"] = new_icon_path
+                changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)

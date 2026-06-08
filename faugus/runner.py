@@ -932,45 +932,6 @@ def main():
     else:
         FaugusRun(args.message, args.command).run()
 
-def update_games_json():
-    if not os.path.exists(games_json):
-        return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
-        return
-
-    changed = False
-
-    icons_dir = PathManager.user_config('faugus-launcher/icons')
-
-    for game in games:
-        if game.get("runner") == "Proton-CachyOS":
-            game["runner"] = "Proton-CachyOS (System)"
-            changed = True
-
-        if "favorite" in game:
-            if game["favorite"] == True:
-                game["category"] = False
-
-            game.pop("favorite")
-            changed = True
-
-        game_id = game.get("gameid")
-
-        if game_id:
-            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
-
-            if game.get("icon") != new_icon_path:
-                game["icon"] = new_icon_path
-                changed = True
-
-    if changed:
-        with open(games_json, "w", encoding="utf-8") as f:
-            json.dump(games, f, indent=4, ensure_ascii=False)
-
 if __name__ == "__main__":
     update_games_json()
     main()
