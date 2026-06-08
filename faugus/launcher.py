@@ -3752,11 +3752,11 @@ class Settings(Gtk.Dialog):
         self.label_support.set_margin_top(10)
 
         button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", self.on_button_kofi_clicked)
+        button_kofi.connect("clicked", on_button_kofi_clicked)
         button_kofi.get_style_context().add_class("kofi")
 
         button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", self.on_button_paypal_clicked)
+        button_paypal.connect("clicked", on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
@@ -4554,14 +4554,6 @@ class Settings(Gtk.Dialog):
         response = dialog.run()
         dialog.destroy()
         return response == Gtk.ResponseType.OK
-
-    def on_button_kofi_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://ko-fi.com/K3K210EMDU")
-
-    def on_button_paypal_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(

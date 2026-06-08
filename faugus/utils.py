@@ -136,3 +136,11 @@ def find_largest_resolution(directory):
 def on_button_search_protonfix_clicked(widget):
     import webbrowser
     webbrowser.open("https://umu.openwinecomponents.org/")
+
+def on_button_kofi_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://ko-fi.com/K3K210EMDU")
+
+def on_button_paypal_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")

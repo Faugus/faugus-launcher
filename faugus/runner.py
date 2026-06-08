@@ -358,11 +358,11 @@ class FaugusRun(HiDpiMixin):
         label2.set_halign(Gtk.Align.CENTER)
 
         button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", self.on_button_kofi_clicked)
+        button_kofi.connect("clicked", on_button_kofi_clicked)
         button_kofi.get_style_context().add_class("kofi")
 
         button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", self.on_button_paypal_clicked)
+        button_paypal.connect("clicked", on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
 
         checkbox = Gtk.CheckButton(label=_("Never show this message again"))
@@ -404,14 +404,6 @@ class FaugusRun(HiDpiMixin):
         if checkbox_state:
             self.cfg.set_value("show-donate", False)
             self.cfg.save_config()
-
-    def on_button_kofi_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://ko-fi.com/K3K210EMDU")
-
-    def on_button_paypal_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def show_error_dialog(self, protonpath=None, network_error=False):
         dialog = Gtk.Dialog(title="Faugus Launcher")
