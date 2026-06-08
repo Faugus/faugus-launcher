@@ -13,6 +13,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.utils import apply_dark_theme
+from faugus.config_manager import ConfigManager
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -20,39 +21,6 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 _ = setup_gettext('faugus-proton-manager')
-
-class ConfigManager:
-    def __init__(self):
-        self.default_config = {
-            'language': lang,
-        }
-        self.config = {}
-        self.load_config()
-
-    def load_config(self):
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        self.config[key.strip()] = value.strip().strip('"')
-
-        updated = False
-        for key, default_value in self.default_config.items():
-            if key not in self.config:
-                self.config[key] = default_value
-                updated = True
-
-        if updated or not os.path.isfile(config_file_dir):
-            self.save_config()
-
-    def save_config(self):
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        with open(config_file_dir, 'w') as f:
-            for key, value in self.config.items():
-                f.write(f'{key}={value}\n')
 
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
