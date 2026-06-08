@@ -64,6 +64,20 @@ def add_windows_file_filters(filechooser):
     filechooser.add_filter(windows_filter)
     filechooser.add_filter(all_files_filter)
     filechooser.set_filter(windows_filter)
+
+def add_image_file_filters(filechooser, include_ico=True):
+    image_filter = Gtk.FileFilter()
+    image_filter.set_name(_("Image files"))
+    image_filter.add_pattern("*.png")
+    image_filter.add_pattern("*.jpg")
+    image_filter.add_pattern("*.jpeg")
+    image_filter.add_pattern("*.jxl")
+    image_filter.add_pattern("*.bmp")
+    image_filter.add_pattern("*.gif")
+    image_filter.add_pattern("*.svg")
+    if include_ico:
+        image_filter.add_pattern("*.ico")
+    filechooser.add_filter(image_filter)
     
 _FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 

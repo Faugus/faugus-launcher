@@ -854,17 +854,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             _("Cancel")
         )
 
-        filter_ico = Gtk.FileFilter()
-        filter_ico.set_name(_("Image files"))
-        filter_ico.add_pattern("*.png")
-        filter_ico.add_pattern("*.jpg")
-        filter_ico.add_pattern("*.jpeg")
-        filter_ico.add_pattern("*.jxl")
-        filter_ico.add_pattern("*.bmp")
-        filter_ico.add_pattern("*.gif")
-        filter_ico.add_pattern("*.svg")
-        filter_ico.add_pattern("*.ico")
-        filechooser.add_filter(filter_ico)
+        add_image_file_filters(filechooser)
 
         filechooser.set_current_folder(self.icon_directory)
 
