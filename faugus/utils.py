@@ -1,7 +1,9 @@
 import os
+import json
 import re
 import subprocess
-from faugus.path_manager import PathManager, IS_FLATPAK
+from PIL import Image
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 
 def apply_dark_theme():
@@ -95,3 +97,90 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
         parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     return parts
     
+def is_valid_image(file_path):
+    try:
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+        return pixbuf is not None
+    except Exception:
+        return False
+
+def on_entry_changed(widget, entry):
+    if entry.get_text():
+        entry.get_style_context().remove_class("entry")
+
+def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
+    current_text = widget.get_text()
+    if current_text.strip():
+        tooltip.set_text(current_text)
+    else:
+        tooltip.set_text(widget.get_tooltip_text())
+    return True
+
+def find_largest_resolution(directory):
+    largest_image = None
+    largest_resolution = (0, 0)
+    valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
+    for file_name in os.listdir(directory):
+        file_path = os.path.join(directory, file_name)
+        if os.path.isfile(file_path):
+            if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
+                try:
+                    with Image.open(file_path) as img:
+                        width, height = img.size
+                        if width * height > largest_resolution[0] * largest_resolution[1]:
+                            largest_resolution = (width, height)
+                            largest_image = file_path
+                except IOError:
+                    print(f"Unable to open {file_path}")
+    return largest_image
+
+def on_button_search_protonfix_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://umu.openwinecomponents.org/")
+
+def on_button_kofi_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://ko-fi.com/K3K210EMDU")
+
+def on_button_paypal_clicked(widget):
+    import webbrowser
+    webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+
+def update_games_json():
+    if not os.path.exists(games_json):
+        return
+
+    try:
+        with open(games_json, "r", encoding="utf-8") as f:
+            games = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return
+
+    changed = False
+
+    icons_dir = PathManager.user_config('faugus-launcher/icons')
+
+    for game in games:
+        if game.get("runner") == "Proton-CachyOS":
+            game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+        if "favorite" in game:
+            if game["favorite"] == True:
+                game["category"] = False
+
+            game.pop("favorite")
+            changed = True
+
+        game_id = game.get("gameid")
+
+        if game_id:
+            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+
+            if game.get("icon") != new_icon_path:
+                game["icon"] = new_icon_path
+                changed = True
+
+    if changed:
+        with open(games_json, "w", encoding="utf-8") as f:
+            json.dump(games, f, indent=4, ensure_ascii=False)

@@ -3644,8 +3644,8 @@ class Settings(Gtk.Dialog):
         self.entry_default_prefix = Gtk.Entry()
         self.entry_default_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_default_prefix.set_has_tooltip(True)
-        self.entry_default_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
-        self.entry_default_prefix.connect("changed", self.on_entry_changed, self.entry_default_prefix)
+        self.entry_default_prefix.connect("query-tooltip", on_entry_query_tooltip)
+        self.entry_default_prefix.connect("changed", on_entry_changed, self.entry_default_prefix)
 
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -3658,7 +3658,7 @@ class Settings(Gtk.Dialog):
         self.entry_lossless = Gtk.Entry()
         self.entry_lossless.set_tooltip_text(_("/path/to/Lossless.dll"))
         self.entry_lossless.set_has_tooltip(True)
-        self.entry_lossless.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_lossless.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_search_lossless = Gtk.Button()
         self.button_search_lossless.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
@@ -3752,11 +3752,11 @@ class Settings(Gtk.Dialog):
         self.label_support.set_margin_top(10)
 
         button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", self.on_button_kofi_clicked)
+        button_kofi.connect("clicked", on_button_kofi_clicked)
         button_kofi.get_style_context().add_class("kofi")
 
         button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", self.on_button_paypal_clicked)
+        button_paypal.connect("clicked", on_button_paypal_clicked)
         button_paypal.get_style_context().add_class("paypal")
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
@@ -4157,14 +4157,6 @@ class Settings(Gtk.Dialog):
 
         self.combobox_language.set_active(0)
 
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
-
     def on_combobox_interface_changed(self, combobox):
         active_id = combobox.get_active_id()
         if active_id == "List":
@@ -4244,10 +4236,6 @@ class Settings(Gtk.Dialog):
         cell_renderer = self.combobox_runner.get_cells()[0]
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
-
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
 
     def update_config_file(self):
         combobox_language = self.combobox_language.get_active_text()
@@ -4566,14 +4554,6 @@ class Settings(Gtk.Dialog):
         response = dialog.run()
         dialog.destroy()
         return response == Gtk.ResponseType.OK
-
-    def on_button_kofi_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://ko-fi.com/K3K210EMDU")
-
-    def on_button_paypal_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
     def on_button_search_prefix_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
@@ -5100,23 +5080,23 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", on_entry_changed, self.entry_title)
         if interface_mode == "Banners":
             self.entry_title.connect("focus-out-event", self.on_entry_focus_out)
         self.entry_title.set_tooltip_text(_("Game Title"))
         self.entry_title.set_has_tooltip(True)
-        self.entry_title.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         # Widgets for path
         self.label_path = Gtk.Label(label=_("Path"))
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
-        self.entry_path.connect("changed", self.on_entry_changed, self.entry_path)
+        self.entry_path.connect("changed", on_entry_changed, self.entry_path)
         if file_path:
             self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
         self.entry_path.set_has_tooltip(True)
-        self.entry_path.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search = Gtk.Button()
         self.button_search.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search.connect("clicked", self.on_button_search_clicked)
@@ -5126,10 +5106,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_prefix = Gtk.Label(label=_("Prefix"))
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
-        self.entry_prefix.connect("changed", self.on_entry_changed, self.entry_prefix)
+        self.entry_prefix.connect("changed", on_entry_changed, self.entry_prefix)
         self.entry_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_prefix.set_has_tooltip(True)
-        self.entry_prefix.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_prefix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
@@ -5146,11 +5126,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_protonfix = Gtk.Entry()
         self.entry_protonfix.set_tooltip_text("UMU ID")
         self.entry_protonfix.set_has_tooltip(True)
-        self.entry_protonfix.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_protonfix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(
             Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
         # Widgets for launch arguments
@@ -5159,7 +5139,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_launch_arguments = Gtk.Entry()
         self.entry_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
         self.entry_launch_arguments.set_has_tooltip(True)
-        self.entry_launch_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_launch_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         # Widgets for game arguments
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
@@ -5167,7 +5147,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
         self.entry_game_arguments.set_has_tooltip(True)
-        self.entry_game_arguments.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_game_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
@@ -5542,7 +5522,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_addapp.set_text(addapp)
         self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
         self.entry_addapp.set_has_tooltip(True)
-        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_addapp.set_hexpand(True)
 
         button_search_addapp = Gtk.Button()
@@ -5774,14 +5754,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog.destroy()
         return response
 
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
-
     def on_image_clicked(self, widget, event):
         self.menu.popup_at_pointer(event)
 
@@ -5793,13 +5765,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.update_image_banner()
 
     def on_load_file(self, widget):
-        def is_valid_image(file_path):
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-                return pixbuf is not None
-            except Exception:
-                return False
-
         filechooser = Gtk.FileChooserNative(
             title=_("Select an image for the banner"),
             action=Gtk.FileChooserAction.OPEN,
@@ -6177,10 +6142,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell_renderer.set_property("max-width-chars", 20)
 
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
-
     def load_config(self):
         cfg = ConfigManager()
 
@@ -6245,10 +6206,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         filechooser.destroy()
 
-    def on_button_search_protonfix_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://umu.openwinecomponents.org/")
-
     def set_image_shortcut_icon(self):
         image_path = faugus_png
         shutil.copyfile(image_path, self.icon_temp)
@@ -6286,13 +6243,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
             except Exception as e:
                 print(f"An error occurred: {e}")
-
-        def is_valid_image(file_path):
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-                return pixbuf is not None
-            except Exception:
-                return False
 
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
@@ -6375,29 +6325,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
-
-    def find_largest_resolution(self, directory):
-        largest_image = None
-        largest_resolution = (0, 0)  # (width, height)
-
-        # Define a set of valid image extensions
-        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
-
-        for file_name in os.listdir(directory):
-            file_path = os.path.join(directory, file_name)
-            if os.path.isfile(file_path):
-                # Check if the file has a valid image extension
-                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
-                    try:
-                        with Image.open(file_path) as img:
-                            width, height = img.size
-                            if width * height > largest_resolution[0] * largest_resolution[1]:
-                                largest_resolution = (width, height)
-                                largest_image = file_path
-                    except IOError:
-                        print(f"Unable to open {file_path}")
-
-        return largest_image
 
     def check_existing_shortcut(self):
         # Check if the shortcut already exists and mark or unmark the checkbox
@@ -6740,45 +6667,6 @@ def main():
     app = FaugusApp(start_hidden)
     app.run(sys.argv)
 
-def update_games_json():
-    if not os.path.exists(games_json):
-        return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
-        return
-
-    changed = False
-
-    icons_dir = PathManager.user_config('faugus-launcher/icons')
-
-    for game in games:
-        if game.get("runner") == "Proton-CachyOS":
-            game["runner"] = "Proton-CachyOS (System)"
-            changed = True
-
-        if "favorite" in game:
-            if game["favorite"] == True:
-                game["category"] = False
-
-            game.pop("favorite")
-            changed = True
-
-        game_id = game.get("gameid")
-
-        if game_id:
-            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
-
-            if game.get("icon") != new_icon_path:
-                game["icon"] = new_icon_path
-                changed = True
-
-    if changed:
-        with open(games_json, "w", encoding="utf-8") as f:
-            json.dump(games, f, indent=4, ensure_ascii=False)
-
 # returns the number of other games using the same prefix
 def prefixes_count(prefix):
     if not os.path.exists(games_json):
@@ -6795,4 +6683,3 @@ def prefixes_count(prefix):
 if __name__ == "__main__":
     update_games_json()
     main()
-    

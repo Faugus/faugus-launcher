@@ -10,7 +10,6 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
-from PIL import Image
 from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
@@ -80,7 +79,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.connect("changed", self.on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", on_entry_changed, self.entry_title)
         self.entry_title.set_tooltip_text(_("Game Title"))
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
@@ -90,7 +89,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_image(
             Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
-        self.button_search_protonfix.connect("clicked", self.on_button_search_protonfix_clicked)
+        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
         self.label_launch_arguments = Gtk.Label(label=_("Launch Arguments"))
@@ -364,14 +363,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
-    def on_entry_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        current_text = widget.get_text()
-        if current_text.strip():
-            tooltip.set_text(current_text)
-        else:
-            tooltip.set_text(widget.get_tooltip_text())
-        return True
-
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
         dialog.set_resizable(False)
@@ -406,7 +397,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.entry_addapp.set_text(addapp)
         self.entry_addapp.set_tooltip_text(_("/path/to/the/app"))
         self.entry_addapp.set_has_tooltip(True)
-        self.entry_addapp.connect("query-tooltip", self.on_entry_query_tooltip)
+        self.entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_addapp.set_hexpand(True)
 
         button_search_addapp = Gtk.Button()
@@ -657,33 +648,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         filechooser.destroy()
 
-    def find_largest_resolution(self, directory):
-        largest_image = None
-        largest_resolution = (0, 0)  # (width, height)
-
-        # Define a set of valid image extensions
-        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
-
-        for file_name in os.listdir(directory):
-            file_path = os.path.join(directory, file_name)
-            if os.path.isfile(file_path):
-                # Check if the file has a valid image extension
-                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
-                    try:
-                        with Image.open(file_path) as img:
-                            width, height = img.size
-                            if width * height > largest_resolution[0] * largest_resolution[1]:
-                                largest_resolution = (width, height)
-                                largest_image = file_path
-                    except IOError:
-                        print(f"Unable to open {file_path}")
-
-        return largest_image
-
-    def on_button_search_protonfix_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://umu.openwinecomponents.org/")
-
     def load_config(self):
         cfg = ConfigManager()
 
@@ -846,10 +810,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             shutil.rmtree(self.icon_directory)
         self.destroy()
 
-    def on_entry_changed(self, widget, entry):
-        if entry.get_text():
-            entry.get_style_context().remove_class("entry")
-
     def set_image_shortcut_icon(self):
         image_path = faugus_png
 
@@ -885,13 +845,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
             except Exception as e:
                 print(f"An error occurred: {e}")
-
-        def is_valid_image(file_path):
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
-                return pixbuf is not None
-            except Exception:
-                return False
 
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
@@ -999,4 +952,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
