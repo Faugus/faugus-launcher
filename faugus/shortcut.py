@@ -10,7 +10,6 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
-from PIL import Image
 from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
@@ -649,29 +648,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         filechooser.destroy()
 
-    def find_largest_resolution(self, directory):
-        largest_image = None
-        largest_resolution = (0, 0)  # (width, height)
-
-        # Define a set of valid image extensions
-        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
-
-        for file_name in os.listdir(directory):
-            file_path = os.path.join(directory, file_name)
-            if os.path.isfile(file_path):
-                # Check if the file has a valid image extension
-                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
-                    try:
-                        with Image.open(file_path) as img:
-                            width, height = img.size
-                            if width * height > largest_resolution[0] * largest_resolution[1]:
-                                largest_resolution = (width, height)
-                                largest_image = file_path
-                    except IOError:
-                        print(f"Unable to open {file_path}")
-
-        return largest_image
-
     def on_button_search_protonfix_clicked(self, widget):
         import webbrowser
         webbrowser.open("https://umu.openwinecomponents.org/")
@@ -980,4 +956,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

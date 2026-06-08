@@ -6338,29 +6338,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
 
-    def find_largest_resolution(self, directory):
-        largest_image = None
-        largest_resolution = (0, 0)  # (width, height)
-
-        # Define a set of valid image extensions
-        valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
-
-        for file_name in os.listdir(directory):
-            file_path = os.path.join(directory, file_name)
-            if os.path.isfile(file_path):
-                # Check if the file has a valid image extension
-                if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
-                    try:
-                        with Image.open(file_path) as img:
-                            width, height = img.size
-                            if width * height > largest_resolution[0] * largest_resolution[1]:
-                                largest_resolution = (width, height)
-                                largest_image = file_path
-                    except IOError:
-                        print(f"Unable to open {file_path}")
-
-        return largest_image
-
     def check_existing_shortcut(self):
         # Check if the shortcut already exists and mark or unmark the checkbox
         title = self.entry_title.get_text().strip()
@@ -6757,4 +6734,3 @@ def prefixes_count(prefix):
 if __name__ == "__main__":
     update_games_json()
     main()
-    

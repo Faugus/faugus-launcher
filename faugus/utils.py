@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+from PIL import Image
 from faugus.path_manager import PathManager, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
 
@@ -113,3 +114,21 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     else:
         tooltip.set_text(widget.get_tooltip_text())
     return True
+
+def find_largest_resolution(directory):
+    largest_image = None
+    largest_resolution = (0, 0)
+    valid_image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'}
+    for file_name in os.listdir(directory):
+        file_path = os.path.join(directory, file_name)
+        if os.path.isfile(file_path):
+            if os.path.splitext(file_name)[1].lower() in valid_image_extensions:
+                try:
+                    with Image.open(file_path) as img:
+                        width, height = img.size
+                        if width * height > largest_resolution[0] * largest_resolution[1]:
+                            largest_resolution = (width, height)
+                            largest_image = file_path
+                except IOError:
+                    print(f"Unable to open {file_path}")
+    return largest_image
