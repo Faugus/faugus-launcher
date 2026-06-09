@@ -433,21 +433,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.on_button_play_clicked(None, game)
 
     def on_close(self, *_):
+        config = ConfigManager()
+
         if self.window_behavior == "Remember":
             width, height = self.get_size()
-            config = ConfigManager()
             config.set_value("width", width)
             config.set_value("height", height)
-            config.save_config()
+
+        if self.banner_size:
+            config.set_value("banner-size", self.banner_size)
+
+        config.save_config()
 
         if self.system_tray:
             self.hide()
             return True
 
         if self.indicator:
-            self.indicator.set_status(
-                AyatanaAppIndicator3.IndicatorStatus.PASSIVE
-            )
+            self.indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.PASSIVE)
         self.get_application().quit()
         return False
 
@@ -489,17 +492,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if is_big:
             self.set_default_size(1280, 720)
             self.set_resizable(True)
-            top_orientation = Gtk.Orientation.HORIZONTAL
             if self.window_behavior == "Remember":
                 self.resize(self.window_width, self.window_height)
         else:
             self.set_default_size(-1, 610)
             self.set_resizable(False)
-            top_orientation = Gtk.Orientation.VERTICAL
 
         self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box_top = Gtk.Box(orientation=top_orientation)
-        self.box_bottom = Gtk.Box()
 
         def create_button(icon_name, callback, tooltip=None):
             btn = Gtk.Button()
@@ -534,6 +533,43 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_search.connect("changed", self.on_search_changed)
         self.entry_search.set_size_request(170, 50)
 
+        initial_zoom = self.banner_size
+        adjustment = Gtk.Adjustment(value=initial_zoom, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
+        self.zoom_slider = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
+        self.zoom_slider.set_size_request(150, -1)
+        self.zoom_slider.set_draw_value(True)
+        self.zoom_slider.set_digits(0)
+        self.zoom_slider.set_margin_end(10)
+
+        def on_zoom_changed(widget):
+            val = widget.get_value()
+            snapped = round(val / 10.0) * 10.0
+            if val != snapped:
+                widget.set_value(snapped)
+                return
+
+            zoom_pct = int(snapped)
+
+            if hasattr(self, '_last_zoom') and self._last_zoom == zoom_pct:
+                return
+            self._last_zoom = zoom_pct
+            self.banner_size = zoom_pct
+
+            if hasattr(self, 'flowbox'):
+                for child in self.flowbox.get_children():
+                    if not hasattr(child, 'game') or not child.game:
+                        continue
+                    game = child.game
+
+                    if self.interface_mode == "Banners" and hasattr(child, 'banner'):
+                        banner_path = game.banner if os.path.isfile(game.banner) else faugus_banner
+                        zoom_width = int(230 * (zoom_pct / 100.0))
+                        zoom_height = int(zoom_width * 1.5)
+                        surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
+                        child.banner.set_from_surface(surface)
+
+        self.zoom_slider.connect("value-changed", on_zoom_changed)
+
         scroll_box = Gtk.ScrolledWindow()
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll_box.set_margin_top(10)
@@ -567,7 +603,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             matches_category = True
 
             if self.show_categories and self.current_category and self.current_category != _("None"):
-                raw_cat = getattr(game, 'category', [])
+                raw_cat = game.category
 
                 if isinstance(raw_cat, str):
                     game_cats = [raw_cat]
@@ -588,14 +624,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox.set_sort_func(sort_games, None)
         self.flowbox.set_filter_func(filter_games, None)
         scroll_box.add(self.flowbox)
-        self.load_games()
 
+        sidebar = None
         if self.show_categories:
-            scroll_box.set_size_request(350, -1)
-
-            self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            self.main_hbox.pack_start(scroll_box, True, True, 0)
-
             sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             sidebar.set_size_request(220, -1)
             sidebar.set_margin_top(10)
@@ -633,62 +664,102 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.category_context_menu.show_all()
 
-            grid_controls = Gtk.Grid()
-            grid_controls.set_column_spacing(10)
-            grid_controls.set_row_spacing(10)
-            grid_controls.set_halign(Gtk.Align.CENTER)
-            grid_controls.set_margin_bottom(10)
-
-            grid_controls.attach(self.entry_search, 0, 0, 4, 1)
-            grid_controls.attach(self.button_add,   0, 1, 1, 1)
-            grid_controls.attach(self.button_settings,   1, 1, 1, 1)
-            grid_controls.attach(self.button_kill,       2, 1, 1, 1)
-            grid_controls.attach(self.button_play,  3, 1, 1, 1)
-
-            sidebar.pack_end(grid_controls, False, False, 0)
-            self.main_hbox.pack_start(sidebar, False, False, 0)
-
+        if is_big:
+            self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             self.box_main.pack_start(self.main_hbox, True, True, 0)
 
-            if hasattr(self, 'populate_categories'):
-                self.populate_categories()
+            if sidebar:
+                sidebar.set_margin_start(10)
+                self.main_hbox.pack_start(sidebar, False, False, 0)
+
+            right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self.main_hbox.pack_start(right_vbox, True, True, 0)
+
+            if self.interface_mode != "Banners":
+                self.zoom_slider.set_no_show_all(True)
+
+            bottom_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            bottom_bar.set_margin_top(5)
+            bottom_bar.set_margin_bottom(10)
+            bottom_bar.set_margin_start(10)
+            bottom_bar.set_margin_end(10)
+
+            bottom_bar.pack_start(self.zoom_slider, False, False, 0)
+
+            center_grid = Gtk.Grid()
+            center_grid.set_column_spacing(10)
+            center_grid.attach(self.button_add, 0, 0, 1, 1)
+            center_grid.attach(self.button_settings, 1, 0, 1, 1)
+            center_grid.attach(self.entry_search, 2, 0, 1, 1)
+            center_grid.attach(self.button_kill, 3, 0, 1, 1)
+            center_grid.attach(self.button_play, 4, 0, 1, 1)
+
+            bottom_bar.set_center_widget(center_grid)
+
+            right_vbox.pack_start(scroll_box, True, True, 0)
+            right_vbox.pack_start(bottom_bar, False, False, 0)
+
+        else:
+            self.box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self.box_bottom = Gtk.Box()
+
+            if sidebar:
+                scroll_box.set_size_request(350, -1)
+                self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+                self.main_hbox.pack_start(scroll_box, True, True, 0)
+
+                grid_controls = Gtk.Grid()
+                grid_controls.set_column_spacing(10)
+                grid_controls.set_row_spacing(10)
+                grid_controls.set_halign(Gtk.Align.CENTER)
+                grid_controls.set_margin_bottom(10)
+
+                grid_controls.attach(self.entry_search, 0, 0, 4, 1)
+                grid_controls.attach(self.button_add,   0, 1, 1, 1)
+                grid_controls.attach(self.button_settings,   1, 1, 1, 1)
+                grid_controls.attach(self.button_kill,       2, 1, 1, 1)
+                grid_controls.attach(self.button_play,  3, 1, 1, 1)
+
+                sidebar.pack_end(grid_controls, False, False, 0)
+                self.main_hbox.pack_start(sidebar, False, False, 0)
+
+                self.box_main.pack_start(self.main_hbox, True, True, 0)
+            else:
+                self.box_top.pack_start(scroll_box, True, True, 0)
+
+                grid_controls = Gtk.Grid()
+                grid_controls.set_column_spacing(10)
+                grid_controls.set_margin_bottom(10)
+                grid_controls.set_margin_start(10)
+                grid_controls.set_margin_end(10)
+                self.entry_search.set_hexpand(True)
+
+                grid_controls.attach(self.button_add,   0, 0, 1, 1)
+                grid_controls.attach(self.button_settings,   1, 0, 1, 1)
+                grid_controls.attach(self.entry_search, 2, 0, 1, 1)
+                grid_controls.attach(self.button_kill,       3, 0, 1, 1)
+                grid_controls.attach(self.button_play,  4, 0, 1, 1)
+
+                self.box_bottom.pack_start(grid_controls, True, True, 0)
+
+                self.box_main.pack_start(self.box_top, True, True, 0)
+                self.box_main.pack_end(self.box_bottom, False, True, 0)
+
+        self.load_games()
+
+        if sidebar and hasattr(self, 'populate_categories'):
+            self.populate_categories()
             row = self.listbox_categories.get_row_at_index(0)
             if row:
                 self.listbox_categories.select_row(row)
-        else:
-            self.box_top.pack_start(scroll_box, True, True, 0)
-
-            grid_controls = Gtk.Grid()
-            grid_controls.set_column_spacing(10)
-            #grid_controls.set_margin_top(10)
-            grid_controls.set_margin_bottom(10)
-            grid_controls.set_margin_start(10)
-            grid_controls.set_margin_end(10)
-
-            if is_big:
-                grid_controls.set_halign(Gtk.Align.CENTER)
-            else:
-                self.entry_search.set_hexpand(True)
-
-            grid_controls.attach(self.button_add,   0, 0, 1, 1)
-            grid_controls.attach(self.button_settings,   1, 0, 1, 1)
-            grid_controls.attach(self.entry_search, 2, 0, 1, 1)
-            grid_controls.attach(self.button_kill,       3, 0, 1, 1)
-            grid_controls.attach(self.button_play,  4, 0, 1, 1)
-
-            self.box_bottom.pack_start(grid_controls, True, True, 0)
-
-            self.box_main.pack_start(self.box_top, True, True, 0)
-            self.box_main.pack_end(self.box_bottom, False, True, 0)
 
         self.add(self.box_main)
-
         self.select_first_child()
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
 
-        if is_big:
-            self.fullscreen_activated = getattr(self, 'start_fullscreen', False)
+        if is_big and self.window_behavior == "Fullscreen":
+            self.fullscreen_activated = True
 
     def on_category_right_click(self, widget, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == Gdk.BUTTON_SECONDARY:
@@ -1801,7 +1872,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
-        self.smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
@@ -1813,6 +1883,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.window_behavior = cfg.config.get('window-behavior', '')
         self.window_width = int(cfg.config.get('width', 1280))
         self.window_height = int(cfg.config.get('height', 720))
+        self.banner_size = int(cfg.config.get('banner-size', 100))
 
         if self.enable_logging:
             if self.menu_show_logs not in self.context_menu.get_children():
@@ -1877,6 +1948,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             print(f"Error reading the JSON file: {e}")
 
     def add_item_list(self, game):
+        zoom_pct = self.banner_size
+
         if self.interface_mode == "List":
             hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         if self.interface_mode == "Blocks":
@@ -1895,11 +1968,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode in ("Blocks", "Banners"):
             game_label.set_line_wrap(True)
+            game_label.set_lines(2)
+            game_label.set_ellipsize(Pango.EllipsizeMode.END)
             game_label.set_max_width_chars(1)
             game_label.set_justify(Gtk.Justification.CENTER)
 
         self.flowbox_child = Gtk.FlowBoxChild()
         self.flowbox_child.game = game
+        self.flowbox_child.label = game_label
+        self.flowbox_child.hbox = hbox
 
         anim_box = Gtk.Box()
         anim_box.get_style_context().add_class("launch-overlay")
@@ -1935,7 +2012,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
-            surface = self.get_game_artwork(game_icon, game, 100, 100)
+            block_size = 100
+
+            surface = self.get_game_artwork(game_icon, game, block_size, block_size)
             image = Gtk.Image.new_from_surface(surface)
 
             self.flowbox_child.image = image
@@ -1975,10 +2054,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if not os.path.isfile(game.banner):
                 banner_path = faugus_banner
 
-            if self.smaller_banners:
-                surface = self.get_game_artwork(banner_path, game, 180, 270)
-            else:
-                surface = self.get_game_artwork(banner_path, game, 230, 345)
+            zoom_width = int(230 * (zoom_pct / 100.0))
+            zoom_height = int(zoom_width * 1.5)
+
+            surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
 
             image2.set_from_surface(surface)
 
@@ -2022,10 +2101,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if not os.path.isfile(game.banner):
                 banner_path = faugus_banner
 
-            if self.smaller_banners:
-                surface = self.get_game_artwork(banner_path, game, 180, 270)
-            else:
-                surface = self.get_game_artwork(banner_path, game, 230, 345)
+            zoom_pct = getattr(self, "banner_size", 100)
+            zoom_width = int(230 * (zoom_pct / 100.0))
+            zoom_height = int(zoom_width * 1.5)
+
+            surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
 
             flowbox_child.banner.set_from_surface(surface)
 
@@ -2104,9 +2184,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
-
-                if self.smaller_banners != settings_dialog.checkbox_smaller_banners.get_active():
                     os.execv(sys.executable, [sys.executable] + sys.argv)
 
                 if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
@@ -3635,9 +3712,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_show_labels = Gtk.CheckButton(label=_("Show labels"))
         self.checkbox_show_labels.set_active(False)
 
-        self.checkbox_smaller_banners = Gtk.CheckButton(label=_("Smaller banners"))
-        self.checkbox_smaller_banners.set_active(False)
-
         self.label_default_prefix = Gtk.Label(label=_("Default Prefixes Location"))
         self.label_default_prefix.set_halign(Gtk.Align.START)
 
@@ -4000,7 +4074,6 @@ class Settings(Gtk.Dialog):
 
         self.grid_big_interface.attach(self.combobox_window_behavior, 0, 0, 1, 1)
         self.grid_big_interface.attach(self.checkbox_show_labels, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_smaller_banners, 0, 2, 1, 1)
         self.combobox_window_behavior.set_hexpand(True)
 
         grid_support.attach(button_kofi, 0, 1, 1, 1)
@@ -4164,11 +4237,9 @@ class Settings(Gtk.Dialog):
         if active_id == "Blocks":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(False)
-            self.checkbox_smaller_banners.set_visible(False)
         if active_id == "Banners":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(True)
-            self.checkbox_smaller_banners.set_visible(True)
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
@@ -4268,7 +4339,6 @@ class Settings(Gtk.Dialog):
         config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
-        config.set_value("smaller-banners", self.checkbox_smaller_banners.get_active())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("start-minimized", self.checkbox_start_minimized.get_active())
@@ -4619,7 +4689,6 @@ class Settings(Gtk.Dialog):
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         show_labels = cfg.config.get('show-labels', 'False') == 'True'
-        smaller_banners = cfg.config.get('smaller-banners', 'False') == 'True'
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
@@ -4662,7 +4731,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_boot.set_active(self.start_boot)
         self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_show_labels.set_active(show_labels)
-        self.checkbox_smaller_banners.set_active(smaller_banners)
         self.checkbox_enable_logging.set_active(enable_logging)
         self.checkbox_show_hidden.set_active(show_hidden)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
