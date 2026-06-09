@@ -335,13 +335,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def check_running(self):
         changed = False
-    
+
         for gameid, proc in list(self.processes.items()):
             if proc.poll() is not None:
                 del self.processes[gameid]
                 self.running.pop(gameid, None)
                 changed = True
-    
+
         for gameid, pid in list(self.running.items()):
             if gameid not in self.processes:
                 try:
@@ -351,13 +351,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 except OSError:
                     del self.running[gameid]
                     changed = True
-    
+
         if changed:
             self.save_running()
-    
+
         if self.running or changed:
             self.update_icon()
-    
+
         return True
 
     def save_running(self):
@@ -525,6 +525,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_search.connect("changed", self.on_search_changed)
         self.entry_search.set_size_request(170, 50)
 
+        self.button_category = Gtk.Button(label=_("Categories"))
+        self.button_category.set_size_request(150, -1)
+        self.button_category.connect("clicked", self.on_category_button_clicked)
+
         initial_zoom = self.banner_size
         adjustment = Gtk.Adjustment(value=initial_zoom, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
         self.zoom_slider = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
@@ -594,7 +598,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             matches_search = search_text in game.title.lower() if search_text else True
             matches_category = True
 
-            if self.show_categories and self.current_category and self.current_category != _("None"):
+            if getattr(self, 'show_categories', True) and self.current_category and self.current_category != _("None"):
                 raw_cat = game.category
 
                 if isinstance(raw_cat, str):
@@ -617,52 +621,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox.set_filter_func(filter_games, None)
         scroll_box.add(self.flowbox)
 
-        sidebar = None
-        if self.show_categories:
-            sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            sidebar.set_size_request(220, -1)
-            sidebar.set_margin_top(10)
-            sidebar.set_margin_end(10)
-
-            cat_scroll = Gtk.ScrolledWindow()
-            cat_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-
-            self.listbox_categories = Gtk.ListBox()
-            self.listbox_categories.connect("row-selected", self.on_category_selected)
-            self.listbox_categories.connect("button-press-event", self.on_category_right_click)
-            self.listbox_categories.get_style_context().add_class("category-list")
-            self.listbox_categories.set_margin_bottom(5)
-            cat_scroll.add(self.listbox_categories)
-            sidebar.pack_start(cat_scroll, True, True, 3)
-
-            self.category_context_menu = Gtk.Menu()
-            menu_add_cat = Gtk.MenuItem(label=_("New"))
-            menu_add_cat.connect("activate", self.on_add_category_clicked)
-            self.category_context_menu.append(menu_add_cat)
-
-            self.menu_edit_cat = Gtk.MenuItem(label=_("Edit"))
-            self.menu_edit_cat.connect("activate", self.on_edit_category_clicked)
-            self.category_context_menu.append(self.menu_edit_cat)
-
-            self.menu_remove_cat = Gtk.MenuItem(label=_("Remove"))
-            self.menu_remove_cat.connect("activate", self.on_remove_category_clicked)
-            self.category_context_menu.append(self.menu_remove_cat)
-
-            self.menu_toggle_uncat = Gtk.CheckMenuItem(label=_("Show Uncategorized"))
-            self.menu_toggle_uncat.set_active(False)
-            self.show_uncategorized = False
-            self.menu_toggle_uncat.connect("toggled", self.on_toggle_uncategorized)
-            self.category_context_menu.append(self.menu_toggle_uncat)
-
-            self.category_context_menu.show_all()
-
         if is_big:
             self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
             self.box_main.pack_start(self.main_hbox, True, True, 0)
-
-            if sidebar:
-                sidebar.set_margin_start(10)
-                self.main_hbox.pack_start(sidebar, False, False, 0)
 
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.main_hbox.pack_start(right_vbox, True, True, 0)
@@ -677,6 +638,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             bottom_bar.set_margin_end(10)
 
             bottom_bar.pack_start(self.zoom_slider, False, False, 0)
+
+            if getattr(self, 'show_categories', True):
+                bottom_bar.pack_end(self.button_category, False, False, 0)
 
             center_grid = Gtk.Grid()
             center_grid.set_column_spacing(10)
@@ -695,55 +659,36 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.box_bottom = Gtk.Box()
 
-            if sidebar:
-                scroll_box.set_size_request(350, -1)
-                self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-                self.main_hbox.pack_start(scroll_box, True, True, 0)
+            if getattr(self, 'show_categories', True):
+                top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+                top_bar.set_margin_top(10)
+                top_bar.set_margin_start(10)
+                top_bar.set_margin_end(10)
+                self.button_category.set_hexpand(True)
+                top_bar.pack_start(self.button_category, True, True, 0)
+                self.box_top.pack_start(top_bar, False, False, 0)
 
-                grid_controls = Gtk.Grid()
-                grid_controls.set_column_spacing(10)
-                grid_controls.set_row_spacing(10)
-                grid_controls.set_halign(Gtk.Align.CENTER)
-                grid_controls.set_margin_bottom(10)
+            self.box_top.pack_start(scroll_box, True, True, 0)
 
-                grid_controls.attach(self.entry_search, 0, 0, 4, 1)
-                grid_controls.attach(self.button_add,   0, 1, 1, 1)
-                grid_controls.attach(self.button_settings,   1, 1, 1, 1)
-                grid_controls.attach(self.button_kill,       2, 1, 1, 1)
-                grid_controls.attach(self.button_play,  3, 1, 1, 1)
+            grid_controls = Gtk.Grid()
+            grid_controls.set_column_spacing(10)
+            grid_controls.set_margin_bottom(10)
+            grid_controls.set_margin_start(10)
+            grid_controls.set_margin_end(10)
+            self.entry_search.set_hexpand(True)
 
-                sidebar.pack_end(grid_controls, False, False, 0)
-                self.main_hbox.pack_start(sidebar, False, False, 0)
+            grid_controls.attach(self.button_add,   0, 0, 1, 1)
+            grid_controls.attach(self.button_settings,   1, 0, 1, 1)
+            grid_controls.attach(self.entry_search, 2, 0, 1, 1)
+            grid_controls.attach(self.button_kill,       3, 0, 1, 1)
+            grid_controls.attach(self.button_play,  4, 0, 1, 1)
 
-                self.box_main.pack_start(self.main_hbox, True, True, 0)
-            else:
-                self.box_top.pack_start(scroll_box, True, True, 0)
+            self.box_bottom.pack_start(grid_controls, True, True, 0)
 
-                grid_controls = Gtk.Grid()
-                grid_controls.set_column_spacing(10)
-                grid_controls.set_margin_bottom(10)
-                grid_controls.set_margin_start(10)
-                grid_controls.set_margin_end(10)
-                self.entry_search.set_hexpand(True)
-
-                grid_controls.attach(self.button_add,   0, 0, 1, 1)
-                grid_controls.attach(self.button_settings,   1, 0, 1, 1)
-                grid_controls.attach(self.entry_search, 2, 0, 1, 1)
-                grid_controls.attach(self.button_kill,       3, 0, 1, 1)
-                grid_controls.attach(self.button_play,  4, 0, 1, 1)
-
-                self.box_bottom.pack_start(grid_controls, True, True, 0)
-
-                self.box_main.pack_start(self.box_top, True, True, 0)
-                self.box_main.pack_end(self.box_bottom, False, True, 0)
+            self.box_main.pack_start(self.box_top, True, True, 0)
+            self.box_main.pack_end(self.box_bottom, False, True, 0)
 
         self.load_games()
-
-        if sidebar and hasattr(self, 'populate_categories'):
-            self.populate_categories()
-            row = self.listbox_categories.get_row_at_index(0)
-            if row:
-                self.listbox_categories.select_row(row)
 
         self.add(self.box_main)
         self.select_first_child()
@@ -753,95 +698,252 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if is_big and self.window_behavior == "Fullscreen":
             self.fullscreen_activated = True
 
-    def on_category_right_click(self, widget, event):
-        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == Gdk.BUTTON_SECONDARY:
-            row = widget.get_row_at_y(int(event.y))
-            if row:
-                widget.select_row(row)
+    def on_category_button_clicked(self, button):
+        menu = Gtk.Menu()
 
-            show_options = False
-            if row:
-                cat_name = getattr(row, 'category_name', None)
-                if cat_name and cat_name not in [_("None"), _("Uncategorized")]:
-                    show_options = True
+        categories = [_("All"), _("Uncategorized")] + self._get_current_categories()
 
-            self.menu_edit_cat.set_visible(show_options)
-            self.menu_remove_cat.set_visible(show_options)
+        for cat_name in categories:
+            item = Gtk.MenuItem(label=cat_name)
+            item.set_size_request(100, -1)
+            item.connect("activate", self.on_category_menu_item_selected, cat_name)
+            menu.append(item)
 
-            self.category_context_menu.popup_at_pointer(event)
-            return True
-        return False
+        menu.append(Gtk.SeparatorMenuItem())
 
-    def populate_categories(self):
-        for child in self.listbox_categories.get_children():
-            self.listbox_categories.remove(child)
+        item_manage = Gtk.MenuItem(label=_("Manage categories..."))
+        item_manage.connect("activate", self.on_manage_categories_clicked)
+        menu.append(item_manage)
 
-        categories = []
-        if os.path.exists(categories_file):
-            with open(categories_file, "r", encoding="utf-8") as f:
-                categories = [line.strip() for line in f if line.strip()]
-
-        categories = sorted(categories, key=str.lower)
-
-        row_all = Gtk.ListBoxRow()
-        row_all.set_size_request(-1, 50)
-
-        lbl_all = Gtk.Label(label=_("All"), xalign=0)
-        lbl_all.set_margin_start(10)
-
-        row_all.add(lbl_all)
-        row_all.category_name = _("None")
-        self.listbox_categories.add(row_all)
-
-        if getattr(self, 'show_uncategorized', False):
-            row_uncat = Gtk.ListBoxRow()
-            row_uncat.set_size_request(-1, 50)
-
-            lbl_uncat = Gtk.Label(label=_("Uncategorized"), xalign=0)
-            lbl_uncat.set_margin_start(10)
-
-            row_uncat.add(lbl_uncat)
-            row_uncat.category_name = _("Uncategorized")
-            self.listbox_categories.add(row_uncat)
-
-        for cat in categories:
-            row = Gtk.ListBoxRow()
-            row.set_size_request(-1, 50)
-
-            lbl = Gtk.Label(label=cat, xalign=0)
-            lbl.set_margin_start(10)
-
-            row.add(lbl)
-            row.category_name = cat
-            self.listbox_categories.add(row)
-
-        self.listbox_categories.show_all()
-
-    def on_toggle_uncategorized(self, widget):
-        self.show_uncategorized = widget.get_active()
-
-        target_cat = self.current_category
-        if not self.show_uncategorized and target_cat == _("Uncategorized"):
-            target_cat = _("None")
-
-        self.populate_categories()
-
-        for row in self.listbox_categories.get_children():
-            if getattr(row, 'category_name', None) == target_cat:
-                self.listbox_categories.select_row(row)
-                break
-
-    def on_category_selected(self, listbox, row):
-        if row is None:
-            self.current_category = None
+        menu.show_all()
+        if self.interface_mode == "List":
+            menu.popup_at_widget(
+                button,
+                Gdk.Gravity.SOUTH,
+                Gdk.Gravity.NORTH,
+                None
+            )
         else:
-            self.current_category = getattr(row, 'category_name', None)
+            menu.popup_at_widget(
+                button,
+                Gdk.Gravity.NORTH,
+                Gdk.Gravity.SOUTH,
+                None
+            )
 
-        self.flowbox.invalidate_filter()
+    def on_category_menu_item_selected(self, menu_item, category_name):
+        self.button_category.set_label(category_name)
+
+        if category_name == _("All"):
+            self.current_category = _("None")
+        else:
+            self.current_category = category_name
+
+        if hasattr(self, 'flowbox'):
+            self.flowbox.invalidate_filter()
+
+    def on_manage_categories_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Manage Categories"), parent=self)
+        dialog.set_modal(True)
+        dialog.set_resizable(False)
+        dialog.set_default_size(300, 400)
+
+        box = dialog.get_content_area()
+
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_vexpand(True)
+
+        listbox = Gtk.ListBox()
+        listbox.get_style_context().add_class("category-list")
+        scroll.add(listbox)
+        frame.add(scroll)
+
+        box.pack_start(frame, True, True, 0)
+
+        def populate_dialog_list():
+            for child in listbox.get_children():
+                listbox.remove(child)
+
+            for c in self._get_current_categories():
+                row = Gtk.ListBoxRow()
+                row.set_size_request(-1, 40)
+                lbl = Gtk.Label(label=c, xalign=0)
+                lbl.set_margin_start(10)
+                row.add(lbl)
+                row.category_name = c
+                listbox.add(row)
+
+            listbox.show_all()
+
+        populate_dialog_list()
+
+        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        btn_box.set_margin_start(10)
+        btn_box.set_margin_end(10)
+        btn_box.set_margin_bottom(10)
+
+        btn_add = Gtk.Button(label=_("Add"))
+        btn_edit = Gtk.Button(label=_("Edit"))
+        btn_remove = Gtk.Button(label=_("Remove"))
+
+        btn_add.set_hexpand(True)
+        btn_edit.set_hexpand(True)
+        btn_remove.set_hexpand(True)
+
+        btn_box.pack_start(btn_add, True, True, 0)
+        btn_box.pack_start(btn_edit, True, True, 0)
+        btn_box.pack_start(btn_remove, True, True, 0)
+
+        box.pack_start(btn_box, False, False, 0)
+
+        def on_add(b):
+            row = Gtk.ListBoxRow()
+            row.set_size_request(-1, 40)
+            entry = Gtk.Entry()
+            entry.set_margin_start(10)
+            entry.set_margin_end(10)
+            row.add(entry)
+            row.category_name = None
+
+            listbox.add(row)
+            listbox.show_all()
+            listbox.select_row(row)
+            entry.grab_focus()
+
+            finished = False
+
+            def finish_add():
+                nonlocal finished
+                if finished:
+                    return False
+                finished = True
+
+                new_cat = entry.get_text().strip()
+                reserved_names = [_("None"), _("All"), _("Uncategorized")]
+                cats = self._get_current_categories()
+
+                if not new_cat or new_cat in reserved_names or new_cat in cats:
+                    if row.get_parent():
+                        listbox.remove(row)
+                    return False
+
+                cats.append(new_cat)
+                self._save_categories(sorted(cats, key=str.lower))
+                populate_dialog_list()
+                return False
+
+            entry.connect("activate", lambda e: finish_add())
+            entry.connect("focus-out-event", lambda e, ev: GLib.idle_add(finish_add))
+
+        def on_edit(b):
+            selected_row = listbox.get_selected_row()
+            if not selected_row:
+                return
+
+            old_cat = getattr(selected_row, 'category_name', None)
+            if not old_cat:
+                return
+
+            old_child = selected_row.get_child()
+            if isinstance(old_child, Gtk.Entry):
+                return
+
+            old_label = old_child.get_text()
+            selected_row.remove(old_child)
+
+            entry = Gtk.Entry()
+            entry.set_margin_start(10)
+            entry.set_margin_end(10)
+            entry.set_text(old_label)
+            selected_row.add(entry)
+
+            listbox.show_all()
+            entry.grab_focus()
+            entry.set_position(-1)
+
+            finished = False
+
+            def restore_label(text):
+                current_child = selected_row.get_child()
+                if current_child:
+                    selected_row.remove(current_child)
+                lbl = Gtk.Label(label=text, xalign=0)
+                lbl.set_margin_start(10)
+                selected_row.add(lbl)
+                selected_row.category_name = text
+                listbox.show_all()
+
+            def finish_edit():
+                nonlocal finished
+                if finished:
+                    return False
+                finished = True
+
+                new_cat = entry.get_text().strip()
+                reserved_names = [_("None"), _("All"), _("Uncategorized")]
+                cats = self._get_current_categories()
+
+                if not new_cat or new_cat == old_cat or new_cat in reserved_names or new_cat in cats:
+                    restore_label(old_label)
+                    return False
+
+                if old_cat in cats:
+                    idx = cats.index(old_cat)
+                    cats[idx] = new_cat
+                    self._save_categories(sorted(cats, key=str.lower))
+                    self._update_games_category(old_cat, new_cat)
+
+                    if self.current_category == old_cat:
+                        self.current_category = new_cat
+                        self.button_category.set_label(new_cat)
+
+                    self.flowbox.invalidate_filter()
+
+                populate_dialog_list()
+                return False
+
+            entry.connect("activate", lambda e: finish_edit())
+            entry.connect("focus-out-event", lambda e, ev: GLib.idle_add(finish_edit))
+
+        def on_remove(b):
+            selected_row = listbox.get_selected_row()
+            if not selected_row:
+                return
+
+            cat_to_remove = getattr(selected_row, 'category_name', None)
+            if not cat_to_remove:
+                return
+
+            cats = self._get_current_categories()
+            if cat_to_remove in cats:
+                cats.remove(cat_to_remove)
+                self._save_categories(cats)
+                self._remove_games_category(cat_to_remove)
+
+                if self.current_category == cat_to_remove:
+                    self.current_category = _("None")
+                    self.button_category.set_label(_("Categories"))
+
+                populate_dialog_list()
+                self.flowbox.invalidate_filter()
+
+        btn_add.connect("clicked", on_add)
+        btn_edit.connect("clicked", on_edit)
+        btn_remove.connect("clicked", on_remove)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def _save_categories(self, categories):
         os.makedirs(os.path.dirname(categories_file), exist_ok=True)
-
         with open(categories_file, "w", encoding="utf-8") as f:
             for cat in categories:
                 f.write(f"{cat}\n")
@@ -850,259 +952,66 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if os.path.exists(categories_file):
             with open(categories_file, "r", encoding="utf-8") as f:
                 return [line.strip() for line in f if line.strip()]
-
         return []
 
-    def on_add_category_clicked(self, widget):
-        row = Gtk.ListBoxRow()
-        entry = Gtk.Entry()
-        row.add(entry)
-
-        row.category_name = None
-        row.is_temporary = True
-
-        self.listbox_categories.add(row)
-        self.listbox_categories.show_all()
-        self.listbox_categories.select_row(row)
-
-        entry.grab_focus()
-
-        finished = False
-
-        def finish_add():
-            nonlocal finished
-
-            if finished:
-                return False
-
-            finished = True
-
-            new_cat = entry.get_text().strip()
-            reserved_names = [_("None"), _("All"), _("Uncategorized")]
-
-            if not new_cat or new_cat in reserved_names:
-                if row.get_parent():
-                    self.listbox_categories.remove(row)
-
-                return False
-
-            categories = self._get_current_categories()
-
-            if new_cat in categories:
-                if row.get_parent():
-                    self.listbox_categories.remove(row)
-
-                return False
-
-            categories.append(new_cat)
-
-            self._save_categories(categories)
-
-            self.populate_categories()
-
-            for child in self.listbox_categories.get_children():
-                if getattr(child, "category_name", None) == new_cat:
-                    self.listbox_categories.select_row(child)
-                    break
-
-            return False
-
-        entry.connect("activate", lambda e: finish_add())
-
-        def on_focus_out(entry, event):
-            widget = Gtk.get_event_widget(event)
-
-            if widget and (
-                widget == entry
-                or entry.is_ancestor(widget)
-            ):
-                return False
-
-            GLib.idle_add(finish_add)
-
-            return False
-
-        entry.connect("focus-out-event", on_focus_out)
-
-    def on_edit_category_clicked(self, widget):
-        selected_row = self.listbox_categories.get_selected_row()
-
-        if not selected_row:
-            return
-
-        old_cat = getattr(selected_row, 'category_name', None)
-
-        if not old_cat or old_cat == _("None"):
-            return
-
-        old_child = selected_row.get_child()
-
-        if isinstance(old_child, Gtk.Entry):
-            return
-
-        old_label = old_child.get_text()
-
-        selected_row.remove(old_child)
-
-        entry = Gtk.Entry()
-        entry.set_text(old_label)
-
-        selected_row.add(entry)
-
-        self.listbox_categories.show_all()
-
-        entry.grab_focus()
-        entry.set_position(-1)
-
-        finished = False
-
-        def restore_label(text):
-            current_child = selected_row.get_child()
-
-            if current_child:
-                selected_row.remove(current_child)
-
-            label = Gtk.Label(label=text, xalign=0)
-            label.set_margin_start(10)
-
-            selected_row.add(label)
-            selected_row.category_name = text
-
-            self.listbox_categories.show_all()
-
-        def finish_edit():
-            nonlocal finished
-
-            if finished:
-                return False
-
-            finished = True
-
-            new_cat = entry.get_text().strip()
-            reserved_names = [_("None"), _("All"), _("Uncategorized")]
-
-            if not new_cat or new_cat == old_cat or new_cat in reserved_names:
-                restore_label(old_label)
-                return False
-
-            categories = self._get_current_categories()
-
-            if new_cat in categories:
-                restore_label(old_label)
-                return False
-
-            if old_cat in categories:
-                idx = categories.index(old_cat)
-                categories[idx] = new_cat
-
-                self._save_categories(categories)
-
-                try:
-                    data = load_json_file(games_json, [])
-
-                    changed = False
-
-                    for item in data:
-                        raw_cat = item.get("category", [])
-
-                        if isinstance(raw_cat, str) and raw_cat == old_cat:
-                            item["category"] = [new_cat]
-                            changed = True
-                        elif isinstance(raw_cat, list) and old_cat in raw_cat:
-                            raw_cat = [new_cat if c == old_cat else c for c in raw_cat]
-                            item["category"] = list(dict.fromkeys(raw_cat))
-                            changed = True
-
-                    if changed:
-                        save_json_file(data, games_json)
-
-                        for flowbox_child in self.flowbox.get_children():
-                            if hasattr(flowbox_child, "game"):
-                                child_cat = getattr(flowbox_child.game, "category", [])
-                                if isinstance(child_cat, str) and child_cat == old_cat:
-                                    flowbox_child.game.category = [new_cat]
-                                elif isinstance(child_cat, list) and old_cat in child_cat:
-                                    child_cat = [new_cat if c == old_cat else c for c in child_cat]
-                                    flowbox_child.game.category = list(dict.fromkeys(child_cat))
-
-                except Exception:
-                    pass
-
-                self.populate_categories()
-                self.flowbox.invalidate_filter()
-
-                for row in self.listbox_categories.get_children():
-                    if getattr(row, "category_name", None) == new_cat:
-                        self.listbox_categories.select_row(row)
-                        break
-
-            return False
-
-        entry.connect("activate", lambda e: finish_edit())
-
-        entry.connect(
-            "focus-out-event",
-            lambda e, ev: GLib.idle_add(finish_edit)
-        )
-
-    def on_remove_category_clicked(self, widget):
-        selected_row = self.listbox_categories.get_selected_row()
-
-        if not selected_row:
-            return
-
-        cat_to_remove = getattr(selected_row, 'category_name', None)
-
-        if not cat_to_remove or cat_to_remove == _("None"):
-            return
-
-        categories = self._get_current_categories()
-
-        if cat_to_remove in categories:
-            categories.remove(cat_to_remove)
-            self._save_categories(categories)
-
-            try:
-                data = load_json_file(games_json, [])
-
-                changed = False
-
-                for item in data:
-                    raw_cat = item.get("category", [])
-
-                    if isinstance(raw_cat, str) and raw_cat == cat_to_remove:
+    def _update_games_category(self, old_cat, new_cat):
+        try:
+            data = load_json_file(games_json, [])
+            changed = False
+
+            for item in data:
+                raw_cat = item.get("category", [])
+                if isinstance(raw_cat, str) and raw_cat == old_cat:
+                    item["category"] = [new_cat]
+                    changed = True
+                elif isinstance(raw_cat, list) and old_cat in raw_cat:
+                    raw_cat = [new_cat if c == old_cat else c for c in raw_cat]
+                    item["category"] = list(dict.fromkeys(raw_cat))
+                    changed = True
+
+            if changed:
+                save_json_file(data, games_json)
+                for flowbox_child in self.flowbox.get_children():
+                    if hasattr(flowbox_child, "game"):
+                        child_cat = getattr(flowbox_child.game, "category", [])
+                        if isinstance(child_cat, str) and child_cat == old_cat:
+                            flowbox_child.game.category = [new_cat]
+                        elif isinstance(child_cat, list) and old_cat in child_cat:
+                            child_cat = [new_cat if c == old_cat else c for c in child_cat]
+                            flowbox_child.game.category = list(dict.fromkeys(child_cat))
+        except Exception:
+            pass
+
+    def _remove_games_category(self, cat_to_remove):
+        try:
+            data = load_json_file(games_json, [])
+            changed = False
+
+            for item in data:
+                raw_cat = item.get("category", [])
+                if isinstance(raw_cat, str) and raw_cat == cat_to_remove:
+                    item.pop("category", None)
+                    changed = True
+                elif isinstance(raw_cat, list) and cat_to_remove in raw_cat:
+                    raw_cat.remove(cat_to_remove)
+                    if not raw_cat:
                         item.pop("category", None)
-                        changed = True
-                    elif isinstance(raw_cat, list) and cat_to_remove in raw_cat:
-                        raw_cat.remove(cat_to_remove)
-                        if not raw_cat:
-                            item.pop("category", None)
-                        else:
-                            item["category"] = raw_cat
-                        changed = True
+                    else:
+                        item["category"] = raw_cat
+                    changed = True
 
-                if changed:
-                    save_json_file(data, games_json)
-
-                    for child in self.flowbox.get_children():
-                        if hasattr(child, "game"):
-                            child_cat = getattr(child.game, "category", [])
-                            if isinstance(child_cat, str) and child_cat == cat_to_remove:
-                                child.game.category = []
-                            elif isinstance(child_cat, list) and cat_to_remove in child_cat:
-                                child_cat.remove(cat_to_remove)
-                                child.game.category = child_cat
-
-            except Exception:
-                pass
-
-            self.populate_categories()
-            self.flowbox.invalidate_filter()
-
-            row = self.listbox_categories.get_row_at_index(0)
-
-            if row:
-                self.listbox_categories.select_row(row)
+            if changed:
+                save_json_file(data, games_json)
+                for child in self.flowbox.get_children():
+                    if hasattr(child, "game"):
+                        child_cat = getattr(child.game, "category", [])
+                        if isinstance(child_cat, str) and child_cat == cat_to_remove:
+                            child.game.category = []
+                        elif isinstance(child_cat, list) and cat_to_remove in child_cat:
+                            child_cat.remove(cat_to_remove)
+                            child.game.category = child_cat
+        except Exception:
+            pass
 
     def show_power_menu(self, widget):
         dialog = Gtk.Dialog(title="Faugus Launcher", parent=self)
