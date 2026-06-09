@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 20:06-0300\n"
+"POT-Creation-Date: 2026-06-09 17:12-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,42 +17,35 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /usr/bin/faugus-proton-manager:72
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:27
 msgid "Faugus Proton Manager"
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
-#: /usr/bin/faugus-proton-manager:474
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:251
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:393
 msgid "Remove"
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
-#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:251
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:399
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:416
 msgid "Download"
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:351
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:343
 msgid "Downloading..."
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:353
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:345
 #, python-format
 msgid "Downloading %s..."
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:374
 #, python-format
 msgid "Extracting %s..."
 msgstr ""
 
-#: /usr/bin/faugus-proton-manager:421
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:400
 msgid "Error during download"
-msgstr ""
-
-#: /usr/bin/faugus-proton-manager:428
-msgid "Extracting..."
-msgstr ""
-
-#: /usr/bin/faugus-proton-manager:480
-msgid "Error during extraction"
 msgstr ""
