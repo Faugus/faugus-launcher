@@ -1,7 +1,10 @@
 import os
 import json
 import re
+import shutil
 import subprocess
+import tempfile
+from pathlib import Path
 from PIL import Image
 from faugus.path_manager import PathManager, IS_FLATPAK, games_json
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
@@ -42,6 +45,23 @@ class HiDpiMixin:
         surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
         return surface
 
+def ensure_parent_dir(path):
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+def load_json_file(filepath, default=None):
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default if default is not None else []
+
+def save_json_file(data, filepath, indent=4):
+    ensure_parent_dir(filepath)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=indent, ensure_ascii=False)
+
 def format_title(title):
     title = title.strip().lower()
     title = re.sub(r"[^\w\s-]", "", title)
@@ -64,6 +84,20 @@ def add_windows_file_filters(filechooser):
     filechooser.add_filter(windows_filter)
     filechooser.add_filter(all_files_filter)
     filechooser.set_filter(windows_filter)
+
+def add_image_file_filters(filechooser, include_ico=True):
+    image_filter = Gtk.FileFilter()
+    image_filter.set_name(_("Image files"))
+    image_filter.add_pattern("*.png")
+    image_filter.add_pattern("*.jpg")
+    image_filter.add_pattern("*.jpeg")
+    image_filter.add_pattern("*.jxl")
+    image_filter.add_pattern("*.bmp")
+    image_filter.add_pattern("*.gif")
+    image_filter.add_pattern("*.svg")
+    if include_ico:
+        image_filter.add_pattern("*.ico")
+    filechooser.add_filter(image_filter)
     
 _FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
@@ -134,6 +168,64 @@ def find_largest_resolution(directory):
                     print(f"Unable to open {file_path}")
     return largest_image
 
+def extract_ico_frames(exe_path, output_path):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_ico = os.path.join(tmpdir, "icon.ico")
+        result = subprocess.run(['icoextract', exe_path, temp_ico], text=True, capture_output=True)
+        if result.returncode != 0:
+            if "NoIconsAvailableError" not in result.stderr and "PEFormatError" not in result.stderr:
+                print(f"Error extracting icon: {result.stderr}")
+            return False
+
+        command_magick = shutil.which("magick") or shutil.which("convert")
+        if not command_magick:
+            return False
+
+        extract_pattern = os.path.join(tmpdir, "frame_%d.png")
+        subprocess.run([command_magick, temp_ico, extract_pattern])
+
+        best, size = None, 0
+
+        def get_index(filepath):
+            match = re.search(r'frame_(\d+)\.png', filepath.name)
+            return int(match.group(1)) if match else 999
+
+        png_files = sorted(Path(tmpdir).glob("frame_*.png"), key=get_index)
+
+        for f in png_files:
+            r = subprocess.run(
+                [command_magick, "identify", "-format", "%wx%h", str(f)],
+                capture_output=True, text=True
+            )
+            if r.returncode == 0 and r.stdout:
+                w, h = map(int, r.stdout.strip().split("x"))
+                current_size = w * h
+                if current_size > size:
+                    best, size = str(f), current_size
+
+        if best:
+            subprocess.run([command_magick, best, "-resize", "256x256!", output_path], check=True)
+            return True
+        return False
+
+
+def extract_ico_simple(exe_path, output_path):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        temp_ico = os.path.join(tmpdir, "icon.ico")
+        result = subprocess.run(['icoextract', exe_path, temp_ico], text=True, capture_output=True)
+        if result.returncode != 0:
+            if "NoIconsAvailableError" not in result.stderr and "PEFormatError" not in result.stderr:
+                print(f"Error extracting icon: {result.stderr}")
+            return False
+
+        command_magick = shutil.which("magick") or shutil.which("convert")
+        if not command_magick:
+            return False
+
+        subprocess.run([command_magick, temp_ico, "-resize", "256x256!", output_path], check=True)
+        return True
+
+
 def on_button_search_protonfix_clicked(widget):
     import webbrowser
     webbrowser.open("https://umu.openwinecomponents.org/")
@@ -147,13 +239,8 @@ def on_button_paypal_clicked(widget):
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
 def update_games_json():
-    if not os.path.exists(games_json):
-        return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
+    games = load_json_file(games_json, None)
+    if games is None:
         return
 
     changed = False
@@ -182,5 +269,35 @@ def update_games_json():
                 changed = True
 
     if changed:
-        with open(games_json, "w", encoding="utf-8") as f:
-            json.dump(games, f, indent=4, ensure_ascii=False)
+        save_json_file(games, games_json)
+
+GAME_FIELDS = [
+    "gameid", "title", "path", "prefix",
+    "launch_arguments", "game_arguments",
+    "mangohud", "gamemode", "disable_hidraw",
+    "protonfix", "runner",
+    "addapp_checkbox", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
+    "banner",
+    "lossless_enabled", "lossless_multiplier", "lossless_flow",
+    "lossless_performance", "lossless_hdr", "lossless_present",
+    "playtime", "hidden", "prevent_sleep", "category", "icon",
+]
+
+def game_to_dict(game):
+    return {field: getattr(game, field) for field in GAME_FIELDS}
+
+def game_to_save_dict(game, hidden=None):
+    d = {**game_to_dict(game),
+         "mangohud": True if game.mangohud else "",
+         "gamemode": True if game.gamemode else "",
+         "disable_hidraw": True if game.disable_hidraw else "",
+         "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else ""}
+    if hidden is not None:
+        d["hidden"] = hidden
+    return d
+
+def prepare_game_kwargs(data):
+    defaults = {f: "" for f in GAME_FIELDS}
+    defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
+                     "category": False, "icon": ""})
+    return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}

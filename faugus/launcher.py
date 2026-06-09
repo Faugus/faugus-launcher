@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import json
 import re
 import shutil
 import subprocess
@@ -141,16 +140,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.processes = {}
 
         if not os.path.exists(running_games):
-            os.makedirs(os.path.dirname(running_games), exist_ok=True)
-            with open(running_games, 'w') as f:
-                json.dump({}, f)
+            save_json_file({}, running_games)
 
-        try:
-            with open(running_games) as f:
-                self.running = json.load(f)
-                if not isinstance(self.running, dict):
-                    self.running = {}
-        except:
+        self.running = load_json_file(running_games, {})
+        if not isinstance(self.running, dict):
             self.running = {}
 
         self.working_directory = faugus_launcher_dir
@@ -368,8 +361,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def save_running(self):
-        with open(running_games, "w") as f:
-            json.dump(self.running, f)
+        save_json_file(self.running, running_games)
 
     def load_tray_icon(self):
         if not self.system_tray:
@@ -1006,8 +998,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self._save_categories(categories)
 
                 try:
-                    with open(games_json, "r", encoding="utf-8") as f:
-                        data = json.load(f)
+                    data = load_json_file(games_json, [])
 
                     changed = False
 
@@ -1023,8 +1014,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             changed = True
 
                     if changed:
-                        with open(games_json, "w", encoding="utf-8") as f:
-                            json.dump(data, f, indent=4, ensure_ascii=False)
+                        save_json_file(data, games_json)
 
                         for flowbox_child in self.flowbox.get_children():
                             if hasattr(flowbox_child, "game"):
@@ -1073,8 +1063,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._save_categories(categories)
 
             try:
-                with open(games_json, "r", encoding="utf-8") as f:
-                    data = json.load(f)
+                data = load_json_file(games_json, [])
 
                 changed = False
 
@@ -1093,8 +1082,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         changed = True
 
                 if changed:
-                    with open(games_json, "w", encoding="utf-8") as f:
-                        json.dump(data, f, indent=4, ensure_ascii=False)
+                    save_json_file(data, games_json)
 
                     for child in self.flowbox.get_children():
                         if hasattr(child, "game"):
@@ -1171,8 +1159,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.menu_title.get_child().set_text(title)
 
-                with open(games_json, "r") as f:
-                    data = json.load(f)
+                data = load_json_file(games_json, [])
 
                 for item_data in data:
                     if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
@@ -1350,8 +1337,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         try:
-            with open(games_json, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = load_json_file(games_json, [])
 
             for item in data:
                 if item.get("gameid") == game.gameid:
@@ -1359,10 +1345,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     game.hidden = item["hidden"]
                     break
 
-            with open(games_json, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+            save_json_file(data, games_json)
 
-        except Exception as e:
+        except Exception:
             return
 
         self.update_list()
@@ -1370,8 +1355,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_context_menu_category(self, menu_item, category_name, selected_gameid):
         try:
-            with open(games_json, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = load_json_file(games_json, [])
 
             for item in data:
                 if item.get("gameid") == selected_gameid:
@@ -1402,10 +1386,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             break
                     break
 
-            with open(games_json, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+            save_json_file(data, games_json)
 
-        except Exception as e:
+        except Exception:
             return
 
         self.flowbox.invalidate_filter()
@@ -1642,48 +1625,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game.banner = new_banner
         game.addapp_bat = new_addapp_bat
 
-        game_info = {
-            "gameid": title_formatted,
-            "title": game.title,
-            "path": game.path,
-            "prefix": game.prefix,
-            "launch_arguments": game.launch_arguments,
-            "game_arguments": game.game_arguments,
-            "mangohud": game.mangohud,
-            "gamemode": game.gamemode,
-            "disable_hidraw": game.disable_hidraw,
-            "protonfix": game.protonfix,
-            "runner": game.runner,
-            "addapp_checkbox": game.addapp_checkbox,
-            "addapp": game.addapp,
-            "addapp_bat": game.addapp_bat,
-            "addapp_delay": game.addapp_delay,
-            "addapp_first": game.addapp_first,
-            "banner": game.banner,
-            "lossless_enabled": game.lossless_enabled,
-            "lossless_multiplier": game.lossless_multiplier,
-            "lossless_flow": game.lossless_flow,
-            "lossless_performance": game.lossless_performance,
-            "lossless_hdr": game.lossless_hdr,
-            "playtime": game.playtime,
-            "hidden": game.hidden,
-            "prevent_sleep": game.prevent_sleep,
-            "category": game.category,
-            "icon": game.icon,
-        }
+        game_info = game_to_dict(game)
+        game_info["gameid"] = title_formatted
 
-        games = []
-        if os.path.exists("games.json"):
-            try:
-                with open("games.json", "r", encoding="utf-8") as file:
-                    games = json.load(file)
-            except json.JSONDecodeError as e:
-                print(f"Error reading the JSON file: {e}")
+        games = load_json_file("games.json", [])
 
         games.append(game_info)
 
-        with open("games.json", "w", encoding="utf-8") as file:
-            json.dump(games, file, ensure_ascii=False, indent=4)
+        save_json_file(games, "games.json")
 
         self.games.append(game)
         self.add_item_list(game)
@@ -1893,59 +1842,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.context_menu.remove(self.menu_show_logs)
 
     def load_games(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as file:
-                games_data = json.load(file)
+        games_data = load_json_file("games.json", [])
 
-                self.games.clear()
-                for game_data in games_data:
-                    game = Game(
-                        game_data.get("gameid", ""),
-                        game_data.get("title", ""),
-                        game_data.get("path", ""),
-                        game_data.get("prefix", ""),
-                        game_data.get("launch_arguments", ""),
-                        game_data.get("game_arguments", ""),
-                        game_data.get("mangohud", ""),
-                        game_data.get("gamemode", ""),
-                        game_data.get("disable_hidraw", ""),
-                        game_data.get("protonfix", ""),
-                        game_data.get("runner", ""),
-                        game_data.get("addapp_checkbox", ""),
-                        game_data.get("addapp", ""),
-                        game_data.get("addapp_bat", ""),
-                        game_data.get("addapp_delay", ""),
-                        game_data.get("addapp_first", ""),
-                        game_data.get("banner", ""),
-                        game_data.get("lossless_enabled", ""),
-                        game_data.get("lossless_multiplier", ""),
-                        game_data.get("lossless_flow", ""),
-                        game_data.get("lossless_performance", ""),
-                        game_data.get("lossless_hdr", ""),
-                        game_data.get("lossless_present", ""),
-                        game_data.get("playtime", 0),
-                        game_data.get("hidden", False),
-                        game_data.get("prevent_sleep", False),
-                        game_data.get("category", False),
-                        game_data.get("icon", "")
-                    )
+        self.games.clear()
+        for game_data in games_data:
+            game = Game(**prepare_game_kwargs(game_data))
 
-                    if not self.show_hidden and game.hidden:
-                        continue
+            if not self.show_hidden and game.hidden:
+                continue
 
-                    self.games.append(game)
+            self.games.append(game)
 
-                self.games = sorted(self.games, key=lambda x: x.title.lower())
-                self.filtered_games = self.games[:]
+        self.games = sorted(self.games, key=lambda x: x.title.lower())
+        self.filtered_games = self.games[:]
 
-                self.flowbox.foreach(Gtk.Widget.destroy)
-                for game in self.filtered_games:
-                    self.add_item_list(game)
-
-        except FileNotFoundError:
-            pass
-        except json.JSONDecodeError as e:
-            print(f"Error reading the JSON file: {e}")
+        self.flowbox.foreach(Gtk.Widget.destroy)
+        for game in self.filtered_games:
+            self.add_item_list(game)
 
     def add_item_list(self, game):
         zoom_pct = self.banner_size
@@ -2585,10 +2498,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.select_first_child()
 
     def reload_playtimes(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as f:
-                games_data = json.load(f)
-        except FileNotFoundError:
+        games_data = load_json_file("games.json", [])
+        if not games_data:
             return
 
         playtime_map = {g["gameid"]: g.get("playtime", 0) for g in games_data}
@@ -2695,11 +2606,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
 
-            if os.path.exists(games_json):
-                with open(games_json, encoding="utf-8") as f:
-                    games = json.load(f)
+            games = load_json_file(games_json, [])
 
-                if any(game.get("title", "").casefold() == title.casefold() for game in games):
+            if any(game.get("title", "").casefold() == title.casefold() for game in games):
                     self.show_warning_dialog_main(
                         add_game_dialog,
                         _("%s already exists.") % title,
@@ -2836,51 +2745,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         steam_shortcut_state, icon_temp, icon_final
                     )
 
-            game_info = {
-                "gameid": title_formatted,
-                "title": title,
-                "path": path,
-                "prefix": prefix,
-                "launch_arguments": launch_arguments,
-                "game_arguments": game_arguments,
-                "mangohud": mangohud,
-                "gamemode": gamemode,
-                "disable_hidraw": disable_hidraw,
-                "protonfix": protonfix,
-                "runner": runner,
-                "addapp_checkbox": addapp_checkbox,
-                "addapp": addapp,
-                "addapp_bat": addapp_bat,
-                "addapp_delay": addapp_delay,
-                "addapp_first": addapp_first,
-                "banner": banner,
-                "lossless_enabled": lossless_enabled,
-                "lossless_multiplier": lossless_multiplier,
-                "lossless_flow": lossless_flow,
-                "lossless_performance": lossless_performance,
-                "lossless_hdr": lossless_hdr,
-                "lossless_present": lossless_present,
-                "playtime": playtime,
-                "hidden": hidden,
-                "prevent_sleep": prevent_sleep,
-                "category": category,
-                "icon": icon,
-            }
+            game_info = game_to_dict(game)
 
-            games = []
-            if os.path.exists("games.json"):
-                try:
-                    with open("games.json", "r", encoding="utf-8") as file:
-                        games = json.load(file)
-                except json.JSONDecodeError as e:
-                    print(f"Error reading the JSON file: {e}")
+            games = load_json_file("games.json", [])
 
             games.append(game_info)
 
             self.backup_games()
 
-            with open("games.json", "w", encoding="utf-8") as file:
-                json.dump(games, file, ensure_ascii=False, indent=4)
+            save_json_file(games, "games.json")
 
             self.games.append(game)
 
@@ -3477,11 +3350,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.show_all()
 
     def save_games(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as file:
-                all_games_data = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            all_games_data = []
+        all_games_data = load_json_file("games.json", [])
 
         visible_games_map = {game.gameid: game for game in self.games}
         deleted_id = getattr(self, "_deleted_gameid", None)
@@ -3498,36 +3367,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if gameid in visible_games_map:
                 game = visible_games_map.pop(gameid)
-                game_data = {
-                    "gameid": game.gameid,
-                    "title": game.title,
-                    "path": game.path,
-                    "prefix": game.prefix,
-                    "launch_arguments": game.launch_arguments,
-                    "game_arguments": game.game_arguments,
-                    "mangohud": True if game.mangohud else "",
-                    "gamemode": True if game.gamemode else "",
-                    "disable_hidraw": True if game.disable_hidraw else "",
-                    "protonfix": game.protonfix,
-                    "runner": game.runner,
-                    "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                    "addapp": game.addapp,
-                    "addapp_bat": game.addapp_bat,
-                    "addapp_delay": game.addapp_delay,
-                    "addapp_first": game.addapp_first,
-                    "banner": game.banner,
-                    "lossless_enabled": game.lossless_enabled,
-                    "lossless_multiplier": game.lossless_multiplier,
-                    "lossless_flow": game.lossless_flow,
-                    "lossless_performance": game.lossless_performance,
-                    "lossless_hdr": game.lossless_hdr,
-                    "lossless_present": game.lossless_present,
-                    "playtime": game.playtime,
-                    "hidden": hidden,
-                    "prevent_sleep": game.prevent_sleep,
-                    "category": game.category,
-                    "icon": game.icon,
-                }
+                game_data = game_to_save_dict(game, hidden=hidden)
 
             new_games_data.append(game_data)
 
@@ -3536,8 +3376,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.backup_games()
 
-        with open("games.json", "w", encoding="utf-8") as file:
-            json.dump(new_games_data, file, ensure_ascii=False, indent=4)
+        save_json_file(new_games_data, "games.json")
 
     def backup_games(self):
         if os.path.isfile(games_json):
@@ -5840,16 +5679,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             cancel_label=_("Cancel"),
         )
 
-        filter_ico = Gtk.FileFilter()
-        filter_ico.set_name(_("Image files"))
-        filter_ico.add_pattern("*.png")
-        filter_ico.add_pattern("*.jpg")
-        filter_ico.add_pattern("*.jpeg")
-        filter_ico.add_pattern("*.jxl")
-        filter_ico.add_pattern("*.bmp")
-        filter_ico.add_pattern("*.gif")
-        filter_ico.add_pattern("*.svg")
-        filechooser.add_filter(filter_ico)
+        add_image_file_filters(filechooser, include_ico=False)
 
         response = filechooser.run()
 
@@ -6291,26 +6121,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         path = self.entry_path.get_text()
 
         if os.path.isfile(path):
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
-
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            if extract_ico_simple(path, self.icon_converted):
+                shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
 
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
@@ -6320,17 +6132,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             _("Cancel")
         )
 
-        filter_ico = Gtk.FileFilter()
-        filter_ico.set_name(_("Image files"))
-        filter_ico.add_pattern("*.png")
-        filter_ico.add_pattern("*.jpg")
-        filter_ico.add_pattern("*.jpeg")
-        filter_ico.add_pattern("*.jxl")
-        filter_ico.add_pattern("*.bmp")
-        filter_ico.add_pattern("*.gif")
-        filter_ico.add_pattern("*.svg")
-        filter_ico.add_pattern("*.ico")
-        filechooser.add_filter(filter_ico)
+        add_image_file_filters(filechooser)
 
         filechooser.set_current_folder(self.icon_directory)
 
@@ -6531,62 +6333,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if response == Gtk.ResponseType.ACCEPT:
             path = filechooser.get_filename()
 
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
-
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-
-                    extract_pattern = os.path.join(self.icon_directory, "frame_%d.png")
-                    subprocess.run([command_magick, self.icon_extracted, extract_pattern])
-
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-                    best, size = None, 0
-
-                    def get_index(filepath):
-                        match = re.search(r'frame_(\d+)\.png', filepath.name)
-                        return int(match.group(1)) if match else 999
-
-                    png_files = sorted(Path(self.icon_directory).glob("frame_*.png"), key=get_index)
-
-                    for f in png_files:
-                        r = subprocess.run(
-                            [command_magick, "identify", "-format", "%wx%h", str(f)],
-                            capture_output=True, text=True
-                        )
-
-                        if r.returncode == 0 and r.stdout:
-                            w, h = map(int, r.stdout.strip().split("x"))
-                            current_size = w * h
-
-                            if current_size > size:
-                                best, size = str(f), current_size
-
-                    if best:
-                        subprocess.run([command_magick, best, "-resize", "256x256!", self.icon_converted], check=True)
-                        shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
-
-                        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                        image = Gtk.Image.new_from_surface(surface)
-
-                        self.button_shortcut_icon.set_image(image)
-
-                    for f in png_files:
-                        os.remove(f)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            if extract_ico_frames(path, os.path.expanduser(self.icon_temp)):
+                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                image = Gtk.Image.new_from_surface(surface)
+                self.button_shortcut_icon.set_image(image)
+            else:
+                self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
             self.entry_path.set_text(path)
 
@@ -6737,15 +6489,9 @@ def main():
 
 # returns the number of other games using the same prefix
 def prefixes_count(prefix):
-    if not os.path.exists(games_json):
+    games = load_json_file(games_json, None)
+    if games is None:
         return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
-        return
-
     return sum(1 for x in games if x.get("prefix") == prefix) - 1
 
 if __name__ == "__main__":
