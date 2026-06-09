@@ -429,7 +429,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             self.on_button_play_clicked(None, game)
 
-    def on_close(self, *_):
+    def on_close(self, *args):
         config = ConfigManager()
 
         if self.window_behavior == "Remember":
@@ -439,6 +439,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.banner_size:
             config.set_value("banner-size", self.banner_size)
+
+        if hasattr(self, 'current_sort_id'):
+            config.set_value("sort", self.current_sort_id)
+
+        if hasattr(self, 'current_category'):
+            cat = self.current_category
+            if cat is None or cat == _("All"):
+                cat_id = "all"
+            elif cat == _("Uncategorized"):
+                cat_id = "uncategorized"
+            else:
+                cat_id = cat
+            config.set_value("category", cat_id)
 
         config.save_config()
 
@@ -533,11 +546,31 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.opt_alpha = _("Alphabetical")
         self.opt_playtime = _("Playtime")
         self.opt_lastplayed = _("Last played")
-        self.current_sort = self.opt_alpha
+
+        self.sort_map = {
+            "alpha": self.opt_alpha,
+            "playtime": self.opt_playtime,
+            "lastplayed": self.opt_lastplayed
+        }
+
+        self.current_sort_id = getattr(self, "sort", "alpha")
+        if self.current_sort_id not in self.sort_map:
+            self.current_sort_id = "alpha"
+        self.current_sort = self.sort_map[self.current_sort_id]
+
+        saved_category = getattr(self, "category", "all")
+        if saved_category == "all":
+            self.current_category = None
+        elif saved_category == "uncategorized":
+            self.current_category = _("Uncategorized")
+        else:
+            self.current_category = saved_category
+
         self.playtime_data = {}
         self.latest_games_order = {}
 
-        self.button_category = Gtk.Button(label=_("All"))
+        cat_label = self.current_category if self.current_category and self.current_category != _("None") else _("All")
+        self.button_category = Gtk.Button(label=cat_label)
         self.button_category.set_size_request(110, -1)
         self.button_category.connect("clicked", self.on_category_button_clicked)
 
@@ -572,16 +605,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             vbox.set_margin_end(10)
 
             focus_btn = None
-            for opt in [self.opt_alpha, self.opt_playtime, self.opt_lastplayed]:
-                btn = Gtk.Button(label=opt)
-                if opt == self.current_sort:
+            for s_id, s_label in self.sort_map.items():
+                btn = Gtk.Button(label=s_label)
+                if s_id == self.current_sort_id:
                     focus_btn = btn
-                def set_sort(btn_widget, sort_opt=opt):
-                    self.current_sort = sort_opt
-                    self.button_sort.set_label(sort_opt)
+
+                def set_sort(btn_widget, target_id=s_id, target_label=s_label):
+                    self.current_sort_id = target_id
+                    self.current_sort = target_label
+                    self.button_sort.set_label(target_label)
                     update_sort_data()
                     self.flowbox.invalidate_sort()
                     popover.popdown()
+
                 btn.connect("clicked", set_sort)
                 btn.set_relief(Gtk.ReliefStyle.NONE)
                 vbox.pack_start(btn, False, False, 0)
@@ -655,21 +691,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def sort_games(child1, child2, user_data):
             g1, g2 = child1.game, child2.game
 
-            if self.current_sort == self.opt_playtime:
+            if self.current_sort_id == "playtime":
                 pt1 = self.playtime_data.get(g1.gameid, 0)
                 pt2 = self.playtime_data.get(g2.gameid, 0)
                 if pt1 != pt2:
                     return (pt1 < pt2) - (pt1 > pt2)
 
-            elif self.current_sort == self.opt_lastplayed:
+            elif self.current_sort_id == "lastplayed":
                 idx1 = self.latest_games_order.get(g1.gameid, float('inf'))
                 idx2 = self.latest_games_order.get(g2.gameid, float('inf'))
                 if idx1 != idx2:
                     return (idx1 > idx2) - (idx1 < idx2)
 
             return (g1.title > g2.title) - (g1.title < g2.title)
-
-        self.current_category = None
 
         def filter_games(child, user_data):
             game = child.game
@@ -1840,6 +1874,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.window_width = int(cfg.config.get('width', 1280))
         self.window_height = int(cfg.config.get('height', 720))
         self.banner_size = int(cfg.config.get('banner-size', 100))
+        self.sort = cfg.config.get('sort', '')
+        self.category = cfg.config.get('category', '')
 
         if self.enable_logging:
             if self.menu_show_logs not in self.context_menu.get_children():
