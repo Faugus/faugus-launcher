@@ -389,7 +389,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if os.path.exists(latest_games):
             with open(latest_games) as f:
+                added_count = 0
                 for gameid in map(str.strip, f):
+                    if added_count >= 5:
+                        break
+
                     game = games_by_id.get(gameid)
                     if not game:
                         continue
@@ -397,6 +401,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     item = Gtk.MenuItem(label=game.title)
                     item.connect("activate", self.on_game_selected, game)
                     menu.append(item)
+                    added_count += 1
 
         if menu.get_children():
             menu.append(Gtk.SeparatorMenuItem())
@@ -2205,8 +2210,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_directory = os.path.dirname(game.path)
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
-        if game.runner == "Steam":
+        def update_latest_and_sort():
             self.update_latest_games_file(game.gameid)
+            if hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed:
+                self.latest_games_order.clear()
+                try:
+                    if os.path.exists(latest_games):
+                        with open(latest_games) as f:
+                            for idx, gid in enumerate(map(str.strip, f)):
+                                self.latest_games_order[gid] = idx
+                except:
+                    pass
+                if hasattr(self, 'flowbox'):
+                    self.flowbox.invalidate_sort()
+
+        if game.runner == "Steam":
+            update_latest_and_sort()
             subprocess.Popen(
                 [sys.executable, "-m", "faugus.runner", "--game", gameid],
                 cwd=cwd,
@@ -2229,7 +2248,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
             return
 
-        self.update_latest_games_file(game.gameid)
+        update_latest_and_sort()
         cmd = (sys.executable, "-m", "faugus.runner", "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None)
 
@@ -2250,6 +2269,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.running.pop(game, None)
         self.processes.pop(game, None)
         self.save_running()
+
+        if hasattr(self, 'current_sort') and hasattr(self, 'opt_playtime') and self.current_sort == self.opt_playtime:
+            try:
+                data = load_json_file(games_json, [])
+                for item in data:
+                    if isinstance(item, dict) and "gameid" in item:
+                        self.playtime_data[item["gameid"]] = item.get("playtime", 0)
+            except:
+                pass
+
+            if hasattr(self, 'flowbox'):
+                GLib.idle_add(self.flowbox.invalidate_sort)
+
         GLib.idle_add(self.update_icon)
 
     def update_latest_games_file(self, gameid):
@@ -2265,7 +2297,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         games.insert(0, gameid)
 
         with open(latest_games, 'w') as f:
-            f.write('\n'.join(games[:5]))
+            f.write('\n'.join(games))
 
         self.load_tray_icon()
 
@@ -2496,7 +2528,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_list()
 
             # Remove the game from the latest-games file if it exists
-            self.remove_game_from_latest_games(title)
+            self.remove_game_from_latest_games(gameid)
             self.select_first_child()
 
     def reload_playtimes(self):
@@ -2526,23 +2558,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             except SyntaxError:
                 pass
 
-    def remove_game_from_latest_games(self, title):
+    def remove_game_from_latest_games(self, gameid):
         try:
-            # Read the current list of recent games
             with open(latest_games, 'r') as f:
                 recent_games = f.read().splitlines()
 
-            # Remove the game title if it exists in the list
-            if title in recent_games:
-                recent_games.remove(title)
+            if gameid in recent_games:
+                recent_games.remove(gameid)
 
-                # Write the updated list back, maintaining max 5 entries
                 with open(latest_games, 'w') as f:
-                    f.write("\n".join(recent_games[:5]))
+                    f.write("\n".join(recent_games))
             self.load_tray_icon()
 
         except FileNotFoundError:
-            pass  # Ignore if the file doesn't exist yet
+            pass
 
     def show_warning_dialog_main(self, parent, text1, text2):
         dialog = Gtk.Dialog(title="Faugus Launcher")
@@ -2913,7 +2942,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.games.remove(game)
                 self.save_games()
                 self.update_list()
-                self.remove_game_from_latest_games(title)
+                self.remove_game_from_latest_games(game.gameid)
                 self.show_warning_dialog_main(self, _("%s was not installed!") % title, "")
 
             if self.interface_mode != "List":
