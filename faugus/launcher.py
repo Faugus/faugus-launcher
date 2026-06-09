@@ -2115,18 +2115,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.get_style_context().remove_class("entry")
 
-        if settings_dialog.combobox_interface.get_active_id() == "Banners":
-            if not default_prefix:
-                if not default_prefix:
-                    settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
-                return False
-            return True
-        elif not default_prefix:
+        if not default_prefix:
             settings_dialog.entry_default_prefix.get_style_context().add_class("entry")
             return False
-        else:
-            return True
 
+        return True
+        
     def manage_autostart_file(self, start_boot, start_minimized):
         autostart_path = PathManager.user_home('.config/autostart/faugus-launcher.desktop')
         autostart_dir = os.path.dirname(autostart_path)
