@@ -525,9 +525,70 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_search.connect("changed", self.on_search_changed)
         self.entry_search.set_size_request(170, 50)
 
-        self.button_category = Gtk.Button(label=_("Categories"))
-        self.button_category.set_size_request(150, -1)
+        self.opt_alpha = _("Alphabetical")
+        self.opt_playtime = _("Playtime")
+        self.opt_lastplayed = _("Last played")
+        self.current_sort = self.opt_alpha
+        self.playtime_data = {}
+        self.latest_games_order = {}
+
+        self.button_category = Gtk.Button(label=_("All"))
+        self.button_category.set_size_request(110, -1)
         self.button_category.connect("clicked", self.on_category_button_clicked)
+
+        self.button_sort = Gtk.Button(label=self.current_sort)
+        self.button_sort.set_size_request(110, -1)
+
+        def update_sort_data():
+            self.playtime_data.clear()
+            try:
+                data = load_json_file(games_json, [])
+                for item in data:
+                    if isinstance(item, dict) and "gameid" in item:
+                        self.playtime_data[item["gameid"]] = item.get("playtime", 0)
+            except:
+                pass
+
+            self.latest_games_order.clear()
+            try:
+                if os.path.exists(latest_games):
+                    with open(latest_games) as f:
+                        for idx, gid in enumerate(map(str.strip, f)):
+                            self.latest_games_order[gid] = idx
+            except:
+                pass
+
+        def on_sort_button_clicked(widget):
+            popover = Gtk.Popover.new(widget)
+            vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+            vbox.set_margin_top(10)
+            vbox.set_margin_bottom(10)
+            vbox.set_margin_start(10)
+            vbox.set_margin_end(10)
+
+            focus_btn = None
+            for opt in [self.opt_alpha, self.opt_playtime, self.opt_lastplayed]:
+                btn = Gtk.Button(label=opt)
+                if opt == self.current_sort:
+                    focus_btn = btn
+                def set_sort(btn_widget, sort_opt=opt):
+                    self.current_sort = sort_opt
+                    self.button_sort.set_label(sort_opt)
+                    update_sort_data()
+                    self.flowbox.invalidate_sort()
+                    popover.popdown()
+                btn.connect("clicked", set_sort)
+                btn.set_relief(Gtk.ReliefStyle.NONE)
+                vbox.pack_start(btn, False, False, 0)
+
+            vbox.show_all()
+            popover.add(vbox)
+            popover.popup()
+
+            if focus_btn:
+                focus_btn.grab_focus()
+
+        self.button_sort.connect("clicked", on_sort_button_clicked)
 
         initial_zoom = self.banner_size
         adjustment = Gtk.Adjustment(value=initial_zoom, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
@@ -588,6 +649,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def sort_games(child1, child2, user_data):
             g1, g2 = child1.game, child2.game
+
+            if self.current_sort == self.opt_playtime:
+                pt1 = self.playtime_data.get(g1.gameid, 0)
+                pt2 = self.playtime_data.get(g2.gameid, 0)
+                if pt1 != pt2:
+                    return (pt1 < pt2) - (pt1 > pt2)
+
+            elif self.current_sort == self.opt_lastplayed:
+                idx1 = self.latest_games_order.get(g1.gameid, float('inf'))
+                idx2 = self.latest_games_order.get(g2.gameid, float('inf'))
+                if idx1 != idx2:
+                    return (idx1 > idx2) - (idx1 < idx2)
+
             return (g1.title > g2.title) - (g1.title < g2.title)
 
         self.current_category = None
@@ -640,7 +714,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             bottom_bar.pack_start(self.zoom_slider, False, False, 0)
 
             if getattr(self, 'show_categories', True):
-                bottom_bar.pack_end(self.button_category, False, False, 0)
+                box_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                box_actions.set_margin_start(10)
+                box_actions.pack_start(self.button_sort, False, False, 0)
+                box_actions.pack_start(self.button_category, False, False, 0)
+                bottom_bar.pack_end(box_actions, False, False, 0)
 
             center_grid = Gtk.Grid()
             center_grid.set_column_spacing(10)
@@ -660,11 +738,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.box_bottom = Gtk.Box()
 
             if getattr(self, 'show_categories', True):
-                top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+                top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
                 top_bar.set_margin_top(10)
                 top_bar.set_margin_start(10)
                 top_bar.set_margin_end(10)
+                self.button_sort.set_hexpand(True)
                 self.button_category.set_hexpand(True)
+                top_bar.pack_start(self.button_sort, True, True, 0)
                 top_bar.pack_start(self.button_category, True, True, 0)
                 self.box_top.pack_start(top_bar, False, False, 0)
 
@@ -688,6 +768,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.box_main.pack_start(self.box_top, True, True, 0)
             self.box_main.pack_end(self.box_bottom, False, True, 0)
 
+        update_sort_data()
         self.load_games()
 
         self.add(self.box_main)
@@ -699,37 +780,49 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.fullscreen_activated = True
 
     def on_category_button_clicked(self, button):
-        menu = Gtk.Menu()
+        popover = Gtk.Popover.new(button)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+        vbox.set_margin_top(10)
+        vbox.set_margin_bottom(10)
+        vbox.set_margin_start(10)
+        vbox.set_margin_end(10)
 
         categories = [_("All"), _("Uncategorized")] + self._get_current_categories()
+        current_label = self.button_category.get_label()
+        focus_btn = None
 
         for cat_name in categories:
-            item = Gtk.MenuItem(label=cat_name)
-            item.set_size_request(100, -1)
-            item.connect("activate", self.on_category_menu_item_selected, cat_name)
-            menu.append(item)
+            btn = Gtk.Button(label=cat_name)
+            if cat_name == current_label:
+                focus_btn = btn
+            btn.set_relief(Gtk.ReliefStyle.NONE)
+            def set_category(btn_widget, cat=cat_name):
+                self.on_category_menu_item_selected(btn_widget, cat)
+                popover.popdown()
+            btn.connect("clicked", set_category)
+            vbox.pack_start(btn, False, False, 0)
 
-        menu.append(Gtk.SeparatorMenuItem())
+        separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        separator.set_margin_top(5)
+        separator.set_margin_bottom(5)
+        vbox.pack_start(separator, False, False, 0)
 
-        item_manage = Gtk.MenuItem(label=_("Manage categories..."))
-        item_manage.connect("activate", self.on_manage_categories_clicked)
-        menu.append(item_manage)
+        btn_manage = Gtk.Button(label=_("Manage categories..."))
+        btn_manage.set_relief(Gtk.ReliefStyle.NONE)
 
-        menu.show_all()
-        if self.interface_mode == "List":
-            menu.popup_at_widget(
-                button,
-                Gdk.Gravity.SOUTH,
-                Gdk.Gravity.NORTH,
-                None
-            )
-        else:
-            menu.popup_at_widget(
-                button,
-                Gdk.Gravity.NORTH,
-                Gdk.Gravity.SOUTH,
-                None
-            )
+        def manage_categories(btn_widget):
+            popover.popdown()
+            GLib.idle_add(self.on_manage_categories_clicked, btn_widget)
+
+        btn_manage.connect("clicked", manage_categories)
+        vbox.pack_start(btn_manage, False, False, 0)
+
+        vbox.show_all()
+        popover.add(vbox)
+        popover.popup()
+
+        if focus_btn:
+            focus_btn.grab_focus()
 
     def on_category_menu_item_selected(self, menu_item, category_name):
         self.button_category.set_label(category_name)
@@ -929,7 +1022,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 if self.current_category == cat_to_remove:
                     self.current_category = _("None")
-                    self.button_category.set_label(_("Categories"))
+                    self.button_category.set_label(_("All"))
 
                 populate_dialog_list()
                 self.flowbox.invalidate_filter()
