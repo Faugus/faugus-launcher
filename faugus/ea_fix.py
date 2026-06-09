@@ -1,4 +1,3 @@
-import json
 import os
 import re
 import shutil
@@ -7,6 +6,7 @@ from pathlib import Path
 
 from faugus.path_manager import *
 from faugus.steam_setup import steam_shortcuts_path
+from faugus.utils import load_json_file, save_json_file
 
 def update_desktop_path(shortcut_path, new_dir_path):
     try:
@@ -92,38 +92,32 @@ def update_ea_path(prefix):
 
     new_executable_dir = os.path.dirname(new_path)
 
-    if os.path.exists(games_json):
-        try:
-            with open(games_json, "r", encoding="utf-8") as f:
-                games = json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            games = []
+    games = load_json_file(games_json, [])
 
-        changed = False
+    changed = False
 
-        for game in games:
-            if "EALauncher.exe" in game.get("path", ""):
-                game["path"] = new_path
-                changed = True
+    for game in games:
+        if "EALauncher.exe" in game.get("path", ""):
+            game["path"] = new_path
+            changed = True
 
-                gameid = game.get("gameid") or game.get("id")
-                game_title = game.get("title") or game.get("name") or "EA App"
+            gameid = game.get("gameid") or game.get("id")
+            game_title = game.get("title") or game.get("name") or "EA App"
 
-                if gameid:
-                    applications_shortcut_path = f"{app_dir}/{gameid}.desktop"
-                    desktop_shortcut_path = f"{desktop_dir}/{gameid}.desktop"
+            if gameid:
+                applications_shortcut_path = f"{app_dir}/{gameid}.desktop"
+                desktop_shortcut_path = f"{desktop_dir}/{gameid}.desktop"
 
-                    if os.path.exists(applications_shortcut_path):
-                        update_desktop_path(applications_shortcut_path, new_executable_dir)
+                if os.path.exists(applications_shortcut_path):
+                    update_desktop_path(applications_shortcut_path, new_executable_dir)
 
-                    if os.path.exists(desktop_shortcut_path):
-                        update_desktop_path(desktop_shortcut_path, new_executable_dir)
+                if os.path.exists(desktop_shortcut_path):
+                    update_desktop_path(desktop_shortcut_path, new_executable_dir)
 
-                if game_title:
-                    update_steam_shortcut(game_title, new_executable_dir, new_path)
+            if game_title:
+                update_steam_shortcut(game_title, new_executable_dir, new_path)
 
-        if changed:
-            with open(games_json, "w", encoding="utf-8") as f:
-                json.dump(games, f, indent=4, ensure_ascii=False)
+    if changed:
+        save_json_file(games, games_json)
 
     return new_path

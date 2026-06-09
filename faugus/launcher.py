@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import json
 import re
 import shutil
 import subprocess
@@ -141,16 +140,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.processes = {}
 
         if not os.path.exists(running_games):
-            os.makedirs(os.path.dirname(running_games), exist_ok=True)
-            with open(running_games, 'w') as f:
-                json.dump({}, f)
+            save_json_file({}, running_games)
 
-        try:
-            with open(running_games) as f:
-                self.running = json.load(f)
-                if not isinstance(self.running, dict):
-                    self.running = {}
-        except:
+        self.running = load_json_file(running_games, {})
+        if not isinstance(self.running, dict):
             self.running = {}
 
         self.working_directory = faugus_launcher_dir
@@ -368,8 +361,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def save_running(self):
-        with open(running_games, "w") as f:
-            json.dump(self.running, f)
+        save_json_file(self.running, running_games)
 
     def load_tray_icon(self):
         if not self.system_tray:
@@ -1006,8 +998,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self._save_categories(categories)
 
                 try:
-                    with open(games_json, "r", encoding="utf-8") as f:
-                        data = json.load(f)
+                    data = load_json_file(games_json, [])
 
                     changed = False
 
@@ -1023,8 +1014,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             changed = True
 
                     if changed:
-                        with open(games_json, "w", encoding="utf-8") as f:
-                            json.dump(data, f, indent=4, ensure_ascii=False)
+                        save_json_file(data, games_json)
 
                         for flowbox_child in self.flowbox.get_children():
                             if hasattr(flowbox_child, "game"):
@@ -1073,8 +1063,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._save_categories(categories)
 
             try:
-                with open(games_json, "r", encoding="utf-8") as f:
-                    data = json.load(f)
+                data = load_json_file(games_json, [])
 
                 changed = False
 
@@ -1093,8 +1082,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         changed = True
 
                 if changed:
-                    with open(games_json, "w", encoding="utf-8") as f:
-                        json.dump(data, f, indent=4, ensure_ascii=False)
+                    save_json_file(data, games_json)
 
                     for child in self.flowbox.get_children():
                         if hasattr(child, "game"):
@@ -1171,8 +1159,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.menu_title.get_child().set_text(title)
 
-                with open(games_json, "r") as f:
-                    data = json.load(f)
+                data = load_json_file(games_json, [])
 
                 for item_data in data:
                     if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
@@ -1350,8 +1337,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         try:
-            with open(games_json, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = load_json_file(games_json, [])
 
             for item in data:
                 if item.get("gameid") == game.gameid:
@@ -1359,10 +1345,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     game.hidden = item["hidden"]
                     break
 
-            with open(games_json, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+            save_json_file(data, games_json)
 
-        except Exception as e:
+        except Exception:
             return
 
         self.update_list()
@@ -1370,8 +1355,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_context_menu_category(self, menu_item, category_name, selected_gameid):
         try:
-            with open(games_json, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = load_json_file(games_json, [])
 
             for item in data:
                 if item.get("gameid") == selected_gameid:
@@ -1402,10 +1386,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             break
                     break
 
-            with open(games_json, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+            save_json_file(data, games_json)
 
-        except Exception as e:
+        except Exception:
             return
 
         self.flowbox.invalidate_filter()
@@ -1645,18 +1628,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_info = game_to_dict(game)
         game_info["gameid"] = title_formatted
 
-        games = []
-        if os.path.exists("games.json"):
-            try:
-                with open("games.json", "r", encoding="utf-8") as file:
-                    games = json.load(file)
-            except json.JSONDecodeError as e:
-                print(f"Error reading the JSON file: {e}")
+        games = load_json_file("games.json", [])
 
         games.append(game_info)
 
-        with open("games.json", "w", encoding="utf-8") as file:
-            json.dump(games, file, ensure_ascii=False, indent=4)
+        save_json_file(games, "games.json")
 
         self.games.append(game)
         self.add_item_list(game)
@@ -1866,30 +1842,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.context_menu.remove(self.menu_show_logs)
 
     def load_games(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as file:
-                games_data = json.load(file)
+        games_data = load_json_file("games.json", [])
 
-                self.games.clear()
-                for game_data in games_data:
-                    game = Game(**prepare_game_kwargs(game_data))
+        self.games.clear()
+        for game_data in games_data:
+            game = Game(**prepare_game_kwargs(game_data))
 
-                    if not self.show_hidden and game.hidden:
-                        continue
+            if not self.show_hidden and game.hidden:
+                continue
 
-                    self.games.append(game)
+            self.games.append(game)
 
-                self.games = sorted(self.games, key=lambda x: x.title.lower())
-                self.filtered_games = self.games[:]
+        self.games = sorted(self.games, key=lambda x: x.title.lower())
+        self.filtered_games = self.games[:]
 
-                self.flowbox.foreach(Gtk.Widget.destroy)
-                for game in self.filtered_games:
-                    self.add_item_list(game)
-
-        except FileNotFoundError:
-            pass
-        except json.JSONDecodeError as e:
-            print(f"Error reading the JSON file: {e}")
+        self.flowbox.foreach(Gtk.Widget.destroy)
+        for game in self.filtered_games:
+            self.add_item_list(game)
 
     def add_item_list(self, game):
         zoom_pct = self.banner_size
@@ -2529,10 +2498,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.select_first_child()
 
     def reload_playtimes(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as f:
-                games_data = json.load(f)
-        except FileNotFoundError:
+        games_data = load_json_file("games.json", [])
+        if not games_data:
             return
 
         playtime_map = {g["gameid"]: g.get("playtime", 0) for g in games_data}
@@ -2639,11 +2606,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 title = add_game_dialog.combobox_launcher.get_active_text()
 
-            if os.path.exists(games_json):
-                with open(games_json, encoding="utf-8") as f:
-                    games = json.load(f)
+            games = load_json_file(games_json, [])
 
-                if any(game.get("title", "").casefold() == title.casefold() for game in games):
+            if any(game.get("title", "").casefold() == title.casefold() for game in games):
                     self.show_warning_dialog_main(
                         add_game_dialog,
                         _("%s already exists.") % title,
@@ -2782,20 +2747,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             game_info = game_to_dict(game)
 
-            games = []
-            if os.path.exists("games.json"):
-                try:
-                    with open("games.json", "r", encoding="utf-8") as file:
-                        games = json.load(file)
-                except json.JSONDecodeError as e:
-                    print(f"Error reading the JSON file: {e}")
+            games = load_json_file("games.json", [])
 
             games.append(game_info)
 
             self.backup_games()
 
-            with open("games.json", "w", encoding="utf-8") as file:
-                json.dump(games, file, ensure_ascii=False, indent=4)
+            save_json_file(games, "games.json")
 
             self.games.append(game)
 
@@ -3392,11 +3350,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.show_all()
 
     def save_games(self):
-        try:
-            with open("games.json", "r", encoding="utf-8") as file:
-                all_games_data = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            all_games_data = []
+        all_games_data = load_json_file("games.json", [])
 
         visible_games_map = {game.gameid: game for game in self.games}
         deleted_id = getattr(self, "_deleted_gameid", None)
@@ -3422,8 +3376,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.backup_games()
 
-        with open("games.json", "w", encoding="utf-8") as file:
-            json.dump(new_games_data, file, ensure_ascii=False, indent=4)
+        save_json_file(new_games_data, "games.json")
 
     def backup_games(self):
         if os.path.isfile(games_json):
@@ -6536,15 +6489,9 @@ def main():
 
 # returns the number of other games using the same prefix
 def prefixes_count(prefix):
-    if not os.path.exists(games_json):
+    games = load_json_file(games_json, None)
+    if games is None:
         return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
-        return
-
     return sum(1 for x in games if x.get("prefix") == prefix) - 1
 
 if __name__ == "__main__":

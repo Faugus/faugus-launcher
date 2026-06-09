@@ -45,6 +45,23 @@ class HiDpiMixin:
         surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
         return surface
 
+def ensure_parent_dir(path):
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+def load_json_file(filepath, default=None):
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default if default is not None else []
+
+def save_json_file(data, filepath, indent=4):
+    ensure_parent_dir(filepath)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=indent, ensure_ascii=False)
+
 def format_title(title):
     title = title.strip().lower()
     title = re.sub(r"[^\w\s-]", "", title)
@@ -222,13 +239,8 @@ def on_button_paypal_clicked(widget):
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
 def update_games_json():
-    if not os.path.exists(games_json):
-        return
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
+    games = load_json_file(games_json, None)
+    if games is None:
         return
 
     changed = False
@@ -257,8 +269,7 @@ def update_games_json():
                 changed = True
 
     if changed:
-        with open(games_json, "w", encoding="utf-8") as f:
-            json.dump(games, f, indent=4, ensure_ascii=False)
+        save_json_file(games, games_json)
 
 GAME_FIELDS = [
     "gameid", "title", "path", "prefix",

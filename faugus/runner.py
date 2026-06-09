@@ -5,7 +5,6 @@ import sys
 import subprocess
 import argparse
 import re
-import json
 import time
 import shlex
 import signal
@@ -746,22 +745,16 @@ class FaugusRun(HiDpiMixin):
 
         game_id = os.environ.get("FAUGUSID")
 
-        if game_id and os.path.exists(games_json):
-            try:
-                with open(games_json, "r", encoding="utf-8") as f:
-                    games = json.load(f)
-
+        if game_id:
+            games = load_json_file(games_json, [])
+            if games:
                 for game in games:
                     if game.get("gameid") == game_id:
                         old_time = game.get("playtime", 0)
                         game["playtime"] = old_time + runtime
                         break
 
-                with open(games_json, "w", encoding="utf-8") as f:
-                    json.dump(games, f, indent=4)
-
-            except Exception as e:
-                pass
+                save_json_file(games, games_json)
 
         GLib.idle_add(self.close_splash_window)
         GLib.idle_add(self.close_log_window)
@@ -872,13 +865,8 @@ def build_launch_command(game):
     return " ".join(command_parts)
 
 def load_game_from_json(gameid):
-    if not os.path.exists(games_json):
-        return None
-
-    try:
-        with open(games_json, "r", encoding="utf-8") as f:
-            games = json.load(f)
-    except json.JSONDecodeError:
+    games = load_json_file(games_json, None)
+    if games is None:
         return None
 
     for game in games:
