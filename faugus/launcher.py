@@ -3622,7 +3622,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_enable_logging = Gtk.CheckButton(label=_("Enable logging"))
         self.checkbox_enable_logging.set_active(False)
 
-        self.checkbox_show_categories = Gtk.CheckButton(label=_("Show categories menu"))
+        self.checkbox_show_categories = Gtk.CheckButton(label=_("Show categories and sort buttons"))
 
         self.checkbox_show_hidden = Gtk.CheckButton(label=_("Show hidden games"))
         self.checkbox_show_hidden.set_tooltip_text(_("Press Ctrl+H to show/hide games."))
