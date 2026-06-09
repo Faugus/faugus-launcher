@@ -1642,35 +1642,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game.banner = new_banner
         game.addapp_bat = new_addapp_bat
 
-        game_info = {
-            "gameid": title_formatted,
-            "title": game.title,
-            "path": game.path,
-            "prefix": game.prefix,
-            "launch_arguments": game.launch_arguments,
-            "game_arguments": game.game_arguments,
-            "mangohud": game.mangohud,
-            "gamemode": game.gamemode,
-            "disable_hidraw": game.disable_hidraw,
-            "protonfix": game.protonfix,
-            "runner": game.runner,
-            "addapp_checkbox": game.addapp_checkbox,
-            "addapp": game.addapp,
-            "addapp_bat": game.addapp_bat,
-            "addapp_delay": game.addapp_delay,
-            "addapp_first": game.addapp_first,
-            "banner": game.banner,
-            "lossless_enabled": game.lossless_enabled,
-            "lossless_multiplier": game.lossless_multiplier,
-            "lossless_flow": game.lossless_flow,
-            "lossless_performance": game.lossless_performance,
-            "lossless_hdr": game.lossless_hdr,
-            "playtime": game.playtime,
-            "hidden": game.hidden,
-            "prevent_sleep": game.prevent_sleep,
-            "category": game.category,
-            "icon": game.icon,
-        }
+        game_info = game_to_dict(game)
+        game_info["gameid"] = title_formatted
 
         games = []
         if os.path.exists("games.json"):
@@ -1899,36 +1872,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.games.clear()
                 for game_data in games_data:
-                    game = Game(
-                        game_data.get("gameid", ""),
-                        game_data.get("title", ""),
-                        game_data.get("path", ""),
-                        game_data.get("prefix", ""),
-                        game_data.get("launch_arguments", ""),
-                        game_data.get("game_arguments", ""),
-                        game_data.get("mangohud", ""),
-                        game_data.get("gamemode", ""),
-                        game_data.get("disable_hidraw", ""),
-                        game_data.get("protonfix", ""),
-                        game_data.get("runner", ""),
-                        game_data.get("addapp_checkbox", ""),
-                        game_data.get("addapp", ""),
-                        game_data.get("addapp_bat", ""),
-                        game_data.get("addapp_delay", ""),
-                        game_data.get("addapp_first", ""),
-                        game_data.get("banner", ""),
-                        game_data.get("lossless_enabled", ""),
-                        game_data.get("lossless_multiplier", ""),
-                        game_data.get("lossless_flow", ""),
-                        game_data.get("lossless_performance", ""),
-                        game_data.get("lossless_hdr", ""),
-                        game_data.get("lossless_present", ""),
-                        game_data.get("playtime", 0),
-                        game_data.get("hidden", False),
-                        game_data.get("prevent_sleep", False),
-                        game_data.get("category", False),
-                        game_data.get("icon", "")
-                    )
+                    game = Game(**prepare_game_kwargs(game_data))
 
                     if not self.show_hidden and game.hidden:
                         continue
@@ -2836,36 +2780,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         steam_shortcut_state, icon_temp, icon_final
                     )
 
-            game_info = {
-                "gameid": title_formatted,
-                "title": title,
-                "path": path,
-                "prefix": prefix,
-                "launch_arguments": launch_arguments,
-                "game_arguments": game_arguments,
-                "mangohud": mangohud,
-                "gamemode": gamemode,
-                "disable_hidraw": disable_hidraw,
-                "protonfix": protonfix,
-                "runner": runner,
-                "addapp_checkbox": addapp_checkbox,
-                "addapp": addapp,
-                "addapp_bat": addapp_bat,
-                "addapp_delay": addapp_delay,
-                "addapp_first": addapp_first,
-                "banner": banner,
-                "lossless_enabled": lossless_enabled,
-                "lossless_multiplier": lossless_multiplier,
-                "lossless_flow": lossless_flow,
-                "lossless_performance": lossless_performance,
-                "lossless_hdr": lossless_hdr,
-                "lossless_present": lossless_present,
-                "playtime": playtime,
-                "hidden": hidden,
-                "prevent_sleep": prevent_sleep,
-                "category": category,
-                "icon": icon,
-            }
+            game_info = game_to_dict(game)
 
             games = []
             if os.path.exists("games.json"):
@@ -3498,36 +3413,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if gameid in visible_games_map:
                 game = visible_games_map.pop(gameid)
-                game_data = {
-                    "gameid": game.gameid,
-                    "title": game.title,
-                    "path": game.path,
-                    "prefix": game.prefix,
-                    "launch_arguments": game.launch_arguments,
-                    "game_arguments": game.game_arguments,
-                    "mangohud": True if game.mangohud else "",
-                    "gamemode": True if game.gamemode else "",
-                    "disable_hidraw": True if game.disable_hidraw else "",
-                    "protonfix": game.protonfix,
-                    "runner": game.runner,
-                    "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else "",
-                    "addapp": game.addapp,
-                    "addapp_bat": game.addapp_bat,
-                    "addapp_delay": game.addapp_delay,
-                    "addapp_first": game.addapp_first,
-                    "banner": game.banner,
-                    "lossless_enabled": game.lossless_enabled,
-                    "lossless_multiplier": game.lossless_multiplier,
-                    "lossless_flow": game.lossless_flow,
-                    "lossless_performance": game.lossless_performance,
-                    "lossless_hdr": game.lossless_hdr,
-                    "lossless_present": game.lossless_present,
-                    "playtime": game.playtime,
-                    "hidden": hidden,
-                    "prevent_sleep": game.prevent_sleep,
-                    "category": game.category,
-                    "icon": game.icon,
-                }
+                game_data = game_to_save_dict(game, hidden=hidden)
 
             new_games_data.append(game_data)
 

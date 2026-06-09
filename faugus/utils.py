@@ -259,3 +259,34 @@ def update_games_json():
     if changed:
         with open(games_json, "w", encoding="utf-8") as f:
             json.dump(games, f, indent=4, ensure_ascii=False)
+
+GAME_FIELDS = [
+    "gameid", "title", "path", "prefix",
+    "launch_arguments", "game_arguments",
+    "mangohud", "gamemode", "disable_hidraw",
+    "protonfix", "runner",
+    "addapp_checkbox", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
+    "banner",
+    "lossless_enabled", "lossless_multiplier", "lossless_flow",
+    "lossless_performance", "lossless_hdr", "lossless_present",
+    "playtime", "hidden", "prevent_sleep", "category", "icon",
+]
+
+def game_to_dict(game):
+    return {field: getattr(game, field) for field in GAME_FIELDS}
+
+def game_to_save_dict(game, hidden=None):
+    d = {**game_to_dict(game),
+         "mangohud": True if game.mangohud else "",
+         "gamemode": True if game.gamemode else "",
+         "disable_hidraw": True if game.disable_hidraw else "",
+         "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else ""}
+    if hidden is not None:
+        d["hidden"] = hidden
+    return d
+
+def prepare_game_kwargs(data):
+    defaults = {f: "" for f in GAME_FIELDS}
+    defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
+                     "category": False, "icon": ""})
+    return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
