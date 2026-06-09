@@ -30,6 +30,7 @@ else:
     lsfgvk_possible_paths = [
         Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path("/usr/local/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib/liblsfg-vk-layer.so"),
         Path("/usr/lib64/liblsfg-vk-layer.so"),
