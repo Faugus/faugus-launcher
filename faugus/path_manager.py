@@ -67,6 +67,36 @@ class PathManager:
         return str(compatibilitytools_folder)
 
     @staticmethod
+    def get_prgname():
+        return "io.github.Faugus.faugus-launcher" if IS_FLATPAK else "faugus-launcher"
+
+    @staticmethod
+    def get_launcher_icon():
+        return PathManager.get_icon(
+            'io.github.Faugus.faugus-launcher.svg' if IS_FLATPAK else 'faugus-launcher.svg'
+        )
+
+    @staticmethod
+    def find_lsfgvk_layer():
+        if IS_FLATPAK:
+            possible = [
+                Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"),
+                Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+                Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
+                Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+            ]
+        else:
+            possible = [
+                Path("/usr/lib/liblsfg-vk.so"),
+                Path("/usr/lib64/liblsfg-vk.so"),
+                Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+                Path("/usr/lib/liblsfg-vk-layer.so"),
+                Path("/usr/lib64/liblsfg-vk-layer.so"),
+                Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+            ]
+        return next((p for p in possible if p.exists()), possible[-1])
+
+    @staticmethod
     def user_desktop():
         config_file = Path(PathManager.user_config('user-dirs.dirs'))
 

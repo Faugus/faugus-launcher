@@ -15,10 +15,7 @@ from faugus.language_config import *
 from faugus.utils import apply_dark_theme
 from faugus.config_manager import ConfigManager
 
-if IS_FLATPAK:
-    GLib.set_prgname("io.github.Faugus.faugus-launcher")
-else:
-    GLib.set_prgname("faugus-launcher")
+GLib.set_prgname(PathManager.get_prgname())
 
 _ = setup_gettext('faugus-proton-manager')
 
