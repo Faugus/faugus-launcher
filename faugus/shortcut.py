@@ -18,8 +18,8 @@ if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
     lsfgvk_possible_paths = [
-        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
     ]
@@ -28,10 +28,10 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
     lsfgvk_possible_paths = [
-        Path("/usr/lib/liblsfg-vk.so"),
-        Path("/usr/lib64/liblsfg-vk.so"),
-        Path("/usr/local/lib/liblsfg-vk.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+        Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path("/usr/local/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
+        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
         Path("/usr/lib/liblsfg-vk-layer.so"),
         Path("/usr/lib64/liblsfg-vk-layer.so"),
         Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
