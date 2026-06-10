@@ -2,7 +2,6 @@ import os
 import re
 import shutil
 import vdf
-from pathlib import Path
 
 from faugus.path_manager import *
 from faugus.steam_setup import steam_shortcuts_path

@@ -6,7 +6,6 @@ import gi
 import tarfile
 import shutil
 import threading
-from pathlib import Path
 
 gi.require_version("Gtk", "3.0")
 

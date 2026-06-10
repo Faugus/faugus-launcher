@@ -3,8 +3,6 @@
 import sys
 import gi
 import shutil
-import subprocess
-import re
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')
@@ -62,8 +60,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
-
-        self.default_prefix = ""
 
         self.addapp_enabled = False
         self.addapp = ""
@@ -600,7 +596,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
     def load_config(self):
         cfg = ConfigManager()
 
-        self.default_prefix = cfg.config.get('default-prefix', '').strip('"')
         mangohud = cfg.config.get('mangohud', 'False') == 'True'
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
