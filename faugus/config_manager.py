@@ -42,7 +42,7 @@ class ConfigManager:
             'height': '720',
             'banner-size': '100',
             'sort': 'alpha',
-            'category': 'None',
+            'category': 'all',
         }
 
         self.config = {}

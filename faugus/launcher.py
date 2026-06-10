@@ -446,7 +446,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if hasattr(self, 'current_category'):
             cat = self.current_category
-            if cat is None or cat == _("All"):
+            if cat == _("All") or cat is None:
                 cat_id = "all"
             elif cat == _("Uncategorized"):
                 cat_id = "uncategorized"
@@ -561,7 +561,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         saved_category = getattr(self, "category", "all")
         if saved_category == "all":
-            self.current_category = None
+            self.current_category = _("All")
         elif saved_category == "uncategorized":
             self.current_category = _("Uncategorized")
         else:
@@ -570,8 +570,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.playtime_data = {}
         self.latest_games_order = {}
 
-        cat_label = self.current_category if self.current_category and self.current_category != _("None") else _("All")
-        self.button_category = Gtk.Button(label=cat_label)
+        self.button_category = Gtk.Button(label=self.current_category)
         self.button_category.set_size_request(110, -1)
         self.button_category.connect("clicked", self.on_category_button_clicked)
 
@@ -712,7 +711,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             matches_search = search_text in game.title.lower() if search_text else True
             matches_category = True
 
-            if getattr(self, 'show_categories', True) and self.current_category and self.current_category != _("None"):
+            if getattr(self, 'show_categories', True) and self.current_category and self.current_category != _("All"):
                 raw_cat = game.category
 
                 if isinstance(raw_cat, str):
@@ -866,11 +865,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_category_menu_item_selected(self, menu_item, category_name):
         self.button_category.set_label(category_name)
-
-        if category_name == _("All"):
-            self.current_category = _("None")
-        else:
-            self.current_category = category_name
+        self.current_category = category_name
 
         if hasattr(self, 'flowbox'):
             self.flowbox.invalidate_filter()
