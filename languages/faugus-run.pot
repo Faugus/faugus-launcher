@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 23:20-0300\n"
+"POT-Creation-Date: 2026-06-09 17:12-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,63 +17,64 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /usr/bin/faugus-run:132
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
 msgid "Starting Steam game..."
 msgstr ""
 
-#: /usr/bin/faugus-run:359
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
 msgid "Are you enjoying Faugus Launcher?"
 msgstr ""
 
-#: /usr/bin/faugus-run:363
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
 msgid "Please consider donating"
 msgstr ""
 
-#: /usr/bin/faugus-run:375
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
 msgid "Never show this message again"
 msgstr ""
 
-#: /usr/bin/faugus-run:385
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
 msgid "Continue"
 msgstr ""
 
-#: /usr/bin/faugus-run:442
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
 msgid "Internet connection error."
 msgstr ""
 
-#: /usr/bin/faugus-run:446
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
 #, python-format
 msgid "%s was not found."
 msgstr ""
 
-#: /usr/bin/faugus-run:450
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
 msgid "Please install it or use another Proton version."
 msgstr ""
 
-#: /usr/bin/faugus-run:457 /usr/bin/faugus-run:697
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:441
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:691
 msgid "Ok"
 msgstr ""
 
-#: /usr/bin/faugus-run:599
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
 msgid "Components are up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:621
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
 msgid "Updating"
 msgstr ""
 
-#: /usr/bin/faugus-run:623
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:614
 msgid "Downloading"
 msgstr ""
 
-#: /usr/bin/faugus-run:625
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
 msgid "Extracting"
 msgstr ""
 
-#: /usr/bin/faugus-run:631
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
 msgid "is up to date"
 msgstr ""
 
-#: /usr/bin/faugus-run:694
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
 msgid "The keys and values were successfully added to the registry."
 msgstr ""

@@ -41,6 +41,8 @@ class ConfigManager:
             'width': '1280',
             'height': '720',
             'banner-size': '100',
+            'sort': 'alpha',
+            'category': 'all',
         }
 
         self.config = {}
