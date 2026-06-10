@@ -555,6 +555,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         }
 
         self.current_sort_id = getattr(self, "sort", "alpha")
+        if not getattr(self, 'show_categories', True):
+            self.current_sort_id = "alpha"
+
         if self.current_sort_id not in self.sort_map:
             self.current_sort_id = "alpha"
         self.current_sort = self.sort_map[self.current_sort_id]
@@ -691,17 +694,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def sort_games(child1, child2, user_data):
             g1, g2 = child1.game, child2.game
 
-            if self.current_sort_id == "playtime":
-                pt1 = self.playtime_data.get(g1.gameid, 0)
-                pt2 = self.playtime_data.get(g2.gameid, 0)
-                if pt1 != pt2:
-                    return (pt1 < pt2) - (pt1 > pt2)
+            if getattr(self, 'show_categories', True):
+                if self.current_sort_id == "playtime":
+                    pt1 = self.playtime_data.get(g1.gameid, 0)
+                    pt2 = self.playtime_data.get(g2.gameid, 0)
+                    if pt1 != pt2:
+                        return (pt1 < pt2) - (pt1 > pt2)
 
-            elif self.current_sort_id == "lastplayed":
-                idx1 = self.latest_games_order.get(g1.gameid, float('inf'))
-                idx2 = self.latest_games_order.get(g2.gameid, float('inf'))
-                if idx1 != idx2:
-                    return (idx1 > idx2) - (idx1 < idx2)
+                elif self.current_sort_id == "lastplayed":
+                    idx1 = self.latest_games_order.get(g1.gameid, float('inf'))
+                    idx2 = self.latest_games_order.get(g2.gameid, float('inf'))
+                    if idx1 != idx2:
+                        return (idx1 > idx2) - (idx1 < idx2)
 
             return (g1.title > g2.title) - (g1.title < g2.title)
 
