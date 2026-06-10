@@ -60,6 +60,7 @@ else:
 
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
 categories_file = PathManager.user_config('faugus-launcher/categories.txt')
+custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
 faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
 running_games = PathManager.user_data('faugus-launcher/running_games.json')
@@ -305,24 +306,34 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.menu_play.set_sensitive(not is_running)
 
     def selected(self):
-        selected = self.flowbox.get_selected_children()
-        if not selected:
+        selected_items = self.flowbox.get_selected_children()
+        if not selected_items:
             return None
 
-        child = selected[0]
+        child = selected_items[0]
+
+        if hasattr(child, 'game') and child.game:
+            return child.game
+
         root_widget = child.get_child()
+
+        if isinstance(root_widget, Gtk.EventBox) and getattr(root_widget, 'is_dnd_wrapper', False):
+            root_widget = root_widget.get_child()
 
         if isinstance(root_widget, Gtk.Overlay):
             box = root_widget.get_child()
         else:
             box = root_widget
 
-        label = box.get_children()[1]
-        title = label.get_text()
+        try:
+            label = box.get_children()[1]
+            title = label.get_text()
 
-        for game in self.games:
-            if game.title == title:
-                return game
+            for game in getattr(self, 'games', []):
+                if game.title == title:
+                    return game
+        except IndexError:
+            pass
 
         return None
 
@@ -534,11 +545,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.opt_alpha = _("Alphabetical")
         self.opt_playtime = _("Playtime")
         self.opt_lastplayed = _("Last played")
+        self.opt_custom = _("Custom")
 
         self.sort_map = {
             "alpha": self.opt_alpha,
             "playtime": self.opt_playtime,
-            "lastplayed": self.opt_lastplayed
+            "lastplayed": self.opt_lastplayed,
+            "custom": self.opt_custom
         }
 
         self.current_sort_id = getattr(self, "sort", "alpha")
@@ -559,6 +572,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.playtime_data = {}
         self.latest_games_order = {}
+        self.custom_order_data = {}
 
         self.button_category = Gtk.Button(label=self.current_category)
         self.button_category.set_size_request(110, -1)
@@ -583,6 +597,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     with open(latest_games) as f:
                         for idx, gid in enumerate(map(str.strip, f)):
                             self.latest_games_order[gid] = idx
+            except:
+                pass
+
+            self.custom_order_data.clear()
+            try:
+                if os.path.exists(custom_order):
+                    with open(custom_order, "r") as f:
+                        self.custom_order_data.update(json.load(f))
             except:
                 pass
 
@@ -669,6 +691,138 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.connect('button-release-event', self.on_item_release_event)
 
+        def setup_dnd_for_widget(fb_child):
+            if not isinstance(fb_child, Gtk.FlowBoxChild):
+                return
+
+            inner = fb_child.get_child()
+            if not inner:
+                return
+
+            if isinstance(inner, Gtk.EventBox) and getattr(inner, 'is_dnd_wrapper', False):
+                ev_box = inner
+            else:
+                fb_child.remove(inner)
+                ev_box = Gtk.EventBox()
+                ev_box.is_dnd_wrapper = True
+                ev_box.add(inner)
+                ev_box.show_all()
+                fb_child.add(ev_box)
+
+            targets = [Gtk.TargetEntry.new("text/plain", Gtk.TargetFlags.SAME_APP, 0)]
+
+            ev_box.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, targets, Gdk.DragAction.MOVE)
+            fb_child.drag_dest_set(Gtk.DestDefaults.ALL, targets, Gdk.DragAction.MOVE)
+
+            def get_game(w):
+                if hasattr(w, 'game') and w.game: return w.game
+                if hasattr(w, 'get_child'):
+                    c = w.get_child()
+                    if hasattr(c, 'game') and c.game: return c.game
+                    if hasattr(c, 'get_child'):
+                        cc = c.get_child()
+                        if hasattr(cc, 'game') and cc.game: return cc.game
+                p = w.get_parent()
+                while p:
+                    if hasattr(p, 'game') and p.game: return p.game
+                    p = p.get_parent()
+                return None
+
+            def on_drag_begin(widget, drag_context):
+                g = get_game(widget)
+                if g:
+                    self._drag_source_id = g.gameid
+                    parent = widget.get_parent()
+                    if isinstance(parent, Gtk.FlowBoxChild):
+                        self.flowbox.select_child(parent)
+                Gtk.drag_set_icon_default(drag_context)
+
+            def on_drag_data_get(widget, drag_context, selection_data, info, time):
+                g = get_game(widget)
+                if g:
+                    selection_data.set_text(g.gameid, -1)
+
+            def on_drag_motion(widget, drag_context, x, y, time):
+                if self.current_sort_id != "custom" or not getattr(self, '_drag_source_id', None):
+                    return False
+
+                target_g = get_game(widget)
+                if not target_g:
+                    return False
+
+                source_id = self._drag_source_id
+                target_id = target_g.gameid
+
+                if source_id == target_id:
+                    Gdk.drag_status(drag_context, Gdk.DragAction.MOVE, time)
+                    return True
+
+                ordered = []
+
+                for child in self.flowbox.get_children():
+                    g = get_game(child)
+                    if g:
+                        ordered.append(g.gameid)
+
+                ordered.sort(key=lambda gid: self.custom_order_data.get(gid, 999999))
+
+                try:
+                    src = ordered.index(source_id)
+                    dst = ordered.index(target_id)
+                except ValueError:
+                    return False
+
+                if src != dst:
+                    ordered.pop(src)
+                    ordered.insert(dst, source_id)
+
+                    for idx, gid in enumerate(ordered):
+                        self.custom_order_data[gid] = idx
+
+                    self.flowbox.invalidate_sort()
+
+                Gdk.drag_status(drag_context, Gdk.DragAction.MOVE, time)
+                return True
+
+            def on_drag_data_received(widget, drag_context, x, y, selection_data, info, time):
+                drag_context.finish(True, False, time)
+
+            def on_drag_end(widget, drag_context):
+                self._drag_source_id = None
+                if self.current_sort_id == "custom":
+                    try:
+                        with open(custom_order, "w") as f:
+                            json.dump(self.custom_order_data, f)
+                    except:
+                        pass
+
+            try:
+                ev_box.disconnect_by_func(on_drag_begin)
+                ev_box.disconnect_by_func(on_drag_data_get)
+                ev_box.disconnect_by_func(on_drag_end)
+                fb_child.disconnect_by_func(on_drag_motion)
+                fb_child.disconnect_by_func(on_drag_data_received)
+            except:
+                pass
+
+            ev_box.connect("drag-begin", on_drag_begin)
+            ev_box.connect("drag-data-get", on_drag_data_get)
+            ev_box.connect("drag-end", on_drag_end)
+            fb_child.connect("drag-motion", on_drag_motion)
+            fb_child.connect("drag-data-received", on_drag_data_received)
+
+        def on_child_added(container, widget):
+            def apply_dnd():
+                parent = widget.get_parent()
+                if parent and isinstance(parent, Gtk.FlowBoxChild):
+                    setup_dnd_for_widget(parent)
+                elif isinstance(widget, Gtk.FlowBoxChild):
+                    setup_dnd_for_widget(widget)
+                return False
+            GLib.idle_add(apply_dnd)
+
+        self.flowbox.connect('add', on_child_added)
+
         if is_big:
             self.flowbox.set_halign(Gtk.Align.CENTER)
             self.flowbox.set_valign(Gtk.Align.CENTER)
@@ -679,9 +833,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.set_valign(Gtk.Align.START)
 
         def sort_games(child1, child2, user_data):
-            g1, g2 = child1.game, child2.game
+            g1 = getattr(child1, 'game', None) or getattr(child1.get_child(), 'game', None)
+            g2 = getattr(child2, 'game', None) or getattr(child2.get_child(), 'game', None)
 
-            if getattr(self, 'show_categories', True):
+            if getattr(self, 'show_categories', True) and g1 and g2:
                 if self.current_sort_id == "playtime":
                     pt1 = self.playtime_data.get(g1.gameid, 0)
                     pt2 = self.playtime_data.get(g2.gameid, 0)
@@ -694,10 +849,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if idx1 != idx2:
                         return (idx1 > idx2) - (idx1 < idx2)
 
-            return (g1.title > g2.title) - (g1.title < g2.title)
+                elif self.current_sort_id == "custom":
+                    idx1 = self.custom_order_data.get(g1.gameid, 999999)
+                    idx2 = self.custom_order_data.get(g2.gameid, 999999)
+                    if idx1 != idx2:
+                        return (idx1 > idx2) - (idx1 < idx2)
+
+            return (g1.title > g2.title) - (g1.title < g2.title) if g1 and g2 else 0
 
         def filter_games(child, user_data):
-            game = child.game
+            game = getattr(child, 'game', None) or getattr(child.get_child(), 'game', None)
+            if not game:
+                return False
+
             search_text = self.entry_search.get_text().lower()
             matches_search = search_text in game.title.lower() if search_text else True
             matches_category = True
@@ -800,6 +964,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         update_sort_data()
         self.load_games()
+
+        for child in self.flowbox.get_children():
+            setup_dnd_for_widget(child)
 
         self.add(self.box_main)
         self.select_first_child()
@@ -1677,8 +1844,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.last_click_time = current_time
 
     def get_item_at_event(self, event):
-        x, y = event.x, event.y
-        return self.flowbox.get_child_at_pos(x, y)
+        widget = Gtk.get_event_widget(event)
+
+        while widget:
+            if isinstance(widget, Gtk.FlowBoxChild):
+                return widget
+            if isinstance(widget, Gtk.FlowBox):
+                break
+            widget = widget.get_parent()
+
+        return None
 
     def on_item_double_click(self, item):
         game = self.selected()
