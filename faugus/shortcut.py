@@ -3,8 +3,6 @@
 import sys
 import gi
 import shutil
-import subprocess
-import re
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('Gdk', '3.0')

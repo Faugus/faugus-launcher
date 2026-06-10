@@ -14,7 +14,6 @@ gi.require_version('Gdk', '3.0')
 gi.require_version('AyatanaAppIndicator3', '0.1')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, AyatanaAppIndicator3, Pango
-from PIL import Image
 from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
