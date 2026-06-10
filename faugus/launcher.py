@@ -267,14 +267,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode == "List":
             self.setup_interface()
-        if self.interface_mode == "Blocks":
-            if self.window_behavior == "Maximized":
-                self.maximize()
-            if self.window_behavior == "Fullscreen":
-                self.fullscreen()
-                self.fullscreen_activated = True
-            self.setup_interface(True)
-        if self.interface_mode == "Banners":
+        if self.interface_mode in ("Blocks", "Banners"):
             if self.window_behavior == "Maximized":
                 self.maximize()
             if self.window_behavior == "Fullscreen":
@@ -466,11 +459,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def restore_window(self, *_):
         self.show_all()
-        if self.interface_mode != "List":
-            if self.fullscreen_activated:
-                self.fullscreen_activated = True
-            else:
-                self.fullscreen_activated = False
         self.present()
 
     def on_quit(self, *_):
@@ -1207,13 +1195,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         formatted = self.format_playtime(game.playtime)
                         children = self.context_menu.get_children()
 
-                        if not formatted:
-                            if self.menu_playtime in children:
-                                self.context_menu.remove(self.menu_playtime)
-                        else:
-                            if self.menu_playtime in children:
-                                self.context_menu.remove(self.menu_playtime)
-
+                        if self.menu_playtime in children:
+                            self.context_menu.remove(self.menu_playtime)
+                        if formatted:
                             self.context_menu.insert(self.menu_playtime, 1)
                             self.menu_playtime.get_child().set_text(formatted)
 
@@ -1230,12 +1214,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.log_file_path = f"{logs_dir}/{game.gameid}/steam-0.log"
                 self.umu_log_file_path = f"{logs_dir}/{game.gameid}/umu.log"
 
-                if self.context_menu:
-                    if os.path.exists(self.log_file_path):
-                        self.menu_show_logs.set_sensitive(True)
-                        self.current_title = title
-                    else:
-                        self.menu_show_logs.set_sensitive(False)
+                if os.path.exists(self.log_file_path):
+                    self.menu_show_logs.set_sensitive(True)
+                    self.current_title = title
+                else:
+                    self.menu_show_logs.set_sensitive(False)
 
                 if game.hidden:
                     self.menu_hide.get_child().set_text(_("Remove from hidden"))
@@ -1245,7 +1228,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 for child in self.submenu_category.get_children():
                     self.submenu_category.remove(child)
 
-                categories_file = PathManager.user_config('faugus-launcher/categories.txt')
                 categories = []
 
                 if os.path.exists(categories_file):
@@ -1766,12 +1748,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         gameid = game.gameid
         title = game.title
 
-        selected = self.flowbox.get_selected_children()
-
-        if not selected:
-            return
-
-        child = selected[0]
+        child = self.flowbox.get_selected_children()[0]
         current_focus = self.get_focus()
 
         if not child.is_focus():
@@ -1896,10 +1873,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.games.append(game)
 
         self.games = sorted(self.games, key=lambda x: x.title.lower())
-        self.filtered_games = self.games[:]
 
         self.flowbox.foreach(Gtk.Widget.destroy)
-        for game in self.filtered_games:
+        for game in self.games:
             self.add_item_list(game)
 
     def add_item_list(self, game):
@@ -2125,10 +2101,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             settings_dialog.update_config_file()
             self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
 
-            if settings_dialog.checkbox_system_tray.get_active():
-                self.system_tray = True
-            else:
-                self.system_tray = False
+            self.system_tray = settings_dialog.checkbox_system_tray.get_active()
 
             GLib.timeout_add(1000, self.load_tray_icon)
 
@@ -2974,11 +2947,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.remove_game_from_latest_games(game.gameid)
                 self.show_warning_dialog_main(self, _("%s was not installed!") % title, "")
 
-            if self.interface_mode != "List":
-                if self.fullscreen_activated:
-                    self.fullscreen_activated = True
-                else:
-                    self.fullscreen_activated = False
             return False
 
         return True
@@ -6542,7 +6510,6 @@ def main():
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
         sys.exit(0)
-        return
 
     app = FaugusApp(start_hidden)
     app.run(sys.argv)
