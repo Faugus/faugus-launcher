@@ -21,6 +21,15 @@ else:
 _ = setup_gettext('faugus-proton-manager')
 
 VARIANTS = {
+    "cachyos": {
+        "name": "Proton-CachyOS",
+        "tab_label": "Proton-CachyOS",
+        "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
+        "tag_prefix": "cachyos-",
+        "archive_ext": ["x86_64.tar.xz"],
+        "latest_dir": "Proton-CachyOS Latest",
+        "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
+    },
     "ge": {
         "name": "GE-Proton",
         "tab_label": "GE-Proton",
@@ -39,15 +48,6 @@ VARIANTS = {
         "archive_ext": [".tar.xz"],
         "latest_dir": "Proton-EM Latest",
         "tag_to_display": lambda tag: f"proton-{tag}",
-    },
-    "cachyos": {
-        "name": "Proton-CachyOS",
-        "tab_label": "Proton-CachyOS",
-        "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
-        "tag_prefix": "cachyos-",
-        "archive_ext": ["x86_64.tar.xz"],
-        "latest_dir": "Proton-CachyOS Latest",
-        "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
     },
     "dw": {
         "name": "DW-Proton",
