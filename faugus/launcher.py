@@ -735,6 +735,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     parent = widget.get_parent()
                     if isinstance(parent, Gtk.FlowBoxChild):
                         self.flowbox.select_child(parent)
+
+                    try:
+                        if hasattr(g, 'icon') and g.icon:
+                            if os.path.isfile(g.icon):
+                                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True)
+                            else:
+                                theme = Gtk.IconTheme.get_default()
+                                pixbuf = theme.load_icon(g.icon, 48, 0)
+
+                            if pixbuf:
+                                Gtk.drag_set_icon_pixbuf(drag_context, pixbuf, 24, 24)
+                                return
+                    except Exception:
+                        pass
+
                 Gtk.drag_set_icon_default(drag_context)
 
             def on_drag_data_get(widget, drag_context, selection_data, info, time):
