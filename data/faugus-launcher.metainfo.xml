@@ -82,19 +82,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.1-1" date="2026-06-11">
+    <release version="1.22.2-1" date="2026-06-11">
       <description>
         <ul>
-          <li>Updated Portuguese translation.</li>
-          <li>Updated Chinese Simplified translation.</li>
-          <li>Updated Chinese Traditional translation.</li>
-          <li>Updated Italian translation.</li>
-          <li>A lot of code refactoring and cleanup.</li>
-          <li>Now the Banners interface mode has a zoom slider to adjust the banner size.</li>
-          <li>Reworked the Categories UI.</li>
-          <li>Added a button to sort games.</li>
-          <li>Now checks the LSFG-VK natively installed on Bazzite.</li>
-          <li>Removed the HDR option as now Proton-CachyOS and EM-Proton enables it by default when using the Wayland driver.</li>
+          <li>Hotfix unable to change icons.</li>
+          <li>Updated Japanase translation.</li>
         </ul>
       </description>
     </release>
