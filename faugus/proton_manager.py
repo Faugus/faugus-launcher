@@ -12,7 +12,6 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.utils import apply_dark_theme
-from faugus.config_manager import ConfigManager
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -145,15 +144,10 @@ class ProtonDownloader(Gtk.Dialog):
         tab_box_dw.show_all()
         self.notebook.append_page(scroll_dw, tab_box_dw)
 
-        self.load_config()
         self.get_releases()
         self.show_all()
         self.progress_bar.set_visible(False)
         self.progress_label.set_visible(False)
-
-    def load_config(self):
-        cfg = ConfigManager()
-        self.language = cfg.config.get('language', '')
 
     def get_releases(self):
         threading.Thread(target=self.fetch_releases_from_url,
