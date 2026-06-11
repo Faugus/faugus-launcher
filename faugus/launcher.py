@@ -3142,53 +3142,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def extract_best_icon(self, exe_path, gameid):
         icons_dir = PathManager.user_config('faugus-launcher/icons')
-        tmp_dir = PathManager.user_config('faugus-launcher/icon_extract')
-
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-        os.makedirs(tmp_dir, exist_ok=True)
         os.makedirs(icons_dir, exist_ok=True)
-
-        extracted = os.path.join(tmp_dir, "icon.ico")
-
-        if subprocess.run(["icoextract", exe_path, extracted], capture_output=True).returncode != 0:
-            return None
-
-        magick = shutil.which("magick") or shutil.which("convert")
-        if not magick:
-            return None
-
-        subprocess.run([magick, extracted, os.path.join(tmp_dir, "icon_%d.png")])
-        os.remove(extracted)
-
-        best, size = None, 0
-
-        def get_index(filepath):
-            match = re.search(r'icon[-_](\d+)\.png', filepath.name)
-            return int(match.group(1)) if match else 999
-
-        png_files = sorted(Path(tmp_dir).glob("*.png"), key=get_index)
-
-        for f in png_files:
-            r = subprocess.run(
-                [magick, "identify", "-format", "%wx%h", str(f)],
-                capture_output=True, text=True
-            )
-
-            if r.returncode == 0 and r.stdout:
-                w, h = map(int, r.stdout.strip().split("x"))
-                current_size = w * h
-
-                if current_size > size:
-                    best, size = str(f), current_size
-
-        if not best:
-            return None
-
         final = os.path.join(icons_dir, f"{gameid}.ico")
-        subprocess.run([magick, best, "-resize", "256x256!", f"png:{final}"], check=True)
-
-        shutil.rmtree(tmp_dir)
-        return final
+        status = extract_ico_frames(exe_path, final)
+        return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
@@ -6323,26 +6280,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         path = self.entry_path.get_text()
 
         if os.path.isfile(path):
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
-
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, self.icon_extracted, "-resize", "256x256!", self.icon_converted], check=True)
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            os.makedirs(self.icon_directory, exist_ok=True)
+            status = extract_ico_simple(path, self.icon_converted)
+            if status == "no_icons":
+                self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
         filechooser = Gtk.FileChooserNative.new(
             _("Select an icon for the shortcut"),
@@ -6553,62 +6494,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if response == Gtk.ResponseType.ACCEPT:
             path = filechooser.get_filename()
 
-            if not os.path.exists(self.icon_directory):
-                os.makedirs(self.icon_directory)
+            os.makedirs(self.icon_directory, exist_ok=True)
 
-            try:
-                result = subprocess.run(['icoextract', path, self.icon_extracted], text=True, capture_output=True)
-
-                if result.returncode != 0:
-                    if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                        print("The file does not contain icons.")
-                        self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
-                    else:
-                        print(f"Error extracting icon: {result.stderr}")
-                else:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-
-                    extract_pattern = os.path.join(self.icon_directory, "frame_%d.png")
-                    subprocess.run([command_magick, self.icon_extracted, extract_pattern])
-
-                    if os.path.isfile(self.icon_extracted):
-                        os.remove(self.icon_extracted)
-
-                    best, size = None, 0
-
-                    def get_index(filepath):
-                        match = re.search(r'frame_(\d+)\.png', filepath.name)
-                        return int(match.group(1)) if match else 999
-
-                    png_files = sorted(Path(self.icon_directory).glob("frame_*.png"), key=get_index)
-
-                    for f in png_files:
-                        r = subprocess.run(
-                            [command_magick, "identify", "-format", "%wx%h", str(f)],
-                            capture_output=True, text=True
-                        )
-
-                        if r.returncode == 0 and r.stdout:
-                            w, h = map(int, r.stdout.strip().split("x"))
-                            current_size = w * h
-
-                            if current_size > size:
-                                best, size = str(f), current_size
-
-                    if best:
-                        subprocess.run([command_magick, best, "-resize", "256x256!", self.icon_converted], check=True)
-                        shutil.move(self.icon_converted, os.path.expanduser(self.icon_temp))
-
-                        surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                        image = Gtk.Image.new_from_surface(surface)
-
-                        self.button_shortcut_icon.set_image(image)
-
-                    for f in png_files:
-                        os.remove(f)
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
+            status = extract_ico_frames(path, self.icon_temp)
+            if status == "ok":
+                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
+                self.button_shortcut_icon.set_image(Gtk.Image.new_from_surface(surface))
+            elif status == "no_icons":
+                self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
             self.entry_path.set_text(path)
 
