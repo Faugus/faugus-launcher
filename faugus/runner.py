@@ -97,8 +97,6 @@ class FaugusRun(HiDpiMixin):
                 )
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
-            if self.enable_hdr:
-                set_env("DXVK_HDR", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
 
@@ -504,7 +502,6 @@ class FaugusRun(HiDpiMixin):
         self.default_prefix = self.cfg.config.get('default-prefix', '')
         self.enable_logging = self.cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_hdr = self.cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))

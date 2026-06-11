@@ -20,7 +20,6 @@ class ConfigManager:
             'show-labels': 'False',
             'enable-logging': 'False',
             'wayland-driver': 'False',
-            'enable-hdr': 'False',
             'enable-wow64': 'False',
             'language': lang,
             'logging-warning': 'False',

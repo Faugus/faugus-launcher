@@ -2016,7 +2016,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -3833,10 +3832,6 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Use Wayland driver (experimental)"))
         self.checkbox_wayland_driver.set_active(False)
-        self.checkbox_wayland_driver.connect("toggled", self.on_checkbox_wayland_driver_toggled)
-
-        self.checkbox_enable_hdr = Gtk.CheckButton(label=_("Enable HDR (experimental)"))
-        self.checkbox_enable_hdr.set_sensitive(False)
 
         self.checkbox_enable_wow64 = Gtk.CheckButton(label=_("Enable WOW64 (experimental)"))
 
@@ -4100,8 +4095,7 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 9, 1, 1)
         grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_hdr, 0, 12, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 13, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -4291,13 +4285,6 @@ class Settings(Gtk.Dialog):
             self.checkbox_start_minimized.set_sensitive(True)
             self.checkbox_mono_icon.set_sensitive(True)
 
-    def on_checkbox_wayland_driver_toggled(self, widget):
-        if not widget.get_active():
-            self.checkbox_enable_hdr.set_active(False)
-            self.checkbox_enable_hdr.set_sensitive(False)
-        else:
-            self.checkbox_enable_hdr.set_sensitive(True)
-
     def populate_combobox_with_runners(self):
         # List of default entries
         self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
@@ -4377,7 +4364,6 @@ class Settings(Gtk.Dialog):
         config.set_value("enable-logging", self.checkbox_enable_logging.get_active())
         config.set_value("show-hidden", self.checkbox_show_hidden.get_active())
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
-        config.set_value("enable-hdr", self.checkbox_enable_hdr.get_active())
         config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
@@ -4735,7 +4721,6 @@ class Settings(Gtk.Dialog):
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
-        enable_hdr = cfg.config.get('enable-hdr', 'False') == 'True'
         enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
@@ -4777,7 +4762,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_show_hidden.set_active(show_hidden)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
         self.checkbox_wayland_driver.set_active(wayland_driver)
-        self.checkbox_enable_hdr.set_active(enable_hdr)
         self.checkbox_enable_wow64.set_active(enable_wow64)
         self.combobox_interface.set_active_id(self.interface_mode)
         self.checkbox_start_minimized.set_active(start_minimized)
