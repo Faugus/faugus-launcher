@@ -57,7 +57,7 @@
       <caption>Main window: Blocks interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/cb11688/screenshots/main-banners.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f87129d/screenshots/main-banners.png</image>
       <caption>Main window: Banners interface mode</caption>
     </screenshot>
     <screenshot>
@@ -69,7 +69,7 @@
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/cb11688/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f87129d/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -82,23 +82,19 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.21.1-1" date="2026-06-05">
+    <release version="1.22.1-1" date="2026-06-11">
       <description>
         <ul>
-          <li>Fixed an issue that prevented games from running with the Nouveau and NVK drivers.</li>
-          <li>Removed a visual effect that was causing visibility issues in the Global Environment Variables section.</li>
-          <li>Removed the old GAMEID logic. This fixes some Protonfixes not being applied.</li>
-          <li>Fixed an issue that caused Proton Manager to freeze when a Proton installation failed to finish.</li>
-          <li>Another attempt to fix the EA App issue.</li>
-          <li>Now extracts the best resolution icon from the executable.</li>
-          <li>Fixed missing translations in the splash window.</li>
-          <li>Icons in the shortcut window and splash window now have better resolution.</li>
-          <li>A lot of code refactoring, removal of leftover code, and minor fixes.</li>
-          <li>Updated the Polish translation.</li>
-          <li>Updated the Japanese translation.</li>
-          <li>The HDR option now sets `DXVK_HDR=1` instead of `PROTON_ENABLE_HDR=1`.</li>
-          <li>The splash window now displays the game's icon instead of the Faugus icon.</li>
-          <li>Added support for DW-Proton.</li>
+          <li>Updated Portuguese translation.</li>
+          <li>Updated Chinese Simplified translation.</li>
+          <li>Updated Chinese Traditional translation.</li>
+          <li>Updated Italian translation.</li>
+          <li>A lot of code refactoring and cleanup.</li>
+          <li>Now the Banners interface mode has a zoom slider to adjust the banner size.</li>
+          <li>Reworked the Categories UI.</li>
+          <li>Added a button to sort games.</li>
+          <li>Now checks the LSFG-VK natively installed on Bazzite.</li>
+          <li>Removed the HDR option as now Proton-CachyOS and EM-Proton enables it by default when using the Wayland driver.</li>
         </ul>
       </description>
     </release>
