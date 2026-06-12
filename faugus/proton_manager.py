@@ -12,7 +12,6 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.utils import apply_dark_theme
-from faugus.config_manager import ConfigManager
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -20,6 +19,47 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 _ = setup_gettext('faugus-proton-manager')
+
+VARIANTS = {
+    "cachyos": {
+        "name": "Proton-CachyOS",
+        "tab_label": "Proton-CachyOS",
+        "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
+        "tag_prefix": "cachyos-",
+        "archive_ext": ["x86_64.tar.xz"],
+        "latest_dir": "Proton-CachyOS Latest",
+        "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
+    },
+    "ge": {
+        "name": "GE-Proton",
+        "tab_label": "GE-Proton",
+        "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
+        "tag_prefix": "GE-Proton",
+        "archive_ext": [".tar.gz", ".tar.xz"],
+        "latest_dir": "Proton-GE Latest",
+        "min_version": (9, 1),
+        "tag_to_display": lambda tag: tag,
+    },
+    "em": {
+        "name": "Proton-EM",
+        "tab_label": "Proton-EM",
+        "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
+        "tag_prefix": "EM-",
+        "archive_ext": [".tar.xz"],
+        "latest_dir": "Proton-EM Latest",
+        "tag_to_display": lambda tag: f"proton-{tag}",
+    },
+    "dw": {
+        "name": "DW-Proton",
+        "tab_label": "DW-Proton",
+        "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
+        "tag_prefix": "dwproton-",
+        "archive_ext": ["x86_64.tar.xz"],
+        "latest_dir": "DW-Proton Latest",
+        "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
+    },
+}
+
 
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
@@ -61,120 +101,48 @@ class ProtonDownloader(Gtk.Dialog):
         self.notebook.set_hexpand(True)
         frame.add(self.notebook)
 
-        self.grid_cachyos = Gtk.Grid()
-        self.grid_cachyos.set_hexpand(True)
-        self.grid_cachyos.set_row_spacing(5)
-        self.grid_cachyos.set_column_spacing(10)
-        scroll_cachyos = Gtk.ScrolledWindow()
-        scroll_cachyos.set_size_request(400, 400)
-        scroll_cachyos.set_margin_top(10)
-        scroll_cachyos.set_margin_bottom(10)
-        scroll_cachyos.set_margin_start(10)
-        scroll_cachyos.set_margin_end(10)
-        scroll_cachyos.add(self.grid_cachyos)
+        self.grids = {}
+        for key, variant in VARIANTS.items():
+            grid = Gtk.Grid()
+            grid.set_hexpand(True)
+            grid.set_row_spacing(5)
+            grid.set_column_spacing(10)
+            scroll = Gtk.ScrolledWindow()
+            scroll.set_size_request(400, 400)
+            scroll.set_margin_top(10)
+            scroll.set_margin_bottom(10)
+            scroll.set_margin_start(10)
+            scroll.set_margin_end(10)
+            scroll.add(grid)
 
-        tab_box_cachyos = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_cachyos = Gtk.Label(label="Proton-CachyOS")
-        tab_label_cachyos.set_width_chars(15)
-        tab_label_cachyos.set_xalign(0.5)
-        tab_box_cachyos.pack_start(tab_label_cachyos, True, True, 0)
-        tab_box_cachyos.set_hexpand(True)
-        tab_box_cachyos.show_all()
-        self.notebook.append_page(scroll_cachyos, tab_box_cachyos)
+            tab_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            tab_label = Gtk.Label(label=variant["tab_label"])
+            tab_label.set_width_chars(15)
+            tab_label.set_xalign(0.5)
+            tab_box.pack_start(tab_label, True, True, 0)
+            tab_box.set_hexpand(True)
+            tab_box.show_all()
+            self.notebook.append_page(scroll, tab_box)
+            self.grids[key] = grid
 
-        self.grid_ge = Gtk.Grid()
-        self.grid_ge.set_hexpand(True)
-        self.grid_ge.set_row_spacing(5)
-        self.grid_ge.set_column_spacing(10)
-        scroll_ge = Gtk.ScrolledWindow()
-        scroll_ge.set_size_request(400, 400)
-        scroll_ge.set_margin_top(10)
-        scroll_ge.set_margin_bottom(10)
-        scroll_ge.set_margin_start(10)
-        scroll_ge.set_margin_end(10)
-        scroll_ge.add(self.grid_ge)
-
-        tab_box_ge = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_ge = Gtk.Label(label="GE-Proton")
-        tab_label_ge.set_width_chars(15)
-        tab_label_ge.set_xalign(0.5)
-        tab_box_ge.pack_start(tab_label_ge, True, True, 0)
-        tab_box_ge.set_hexpand(True)
-        tab_box_ge.show_all()
-        self.notebook.append_page(scroll_ge, tab_box_ge)
-
-        self.grid_em = Gtk.Grid()
-        self.grid_em.set_hexpand(True)
-        self.grid_em.set_row_spacing(5)
-        self.grid_em.set_column_spacing(10)
-        scroll_em = Gtk.ScrolledWindow()
-        scroll_em.set_size_request(400, 400)
-        scroll_em.set_margin_top(10)
-        scroll_em.set_margin_bottom(10)
-        scroll_em.set_margin_start(10)
-        scroll_em.set_margin_end(10)
-        scroll_em.add(self.grid_em)
-
-        tab_box_em = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_em = Gtk.Label(label="Proton-EM")
-        tab_label_em.set_width_chars(15)
-        tab_label_em.set_xalign(0.5)
-        tab_box_em.pack_start(tab_label_em, True, True, 0)
-        tab_box_em.set_hexpand(True)
-        tab_box_em.show_all()
-        self.notebook.append_page(scroll_em, tab_box_em)
-
-        self.grid_dw = Gtk.Grid()
-        self.grid_dw.set_hexpand(True)
-        self.grid_dw.set_row_spacing(5)
-        self.grid_dw.set_column_spacing(10)
-        scroll_dw = Gtk.ScrolledWindow()
-        scroll_dw.set_size_request(400, 400)
-        scroll_dw.set_margin_top(10)
-        scroll_dw.set_margin_bottom(10)
-        scroll_dw.set_margin_start(10)
-        scroll_dw.set_margin_end(10)
-        scroll_dw.add(self.grid_dw)
-
-        tab_box_dw = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label_dw = Gtk.Label(label="DW-Proton")
-        tab_label_dw.set_width_chars(15)
-        tab_label_dw.set_xalign(0.5)
-        tab_box_dw.pack_start(tab_label_dw, True, True, 0)
-        tab_box_dw.set_hexpand(True)
-        tab_box_dw.show_all()
-        self.notebook.append_page(scroll_dw, tab_box_dw)
-
-        self.load_config()
         self.get_releases()
         self.show_all()
         self.progress_bar.set_visible(False)
         self.progress_label.set_visible(False)
 
-    def load_config(self):
-        cfg = ConfigManager()
-        self.language = cfg.config.get('language', '')
-
     def get_releases(self):
-        threading.Thread(target=self.fetch_releases_from_url,
-                         args=("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases", self.grid_ge),
-                         daemon=True).start()
+        for key, variant in VARIANTS.items():
+            threading.Thread(
+                target=self.fetch_releases_from_url,
+                args=(variant, self.grids[key]),
+                daemon=True
+            ).start()
 
-        threading.Thread(target=self.fetch_releases_from_url,
-                         args=("https://api.github.com/repos/Etaash-mathamsetty/Proton/releases", self.grid_em),
-                         daemon=True).start()
-
-        threading.Thread(target=self.fetch_releases_from_url,
-                         args=("https://api.github.com/repos/CachyOS/proton-cachyos/releases", self.grid_cachyos),
-                         daemon=True).start()
-
-        threading.Thread(target=self.fetch_releases_from_url,
-                         args=("https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases", self.grid_dw),
-                         daemon=True).start()
-
-    def fetch_releases_from_url(self, url, grid):
+    def fetch_releases_from_url(self, variant, grid):
         page = 1
         seen_tags = set()
+        url = variant["api_url"]
+        prefix = variant["tag_prefix"]
 
         while True:
             response = requests.get(url, params={"page": page, "per_page": 100})
@@ -189,53 +157,35 @@ class ProtonDownloader(Gtk.Dialog):
                         continue
                     seen_tags.add(tag_name)
 
-                    if "GloriousEggroll" in url:
-                        if not tag_name.startswith("GE-Proton"):
-                            continue
+                    if not tag_name.startswith(prefix):
+                        continue
+
+                    if "min_version" in variant:
                         try:
-                            version_str = tag_name.replace("GE-Proton", "")
+                            version_str = tag_name.replace(prefix, "")
                             major, minor = map(int, version_str.split("-"))
-                            if (major, minor) < (9, 1):
+                            if (major, minor) < variant["min_version"]:
                                 continue
                         except Exception:
                             continue
 
-                    elif "Etaash-mathamsetty" in url:
-                        if not tag_name.startswith("EM-"):
-                            continue
-
-                    elif "CachyOS" in url:
-                        if not tag_name.startswith("cachyos-"):
-                            continue
-
-                    elif "dawn.wine" in url:
-                        if not tag_name.startswith("dwproton-"):
-                            continue
-
                     assets = release.get("assets", [])
                     has_valid_asset = any(
-                        asset["name"].endswith((".tar.gz", ".tar.xz"))
+                        any(asset["name"].endswith(ext) for ext in variant["archive_ext"])
                         for asset in assets
                     )
                     if not has_valid_asset:
                         continue
 
-                    GLib.idle_add(self.add_release_to_grid, release, grid)
+                    GLib.idle_add(self.add_release_to_grid, release, grid, variant)
 
                 page += 1
             else:
                 break
 
-    def add_release_to_grid(self, release, grid):
+    def add_release_to_grid(self, release, grid, variant):
         tag_name = release["tag_name"]
-        if tag_name.startswith("cachyos-"):
-            display_tag_name = f"Proton-CachyOS-{tag_name.replace('cachyos-', '')}"
-        elif tag_name.startswith("EM-"):
-            display_tag_name = f"proton-{tag_name}"
-        elif tag_name.startswith("dwproton-"):
-            display_tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
-        else:
-            display_tag_name = tag_name
+        display_tag_name = variant["tag_to_display"](tag_name)
 
         row_index = len(grid.get_children()) // 2
 
@@ -244,88 +194,74 @@ class ProtonDownloader(Gtk.Dialog):
         label.set_hexpand(True)
         grid.attach(label, 0, row_index, 1, 1)
 
-        version_path = self.get_installed_path(display_tag_name)
-        is_installed = os.path.exists(version_path)
+        version_path = self.get_installed_path(tag_name, variant)
+        is_installed = version_path.exists()
 
         button = Gtk.Button(label=_("Remove") if is_installed else _("Download"))
-        button.connect("clicked", self.on_button_clicked, release)
+        button.connect("clicked", self.on_button_clicked, release, variant)
         button.set_size_request(120, -1)
         grid.attach(button, 1, row_index, 1, 1)
 
         grid.show_all()
 
-    def get_installed_path(self, tag_name):
-        tag_lower = tag_name.lower()
+    def get_installed_path(self, tag_name, variant):
+        display_name = variant["tag_to_display"](tag_name)
+
+        for name in (tag_name, display_name):
+            p = compatibility_dir / name
+            if p.exists():
+                return p
 
         if compatibility_dir.exists():
+            tag_lower = tag_name.lower()
+            display_lower = display_name.lower()
             for folder in compatibility_dir.iterdir():
                 if not folder.is_dir():
                     continue
-
-                folder_name_lower = folder.name.lower()
-
-                if folder_name_lower.endswith(tag_lower):
+                fn_lower = folder.name.lower()
+                if fn_lower == tag_lower or fn_lower == display_lower:
                     return folder
-                if tag_lower.startswith("proton-"):
-                    if folder_name_lower.endswith(tag_lower[len("proton-"):]):
-                        return folder
-                if "cachyos" in tag_lower:
-                    base_tag = tag_lower.replace("proton-cachyos-", "cachyos-").replace("proton-", "")
-                    if base_tag in folder_name_lower:
-                        return folder
-                if "dw-proton" in tag_lower:
-                    base_tag = tag_lower.replace("dw-proton-", "dwproton-")
-                    if base_tag in folder_name_lower:
-                        return folder
+                if tag_lower in fn_lower or display_lower in fn_lower:
+                    return folder
 
-        return compatibility_dir / tag_name
+        return compatibility_dir / display_name
 
     def update_button(self, button, new_label):
         button.set_label(new_label)
         button.set_sensitive(True)
 
-    def on_button_clicked(self, widget, release):
+    def on_button_clicked(self, widget, release, variant):
         tag_name = release["tag_name"]
-        if tag_name.startswith("EM-"):
-            tag_name = f"proton-{tag_name}"
-        elif tag_name.startswith("dwproton-"):
-            tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
+        version_path = self.get_installed_path(tag_name, variant)
 
-        version_path = self.get_installed_path(tag_name)
-
-        if os.path.exists(version_path):
-            self.on_remove_clicked(widget, release)
+        if version_path.exists():
+            self.on_remove_clicked(widget, release, variant)
         else:
             self.progress_bar.set_visible(True)
             self.progress_label.set_visible(True)
-            self.on_download_clicked(widget, release)
+            self.on_download_clicked(widget, release, variant)
 
     def disable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos, self.grid_dw):
+        for grid in self.grids.values():
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(False)
 
     def enable_all_buttons(self):
-        for grid in (self.grid_ge, self.grid_em, self.grid_cachyos, self.grid_dw):
+        for grid in self.grids.values():
             for child in grid.get_children():
                 if isinstance(child, Gtk.Button):
                     child.set_sensitive(True)
 
-    def on_download_clicked(self, widget, release):
+    def on_download_clicked(self, widget, release, variant):
         self.disable_all_buttons()
 
         selected_asset = None
         for asset in release["assets"]:
             name = asset["name"]
-            if name.endswith((".tar.gz", ".tar.xz")):
-                if "cachyos" in name.lower() or "dwproton" in name.lower():
-                    if name.endswith("x86_64.tar.xz") or name.endswith("x86_64.tar.gz"):
-                        selected_asset = asset
-                        break
-                else:
-                    selected_asset = asset
-                    break
+            if any(name.endswith(ext) for ext in variant["archive_ext"]):
+                selected_asset = asset
+                break
 
         if selected_asset:
             self.download_and_extract(
@@ -359,6 +295,7 @@ class ProtonDownloader(Gtk.Dialog):
                 response.raise_for_status()
                 total_size = int(response.headers.get("content-length", 0))
                 downloaded_size = 0
+                last_pct = -1
 
                 with open(tar_file_path, "wb") as f:
                     for chunk in response.iter_content(chunk_size=1024*64):
@@ -366,9 +303,11 @@ class ProtonDownloader(Gtk.Dialog):
                         f.write(chunk)
                         downloaded_size += len(chunk)
                         if total_size > 0:
-                            progress = downloaded_size / total_size
-                            GLib.idle_add(self.progress_bar.set_fraction, progress)
-                            GLib.idle_add(self.progress_bar.set_text, f"{int(progress * 100)}%")
+                            pct = int(downloaded_size * 1200 / total_size)
+                            if pct != last_pct:
+                                last_pct = pct
+                                GLib.idle_add(self.progress_bar.set_fraction, downloaded_size / total_size)
+                                GLib.idle_add(self.progress_bar.set_text, f"{pct / 3:.1f}%")
 
                 GLib.idle_add(self.progress_label.set_text, _("Extracting %s...") % tag_name)
                 GLib.idle_add(self.progress_bar.set_fraction, 0)
@@ -378,13 +317,15 @@ class ProtonDownloader(Gtk.Dialog):
                 with tarfile.open(tar_file_path, mode) as tar:
                     members = tar.getmembers()
                     total_members = len(members)
+                    last_pct = -1
 
                     for i, member in enumerate(members):
                         tar.extract(member, path=compatibility_dir, filter="fully_trusted")
-                        if i % 10 == 0:
-                            progress = (i + 1) / total_members
-                            GLib.idle_add(self.progress_bar.set_fraction, progress)
-                            GLib.idle_add(self.progress_bar.set_text, f"{int(progress * 100)}%")
+                        pct = int((i + 1) * 1200 / total_members)
+                        if pct != last_pct:
+                            last_pct = pct
+                            GLib.idle_add(self.progress_bar.set_fraction, (i + 1) / total_members)
+                            GLib.idle_add(self.progress_bar.set_text, f"{pct / 3:.1f}%")
 
                 if os.path.exists(tar_file_path):
                     os.remove(tar_file_path)
@@ -403,13 +344,10 @@ class ProtonDownloader(Gtk.Dialog):
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def on_remove_clicked(self, widget, release):
+    def on_remove_clicked(self, widget, release, variant):
         tag_name = release["tag_name"]
-        if tag_name.startswith("dwproton-"):
-            tag_name = f"DW-Proton-{tag_name.replace('dwproton-', '')}"
-
-        version_path = self.get_installed_path(tag_name)
-        if version_path and os.path.exists(version_path):
+        version_path = self.get_installed_path(tag_name, variant)
+        if version_path and version_path.exists():
             try:
                 shutil.rmtree(version_path)
                 self.update_button(widget, _("Download"))
