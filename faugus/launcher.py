@@ -2720,7 +2720,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_list()
 
             # Remove the game from the latest-games file if it exists
-            self.remove_game_from_latest_games(gameid)
+            self.remove_latest_and_order(gameid)
             self.select_first_child()
 
     def reload_playtimes(self):
@@ -2750,7 +2750,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             except SyntaxError:
                 pass
 
-    def remove_game_from_latest_games(self, gameid):
+    def remove_latest_and_order(self, gameid):
         try:
             with open(latest_games, 'r') as f:
                 recent_games = f.read().splitlines()
@@ -2760,9 +2760,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 with open(latest_games, 'w') as f:
                     f.write("\n".join(recent_games))
+
             self.load_tray_icon()
 
         except FileNotFoundError:
+            pass
+
+        try:
+            with open(custom_order, 'r') as f:
+                custom_order_data = json.load(f)
+
+            if gameid in custom_order_data:
+                del custom_order_data[gameid]
+
+                with open(custom_order, 'w') as f:
+                    json.dump(custom_order_data, f)
+
+        except (FileNotFoundError, json.JSONDecodeError):
             pass
 
     def show_warning_dialog_main(self, parent, text1, text2):
@@ -3123,7 +3137,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.games.remove(game)
                 self.save_games()
                 self.update_list()
-                self.remove_game_from_latest_games(game.gameid)
+                self.remove_latest_and_order(game.gameid)
                 self.show_warning_dialog_main(self, _("%s was not installed!") % title, "")
 
             return False
