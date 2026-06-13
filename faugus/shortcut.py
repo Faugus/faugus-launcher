@@ -382,7 +382,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         btn_copy.set_image(img)
 
         store_args = Gtk.ListStore(str)
-        current_args = self.launch_arguments.split()
+        current_args = self.launch_arguments.split("\n")
         for arg in current_args:
             if arg.strip():
                 store_args.append([arg])
@@ -477,7 +477,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 json.dump(presets_to_save, f)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
-            self.launch_arguments = " ".join(args_to_save)
+            self.launch_arguments = "\n".join(args_to_save)
 
         dialog.destroy()
         return response
@@ -826,13 +826,23 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.ico')
 
-        # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
         protonfix = self.entry_protonfix.get_text()
-        launch_arguments = self.launch_arguments
+
+        raw_args = self.launch_arguments.split()
+        env_vars = []
+        other_args = []
+        for arg in raw_args:
+            if "=" in arg and not arg.startswith("-"):
+                env_vars.append(arg)
+            else:
+                other_args.append(arg)
+
+        launch_arguments = " ".join(env_vars + other_args)
+
         game_arguments = self.entry_game_arguments.get_text()
         lossless_enabled = self.lossless_enabled
         lossless_multiplier = self.lossless_multiplier
@@ -846,12 +856,10 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         disable_hidraw = True if self.checkbox_disable_hidraw.get_active() else ""
         prevent_sleep = True if self.checkbox_prevent_sleep.get_active() else ""
 
-        # Get the directory containing the executable
         game_directory = os.path.dirname(self.file_path)
 
         command_parts = []
 
-        # Add command parts if they are not empty
         if disable_hidraw:
             command_parts.append("PROTON_DISABLE_HIDRAW=1")
         if prevent_sleep:
@@ -865,21 +873,21 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             command_parts.append("gamemoderun")
         if mangohud:
             command_parts.append("mangohud")
-        # Add the fixed command and remaining arguments
+
         command_parts.append(f"'{umu_run}'")
+
         if self.addapp_enabled:
             escaped_addapp_bat = addapp_bat.replace("'", "'\\''")
             command_parts.append(f"'{escaped_addapp_bat}'")
         elif self.file_path:
             escaped_file_path = self.file_path.replace("'", "'\\''")
             command_parts.append(f"'{escaped_file_path}'")
+
         if game_arguments:
             command_parts.append(f"{game_arguments}")
 
-        # Join all parts into a single command
         command = ' '.join(command_parts)
 
-        # Create a .desktop file
         if IS_FLATPAK:
             desktop_file_content = (
                 f'[Desktop Entry]\n'
@@ -901,7 +909,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 f'Path={game_directory}\n'
             )
 
-        # Check if the destination directory exists and create if it doesn't
         applications_directory = app_dir
         if not os.path.exists(applications_directory):
             os.makedirs(applications_directory)
@@ -915,10 +922,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
 
-        # Make the .desktop file executable
         os.chmod(applications_shortcut_path, 0o755)
 
-        # Copy the shortcut to Desktop
         desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
         os.chmod(desktop_shortcut_path, 0o755)

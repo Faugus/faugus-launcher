@@ -5596,7 +5596,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         btn_copy.set_image(img)
 
         store_args = Gtk.ListStore(str)
-        current_args = self.launch_arguments.split()
+        current_args = self.launch_arguments.split("\n")
         for arg in current_args:
             if arg.strip():
                 store_args.append([arg])
@@ -5691,7 +5691,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 json.dump(presets_to_save, f)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
-            self.launch_arguments = " ".join(args_to_save)
+            self.launch_arguments = "\n".join(args_to_save)
 
         dialog.destroy()
         return response
@@ -6247,7 +6247,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
 
             if active_id == "battle":
-                self.launch_arguments = "WINE_SIMULATE_WRITECOPY=1 PROTON_ENABLE_WAYLAND=0"
+                self.launch_arguments = "WINE_SIMULATE_WRITECOPY=1\nPROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
 
             elif active_id == "ea":
