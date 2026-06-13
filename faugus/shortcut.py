@@ -37,6 +37,7 @@ else:
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
+presets_file = PathManager.user_config('faugus-launcher/presets.json')
 
 _ = setup_gettext('faugus-launcher')
 
@@ -66,6 +67,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.addapp_delay = ""
         self.addapp_first = False
 
+        self.launch_arguments = ""
+
         self.lossless_enabled = False
         self.lossless_multiplier = 1
         self.lossless_flow = 100
@@ -89,23 +92,22 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
-        self.label_launch_arguments = Gtk.Label(label=_("Launch Arguments"))
-        self.label_launch_arguments.set_halign(Gtk.Align.START)
-        self.entry_launch_arguments = Gtk.Entry()
-        self.entry_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
-
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
 
-        self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
-        self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
+        self.button_launch_arguments = Gtk.Button(label=_("Launch Arguments"))
+        self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
+        self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
         self.button_addapp.set_tooltip_text(
             _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
+
+        self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
+        self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
@@ -205,13 +207,12 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.entry_protonfix.set_hexpand(True)
         self.grid_protonfix.attach(self.button_search_protonfix, 3, 1, 1, 1)
 
-        self.grid_launch_arguments.attach(self.label_launch_arguments, 0, 0, 4, 1)
-        self.grid_launch_arguments.attach(self.entry_launch_arguments, 0, 1, 4, 1)
-        self.entry_launch_arguments.set_hexpand(True)
-
         self.grid_game_arguments.attach(self.label_game_arguments, 0, 0, 4, 1)
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
+
+        self.grid_launch_arguments.attach(self.button_launch_arguments, 0, 0, 1, 1)
+        self.button_launch_arguments.set_hexpand(True)
 
         self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
         self.button_addapp.set_hexpand(True)
@@ -262,8 +263,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.main_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
         self.main_grid.add(self.grid_title)
         self.main_grid.add(self.grid_protonfix)
-        self.main_grid.add(self.grid_launch_arguments)
         self.main_grid.add(self.grid_game_arguments)
+        self.main_grid.add(self.grid_launch_arguments)
         self.main_grid.add(self.grid_addapp)
         self.main_grid.add(self.grid_lossless)
         self.main_grid.add(self.box_tools)
@@ -313,8 +314,177 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         # Connect the destroy signal to Gtk.main_quit
         self.connect("destroy", Gtk.main_quit)
 
+    def on_button_launch_arguments_clicked(self, widget):
+        dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=self, flags=0)
+        dialog.set_resizable(False)
+        dialog.set_modal(True)
+        dialog.set_default_size(650, 400)
+
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        hbox.set_margin_start(10)
+        hbox.set_margin_end(10)
+        hbox.set_margin_top(10)
+        hbox.set_margin_bottom(10)
+
+        store_presets = Gtk.ListStore(str)
+
+        if os.path.exists(presets_file):
+            try:
+                with open(presets_file, "r") as f:
+                    for item in json.load(f):
+                        store_presets.append([item])
+            except Exception:
+                pass
+        store_presets.append([""])
+
+        tree_presets = Gtk.TreeView(model=store_presets)
+        tree_presets.set_hexpand(True)
+        tree_presets.set_vexpand(True)
+        renderer_presets = Gtk.CellRendererText()
+        renderer_presets.set_property("editable", True)
+
+        def on_preset_edited(renderer, path, new_text):
+            store_presets[path][0] = new_text
+            if path == str(len(store_presets) - 1) and new_text.strip() != "":
+                store_presets.append([""])
+
+        def on_preset_key_press(widget, event):
+            if event.keyval == Gdk.KEY_Delete:
+                selection = widget.get_selection()
+                model, treeiter = selection.get_selected()
+                if treeiter is not None:
+                    if model[treeiter][0] != "" or len(model) > 1:
+                        model.remove(treeiter)
+                    if len(model) == 0 or model[-1][0] != "":
+                        model.append([""])
+                return True
+            return False
+
+        renderer_presets.connect("edited", on_preset_edited)
+        tree_presets.connect("key-press-event", on_preset_key_press)
+        column_presets = Gtk.TreeViewColumn(_("Presets"), renderer_presets, text=0)
+        tree_presets.append_column(column_presets)
+        scroll_presets = Gtk.ScrolledWindow()
+        scroll_presets.add(tree_presets)
+
+        btn_copy = Gtk.Button()
+        btn_copy.set_size_request(50, 50)
+        btn_copy.set_valign(Gtk.Align.CENTER)
+
+        img = Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON)
+
+        def flip_image(w, cr):
+            cr.translate(w.get_allocated_width(), 0)
+            cr.scale(-1, 1)
+            return False
+
+        img.connect("draw", flip_image)
+        btn_copy.set_image(img)
+
+        store_args = Gtk.ListStore(str)
+        current_args = self.launch_arguments.split()
+        for arg in current_args:
+            if arg.strip():
+                store_args.append([arg])
+        store_args.append([""])
+
+        tree_args = Gtk.TreeView(model=store_args)
+        tree_args.set_hexpand(True)
+        tree_args.set_vexpand(True)
+        renderer_args = Gtk.CellRendererText()
+        renderer_args.set_property("editable", True)
+
+        def on_arg_edited(renderer, path, new_text):
+            store_args[path][0] = new_text
+            if path == str(len(store_args) - 1) and new_text.strip() != "":
+                store_args.append([""])
+
+        def on_arg_key_press(widget, event):
+            if event.keyval == Gdk.KEY_Delete:
+                selection = widget.get_selection()
+                model, treeiter = selection.get_selected()
+                if treeiter is not None:
+                    if model[treeiter][0] != "" or len(model) > 1:
+                        model.remove(treeiter)
+                    if len(model) == 0 or model[-1][0] != "":
+                        model.append([""])
+                return True
+            return False
+
+        renderer_args.connect("edited", on_arg_edited)
+        tree_args.connect("key-press-event", on_arg_key_press)
+        column_args = Gtk.TreeViewColumn(_("Launch Arguments"), renderer_args, text=0)
+        tree_args.append_column(column_args)
+        scroll_args = Gtk.ScrolledWindow()
+        scroll_args.add(tree_args)
+
+        sel_presets = tree_presets.get_selection()
+        sel_args = tree_args.get_selection()
+
+        def on_presets_selection_changed(sel):
+            if sel.count_selected_rows() > 0:
+                sel_args.unselect_all()
+
+        def on_args_selection_changed(sel):
+            if sel.count_selected_rows() > 0:
+                sel_presets.unselect_all()
+
+        sel_presets.connect("changed", on_presets_selection_changed)
+        sel_args.connect("changed", on_args_selection_changed)
+
+        def on_copy_clicked(btn):
+            selection = tree_presets.get_selection()
+            model, treeiter = selection.get_selected()
+            if treeiter is not None:
+                val = model[treeiter][0].strip()
+                if val:
+                    store_args.insert(len(store_args) - 1, [val])
+
+        btn_copy.connect("clicked", on_copy_clicked)
+
+        hbox.pack_start(scroll_args, True, True, 0)
+        hbox.pack_start(btn_copy, False, False, 0)
+        hbox.pack_start(scroll_presets, True, True, 0)
+
+        content_area = dialog.get_content_area()
+        content_area.pack_start(hbox, True, True, 0)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
+        button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_margin_start(10)
+        bottom_box.set_margin_end(10)
+        bottom_box.set_margin_bottom(10)
+        bottom_box.pack_start(button_cancel, True, True, 0)
+        bottom_box.pack_start(button_ok, True, True, 0)
+
+        content_area.pack_start(bottom_box, False, False, 0)
+
+        dialog.show_all()
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            presets_to_save = [row[0] for row in store_presets if row[0].strip()]
+            with open(presets_file, "w") as f:
+                json.dump(presets_to_save, f)
+
+            args_to_save = [row[0] for row in store_args if row[0].strip()]
+            self.launch_arguments = " ".join(args_to_save)
+
+        dialog.destroy()
+        return response
+
     def on_button_addapp_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Additional Application"), parent=self, flags=0)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
 
         frame = Gtk.Frame()
@@ -372,7 +542,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.entry_delay.set_numeric(True)
         self.entry_delay.set_hexpand(True)
 
-        checkbox_addapp_first = Gtk.CheckButton(label=_("Run additional application first"))
+        checkbox_addapp_first = Gtk.CheckButton(label=_("Run the application first"))
         checkbox_addapp_first.set_active(addapp_first)
         checkbox_addapp_first.set_halign(Gtk.Align.START)
 
@@ -433,6 +603,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
     def on_button_lossless_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=self, flags=0)
+        dialog.set_modal(True)
         dialog.set_resizable(False)
 
         frame = Gtk.Frame()
@@ -456,7 +627,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         hdr = val if (val := getattr(self, "lossless_hdr", False)) != "" else False
         present = val if (val := getattr(self, "lossless_present", False)) != "" else "VSync/FIFO (default)"
 
-        checkbox_enable = Gtk.CheckButton(label="Enable")
+        checkbox_enable = Gtk.CheckButton(label=_("Enable"))
         checkbox_enable.set_active(enabled)
         checkbox_enable.set_halign(Gtk.Align.START)
 
@@ -581,20 +752,19 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
     def on_button_search_addapp_clicked(self, widget):
         filechooser = Gtk.FileChooserNative(
             title=_("Select an additional application"),
-            transient_for=self,
             action=Gtk.FileChooserAction.OPEN,
             accept_label=_("Open"),
             cancel_label=_("Cancel"),
         )
-
-        filechooser.set_current_folder(os.path.expanduser("~/"))
 
         add_windows_file_filters(filechooser)
 
         response = filechooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            self.entry_addapp.set_text(filechooser.get_filename())
+            selected_file = filechooser.get_filename()
+            if selected_file:
+                self.entry_addapp.set_text(selected_file)
 
         filechooser.destroy()
 
@@ -662,7 +832,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             new_icon_path = faugus_png
 
         protonfix = self.entry_protonfix.get_text()
-        launch_arguments = self.entry_launch_arguments.get_text()
+        launch_arguments = self.launch_arguments
         game_arguments = self.entry_game_arguments.get_text()
         lossless_enabled = self.lossless_enabled
         lossless_multiplier = self.lossless_multiplier
