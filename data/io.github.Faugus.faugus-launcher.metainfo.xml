@@ -88,7 +88,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.3-1" date="2026-06-13">
+    <release version="1.22.4-1" date="2026-06-13">
       <description>
         <ul>
           <li>Fixed launchers not being installed due to recent changes.</li>
