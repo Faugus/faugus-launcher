@@ -310,33 +310,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         selected_items = self.flowbox.get_selected_children()
         if not selected_items:
             return None
-
-        child = selected_items[0]
-
-        if hasattr(child, 'game') and child.game:
-            return child.game
-
-        root_widget = child.get_child()
-
-        if isinstance(root_widget, Gtk.EventBox) and getattr(root_widget, 'is_dnd_wrapper', False):
-            root_widget = root_widget.get_child()
-
-        if isinstance(root_widget, Gtk.Overlay):
-            box = root_widget.get_child()
-        else:
-            box = root_widget
-
-        try:
-            label = box.get_children()[1]
-            title = label.get_text()
-
-            for game in getattr(self, 'games', []):
-                if game.title == title:
-                    return game
-        except IndexError:
-            pass
-
-        return None
+        return getattr(selected_items[0], 'game', None)
 
     def check_running(self):
         changed = False
@@ -1517,27 +1491,27 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return " ".join(parts)
 
     def on_context_menu_play(self, menu_item):
-        selected_item = self.flowbox.get_selected_children()[0]
-        self.on_button_play_clicked(None, selected_item.game)
+        game = self.selected()
+        if game:
+            self.on_button_play_clicked(None, game)
 
     def on_context_menu_edit(self, menu_item):
-        selected_item = self.flowbox.get_selected_children()[0]
-        self.on_button_edit_clicked(selected_item)
+        game = self.selected()
+        if game:
+            self.on_button_edit_clicked(game)
 
     def on_context_menu_delete(self, menu_item):
-        selected_item = self.flowbox.get_selected_children()[0]
-        self.on_button_delete_clicked(selected_item)
+        game = self.selected()
+        if game:
+            self.on_button_delete_clicked(game)
 
     def on_context_menu_duplicate(self, menu_item):
-        selected_item = self.flowbox.get_selected_children()[0]
-        self.on_duplicate_clicked(selected_item)
+        game = self.selected()
+        if game:
+            self.on_duplicate_clicked(game)
 
     def on_context_menu_hide(self, menu_item):
-        selected = self.flowbox.get_selected_children()
-        if not selected:
-            return
-
-        game = selected[0].game
+        game = self.selected()
         if not game:
             return
 
@@ -1611,11 +1585,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         subprocess.run(["xdg-open", self.current_prefix], check=True)
 
     def on_context_menu_run(self, menu_item):
-        selected = self.flowbox.get_selected_children()
-        if not selected:
-            return
-
-        game = selected[0].game
+        game = self.selected()
         if not game:
             return
         filechooser = Gtk.FileChooserNative(
@@ -1662,8 +1632,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         filechooser.destroy()
 
     def on_context_show_logs(self, menu_item):
-        selected_item = self.flowbox.get_selected_children()[0]
-        self.on_show_logs_clicked(selected_item)
+        game = self.selected()
+        if game:
+            self.on_show_logs_clicked(game)
 
     def on_show_logs_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self)
