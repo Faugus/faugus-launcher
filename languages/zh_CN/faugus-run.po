@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-30 23:20-0300\n"
-"PO-Revision-Date: 2026-06-06 22:32+0800\n"
+"POT-Creation-Date: 2026-06-09 17:12-0300\n"
+"PO-Revision-Date: 2026-06-14 11:59+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -18,64 +18,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.9\n"
 
-#: /usr/bin/faugus-run:132
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
 msgid "Starting Steam game..."
 msgstr "启动 Steam 游戏……"
 
-#: /usr/bin/faugus-run:359
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
 msgid "Are you enjoying Faugus Launcher?"
 msgstr "你喜欢 Faugus 启动器的体验吗?"
 
-#: /usr/bin/faugus-run:363
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
 msgid "Please consider donating"
 msgstr "请考虑赞助支持"
 
-#: /usr/bin/faugus-run:375
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
 msgid "Never show this message again"
 msgstr "不再显示此消息"
 
-#: /usr/bin/faugus-run:385
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
 msgid "Continue"
 msgstr "继续"
 
-#: /usr/bin/faugus-run:442
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
 msgid "Internet connection error."
 msgstr "网络连接错误"
 
-#: /usr/bin/faugus-run:446
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
 #, python-format
 msgid "%s was not found."
 msgstr "未找到 %s"
 
-#: /usr/bin/faugus-run:450
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
 msgid "Please install it or use another Proton version."
 msgstr "请安装或使用其他版本的 Proton"
 
-#: /usr/bin/faugus-run:457 /usr/bin/faugus-run:697
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:441
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:691
 msgid "Ok"
 msgstr "好"
 
-#: /usr/bin/faugus-run:599
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
 msgid "Components are up to date"
 msgstr "组件已是最新"
 
-#: /usr/bin/faugus-run:621
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
 msgid "Updating"
 msgstr "更新中"
 
-#: /usr/bin/faugus-run:623
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:614
 msgid "Downloading"
 msgstr "下载中"
 
-#: /usr/bin/faugus-run:625
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
 msgid "Extracting"
 msgstr "解压中"
 
-#: /usr/bin/faugus-run:631
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
 msgid "is up to date"
 msgstr "是最新的"
 
-#: /usr/bin/faugus-run:694
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
 msgid "The keys and values were successfully added to the registry."
 msgstr "键值均已成功添加至注册表"
 
