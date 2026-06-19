@@ -221,30 +221,31 @@ class FaugusRun(HiDpiMixin):
 
         try:
             fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            self.has_lock = True
 
         except BlockingIOError:
-            self.has_lock = False
             set_env("UMU_CONTAINER_NSENTER", "1")
 
     def execute_final_command(self):
-        import gc
 
         def start_and_watch(cmd, is_game=False):
+            log_file = None
+            if self.enable_logging:
+                log_path = Path(logs_dir) / self.log_dir
+                log_path.mkdir(parents=True, exist_ok=True)
+                log_file = open(log_path / "umu.log", "a", encoding="utf-8")
+
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 bufsize=8192, text=True
             )
 
-            def watch_stream(stream):
+            def watch_stream(stream, lf=None):
                 for line in iter(stream.readline, ""):
                     clean_line = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', line).strip()
 
-                    if self.enable_logging:
-                        log_path = Path(logs_dir) / self.log_dir
-                        log_path.mkdir(parents=True, exist_ok=True)
-                        with open(log_path / "umu.log", "a", encoding="utf-8") as f:
-                            f.write(f"{clean_line}\n")
+                    if lf:
+                        lf.write(f"{clean_line}\n")
+                        lf.flush()
 
                     self.check_game_output(clean_line)
 
@@ -255,8 +256,8 @@ class FaugusRun(HiDpiMixin):
                 stream.close()
 
             threads = [
-                Thread(target=watch_stream, args=(process.stdout,), daemon=True),
-                Thread(target=watch_stream, args=(process.stderr,), daemon=True)
+                Thread(target=watch_stream, args=(process.stdout, log_file), daemon=True),
+                Thread(target=watch_stream, args=(process.stderr, log_file), daemon=True)
             ]
             for t in threads: t.start()
 
@@ -264,9 +265,19 @@ class FaugusRun(HiDpiMixin):
                 self.process = process
                 GLib.child_watch_add(GLib.PRIORITY_DEFAULT, process.pid, self.on_process_exit)
                 Thread(target=self._watch_game_process, daemon=True).start()
+                if log_file:
+                    def close_log_later():
+                        process.wait()
+                        for t in threads:
+                            t.join(timeout=5)
+                        log_file.flush()
+                        log_file.close()
+                    Thread(target=close_log_later, daemon=True).start()
             else:
                 process.wait()
                 for t in threads: t.join(timeout=1)
+                if log_file:
+                    log_file.close()
 
         popen_prefix = []
         if os.environ.get("PREVENT_SLEEP"):
@@ -293,8 +304,6 @@ class FaugusRun(HiDpiMixin):
 
         for cmd in cmds_to_run:
             start_and_watch(cmd)
-
-        if cmds_to_run: gc.collect()
 
         game_cmd = popen_prefix + shlex.split(self.message)
         start_and_watch(game_cmd, is_game=True)
