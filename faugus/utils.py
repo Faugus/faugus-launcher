@@ -6,8 +6,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 from PIL import Image
-from faugus.path_manager import PathManager, IS_FLATPAK, games_json
-from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos
+from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
 
 def apply_dark_theme():
     if IS_FLATPAK:
@@ -309,6 +309,48 @@ def update_games_json():
 
     if changed:
         save_json_file(games, games_json)
+
+def version_key(v):
+    cleaned = re.sub(r'^[^\d]+', '', v)
+    parts = re.split(r'(\d+)', cleaned)
+    return [int(p) if p.isdigit() else p for p in parts]
+
+def populate_combobox_with_runners(combobox):
+    combobox.append_text("Proton-CachyOS Latest (default)")
+    combobox.append_text("GE-Proton Latest")
+    combobox.append_text("Proton-EM Latest")
+    combobox.append_text("DW-Proton Latest")
+    combobox.append_text("UMU-Proton Latest")
+
+    if os.path.exists(proton_cachyos):
+        combobox.append_text("Proton-CachyOS (System)")
+
+    try:
+        if os.path.exists(compatibility_dir):
+            versions = []
+            for entry in os.listdir(compatibility_dir):
+                entry_path = os.path.join(compatibility_dir, entry)
+                if (
+                    os.path.isdir(entry_path)
+                    and entry not in ("UMU-Latest", "LegacyRuntime")
+                    and not entry.startswith("Proton-GE Latest")
+                    and not entry.startswith("Proton-EM Latest")
+                    and not entry.startswith("DW-Proton Latest")
+                    and not entry.startswith("Proton-CachyOS Latest")
+                ):
+                    versions.append(entry)
+
+            versions.sort(key=version_key, reverse=True)
+
+            for version in versions:
+                combobox.append_text(version)
+    except Exception as e:
+        print(f"Error accessing the directory: {e}")
+
+    combobox.set_active(0)
+    cell_renderer = combobox.get_cells()[0]
+    cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+    cell_renderer.set_property("max-width-chars", 20)
 
 GAME_FIELDS = [
     "gameid", "title", "path", "prefix",
