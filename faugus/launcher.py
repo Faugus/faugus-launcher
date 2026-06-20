@@ -2963,24 +2963,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
                 if addapp_checkbox == "addapp_enabled":
-                    with open(addapp_bat, "w") as bat_file:
-                        bat_file.write(f'@echo off\n')
-                        if not addapp_first:
-                            if game_arguments:
-                                bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
-                            else:
-                                bat_file.write(f'start "" "z:{path}"\n')
-                            if addapp_delay:
-                                bat_file.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
-                            bat_file.write(f'start "" "z:{addapp}"\n')
-                        else:
-                            bat_file.write(f'start "" "z:{addapp}"\n')
-                            if addapp_delay:
-                                bat_file.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
-                            if game_arguments:
-                                bat_file.write(f'start "" "z:{path}" {game_arguments}\n')
-                            else:
-                                bat_file.write(f'start "" "z:{path}"\n')
+                    write_addapp_bat(addapp_bat, path, addapp, addapp_delay, addapp_first, game_arguments)
 
                 self.add_item_list(game)
                 self.update_list()
@@ -3254,24 +3237,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
 
             if game.addapp_checkbox == True:
-                with open(game.addapp_bat, "w") as bat_file:
-                    bat_file.write(f'@echo off\n')
-                    if not game.addapp_first:
-                        if game.game_arguments:
-                            bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
-                        else:
-                            bat_file.write(f'start "" "z:{game.path}"\n')
-                        if game.addapp_delay:
-                            bat_file.write(f'ping -n {game.addapp_delay} 127.0.0.1 >nul\n')
-                        bat_file.write(f'start "" "z:{game.addapp}"\n')
-                    else:
-                        bat_file.write(f'start "" "z:{game.addapp}"\n')
-                        if game.addapp_delay:
-                            bat_file.write(f'ping -n {game.addapp_delay} 127.0.0.1 >nul\n')
-                        if game.game_arguments:
-                            bat_file.write(f'start "" "z:{game.path}" {game.game_arguments}\n')
-                        else:
-                            bat_file.write(f'start "" "z:{game.path}"\n')
+                write_addapp_bat(game.addapp_bat, game.path, game.addapp, game.addapp_delay, game.addapp_first, game.game_arguments)
 
             self.save_games()
             self.update_list()

@@ -804,24 +804,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         game_arguments = self.entry_game_arguments.get_text()
 
         if self.addapp_enabled:
-            with open(addapp_bat, "w") as bat_file:
-                bat_file.write(f'@echo off\n')
-                if not self.addapp_first:
-                    if game_arguments:
-                        bat_file.write(f'start "" "z:{self.file_path}" {game_arguments}\n')
-                    else:
-                        bat_file.write(f'start "" "z:{self.file_path}"\n')
-                    if self.addapp_delay:
-                        bat_file.write(f'ping -n {self.addapp_delay} 127.0.0.1 >nul\n')
-                    bat_file.write(f'start "" "z:{self.addapp}"\n')
-                else:
-                    bat_file.write(f'start "" "z:{self.addapp}"\n')
-                    if self.addapp_delay:
-                        bat_file.write(f'ping -n {self.addapp_delay} 127.0.0.1 >nul\n')
-                    if game_arguments:
-                        bat_file.write(f'start "" "z:{self.file_path}" {game_arguments}\n')
-                    else:
-                        bat_file.write(f'start "" "z:{self.file_path}"\n')
+            write_addapp_bat(addapp_bat, self.file_path, self.addapp, self.addapp_delay, self.addapp_first, game_arguments)
 
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.ico')

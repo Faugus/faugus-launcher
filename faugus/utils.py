@@ -130,7 +130,27 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
     if lossless_present:
         parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     return parts
-    
+
+def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, game_arguments):
+    with open(bat_path, "w") as f:
+        f.write('@echo off\n')
+        if not addapp_first:
+            if game_arguments:
+                f.write(f'start "" "z:{exe_path}" {game_arguments}\n')
+            else:
+                f.write(f'start "" "z:{exe_path}"\n')
+            if addapp_delay:
+                f.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
+            f.write(f'start "" "z:{addapp}"\n')
+        else:
+            f.write(f'start "" "z:{addapp}"\n')
+            if addapp_delay:
+                f.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
+            if game_arguments:
+                f.write(f'start "" "z:{exe_path}" {game_arguments}\n')
+            else:
+                f.write(f'start "" "z:{exe_path}"\n')
+
 def is_valid_image(file_path):
     try:
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
