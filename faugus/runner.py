@@ -81,6 +81,8 @@ class FaugusRun(HiDpiMixin):
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
+        self.extract_env_from_message()
+
         if not self.splash_disable and not self.disable_updates:
             GLib.idle_add(self.show_splash)
 
@@ -99,8 +101,6 @@ class FaugusRun(HiDpiMixin):
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
-
-        self.extract_env_from_message()
 
         if self.command == "winetricks":
             GLib.idle_add(self.show_log_window)
