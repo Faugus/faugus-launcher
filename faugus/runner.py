@@ -299,15 +299,14 @@ class FaugusRun(HiDpiMixin):
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
+        force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates
+        if not force_off or not self.components_exists:
+            cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
         if not is_sniper:
-            force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates
             if force_off: set_env("UMU_RUNTIME_UPDATE", "0")
-
             if self.proton_latest and (not force_off or not self.proton_exists):
                 cmds_to_run.append([sys.executable, "-m", "faugus.proton_downloader", self.proton_latest])
-            if not force_off or not self.components_exists:
-                cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
         for cmd in cmds_to_run:
             start_and_watch(cmd)
