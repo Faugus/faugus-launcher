@@ -1360,18 +1360,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                         break
 
-                if game.protonfix:
-                    match = re.search(r"umu-(\d+)", game.protonfix)
-                    if match:
-                        log_id = match.group(1)
-                    else:
-                        log_id = "0"
-                    self.log_file_path = f"{logs_dir}/{game.gameid}/steam-{log_id}.log"
-                else:
-                    self.log_file_path = f"{logs_dir}/{game.gameid}/steam-0.log"
-                self.umu_log_file_path = f"{logs_dir}/{game.gameid}/umu.log"
+                self.proton_log = f"{logs_dir}/{game.gameid}/proton.log"
+                self.umu_log = f"{logs_dir}/{game.gameid}/umu.log"
 
-                if os.path.exists(self.log_file_path):
+                if os.path.exists(self.proton_log):
                     self.menu_show_logs.set_sensitive(True)
                     self.current_title = title
                 else:
@@ -1646,7 +1638,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         text_view1 = Gtk.TextView()
         text_view1.set_editable(False)
         text_buffer1 = text_view1.get_buffer()
-        with open(self.log_file_path, "r") as log_file:
+        with open(self.proton_log, "r") as log_file:
             text_buffer1.set_text(log_file.read())
         scrolled_window1.add(text_view1)
 
@@ -1655,7 +1647,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         text_view2 = Gtk.TextView()
         text_view2.set_editable(False)
         text_buffer2 = text_view2.get_buffer()
-        with open(self.umu_log_file_path, "r") as log_file:
+        with open(self.umu_log, "r") as log_file:
             text_buffer2.set_text(log_file.read())
         scrolled_window2.add(text_view2)
 
@@ -1675,7 +1667,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             clipboard.store()
 
         def open_location(button):
-            subprocess.run(["xdg-open", os.path.dirname(self.log_file_path)], check=True)
+            subprocess.run(["xdg-open", os.path.dirname(self.proton_log)], check=True)
 
         button_copy_clipboard = Gtk.Button(label=_("Copy to clipboard"))
         button_copy_clipboard.set_size_request(150, -1)

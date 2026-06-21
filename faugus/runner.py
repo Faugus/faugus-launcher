@@ -137,8 +137,15 @@ class FaugusRun(HiDpiMixin):
         if not os.environ.get("PROTONPATH") == "umu-sniper":
             if self.enable_logging:
                 set_env("UMU_LOG", "1")
-                set_env("PROTON_LOG_DIR", f"{logs_dir}/{self.log_dir}")
+
+                target_dir = f"{logs_dir}/{self.log_dir}"
+                set_env("PROTON_LOG_DIR", target_dir)
                 set_env("PROTON_LOG", "1")
+
+                if os.path.exists(target_dir):
+                    for file in os.listdir(target_dir):
+                        if "steam" in file or "proton" in file:
+                            os.remove(f"{target_dir}/{file}")
 
         if not os.environ.get("WINEPREFIX"):
             if not os.environ.get("PROTONPATH") == "umu-sniper":
@@ -761,6 +768,18 @@ class FaugusRun(HiDpiMixin):
                         break
 
                 save_json_file(games, games_json)
+
+        if self.enable_logging:
+            target_dir = f"{logs_dir}/{self.log_dir}"
+
+            if os.path.exists(target_dir):
+                for file in os.listdir(target_dir):
+                    if "steam" in file:
+                        old_path = f"{target_dir}/{file}"
+                        new_path = f"{target_dir}/proton.log"
+
+                        os.rename(old_path, new_path)
+                        break
 
         GLib.idle_add(self.close_splash_window)
         GLib.idle_add(self.close_log_window)
