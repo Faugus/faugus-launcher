@@ -4225,56 +4225,7 @@ class Settings(Gtk.Dialog):
             self.checkbox_mono_icon.set_sensitive(True)
 
     def populate_combobox_with_runners(self):
-        # List of default entries
-        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("GE-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
-        self.combobox_runner.append_text("DW-Proton Latest")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-
-        if os.path.exists(proton_cachyos):
-            self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        try:
-            # Check if the directory exists
-            if os.path.exists(compatibility_dir):
-                # List to hold version directories
-                versions = []
-                # Iterate over the folders in the directory
-                for entry in os.listdir(compatibility_dir):
-                    entry_path = os.path.join(compatibility_dir, entry)
-                    # Add to list only if it's a directory and not "UMU-Latest"
-                    if (
-                        os.path.isdir(entry_path)
-                        and entry not in ("UMU-Latest", "LegacyRuntime")
-                        and not entry.startswith("Proton-GE Latest")
-                        and not entry.startswith("Proton-EM Latest")
-                        and not entry.startswith("DW-Proton Latest")
-                        and not entry.startswith("Proton-CachyOS Latest")
-                    ):
-                        versions.append(entry)
-
-                # Sort versions in descending order
-                def version_key(v):
-                    cleaned = re.sub(r'^[^\d]+', '', v)
-                    parts = re.split(r'(\d+)', cleaned)
-                    return [int(p) if p.isdigit() else p for p in parts]
-
-                versions.sort(key=version_key, reverse=True)
-
-                # Add sorted versions to ComboBox
-                for version in versions:
-                    self.combobox_runner.append_text(version)
-
-        except Exception as e:
-            print(f"Error accessing the directory: {e}")
-
-        # Set the active item, if desired
-        self.combobox_runner.set_active(0)
-
-        cell_renderer = self.combobox_runner.get_cells()[0]
-        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
-        cell_renderer.set_property("max-width-chars", 20)
+        populate_combobox_with_runners(self.combobox_runner)
 
     def update_config_file(self):
         combobox_language = self.combobox_language.get_active_text()
@@ -6262,56 +6213,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runners(self):
-        # List of default entries
-        self.combobox_runner.append_text("Proton-CachyOS Latest (default)")
-        self.combobox_runner.append_text("GE-Proton Latest")
-        self.combobox_runner.append_text("Proton-EM Latest")
-        self.combobox_runner.append_text("DW-Proton Latest")
-        self.combobox_runner.append_text("UMU-Proton Latest")
-
-        if os.path.exists(proton_cachyos):
-            self.combobox_runner.append_text("Proton-CachyOS (System)")
-
-        try:
-            # Check if the directory exists
-            if os.path.exists(compatibility_dir):
-                # List to hold version directories
-                versions = []
-                # Iterate over the folders in the directory
-                for entry in os.listdir(compatibility_dir):
-                    entry_path = os.path.join(compatibility_dir, entry)
-                    # Add to list only if it's a directory and not "UMU-Latest"
-                    if (
-                        os.path.isdir(entry_path)
-                        and entry not in ("UMU-Latest", "LegacyRuntime")
-                        and not entry.startswith("Proton-GE Latest")
-                        and not entry.startswith("Proton-EM Latest")
-                        and not entry.startswith("DW-Proton Latest")
-                        and not entry.startswith("Proton-CachyOS Latest")
-                    ):
-                        versions.append(entry)
-
-                # Sort versions in descending order
-                def version_key(v):
-                    cleaned = re.sub(r'^[^\d]+', '', v)
-                    parts = re.split(r'(\d+)', cleaned)
-                    return [int(p) if p.isdigit() else p for p in parts]
-
-                versions.sort(key=version_key, reverse=True)
-
-                # Add sorted versions to ComboBox
-                for version in versions:
-                    self.combobox_runner.append_text(version)
-
-        except Exception as e:
-            print(f"Error accessing the directory: {e}")
-
-        # Set the active item, if desired
-        self.combobox_runner.set_active(0)
-
-        cell_renderer = self.combobox_runner.get_cells()[0]
-        cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
-        cell_renderer.set_property("max-width-chars", 20)
+        populate_combobox_with_runners(self.combobox_runner)
 
     def load_config(self):
         cfg = ConfigManager()
