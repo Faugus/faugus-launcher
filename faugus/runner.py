@@ -89,12 +89,11 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
-            subprocess.run(
-                    ["vulkaninfo", "--summary"],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    check=False
-                )
+            subprocess.Popen(
+                ["vulkaninfo", "--summary"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.enable_wow64:
