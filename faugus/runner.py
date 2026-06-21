@@ -271,7 +271,6 @@ class FaugusRun(HiDpiMixin):
                 Thread(target=self._watch_game_process, daemon=True).start()
                 if log_file:
                     def close_log_later():
-                        process.wait()
                         for t in threads:
                             t.join(timeout=5)
                         log_file.flush()
