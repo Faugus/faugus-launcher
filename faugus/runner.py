@@ -156,9 +156,9 @@ class FaugusRun(HiDpiMixin):
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
-            if protonpath == "Linux-Native":
+            elif protonpath == "Linux-Native":
                 pass
-            if protonpath == "Steam":
+            elif protonpath == "Steam":
                 pass
             else:
                 protonpath_path = compatibility_dir / protonpath
