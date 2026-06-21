@@ -123,8 +123,6 @@ class FaugusRun(HiDpiMixin):
             GLib.timeout_add(5000, close_app)
             return
 
-        self.start_time = time.time()
-
         # LSFG_LEGACY env is deprecated in LSFG-VK 2.0
         if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
             if self.lossless_location:
@@ -312,6 +310,7 @@ class FaugusRun(HiDpiMixin):
             start_and_watch(cmd)
 
         game_cmd = popen_prefix + shlex.split(self.message)
+        self.start_time = time.time()
         start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
