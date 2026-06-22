@@ -815,6 +815,15 @@ def build_launch_command(game):
     lossless_present = game.get("lossless_present", "")
     icon = game.get("icon", "")
 
+    if lossless_performance:
+        lossless_performance = 1
+    else:
+        lossless_performance = 0
+    if lossless_hdr:
+        lossless_hdr = 1
+    else:
+        lossless_hdr = 0
+
     if gameid == "ea-app":
         path = update_ea_path(prefix)
 
