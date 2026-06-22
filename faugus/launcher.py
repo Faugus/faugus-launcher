@@ -5868,7 +5868,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                self.show_invalid_image_dialog()
+                show_invalid_image_dialog()
             else:
                 shutil.copyfile(file_path, self.banner_path_temp)
                 self.update_image_banner()
@@ -5923,7 +5923,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 valid_exts = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg")
 
                 if not url.lower().endswith(valid_exts):
-                    self.show_invalid_image_dialog()
+                    show_invalid_image_dialog()
                     dialog.show_all()
                     continue
 
@@ -5937,55 +5937,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     break
 
                 except Exception:
-                    self.show_invalid_image_dialog()
+                    show_invalid_image_dialog()
                     dialog.show_all()
                     continue
 
-        dialog.destroy()
-
-    def show_invalid_image_dialog(self):
-        dialog = Gtk.Dialog(title="Faugus Launcher")
-        dialog.set_modal(True)
-        dialog.set_resizable(False)
-        play_notification_sound()
-
-        label = Gtk.Label(label=_("The selected file is not a valid image."))
-        label.set_halign(Gtk.Align.CENTER)
-
-        label2 = Gtk.Label(label=_("Please choose another one."))
-        label2.set_halign(Gtk.Align.CENTER)
-
-        button_yes = Gtk.Button(label=_("Ok"))
-        button_yes.set_size_request(150, -1)
-        button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
-
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.pack_start(label, True, True, 0)
-        box_top.pack_start(label2, True, True, 0)
-        box_bottom.pack_start(button_yes, True, True, 0)
-
-        content_area.add(box_top)
-        content_area.add(box_bottom)
-
-        dialog.show_all()
-        dialog.run()
         dialog.destroy()
 
     def get_banner(self):
@@ -6275,51 +6230,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if response == Gtk.ResponseType.ACCEPT:
             file_path = filechooser.get_filename()
             if not file_path or not is_valid_image(file_path):
-                dialog = Gtk.Dialog(title="Faugus Launcher")
-                dialog.set_modal(True)
-                dialog.set_resizable(False)
-                play_notification_sound()
-
-                label = Gtk.Label()
-                label.set_label(_("The selected file is not a valid image."))
-                label.set_halign(Gtk.Align.CENTER)
-
-                label2 = Gtk.Label()
-                label2.set_label(_("Please choose another one."))
-                label2.set_halign(Gtk.Align.CENTER)
-
-                button_yes = Gtk.Button(label=_("Ok"))
-                button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
-
-                content_area = dialog.get_content_area()
-                content_area.set_border_width(0)
-                content_area.set_halign(Gtk.Align.CENTER)
-                content_area.set_valign(Gtk.Align.CENTER)
-                content_area.set_vexpand(True)
-                content_area.set_hexpand(True)
-
-                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-                box_top.set_margin_start(20)
-                box_top.set_margin_end(20)
-                box_top.set_margin_top(20)
-                box_top.set_margin_bottom(20)
-
-                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                box_bottom.set_margin_start(10)
-                box_bottom.set_margin_end(10)
-                box_bottom.set_margin_bottom(10)
-
-                box_top.pack_start(label, True, True, 0)
-                box_top.pack_start(label2, True, True, 0)
-                box_bottom.pack_start(button_yes, True, True, 0)
-
-                content_area.add(box_top)
-                content_area.add(box_bottom)
-
-                dialog.show_all()
-                dialog.run()
-                dialog.destroy()
+                show_invalid_image_dialog()
             else:
                 shutil.copyfile(file_path, self.icon_temp)
                 surface = self.new_surface_from_image(self.icon_temp, 50, 50)
