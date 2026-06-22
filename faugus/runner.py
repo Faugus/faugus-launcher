@@ -208,7 +208,8 @@ class FaugusRun(HiDpiMixin):
         print("\n=== UMU-LAUNCHER COMMAND ===")
         print(f"{self.message}\n")
 
-        set_env("UMU_USE_STEAM", "1")
+        if not os.environ.get("UMU_USE_STEAM"):
+            set_env("UMU_USE_STEAM", "1")
 
         self.lock_prefix()
         self.execute_final_command()
