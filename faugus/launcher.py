@@ -59,7 +59,7 @@ else:
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
-categories_file = PathManager.user_config('faugus-launcher/categories.txt')
+categories_file = PathManager.user_data('faugus-launcher/categories.txt')
 custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
 presets_file = PathManager.user_config('faugus-launcher/presets.json')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
