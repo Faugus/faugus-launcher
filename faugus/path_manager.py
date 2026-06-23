@@ -35,7 +35,7 @@ class PathManager:
 
     @staticmethod
     def user_state(*relative_paths):
-        xdg_state_home = Path(os.getenv('XDG_STATE_HOME', Path.home() / '.state'))
+        xdg_state_home = Path(os.getenv('XDG_STATE_HOME', Path.home() / '.local/state'))
         return str(xdg_state_home.joinpath(*relative_paths))
 
     @staticmethod
