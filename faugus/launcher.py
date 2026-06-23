@@ -3093,7 +3093,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def extract_best_icon(self, exe_path, gameid):
-        icons_dir = PathManager.user_config('faugus-launcher/icons')
+        icons_dir = PathManager.user_data('faugus-launcher/icons')
         os.makedirs(icons_dir, exist_ok=True)
         final = os.path.join(icons_dir, f"{gameid}.ico")
         status = extract_ico_frames(exe_path, final)
