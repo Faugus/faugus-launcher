@@ -26,8 +26,9 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-eac_dir = PathManager.user_config("faugus-launcher/components/eac")
-be_dir = PathManager.user_config("faugus-launcher/components/be")
+components_dir = PathManager.user_data("faugus-launcher/components")
+eac_dir = os.path.join(components_dir, "eac")
+be_dir = os.path.join(components_dir, "be")
 os.makedirs(compatibility_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-run')
