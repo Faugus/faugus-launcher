@@ -36,7 +36,7 @@ else:
     ]
     lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
-icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
+icons_dir = PathManager.user_data('faugus-launcher/icons-nolauncher')
 presets_file = PathManager.user_config('faugus-launcher/presets.json')
 
 _ = setup_gettext('faugus-launcher')

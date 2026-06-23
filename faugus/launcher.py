@@ -22,7 +22,7 @@ from faugus.ea_fix import *
 VERSION = "1.22.4"
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-icons_dir = PathManager.user_config('faugus-launcher/icons')
+icons_dir = PathManager.user_data('faugus-launcher/icons')
 banners_dir = PathManager.user_config('faugus-launcher/banners')
 backup_dir = PathManager.user_config("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')

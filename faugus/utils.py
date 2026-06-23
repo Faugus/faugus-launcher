@@ -97,7 +97,7 @@ def add_image_file_filters(filechooser, include_ico=True):
     if include_ico:
         image_filter.add_pattern("*.ico")
     filechooser.add_filter(image_filter)
-    
+
 _FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
 def play_notification_sound():
@@ -331,7 +331,7 @@ def update_games_json():
 
     changed = False
 
-    icons_dir = PathManager.user_config('faugus-launcher/icons')
+    icons_dir = PathManager.user_data('faugus-launcher/icons')
 
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
