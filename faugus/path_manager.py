@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import shutil
 from pathlib import Path
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -16,7 +17,7 @@ class PathManager:
 
     @staticmethod
     def system_data(*relative_paths):
-        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
+        xdg_data_dirs = (os.getenv('XDG_DATA_DIRS') or '/usr/local/share:/usr/share').split(':')
         for data_dir in xdg_data_dirs:
             path = Path(data_dir).joinpath(*relative_paths)
             if path.exists():
@@ -25,17 +26,17 @@ class PathManager:
 
     @staticmethod
     def user_data(*relative_paths):
-        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+        xdg_data_home = Path(os.getenv('XDG_DATA_HOME') or os.path.join(Path.home(), '.local', 'share'))
         return str(xdg_data_home.joinpath(*relative_paths))
 
     @staticmethod
     def user_config(*relative_paths):
-        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME') or os.path.join(Path.home(), '.config'))
         return str(xdg_config_home.joinpath(*relative_paths))
 
     @staticmethod
     def user_state(*relative_paths):
-        xdg_state_home = Path(os.getenv('XDG_STATE_HOME', Path.home() / '.local/state'))
+        xdg_state_home = Path(os.getenv('XDG_STATE_HOME') or os.path.join(Path.home(), '.local', 'state'))
         return str(xdg_state_home.joinpath(*relative_paths))
 
     @staticmethod
