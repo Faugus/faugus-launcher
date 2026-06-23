@@ -63,7 +63,7 @@ categories_file = PathManager.user_config('faugus-launcher/categories.txt')
 custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
 presets_file = PathManager.user_config('faugus-launcher/presets.json')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
-faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
+faugus_temp = PathManager.user_state('faugus-launcher/faugus_temp')
 running_games = PathManager.user_state('faugus-launcher/running_games.json')
 
 os.makedirs(compatibility_dir, exist_ok=True)
