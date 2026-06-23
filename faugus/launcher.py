@@ -18,6 +18,7 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
+from faugus.xdg_migration import migrate_legacy_xdg_layout
 
 VERSION = "1.22.4"
 
@@ -6530,5 +6531,6 @@ def prefixes_count(prefix):
     return sum(1 for x in games if x.get("prefix") == prefix) - 1
 
 if __name__ == "__main__":
+    migrate_legacy_xdg_layout()
     update_games_json()
     main()
