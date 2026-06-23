@@ -94,7 +94,7 @@ class PathManager:
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = PathManager.user_home('Faugus')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
+logs_dir = PathManager.user_data('faugus-launcher/logs')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
 games_json = PathManager.user_data('faugus-launcher/games.json')
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
