@@ -4400,6 +4400,8 @@ class Settings(Gtk.Dialog):
         backup_win.show_all()
 
     def on_button_restore_clicked(self, widget):
+        from faugus.backup import restore_backup
+
         filechooser = Gtk.FileChooserNative(
             title=_("Select a backup file to restore"),
             action=Gtk.FileChooserAction.OPEN,
@@ -4422,34 +4424,18 @@ class Settings(Gtk.Dialog):
                 self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
                 return
 
-            temp_dir = os.path.join(faugus_launcher_dir, "temp-restore")
-            shutil.unpack_archive(zip_file, temp_dir, "zip")
-
-            marker_path = os.path.join(temp_dir, ".faugus_marker")
-            if not os.path.exists(marker_path):
-                shutil.rmtree(temp_dir)
-                filechooser.destroy()
-                self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
-                return
-
             if self.show_warning_dialog_settings(self, _("Are you sure you want to overwrite the settings?"), True):
-                for item in os.listdir(temp_dir):
-                    if item == ".faugus_marker":
-                        continue
-                    src = os.path.join(temp_dir, item)
-                    dst = os.path.join(faugus_launcher_dir, item)
+                try:
+                    restore_backup(zip_file, faugus_launcher_dir)
+                except (ValueError, shutil.ReadError, OSError):
+                    filechooser.destroy()
+                    self.show_warning_dialog_settings(
+                        self,
+                        _("This is not a valid Faugus Launcher backup file."),
+                        False,
+                    )
+                    return
 
-                    if os.path.isdir(dst):
-                        shutil.rmtree(dst)
-                    elif os.path.isfile(dst):
-                        os.remove(dst)
-
-                    if os.path.isdir(src):
-                        shutil.copytree(src, dst)
-                    elif os.path.isfile(src):
-                        shutil.copy2(src, dst)
-
-                shutil.rmtree(temp_dir)
                 global faugus_backup
                 faugus_backup = True
                 self.response(Gtk.ResponseType.OK)

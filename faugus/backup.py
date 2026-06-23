@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import time
+import tempfile
 import calendar
 from datetime import datetime, timedelta
 import gi
@@ -9,6 +10,26 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from faugus.language_config import *
 from faugus.utils import on_entry_changed
+
+CONFIG_BACKUP_ITEMS = (
+    "config.ini",
+    "envar.txt",
+)
+
+DATA_BACKUP_ITEMS = (
+    "games.json",
+    "banners",
+    "icons",
+    "icons-nolauncher",
+    "games-backup",
+    "presets.json",
+    "categories.txt",
+    "custom-order.json",
+)
+
+STATE_BACKUP_ITEMS_LEGACY = (
+    "latest-games.txt",
+)
 
 def load_config(faugus_dir):
     config = {}
@@ -30,36 +51,90 @@ def save_config(faugus_dir, config):
             else:
                 f.write(f'{key}={value}\n')
 
+def copy_backup_item(source_root, destination_root, item):
+    source = os.path.join(source_root, item)
+    destination = os.path.join(destination_root, item)
+
+    if os.path.isdir(source):
+        shutil.copytree(source, destination, dirs_exist_ok=True)
+    elif os.path.isfile(source):
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        shutil.copy2(source, destination)
+
+def restore_backup_item(source_root, destination_root, item):
+    source = os.path.join(source_root, item)
+    destination = os.path.join(destination_root, item)
+
+    if not os.path.exists(source):
+        return
+
+    if os.path.isdir(destination):
+        shutil.rmtree(destination)
+    elif os.path.exists(destination):
+        os.remove(destination)
+
+    os.makedirs(os.path.dirname(destination), exist_ok=True)
+    if os.path.isdir(source):
+        shutil.copytree(source, destination)
+    else:
+        shutil.copy2(source, destination)
+
 def perform_backup(faugus_dir, dest_path):
-    items = ["banners", "games-backup", "icons", "config.ini", "envar.txt", "games.json", "latest-games.txt"]
-    temp_dir = os.path.join(faugus_dir, "temp-backup")
-    os.makedirs(temp_dir, exist_ok=True)
-
-    for item in items:
-        src = os.path.join(faugus_dir, item)
-        dst = os.path.join(temp_dir, item)
-        if os.path.isdir(src):
-            shutil.copytree(src, dst, dirs_exist_ok=True)
-        elif os.path.isfile(src):
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            shutil.copy2(src, dst)
-
-    marker_path = os.path.join(temp_dir, ".faugus_marker")
-    with open(marker_path, "w") as f:
-        f.write("faugus-launcher-backup")
-
+    data_dir = PathManager.user_data("faugus-launcher")
     current_date = datetime.now().strftime("%Y-%m-%d")
-    zip_path = os.path.join(faugus_dir, f"faugus-launcher-{current_date}")
 
-    shutil.make_archive(zip_path, "zip", temp_dir)
-    shutil.rmtree(temp_dir)
+    with tempfile.TemporaryDirectory(prefix="faugus-backup-") as temp_dir:
+        backup_root = os.path.join(temp_dir, "backup")
+        config_root = os.path.join(backup_root, "config")
+        data_root = os.path.join(backup_root, "data")
 
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    if os.path.exists(dest_path):
-        os.remove(dest_path)
+        for item in CONFIG_BACKUP_ITEMS:
+            copy_backup_item(faugus_dir, config_root, item)
+        for item in DATA_BACKUP_ITEMS:
+            copy_backup_item(data_dir, data_root, item)
 
-    shutil.move(zip_path + ".zip", dest_path)
+        marker_path = os.path.join(backup_root, ".faugus_marker")
+        with open(marker_path, "w", encoding="utf-8") as marker:
+            marker.write("faugus-launcher-backup-v2\n")
+
+        archive_base = os.path.join(temp_dir, f"faugus-launcher-{current_date}")
+        archive_path = shutil.make_archive(archive_base, "zip", backup_root)
+
+        os.makedirs(os.path.dirname(dest_path) or ".", exist_ok=True)
+        if os.path.exists(dest_path):
+            os.remove(dest_path)
+        shutil.move(archive_path, dest_path)
+
     return current_date
+
+def restore_backup(archive_path, faugus_dir):
+    data_dir = PathManager.user_data("faugus-launcher")
+    state_dir = PathManager.user_state("faugus-launcher")
+
+    with tempfile.TemporaryDirectory(prefix="faugus-restore-") as temp_dir:
+        shutil.unpack_archive(archive_path, temp_dir, "zip")
+
+        marker_path = os.path.join(temp_dir, ".faugus_marker")
+        if not os.path.isfile(marker_path):
+            raise ValueError("not a Faugus Launcher backup")
+
+        config_root = os.path.join(temp_dir, "config")
+        data_root = os.path.join(temp_dir, "data")
+
+        if os.path.isdir(config_root) or os.path.isdir(data_root):
+            for item in CONFIG_BACKUP_ITEMS:
+                restore_backup_item(config_root, faugus_dir, item)
+            for item in DATA_BACKUP_ITEMS:
+                restore_backup_item(data_root, data_dir, item)
+            return
+
+        # Backward compatibility with backups made before the XDG split.
+        for item in CONFIG_BACKUP_ITEMS:
+            restore_backup_item(temp_dir, faugus_dir, item)
+        for item in DATA_BACKUP_ITEMS:
+            restore_backup_item(temp_dir, data_dir, item)
+        for item in STATE_BACKUP_ITEMS_LEGACY:
+            restore_backup_item(temp_dir, state_dir, item)
 
 def setup_autostart(enable, script_path, faugus_dir):
     autostart_dir = os.path.expanduser("~/.config/autostart")
