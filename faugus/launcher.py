@@ -24,7 +24,7 @@ VERSION = "1.22.4"
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 icons_dir = PathManager.user_data('faugus-launcher/icons')
 banners_dir = PathManager.user_data('faugus-launcher/banners')
-backup_dir = PathManager.user_config("faugus-launcher/games-backup")
+backup_dir = PathManager.user_data("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 
 if IS_FLATPAK:
