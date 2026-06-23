@@ -18,6 +18,7 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.ea_fix import *
 from faugus.steam_setup import IS_STEAM_FLATPAK
+from faugus.path_manager import components_dir
 
 if IS_FLATPAK:
     faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
@@ -26,7 +27,6 @@ else:
     faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-components_dir = PathManager.user_data("faugus-launcher/components")
 eac_dir = os.path.join(components_dir, "eac")
 be_dir = os.path.join(components_dir, "be")
 os.makedirs(compatibility_dir, exist_ok=True)
