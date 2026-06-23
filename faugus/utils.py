@@ -163,12 +163,10 @@ def show_invalid_image_dialog():
     dialog.set_resizable(False)
     play_notification_sound()
 
-    label = Gtk.Label()
-    label.set_label(_("The selected file is not a valid image."))
+    label = Gtk.Label(label=_("The selected file is not a valid image."))
     label.set_halign(Gtk.Align.CENTER)
 
-    label2 = Gtk.Label()
-    label2.set_label(_("Please choose another one."))
+    label2 = Gtk.Label(label=_("Please choose another one."))
     label2.set_halign(Gtk.Align.CENTER)
 
     button_yes = Gtk.Button(label=_("Ok"))
@@ -429,3 +427,456 @@ def prepare_game_kwargs(data):
     defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
+
+def show_launch_arguments_dialog(parent, presets_file, current_launch_arguments):
+    dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)
+    dialog.set_resizable(False)
+    dialog.set_modal(True)
+    dialog.set_default_size(650, 400)
+
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    hbox.set_margin_start(10)
+    hbox.set_margin_end(10)
+    hbox.set_margin_top(10)
+    hbox.set_margin_bottom(10)
+
+    store_presets = Gtk.ListStore(str)
+
+    if os.path.exists(presets_file):
+        try:
+            with open(presets_file, "r") as f:
+                for item in json.load(f):
+                    store_presets.append([item])
+        except Exception:
+            pass
+    store_presets.append([""])
+
+    tree_presets = Gtk.TreeView(model=store_presets)
+    tree_presets.set_hexpand(True)
+    tree_presets.set_vexpand(True)
+    renderer_presets = Gtk.CellRendererText()
+    renderer_presets.set_property("editable", True)
+
+    def on_preset_edited(renderer, path, new_text):
+        store_presets[path][0] = new_text
+        if path == str(len(store_presets) - 1) and new_text.strip() != "":
+            store_presets.append([""])
+
+    def on_preset_key_press(widget, event):
+        if event.keyval == Gdk.KEY_Delete:
+            selection = widget.get_selection()
+            model, treeiter = selection.get_selected()
+            if treeiter is not None:
+                if model[treeiter][0] != "" or len(model) > 1:
+                    model.remove(treeiter)
+                if len(model) == 0 or model[-1][0] != "":
+                    model.append([""])
+            return True
+        return False
+
+    renderer_presets.connect("edited", on_preset_edited)
+    tree_presets.connect("key-press-event", on_preset_key_press)
+    column_presets = Gtk.TreeViewColumn(_("Presets"), renderer_presets, text=0)
+    tree_presets.append_column(column_presets)
+    scroll_presets = Gtk.ScrolledWindow()
+    scroll_presets.add(tree_presets)
+
+    btn_copy = Gtk.Button()
+    btn_copy.set_size_request(50, 50)
+    btn_copy.set_valign(Gtk.Align.CENTER)
+
+    img = Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON)
+
+    def flip_image(w, cr):
+        cr.translate(w.get_allocated_width(), 0)
+        cr.scale(-1, 1)
+        return False
+
+    img.connect("draw", flip_image)
+    btn_copy.set_image(img)
+
+    store_args = Gtk.ListStore(str)
+    current_args = current_launch_arguments.split("\n")
+    for arg in current_args:
+        if arg.strip():
+            store_args.append([arg])
+    store_args.append([""])
+
+    tree_args = Gtk.TreeView(model=store_args)
+    tree_args.set_hexpand(True)
+    tree_args.set_vexpand(True)
+    renderer_args = Gtk.CellRendererText()
+    renderer_args.set_property("editable", True)
+
+    def on_arg_edited(renderer, path, new_text):
+        store_args[path][0] = new_text
+        if path == str(len(store_args) - 1) and new_text.strip() != "":
+            store_args.append([""])
+
+    def on_arg_key_press(widget, event):
+        if event.keyval == Gdk.KEY_Delete:
+            selection = widget.get_selection()
+            model, treeiter = selection.get_selected()
+            if treeiter is not None:
+                if model[treeiter][0] != "" or len(model) > 1:
+                    model.remove(treeiter)
+                if len(model) == 0 or model[-1][0] != "":
+                    model.append([""])
+            return True
+        return False
+
+    renderer_args.connect("edited", on_arg_edited)
+    tree_args.connect("key-press-event", on_arg_key_press)
+    column_args = Gtk.TreeViewColumn(_("Launch Arguments"), renderer_args, text=0)
+    tree_args.append_column(column_args)
+    scroll_args = Gtk.ScrolledWindow()
+    scroll_args.add(tree_args)
+
+    sel_presets = tree_presets.get_selection()
+    sel_args = tree_args.get_selection()
+
+    def on_presets_selection_changed(sel):
+        if sel.count_selected_rows() > 0:
+            sel_args.unselect_all()
+
+    def on_args_selection_changed(sel):
+        if sel.count_selected_rows() > 0:
+            sel_presets.unselect_all()
+
+    sel_presets.connect("changed", on_presets_selection_changed)
+    sel_args.connect("changed", on_args_selection_changed)
+
+    def on_copy_clicked(btn):
+        selection = tree_presets.get_selection()
+        model, treeiter = selection.get_selected()
+        if treeiter is not None:
+            val = model[treeiter][0].strip()
+            if val:
+                store_args.insert(len(store_args) - 1, [val])
+
+    btn_copy.connect("clicked", on_copy_clicked)
+
+    hbox.pack_start(scroll_args, True, True, 0)
+    hbox.pack_start(btn_copy, False, False, 0)
+    hbox.pack_start(scroll_presets, True, True, 0)
+
+    content_area = dialog.get_content_area()
+    content_area.pack_start(hbox, True, True, 0)
+
+    button_cancel = Gtk.Button(label=_("Cancel"))
+    button_cancel.set_size_request(150, -1)
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+    button_ok = Gtk.Button(label=_("Ok"))
+    button_ok.set_size_request(150, -1)
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_margin_start(10)
+    bottom_box.set_margin_end(10)
+    bottom_box.set_margin_bottom(10)
+    bottom_box.pack_start(button_cancel, True, True, 0)
+    bottom_box.pack_start(button_ok, True, True, 0)
+
+    content_area.pack_start(bottom_box, False, False, 0)
+
+    dialog.show_all()
+    response = dialog.run()
+
+    result = current_launch_arguments
+    if response == Gtk.ResponseType.OK:
+        presets_to_save = [row[0] for row in store_presets if row[0].strip()]
+        with open(presets_file, "w") as f:
+            json.dump(presets_to_save, f)
+
+        args_to_save = [row[0] for row in store_args if row[0].strip()]
+        result = "\n".join(args_to_save)
+
+    dialog.destroy()
+    return result
+
+def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first):
+    dialog = Gtk.Dialog(title=_("Additional Application"), parent=parent, flags=0)
+    dialog.set_modal(True)
+    dialog.set_resizable(False)
+
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
+
+    grid = Gtk.Grid()
+    grid.set_row_spacing(10)
+    grid.set_column_spacing(10)
+    grid.set_margin_top(10)
+    grid.set_margin_bottom(10)
+    grid.set_margin_start(10)
+    grid.set_margin_end(10)
+
+    enabled = val if (val := addapp_enabled) != "" else False
+    cur_path = val if (val := addapp) != "" else ""
+    cur_delay = val if (val := addapp_delay) != "" else ""
+    cur_first = val if (val := addapp_first) != "" else False
+
+    checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+    checkbox_enable.set_active(enabled)
+    checkbox_enable.set_halign(Gtk.Align.START)
+
+    label_path = Gtk.Label(label=_("Path"))
+    label_path.set_halign(Gtk.Align.START)
+
+    entry_addapp = Gtk.Entry()
+    entry_addapp.set_text(cur_path)
+    entry_addapp.set_tooltip_text(_("/path/to/the/app"))
+    entry_addapp.set_has_tooltip(True)
+    entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
+    entry_addapp.set_hexpand(True)
+
+    button_search_addapp = Gtk.Button()
+    button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+    button_search_addapp.set_size_request(50, -1)
+
+    def on_search_clicked(w):
+        filechooser = Gtk.FileChooserNative(
+            title=_("Select an additional application"),
+            action=Gtk.FileChooserAction.OPEN,
+            accept_label=_("Open"),
+            cancel_label=_("Cancel"),
+        )
+        add_windows_file_filters(filechooser)
+        resp = filechooser.run()
+        if resp == Gtk.ResponseType.ACCEPT:
+            selected_file = filechooser.get_filename()
+            if selected_file:
+                entry_addapp.set_text(selected_file)
+        filechooser.destroy()
+
+    button_search_addapp.connect("clicked", on_search_clicked)
+
+    label_delay = Gtk.Label(label=_("Delay (seconds)"))
+    label_delay.set_halign(Gtk.Align.START)
+
+    adjustment = Gtk.Adjustment(
+        value=int(cur_delay) if cur_delay else 0,
+        lower=0, upper=60, step_increment=1, page_increment=10, page_size=0
+    )
+
+    entry_delay = Gtk.SpinButton()
+    entry_delay.set_adjustment(adjustment)
+    entry_delay.set_numeric(True)
+    entry_delay.set_hexpand(True)
+
+    checkbox_addapp_first = Gtk.CheckButton(label=_("Run the application first"))
+    checkbox_addapp_first.set_active(cur_first)
+    checkbox_addapp_first.set_halign(Gtk.Align.START)
+
+    def on_enable_toggled(cb):
+        active = cb.get_active()
+        label_path.set_sensitive(active)
+        entry_addapp.set_sensitive(active)
+        button_search_addapp.set_sensitive(active)
+        label_delay.set_sensitive(active)
+        entry_delay.set_sensitive(active)
+        checkbox_addapp_first.set_sensitive(active)
+
+    checkbox_enable.connect("toggled", on_enable_toggled)
+    on_enable_toggled(checkbox_enable)
+
+    grid.attach(checkbox_enable,        0, 0, 1, 1)
+    grid.attach(label_path,             0, 1, 1, 1)
+    grid.attach(entry_addapp,           0, 2, 3, 1)
+    grid.attach(button_search_addapp,   3, 2, 1, 1)
+    grid.attach(label_delay,            0, 3, 1, 1)
+    grid.attach(entry_delay,            0, 4, 4, 1)
+    grid.attach(checkbox_addapp_first,  0, 5, 1, 1)
+
+    frame.add(grid)
+
+    button_cancel = Gtk.Button(label=_("Cancel"))
+    button_cancel.set_size_request(150, -1)
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+    button_ok = Gtk.Button(label=_("Ok"))
+    button_ok.set_size_request(150, -1)
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_margin_start(10)
+    bottom_box.set_margin_end(10)
+    bottom_box.set_margin_bottom(10)
+    bottom_box.pack_start(button_cancel, True, True, 0)
+    bottom_box.pack_start(button_ok, True, True, 0)
+
+    content_area = dialog.get_content_area()
+    content_area.pack_start(frame, True, True, 0)
+    content_area.pack_start(bottom_box, False, False, 0)
+
+    dialog.show_all()
+    response = dialog.run()
+
+    result = (addapp_enabled, addapp, addapp_delay, addapp_first)
+    if response == Gtk.ResponseType.OK:
+        result = (
+            checkbox_enable.get_active(),
+            entry_addapp.get_text(),
+            entry_delay.get_text(),
+            checkbox_addapp_first.get_active(),
+        )
+
+    dialog.destroy()
+    return result
+
+def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
+                         lossless_performance, lossless_hdr, lossless_present):
+    dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=parent, flags=0)
+    dialog.set_modal(True)
+    dialog.set_resizable(False)
+
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
+
+    grid = Gtk.Grid()
+    grid.set_row_spacing(10)
+    grid.set_column_spacing(10)
+    grid.set_margin_top(10)
+    grid.set_margin_bottom(10)
+    grid.set_margin_start(10)
+    grid.set_margin_end(10)
+
+    enabled = val if (val := lossless_enabled) != "" else False
+    multiplier = val if (val := lossless_multiplier) != "" else 1
+    flow = val if (val := lossless_flow) != "" else 100
+    performance = val if (val := lossless_performance) != "" else False
+    hdr = val if (val := lossless_hdr) != "" else False
+    present = val if (val := lossless_present) != "" else "VSync/FIFO (default)"
+
+    checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+    checkbox_enable.set_active(enabled)
+    checkbox_enable.set_halign(Gtk.Align.START)
+
+    label_multiplier = Gtk.Label(label=_("Multiplier"))
+    label_multiplier.set_halign(Gtk.Align.START)
+    spin_multiplier = Gtk.SpinButton()
+    spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
+    spin_multiplier.set_numeric(True)
+    spin_multiplier.set_tooltip_text(_("Multiply the FPS."))
+
+    label_flow = Gtk.Label(label=_("Flow Scale"))
+    label_flow.set_halign(Gtk.Align.START)
+    adjustment = Gtk.Adjustment(value=flow, lower=25, upper=100, step_increment=1)
+    scale_flow = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
+    scale_flow.set_digits(0)
+    scale_flow.set_hexpand(True)
+    scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
+    scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution."))
+
+    checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
+    checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality."))
+    checkbox_performance.set_active(performance)
+
+    checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
+    checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
+    checkbox_hdr.set_active(hdr)
+
+    label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
+    label_present.set_halign(Gtk.Align.START)
+
+    combobox_present = Gtk.ComboBoxText()
+    combobox_present.set_tooltip_text(_("Override the present mode."))
+
+    options = [
+        "VSync/FIFO (default)",
+        "Mailbox",
+        "Immediate",
+    ]
+
+    for opt in options:
+        combobox_present.append_text(opt)
+
+    mapping = {
+        "fifo": "VSync/FIFO (default)",
+        "mailbox": "Mailbox",
+        "immediate": "Immediate",
+    }
+
+    ui_value = mapping.get(present, "VSync/FIFO (default)")
+    combobox_present.set_active(options.index(ui_value))
+
+    def on_enable_toggled(cb):
+        active = cb.get_active()
+        label_multiplier.set_sensitive(active)
+        spin_multiplier.set_sensitive(active)
+        label_flow.set_sensitive(active)
+        scale_flow.set_sensitive(active)
+        checkbox_performance.set_sensitive(active)
+        checkbox_hdr.set_sensitive(active)
+        label_present.set_sensitive(active)
+        combobox_present.set_sensitive(active)
+
+    checkbox_enable.connect("toggled", on_enable_toggled)
+    on_enable_toggled(checkbox_enable)
+
+    grid.attach(checkbox_enable,        0, 0, 1, 1)
+    grid.attach(label_multiplier,       0, 1, 1, 1)
+    grid.attach(spin_multiplier,        0, 2, 1, 1)
+    grid.attach(label_flow,             0, 3, 1, 1)
+    grid.attach(scale_flow,             0, 4, 1, 1)
+    grid.attach(checkbox_performance,   0, 5, 1, 1)
+    grid.attach(checkbox_hdr,           0, 6, 1, 1)
+    grid.attach(label_present,          0, 7, 1, 1)
+    grid.attach(combobox_present,       0, 8, 1, 1)
+
+    frame.add(grid)
+
+    button_cancel = Gtk.Button(label=_("Cancel"))
+    button_cancel.set_size_request(150, -1)
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+    button_ok = Gtk.Button(label=_("Ok"))
+    button_ok.set_size_request(150, -1)
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_margin_start(10)
+    bottom_box.set_margin_end(10)
+    bottom_box.set_margin_bottom(10)
+    bottom_box.pack_start(button_cancel, True, True, 0)
+    bottom_box.pack_start(button_ok, True, True, 0)
+
+    content_area = dialog.get_content_area()
+    content_area.pack_start(frame, True, True, 0)
+    content_area.pack_start(bottom_box, False, False, 0)
+
+    dialog.show_all()
+    response = dialog.run()
+
+    result = (lossless_enabled, lossless_multiplier, lossless_flow,
+              lossless_performance, lossless_hdr, lossless_present)
+    if response == Gtk.ResponseType.OK:
+        present_text = combobox_present.get_active_text()
+        present_mapping = {
+            "VSync/FIFO (default)": "fifo",
+            "Mailbox": "mailbox",
+            "Immediate": "immediate",
+        }
+        result = (
+            checkbox_enable.get_active(),
+            spin_multiplier.get_value_as_int(),
+            scale_flow.get_value(),
+            checkbox_performance.get_active(),
+            checkbox_hdr.get_active(),
+            present_mapping.get(present_text, "fifo"),
+        )
+
+    dialog.destroy()
+    return result
