@@ -13,28 +13,9 @@ from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
 
 if IS_FLATPAK:
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
-    lsfgvk_possible_paths = [
-        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
-    ]
-    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
-    faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
-    lsfgvk_possible_paths = [
-        Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path("/usr/local/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib/liblsfg-vk-layer.so"),
-        Path("/usr/lib64/liblsfg-vk-layer.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
-    ]
-    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
 presets_file = PathManager.user_config('faugus-launcher/presets.json')
