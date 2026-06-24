@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import platform
 import tarfile
 import urllib.request
 import shutil
@@ -38,6 +39,12 @@ CONFIGS = {
     },
 }
 
+FOREIGN_ARCH_TOKENS = {
+    "x86_64": ("aarch64", "arm64"),
+    "aarch64": ("x86_64", "amd64"),
+    "arm64": ("x86_64", "amd64"),
+}
+
 def get_latest_tag_and_url(api, archive_ext):
     try:
         with urllib.request.urlopen(api, timeout=5) as r:
@@ -45,8 +52,14 @@ def get_latest_tag_and_url(api, archive_ext):
     except Exception:
         return None, None
 
+    foreign = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
     asset = next(
-        (a for a in data.get("assets", []) if a["name"].endswith(archive_ext)),
+        (
+            a
+            for a in data.get("assets", [])
+            if a["name"].endswith(archive_ext)
+            and not any(token in a["name"] for token in foreign)
+        ),
         None,
     )
 
