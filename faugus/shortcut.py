@@ -83,11 +83,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))

@@ -3726,11 +3726,7 @@ class Settings(Gtk.Dialog):
         self.button_run_default.connect("clicked", self.on_button_run_default_clicked)
         self.button_run_default.set_tooltip_text(_("Run a file inside the prefix"))
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
@@ -5042,11 +5038,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
