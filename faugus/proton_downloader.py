@@ -45,6 +45,21 @@ FOREIGN_ARCH_TOKENS = {
     "arm64": ("x86_64", "amd64"),
 }
 
+def select_asset(assets, archive_exts):
+    foreign_tokens = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
+    if isinstance(archive_exts, str):
+        archive_exts = [archive_exts]
+
+    return next(
+        (
+            a for a in assets
+            if any(a["name"].endswith(ext) for ext in archive_exts)
+            and not any(token in a["name"] for token in foreign_tokens)
+        ),
+        None,
+    )
+
+
 def get_latest_tag_and_url(api, archive_ext):
     try:
         with urllib.request.urlopen(api, timeout=5) as r:
@@ -52,17 +67,7 @@ def get_latest_tag_and_url(api, archive_ext):
     except Exception:
         return None, None
 
-    foreign = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
-    asset = next(
-        (
-            a
-            for a in data.get("assets", [])
-            if a["name"].endswith(archive_ext)
-            and not any(token in a["name"] for token in foreign)
-        ),
-        None,
-    )
-
+    asset = select_asset(data.get("assets", []), archive_ext)
     if not asset:
         return None, None
 
