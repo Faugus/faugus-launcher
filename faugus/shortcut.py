@@ -103,15 +103,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_ok.connect("clicked", self.on_ok_clicked)
         self.button_ok.set_size_request(150, -1)
 
-        css_provider = Gtk.CssProvider()
-        css = """
-        .entry {
-            border-color: Red;
-        }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        load_red_entry_css()
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.box.set_margin_start(0)

@@ -214,6 +214,18 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
         tooltip.set_text(widget.get_tooltip_text())
     return True
 
+def load_red_entry_css():
+    css_provider = Gtk.CssProvider()
+    css = """
+    .entry {
+        border-color: Red;
+    }
+    """
+    css_provider.load_from_data(css.encode('utf-8'))
+    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+
 def extract_ico_simple(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:
