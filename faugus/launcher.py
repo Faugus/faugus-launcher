@@ -3740,13 +3740,7 @@ class Settings(Gtk.Dialog):
         self.label_support.set_margin_end(10)
         self.label_support.set_margin_top(10)
 
-        button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", on_button_kofi_clicked)
-        button_kofi.get_style_context().add_class("kofi")
-
-        button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", on_button_paypal_clicked)
-        button_paypal.get_style_context().add_class("paypal")
+        button_kofi, button_paypal = make_donate_buttons()
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))

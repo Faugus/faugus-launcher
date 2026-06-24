@@ -364,13 +364,7 @@ class FaugusRun(HiDpiMixin):
         )
         label2.set_halign(Gtk.Align.CENTER)
 
-        button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", on_button_kofi_clicked)
-        button_kofi.get_style_context().add_class("kofi")
-
-        button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", on_button_paypal_clicked)
-        button_paypal.get_style_context().add_class("paypal")
+        button_kofi, button_paypal = make_donate_buttons()
 
         checkbox = Gtk.CheckButton(label=_("Never show this message again"))
         checkbox.set_halign(Gtk.Align.CENTER)

@@ -310,6 +310,17 @@ def extract_ico_frames(exe_path, output_path):
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
+def make_donate_buttons():
+    button_kofi = Gtk.Button(label="Ko-fi")
+    button_kofi.connect("clicked", on_button_kofi_clicked)
+    button_kofi.get_style_context().add_class("kofi")
+
+    button_paypal = Gtk.Button(label="PayPal")
+    button_paypal.connect("clicked", on_button_paypal_clicked)
+    button_paypal.get_style_context().add_class("paypal")
+
+    return button_kofi, button_paypal
+
 def on_button_search_protonfix_clicked(widget):
     import webbrowser
     webbrowser.open("https://umu.openwinecomponents.org/")
