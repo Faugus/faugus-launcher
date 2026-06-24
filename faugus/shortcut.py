@@ -232,18 +232,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         self.load_config()
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
 
         if os.path.exists(lsfgvk_path):
             if lossless_dll or os.path.exists(self.lossless_location):

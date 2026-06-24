@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
 
 def apply_dark_theme():
@@ -213,6 +213,21 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     else:
         tooltip.set_text(widget.get_tooltip_text())
     return True
+
+def disable_mangohud_gamemode_if_missing(obj):
+    obj.mangohud_enabled = os.path.exists(mangohud_dir)
+    if not obj.mangohud_enabled:
+        obj.checkbox_mangohud.set_sensitive(False)
+        obj.checkbox_mangohud.set_active(False)
+        obj.checkbox_mangohud.set_tooltip_text(
+            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
+
+    obj.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
+    if not obj.gamemode_enabled:
+        obj.checkbox_gamemode.set_sensitive(False)
+        obj.checkbox_gamemode.set_active(False)
+        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
 
 def load_red_entry_css():
     css_provider = Gtk.CssProvider()

@@ -4033,18 +4033,7 @@ class Settings(Gtk.Dialog):
         self.show_all()
         self.on_combobox_interface_changed(self.combobox_interface)
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
         self.track_modifications(self.box)
 
     def on_envar_key_press(self, widget, event):
@@ -5305,18 +5294,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
         self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
 
         self.updated_steam_id = detect_steam_id()
         if not self.updated_steam_id:
