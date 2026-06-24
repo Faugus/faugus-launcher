@@ -7,6 +7,8 @@ import tarfile
 import shutil
 import threading
 
+from faugus.proton_downloader import select_asset
+
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk, GLib
@@ -256,12 +258,7 @@ class ProtonDownloader(Gtk.Dialog):
     def on_download_clicked(self, widget, release, variant):
         self.disable_all_buttons()
 
-        selected_asset = None
-        for asset in release["assets"]:
-            name = asset["name"]
-            if any(name.endswith(ext) for ext in variant["archive_ext"]):
-                selected_asset = asset
-                break
+        selected_asset = select_asset(release["assets"], variant["archive_ext"])
 
         if selected_asset:
             self.download_and_extract(
