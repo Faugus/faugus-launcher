@@ -86,6 +86,27 @@ class PathManager:
 
         return PathManager.user_home('Desktop')
 
+lsfgvk_flatpak_paths = [
+    Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"),
+    Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+    Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
+    Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+]
+lsfgvk_native_paths = [
+    Path("/usr/lib/liblsfg-vk.so"),
+    Path("/usr/lib64/liblsfg-vk.so"),
+    Path("/usr/local/lib/liblsfg-vk.so"),
+    Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
+    Path("/usr/lib/liblsfg-vk-layer.so"),
+    Path("/usr/lib64/liblsfg-vk-layer.so"),
+    Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
+]
+
+_lsfgvk_candidates = lsfgvk_flatpak_paths if IS_FLATPAK else lsfgvk_native_paths
+lsfgvk_path = next((p for p in _lsfgvk_candidates if p.exists()), _lsfgvk_candidates[-1])
+
+faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_FLATPAK else PathManager.get_icon('faugus-launcher.svg')
+
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = PathManager.user_home('Faugus')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')

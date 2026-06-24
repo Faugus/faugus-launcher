@@ -20,10 +20,8 @@ from faugus.ea_fix import *
 from faugus.steam_setup import IS_STEAM_FLATPAK
 
 if IS_FLATPAK:
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:
-    faugus_png = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
 eac_dir = PathManager.user_config("faugus-launcher/components/eac")

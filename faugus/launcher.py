@@ -28,7 +28,6 @@ backup_dir = PathManager.user_config("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 
 if IS_FLATPAK:
-    faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg')
     tray_icon = 'io.github.Faugus.faugus-launcher'
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
     mono_dest = Path(PathManager.user_data('faugus-launcher/faugus-mono.svg'))
@@ -36,27 +35,9 @@ if IS_FLATPAK:
     if not mono_dest.exists():
         shutil.copy(faugus_mono_icon, mono_dest)
     faugus_mono_icon = PathManager.user_data('faugus-launcher/faugus-mono.svg')
-    lsfgvk_possible_paths = [
-        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
-    ]
-    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 else:
-    faugus_png = PathManager.get_icon('faugus-launcher.svg')
     tray_icon = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
-    lsfgvk_possible_paths = [
-        Path("/usr/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib64/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path("/usr/local/lib/liblsfg-vk.so"), # Deprecated in LSFG-VK v2.0
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')), # Deprecated in LSFG-VK v2.0
-        Path("/usr/lib/liblsfg-vk-layer.so"),
-        Path("/usr/lib64/liblsfg-vk-layer.so"),
-        Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so'))
-    ]
-    lsfgvk_path = next((p for p in lsfgvk_possible_paths if p.exists()), lsfgvk_possible_paths[-1])
 
 latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
 categories_file = PathManager.user_config('faugus-launcher/categories.txt')
