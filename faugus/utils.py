@@ -228,14 +228,12 @@ def disable_mangohud_gamemode_if_missing(obj):
         obj.checkbox_gamemode.set_active(False)
         obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
 
-
 def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
     obj.checkbox_mangohud.set_tooltip_text(
         _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
     obj.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
     obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
-
 
 def choose_shortcut_icon(obj):
     filechooser = Gtk.FileChooserNative.new(
@@ -266,7 +264,6 @@ def choose_shortcut_icon(obj):
     if os.path.isdir(obj.icon_directory):
         shutil.rmtree(obj.icon_directory)
 
-
 def load_red_entry_css():
     css_provider = Gtk.CssProvider()
     css = """
@@ -277,7 +274,6 @@ def load_red_entry_css():
     css_provider.load_from_data(css.encode('utf-8'))
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
 
 def extract_ico_simple(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
@@ -310,7 +306,6 @@ def extract_ico_simple(exe_path, output_path):
         return "error"
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
-
 
 def extract_ico_frames(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
