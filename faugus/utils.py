@@ -237,6 +237,36 @@ def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
 
 
+def choose_shortcut_icon(obj):
+    filechooser = Gtk.FileChooserNative.new(
+        _("Select an icon for the shortcut"),
+        obj,
+        Gtk.FileChooserAction.OPEN,
+        _("Open"),
+        _("Cancel")
+    )
+
+    add_image_file_filters(filechooser)
+
+    filechooser.set_current_folder(obj.icon_directory)
+
+    response = filechooser.run()
+    if response == Gtk.ResponseType.ACCEPT:
+        file_path = filechooser.get_filename()
+        if not file_path or not is_valid_image(file_path):
+            show_invalid_image_dialog()
+        else:
+            shutil.copyfile(file_path, obj.icon_temp)
+            surface = obj.new_surface_from_image(obj.icon_temp, 50, 50)
+            image = Gtk.Image.new_from_surface(surface)
+            obj.button_shortcut_icon.set_image(image)
+
+    filechooser.destroy()
+
+    if os.path.isdir(obj.icon_directory):
+        shutil.rmtree(obj.icon_directory)
+
+
 def load_red_entry_css():
     css_provider = Gtk.CssProvider()
     css = """

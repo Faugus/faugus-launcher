@@ -5710,33 +5710,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if status == "no_icons":
                 self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
-        filechooser = Gtk.FileChooserNative.new(
-            _("Select an icon for the shortcut"),
-            self,
-            Gtk.FileChooserAction.OPEN,
-            _("Open"),
-            _("Cancel")
-        )
-
-        add_image_file_filters(filechooser)
-
-        filechooser.set_current_folder(self.icon_directory)
-
-        response = filechooser.run()
-        if response == Gtk.ResponseType.ACCEPT:
-            file_path = filechooser.get_filename()
-            if not file_path or not is_valid_image(file_path):
-                show_invalid_image_dialog()
-            else:
-                shutil.copyfile(file_path, self.icon_temp)
-                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                image = Gtk.Image.new_from_surface(surface)
-                self.button_shortcut_icon.set_image(image)
-
-        filechooser.destroy()
-
-        if os.path.isdir(self.icon_directory):
-            shutil.rmtree(self.icon_directory)
+        choose_shortcut_icon(self)
 
     def check_existing_shortcut(self):
         # Check if the shortcut already exists and mark or unmark the checkbox
