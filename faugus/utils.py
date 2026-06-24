@@ -428,6 +428,19 @@ def prepare_game_kwargs(data):
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
 
+def init_addon_defaults(obj):
+    obj.addapp_enabled = False
+    obj.addapp = ""
+    obj.addapp_delay = ""
+    obj.addapp_first = False
+    obj.launch_arguments = ""
+    obj.lossless_enabled = False
+    obj.lossless_multiplier = 1
+    obj.lossless_flow = 100
+    obj.lossless_performance = False
+    obj.lossless_hdr = False
+    obj.lossless_present = False
+
 def show_launch_arguments_dialog(parent, presets_file, current_launch_arguments):
     dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)
     dialog.set_resizable(False)

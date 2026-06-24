@@ -43,19 +43,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
-        self.addapp_enabled = False
-        self.addapp = ""
-        self.addapp_delay = ""
-        self.addapp_first = False
-
-        self.launch_arguments = ""
-
-        self.lossless_enabled = False
-        self.lossless_multiplier = 1
-        self.lossless_flow = 100
-        self.lossless_performance = False
-        self.lossless_hdr = False
-        self.lossless_present = False
+        init_addon_defaults(self)
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)

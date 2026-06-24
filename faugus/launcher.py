@@ -4817,19 +4817,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.interface_mode = interface_mode
         self.updated_steam_id = None
 
-        self.addapp_enabled = False
-        self.addapp = ""
-        self.addapp_delay = ""
-        self.addapp_first = False
-
-        self.launch_arguments = ""
-
-        self.lossless_enabled = False
-        self.lossless_multiplier = 1
-        self.lossless_flow = 100
-        self.lossless_performance = False
-        self.lossless_hdr = False
-        self.lossless_present = False
+        init_addon_defaults(self)
 
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
