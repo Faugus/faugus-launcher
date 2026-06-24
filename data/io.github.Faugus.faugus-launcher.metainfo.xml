@@ -88,14 +88,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.4-1" date="2026-06-13">
+    <release version="1.22.5-1" date="2026-06-24">
       <description>
         <ul>
-          <li>Fixed launchers not being installed due to recent changes.</li>
-          <li>More code refactoring/cleanup.</li>
-          <li>Now removes the game from the custom order file when deleting it.</li>
-          <li>Updated Italian translation.</li>
-          <li>Added a new UI for Launch Arguments.</li>
+          <li>Fixed incorrect architecture build of GE-Proton-11 being downloaded.</li>
+          <li>Improved playtime count accuracy.</li>
+          <li>Fixed Linux game not downloading umu in a fresh installation.</li>
+          <li>Fixed Show Logs option not available due to recent changes.</li>
+          <li>More code refactoring and cleanup.</li>
+          <li>Fixed game icon not showing on Slash Window when discrete GPU option is enabled.</li>
+          <li>Updated Chinese Simplified translation.</li>
         </ul>
       </description>
     </release>
