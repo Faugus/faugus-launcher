@@ -2245,29 +2245,28 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             GLib.timeout_add(1000, self.load_tray_icon)
 
-            if validation_result:
-                combobox_language = settings_dialog.combobox_language.get_active_text()
+            combobox_language = settings_dialog.combobox_language.get_active_text()
 
-                if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                settings_dialog.update_envar_file()
+            settings_dialog.update_envar_file()
 
-                if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
-                    self.load_config()
-                    self.update_list()
+            if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
+                self.load_config()
+                self.update_list()
 
             self.load_config()
             settings_dialog.destroy()
