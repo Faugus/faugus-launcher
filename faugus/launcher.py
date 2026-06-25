@@ -2439,9 +2439,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_button_kill_clicked(self, widget):
         if not IS_FLATPAK:
-            if not isinstance(self.running, dict):
-                self.running = {}
-
             for gameid, pid in list(self.running.items()):
                 try:
                     os.kill(pid, signal.SIGUSR1)
