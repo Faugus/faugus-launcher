@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
 
 def apply_dark_theme():
@@ -214,6 +214,67 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
         tooltip.set_text(widget.get_tooltip_text())
     return True
 
+def disable_mangohud_gamemode_if_missing(obj):
+    obj.mangohud_enabled = os.path.exists(mangohud_dir)
+    if not obj.mangohud_enabled:
+        obj.checkbox_mangohud.set_sensitive(False)
+        obj.checkbox_mangohud.set_active(False)
+        obj.checkbox_mangohud.set_tooltip_text(
+            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
+
+    obj.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
+    if not obj.gamemode_enabled:
+        obj.checkbox_gamemode.set_sensitive(False)
+        obj.checkbox_gamemode.set_active(False)
+        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+
+def create_mangohud_gamemode_checkboxes(obj):
+    obj.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
+    obj.checkbox_mangohud.set_tooltip_text(
+        _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
+    obj.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
+    obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+
+def choose_shortcut_icon(obj):
+    filechooser = Gtk.FileChooserNative.new(
+        _("Select an icon for the shortcut"),
+        obj,
+        Gtk.FileChooserAction.OPEN,
+        _("Open"),
+        _("Cancel")
+    )
+
+    add_image_file_filters(filechooser)
+
+    filechooser.set_current_folder(obj.icon_directory)
+
+    response = filechooser.run()
+    if response == Gtk.ResponseType.ACCEPT:
+        file_path = filechooser.get_filename()
+        if not file_path or not is_valid_image(file_path):
+            show_invalid_image_dialog()
+        else:
+            shutil.copyfile(file_path, obj.icon_temp)
+            surface = obj.new_surface_from_image(obj.icon_temp, 50, 50)
+            image = Gtk.Image.new_from_surface(surface)
+            obj.button_shortcut_icon.set_image(image)
+
+    filechooser.destroy()
+
+    if os.path.isdir(obj.icon_directory):
+        shutil.rmtree(obj.icon_directory)
+
+def load_red_entry_css():
+    css_provider = Gtk.CssProvider()
+    css = """
+    .entry {
+        border-color: Red;
+    }
+    """
+    css_provider.load_from_data(css.encode('utf-8'))
+    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
+                                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
 def extract_ico_simple(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:
@@ -245,7 +306,6 @@ def extract_ico_simple(exe_path, output_path):
         return "error"
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
-
 
 def extract_ico_frames(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
@@ -309,6 +369,17 @@ def extract_ico_frames(exe_path, output_path):
         return "error"
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+def make_donate_buttons():
+    button_kofi = Gtk.Button(label="Ko-fi")
+    button_kofi.connect("clicked", on_button_kofi_clicked)
+    button_kofi.get_style_context().add_class("kofi")
+
+    button_paypal = Gtk.Button(label="PayPal")
+    button_paypal.connect("clicked", on_button_paypal_clicked)
+    button_paypal.get_style_context().add_class("paypal")
+
+    return button_kofi, button_paypal
 
 def on_button_search_protonfix_clicked(widget):
     import webbrowser
@@ -427,6 +498,19 @@ def prepare_game_kwargs(data):
     defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
+
+def init_addon_defaults(obj):
+    obj.addapp_enabled = False
+    obj.addapp = ""
+    obj.addapp_delay = ""
+    obj.addapp_first = False
+    obj.launch_arguments = ""
+    obj.lossless_enabled = False
+    obj.lossless_multiplier = 1
+    obj.lossless_flow = 100
+    obj.lossless_performance = False
+    obj.lossless_hdr = False
+    obj.lossless_present = False
 
 def show_launch_arguments_dialog(parent, presets_file, current_launch_arguments):
     dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)

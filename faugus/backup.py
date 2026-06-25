@@ -6,9 +6,9 @@ import calendar
 from datetime import datetime, timedelta
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed
+from faugus.utils import on_entry_changed, load_red_entry_css
 
 def load_config(faugus_dir):
     config = {}
@@ -159,15 +159,7 @@ class BackupWindow(Gtk.Dialog):
         self.faugus_dir = faugus_dir
         self.config = load_config(self.faugus_dir)
 
-        css_provider = Gtk.CssProvider()
-        css = """
-        .entry {
-            border-color: Red;
-        }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        load_red_entry_css()
 
         self.root_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.get_content_area().pack_start(self.root_box, True, True, 0)

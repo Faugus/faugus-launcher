@@ -43,19 +43,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
-        self.addapp_enabled = False
-        self.addapp = ""
-        self.addapp_delay = ""
-        self.addapp_first = False
-
-        self.launch_arguments = ""
-
-        self.lossless_enabled = False
-        self.lossless_multiplier = 1
-        self.lossless_flow = 100
-        self.lossless_performance = False
-        self.lossless_hdr = False
-        self.lossless_present = False
+        init_addon_defaults(self)
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
@@ -95,11 +83,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_disable_hidraw.set_tooltip_text(
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
@@ -115,15 +99,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_ok.connect("clicked", self.on_ok_clicked)
         self.button_ok.set_size_request(150, -1)
 
-        css_provider = Gtk.CssProvider()
-        css = """
-        .entry {
-            border-color: Red;
-        }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        load_red_entry_css()
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.box.set_margin_start(0)
@@ -252,18 +228,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         self.load_config()
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
 
         if os.path.exists(lsfgvk_path):
             if lossless_dll or os.path.exists(self.lossless_location):
@@ -481,33 +446,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             if status == "no_icons":
                 self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
-        filechooser = Gtk.FileChooserNative.new(
-            _("Select an icon for the shortcut"),
-            self,
-            Gtk.FileChooserAction.OPEN,
-            _("Open"),
-            _("Cancel")
-        )
-
-        add_image_file_filters(filechooser)
-
-        filechooser.set_current_folder(self.icon_directory)
-
-        response = filechooser.run()
-        if response == Gtk.ResponseType.ACCEPT:
-            file_path = filechooser.get_filename()
-            if not file_path or not is_valid_image(file_path):
-                show_invalid_image_dialog()
-            else:
-                shutil.copyfile(file_path, self.icon_temp)
-                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                image = Gtk.Image.new_from_surface(surface)
-                self.button_shortcut_icon.set_image(image)
-
-        filechooser.destroy()
-
-        if os.path.isdir(self.icon_directory):
-            shutil.rmtree(self.icon_directory)
+        choose_shortcut_icon(self)
         self.set_sensitive(True)
 
     def validate_fields(self):

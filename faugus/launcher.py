@@ -3726,11 +3726,7 @@ class Settings(Gtk.Dialog):
         self.button_run_default.connect("clicked", self.on_button_run_default_clicked)
         self.button_run_default.set_tooltip_text(_("Run a file inside the prefix"))
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
@@ -3740,13 +3736,7 @@ class Settings(Gtk.Dialog):
         self.label_support.set_margin_end(10)
         self.label_support.set_margin_top(10)
 
-        button_kofi = Gtk.Button(label="Ko-fi")
-        button_kofi.connect("clicked", on_button_kofi_clicked)
-        button_kofi.get_style_context().add_class("kofi")
-
-        button_paypal = Gtk.Button(label="PayPal")
-        button_paypal.connect("clicked", on_button_paypal_clicked)
-        button_paypal.get_style_context().add_class("paypal")
+        button_kofi, button_paypal = make_donate_buttons()
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -4039,18 +4029,7 @@ class Settings(Gtk.Dialog):
         self.show_all()
         self.on_combobox_interface_changed(self.combobox_interface)
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
         self.track_modifications(self.box)
 
     def on_envar_key_press(self, widget, event):
@@ -4817,19 +4796,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.interface_mode = interface_mode
         self.updated_steam_id = None
 
-        self.addapp_enabled = False
-        self.addapp = ""
-        self.addapp_delay = ""
-        self.addapp_first = False
-
-        self.launch_arguments = ""
-
-        self.lossless_enabled = False
-        self.lossless_multiplier = 1
-        self.lossless_flow = 100
-        self.lossless_performance = False
-        self.lossless_hdr = False
-        self.lossless_present = False
+        init_addon_defaults(self)
 
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
@@ -5071,11 +5038,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
-        self.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
-        self.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
-        self.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-        self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+        create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
@@ -5323,18 +5286,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
         self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
 
-        self.mangohud_enabled = os.path.exists(mangohud_dir)
-        if not self.mangohud_enabled:
-            self.checkbox_mangohud.set_sensitive(False)
-            self.checkbox_mangohud.set_active(False)
-            self.checkbox_mangohud.set_tooltip_text(
-                _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
-
-        self.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
-        if not self.gamemode_enabled:
-            self.checkbox_gamemode.set_sensitive(False)
-            self.checkbox_gamemode.set_active(False)
-            self.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        disable_mangohud_gamemode_if_missing(self)
 
         self.updated_steam_id = detect_steam_id()
         if not self.updated_steam_id:
@@ -5758,33 +5710,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if status == "no_icons":
                 self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
-        filechooser = Gtk.FileChooserNative.new(
-            _("Select an icon for the shortcut"),
-            self,
-            Gtk.FileChooserAction.OPEN,
-            _("Open"),
-            _("Cancel")
-        )
-
-        add_image_file_filters(filechooser)
-
-        filechooser.set_current_folder(self.icon_directory)
-
-        response = filechooser.run()
-        if response == Gtk.ResponseType.ACCEPT:
-            file_path = filechooser.get_filename()
-            if not file_path or not is_valid_image(file_path):
-                show_invalid_image_dialog()
-            else:
-                shutil.copyfile(file_path, self.icon_temp)
-                surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-                image = Gtk.Image.new_from_surface(surface)
-                self.button_shortcut_icon.set_image(image)
-
-        filechooser.destroy()
-
-        if os.path.isdir(self.icon_directory):
-            shutil.rmtree(self.icon_directory)
+        choose_shortcut_icon(self)
 
     def check_existing_shortcut(self):
         # Check if the shortcut already exists and mark or unmark the checkbox
