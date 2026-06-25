@@ -85,7 +85,6 @@ class FaugusApp(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
-        os.environ["GTK_USE_PORTAL"] = "1"
         apply_dark_theme()
 
     def do_activate(self):

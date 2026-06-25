@@ -460,7 +460,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         return True
 
 def main():
-    os.environ["GTK_USE_PORTAL"] = "1"
     apply_dark_theme()
     exec_path = sys.argv[1]
 
@@ -468,7 +467,6 @@ def main():
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
     Gtk.main()
-
 
 if __name__ == "__main__":
     main()
