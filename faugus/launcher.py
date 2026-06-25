@@ -2457,23 +2457,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 """, shell=True)
 
     def on_button_add_clicked(self, widget):
-        file_path = ""
         # Handle add button click event
-        add_game_dialog = AddGame(self, file_path, self.interface_mode)
+        add_game_dialog = AddGame(self, self.interface_mode)
         add_game_dialog.combobox_steam_title.connect("changed", add_game_dialog.on_combobox_steam_changed)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
 
     def on_button_edit_clicked(self, widget):
-        file_path = ""
-
         game = self.selected()
         gameid = game.gameid
         title = game.title
 
         if game:
-            edit_game_dialog = AddGame(self, file_path, self.interface_mode)
+            edit_game_dialog = AddGame(self, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model_steam_title = edit_game_dialog.combobox_steam_title.get_model()
@@ -4780,7 +4777,7 @@ class DeleteDialog(Gtk.Dialog):
         self.show_all()
 
 class AddGame(Gtk.Dialog, HiDpiMixin):
-    def __init__(self, parent, file_path, interface_mode):
+    def __init__(self, parent, interface_mode):
         super().__init__(title=_("New Game/App"), parent=parent)
         self.set_modal(True)
         self.set_resizable(False)
@@ -4974,8 +4971,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
         self.entry_path.connect("changed", on_entry_changed, self.entry_path)
-        if file_path:
-            self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
         self.entry_path.set_has_tooltip(True)
         self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
