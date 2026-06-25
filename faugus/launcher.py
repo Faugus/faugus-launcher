@@ -605,8 +605,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.button_sort.connect("clicked", on_sort_button_clicked)
 
-        initial_zoom = self.banner_size
-        adjustment = Gtk.Adjustment(value=initial_zoom, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
+        adjustment = Gtk.Adjustment(value=self.banner_size, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
         self.zoom_slider = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
         self.zoom_slider.set_size_request(150, -1)
         self.zoom_slider.set_draw_value(True)
@@ -949,9 +948,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.select_first_child()
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
-
-        if is_big and self.window_behavior == "Fullscreen":
-            self.fullscreen_activated = True
 
     def on_category_button_clicked(self, button):
         popover = Gtk.Popover.new(button)
@@ -2345,7 +2341,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     return False
                 GLib.timeout_add(150, remove_anim)
 
-        button = widget or self.button_play
         gameid = game.gameid
         title = game.title
         game_directory = os.path.dirname(game.path)
