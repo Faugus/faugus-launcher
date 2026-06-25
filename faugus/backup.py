@@ -61,7 +61,7 @@ def perform_backup(faugus_dir, dest_path):
     shutil.move(zip_path + ".zip", dest_path)
     return current_date
 
-def setup_autostart(enable, script_path, faugus_dir):
+def setup_autostart(enable, faugus_dir):
     autostart_dir = os.path.expanduser("~/.config/autostart")
     desktop_file = os.path.join(autostart_dir, "faugus-backup.desktop")
 
@@ -378,8 +378,7 @@ class BackupWindow(Gtk.Dialog):
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
         save_config(self.faugus_dir, self.config)
 
-        script_path = os.path.abspath(__file__)
-        setup_autostart(self.check_auto.get_active(), script_path, self.faugus_dir)
+        setup_autostart(self.check_auto.get_active(), self.faugus_dir)
 
         if self.check_auto.get_active() and should_run_backup(self.config):
             try:

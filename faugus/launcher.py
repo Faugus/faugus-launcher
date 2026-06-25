@@ -1488,7 +1488,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_context_menu_duplicate(self, menu_item):
         game = self.selected()
         if game:
-            self.on_duplicate_clicked(game)
+            self.on_duplicate_clicked()
 
     def on_context_menu_hide(self, menu_item):
         game = self.selected()
@@ -1614,9 +1614,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_context_show_logs(self, menu_item):
         game = self.selected()
         if game:
-            self.on_show_logs_clicked(game)
+            self.on_show_logs_clicked()
 
-    def on_show_logs_clicked(self, widget):
+    def on_show_logs_clicked(self):
         dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self)
         dialog.set_modal(True)
         dialog.set_default_size(1280, 720)
@@ -1710,7 +1710,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.run()
         dialog.destroy()
 
-    def on_duplicate_clicked(self, widget):
+    def on_duplicate_clicked(self):
         game = self.selected()
         title = game.title
 
@@ -2469,7 +2469,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_button_add_clicked(self, widget):
         file_path = ""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.running, file_path, self.interface_mode)
+        add_game_dialog = AddGame(self, file_path, self.interface_mode)
         add_game_dialog.combobox_steam_title.connect("changed", add_game_dialog.on_combobox_steam_changed)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
@@ -2477,17 +2477,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_button_edit_clicked(self, widget):
         file_path = ""
-        game_running = False
 
         game = self.selected()
         gameid = game.gameid
         title = game.title
 
         if game:
-            if gameid in self.running:
-                game_running = True
-
-            edit_game_dialog = AddGame(self, game_running, file_path, self.interface_mode)
+            edit_game_dialog = AddGame(self, file_path, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model_steam_title = edit_game_dialog.combobox_steam_title.get_model()
@@ -2594,7 +2590,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
-            if game_running:
+            if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
@@ -4794,7 +4790,7 @@ class DeleteDialog(Gtk.Dialog):
         self.show_all()
 
 class AddGame(Gtk.Dialog, HiDpiMixin):
-    def __init__(self, parent, game_running2, file_path, interface_mode):
+    def __init__(self, parent, file_path, interface_mode):
         super().__init__(title=_("New Game/App"), parent=parent)
         self.set_modal(True)
         self.set_resizable(False)
