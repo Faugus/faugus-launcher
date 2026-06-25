@@ -97,6 +97,8 @@ class FaugusRun(HiDpiMixin):
         if self.enable_wow64:
             set_env("PROTON_USE_WOW64", "1")
 
+        set_env("UMU_USE_STEAM", "1")
+
         self.extract_env_from_message()
 
         if self.command == "winetricks":
@@ -205,8 +207,6 @@ class FaugusRun(HiDpiMixin):
 
         print("\n=== UMU-LAUNCHER COMMAND ===")
         print(f"{self.message}\n")
-
-        set_env("UMU_USE_STEAM", "1")
 
         self.lock_prefix()
         self.execute_final_command()
