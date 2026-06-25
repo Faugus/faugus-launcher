@@ -85,6 +85,14 @@ class FaugusApp(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+
+        app_icon_dir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "..", "share", "icons"
+        )
+        app_icon_dir = os.path.normpath(app_icon_dir)
+        if os.path.isdir(app_icon_dir):
+            Gtk.IconTheme.get_default().prepend_search_path(app_icon_dir)
+
         apply_dark_theme()
 
     def do_activate(self):
