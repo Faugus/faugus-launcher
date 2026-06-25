@@ -25,13 +25,19 @@ def apply_dark_theme():
             is_dark = False
         Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", is_dark)
     else:
-        desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+        is_dark_theme = False
         try:
-            is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+            desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+            try:
+                is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+            except Exception:
+                is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
         except Exception:
-            is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
+            pass
         if is_dark_theme:
-            Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", True)
+            settings = Gtk.Settings.get_default()
+            if settings:
+                settings.set_property("gtk-application-prefer-dark-theme", True)
 
 class HiDpiMixin:
     def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
@@ -97,7 +103,7 @@ def add_image_file_filters(filechooser, include_ico=True):
     if include_ico:
         image_filter.add_pattern("*.ico")
     filechooser.add_filter(image_filter)
-    
+
 _FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
 
 def play_notification_sound():
