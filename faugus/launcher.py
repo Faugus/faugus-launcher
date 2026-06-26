@@ -114,7 +114,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.fullscreen_activated = False
         self.system_tray = False
         self.indicator = False
-        self.start_boot = False
         self.mono_icon = False
 
         self.current_prefix = None
@@ -1942,16 +1941,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         cfg = ConfigManager()
 
         self.system_tray = cfg.config.get('system-tray', 'False') == 'True'
-        self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
-        self.disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
-        self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         self.show_categories = cfg.config.get('show-categories', 'False') == 'True'
