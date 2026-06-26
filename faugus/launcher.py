@@ -1570,10 +1570,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         response = filechooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            title = game.title
             prefix = game.prefix
             runner = game.runner
-            title_formatted = format_title(title)
+            title_formatted = format_title(game.title)
             file_run = filechooser.get_filename()
             game_directory = os.path.dirname(game.path)
             cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
