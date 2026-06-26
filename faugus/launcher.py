@@ -119,7 +119,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.current_prefix = None
         self.games = []
-        self.updated_steam_id = None
 
         self.last_click_time = 0
         self.last_clicked_item = None
@@ -2539,8 +2538,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
 
-            self.updated_steam_id = detect_steam_id()
-            if self.updated_steam_id is not None:
+            if detect_steam_id() is not None:
                 if self.check_steam_shortcut(title):
                     edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
@@ -4761,7 +4759,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.parent_window = parent
         self.interface_mode = interface_mode
-        self.updated_steam_id = None
 
         init_addon_defaults(self)
 
@@ -5253,8 +5250,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        self.updated_steam_id = detect_steam_id()
-        if not self.updated_steam_id:
+        if not detect_steam_id():
             self.checkbox_shortcut_steam.set_sensitive(False)
             self.checkbox_shortcut_steam.set_tooltip_text(
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
