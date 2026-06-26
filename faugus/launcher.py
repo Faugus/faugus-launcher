@@ -135,9 +135,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not isinstance(self.running, dict):
             self.running = {}
 
-        self.working_directory = faugus_launcher_dir
-        os.chdir(self.working_directory)
-
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
             .game {
@@ -1779,11 +1776,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_info = game_to_dict(game)
         game_info["gameid"] = title_formatted
 
-        games = load_json_file("games.json", [])
+        games = load_json_file(games_json, [])
 
         games.append(game_info)
 
-        save_json_file(games, "games.json")
+        save_json_file(games, games_json)
 
         self.games.append(game)
         self.add_item_list(game)
@@ -1997,7 +1994,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.context_menu.remove(self.menu_show_logs)
 
     def load_games(self):
-        games_data = load_json_file("games.json", [])
+        games_data = load_json_file(games_json, [])
 
         self.games.clear()
         for game_data in games_data:
@@ -2658,7 +2655,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.select_first_child()
 
     def reload_playtimes(self):
-        games_data = load_json_file("games.json", [])
+        games_data = load_json_file(games_json, [])
         if not games_data:
             return
 
@@ -2910,13 +2907,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             game_info = game_to_dict(game)
 
-            games = load_json_file("games.json", [])
+            games = load_json_file(games_json, [])
 
             games.append(game_info)
 
             self.backup_games()
 
-            save_json_file(games, "games.json")
+            save_json_file(games, games_json)
 
             self.games.append(game)
 
@@ -3420,7 +3417,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.show_all()
 
     def save_games(self):
-        all_games_data = load_json_file("games.json", [])
+        all_games_data = load_json_file(games_json, [])
 
         visible_games_map = {game.gameid: game for game in self.games}
         deleted_id = getattr(self, "_deleted_gameid", None)
@@ -3446,7 +3443,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.backup_games()
 
-        save_json_file(new_games_data, "games.json")
+        save_json_file(new_games_data, games_json)
 
     def backup_games(self):
         if os.path.isfile(games_json):
@@ -4656,7 +4653,6 @@ class Game:
         self.prevent_sleep = prevent_sleep
         self.category = category
         self.icon = icon
-
 
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
