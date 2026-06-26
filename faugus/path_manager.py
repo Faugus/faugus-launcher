@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import shutil
 from pathlib import Path
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
@@ -16,7 +17,7 @@ class PathManager:
 
     @staticmethod
     def system_data(*relative_paths):
-        xdg_data_dirs = os.getenv('XDG_DATA_DIRS', '/usr/local/share:/usr/share').split(':')
+        xdg_data_dirs = (os.getenv('XDG_DATA_DIRS') or '/usr/local/share:/usr/share').split(':')
         for data_dir in xdg_data_dirs:
             path = Path(data_dir).joinpath(*relative_paths)
             if path.exists():
@@ -25,13 +26,18 @@ class PathManager:
 
     @staticmethod
     def user_data(*relative_paths):
-        xdg_data_home = Path(os.getenv('XDG_DATA_HOME', Path.home() / '.local/share'))
+        xdg_data_home = Path(os.getenv('XDG_DATA_HOME') or os.path.join(Path.home(), '.local', 'share'))
         return str(xdg_data_home.joinpath(*relative_paths))
 
     @staticmethod
     def user_config(*relative_paths):
-        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / '.config'))
+        xdg_config_home = Path(os.getenv('XDG_CONFIG_HOME') or os.path.join(Path.home(), '.config'))
         return str(xdg_config_home.joinpath(*relative_paths))
+
+    @staticmethod
+    def user_state(*relative_paths):
+        xdg_state_home = Path(os.getenv('XDG_STATE_HOME') or os.path.join(Path.home(), '.local', 'state'))
+        return str(xdg_state_home.joinpath(*relative_paths))
 
     @staticmethod
     def find_binary(binary_name):
@@ -110,9 +116,9 @@ faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_
 faugus_launcher_dir = PathManager.user_config('faugus-launcher')
 prefixes_dir = PathManager.user_home('Faugus')
 config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
+logs_dir = PathManager.user_data('faugus-launcher/logs')
 envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_json = PathManager.user_config('faugus-launcher/games.json')
+games_json = PathManager.user_data('faugus-launcher/games.json')
 proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 umu_run = PathManager.user_data('faugus-launcher/umu-run')
 compatibility_dir = Path(PathManager.get_compatibilitytools())
@@ -121,3 +127,4 @@ gamemoderun = PathManager.find_binary('gamemoderun')
 launcher_path = PathManager.find_binary('faugus-launcher')
 app_dir = Path(PathManager.get_applications())
 desktop_dir = PathManager.user_desktop()
+components_dir = PathManager.user_data('faugus-launcher/components')

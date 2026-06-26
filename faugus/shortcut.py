@@ -17,8 +17,8 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
-presets_file = PathManager.user_config('faugus-launcher/presets.json')
+icons_dir = PathManager.user_data('faugus-launcher/icons-nolauncher')
+presets_file = PathManager.user_data('faugus-launcher/presets.json')
 
 _ = setup_gettext('faugus-launcher')
 

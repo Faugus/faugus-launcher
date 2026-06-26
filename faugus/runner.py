@@ -18,14 +18,15 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.ea_fix import *
 from faugus.steam_setup import IS_STEAM_FLATPAK
+from faugus.path_manager import components_dir
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
 else:
     GLib.set_prgname("faugus-launcher")
 
-eac_dir = PathManager.user_config("faugus-launcher/components/eac")
-be_dir = PathManager.user_config("faugus-launcher/components/be")
+eac_dir = os.path.join(components_dir, "eac")
+be_dir = os.path.join(components_dir, "be")
 os.makedirs(compatibility_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-run')

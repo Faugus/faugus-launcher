@@ -5,7 +5,7 @@ import requests
 import tarfile
 import shutil
 
-from faugus.path_manager import PathManager
+from faugus.path_manager import PathManager, components_dir
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
@@ -64,7 +64,7 @@ def update_umu():
 
 BE_URL = "https://github.com/Faugus/components/releases/download/{}/be.tar.gz"
 EAC_URL = "https://github.com/Faugus/components/releases/download/{}/eac.tar.gz"
-DOWNLOAD_DIR = PathManager.user_config('faugus-launcher/components')
+DOWNLOAD_DIR = components_dir
 REPO_URL = "https://api.github.com/repos/Faugus/components/releases/latest"
 VERSION_FILE = f"{DOWNLOAD_DIR}/version.txt"
 

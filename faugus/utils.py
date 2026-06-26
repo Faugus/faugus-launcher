@@ -406,7 +406,7 @@ def update_games_json():
 
     changed = False
 
-    icons_dir = PathManager.user_config('faugus-launcher/icons')
+    icons_dir = PathManager.user_data('faugus-launcher/icons')
 
     for game in games:
         if game.get("runner") == "Proton-CachyOS":

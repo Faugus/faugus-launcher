@@ -18,13 +18,14 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
+from faugus.xdg_migration import migrate_legacy_xdg_layout
 
 VERSION = "1.22.6"
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-icons_dir = PathManager.user_config('faugus-launcher/icons')
-banners_dir = PathManager.user_config('faugus-launcher/banners')
-backup_dir = PathManager.user_config("faugus-launcher/games-backup")
+icons_dir = PathManager.user_data('faugus-launcher/icons')
+banners_dir = PathManager.user_data('faugus-launcher/banners')
+backup_dir = PathManager.user_data("faugus-launcher/games-backup")
 faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
 
 if IS_FLATPAK:
@@ -39,13 +40,14 @@ else:
     tray_icon = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
-categories_file = PathManager.user_config('faugus-launcher/categories.txt')
-custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
-presets_file = PathManager.user_config('faugus-launcher/presets.json')
+latest_games = PathManager.user_state('faugus-launcher/latest-games.txt')
+categories_file = PathManager.user_data('faugus-launcher/categories.txt')
+custom_order = PathManager.user_data('faugus-launcher/custom-order.json')
+presets_file = PathManager.user_data('faugus-launcher/presets.json')
 faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
-faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
-running_games = PathManager.user_data('faugus-launcher/running_games.json')
+faugus_temp = PathManager.user_state('faugus-launcher/faugus_temp')
+faugus_launcher_state_dir = PathManager.user_state('faugus-launcher')
+running_games = PathManager.user_state('faugus-launcher/running_games.json')
 
 os.makedirs(compatibility_dir, exist_ok=True)
 
@@ -53,6 +55,7 @@ faugus_backup = False
 
 os.makedirs(faugus_launcher_share_dir, exist_ok=True)
 os.makedirs(faugus_launcher_dir, exist_ok=True)
+os.makedirs(faugus_launcher_state_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-launcher')
 
@@ -3079,7 +3082,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def extract_best_icon(self, exe_path, gameid):
-        icons_dir = PathManager.user_config('faugus-launcher/icons')
+        icons_dir = PathManager.user_data('faugus-launcher/icons')
         os.makedirs(icons_dir, exist_ok=True)
         final = os.path.join(icons_dir, f"{gameid}.ico")
         status = extract_ico_frames(exe_path, final)
@@ -4365,6 +4368,8 @@ class Settings(Gtk.Dialog):
         backup_win.show_all()
 
     def on_button_restore_clicked(self, widget):
+        from faugus.backup import restore_backup
+
         filechooser = Gtk.FileChooserNative(
             title=_("Select a backup file to restore"),
             action=Gtk.FileChooserAction.OPEN,
@@ -4387,34 +4392,18 @@ class Settings(Gtk.Dialog):
                 self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
                 return
 
-            temp_dir = os.path.join(faugus_launcher_dir, "temp-restore")
-            shutil.unpack_archive(zip_file, temp_dir, "zip")
-
-            marker_path = os.path.join(temp_dir, ".faugus_marker")
-            if not os.path.exists(marker_path):
-                shutil.rmtree(temp_dir)
-                filechooser.destroy()
-                self.show_warning_dialog_settings(self, _("This is not a valid Faugus Launcher backup file."), False)
-                return
-
             if self.show_warning_dialog_settings(self, _("Are you sure you want to overwrite the settings?"), True):
-                for item in os.listdir(temp_dir):
-                    if item == ".faugus_marker":
-                        continue
-                    src = os.path.join(temp_dir, item)
-                    dst = os.path.join(faugus_launcher_dir, item)
+                try:
+                    restore_backup(zip_file, faugus_launcher_dir)
+                except (ValueError, shutil.ReadError, OSError):
+                    filechooser.destroy()
+                    self.show_warning_dialog_settings(
+                        self,
+                        _("This is not a valid Faugus Launcher backup file."),
+                        False,
+                    )
+                    return
 
-                    if os.path.isdir(dst):
-                        shutil.rmtree(dst)
-                    elif os.path.isfile(dst):
-                        os.remove(dst)
-
-                    if os.path.isdir(src):
-                        shutil.copytree(src, dst)
-                    elif os.path.isfile(src):
-                        shutil.copy2(src, dst)
-
-                shutil.rmtree(temp_dir)
                 global faugus_backup
                 faugus_backup = True
                 self.response(Gtk.ResponseType.OK)
@@ -6019,5 +6008,6 @@ def prefixes_count(prefix):
     return sum(1 for x in games if x.get("prefix") == prefix) - 1
 
 if __name__ == "__main__":
+    migrate_legacy_xdg_layout()
     update_games_json()
     main()
