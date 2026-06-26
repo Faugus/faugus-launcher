@@ -3916,7 +3916,6 @@ class Settings(Gtk.Dialog):
 
         grid_lossless.attach(self.label_lossless, 0, 0, 1, 1)
         grid_lossless.attach(self.entry_lossless, 0, 1, 3, 1)
-        self.entry_default_prefix.set_hexpand(True)
         grid_lossless.attach(self.button_search_lossless, 3, 1, 1, 1)
 
         self.combobox_runner.set_hexpand(True)
