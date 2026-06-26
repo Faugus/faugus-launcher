@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import os
 import requests
 import gi
 import tarfile
 import shutil
 import threading
 
-from faugus.proton_downloader import select_asset
+from faugus.proton_downloader import select_asset, get_tar_mode
 
 gi.require_version("Gtk", "3.0")
 
@@ -61,6 +60,24 @@ VARIANTS = {
         "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
 }
+
+
+class _StreamProgress:
+    def __init__(self, raw, total_size, progress_callback):
+        self.raw = raw
+        self.total_size = total_size
+        self.progress_callback = progress_callback
+        self.bytes_read = 0
+
+    def read(self, size=-1):
+        chunk = self.raw.read(size)
+        self.bytes_read += len(chunk)
+        if self.total_size > 0:
+            self.progress_callback(self.bytes_read / self.total_size)
+        return chunk
+
+    def close(self):
+        self.raw.close()
 
 
 class ProtonDownloader(Gtk.Dialog):
@@ -286,46 +303,23 @@ class ProtonDownloader(Gtk.Dialog):
         def worker():
             try:
                 compatibility_dir.mkdir(parents=True, exist_ok=True)
-                tar_file_path = os.path.join(compatibility_dir, filename)
 
                 response = requests.get(url, stream=True, timeout=30)
                 response.raise_for_status()
                 total_size = int(response.headers.get("content-length", 0))
-                downloaded_size = 0
-                last_pct = -1
 
-                with open(tar_file_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=1024*64):
-                        if not chunk: break
-                        f.write(chunk)
-                        downloaded_size += len(chunk)
-                        if total_size > 0:
-                            pct = int(downloaded_size * 1200 / total_size)
-                            if pct != last_pct:
-                                last_pct = pct
-                                GLib.idle_add(self.progress_bar.set_fraction, downloaded_size / total_size)
-                                GLib.idle_add(self.progress_bar.set_text, f"{pct / 3:.1f}%")
+                last_pct = [-1]
+                def _progress(frac):
+                    pct = int(frac * 1000)
+                    if pct != last_pct[0]:
+                        last_pct[0] = pct
+                        GLib.idle_add(self.progress_bar.set_fraction, frac)
+                        GLib.idle_add(self.progress_bar.set_text, f"{pct / 10:.1f}%")
 
-                GLib.idle_add(self.progress_label.set_text, _("Extracting %s...") % tag_name)
-                GLib.idle_add(self.progress_bar.set_fraction, 0)
+                stream = _StreamProgress(response.raw, total_size, _progress)
 
-                mode = 'r:xz' if tar_file_path.endswith('.tar.xz') else 'r:gz'
-
-                with tarfile.open(tar_file_path, mode) as tar:
-                    members = tar.getmembers()
-                    total_members = len(members)
-                    last_pct = -1
-
-                    for i, member in enumerate(members):
-                        tar.extract(member, path=compatibility_dir, filter="fully_trusted")
-                        pct = int((i + 1) * 1200 / total_members)
-                        if pct != last_pct:
-                            last_pct = pct
-                            GLib.idle_add(self.progress_bar.set_fraction, (i + 1) / total_members)
-                            GLib.idle_add(self.progress_bar.set_text, f"{pct / 3:.1f}%")
-
-                if os.path.exists(tar_file_path):
-                    os.remove(tar_file_path)
+                with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
+                    tar.extractall(path=compatibility_dir, filter="fully_trusted")
 
                 GLib.idle_add(self.update_button, button, _("Remove"))
                 GLib.idle_add(self.progress_bar.set_visible, False)
