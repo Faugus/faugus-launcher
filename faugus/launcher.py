@@ -1718,11 +1718,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self._dup_game = game
         self._dup_dialog = DuplicateDialog(self, title)
-
-        self._dup_handler_id = self._dup_dialog.connect(
-            "response",
-            self._on_confirm_duplicate_response
-        )
+        self._dup_dialog.connect("response", self._on_confirm_duplicate_response)
 
     def _on_confirm_duplicate_response(self, dialog, response):
         game = self._dup_game
