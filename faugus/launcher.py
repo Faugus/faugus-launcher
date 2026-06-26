@@ -1900,23 +1900,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if event.keyval == Gdk.KEY_Delete:
             self.on_button_delete_clicked()
 
-        if event.keyval == Gdk.KEY_Tab:
-            current_focus = self.get_focus()
-
-            if current_focus in self.flowbox.get_children():
-                row = self.listbox_categories.get_selected_row()
-
-                if row:
-                    row.grab_focus()
-
-            else:
-                selected = self.flowbox.get_selected_children()
-
-                if selected:
-                    selected[0].grab_focus()
-
-            return True
-
         return False
 
     def running_dialog(self, title):
