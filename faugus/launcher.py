@@ -4768,7 +4768,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             os.makedirs(self.icon_directory)
 
         self.icons_path = icons_dir
-        self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
