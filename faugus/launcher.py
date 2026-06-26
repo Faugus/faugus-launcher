@@ -119,7 +119,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.current_prefix = None
         self.games = []
-        self.flowbox_child = None
         self.updated_steam_id = None
 
         self.last_click_time = 0
