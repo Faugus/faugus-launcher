@@ -389,7 +389,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             self.on_button_play_clicked(None, game)
 
-    def on_close(self, *args):
+    def save_interface_settings(self):
         config = ConfigManager()
 
         if self.window_behavior == "Remember":
@@ -414,6 +414,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             config.set_value("category", cat_id)
 
         config.save_config()
+
+    def on_close(self, *args):
+        self.save_interface_settings()
 
         if self.system_tray:
             self.hide()
@@ -2200,6 +2203,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     )
                     settings_dialog.logging_warning = True
 
+            self.save_interface_settings()
             settings_dialog.update_config_file()
             self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
 
