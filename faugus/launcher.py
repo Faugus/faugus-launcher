@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import re
 import shutil
 import subprocess
 import sys
@@ -115,13 +114,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.fullscreen_activated = False
         self.system_tray = False
         self.indicator = False
-        self.start_boot = False
         self.mono_icon = False
 
         self.current_prefix = None
         self.games = []
-        self.flowbox_child = None
-        self.updated_steam_id = None
 
         self.last_click_time = 0
         self.last_clicked_item = None
@@ -135,9 +131,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.running = load_json_file(running_games, {})
         if not isinstance(self.running, dict):
             self.running = {}
-
-        self.working_directory = faugus_launcher_dir
-        os.chdir(self.working_directory)
 
         self.provider = Gtk.CssProvider()
         self.provider.load_from_data(b"""
@@ -606,8 +599,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.button_sort.connect("clicked", on_sort_button_clicked)
 
-        initial_zoom = self.banner_size
-        adjustment = Gtk.Adjustment(value=initial_zoom, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
+        adjustment = Gtk.Adjustment(value=self.banner_size, lower=50, upper=100, step_increment=10, page_increment=10, page_size=0)
         self.zoom_slider = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
         self.zoom_slider.set_size_request(150, -1)
         self.zoom_slider.set_draw_value(True)
@@ -950,9 +942,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.select_first_child()
         self.connect("key-press-event", self.on_key_press_event)
         self.show_all()
-
-        if is_big and self.window_behavior == "Fullscreen":
-            self.fullscreen_activated = True
 
     def on_category_button_clicked(self, button):
         popover = Gtk.Popover.new(button)
@@ -1488,7 +1477,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_context_menu_duplicate(self, menu_item):
         game = self.selected()
         if game:
-            self.on_duplicate_clicked(game)
+            self.on_duplicate_clicked()
 
     def on_context_menu_hide(self, menu_item):
         game = self.selected()
@@ -1580,10 +1569,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         response = filechooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            title = game.title
             prefix = game.prefix
             runner = game.runner
-            title_formatted = format_title(title)
+            title_formatted = format_title(game.title)
             file_run = filechooser.get_filename()
             game_directory = os.path.dirname(game.path)
             cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
@@ -1614,9 +1602,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_context_show_logs(self, menu_item):
         game = self.selected()
         if game:
-            self.on_show_logs_clicked(game)
+            self.on_show_logs_clicked()
 
-    def on_show_logs_clicked(self, widget):
+    def on_show_logs_clicked(self):
         dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, parent=self)
         dialog.set_modal(True)
         dialog.set_default_size(1280, 720)
@@ -1710,7 +1698,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.run()
         dialog.destroy()
 
-    def on_duplicate_clicked(self, widget):
+    def on_duplicate_clicked(self):
         game = self.selected()
         title = game.title
 
@@ -1729,11 +1717,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self._dup_game = game
         self._dup_dialog = DuplicateDialog(self, title)
-
-        self._dup_handler_id = self._dup_dialog.connect(
-            "response",
-            self._on_confirm_duplicate_response
-        )
+        self._dup_dialog.connect("response", self._on_confirm_duplicate_response)
 
     def _on_confirm_duplicate_response(self, dialog, response):
         game = self._dup_game
@@ -1784,11 +1768,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_info = game_to_dict(game)
         game_info["gameid"] = title_formatted
 
-        games = load_json_file("games.json", [])
+        games = load_json_file(games_json, [])
 
         games.append(game_info)
 
-        save_json_file(games, "games.json")
+        save_json_file(games, games_json)
 
         self.games.append(game)
         self.add_item_list(game)
@@ -1909,23 +1893,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if event.keyval == Gdk.KEY_Delete:
             self.on_button_delete_clicked()
 
-        if event.keyval == Gdk.KEY_Tab:
-            current_focus = self.get_focus()
-
-            if current_focus in self.flowbox.get_children():
-                row = self.listbox_categories.get_selected_row()
-
-                if row:
-                    row.grab_focus()
-
-            else:
-                selected = self.flowbox.get_selected_children()
-
-                if selected:
-                    selected[0].grab_focus()
-
-            return True
-
         return False
 
     def running_dialog(self, title):
@@ -1974,16 +1941,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         cfg = ConfigManager()
 
         self.system_tray = cfg.config.get('system-tray', 'False') == 'True'
-        self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
-        self.disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
-        self.wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_wow64 = cfg.config.get('enable-wow64', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         self.show_categories = cfg.config.get('show-categories', 'False') == 'True'
@@ -2002,7 +1965,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.context_menu.remove(self.menu_show_logs)
 
     def load_games(self):
-        games_data = load_json_file("games.json", [])
+        games_data = load_json_file(games_json, [])
 
         self.games.clear()
         for game_data in games_data:
@@ -2246,29 +2209,28 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             GLib.timeout_add(1000, self.load_tray_icon)
 
-            if validation_result:
-                combobox_language = settings_dialog.combobox_language.get_active_text()
+            combobox_language = settings_dialog.combobox_language.get_active_text()
 
-                if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+            if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
+                os.execv(sys.executable, [sys.executable] + sys.argv)
 
-                settings_dialog.update_envar_file()
+            settings_dialog.update_envar_file()
 
-                if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
-                    self.load_config()
-                    self.update_list()
+            if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
+                self.load_config()
+                self.update_list()
 
             self.load_config()
             settings_dialog.destroy()
@@ -2347,7 +2309,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     return False
                 GLib.timeout_add(150, remove_anim)
 
-        button = widget or self.button_play
         gameid = game.gameid
         title = game.title
         game_directory = os.path.dirname(game.path)
@@ -2446,9 +2407,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_button_kill_clicked(self, widget):
         if not IS_FLATPAK:
-            if not isinstance(self.running, dict):
-                self.running = {}
-
             for gameid, pid in list(self.running.items()):
                 try:
                     os.kill(pid, signal.SIGUSR1)
@@ -2467,27 +2425,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 """, shell=True)
 
     def on_button_add_clicked(self, widget):
-        file_path = ""
         # Handle add button click event
-        add_game_dialog = AddGame(self, self.running, file_path, self.interface_mode)
+        add_game_dialog = AddGame(self, self.interface_mode)
         add_game_dialog.combobox_steam_title.connect("changed", add_game_dialog.on_combobox_steam_changed)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
 
     def on_button_edit_clicked(self, widget):
-        file_path = ""
-        game_running = False
-
         game = self.selected()
         gameid = game.gameid
         title = game.title
 
         if game:
-            if gameid in self.running:
-                game_running = True
-
-            edit_game_dialog = AddGame(self, game_running, file_path, self.interface_mode)
+            edit_game_dialog = AddGame(self, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
             model_steam_title = edit_game_dialog.combobox_steam_title.get_model()
@@ -2577,8 +2528,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
 
-            self.updated_steam_id = detect_steam_id()
-            if self.updated_steam_id is not None:
+            if detect_steam_id() is not None:
                 if self.check_steam_shortcut(title):
                     edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
@@ -2594,7 +2544,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
 
-            if game_running:
+            if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
@@ -2675,7 +2625,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.select_first_child()
 
     def reload_playtimes(self):
-        games_data = load_json_file("games.json", [])
+        games_data = load_json_file(games_json, [])
         if not games_data:
             return
 
@@ -2927,13 +2877,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             game_info = game_to_dict(game)
 
-            games = load_json_file("games.json", [])
+            games = load_json_file(games_json, [])
 
             games.append(game_info)
 
             self.backup_games()
 
-            save_json_file(games, "games.json")
+            save_json_file(games, games_json)
 
             self.games.append(game)
 
@@ -3437,7 +3387,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.show_all()
 
     def save_games(self):
-        all_games_data = load_json_file("games.json", [])
+        all_games_data = load_json_file(games_json, [])
 
         visible_games_map = {game.gameid: game for game in self.games}
         deleted_id = getattr(self, "_deleted_gameid", None)
@@ -3463,7 +3413,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.backup_games()
 
-        save_json_file(new_games_data, "games.json")
+        save_json_file(new_games_data, games_json)
 
     def backup_games(self):
         if os.path.isfile(games_json):
@@ -3936,7 +3886,6 @@ class Settings(Gtk.Dialog):
 
         grid_lossless.attach(self.label_lossless, 0, 0, 1, 1)
         grid_lossless.attach(self.entry_lossless, 0, 1, 3, 1)
-        self.entry_default_prefix.set_hexpand(True)
         grid_lossless.attach(self.button_search_lossless, 3, 1, 1, 1)
 
         self.combobox_runner.set_hexpand(True)
@@ -4674,7 +4623,6 @@ class Game:
         self.category = category
         self.icon = icon
 
-
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
         super().__init__(title=_("Duplicate %s") % title)
@@ -4794,14 +4742,13 @@ class DeleteDialog(Gtk.Dialog):
         self.show_all()
 
 class AddGame(Gtk.Dialog, HiDpiMixin):
-    def __init__(self, parent, game_running2, file_path, interface_mode):
+    def __init__(self, parent, interface_mode):
         super().__init__(title=_("New Game/App"), parent=parent)
         self.set_modal(True)
         self.set_resizable(False)
 
         self.parent_window = parent
         self.interface_mode = interface_mode
-        self.updated_steam_id = None
 
         init_addon_defaults(self)
 
@@ -4816,7 +4763,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             os.makedirs(self.icon_directory)
 
         self.icons_path = icons_dir
-        self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
@@ -4988,8 +4934,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
         self.entry_path.connect("changed", on_entry_changed, self.entry_path)
-        if file_path:
-            self.entry_path.set_text(file_path)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
         self.entry_path.set_has_tooltip(True)
         self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
@@ -5295,8 +5239,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        self.updated_steam_id = detect_steam_id()
-        if not self.updated_steam_id:
+        if not detect_steam_id():
             self.checkbox_shortcut_steam.set_sensitive(False)
             self.checkbox_shortcut_steam.set_tooltip_text(
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
