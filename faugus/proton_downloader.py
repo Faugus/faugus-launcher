@@ -60,18 +60,28 @@ def select_asset(assets, archive_exts):
     )
 
 
+def get_tar_mode(name):
+    if name.endswith(('.tar.gz', '.tgz')):
+        return 'r|gz'
+    if name.endswith(('.tar.xz', '.txz')):
+        return 'r|xz'
+    if name.endswith(('.tar.bz2', '.tbz2')):
+        return 'r|bz2'
+    return 'r|'
+
+
 def get_latest_tag_and_url(api, archive_ext):
     try:
         with urllib.request.urlopen(api, timeout=5) as r:
             data = json.loads(r.read())
     except Exception:
-        return None, None
+        return None, None, None
 
     asset = select_asset(data.get("assets", []), archive_ext)
     if not asset:
-        return None, None
+        return None, None, None
 
-    return data["tag_name"], asset["browser_download_url"]
+    return data["tag_name"], asset["browser_download_url"], asset["name"]
 
 def get_installed_version(proton_dir):
     version_file = proton_dir / "version"
@@ -118,23 +128,20 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
 '''
     )
 
-def install_proton_latest(proton_dir, url, label):
-    archive = STEAM_COMPAT_DIR / url.split("/")[-1]
+def install_proton_latest(proton_dir, url, asset_name, label):
     tmp = STEAM_COMPAT_DIR / "__proton_tmp__"
 
     try:
-        print(f"Downloading {label}...", flush=True)
-        urllib.request.urlretrieve(url, archive)
+        print(f"Downloading & extracting {label}...", flush=True)
+        tmp.mkdir(parents=True, exist_ok=True)
+        response = urllib.request.urlopen(url, timeout=30)
+
+        with tarfile.open(fileobj=response, mode=get_tar_mode(asset_name)) as tar:
+            tar.extractall(tmp, filter="data")
     except Exception:
+        if tmp.exists():
+            shutil.rmtree(tmp)
         return
-
-    print(f"Extracting {label}...", flush=True)
-    tmp.mkdir(exist_ok=True)
-
-    with tarfile.open(archive) as tar:
-        tar.extractall(tmp, filter="data")
-
-    archive.unlink()
 
     extracted = next(tmp.iterdir())
 
@@ -150,7 +157,7 @@ def ensure_latest(kind):
     proton_dir = STEAM_COMPAT_DIR / cfg["dir"]
     proton_dir.parent.mkdir(parents=True, exist_ok=True)
 
-    latest_tag, url = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
+    latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
     if not url:
         return
 
@@ -160,7 +167,7 @@ def ensure_latest(kind):
         print(f"{cfg['label']} is up to date.", flush=True)
         return
 
-    install_proton_latest(proton_dir, url, cfg["label"])
+    install_proton_latest(proton_dir, url, asset_name, cfg["label"])
     rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
 def main():
@@ -172,14 +179,9 @@ def main():
     group.add_argument("--dw", action="store_true")
     args = parser.parse_args()
 
-    if args.ge:
-        ensure_latest("ge")
-    if args.em:
-        ensure_latest("em")
-    if args.cachyos:
-        ensure_latest("cachyos")
-    if args.dw:
-        ensure_latest("dw")
+    for key in vars(args):
+        if getattr(args, key):
+            ensure_latest(key)
 
 if __name__ == "__main__":
     main()
