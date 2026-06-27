@@ -511,8 +511,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         }
 
         self.current_sort_id = getattr(self, "sort", "alpha")
-        if not getattr(self, 'show_categories', True):
-            self.current_sort_id = "alpha"
 
         if self.current_sort_id not in self.sort_map:
             self.current_sort_id = "alpha"
@@ -806,7 +804,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             g1 = getattr(child1, 'game', None) or getattr(child1.get_child(), 'game', None)
             g2 = getattr(child2, 'game', None) or getattr(child2.get_child(), 'game', None)
 
-            if getattr(self, 'show_categories', True) and g1 and g2:
+            if g1 and g2:
                 if self.current_sort_id == "playtime":
                     pt1 = self.playtime_data.get(g1.gameid, 0)
                     pt2 = self.playtime_data.get(g2.gameid, 0)
