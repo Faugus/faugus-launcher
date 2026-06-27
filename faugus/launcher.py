@@ -1703,18 +1703,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game = self.selected()
         title = game.title
 
-        css_provider = Gtk.CssProvider()
-        css = """
-        .entry {
-            border-color: red;
-        }
-        """
-        css_provider.load_from_data(css.encode("utf-8"))
-        Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(),
-            css_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_USER
-        )
+        load_red_entry_css()
 
         self._dup_game = game
         self._dup_dialog = DuplicateDialog(self, title)
