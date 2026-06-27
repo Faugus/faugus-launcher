@@ -2183,10 +2183,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def get_game_artwork(self, path, game, width=None, height=None):
         scale = self.get_scale_factor()
-        if width and height:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), False)
-        else:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+        w = int(width * scale) if width else None
+        h = int(height * scale) if height else None
+
+        pixbuf = safe_load_pixbuf(path, w, h, False)
 
         if not self.is_game_installed(game):
             pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)

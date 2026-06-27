@@ -42,13 +42,39 @@ def apply_dark_theme():
 class HiDpiMixin:
     def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
         scale = self.get_scale_factor()
-        if width and height:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, int(width * scale), int(height * scale), keep_aspect_ratio)
-        else:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+        w = int(width * scale) if width else None
+        h = int(height * scale) if height else None
+
+        pixbuf = safe_load_pixbuf(path, w, h, keep_aspect_ratio)
 
         surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
         return surface
+
+def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
+    try:
+        if w and h:
+            return GdkPixbuf.Pixbuf.new_from_file_at_scale(path, w, h, keep_aspect_ratio)
+        return GdkPixbuf.Pixbuf.new_from_file(path)
+    except GLib.GError as e:
+        if "Compressed icons" not in str(e):
+            raise e
+
+        with open(path, 'rb') as f:
+            data = f.read()
+
+        start = data.find(b'\x89PNG\r\n\x1a\n')
+        if start == -1:
+            raise e
+
+        loader = GdkPixbuf.PixbufLoader.new_with_type("png")
+        loader.write(data[start:])
+        loader.close()
+        pixbuf = loader.get_pixbuf()
+
+        if w and h:
+            pixbuf = pixbuf.scale_simple(w, h, GdkPixbuf.InterpType.BILINEAR)
+
+        return pixbuf
 
 def ensure_parent_dir(path):
     parent = os.path.dirname(path)
@@ -158,7 +184,7 @@ def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, gam
 
 def is_valid_image(file_path):
     try:
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(file_path)
+        pixbuf = safe_load_pixbuf(file_path)
         return pixbuf is not None
     except Exception:
         return False
