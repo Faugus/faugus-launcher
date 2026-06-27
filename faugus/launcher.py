@@ -1712,7 +1712,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
-
         self._dup_game = game
         self._dup_dialog = DuplicateDialog(self, title)
         self._dup_dialog.connect("response", self._on_confirm_duplicate_response)
@@ -3646,9 +3645,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
         self.checkbox_mono_icon.set_sensitive(False)
 
-        self.checkbox_splash_disable = Gtk.CheckButton(label=_("Disable splash window"))
-        self.checkbox_splash_disable.set_active(False)
-
         self.checkbox_disable_updates = Gtk.CheckButton(label=_("Disable automatic updates"))
         self.checkbox_disable_updates.set_active(False)
 
@@ -3906,18 +3902,17 @@ class Settings(Gtk.Dialog):
         self.button_clearlogs.set_hexpand(True)
 
         grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 0, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 1, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 2, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_categories, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 1, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 2, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_categories, 0, 3, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -4117,7 +4112,6 @@ class Settings(Gtk.Dialog):
         config.set_value("disable-hidraw", self.checkbox_disable_hidraw.get_active())
         config.set_value("prevent-sleep", self.checkbox_prevent_sleep.get_active())
         config.set_value("discrete-gpu", self.checkbox_discrete_gpu.get_active())
-        config.set_value("splash-disable", self.checkbox_splash_disable.get_active())
         config.set_value("disable-updates", self.checkbox_disable_updates.get_active())
         config.set_value("system-tray", self.checkbox_system_tray.get_active())
         config.set_value("start-boot", self.checkbox_start_boot.get_active())
@@ -4472,7 +4466,6 @@ class Settings(Gtk.Dialog):
         self.default_runner = cfg.config.get('default-runner', '').strip('"')
         lossless_location = cfg.config.get('lossless-location', '').strip('"')
         discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
-        splash_disable = cfg.config.get('splash-disable', 'False') == 'True'
         disable_updates = cfg.config.get('disable-updates', 'False') == 'True'
         system_tray = cfg.config.get('system-tray', 'False') == 'True'
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
@@ -4514,7 +4507,6 @@ class Settings(Gtk.Dialog):
 
         self.combobox_runner.set_active(index_runner)
         self.checkbox_discrete_gpu.set_active(discrete_gpu)
-        self.checkbox_splash_disable.set_active(splash_disable)
         self.checkbox_disable_updates.set_active(disable_updates)
         self.checkbox_system_tray.set_active(system_tray)
         self.checkbox_start_boot.set_active(self.start_boot)

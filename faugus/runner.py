@@ -79,7 +79,7 @@ class FaugusRun(HiDpiMixin):
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        if not self.splash_disable and not self.disable_updates:
+        if not self.disable_updates:
             GLib.idle_add(self.show_splash)
 
         set_env("PROTON_EAC_RUNTIME", eac_dir)
@@ -500,7 +500,6 @@ class FaugusRun(HiDpiMixin):
         self.cfg = ConfigManager()
 
         self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
-        self.splash_disable = self.cfg.config.get('splash-disable', 'False') == 'True'
         self.default_runner = self.cfg.config.get('default-runner', '')
         self.lossless_location = self.cfg.config.get('lossless-location', '')
         self.default_prefix = self.cfg.config.get('default-prefix', '')

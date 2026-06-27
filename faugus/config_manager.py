@@ -12,7 +12,6 @@ class ConfigManager:
             'default-runner': 'Proton-CachyOS Latest',
             'lossless-location': '',
             'discrete-gpu': 'False',
-            'splash-disable': 'False',
             'system-tray': 'False',
             'start-boot': 'False',
             'mono-icon': 'False',
