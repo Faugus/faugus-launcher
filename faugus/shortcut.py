@@ -5,9 +5,8 @@ import gi
 import shutil
 
 gi.require_version("Gtk", "3.0")
-gi.require_version('Gdk', '3.0')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
+from gi.repository import Gtk, GdkPixbuf, GLib
 from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
@@ -35,11 +34,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
-        if not os.path.exists(self.icon_directory):
-            os.makedirs(self.icon_directory)
-
         self.icons_path = icons_dir
-        self.icon_extracted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.ico')
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
@@ -208,7 +203,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         bottom_box.set_margin_start(10)
         bottom_box.set_margin_end(10)
-        # botton_box.set_margin_top(10)
         bottom_box.set_margin_bottom(10)
 
         self.button_cancel.set_hexpand(True)
@@ -245,8 +239,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.box.add(bottom_box)
         self.add(self.box)
 
-        if not os.path.exists(self.icon_directory):
-            os.makedirs(self.icon_directory)
+        os.makedirs(self.icon_directory, exist_ok=True)
 
         status = extract_ico_frames(self.file_path, self.icon_temp)
         if status == "ok":
@@ -284,7 +277,6 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
         prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
-        self.default_runner = cfg.config.get('default-runner', '').strip('"')
         self.lossless_location = cfg.config.get('lossless-location', '')
 
         self.checkbox_mangohud.set_active(mangohud)
@@ -301,8 +293,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
     def on_ok_clicked(self, widget):
 
-        validation_result = self.validate_fields()
-        if not validation_result:
+        if not self.validate_fields():
             self.set_sensitive(True)
             return
 
@@ -324,10 +315,9 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         protonfix = self.entry_protonfix.get_text()
 
-        raw_args = self.launch_arguments.split()
         env_vars = []
         other_args = []
-        for arg in raw_args:
+        for arg in self.launch_arguments.split():
             if "=" in arg and not arg.startswith("-"):
                 env_vars.append(arg)
             else:
@@ -427,13 +417,9 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.destroy()
 
     def set_image_shortcut_icon(self):
-        image_path = faugus_png
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(faugus_png)
         scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-
-        image = Gtk.Image.new_from_pixbuf(scaled_pixbuf)
-        return image
+        return Gtk.Image.new_from_pixbuf(scaled_pixbuf)
 
     def on_button_shortcut_icon_clicked(self, widget):
         self.set_sensitive(False)
