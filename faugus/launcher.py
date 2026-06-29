@@ -936,9 +936,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         update_sort_data()
         self.load_games()
 
-        for child in self.flowbox.get_children():
-            setup_dnd_for_widget(child)
-
         self.add(self.box_main)
         self.select_first_child()
         self.connect("key-press-event", self.on_key_press_event)
