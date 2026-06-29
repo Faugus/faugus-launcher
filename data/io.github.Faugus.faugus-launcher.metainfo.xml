@@ -88,10 +88,17 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.6-1" date="2026-06-24">
+    <release version="1.22.7-1" date="2026-06-29">
       <description>
         <ul>
-          <li>Fixed incorrect architecture build of GE-Proton-11 being downloaded in the Proton Manager.</li>
+          <li>Fixed Filepicker inconsistency. Should always default to GTK now.</li>
+          <li>Minor changes to work as AppImage.</li>
+          <li>More code refactoring and cleanup.</li>
+          <li>Refactored the Proton download. Much faster now.</li>
+          <li>Fixed Debian build not working properly.</li>
+          <li>Now the selected sort should persist even if the menu is not shown.</li>
+          <li>Now saves the sort option, category and window size when confirming the settings menu.</li>
+          <li>Removed Epic Games launcher support.</li>
         </ul>
       </description>
     </release>

@@ -18,7 +18,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 
-VERSION = "1.22.6"
+VERSION = "1.22.7"
 
 faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
 icons_dir = PathManager.user_config('faugus-launcher/icons')
