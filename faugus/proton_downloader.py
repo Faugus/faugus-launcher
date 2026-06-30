@@ -7,10 +7,7 @@ import urllib.request
 import shutil
 import argparse
 
-from pathlib import Path
-from faugus.path_manager import PathManager
-
-STEAM_COMPAT_DIR = Path(PathManager.get_compatibilitytools())
+from faugus.path_manager import PathManager, compatibility_dir
 
 CONFIGS = {
     "ge": {
@@ -129,7 +126,7 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
     )
 
 def install_proton_latest(proton_dir, url, asset_name, label):
-    tmp = STEAM_COMPAT_DIR / "__proton_tmp__"
+    tmp = compatibility_dir / "__proton_tmp__"
 
     try:
         print(f"Downloading & extracting {label}...", flush=True)
@@ -154,7 +151,7 @@ def install_proton_latest(proton_dir, url, asset_name, label):
 def ensure_latest(kind):
     cfg = CONFIGS[kind]
 
-    proton_dir = STEAM_COMPAT_DIR / cfg["dir"]
+    proton_dir = compatibility_dir / cfg["dir"]
     proton_dir.parent.mkdir(parents=True, exist_ok=True)
 
     latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])

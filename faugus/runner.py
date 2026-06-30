@@ -24,8 +24,6 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-eac_dir = PathManager.user_config("faugus-launcher/components/eac")
-be_dir = PathManager.user_config("faugus-launcher/components/be")
 os.makedirs(compatibility_dir, exist_ok=True)
 
 _ = setup_gettext('faugus-run')
