@@ -56,6 +56,11 @@ class PathManager:
 
     @staticmethod
     def get_compatibilitytools():
+        override = os.getenv('FAUGUS_STEAM_COMPATIBILITYTOOLS_DIR')
+
+        if override:
+            return str(Path(override).expanduser())
+        
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
         compatibilitytools_folder = base_dir / 'Steam' / 'compatibilitytools.d'
         return str(compatibilitytools_folder)
