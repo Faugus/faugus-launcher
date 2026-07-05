@@ -169,25 +169,32 @@ class FaugusRun(HiDpiMixin):
                 if not protonpath_path.is_dir():
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
-        if protonpath == "Proton-EM Latest":
-            self.proton_latest = "--em"
-            steam_compat_dir = compatibility_dir / "Proton-EM Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
 
-        if protonpath == "Proton-GE Latest":
-            self.proton_latest = "--ge"
-            steam_compat_dir = compatibility_dir / "Proton-GE Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+        managed_latest_runners = {
+            "Proton-EM Latest": (
+                "--em",
+                compatibility_dir / "Proton-EM Latest",
+            ),
+            "Proton-GE Latest": (
+                "--ge",
+                compatibility_dir / "Proton-GE Latest",
+            ),
+            "Proton-CachyOS Latest": (
+                "--cachyos",
+                compatibility_dir / "Proton-CachyOS Latest",
+            ),
+            "DW-Proton Latest": (
+                "--dw",
+                compatibility_dir / "DW-Proton Latest",
+            )
+        }
 
-        if protonpath == "Proton-CachyOS Latest":
-            self.proton_latest = "--cachyos"
-            steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+        if protonpath in managed_latest_runners:
+            self.proton_latest, proton_dir = managed_latest_runners[protonpath]
+            self.proton_exists = proton_dir.is_dir()
 
-        if protonpath == "DW-Proton Latest":
-            self.proton_latest = "--dw"
-            steam_compat_dir = compatibility_dir / "DW-Proton Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+            # Change the PROTONPATH environment variable from values like "Proton-GE Latest" to the full path so that any compatibility tools directory should work.
+            set_env("PROTONPATH", str(proton_dir.resolve()))
 
         self.components_exists = (
             os.path.exists(eac_dir) and
