@@ -16,9 +16,6 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
-presets_file = PathManager.user_config('faugus-launcher/presets.json')
-
 _ = setup_gettext('faugus-launcher')
 
 class CreateShortcut(Gtk.Window, HiDpiMixin):
@@ -32,9 +29,9 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.set_title(game_title)
         print(self.file_path)
 
-        self.icon_directory = f"{icons_dir}/icon_temp/"
+        self.icon_directory = f"{shortcut_icons_dir}/icon_temp/"
 
-        self.icons_path = icons_dir
+        self.icons_path = shortcut_icons_dir
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.ico'
 
@@ -254,7 +251,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.connect("destroy", Gtk.main_quit)
 
     def on_button_launch_arguments_clicked(self, widget):
-        self.launch_arguments = show_launch_arguments_dialog(self, presets_file, self.launch_arguments)
+        self.launch_arguments = show_launch_arguments_dialog(self, self.launch_arguments)
 
     def on_button_addapp_clicked(self, widget):
         (self.addapp_enabled, self.addapp,
@@ -309,7 +306,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.ico')
 
-        new_icon_path = f"{icons_dir}/{title_formatted}.ico"
+        new_icon_path = f"{shortcut_icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
