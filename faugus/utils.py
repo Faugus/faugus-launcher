@@ -307,6 +307,32 @@ def load_red_entry_css():
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
+def convert_icon_for_desktop(icon_path):
+    if not icon_path or not os.path.isfile(icon_path):
+        return icon_path
+
+    if not icon_path.lower().endswith(".ico"):
+        return icon_path
+
+    png_path = f"{os.path.splitext(icon_path)[0]}.png"
+
+    if os.path.isfile(png_path) and os.path.getmtime(png_path) >= os.path.getmtime(icon_path):
+        return png_path
+
+    magick = shutil.which("magick") or shutil.which("convert")
+    if not magick:
+        print("ImageMagick not found, cannot convert icon for desktop entry.")
+        return icon_path
+
+    try:
+        subprocess.run(
+            [magick, icon_path, "-resize", "256x256!", png_path], check=True
+        )
+        return png_path
+    except Exception as e:
+        print(f"Error converting icon for desktop entry: {e}")
+        return icon_path
+
 def extract_ico_simple(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:

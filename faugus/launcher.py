@@ -3195,6 +3195,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         new_icon_path = f"{icons_dir}/{game.gameid}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
+        else:
+            new_icon_path = convert_icon_for_desktop(new_icon_path)
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(game.path)
@@ -3339,6 +3341,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         new_icon_path = f"{icons_dir}/{game.gameid}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
+        else:
+            new_icon_path = convert_icon_for_desktop(new_icon_path)
 
         # Get the directory containing the executable
         game_directory = os.path.dirname(game.path)
@@ -3348,10 +3352,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def remove_banner_icon(self, game):
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
         icon_file_path = f"{icons_dir}/{game.gameid}.ico"
+        icon_png_path = f"{icons_dir}/{game.gameid}.png"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
+        if os.path.exists(icon_png_path):
+            os.remove(icon_png_path)
 
     def remove_shortcut(self, game, shortcut):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"

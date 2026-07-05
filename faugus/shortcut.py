@@ -312,6 +312,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         new_icon_path = f"{icons_dir}/{title_formatted}.ico"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
+        else:
+            new_icon_path = convert_icon_for_desktop(new_icon_path)
 
         protonfix = self.entry_protonfix.get_text()
 
