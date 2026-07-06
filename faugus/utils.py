@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from faugus.path_manager import PathManager, IS_FLATPAK, games_json, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun
+from faugus.path_manager import PathManager, IS_FLATPAK, games_json, presets_file, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun, icons_dir, faugus_banner, banners_dir, backup_dir, faugus_mono_icon, faugus_notification, eac_dir, be_dir, shortcut_icons_dir
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
 
 def apply_dark_theme():
@@ -130,10 +130,8 @@ def add_image_file_filters(filechooser, include_ico=True):
         image_filter.add_pattern("*.ico")
     filechooser.add_filter(image_filter)
 
-_FAUGUS_NOTIFICATION = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-
 def play_notification_sound():
-    subprocess.Popen(["canberra-gtk-play", "-f", _FAUGUS_NOTIFICATION])
+    subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
 
 def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
                        lossless_performance, lossless_hdr, lossless_present):
@@ -432,8 +430,6 @@ def update_games_json():
 
     changed = False
 
-    icons_dir = PathManager.user_config('faugus-launcher/icons')
-
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
@@ -599,7 +595,7 @@ def init_addon_defaults(obj):
     obj.lossless_hdr = False
     obj.lossless_present = False
 
-def show_launch_arguments_dialog(parent, presets_file, current_launch_arguments):
+def show_launch_arguments_dialog(parent, current_launch_arguments):
     dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)
     dialog.set_resizable(False)
     dialog.set_modal(True)

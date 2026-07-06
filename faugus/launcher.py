@@ -20,12 +20,6 @@ from faugus.ea_fix import *
 
 VERSION = "1.22.7"
 
-faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-icons_dir = PathManager.user_config('faugus-launcher/icons')
-banners_dir = PathManager.user_config('faugus-launcher/banners')
-backup_dir = PathManager.user_config("faugus-launcher/games-backup")
-faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
-
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -38,13 +32,6 @@ else:
     tray_icon = PathManager.get_icon('faugus-launcher.svg')
     GLib.set_prgname("faugus-launcher")
 
-latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
-categories_file = PathManager.user_config('faugus-launcher/categories.txt')
-custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
-presets_file = PathManager.user_config('faugus-launcher/presets.json')
-faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
-faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
-running_games = PathManager.user_data('faugus-launcher/running_games.json')
 
 os.makedirs(compatibility_dir, exist_ok=True)
 
@@ -3017,7 +3004,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return True
 
     def extract_best_icon(self, exe_path, gameid):
-        icons_dir = PathManager.user_config('faugus-launcher/icons')
         os.makedirs(icons_dir, exist_ok=True)
         final = os.path.join(icons_dir, f"{gameid}.png")
         status = extract_ico_frames(exe_path, final)
@@ -5283,7 +5269,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.set_image(image)
 
     def on_button_launch_arguments_clicked(self, widget):
-        self.launch_arguments = show_launch_arguments_dialog(self, presets_file, self.launch_arguments)
+        self.launch_arguments = show_launch_arguments_dialog(self, self.launch_arguments)
 
     def on_button_addapp_clicked(self, widget):
         (self.addapp_enabled, self.addapp,
