@@ -1722,7 +1722,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         title_formatted = format_title(new_title)
 
         icon = game.icon
-        new_icon = f"{icons_dir}/{title_formatted}.ico"
+        new_icon = f"{icons_dir}/{title_formatted}.png"
         if os.path.exists(icon):
             shutil.copyfile(icon, new_icon)
 
@@ -2772,7 +2772,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 banner = ""
 
             icon_temp = os.path.expanduser(add_game_dialog.icon_temp)
-            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.ico'
+            icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.png'
             icon = icon_final
 
             runner = convert_runner(runner)
@@ -3005,7 +3005,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def extract_best_icon(self, exe_path, gameid):
         os.makedirs(icons_dir, exist_ok=True)
-        final = os.path.join(icons_dir, f"{gameid}.ico")
+        final = os.path.join(icons_dir, f"{gameid}.png")
         status = extract_ico_frames(exe_path, final)
         return final if status == "ok" else None
 
@@ -3123,7 +3123,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     print(f"Error resizing banner: {e}")
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
-            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
+            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.png'
             game.icon = icon_final
 
             game.runner = convert_runner(game.runner)
@@ -3178,7 +3178,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
         # Check if the icon file exists
-        new_icon_path = f"{icons_dir}/{game.gameid}.ico"
+        new_icon_path = f"{icons_dir}/{game.gameid}.png"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
@@ -3322,7 +3322,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
         # Check if the icon file exists
-        new_icon_path = f"{icons_dir}/{game.gameid}.ico"
+        new_icon_path = f"{icons_dir}/{game.gameid}.png"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
@@ -3333,7 +3333,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def remove_banner_icon(self, game):
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
-        icon_file_path = f"{icons_dir}/{game.gameid}.ico"
+        icon_file_path = f"{icons_dir}/{game.gameid}.png"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
         if os.path.exists(icon_file_path):
@@ -4738,7 +4738,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.icons_path = icons_dir
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
-        self.icon_temp = f'{self.icons_path}/icon_temp.ico'
+        self.icon_temp = f'{self.icons_path}/icon_temp.png'
 
         self.box = self.get_content_area()
         self.box.set_margin_start(0)

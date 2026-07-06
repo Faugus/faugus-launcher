@@ -33,7 +33,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         self.icons_path = shortcut_icons_dir
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
-        self.icon_temp = f'{self.icons_path}/icon_temp.ico'
+        self.icon_temp = f'{self.icons_path}/icon_temp.png'
 
         init_addon_defaults(self)
 
@@ -304,9 +304,9 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             write_addapp_bat(addapp_bat, self.file_path, self.addapp, self.addapp_delay, self.addapp_first, game_arguments)
 
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
-            os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.ico')
+            os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.png')
 
-        new_icon_path = f"{shortcut_icons_dir}/{title_formatted}.ico"
+        new_icon_path = f"{shortcut_icons_dir}/{title_formatted}.png"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 

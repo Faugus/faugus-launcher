@@ -445,7 +445,13 @@ def update_games_json():
         game_id = game.get("gameid")
 
         if game_id:
-            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+            ico_path = os.path.join(icons_dir, f"{game_id}.ico")
+            png_path = os.path.join(icons_dir, f"{game_id}.png")
+
+            if os.path.exists(ico_path):
+                new_icon_path = ico_path
+            else:
+                new_icon_path = png_path
 
             if game.get("icon") != new_icon_path:
                 game["icon"] = new_icon_path
