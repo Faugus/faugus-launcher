@@ -8,124 +8,116 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 18:25-0300\n"
-"PO-Revision-Date: 2026-03-17 13:40+0300\n"
+"POT-Creation-Date: 2026-06-09 17:12-0300\n"
+"PO-Revision-Date: 2026-07-06 22:21+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
-#: /usr/bin/faugus-run:106
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
 msgid "Starting Steam game..."
 msgstr "Запуск игры Steam..."
 
-#: /usr/bin/faugus-run:318
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
 msgid "Are you enjoying Faugus Launcher?"
 msgstr "Вам нравится Faugus Launcher?"
 
-#: /usr/bin/faugus-run:322
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
 msgid "Please consider donating"
 msgstr "Пожалуйста, поддержите донатом"
 
-#: /usr/bin/faugus-run:334
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
 msgid "Never show this message again"
 msgstr "Не показывать снова"
 
-#: /usr/bin/faugus-run:344
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
 msgid "Continue"
 msgstr "Продолжить"
 
-#: /usr/bin/faugus-run:392
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
 msgid "Internet connection error."
 msgstr "Ошибка интернет соединения."
 
-#: /usr/bin/faugus-run:396
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
 #, python-format
 msgid "%s was not found."
 msgstr "%s не найден."
 
-#: /usr/bin/faugus-run:400
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
 msgid "Please install it or use another Proton version."
 msgstr "Пожалуйста, установите его или используйте другую версию Proton."
 
-#: /usr/bin/faugus-run:407 /usr/bin/faugus-run:683
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:441
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:691
 msgid "Ok"
 msgstr "Ок"
 
-#: /usr/bin/faugus-run:584
-msgid "Updating UMU-Launcher..."
-msgstr "Обновление UMU-Launcher..."
-
-#: /usr/bin/faugus-run:586
-msgid "UMU-Launcher is up to date"
-msgstr "UMU-Launcher не нуждается в обновлении"
-
-#: /usr/bin/faugus-run:588
-msgid "Updating BattlEye..."
-msgstr "Обновление BattlEye..."
-
-#: /usr/bin/faugus-run:590
-msgid "Updating Easy Anti-Cheat..."
-msgstr "Обновление Easy Anti-Cheat..."
-
-#: /usr/bin/faugus-run:592
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
 msgid "Components are up to date"
 msgstr "Компоненты не нуждается в обновлении"
 
-#: /usr/bin/faugus-run:594
-msgid "Downloading UMU-Proton..."
-msgstr "Загрузка UMU-Proton..."
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
+msgid "Updating"
+msgstr "Обновление"
 
-#: /usr/bin/faugus-run:596
-msgid "Downloading Steam Runtime..."
-msgstr "Загрузка Steam Runtime..."
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:614
+msgid "Downloading"
+msgstr "Загрузка"
 
-#: /usr/bin/faugus-run:598
-msgid "Extracting Steam Runtime..."
-msgstr "Распаковка Steam Runtime..."
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
+msgid "Extracting"
+msgstr "Распаковка"
 
-#: /usr/bin/faugus-run:600
-msgid "Extracting UMU-Proton..."
-msgstr "Распаковка UMU-Proton..."
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
+msgid "is up to date"
+msgstr "не нуждается в обновлении"
 
-#: /usr/bin/faugus-run:602 /usr/bin/faugus-run:608
-msgid "UMU-Proton is up to date"
-msgstr "UMU-Proton не нуждается в обновлении"
-
-#: /usr/bin/faugus-run:604 /usr/bin/faugus-run:610
-msgid "Steam Runtime is up to date"
-msgstr "Steam Runtime не нуждается в обновлении"
-
-#: /usr/bin/faugus-run:606 /usr/bin/faugus-run:617
-msgid "GE-Proton is up to date"
-msgstr "GE-Proton не нуждается в обновлении"
-
-#: /usr/bin/faugus-run:613
-msgid "Downloading GE-Proton..."
-msgstr "Загрузка GE-Proton..."
-
-#: /usr/bin/faugus-run:615
-msgid "Extracting GE-Proton..."
-msgstr "Распаковка GE-Proton..."
-
-#: /usr/bin/faugus-run:619
-msgid "Downloading Proton-EM..."
-msgstr "Загрузка Proton-EM..."
-
-#: /usr/bin/faugus-run:621
-msgid "Extracting Proton-EM..."
-msgstr "Распаковка Proton-EM..."
-
-#: /usr/bin/faugus-run:623
-msgid "Proton-EM is up to date"
-msgstr "Proton-EM не нуждается в обновлении"
-
-#: /usr/bin/faugus-run:680
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
 msgid "The keys and values were successfully added to the registry."
 msgstr "Ключи и значения были успешно добавлены в реестр."
+
+#~ msgid "Updating UMU-Launcher..."
+#~ msgstr "Обновление UMU-Launcher..."
+
+#~ msgid "UMU-Launcher is up to date"
+#~ msgstr "UMU-Launcher не нуждается в обновлении"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Обновление BattlEye..."
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Обновление Easy Anti-Cheat..."
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Загрузка UMU-Proton..."
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Загрузка Steam Runtime..."
+
+#~ msgid "Extracting Steam Runtime..."
+#~ msgstr "Распаковка Steam Runtime..."
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Распаковка UMU-Proton..."
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton не нуждается в обновлении"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime не нуждается в обновлении"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "Загрузка Proton-EM..."
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "Распаковка Proton-EM..."
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM не нуждается в обновлении"
 
 #, python-format
 #~ msgid "Using %s"
