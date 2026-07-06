@@ -96,6 +96,7 @@ class FaugusRun(HiDpiMixin):
             set_env("PROTON_USE_WOW64", "1")
 
         set_env("UMU_USE_STEAM", "1")
+        set_env("UMU_CONTAINER_NSENTER", "1")
 
         self.extract_env_from_message()
 
@@ -206,24 +207,7 @@ class FaugusRun(HiDpiMixin):
         print("\n=== UMU-LAUNCHER COMMAND ===")
         print(f"{self.message}\n")
 
-        self.lock_prefix()
         self.execute_final_command()
-
-    def lock_prefix(self):
-        prefix = os.environ.get("WINEPREFIX")
-
-        if not prefix:
-            return
-
-        os.makedirs(prefix, exist_ok=True)
-        lock_file = os.path.join(prefix, ".faugus.lock")
-        self.lock_fd = open(lock_file, "w")
-
-        try:
-            fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-
-        except BlockingIOError:
-            set_env("UMU_CONTAINER_NSENTER", "1")
 
     def execute_final_command(self):
 
@@ -740,7 +724,6 @@ class FaugusRun(HiDpiMixin):
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
-        self.release_prefix()
 
         game_id = os.environ.get("FAUGUSID")
 
@@ -774,14 +757,6 @@ class FaugusRun(HiDpiMixin):
         kill_child_proc()
 
         return False
-
-    def release_prefix(self):
-        if hasattr(self, "lock_fd"):
-            try:
-                fcntl.flock(self.lock_fd, fcntl.LOCK_UN)
-                self.lock_fd.close()
-            except:
-                pass
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
