@@ -307,32 +307,6 @@ def load_red_entry_css():
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-def convert_icon_for_desktop(icon_path):
-    if not icon_path or not os.path.isfile(icon_path):
-        return icon_path
-
-    if not icon_path.lower().endswith(".ico"):
-        return icon_path
-
-    png_path = f"{os.path.splitext(icon_path)[0]}.png"
-
-    if os.path.isfile(png_path) and os.path.getmtime(png_path) >= os.path.getmtime(icon_path):
-        return png_path
-
-    magick = shutil.which("magick") or shutil.which("convert")
-    if not magick:
-        print("ImageMagick not found, cannot convert icon for desktop entry.")
-        return icon_path
-
-    try:
-        subprocess.run(
-            [magick, icon_path, "-resize", "256x256!", png_path], check=True
-        )
-        return png_path
-    except Exception as e:
-        print(f"Error converting icon for desktop entry: {e}")
-        return icon_path
-
 def extract_ico_simple(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:
@@ -475,7 +449,62 @@ def update_games_json():
         game_id = game.get("gameid")
 
         if game_id:
-            new_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+            new_icon_path = os.path.join(icons_dir, f"{game_id}.png")
+            old_icon_path = os.path.join(icons_dir, f"{game_id}.ico")
+
+            # One-time migration: convert existing .ico to .png
+            if os.path.exists(old_icon_path) and not os.path.exists(new_icon_path):
+                magick = shutil.which("magick") or shutil.which("convert")
+                if magick:
+                    tmp_dir = tempfile.mkdtemp()
+                    try:
+                        # Split ICO into separate frames
+                        subprocess.run(
+                            [magick, old_icon_path, os.path.join(tmp_dir, "frame_%d.png")],
+                            capture_output=True
+                        )
+
+                        # Find the largest frame
+                        best, size = None, 0
+                        for f in Path(tmp_dir).glob("frame_*.png"):
+                            r = subprocess.run(
+                                [magick, "identify", "-format", "%wx%h", str(f)],
+                                capture_output=True, text=True
+                            )
+                            if r.returncode == 0 and r.stdout:
+                                w, h = map(int, r.stdout.strip().split("x"))
+                                current_size = w * h
+                                if current_size > size:
+                                    best, size = str(f), current_size
+
+                        # Save the best frame as the new .png and remove old .ico
+                        if best:
+                            subprocess.run(
+                                [magick, best, "-resize", "256x256!", new_icon_path],
+                                check=True
+                            )
+                            os.remove(old_icon_path)
+
+                            # Update existing .desktop files to point to the new .png
+                            desktop_paths = [
+                                os.path.expanduser(f"~/.local/share/applications/{game_id}.desktop"),
+                                os.path.expanduser(f"~/Desktop/{game_id}.desktop")
+                            ]
+                            for d_path in desktop_paths:
+                                if os.path.exists(d_path):
+                                    try:
+                                        with open(d_path, 'r') as f:
+                                            content = f.read()
+                                        if old_icon_path in content:
+                                            content = content.replace(old_icon_path, new_icon_path)
+                                            with open(d_path, 'w') as f:
+                                                f.write(content)
+                                    except Exception:
+                                        pass
+                    except Exception:
+                        pass
+                    finally:
+                        shutil.rmtree(tmp_dir, ignore_errors=True)
 
             if game.get("icon") != new_icon_path:
                 game["icon"] = new_icon_path
