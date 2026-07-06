@@ -82,17 +82,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.7-1" date="2026-06-29">
+    <release version="1.22.8-1" date="2026-07-06">
       <description>
         <ul>
-          <li>Fixed Filepicker inconsistency. Should always default to GTK now.</li>
-          <li>Minor changes to work as AppImage.</li>
-          <li>More code refactoring and cleanup.</li>
-          <li>Refactored the Proton download. Much faster now.</li>
-          <li>Fixed Debian build not working properly.</li>
-          <li>Now the selected sort should persist even if the menu is not shown.</li>
-          <li>Now saves the sort option, category and window size when confirming the settings menu.</li>
-          <li>Removed Epic Games launcher support.</li>
+          <li>Updated umu-launcher to version 1.4.1.</li>
+          <li>Icons are now png instead of ico.</li>
+          <li>Removed prefix lock logic.</li>
+          <li>More code refactoring.</li>
+          <li>Updated German translation.</li>
+          <li>Updated Japanese translation.</li>
+          <li>Updated Russian translation.</li>
         </ul>
       </description>
     </release>

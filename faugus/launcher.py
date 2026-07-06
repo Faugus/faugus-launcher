@@ -18,7 +18,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 
-VERSION = "1.22.7"
+VERSION = "1.22.8"
 
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'
