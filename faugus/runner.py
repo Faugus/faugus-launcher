@@ -8,7 +8,6 @@ import re
 import time
 import shlex
 import signal
-import fcntl
 
 gi.require_version("Gtk", "3.0")
 
@@ -170,23 +169,19 @@ class FaugusRun(HiDpiMixin):
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
-            steam_compat_dir = compatibility_dir / "Proton-EM Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+            self.proton_exists = (compatibility_dir / "Proton-EM Latest").is_dir()
 
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
-            steam_compat_dir = compatibility_dir / "Proton-GE Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+            self.proton_exists = (compatibility_dir / "Proton-GE Latest").is_dir()
 
         if protonpath == "Proton-CachyOS Latest":
             self.proton_latest = "--cachyos"
-            steam_compat_dir = compatibility_dir / "Proton-CachyOS Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+            self.proton_exists = (compatibility_dir / "Proton-CachyOS Latest").is_dir()
 
         if protonpath == "DW-Proton Latest":
             self.proton_latest = "--dw"
-            steam_compat_dir = compatibility_dir / "DW-Proton Latest"
-            self.proton_exists = steam_compat_dir.is_dir()
+            self.proton_exists = (compatibility_dir / "DW-Proton Latest").is_dir()
 
         self.components_exists = (
             os.path.exists(eac_dir) and
@@ -333,9 +328,8 @@ class FaugusRun(HiDpiMixin):
         box_top.set_margin_top(20)
         box_top.set_margin_bottom(20)
 
-        image_path = faugus_png
         self._scale_widget = dialog
-        surface = self.new_surface_from_image(image_path, 75, 75)
+        surface = self.new_surface_from_image(faugus_png, 75, 75)
         image = Gtk.Image.new_from_surface(surface)
 
         label = Gtk.Label(label=_("Are you enjoying Faugus Launcher?"))
