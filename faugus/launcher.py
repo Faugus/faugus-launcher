@@ -5613,8 +5613,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         filechooser.destroy()
 
     def set_image_shortcut_icon(self):
-        image_path = faugus_png
-        shutil.copyfile(image_path, self.icon_temp)
+        shutil.copyfile(faugus_png, self.icon_temp)
 
         surface = self.new_surface_from_image(self.icon_temp, 50, 50)
         image = Gtk.Image.new_from_surface(surface)

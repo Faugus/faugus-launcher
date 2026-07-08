@@ -388,13 +388,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 f'Path={game_directory}\n'
             )
 
-        applications_directory = app_dir
-        if not os.path.exists(applications_directory):
-            os.makedirs(applications_directory)
-
-        desktop_directory = desktop_dir
-        if not os.path.exists(desktop_directory):
-            os.makedirs(desktop_directory)
+        os.makedirs(app_dir, exist_ok=True)
+        os.makedirs(desktop_dir, exist_ok=True)
 
         applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
 
