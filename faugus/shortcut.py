@@ -238,7 +238,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         os.makedirs(self.icon_directory, exist_ok=True)
 
-        status = extract_ico_frames(self.file_path, self.icon_temp)
+        status = extract_ico(self.file_path, self.icon_temp, best_frame=True)
         if status == "ok":
             surface = self.new_surface_from_image(self.icon_temp, 50, 50)
             self.button_shortcut_icon.set_image(Gtk.Image.new_from_surface(surface))
@@ -420,7 +420,7 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
 
         if os.path.isfile(path):
             os.makedirs(self.icon_directory, exist_ok=True)
-            status = extract_ico_simple(path, self.icon_converted)
+            status = extract_ico(path, self.icon_converted, best_frame=False)
             if status == "no_icons":
                 self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 

@@ -305,7 +305,7 @@ def load_red_entry_css():
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-def extract_ico_simple(exe_path, output_path):
+def extract_ico(exe_path, output_path, best_frame=False):
     tmp_dir = tempfile.mkdtemp()
     try:
         ensure_parent_dir(output_path)
@@ -326,73 +326,47 @@ def extract_ico_simple(exe_path, output_path):
         if not magick:
             return "error"
 
-        subprocess.run(
-            [magick, temp_ico, "-resize", "256x256!", output_path], check=True
-        )
-        return "ok"
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return "error"
-    finally:
-        shutil.rmtree(tmp_dir, ignore_errors=True)
-
-def extract_ico_frames(exe_path, output_path):
-    tmp_dir = tempfile.mkdtemp()
-    try:
-        ensure_parent_dir(output_path)
-        temp_ico = os.path.join(tmp_dir, "icon.ico")
-
-        result = subprocess.run(
-            ['icoextract', exe_path, temp_ico],
-            capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
-                print("The file does not contain icons.")
-                return "no_icons"
-            print(f"Error extracting icon: {result.stderr}")
-            return "error"
-
-        magick = shutil.which("magick") or shutil.which("convert")
-        if not magick:
-            return "error"
-
-        subprocess.run(
-            [magick, temp_ico, os.path.join(tmp_dir, "frame_%d.png")],
-            capture_output=True
-        )
-
-        if os.path.isfile(temp_ico):
-            os.remove(temp_ico)
-
-        def get_index(filepath):
-            match = re.search(r'frame_(\d+)\.png', filepath.name)
-            return int(match.group(1)) if match else 999
-
-        png_files = sorted(Path(tmp_dir).glob("frame_*.png"), key=get_index)
-        if not png_files:
-            return "error"
-
-        best, size = None, 0
-        for f in png_files:
-            r = subprocess.run(
-                [magick, "identify", "-format", "%wx%h", str(f)],
-                capture_output=True, text=True
+        if best_frame:
+            subprocess.run(
+                [magick, temp_ico, os.path.join(tmp_dir, "frame_%d.png")],
+                capture_output=True
             )
-            if r.returncode == 0 and r.stdout:
-                w, h = map(int, r.stdout.strip().split("x"))
-                current_size = w * h
-                if current_size > size:
-                    best, size = str(f), current_size
 
-        if best:
+            if os.path.isfile(temp_ico):
+                os.remove(temp_ico)
+
+            def get_index(filepath):
+                match = re.search(r'frame_(\d+)\.png', filepath.name)
+                return int(match.group(1)) if match else 999
+
+            png_files = sorted(Path(tmp_dir).glob("frame_*.png"), key=get_index)
+            if not png_files:
+                return "error"
+
+            best, size = None, 0
+            for f in png_files:
+                r = subprocess.run(
+                    [magick, "identify", "-format", "%wx%h", str(f)],
+                    capture_output=True, text=True
+                )
+                if r.returncode == 0 and r.stdout:
+                    w, h = map(int, r.stdout.strip().split("x"))
+                    current_size = w * h
+                    if current_size > size:
+                        best, size = str(f), current_size
+
+            if not best:
+                return "error"
+
             subprocess.run(
                 [magick, best, "-resize", "256x256!", output_path], check=True
             )
-            return "ok"
+        else:
+            subprocess.run(
+                [magick, temp_ico, "-resize", "256x256!", output_path], check=True
+            )
 
-        return "error"
+        return "ok"
 
     except Exception as e:
         print(f"An error occurred: {e}")
