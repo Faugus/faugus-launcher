@@ -4,7 +4,7 @@ import shutil
 import vdf
 
 from faugus.path_manager import *
-from faugus.steam_setup import steam_shortcuts_path
+from faugus.steam_setup import get_all_shortcut_paths
 from faugus.utils import load_json_file, save_json_file
 
 def update_desktop_path(shortcut_path, new_dir_path):
@@ -23,30 +23,31 @@ def update_desktop_path(shortcut_path, new_dir_path):
         print(f"Error updating shortcut {shortcut_path}: {e}")
 
 def update_steam_shortcut(game_title, new_start_dir, new_exe):
-    if not os.path.exists(steam_shortcuts_path):
-        return
+    for shortcut_path in get_all_shortcut_paths():
+        if not os.path.exists(shortcut_path):
+            continue
 
-    try:
-        with open(steam_shortcuts_path, 'rb') as f:
-            shortcuts = vdf.binary_load(f)
-    except SyntaxError:
-        return
+        try:
+            with open(shortcut_path, 'rb') as f:
+                shortcuts = vdf.binary_load(f)
+        except SyntaxError:
+            continue
 
-    changed = False
-    if "shortcuts" in shortcuts:
-        for app_id, game_info in shortcuts["shortcuts"].items():
-            if isinstance(game_info, dict) and game_info.get("AppName") == game_title:
-                game_info["StartDir"] = new_start_dir
+        changed = False
+        if "shortcuts" in shortcuts:
+            for app_id, game_info in shortcuts["shortcuts"].items():
+                if isinstance(game_info, dict) and game_info.get("AppName") == game_title:
+                    game_info["StartDir"] = new_start_dir
 
-                if "EALauncher.exe" in game_info.get("Exe", ""):
-                    game_info["Exe"] = f'"{new_exe}"'
+                    if "EALauncher.exe" in game_info.get("Exe", ""):
+                        game_info["Exe"] = f'"{new_exe}"'
 
-                changed = True
+                    changed = True
 
-    if changed:
-        with open(steam_shortcuts_path, 'wb') as f:
-            vdf.binary_dump(shortcuts, f)
-        print(f"Steam shortcut updated for: {game_title}")
+        if changed:
+            with open(shortcut_path, 'wb') as f:
+                vdf.binary_dump(shortcuts, f)
+            print(f"Steam shortcut updated for: {game_title}")
 
 def update_ea_path(prefix):
     ea_base_dir = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop"

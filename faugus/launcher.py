@@ -2503,7 +2503,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
 
-            if detect_steam_id() is not None:
+            if get_all_shortcut_paths():
                 if self.check_steam_shortcut(title):
                     edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
@@ -2524,16 +2524,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
     def check_steam_shortcut(self, title):
-        if os.path.exists(steam_shortcuts_path):
-            try:
-                with open(steam_shortcuts_path, 'rb') as f:
-                    shortcuts = vdf.binary_load(f)
-                for game in shortcuts["shortcuts"].values():
-                    if isinstance(game, dict) and "AppName" in game and game["AppName"] == title:
-                        return True
-                return False
-            except SyntaxError:
-                return False
+        for path in get_all_shortcut_paths():
+            if os.path.exists(path):
+                try:
+                    with open(path, 'rb') as f:
+                        shortcuts = vdf.binary_load(f)
+                    if "shortcuts" in shortcuts:
+                        for game in shortcuts["shortcuts"].values():
+                            if isinstance(game, dict) and "AppName" in game and game["AppName"] == title:
+                                return True
+                except SyntaxError:
+                    continue
         return False
 
     def on_button_delete_clicked(self, *_):
@@ -2611,20 +2612,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 game.playtime = playtime_map[game.gameid]
 
     def remove_steam_shortcut(self, title):
-        if os.path.exists(steam_shortcuts_path):
-            try:
-                with open(steam_shortcuts_path, 'rb') as f:
-                    shortcuts = vdf.binary_load(f)
+        for path in get_all_shortcut_paths():
+            if os.path.exists(path):
+                try:
+                    with open(path, 'rb') as f:
+                        shortcuts = vdf.binary_load(f)
 
-                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if
-                             isinstance(game, dict) and "AppName" in game and game["AppName"] == title]
-                for app_id in to_remove:
-                    del shortcuts["shortcuts"][app_id]
+                    if "shortcuts" not in shortcuts:
+                        continue
 
-                with open(steam_shortcuts_path, 'wb') as f:
-                    vdf.binary_dump(shortcuts, f)
-            except SyntaxError:
-                pass
+                    to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if
+                                 isinstance(game, dict) and "AppName" in game and game["AppName"] == title]
+
+                    if to_remove:
+                        for app_id in to_remove:
+                            del shortcuts["shortcuts"][app_id]
+
+                        with open(path, 'wb') as f:
+                            vdf.binary_dump(shortcuts, f)
+                except SyntaxError:
+                    pass
 
     def remove_latest_and_order(self, gameid):
         try:
@@ -3226,94 +3233,96 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
         def add_game_to_steam(title, game_directory, icon):
-            shortcuts = load_shortcuts(title)
+            for path in get_all_shortcut_paths():
+                shortcuts = load_shortcuts(path)
 
-            existing_app_id = None
-            for app_id, game_info in shortcuts["shortcuts"].items():
-                if isinstance(game_info, dict) and "AppName" in game_info and game_info["AppName"] == title:
-                    existing_app_id = app_id
-                    break
+                if "shortcuts" not in shortcuts:
+                    shortcuts["shortcuts"] = {}
 
-            if IS_FLATPAK:
-                if IS_STEAM_FLATPAK:
-                    exe = '"flatpak-spawn"'
-                    launch_options = f'--host flatpak run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
+                existing_app_id = None
+                for app_id, game_info in shortcuts["shortcuts"].items():
+                    if isinstance(game_info, dict) and "AppName" in game_info and game_info["AppName"] == title:
+                        existing_app_id = app_id
+                        break
+
+                if IS_FLATPAK:
+                    if IS_STEAM_FLATPAK:
+                        exe = '"flatpak-spawn"'
+                        launch_options = f'--host flatpak run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
+                    else:
+                        exe = '"flatpak"'
+                        launch_options = f'run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
                 else:
-                    exe = '"flatpak"'
-                    launch_options = f'run --command=/app/bin/faugus-launcher io.github.Faugus.faugus-launcher --game {game.gameid}'
-            else:
-                if IS_STEAM_FLATPAK:
-                    exe = '"flatpak-spawn"'
-                    launch_options = f'--host {launcher_path} --game {game.gameid}'
+                    if IS_STEAM_FLATPAK:
+                        exe = '"flatpak-spawn"'
+                        launch_options = f'--host {launcher_path} --game {game.gameid}'
+                    else:
+                        exe = f'"{launcher_path}"'
+                        launch_options = f'--game {game.gameid}'
+
+                if existing_app_id:
+                    game_info = shortcuts["shortcuts"][existing_app_id]
+                    game_info.update({
+                        "Exe": exe,
+                        "StartDir": game_directory,
+                        "icon": icon,
+                        "LaunchOptions": launch_options
+                    })
                 else:
-                    exe = f'"{launcher_path}"'
-                    launch_options = f'--game {game.gameid}'
+                    new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
 
-            if existing_app_id:
-                game_info = shortcuts["shortcuts"][existing_app_id]
-                game_info.update({
-                    "Exe": exe,
-                    "StartDir": game_directory,
-                    "icon": icon,
-                    "LaunchOptions": launch_options
-                })
-            else:
-                new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
+                    shortcuts["shortcuts"][str(new_app_id)] = {
+                        "appid": new_app_id,
+                        "AppName": title,
+                        "Exe": exe,
+                        "StartDir": game_directory,
+                        "icon": icon,
+                        "ShortcutPath": "",
+                        "LaunchOptions": launch_options,
+                        "IsHidden": 0,
+                        "AllowDesktopConfig": 1,
+                        "AllowOverlay": 1,
+                        "OpenVR": 0,
+                        "Devkit": 0,
+                        "DevkitGameID": "",
+                        "LastPlayTime": 0,
+                        "FlatpakAppID": "",
+                    }
+                save_shortcuts(shortcuts, path)
 
-                shortcuts["shortcuts"][str(new_app_id)] = {
-                    "appid": new_app_id,
-                    "AppName": title,
-                    "Exe": exe,
-                    "StartDir": game_directory,
-                    "icon": icon,
-                    "ShortcutPath": "",
-                    "LaunchOptions": launch_options,
-                    "IsHidden": 0,
-                    "AllowDesktopConfig": 1,
-                    "AllowOverlay": 1,
-                    "OpenVR": 0,
-                    "Devkit": 0,
-                    "DevkitGameID": "",
-                    "LastPlayTime": 0,
-                    "FlatpakAppID": "",
-                }
-            save_shortcuts(shortcuts)
+        def remove_shortcuts(title):
+            for path in get_all_shortcut_paths():
+                if os.path.exists(path):
+                    try:
+                        with open(path, 'rb') as f:
+                            shortcuts = vdf.binary_load(f)
 
-        def remove_shortcuts(shortcuts, title):
-            # Find and remove existing shortcuts with the same title
-            if os.path.exists(steam_shortcuts_path):
-                to_remove = [app_id for app_id, game in shortcuts["shortcuts"].items() if
-                             isinstance(game, dict) and "AppName" in game and game["AppName"] == title]
-                for app_id in to_remove:
-                    del shortcuts["shortcuts"][app_id]
-                save_shortcuts(shortcuts)
+                        if "shortcuts" in shortcuts:
+                            to_remove = [app_id for app_id, game_info in shortcuts["shortcuts"].items() if
+                                         isinstance(game_info, dict) and "AppName" in game_info and game_info["AppName"] == title]
+                            if to_remove:
+                                for app_id in to_remove:
+                                    del shortcuts["shortcuts"][app_id]
+                                save_shortcuts(shortcuts, path)
+                    except SyntaxError:
+                        pass
 
-        def load_shortcuts(title):
-            # Check if the file exists
-            if os.path.exists(steam_shortcuts_path):
+        def load_shortcuts(path):
+            if os.path.exists(path):
                 try:
-                    # Attempt to load existing shortcuts
-                    with open(steam_shortcuts_path, 'rb') as f:
+                    with open(path, 'rb') as f:
                         return vdf.binary_load(f)
                 except SyntaxError:
-                    # If the file is corrupted, create a new one
                     return {"shortcuts": {}}
-            else:
-                # If the file does not exist, create a new one
-                return {"shortcuts": {}}
+            return {"shortcuts": {}}
 
-        def save_shortcuts(shortcuts):
-            if not os.path.exists(steam_shortcuts_path):
-                open(steam_shortcuts_path, 'wb').close()
-
-            with open(steam_shortcuts_path, 'wb') as f:
+        def save_shortcuts(shortcuts, path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, 'wb') as f:
                 vdf.binary_dump(shortcuts, f)
 
-        # Check if the shortcut checkbox is checked
         if not steam_shortcut_state:
-            # Remove existing shortcut if it exists
-            shortcuts = load_shortcuts(game.title)
-            remove_shortcuts(shortcuts, game.title)
+            remove_shortcuts(game.title)
             if os.path.isfile(os.path.expanduser(icon_temp)):
                 os.rename(os.path.expanduser(icon_temp), icon_final)
             return
@@ -3321,12 +3330,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if os.path.isfile(os.path.expanduser(icon_temp)):
             os.rename(os.path.expanduser(icon_temp), icon_final)
 
-        # Check if the icon file exists
         new_icon_path = f"{icons_dir}/{game.gameid}.png"
         if not os.path.exists(new_icon_path):
             new_icon_path = faugus_png
 
-        # Get the directory containing the executable
         game_directory = os.path.dirname(game.path)
 
         add_game_to_steam(game.title, game_directory, new_icon_path)
@@ -5213,7 +5220,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        if not detect_steam_id():
+        if not get_all_shortcut_paths():
             self.checkbox_shortcut_steam.set_sensitive(False)
             self.checkbox_shortcut_steam.set_tooltip_text(
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))

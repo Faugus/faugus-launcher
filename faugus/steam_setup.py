@@ -47,23 +47,22 @@ lossless_dll = (
     else ""
 )
 
-def detect_steam_id():
+def get_all_shortcut_paths():
+    paths = []
     if userdata:
         try:
             steam_ids = [f for f in os.listdir(userdata)
                          if os.path.isdir(os.path.join(userdata, f)) and f.isdigit()]
-            return steam_ids[0] if steam_ids else None
+            for sid in steam_ids:
+                paths.append(userdata / sid / "config/shortcuts.vdf")
         except (FileNotFoundError, PermissionError):
-            return None
-    return None
-
-steam_id = detect_steam_id()
-steam_shortcuts_path = userdata / steam_id / "config/shortcuts.vdf" if userdata and steam_id else ""
+            pass
+    return paths
 
 def read_library_folders():
     libraries = []
 
-    if not library.exists():
+    if not library or not library.exists():
         return libraries
 
     with open(library, "r", errors="ignore") as f:
@@ -102,7 +101,7 @@ def read_installed_games():
     return sorted(games, key=lambda x: x[1].lower())
 
 def get_steam_icon_path(appid):
-    if not librarycache.exists():
+    if not librarycache or not librarycache.exists():
         return None
 
     cache = librarycache / str(appid)
