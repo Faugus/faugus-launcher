@@ -3013,7 +3013,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def extract_best_icon(self, exe_path, gameid):
         os.makedirs(icons_dir, exist_ok=True)
         final = os.path.join(icons_dir, f"{gameid}.png")
-        status = extract_ico_frames(exe_path, final)
+        status = extract_ico(exe_path, final, best_frame=True)
         return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
@@ -5636,7 +5636,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         if os.path.isfile(path):
             os.makedirs(self.icon_directory, exist_ok=True)
-            status = extract_ico_simple(path, self.icon_converted)
+            status = extract_ico(path, self.icon_converted, best_frame=False)
             if status == "no_icons":
                 self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
 
@@ -5781,7 +5781,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
             os.makedirs(self.icon_directory, exist_ok=True)
 
-            status = extract_ico_frames(path, self.icon_temp)
+            status = extract_ico(path, self.icon_temp, best_frame=True)
             if status == "ok":
                 surface = self.new_surface_from_image(self.icon_temp, 50, 50)
                 self.button_shortcut_icon.set_image(Gtk.Image.new_from_surface(surface))
