@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from faugus.path_manager import PathManager, IS_FLATPAK, games_json, presets_file, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun, icons_dir, faugus_banner, banners_dir, backup_dir, faugus_mono_icon, faugus_notification, eac_dir, be_dir, shortcut_icons_dir
+from faugus.proton_downloader import CONFIGS
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
 
 def apply_dark_theme():
@@ -440,10 +441,11 @@ def version_key(v):
     return [int(p) if p.isdigit() else p for p in parts]
 
 def populate_combobox_with_runners(combobox):
-    combobox.append_text("Proton-CachyOS Latest (default)")
-    combobox.append_text("GE-Proton Latest")
-    combobox.append_text("Proton-EM Latest")
-    combobox.append_text("DW-Proton Latest")
+    for i, cfg in enumerate(CONFIGS.values()):
+        label = f"{cfg['name']} Latest"
+        if i == 0:
+            label += " (default)"
+        combobox.append_text(label)
     combobox.append_text("UMU-Proton Latest")
 
     if os.path.exists(proton_cachyos):
@@ -457,10 +459,7 @@ def populate_combobox_with_runners(combobox):
                 if (
                     os.path.isdir(entry_path)
                     and entry not in ("UMU-Latest", "LegacyRuntime")
-                    and not entry.startswith("Proton-GE Latest")
-                    and not entry.startswith("Proton-EM Latest")
-                    and not entry.startswith("DW-Proton Latest")
-                    and not entry.startswith("Proton-CachyOS Latest")
+                    and not any(entry.startswith(cfg["latest_dir"]) for cfg in CONFIGS.values())
                 ):
                     versions.append(entry)
 
