@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 import gi
 import sys
@@ -8,15 +8,19 @@ import re
 import time
 import shlex
 import signal
+import warnings
 
-gi.require_version("Gtk", "3.0")
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, Gdk, GLib
-from threading import Thread
+from threading import Thread, Event
 from faugus.config_manager import *
 from faugus.utils import *
 from faugus.ea_fix import *
 from faugus.steam_setup import IS_STEAM_FLATPAK
+from faugus.migration import fix_legacy_shortcut_icons
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -24,13 +28,17 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 os.makedirs(compatibility_dir, exist_ok=True)
+fix_legacy_shortcut_icons()
 
 _ = setup_gettext('faugus-run')
 
 _env_set = set()
+
+
 def set_env(key, value):
     os.environ[key] = value
     _env_set.add(key)
+
 
 class FaugusRun(HiDpiMixin):
     def __init__(self, message, command=None):
@@ -43,6 +51,7 @@ class FaugusRun(HiDpiMixin):
         self.proton_latest = None
 
         self.load_config()
+        load_frame_css()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
     def get_scale_factor(self):
@@ -60,8 +69,9 @@ class FaugusRun(HiDpiMixin):
             self.process_thread.start()
             return False
 
+        self.loop = GLib.MainLoop()
         GLib.idle_add(start_thread)
-        Gtk.main()
+        self.loop.run()
 
         self.process_thread.join()
         sys.exit(0)
@@ -113,17 +123,16 @@ class FaugusRun(HiDpiMixin):
             GLib.idle_add(update_ui)
 
             def close_app():
-                Gtk.main_quit()
+                self.loop.quit()
                 sys.exit()
                 return False
 
             GLib.timeout_add(5000, close_app)
             return
 
-        # LSFG_LEGACY env is deprecated in LSFG-VK 2.0
         if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
             if self.lossless_location:
-                set_env("LSFG_DLL_PATH", self.lossless_location) # Deprecated in LSFG-VK v2.0
+                set_env("LSFG_DLL_PATH", self.lossless_location)
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
         if self.enable_logging:
@@ -287,152 +296,166 @@ class FaugusRun(HiDpiMixin):
         start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
-        dialog = Gtk.Dialog(title="Faugus Launcher")
-        dialog.set_decorated(False)
-        dialog.set_resizable(False)
-        play_notification_sound()
+        done = Event()
+        result = {"checked": False}
 
-        css_provider = Gtk.CssProvider()
-        css = """
-        .paypal {
-            color: white;
-            background: #001C64;
-        }
-        .kofi {
-            color: white;
-            background: #1AC0FF;
-        }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                                Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        def build_and_show():
+            dialog = Gtk.Dialog(title="Faugus")
+            hide_dialog_action_area(dialog)
+            dialog.set_decorated(False)
+            dialog.set_resizable(False)
+            play_notification_sound()
 
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
+            css_provider = Gtk.CssProvider()
+            css = """
+            .paypal {
+                color: white;
+                background: #001C64;
+            }
+            .kofi {
+                color: white;
+                background: #1AC0FF;
+            }
+            """
+            css_provider.load_from_data(css.encode('utf-8'))
+            Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
+                                                    Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        frame = Gtk.Frame()
-        frame.set_label_align(0.5, 0.5)
-        frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            content_area = dialog.get_content_area()
+            content_area.set_halign(Gtk.Align.CENTER)
+            content_area.set_valign(Gtk.Align.CENTER)
+            content_area.set_vexpand(True)
+            content_area.set_hexpand(True)
 
-        frame.add(frame_box)
-        content_area.add(frame)
+            frame = Gtk.Frame()
+            frame.set_label_align(0.5)
+            frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
+            frame.set_child(frame_box)
+            content_area.append(frame)
 
-        self._scale_widget = dialog
-        surface = self.new_surface_from_image(faugus_png, 75, 75)
-        image = Gtk.Image.new_from_surface(surface)
+            box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            box_top.set_margin_start(20)
+            box_top.set_margin_end(20)
+            box_top.set_margin_top(20)
+            box_top.set_margin_bottom(20)
 
-        label = Gtk.Label(label=_("Are you enjoying Faugus Launcher?"))
-        label.set_halign(Gtk.Align.CENTER)
+            self._scale_widget = dialog
+            texture = self.new_texture_from_image(faugus_png_raster, 75, 75)
+            image = new_picture(texture)
 
-        label2 = Gtk.Label(
-            label = _("Please consider donating") + " ❤️"
-        )
-        label2.set_halign(Gtk.Align.CENTER)
+            label = Gtk.Label(label=_("Are you enjoying Faugus?"))
+            label.set_halign(Gtk.Align.CENTER)
 
-        button_kofi, button_paypal = make_donate_buttons()
+            label2 = Gtk.Label(
+                label = _("Please consider donating") + " ❤️"
+            )
+            label2.set_halign(Gtk.Align.CENTER)
 
-        checkbox = Gtk.CheckButton(label=_("Never show this message again"))
-        checkbox.set_halign(Gtk.Align.CENTER)
+            button_kofi, button_paypal = make_donate_buttons()
 
-        box_top.pack_start(image, True, True, 0)
-        box_top.pack_start(label, True, True, 0)
-        box_top.pack_start(label2, True, True, 0)
-        box_top.pack_start(button_kofi, True, True, 0)
-        box_top.pack_start(button_paypal, True, True, 0)
-        box_top.pack_start(checkbox, True, True, 0)
+            checkbox = Gtk.CheckButton(label=_("Never show this message again"))
+            checkbox.set_halign(Gtk.Align.CENTER)
 
-        button_continue = Gtk.Button(label=_("Continue"))
-        button_continue.set_size_request(150, -1)
-        button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+            box_top.append(image)
+            box_top.append(label)
+            box_top.append(label2)
+            box_top.append(button_kofi)
+            box_top.append(button_paypal)
+            box_top.append(checkbox)
 
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-        box_bottom.pack_start(button_continue, True, True, 0)
+            button_continue = Gtk.Button(label=_("Continue"))
+            button_continue.set_size_request(150, -1)
+            button_continue.set_hexpand(True)
+            button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
-        frame_box.pack_start(box_top, True, True, 0)
-        frame_box.pack_start(box_bottom, False, False, 0)
+            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            box_bottom.set_margin_start(10)
+            box_bottom.set_margin_end(10)
+            box_bottom.set_margin_bottom(10)
+            box_bottom.append(button_continue)
 
-        checkbox_state = False
+            frame_box.append(box_top)
+            frame_box.append(box_bottom)
 
-        def on_dialog_response(dialog, response_id):
-            nonlocal checkbox_state
-            if response_id == Gtk.ResponseType.OK:
-                checkbox_state = checkbox.get_active()
-            dialog.destroy()
+            def on_dialog_response(dialog, response_id):
+                if response_id == Gtk.ResponseType.OK:
+                    result["checked"] = checkbox.get_active()
+                dialog.destroy()
+                done.set()
 
-        dialog.connect("response", on_dialog_response)
+            dialog.connect("response", on_dialog_response)
+            dialog.present()
+            return False
 
-        dialog.show_all()
-        dialog.run()
+        GLib.idle_add(build_and_show)
+        done.wait()
 
-        if checkbox_state:
+        if result["checked"]:
             self.cfg.set_value("show-donate", False)
             self.cfg.save_config()
 
     def show_error_dialog(self, protonpath=None, network_error=False):
-        dialog = Gtk.Dialog(title="Faugus Launcher")
-        dialog.set_resizable(False)
-        play_notification_sound()
+        done = Event()
 
-        content_area = dialog.get_content_area()
-        content_area.set_border_width(0)
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
+        def build_and_show():
+            dialog = Gtk.Dialog(title="Faugus")
+            hide_dialog_action_area(dialog)
+            dialog.set_resizable(False)
+            play_notification_sound()
 
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
+            content_area = dialog.get_content_area()
+            content_area.set_halign(Gtk.Align.CENTER)
+            content_area.set_valign(Gtk.Align.CENTER)
+            content_area.set_vexpand(True)
+            content_area.set_hexpand(True)
 
-        if network_error:
-            label = Gtk.Label(label=_("Internet connection error."))
-            label.set_halign(Gtk.Align.CENTER)
-            box_top.pack_start(label, True, True, 0)
-        else:
-            label = Gtk.Label(label=_("%s was not found.") % protonpath)
-            label.set_halign(Gtk.Align.CENTER)
+            box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            box_top.set_margin_start(20)
+            box_top.set_margin_end(20)
+            box_top.set_margin_top(20)
+            box_top.set_margin_bottom(20)
 
-            label2 = Gtk.Label(
-                label=_("Please install it or use another Proton version.")
-            )
-            label2.set_halign(Gtk.Align.CENTER)
+            if network_error:
+                label = Gtk.Label(label=_("Internet connection error."))
+                label.set_halign(Gtk.Align.CENTER)
+                box_top.append(label)
+            else:
+                label = Gtk.Label(label=_("%s was not found.") % protonpath)
+                label.set_halign(Gtk.Align.CENTER)
 
-            box_top.pack_start(label, True, True, 0)
-            box_top.pack_start(label2, True, True, 0)
+                label2 = Gtk.Label(
+                    label=_("Please install it or use another Proton version.")
+                )
+                label2.set_halign(Gtk.Align.CENTER)
 
-        button_ok = Gtk.Button(label=_("Ok"))
-        button_ok.set_size_request(150, -1)
-        button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+                box_top.append(label)
+                box_top.append(label2)
 
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-        box_bottom.pack_start(button_ok, True, True, 0)
+            button_ok = Gtk.Button(label=_("Ok"))
+            button_ok.set_size_request(150, -1)
+            button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
-        content_area.add(box_top)
-        content_area.add(box_bottom)
+            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            box_bottom.set_margin_start(10)
+            box_bottom.set_margin_end(10)
+            box_bottom.set_margin_bottom(10)
+            box_bottom.append(button_ok)
 
-        dialog.show_all()
-        dialog.run()
-        dialog.destroy()
-        Gtk.main_quit()
+            content_area.append(box_top)
+            content_area.append(box_bottom)
+
+            def on_response(dialog, response_id):
+                dialog.destroy()
+                done.set()
+
+            dialog.connect("response", on_response)
+            dialog.present()
+            return False
+
+        GLib.idle_add(build_and_show)
+        done.wait()
+        self.loop.quit()
         sys.exit()
 
     def extract_env_from_message(self):
@@ -488,29 +511,27 @@ class FaugusRun(HiDpiMixin):
         self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
 
     def show_splash(self):
-        self.splash_window = Gtk.Window(title="Faugus Launcher")
-        self.splash_window.set_wmclass("faugus-launcher", "faugus-launcher")
+        self.splash_window = Gtk.Window(title="Faugus")
         self.splash_window.set_decorated(False)
         self.splash_window.set_resizable(False)
         self.splash_window.set_default_size(280, -1)
 
         frame = Gtk.Frame()
-        frame.set_label_align(0.5, 0.5)
-        frame.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        frame.set_label_align(0.5)
 
         grid = Gtk.Grid()
         grid.set_halign(Gtk.Align.CENTER)
         grid.set_valign(Gtk.Align.CENTER)
-        frame.add(grid)
+        frame.set_child(grid)
 
         game_icon = os.environ.get("SPLASHICON")
         if game_icon and os.path.exists(game_icon):
             image_path = game_icon
         else:
-            image_path = faugus_png
+            image_path = faugus_png_raster
         self._scale_widget = self.splash_window
-        surface = self.new_surface_from_image(image_path, 75, 75)
-        image = Gtk.Image.new_from_surface(surface)
+        texture = self.new_texture_from_image(image_path, 75, 75)
+        image = new_picture(texture)
         image.set_margin_top(20)
         image.set_margin_start(20)
         image.set_margin_end(20)
@@ -524,11 +545,12 @@ class FaugusRun(HiDpiMixin):
 
         grid.attach(self.label, 0, 1, 1, 1)
 
-        self.splash_window.add(frame)
-        self.splash_window.show_all()
+        self.splash_window.set_child(frame)
+        self.splash_window.present()
 
-        while Gtk.events_pending():
-            Gtk.main_iteration()
+        main_context = GLib.MainContext.default()
+        while main_context.pending():
+            main_context.iteration(False)
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
@@ -539,15 +561,16 @@ class FaugusRun(HiDpiMixin):
 
         self.text_view = Gtk.TextView()
         self.text_view.set_editable(False)
-        scrolled_window.add(self.text_view)
-        self.log_window.add(scrolled_window)
+        scrolled_window.set_child(self.text_view)
+        self.log_window.set_child(scrolled_window)
 
-        self.log_window.connect("delete-event", self.on_log_window_delete_event)
-        self.log_window.show_all()
+        self.log_window.connect("close-request", self.on_log_window_close_request)
+        self.log_window.present()
 
     def check_game_output(self, clean_line):
         if "Downloading upscaler file" in clean_line:
             return False
+
         def update_ui():
             if (
                 "Downloading" in clean_line
@@ -648,7 +671,7 @@ class FaugusRun(HiDpiMixin):
             self.log_window.destroy()
             self.log_window = None
 
-    def on_log_window_delete_event(self, widget, event):
+    def on_log_window_close_request(self, window):
         return True
 
     def show_regedit_confirmation(self):
@@ -657,7 +680,8 @@ class FaugusRun(HiDpiMixin):
             last_part = parts[-1].strip('"')
 
             if last_part.endswith(".reg"):
-                dialog = Gtk.Dialog(title="Faugus Launcher", modal=True)
+                dialog = Gtk.Dialog(title="Faugus", modal=True)
+                hide_dialog_action_area(dialog)
                 dialog.set_resizable(False)
                 subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
 
@@ -670,7 +694,6 @@ class FaugusRun(HiDpiMixin):
                 button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
 
                 content_area = dialog.get_content_area()
-                content_area.set_border_width(0)
                 content_area.set_halign(Gtk.Align.CENTER)
                 content_area.set_valign(Gtk.Align.CENTER)
                 content_area.set_vexpand(True)
@@ -687,20 +710,26 @@ class FaugusRun(HiDpiMixin):
                 box_bottom.set_margin_end(10)
                 box_bottom.set_margin_bottom(10)
 
-                box_top.pack_start(label, True, True, 0)
-                box_bottom.pack_start(button_yes, True, True, 0)
+                box_top.append(label)
+                box_bottom.append(button_yes)
 
-                content_area.add(box_top)
-                content_area.add(box_bottom)
+                content_area.append(box_top)
+                content_area.append(box_bottom)
 
-                dialog.show_all()
-                dialog.run()
-                dialog.destroy()
-                Gtk.main_quit()
-                sys.exit()
+                def on_response(dialog, response_id):
+                    dialog.destroy()
+                    self.loop.quit()
+                    sys.exit()
+
+                dialog.connect("response", on_response)
+                dialog.present()
+                return True
+
+        return False
 
     def on_process_exit(self, pid, condition):
         import psutil
+
         def kill_child_proc():
 
             if self.process and self.process.poll() is None:
@@ -744,13 +773,18 @@ class FaugusRun(HiDpiMixin):
                         os.rename(old_path, new_path)
                         break
 
-        GLib.idle_add(self.close_splash_window)
-        GLib.idle_add(self.close_log_window)
-        GLib.idle_add(self.show_regedit_confirmation)
-        GLib.idle_add(Gtk.main_quit)
+        def finish():
+            self.close_splash_window()
+            self.close_log_window()
+            if not self.show_regedit_confirmation():
+                self.loop.quit()
+            return False
+
+        GLib.idle_add(finish)
         kill_child_proc()
 
         return False
+
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
@@ -835,6 +869,7 @@ def build_launch_command(game):
 
     return " ".join(command_parts)
 
+
 def load_game_from_json(gameid):
     games = load_json_file(games_json, None)
     if games is None:
@@ -845,6 +880,7 @@ def load_game_from_json(gameid):
             return game
 
     return None
+
 
 def is_apple_silicon():
     path = "/proc/device-tree/compatible"
@@ -863,7 +899,16 @@ def is_apple_silicon():
     except:
         return False
 
+
 def main():
+    suppress_adwaita_theme_warning()
+
+    cfg = ConfigManager()
+    apply_interface_customization(
+        cfg.config.get('interface-theme', 'system'),
+        cfg.config.get('accent-color', 'system'),
+    )
+
     if is_apple_silicon() and 'FAUGUS_MUVM' not in os.environ:
         import shutil
         muvm_path = shutil.which('muvm')
@@ -871,8 +916,6 @@ def main():
             env = os.environ.copy()
             args = [muvm_path, "-i", "-e", "FAUGUS_MUVM=1", sys.executable, os.path.abspath(__file__)]
             os.execvpe(muvm_path, args + sys.argv[1:], env)
-
-    apply_dark_theme()
 
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument("message", nargs='?')
@@ -890,6 +933,7 @@ def main():
         FaugusRun(launch_options, None).run()
     else:
         FaugusRun(args.message, args.command).run()
+
 
 if __name__ == "__main__":
     update_games_json()

@@ -3,40 +3,44 @@ import shutil
 import sys
 import time
 import calendar
+import warnings
 from datetime import datetime, timedelta
 import gi
-gi.require_version('Gtk', '3.0')
+
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css
+from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser
 
-def load_config(faugus_dir):
+
+def load_config():
     config = {}
-    config_path = os.path.join(faugus_dir, "config.ini")
-    if os.path.isfile(config_path):
-        with open(config_path, 'r') as f:
+    if os.path.isfile(config_file_dir):
+        with open(config_file_dir, 'r') as f:
             for line in f.read().splitlines():
                 if '=' in line:
                     key, value = line.split('=', 1)
                     config[key.strip()] = value.strip().strip('"')
     return config
 
-def save_config(faugus_dir, config):
-    config_path = os.path.join(faugus_dir, "config.ini")
-    with open(config_path, 'w') as f:
+
+def save_config(config):
+    os.makedirs(os.path.dirname(config_file_dir), exist_ok=True)
+    with open(config_file_dir, 'w') as f:
         for key, value in config.items():
             if key in ['default-prefix', 'default-runner']:
                 f.write(f'{key}="{value}"\n')
             else:
                 f.write(f'{key}={value}\n')
 
-def perform_backup(faugus_dir, dest_path):
-    items = ["banners", "games-backup", "icons", "config.ini", "envar.txt", "games.json", "latest-games.txt"]
-    temp_dir = os.path.join(faugus_dir, "temp-backup")
+
+def perform_backup(dest_path):
+    temp_dir = os.path.join(faugus_temp, "temp-backup")
     os.makedirs(temp_dir, exist_ok=True)
 
-    for item in items:
-        src = os.path.join(faugus_dir, item)
+    for item, src in BACKUP_ITEMS.items():
         dst = os.path.join(temp_dir, item)
         if os.path.isdir(src):
             shutil.copytree(src, dst, dirs_exist_ok=True)
@@ -49,7 +53,7 @@ def perform_backup(faugus_dir, dest_path):
         f.write("faugus-launcher-backup")
 
     current_date = datetime.now().strftime("%Y-%m-%d")
-    zip_path = os.path.join(faugus_dir, f"faugus-launcher-{current_date}")
+    zip_path = os.path.join(faugus_temp, f"faugus-launcher-{current_date}")
 
     shutil.make_archive(zip_path, "zip", temp_dir)
     shutil.rmtree(temp_dir)
@@ -61,7 +65,8 @@ def perform_backup(faugus_dir, dest_path):
     shutil.move(zip_path + ".zip", dest_path)
     return current_date
 
-def setup_autostart(enable, faugus_dir):
+
+def setup_autostart(enable):
     autostart_dir = os.path.expanduser("~/.config/autostart")
     desktop_file = os.path.join(autostart_dir, "faugus-backup.desktop")
 
@@ -71,13 +76,14 @@ def setup_autostart(enable, faugus_dir):
             f.write("[Desktop Entry]\n")
             f.write("Type=Application\n")
             f.write("Name=Faugus Backup Service\n")
-            f.write(f"Exec=python -m faugus.backup --daemon {faugus_dir}\n")
+            f.write("Exec=python -m faugus.backup --daemon\n")
             f.write("Hidden=false\n")
             f.write("NoDisplay=false\n")
             f.write("X-GNOME-Autostart-enabled=true\n")
     else:
         if os.path.exists(desktop_file):
             os.remove(desktop_file)
+
 
 def get_last_monthly_target(today, target_day):
     def safe_replace(date_obj, day):
@@ -94,6 +100,7 @@ def get_last_monthly_target(today, target_day):
     first_day_current_month = today.replace(day=1)
     last_day_prev_month = first_day_current_month - timedelta(days=1)
     return safe_replace(last_day_prev_month, target_day)
+
 
 def should_run_backup(config):
     if config.get('backup-auto-enabled', 'False') != 'True':
@@ -128,10 +135,11 @@ def should_run_backup(config):
 
     return False
 
-def daemon_mode(faugus_dir):
+
+def daemon_mode():
     while True:
         try:
-            config = load_config(faugus_dir)
+            config = load_config()
             if should_run_backup(config):
                 dest_dir = config.get('backup-dest-dir', '')
                 if not dest_dir:
@@ -141,28 +149,31 @@ def daemon_mode(faugus_dir):
                 zip_filename = f"faugus-launcher-{current_date}.zip"
                 dest_path = os.path.join(dest_dir, zip_filename)
 
-                new_date = perform_backup(faugus_dir, dest_path)
+                new_date = perform_backup(dest_path)
                 config['backup-last-date'] = new_date
-                save_config(faugus_dir, config)
+                save_config(config)
         except Exception:
             pass
         time.sleep(14400)
 
+
 _ = setup_gettext('faugus-launcher')
 
+
 class BackupWindow(Gtk.Dialog):
-    def __init__(self, parent, faugus_dir):
+    def __init__(self, parent):
         super().__init__(title=_("Backup Settings"), transient_for=parent)
+        hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
 
-        self.faugus_dir = faugus_dir
-        self.config = load_config(self.faugus_dir)
+        self.config = load_config()
 
         load_red_entry_css()
+        load_frame_css()
 
         self.root_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.get_content_area().pack_start(self.root_box, True, True, 0)
+        self.get_content_area().append(self.root_box)
 
         self.frame = Gtk.Frame()
         self.frame.set_margin_start(10)
@@ -175,12 +186,12 @@ class BackupWindow(Gtk.Dialog):
         self.main_box.set_margin_bottom(10)
         self.main_box.set_margin_start(10)
         self.main_box.set_margin_end(10)
-        self.frame.add(self.main_box)
-        self.root_box.pack_start(self.frame, True, True, 0)
+        self.frame.set_child(self.main_box)
+        self.root_box.append(self.frame)
 
         self.lbl_path = Gtk.Label(label=_("Backup Destination"))
         self.lbl_path.set_halign(Gtk.Align.START)
-        self.main_box.pack_start(self.lbl_path, False, False, 0)
+        self.main_box.append(self.lbl_path)
 
         dest_dir = self.config.get('backup-dest-dir', '')
         if not dest_dir:
@@ -192,17 +203,17 @@ class BackupWindow(Gtk.Dialog):
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
         self.btn_browse = Gtk.Button()
-        self.btn_browse.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.btn_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
         self.btn_browse.connect("clicked", self.on_browse_clicked)
         self.btn_browse.set_size_request(50, -1)
-        self.box_dest.pack_start(self.entry_dest, True, True, 0)
-        self.box_dest.pack_start(self.btn_browse, False, False, 0)
-        self.main_box.pack_start(self.box_dest, False, False, 0)
+        self.box_dest.append(self.entry_dest)
+        self.box_dest.append(self.btn_browse)
+        self.main_box.append(self.box_dest)
 
         self.btn_manual = Gtk.Button(label=_("Backup now"))
         self.btn_manual.set_margin_top(10)
         self.btn_manual.connect("clicked", self.on_manual_clicked)
-        self.main_box.pack_start(self.btn_manual, False, False, 0)
+        self.main_box.append(self.btn_manual)
 
         self.box_switch = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         self.check_auto = Gtk.CheckButton(label=_("Automatic Backup"))
@@ -210,23 +221,24 @@ class BackupWindow(Gtk.Dialog):
         is_enabled = self.config.get('backup-auto-enabled', 'False') == 'True'
         self.check_auto.set_active(is_enabled)
         self.check_auto.connect("toggled", self.on_check_toggled)
-        self.box_switch.pack_start(self.check_auto, False, False, 0)
-        self.main_box.pack_start(self.box_switch, False, False, 0)
+        self.box_switch.append(self.check_auto)
+        self.main_box.append(self.box_switch)
 
         self.box_freq = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.radio_daily = Gtk.RadioButton.new_with_label_from_widget(None, _("Daily"))
-        self.radio_weekly = Gtk.RadioButton.new_with_label_from_widget(self.radio_daily, _("Weekly"))
-        self.radio_monthly = Gtk.RadioButton.new_with_label_from_widget(self.radio_daily, _("Monthly"))
+        self.radio_daily = Gtk.CheckButton(label=_("Daily"))
+        self.radio_weekly = Gtk.CheckButton(label=_("Weekly"))
+        self.radio_weekly.set_group(self.radio_daily)
+        self.radio_monthly = Gtk.CheckButton(label=_("Monthly"))
+        self.radio_monthly.set_group(self.radio_daily)
 
-        self.box_freq.pack_start(self.radio_daily, False, False, 0)
-        self.box_freq.pack_start(self.radio_weekly, False, False, 0)
-        self.box_freq.pack_start(self.radio_monthly, False, False, 0)
-        self.main_box.pack_start(self.box_freq, False, False, 0)
+        self.box_freq.append(self.radio_daily)
+        self.box_freq.append(self.radio_weekly)
+        self.box_freq.append(self.radio_monthly)
+        self.main_box.append(self.box_freq)
 
         self.box_weekly = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.box_weekly.set_no_show_all(True)
 
-        self.combo_weekly = Gtk.ComboBoxText()
+        self.combo_weekly = IdComboBox()
         self.combo_weekly.set_tooltip_text(_("Day of the week"))
         days = [
             ("Monday", _("Monday")),
@@ -240,32 +252,29 @@ class BackupWindow(Gtk.Dialog):
         for day_id, day_name in days:
             self.combo_weekly.append(day_id, day_name)
         self.combo_weekly.set_active(0)
-        self.combo_weekly.show()
         self.combo_weekly.set_hexpand(True)
-        self.box_weekly.pack_start(self.combo_weekly, False, True, 0)
-        self.main_box.pack_start(self.box_weekly, False, False, 0)
+        self.box_weekly.append(self.combo_weekly)
+        self.main_box.append(self.box_weekly)
 
         self.box_monthly = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.box_monthly.set_no_show_all(True)
 
         adj = Gtk.Adjustment(value=1, lower=1, upper=31, step_increment=1, page_increment=5, page_size=0)
         self.spin_monthly = Gtk.SpinButton(adjustment=adj, numeric=True)
         self.spin_monthly.set_tooltip_text(_("Day of the month"))
-        self.spin_monthly.show()
         self.spin_monthly.set_hexpand(True)
-        self.box_monthly.pack_start(self.spin_monthly, False, True, 0)
-        self.main_box.pack_start(self.box_monthly, False, False, 0)
+        self.box_monthly.append(self.spin_monthly)
+        self.main_box.append(self.box_monthly)
 
         last_date = self.config.get('backup-last-date')
         if not last_date or not last_date.strip():
             last_date = _("No backup yet")
         self.lbl_last_backup = Gtk.Label(label=f"{_('Last backup:')} {last_date}")
         self.lbl_last_backup.set_margin_top(10)
-        self.main_box.pack_start(self.lbl_last_backup, False, False, 0)
+        self.main_box.append(self.lbl_last_backup)
 
         self.lbl_warning = Gtk.Label(label=_("Prefixes and Protons will not be backed up!"))
         self.lbl_warning.set_markup(f'<span color="red">{_("Prefixes and Protons will not be backed up!")}</span>')
-        self.main_box.pack_start(self.lbl_warning, False, False, 0)
+        self.main_box.append(self.lbl_warning)
 
         self.btn_cancel = Gtk.Button(label=_("Cancel"))
         self.btn_cancel.set_size_request(100, -1)
@@ -281,10 +290,10 @@ class BackupWindow(Gtk.Dialog):
         self.bottom_box.set_margin_start(10)
         self.bottom_box.set_margin_end(10)
         self.bottom_box.set_margin_bottom(10)
-        self.bottom_box.pack_start(self.btn_cancel, True, True, 0)
-        self.bottom_box.pack_start(self.btn_ok, True, True, 0)
+        self.bottom_box.append(self.btn_cancel)
+        self.bottom_box.append(self.btn_ok)
 
-        self.root_box.pack_start(self.bottom_box, False, False, 0)
+        self.root_box.append(self.bottom_box)
 
         freq_val = self.config.get('backup-frequency', 'daily')
         if freq_val == 'weekly':
@@ -305,7 +314,6 @@ class BackupWindow(Gtk.Dialog):
         self.radio_monthly.connect("toggled", self.on_freq_toggled)
 
         self.update_ui_state()
-        self.show_all()
 
     def on_check_toggled(self, widget):
         self.update_ui_state()
@@ -327,21 +335,23 @@ class BackupWindow(Gtk.Dialog):
         self.box_monthly.set_visible(is_active and self.radio_monthly.get_active())
 
     def on_browse_clicked(self, widget):
-        filechooser = Gtk.FileChooserNative(
-            title=_("Select the backup destination"),
-            action=Gtk.FileChooserAction.SELECT_FOLDER,
-            accept_label=_("Open"),
-            cancel_label=_("Cancel")
+        filechooser = new_file_chooser(
+            self,
+            _("Select the backup destination"),
+            Gtk.FileChooserAction.SELECT_FOLDER,
         )
-        filechooser.set_transient_for(self)
-        response = filechooser.run()
-        if response == Gtk.ResponseType.ACCEPT:
-            self.entry_dest.set_text(filechooser.get_filename())
-        filechooser.destroy()
+
+        def on_response(dialog, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                self.entry_dest.set_text(dialog.get_file().get_path())
+            dialog.destroy()
+
+        filechooser.connect("response", on_response)
+        filechooser.present()
 
     def on_manual_clicked(self, widget):
         if not self.entry_dest.get_text():
-            self.entry_dest.get_style_context().add_class("entry")
+            self.entry_dest.add_css_class("entry")
             return
         dest_dir = self.entry_dest.get_text()
         if not dest_dir:
@@ -352,9 +362,9 @@ class BackupWindow(Gtk.Dialog):
         dest_path = os.path.join(dest_dir, zip_filename)
 
         try:
-            new_date = perform_backup(self.faugus_dir, dest_path)
+            new_date = perform_backup(dest_path)
             self.config['backup-last-date'] = new_date
-            save_config(self.faugus_dir, self.config)
+            save_config(self.config)
             self.lbl_last_backup.set_text(f"{_('Last backup:')} {new_date}")
         except Exception:
             pass
@@ -376,9 +386,9 @@ class BackupWindow(Gtk.Dialog):
             self.config['backup-target-day'] = str(int(self.spin_monthly.get_value()))
 
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
-        save_config(self.faugus_dir, self.config)
+        save_config(self.config)
 
-        setup_autostart(self.check_auto.get_active(), self.faugus_dir)
+        setup_autostart(self.check_auto.get_active())
 
         if self.check_auto.get_active() and should_run_backup(self.config):
             try:
@@ -389,14 +399,15 @@ class BackupWindow(Gtk.Dialog):
                 zip_filename = f"faugus-launcher-{current_date}.zip"
                 dest_path = os.path.join(dest_dir, zip_filename)
 
-                new_date = perform_backup(self.faugus_dir, dest_path)
+                new_date = perform_backup(dest_path)
                 self.config['backup-last-date'] = new_date
-                save_config(self.faugus_dir, self.config)
+                save_config(self.config)
             except Exception:
                 pass
 
         self.destroy()
 
+
 if __name__ == "__main__":
-    if len(sys.argv) > 2 and sys.argv[1] == "--daemon":
-        daemon_mode(sys.argv[2])
+    if len(sys.argv) > 1 and sys.argv[1] == "--daemon":
+        daemon_mode()

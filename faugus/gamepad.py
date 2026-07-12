@@ -1,22 +1,89 @@
 import time
-import pygame
-from gi.repository import Gdk, GLib, Gtk
+import gi
+gi.require_version("Manette", "0.2")
+gi.require_version("Gtk", "4.0")
+from gi.repository import GLib, Gtk, Manette
 from faugus.keyboard import VirtualKeyboard
+from faugus.path_manager import PathManager
+from faugus.utils import widget_children, IdComboBox
 
-def get_button_map(joy):
-    name = joy.get_name().lower()
+MAPPED_BUTTONS = {
+    "confirm": 5,
+    "back": 7,
+    "square": 6,
+    "triangle": 4,
+    "lb": 11,
+    "rb": 12,
+    "start": 9,
+}
+MAPPED_DPAD = {
+    0: Gtk.DirectionType.UP,
+    1: Gtk.DirectionType.DOWN,
+    2: Gtk.DirectionType.LEFT,
+    3: Gtk.DirectionType.RIGHT,
+}
 
-    if any(kw in name for kw in ("playstation", "dualshock", "dualsense", "ps4")):
-        return {"confirm": 0, "back": 1, "square": 2, "triangle": 3, "lb": 9, "rb": 10, "start": 6, "start_alt": 4}
+RAW_BUTTONS = {
+    "confirm": 304,
+    "back": 305,
+    "square": 307,
+    "triangle": 308,
+    "lb": 310,
+    "rb": 311,
+    "start": 315,
+}
+RAW_HAT_AXES = (16, 17)
 
-    return {"confirm": 0, "back": 1, "square": 2, "triangle": 3, "lb": 4, "rb": 5, "start": 7, "start_alt": 6}
+BUTTON_ROLES = {}
+for _role, _code in MAPPED_BUTTONS.items():
+    BUTTON_ROLES[_code] = _role
+for _role, _code in RAW_BUTTONS.items():
+    BUTTON_ROLES[_code] = _role
+
+DPAD_DIRECTIONS = dict(MAPPED_DPAD)
+
+_gamecontrollerdb = None
+
+
+def _load_gamecontrollerdb():
+    global _gamecontrollerdb
+    if _gamecontrollerdb is not None:
+        return _gamecontrollerdb
+
+    mappings = {}
+    path = PathManager.get_asset("gamecontrollerdb.txt")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split(",")
+                if len(parts) < 3:
+                    continue
+                platform_field = next((p for p in parts if p.startswith("platform:")), None)
+                if platform_field and platform_field != "platform:Linux":
+                    continue
+                mappings[parts[0]] = ",".join(parts[2:])
+    except OSError:
+        mappings = {}
+
+    _gamecontrollerdb = mappings
+    return mappings
+
+
+def _apply_gamecontrollerdb_mapping(device):
+    if device.get_mapping() is not None or not device.supports_mapping():
+        return
+    mapping = _load_gamecontrollerdb().get(device.get_guid())
+    if mapping:
+        device.save_user_mapping(mapping)
+
 
 def init_gamepad(self):
-    pygame.init()
-    pygame.joystick.init()
-
-    self.joystick = None
-    self.button_map = None
+    self.gamepad_monitor = Manette.Monitor.new()
+    self.gamepad_device = None
+    self.gamepad_signal_ids = []
 
     self.axis_threshold = 0.7
     self.reset_threshold = 0.3
@@ -29,62 +96,78 @@ def init_gamepad(self):
     self.repeat_delay = 0.5
     self.repeat_interval = 0.1
 
-    self.active_menu_stack = []
+    self.active_popover = None
+    self.gamepad_active_combo = None
+    self.gamepad_combo_popover = None
+    self.gamepad_combo_listbox = None
 
-    GLib.timeout_add(50, lambda: poll_gamepad(self))
+    self.gamepad_monitor.connect("device-connected", lambda mon, device: _attach_device(self, device))
+    self.gamepad_monitor.connect("device-disconnected", lambda mon, device: _detach_device(self, device))
 
-def poll_gamepad(self):
+    iterator = self.gamepad_monitor.iterate()
+    while True:
+        ok, device = iterator.next()
+        if not ok:
+            break
+        _attach_device(self, device)
+
+    GLib.timeout_add(50, lambda: _tick_repeat(self))
+
+
+def _attach_device(self, device):
+    if self.gamepad_device:
+        _detach_device(self, self.gamepad_device)
+
+    self.gamepad_device = device
+
+    _apply_gamecontrollerdb_mapping(device)
+
+    self.gamepad_signal_ids = [
+        device.connect("event", lambda dev, event: _on_device_event(self, event)),
+    ]
+
+
+def _on_device_event(self, event):
+    event_type = event.get_event_type()
+
+    if event_type == Manette.EventType.EVENT_BUTTON_PRESS:
+        _on_button_press(self, event)
+    elif event_type == Manette.EventType.EVENT_BUTTON_RELEASE:
+        _on_button_release(self, event)
+    elif event_type == Manette.EventType.EVENT_ABSOLUTE:
+        _on_absolute_axis(self, event)
+    elif event_type == Manette.EventType.EVENT_HAT:
+        _on_hat_axis(self, event)
+
+
+def _detach_device(self, device):
+    if self.gamepad_device is not device:
+        return
+
+    for signal_id in self.gamepad_signal_ids:
+        device.disconnect(signal_id)
+
+    self.gamepad_signal_ids = []
+    self.gamepad_device = None
+    self.held_direction = None
+
+
+def _is_usable(self):
     active_win = get_active_window()
     is_focused = active_win is not None
     is_running = hasattr(self, "running") and bool(self.running)
 
-    if is_running:
+    if is_running or not is_focused:
         self.held_direction = None
+        return False, active_win
 
-    for event in pygame.event.get():
-        if event.type == pygame.JOYDEVICEADDED:
-            self.joystick = pygame.joystick.Joystick(event.device_index)
-            self.joystick.init()
-            self.button_map = get_button_map(self.joystick)
-            continue
+    return True, active_win
 
-        elif event.type == pygame.JOYDEVICEREMOVED:
-            if self.joystick and self.joystick.get_instance_id() == event.instance_id:
-                self.joystick.quit()
-                self.joystick = None
-                self.button_map = None
-            continue
 
-        if not self.joystick or not self.button_map:
-            continue
+def _tick_repeat(self):
+    usable, _ = _is_usable(self)
 
-        if is_running or not is_focused:
-            self.held_direction = None
-            continue
-
-        menu_visible = False
-        if getattr(self, "active_menu_stack", []):
-            base_menu = self.active_menu_stack[0]["menu"]
-            if base_menu.get_visible():
-                menu_visible = True
-            else:
-                self.active_menu_stack = []
-
-        if event.type == pygame.JOYHATMOTION:
-            _handle_hat_motion(self, event.value)
-
-        elif event.type == pygame.JOYAXISMOTION:
-            _handle_axis_motion(self, event)
-
-        elif event.type == pygame.JOYBUTTONDOWN:
-            if menu_visible:
-                handle_menu_navigation(self, event, self.button_map)
-            else:
-                _handle_button_down(self, event.button)
-
-    if not is_focused or is_running:
-        self.held_direction = None
-    elif getattr(self, "held_direction", None) is not None:
+    if usable and getattr(self, "held_direction", None) is not None:
         now = time.time()
         if now - self.hold_start_time >= self.repeat_delay:
             if now - self.last_repeat_time >= self.repeat_interval:
@@ -92,6 +175,7 @@ def poll_gamepad(self):
                 self.last_repeat_time = now
 
     return True
+
 
 def _set_held_direction(self, direction):
     if direction is not None:
@@ -103,78 +187,161 @@ def _set_held_direction(self, direction):
     else:
         self.held_direction = None
 
+
 def _dispatch_navigation(self, direction):
-    if getattr(self, "active_menu_stack", []) and self.active_menu_stack[0]["menu"].get_visible():
-        _navigate_context_menu(self, direction)
-    else:
-        navigate_gamepad(direction)
+    combo_popover = getattr(self, "gamepad_combo_popover", None)
+    if getattr(self, "gamepad_active_combo", None) and combo_popover and combo_popover.get_visible():
+        _navigate_combo(self, direction)
+        return
+    self.gamepad_active_combo = None
 
-def _handle_hat_motion(self, value):
-    x, y = value
+    active_popover = getattr(self, "active_popover", None)
+    if active_popover and active_popover.get_visible():
+        _navigate_popover(self, direction)
+        return
+    self.active_popover = None
+
+    navigate_gamepad(direction)
+
+
+def _on_hat_axis(self, event):
+    ok, axis, value = event.get_hat()
+    if not ok or not _is_usable(self)[0]:
+        return
+
+    hat_x, hat_y = RAW_HAT_AXES
+
     direction = None
+    if axis == hat_y:
+        if value == -1: direction = Gtk.DirectionType.UP
+        elif value == 1: direction = Gtk.DirectionType.DOWN
+    elif axis == hat_x:
+        if value == -1: direction = Gtk.DirectionType.LEFT
+        elif value == 1: direction = Gtk.DirectionType.RIGHT
 
-    if y == 1: direction = Gtk.DirectionType.UP
-    elif y == -1: direction = Gtk.DirectionType.DOWN
-    elif x == -1: direction = Gtk.DirectionType.LEFT
-    elif x == 1: direction = Gtk.DirectionType.RIGHT
+    if direction is None:
+        held_is_vertical = axis == hat_y and self.held_direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN)
+        held_is_horizontal = axis == hat_x and self.held_direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)
+        if held_is_vertical or held_is_horizontal:
+            _set_held_direction(self, None)
+        return
 
     _set_held_direction(self, direction)
 
-def _handle_axis_motion(self, event):
-    if event.axis == 1:
+
+def _on_absolute_axis(self, event):
+    ok, axis, value = event.get_absolute()
+    if not ok or not _is_usable(self)[0]:
+        return
+
+    if axis == 1:
         if self.can_move_y:
-            if event.value < -self.axis_threshold:
+            if value < -self.axis_threshold:
                 _set_held_direction(self, Gtk.DirectionType.UP)
                 self.can_move_y = False
-            elif event.value > self.axis_threshold:
+            elif value > self.axis_threshold:
                 _set_held_direction(self, Gtk.DirectionType.DOWN)
                 self.can_move_y = False
-        elif abs(event.value) < self.reset_threshold:
+        elif abs(value) < self.reset_threshold:
             self.can_move_y = True
             if getattr(self, "held_direction", None) in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
                 _set_held_direction(self, None)
 
-    elif event.axis == 0:
+    elif axis == 0:
         if self.can_move_x:
-            if event.value < -self.axis_threshold:
+            if value < -self.axis_threshold:
                 _set_held_direction(self, Gtk.DirectionType.LEFT)
                 self.can_move_x = False
-            elif event.value > self.axis_threshold:
+            elif value > self.axis_threshold:
                 _set_held_direction(self, Gtk.DirectionType.RIGHT)
                 self.can_move_x = False
-        elif abs(event.value) < self.reset_threshold:
+        elif abs(value) < self.reset_threshold:
             self.can_move_x = True
             if getattr(self, "held_direction", None) in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
                 _set_held_direction(self, None)
 
-def _handle_button_down(self, button):
-    win = get_active_window()
-    is_dialog_active = isinstance(win, Gtk.Dialog)
-    btn = self.button_map
 
-    if button == btn["confirm"]:
+def _on_button_press(self, event):
+    ok, button = event.get_button()
+    if not ok:
+        return
+
+    usable, active_win = _is_usable(self)
+    if not usable:
+        return
+
+    direction = DPAD_DIRECTIONS.get(button)
+    if direction is not None:
+        _set_held_direction(self, direction)
+        return
+
+    menu_visible = False
+    if getattr(self, "active_popover", None):
+        if self.active_popover.get_visible():
+            menu_visible = True
+        else:
+            self.active_popover = None
+
+    if menu_visible:
+        _handle_menu_button(self, button)
+    else:
+        _handle_button_down(self, button, active_win)
+
+
+def _on_button_release(self, event):
+    ok, button = event.get_button()
+    if not ok:
+        return
+
+    direction = DPAD_DIRECTIONS.get(button)
+    if direction is not None and getattr(self, "held_direction", None) == direction:
+        _set_held_direction(self, None)
+
+
+def _handle_button_down(self, button, win):
+    is_dialog_active = isinstance(win, Gtk.Dialog)
+    role = BUTTON_ROLES.get(button)
+    active_combo = getattr(self, "gamepad_active_combo", None)
+
+    if role == "confirm":
+        if active_combo:
+            focused_row = win.get_focus() if win else None
+            if isinstance(focused_row, Gtk.ListBoxRow):
+                active_combo.set_selected(focused_row.get_index())
+            _close_combo(self)
+            return
+
         focused = win.get_focus() if win else None
+        combo = find_combobox(focused)
 
         if isinstance(focused, Gtk.TreeView):
             _handle_treeview_confirm(focused)
-        elif not find_combobox(focused):
+        elif combo:
+            open_combobox(self, combo)
+        else:
             GLib.idle_add(lambda: activate_focused_widget(self))
 
-    elif button == btn["back"]:
-        if is_dialog_active:
+    elif role == "back":
+        if active_combo:
+            _close_combo(self)
+        elif is_dialog_active:
             win.response(Gtk.ResponseType.CANCEL)
 
+    elif active_combo:
+        return
+
     elif not is_dialog_active:
-        if button == btn["square"]:
+        if role == "square":
             self.button_kill.emit("clicked")
-        elif button == btn["triangle"]:
+        elif role == "triangle":
             _open_context_menu(self)
-        elif button == btn["lb"]:
+        elif role == "lb":
             self.button_add.emit("clicked")
-        elif button == btn["rb"]:
+        elif role == "rb":
             self.button_settings.emit("clicked")
-        elif button == btn["start"]:
+        elif role == "start":
             GLib.idle_add(lambda: self.show_power_menu(None))
+
 
 def _handle_treeview_confirm(treeview):
     path, column = treeview.get_cursor()
@@ -191,29 +358,28 @@ def _handle_treeview_confirm(treeview):
     )
 
     if editable_renderer:
-        treeview.set_cursor(path, column, True)
-        GLib.idle_add(lambda: _open_keyboard_for_treeview(path, column, editable_renderer, treeview))
+        _open_keyboard_for_treeview(path, column, editable_renderer, treeview)
     else:
         treeview.row_activated(path, column)
 
+
 def _open_keyboard_for_treeview(path, column, renderer, treeview):
     active_win = get_active_window()
-    active_widget = active_win.get_focus() if active_win else None
+    model = treeview.get_model()
+    current_text = model[path][0] if model else ""
 
-    if isinstance(active_widget, Gtk.Entry):
-        dummy_entry = Gtk.Entry()
-        dummy_entry.set_text(active_widget.get_text())
+    dummy_entry = Gtk.Entry()
+    dummy_entry.set_text(current_text)
 
-        dialog = VirtualKeyboard(active_win, dummy_entry)
+    def on_keyboard_closed():
+        renderer.emit("edited", path.to_string(), dummy_entry.get_text())
+        treeview.grab_focus()
+        treeview.set_cursor(path, column, False)
+        active_win.present()
 
-        def on_keyboard_closed(*args):
-            renderer.emit("edited", path.to_string(), dummy_entry.get_text())
-            treeview.grab_focus()
-            treeview.set_cursor(path, column, False)
-            active_win.present()
+    dialog = VirtualKeyboard(active_win, dummy_entry, on_close=on_keyboard_closed)
+    dialog.present()
 
-        dialog.connect("destroy", on_keyboard_closed)
-        dialog.show_all()
 
 def _open_context_menu(self):
     focused = self.get_focus()
@@ -229,42 +395,26 @@ def _open_context_menu(self):
 
         menu = getattr(self, "category_context_menu", None)
         if menu:
-            menu.popup_at_widget(focused, Gdk.Gravity.CENTER, Gdk.Gravity.CENTER, None)
+            menu.set_parent(focused)
+            menu.popup()
             active_menu = menu
 
     if not active_menu:
         return
 
-    items = active_menu.get_children()
+    self.active_popover = active_menu
+
+    items = [w for w in widget_children(active_menu.get_child()) if isinstance(w, Gtk.Button) and w.get_visible()]
     if not items:
         return
 
-    self.active_menu_stack = [{"menu": active_menu, "index": 0}]
-
     menu_play = getattr(self, "menu_play", None)
-    selected_index = 0
+    target = menu_play if menu_play in items else next((i for i in items if i.get_sensitive()), items[0])
+    self.set_focus_visible(True)
+    target.grab_focus()
 
-    if menu_play in items:
-        selected_index = items.index(menu_play)
-    else:
-        for i, item in enumerate(items):
-            if isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive():
-                selected_index = i
-                break
-
-    self.active_menu_stack[0]["index"] = selected_index
-    active_menu.select_item(items[selected_index])
 
 def adjust_widget_value(widget, direction):
-    combo = find_combobox(widget)
-    if combo and combo.get_model():
-        count = combo.get_model().iter_n_children(None)
-        current = combo.get_active()
-
-        step = 1 if direction == "right" else -1
-        combo.set_active((current + step) % count)
-        return True
-
     if isinstance(widget, (Gtk.Scale, Gtk.SpinButton)):
         adjustment = widget.get_adjustment()
         step = adjustment.get_step_increment() or 1
@@ -275,146 +425,194 @@ def adjust_widget_value(widget, direction):
 
     return False
 
+
 def find_combobox(widget):
     while widget:
-        if isinstance(widget, Gtk.ComboBox):
+        if isinstance(widget, IdComboBox):
             return widget
         widget = widget.get_parent()
     return None
 
-def get_parent_by_type(widget, widget_type):
+
+def open_combobox(self, combo):
+    if getattr(self, "gamepad_active_combo", None):
+        return
+
+    model = combo.get_model()
+    count = model.get_n_items() if model else 0
+    if count == 0:
+        return
+
+    current = combo.get_selected()
+    if current == Gtk.INVALID_LIST_POSITION or current >= count:
+        current = 0
+
+    list_box = Gtk.ListBox()
+    list_box.set_selection_mode(Gtk.SelectionMode.NONE)
+
+    for i in range(count):
+        item = model.get_item(i)
+        text = item.get_string() if item and hasattr(item, "get_string") else ""
+        label = Gtk.Label(label=text, xalign=0)
+        label.set_margin_start(10)
+        label.set_margin_end(10)
+        label.set_margin_top(6)
+        label.set_margin_bottom(6)
+        row = Gtk.ListBoxRow()
+        row.set_child(label)
+        list_box.append(row)
+
+    scrolled = Gtk.ScrolledWindow()
+    scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+    scrolled.set_max_content_height(480)
+    scrolled.set_propagate_natural_height(True)
+    scrolled.set_child(list_box)
+
+    popover = Gtk.Popover()
+    popover.set_parent(combo)
+    popover.set_autohide(True)
+    popover.add_css_class("menu")
+    popover.set_child(scrolled)
+
+    width = combo.get_width()
+    if width > 0:
+        list_box.set_size_request(width, -1)
+
+    self.gamepad_active_combo = combo
+    self.gamepad_combo_popover = popover
+    self.gamepad_combo_listbox = list_box
+
+    popover.connect("closed", lambda p: _on_combo_popover_closed(self, combo))
+    popover.popup()
+
+    row = list_box.get_row_at_index(current)
+    if row:
+        row.grab_focus()
+
+
+def _on_combo_popover_closed(self, combo):
+    if getattr(self, "gamepad_active_combo", None) is combo:
+        popover = self.gamepad_combo_popover
+        self.gamepad_active_combo = None
+        self.gamepad_combo_popover = None
+        self.gamepad_combo_listbox = None
+        combo.grab_focus()
+        if popover:
+            popover.unparent()
+
+
+def _close_combo(self):
+    popover = getattr(self, "gamepad_combo_popover", None)
+    if popover:
+        popover.popdown()
+    else:
+        self.gamepad_active_combo = None
+
+
+def _navigate_combo(self, direction):
+    popover = getattr(self, "gamepad_combo_popover", None)
+    if not popover or not popover.get_visible():
+        self.gamepad_active_combo = None
+        return
+
+    if direction not in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
+        return
+
+    root = popover.get_root()
+    if root:
+        root.set_focus_visible(True)
+    popover.child_focus(direction)
+
+
+def _navigate_popover(self, direction):
+    popover = getattr(self, "active_popover", None)
+    if not popover or not popover.get_visible():
+        self.active_popover = None
+        return
+    root = popover.get_root()
+    if root:
+        root.set_focus_visible(True)
+    popover.child_focus(direction)
+
+
+def _handle_menu_button(self, button):
+    popover = getattr(self, "active_popover", None)
+    if not popover or not popover.get_visible():
+        return
+
+    role = BUTTON_ROLES.get(button)
+
+    if role == "confirm":
+        GLib.idle_add(lambda: activate_focused_widget(self))
+
+    elif role == "back":
+        popover.popdown()
+        self.active_popover = None
+
+
+def _find_column_list_view(widget):
+    while widget:
+        if type(widget).__name__ == "GtkColumnListView":
+            return widget
+        widget = widget.get_parent()
+    return None
+
+
+def _find_ancestor_by_typename(widget, type_name):
+    while widget:
+        if type(widget).__name__ == type_name:
+            return widget
+        widget = widget.get_parent()
+    return None
+
+
+def _find_descendant_by_typename(widget, type_name):
+    if type(widget).__name__ == type_name:
+        return widget
+    child = widget.get_first_child()
+    while child:
+        found = _find_descendant_by_typename(child, type_name)
+        if found:
+            return found
+        child = child.get_next_sibling()
+    return None
+
+
+def _find_paned_side(widget):
+    child = widget
     parent = widget.get_parent()
     while parent:
-        if isinstance(parent, widget_type):
-            return parent
+        if isinstance(parent, Gtk.Paned):
+            side = "start" if child == parent.get_start_child() else "end"
+            return parent, side
+        child = parent
         parent = parent.get_parent()
-    return None
+    return None, None
 
-def find_widget_by_type(container, widget_type):
-    if isinstance(container, widget_type) and container.get_visible():
-        return container
-    if isinstance(container, Gtk.Container):
-        for child in container.get_children():
-            res = find_widget_by_type(child, widget_type)
-            if res:
-                return res
-    return None
 
-def find_main_treeview(container):
-    if isinstance(container, Gtk.PlacesSidebar):
-        return None
-    if isinstance(container, Gtk.TreeView) and container.get_visible():
-        return container
-    if hasattr(container, "get_children"):
-        for child in container.get_children():
-            res = find_main_treeview(child)
-            if res:
-                return res
-    return None
+def _navigate_column_list(list_view, direction):
+    model = list_view.get_model()
+    count = model.get_n_items() if model else 0
+    if count == 0:
+        return False
 
-def focus_first_button(container):
-    if isinstance(container, Gtk.Button) and container.get_visible() and container.get_sensitive():
-        container.grab_focus()
-        return True
-    if isinstance(container, Gtk.Container):
-        for child in container.get_children():
-            if focus_first_button(child):
-                return True
-    return False
+    current = model.get_selected() if hasattr(model, "get_selected") else Gtk.INVALID_LIST_POSITION
+    if current == Gtk.INVALID_LIST_POSITION:
+        current = -1
 
-def _navigate_context_menu(self, direction):
-    if not getattr(self, "active_menu_stack", None) or not self.active_menu_stack:
-        self.active_menu_stack = [{"menu": self.context_menu, "index": 0}]
+    new_index = current - 1 if direction == Gtk.DirectionType.UP else current + 1
+    if new_index < 0 or new_index >= count:
+        return False
 
-    current_state = self.active_menu_stack[-1]
-    menu = current_state["menu"]
-    items = menu.get_children()
-    if not items:
-        return
+    list_view.activate_action("list.select-item", GLib.Variant("(ubb)", (new_index, False, False)))
+    list_view.activate_action("list.scroll-to-item", GLib.Variant("u", new_index))
+    return True
 
-    def is_valid(item):
-        return isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive()
-
-    if direction in (Gtk.DirectionType.DOWN, Gtk.DirectionType.UP):
-        step = 1 if direction == Gtk.DirectionType.DOWN else -1
-        for _ in range(len(items)):
-            current_state["index"] = (current_state["index"] + step) % len(items)
-            if is_valid(items[current_state["index"]]):
-                break
-        menu.select_item(items[current_state["index"]])
-
-    elif direction == Gtk.DirectionType.RIGHT:
-        item = items[current_state["index"]]
-        submenu = item.get_submenu()
-        if submenu:
-            sub_items = submenu.get_children()
-            sub_index = 0
-            for i, sub_item in enumerate(sub_items):
-                if is_valid(sub_item):
-                    sub_index = i
-                    break
-            self.active_menu_stack.append({"menu": submenu, "index": sub_index})
-            menu.select_item(item)
-            submenu.select_item(sub_items[sub_index])
-
-    elif direction == Gtk.DirectionType.LEFT:
-        if len(self.active_menu_stack) > 1:
-            self.active_menu_stack.pop()
-            parent_state = self.active_menu_stack[-1]
-            parent_menu = parent_state["menu"]
-            parent_item = parent_menu.get_children()[parent_state["index"]]
-            parent_menu.select_item(parent_item)
-
-def handle_menu_navigation(self, event, btn):
-    if not getattr(self, "active_menu_stack", None) or not self.active_menu_stack:
-        return
-
-    if event.type != pygame.JOYBUTTONDOWN:
-        return
-
-    current_state = self.active_menu_stack[-1]
-    menu = current_state["menu"]
-    items = menu.get_children()
-    if not items:
-        return
-
-    def is_valid(item):
-        return isinstance(item, Gtk.MenuItem) and not isinstance(item, Gtk.SeparatorMenuItem) and item.get_sensitive()
-
-    if event.button == btn["confirm"]:
-        item = items[current_state["index"]]
-        if is_valid(item):
-            submenu = item.get_submenu()
-            if submenu:
-                sub_items = submenu.get_children()
-                sub_index = 0
-                for i, sub_item in enumerate(sub_items):
-                    if is_valid(sub_item):
-                        sub_index = i
-                        break
-                self.active_menu_stack.append({"menu": submenu, "index": sub_index})
-                menu.select_item(item)
-                submenu.select_item(sub_items[sub_index])
-            else:
-                GLib.idle_add(item.activate)
-                base_menu = self.active_menu_stack[0]["menu"]
-                base_menu.popdown()
-                self.active_menu_stack = []
-
-    elif event.button == btn["back"]:
-        if len(self.active_menu_stack) > 1:
-            self.active_menu_stack.pop()
-            parent_state = self.active_menu_stack[-1]
-            parent_menu = parent_state["menu"]
-            parent_item = parent_menu.get_children()[parent_state["index"]]
-            parent_menu.select_item(parent_item)
-        else:
-            base_menu = self.active_menu_stack[0]["menu"]
-            base_menu.popdown()
-            self.active_menu_stack = []
 
 def navigate_gamepad(direction):
     active_window = get_active_window()
+    if active_window:
+        active_window.set_focus_visible(True)
     focused = active_window.get_focus() if active_window else None
 
     if not focused:
@@ -422,153 +620,47 @@ def navigate_gamepad(direction):
             active_window.child_focus(Gtk.DirectionType.TAB_FORWARD)
         return
 
+    if isinstance(focused, Gtk.ScrolledWindow):
+        target = _find_descendant_by_typename(focused, "GtkColumnListView")
+        if target:
+            target.grab_focus()
+            focused = active_window.get_focus()
+        else:
+            child = focused.get_child()
+            if child and child.child_focus(Gtk.DirectionType.TAB_FORWARD):
+                focused = active_window.get_focus()
+
     is_horizontal = direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)
     is_vertical = direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN)
 
-    if isinstance(active_window, Gtk.FileChooserDialog):
-        header = find_widget_by_type(active_window, Gtk.HeaderBar)
-        sidebar = find_widget_by_type(active_window, Gtk.PlacesSidebar)
-        tree = find_main_treeview(active_window)
+    if is_vertical and _find_ancestor_by_typename(focused, "GtkPathBar"):
+        if direction == Gtk.DirectionType.UP:
+            titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
+            if isinstance(titlebar, Gtk.HeaderBar):
+                titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+                return
+        else:
+            column_list = _find_descendant_by_typename(active_window, "GtkColumnListView")
+            if column_list:
+                column_list.grab_focus()
+                return
 
-        in_sidebar = sidebar and (focused == sidebar or get_parent_by_type(focused, Gtk.PlacesSidebar) == sidebar)
-        in_header = header and (focused == header or get_parent_by_type(focused, Gtk.HeaderBar) == header)
-        in_tree = tree and (focused == tree or get_parent_by_type(focused, Gtk.TreeView) == tree) and not in_sidebar
+    column_list = _find_column_list_view(focused)
+    if column_list and is_vertical:
+        if _navigate_column_list(column_list, direction):
+            return
 
-        in_pathbar = False
-        if isinstance(focused, (Gtk.ToggleButton, Gtk.Button)) and not in_header and not in_sidebar:
-            in_pathbar = True
-
-        in_footer = not in_sidebar and not in_header and not in_tree and not in_pathbar
-
-        def try_focus_pathbar():
-            def search(w):
-                if isinstance(w, (Gtk.ToggleButton, Gtk.Button)) and w.get_visible() and w.get_sensitive():
-                    p = w.get_parent()
-                    while p:
-                        if p in (header, sidebar): break
-                        p = p.get_parent()
-                    else:
-                        w.grab_focus()
-                        return True
-                if hasattr(w, "get_children"):
-                    for c in w.get_children():
-                        if search(c): return True
-                return False
-            return search(active_window)
-
-        if in_sidebar:
-            if direction == Gtk.DirectionType.RIGHT:
-                if tree:
-                    tree.grab_focus()
-                    path, _ = tree.get_cursor()
-                    if not path and len(tree.get_model()) > 0:
-                        tree.set_cursor(Gtk.TreePath(0))
-                    return
-
-            elif direction == Gtk.DirectionType.UP:
-                listbox = find_widget_by_type(sidebar, Gtk.ListBox) if sidebar else None
-                if listbox:
-                    row = listbox.get_selected_row()
-                    if row and row.get_index() > 0:
-                        prev_row = listbox.get_row_at_index(row.get_index() - 1)
-                        if prev_row:
-                            prev_row.grab_focus()
-                            listbox.select_row(prev_row)
-                            return
-
-                if try_focus_pathbar():
-                    return
-                if header:
-                    focus_first_button(header)
-                    return
-
-            elif direction == Gtk.DirectionType.DOWN:
-                listbox = find_widget_by_type(sidebar, Gtk.ListBox) if sidebar else None
-                if listbox:
-                    row = listbox.get_selected_row()
-                    if row:
-                        next_row = listbox.get_row_at_index(row.get_index() + 1)
-                        if next_row:
-                            next_row.grab_focus()
-                            listbox.select_row(next_row)
-                            return
-
-        elif in_tree:
-            if direction == Gtk.DirectionType.LEFT:
-                if sidebar:
-                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
-                    if listbox:
-                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
-                        if row:
-                            row.grab_focus()
-                            listbox.select_row(row)
-                            return
-                    sidebar.grab_focus()
-                    return
-
-            elif direction == Gtk.DirectionType.UP:
-                path, _ = tree.get_cursor()
-                if not path or path.get_indices()[0] <= 0:
-                    if try_focus_pathbar():
-                        return
-                    if header:
-                        focus_first_button(header)
-                        return
-
-        elif in_pathbar:
-            if direction == Gtk.DirectionType.UP:
-                if header:
-                    focus_first_button(header)
-                    return
-            elif direction == Gtk.DirectionType.DOWN:
-                if tree:
-                    tree.grab_focus()
-                    path, _ = tree.get_cursor()
-                    if not path and len(tree.get_model()) > 0:
-                        tree.set_cursor(Gtk.TreePath(0))
-                    return
-            elif direction == Gtk.DirectionType.LEFT:
-                if sidebar:
-                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
-                    if listbox:
-                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
-                        if row:
-                            row.grab_focus()
-                            listbox.select_row(row)
-                            return
-                    sidebar.grab_focus()
-                    return
-
-        elif in_header:
-            if direction == Gtk.DirectionType.DOWN:
-                if try_focus_pathbar():
-                    return
-                if tree:
-                    tree.grab_focus()
-                    path, _ = tree.get_cursor()
-                    if not path and len(tree.get_model()) > 0:
-                        tree.set_cursor(Gtk.TreePath(0))
-                    return
-
-        elif in_footer:
-            if direction == Gtk.DirectionType.UP:
-                if tree:
-                    tree.grab_focus()
-                    path, _ = tree.get_cursor()
-                    if not path and len(tree.get_model()) > 0:
-                        tree.set_cursor(Gtk.TreePath(0))
-                    return
-            elif direction == Gtk.DirectionType.LEFT:
-                if sidebar:
-                    listbox = find_widget_by_type(sidebar, Gtk.ListBox)
-                    if listbox:
-                        row = listbox.get_selected_row() or listbox.get_row_at_index(0)
-                        if row:
-                            row.grab_focus()
-                            listbox.select_row(row)
-                            return
-                    sidebar.grab_focus()
-                    return
+    if is_horizontal:
+        paned, side = _find_paned_side(focused)
+        if paned:
+            target = None
+            if side == "start" and direction == Gtk.DirectionType.RIGHT:
+                target = paned.get_end_child()
+            elif side == "end" and direction == Gtk.DirectionType.LEFT:
+                target = paned.get_start_child()
+            if target:
+                target.child_focus(Gtk.DirectionType.TAB_FORWARD)
+                return
 
     if isinstance(focused, Gtk.TreeView):
         model = focused.get_model()
@@ -599,13 +691,38 @@ def navigate_gamepad(direction):
 
     active_window.child_focus(direction)
 
-    if isinstance(focused, Gtk.Button):
+    new_focus = active_window.get_focus()
+    if isinstance(new_focus, Gtk.ScrolledWindow):
+        target = _find_descendant_by_typename(new_focus, "GtkColumnListView")
+        if target:
+            target.grab_focus()
+        else:
+            child = new_focus.get_child()
+            if child:
+                child.child_focus(Gtk.DirectionType.TAB_FORWARD)
+
+    new_focus = active_window.get_focus()
+    stuck = new_focus is focused
+
+    if stuck and isinstance(focused, Gtk.Button):
         parent = focused.get_parent()
         while parent:
             if isinstance(parent, Gtk.HeaderBar):
                 active_window.child_focus(Gtk.DirectionType.TAB_FORWARD if direction in (Gtk.DirectionType.DOWN, Gtk.DirectionType.RIGHT) else Gtk.DirectionType.TAB_BACKWARD)
                 return
             parent = parent.get_parent()
+
+    if stuck and direction == Gtk.DirectionType.UP:
+        titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
+        if isinstance(titlebar, Gtk.HeaderBar):
+            titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+            return
+
+    if stuck and direction == Gtk.DirectionType.DOWN:
+        column_list = _find_descendant_by_typename(active_window, "GtkColumnListView")
+        if column_list:
+            column_list.grab_focus()
+
 
 def activate_focused_widget(self):
     active_window = get_active_window()
@@ -614,11 +731,10 @@ def activate_focused_widget(self):
     if not focused:
         return
 
-    if isinstance(focused, Gtk.Entry):
-        parent = focused.get_toplevel()
-        dialog = VirtualKeyboard(parent, focused)
-        dialog.connect("destroy", lambda *a: parent.present())
-        dialog.show_all()
+    if isinstance(focused, (Gtk.Entry, Gtk.Text)):
+        parent = focused.get_root()
+        dialog = VirtualKeyboard(parent, focused, on_close=parent.present)
+        dialog.present()
 
     elif isinstance(focused, Gtk.Button):
         label = focused.get_label() if hasattr(focused, "get_label") else None
@@ -634,9 +750,8 @@ def activate_focused_widget(self):
                     if isinstance(w, Gtk.Button) and w.get_label() == target:
                         w.grab_focus()
                         return True
-                    if isinstance(w, Gtk.Container):
-                        for c in w.get_children():
-                            if find_and_focus(c): return True
+                    for c in widget_children(w):
+                        if find_and_focus(c): return True
                     return False
 
                 find_and_focus(win)
@@ -657,8 +772,23 @@ def activate_focused_widget(self):
             else:
                 self.button_play.emit("clicked")
 
+    elif type(focused).__name__ == "GtkColorSwatch":
+        chooser = focused.get_ancestor(Gtk.ColorChooser)
+        if chooser:
+            chooser.set_rgba(focused.get_property("rgba"))
+
+    elif _find_column_list_view(focused):
+        column_list = _find_column_list_view(focused)
+        model = column_list.get_model()
+        current = model.get_selected() if model and hasattr(model, "get_selected") else Gtk.INVALID_LIST_POSITION
+        if current != Gtk.INVALID_LIST_POSITION:
+            column_list.activate_action("list.activate-item", GLib.Variant("u", current))
+
+
 def get_active_window():
-    for window in Gtk.Window.list_toplevels():
-        if window.is_active() and window.get_property("has-toplevel-focus"):
+    toplevels = Gtk.Window.get_toplevels()
+    for i in range(toplevels.get_n_items()):
+        window = toplevels.get_item(i)
+        if window.is_active():
             return window
     return None

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 import json
 import platform
@@ -7,7 +7,7 @@ import urllib.request
 import shutil
 import argparse
 
-from faugus.path_manager import PathManager, compatibility_dir
+from faugus.path_manager import compatibility_dir
 
 CONFIGS = {
     "ge": {
@@ -41,6 +41,7 @@ FOREIGN_ARCH_TOKENS = {
     "aarch64": ("x86_64", "amd64"),
     "arm64": ("x86_64", "amd64"),
 }
+
 
 def select_asset(assets, archive_exts):
     foreign_tokens = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
@@ -80,6 +81,7 @@ def get_latest_tag_and_url(api, archive_ext):
 
     return data["tag_name"], asset["browser_download_url"], asset["name"]
 
+
 def get_installed_version(proton_dir):
     version_file = proton_dir / "version"
     if not version_file.exists():
@@ -90,6 +92,7 @@ def get_installed_version(proton_dir):
         return None
 
     return parts[1]
+
 
 def normalize_version(v):
     if not v:
@@ -106,6 +109,7 @@ def normalize_version(v):
          .rstrip("+")
          .strip("-")
     )
+
 
 def rewrite_compatibilitytool_vdf(proton_dir, display_name):
     (proton_dir / "compatibilitytool.vdf").write_text(
@@ -124,6 +128,7 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
 }}
 '''
     )
+
 
 def install_proton_latest(proton_dir, url, asset_name, label):
     tmp = compatibility_dir / "__proton_tmp__"
@@ -148,6 +153,7 @@ def install_proton_latest(proton_dir, url, asset_name, label):
     extracted.rename(proton_dir)
     shutil.rmtree(tmp)
 
+
 def ensure_latest(kind):
     cfg = CONFIGS[kind]
 
@@ -167,6 +173,7 @@ def ensure_latest(kind):
     install_proton_latest(proton_dir, url, asset_name, cfg["label"])
     rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
+
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
@@ -179,6 +186,7 @@ def main():
     for key in vars(args):
         if getattr(args, key):
             ensure_latest(key)
+
 
 if __name__ == "__main__":
     main()

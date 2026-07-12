@@ -1,15 +1,19 @@
-#!/usr/bin/python3
+
 
 import sys
+import warnings
 import gi
 import shutil
 
-gi.require_version("Gtk", "3.0")
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-from gi.repository import Gtk, GdkPixbuf, GLib
+gi.require_version("Gtk", "4.0")
+
+from gi.repository import Gtk, GLib
 from faugus.utils import *
 from faugus.config_manager import *
 from faugus.steam_setup import lossless_dll
+from faugus.migration import fix_legacy_shortcut_icons
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -18,10 +22,10 @@ else:
 
 _ = setup_gettext('faugus-launcher')
 
-class CreateShortcut(Gtk.Window, HiDpiMixin):
+
+class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
     def __init__(self, file_path):
-        super().__init__(title="Faugus Launcher")
-        self.set_wmclass("faugus-launcher", "faugus-launcher")
+        super().__init__(title="Faugus")
         self.file_path = file_path
         self.set_resizable(False)
 
@@ -48,8 +52,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.entry_protonfix = Gtk.Entry()
         self.entry_protonfix.set_tooltip_text("UMU ID")
         self.button_search_protonfix = Gtk.Button()
-        self.button_search_protonfix.set_image(
-            Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+        self.button_search_protonfix.set_child(
+            Gtk.Image.new_from_icon_name("system-search-symbolic"))
         self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
         self.button_search_protonfix.set_size_request(50, -1)
 
@@ -81,17 +85,16 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
-        # Button Cancel
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
         self.button_cancel.set_size_request(150, -1)
 
-        # Button Ok
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", self.on_ok_clicked)
         self.button_ok.set_size_request(150, -1)
 
         load_red_entry_css()
+        load_frame_css()
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.box.set_margin_start(0)
@@ -169,33 +172,31 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
         self.button_lossless.set_hexpand(True)
 
-        self.grid_tools = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
-        self.grid_tools.set_row_spacing(10)
-        self.grid_tools.set_column_spacing(10)
+        self.grid_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.grid_tools.set_margin_start(10)
         self.grid_tools.set_margin_end(10)
         self.grid_tools.set_margin_top(10)
         self.grid_tools.set_margin_bottom(10)
 
-        self.grid_shortcut_icon = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
-        self.grid_shortcut_icon.set_row_spacing(10)
-        self.grid_shortcut_icon.set_column_spacing(10)
+        self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.grid_shortcut_icon.set_margin_start(10)
         self.grid_shortcut_icon.set_margin_end(10)
         self.grid_shortcut_icon.set_margin_top(10)
         self.grid_shortcut_icon.set_margin_bottom(10)
 
-        self.grid_tools.add(self.checkbox_mangohud)
-        self.grid_tools.add(self.checkbox_gamemode)
-        self.grid_tools.add(self.checkbox_prevent_sleep)
-        self.grid_tools.add(self.checkbox_disable_hidraw)
+        self.grid_tools.append(self.checkbox_mangohud)
+        self.grid_tools.append(self.checkbox_gamemode)
+        self.grid_tools.append(self.checkbox_prevent_sleep)
+        self.grid_tools.append(self.checkbox_disable_hidraw)
 
-        self.grid_shortcut_icon.add(self.button_shortcut_icon)
+        self.grid_shortcut_icon.append(self.button_shortcut_icon)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
+        self.grid_shortcut_icon.set_halign(Gtk.Align.END)
+        self.grid_shortcut_icon.set_hexpand(True)
 
         self.box_tools = Gtk.Box()
-        self.box_tools.pack_start(self.grid_tools, False, False, 0)
-        self.box_tools.pack_end(self.grid_shortcut_icon, False, False, 0)
+        self.box_tools.append(self.grid_tools)
+        self.box_tools.append(self.grid_shortcut_icon)
 
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         bottom_box.set_margin_start(10)
@@ -205,17 +206,17 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
 
-        bottom_box.pack_start(self.button_cancel, True, True, 0)
-        bottom_box.pack_start(self.button_ok, True, True, 0)
+        bottom_box.append(self.button_cancel)
+        bottom_box.append(self.button_ok)
 
-        self.main_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
-        self.main_grid.add(self.grid_title)
-        self.main_grid.add(self.grid_protonfix)
-        self.main_grid.add(self.grid_game_arguments)
-        self.main_grid.add(self.grid_launch_arguments)
-        self.main_grid.add(self.grid_addapp)
-        self.main_grid.add(self.grid_lossless)
-        self.main_grid.add(self.box_tools)
+        self.main_grid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.main_grid.append(self.grid_title)
+        self.main_grid.append(self.grid_protonfix)
+        self.main_grid.append(self.grid_game_arguments)
+        self.main_grid.append(self.grid_launch_arguments)
+        self.main_grid.append(self.grid_addapp)
+        self.main_grid.append(self.grid_lossless)
+        self.main_grid.append(self.box_tools)
 
         self.load_config()
 
@@ -226,46 +227,49 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
                 self.button_lossless.set_sensitive(True)
             else:
                 self.button_lossless.set_sensitive(False)
-                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings and set the location."))
+                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and set the location."))
         else:
             self.button_lossless.set_sensitive(False)
             self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
 
-        frame.add(self.main_grid)
-        self.box.add(frame)
-        self.box.add(bottom_box)
-        self.add(self.box)
+        frame.set_child(self.main_grid)
+        self.box.append(frame)
+        self.box.append(bottom_box)
+        self.set_child(self.box)
 
         os.makedirs(self.icon_directory, exist_ok=True)
 
         status = extract_ico(self.file_path, self.icon_temp, best_frame=True)
         if status == "ok":
-            surface = self.new_surface_from_image(self.icon_temp, 50, 50)
-            self.button_shortcut_icon.set_image(Gtk.Image.new_from_surface(surface))
+            texture = self.new_texture_from_image(self.icon_temp, 50, 50)
+            self.button_shortcut_icon.set_child(new_picture(texture))
         elif status == "no_icons":
-            self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+            self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
         shutil.rmtree(self.icon_directory, ignore_errors=True)
 
-        # Connect the destroy signal to Gtk.main_quit
-        self.connect("destroy", Gtk.main_quit)
-
     def on_button_launch_arguments_clicked(self, widget):
-        self.launch_arguments = show_launch_arguments_dialog(self, self.launch_arguments)
+        def on_result(result):
+            self.launch_arguments = result
+        show_launch_arguments_dialog(self, self.launch_arguments, on_result)
 
     def on_button_addapp_clicked(self, widget):
-        (self.addapp_enabled, self.addapp,
-         self.addapp_delay, self.addapp_first) = show_addapp_dialog(
+        def on_result(result):
+            (self.addapp_enabled, self.addapp,
+             self.addapp_delay, self.addapp_first) = result
+        show_addapp_dialog(
             self, self.addapp_enabled, self.addapp,
-            self.addapp_delay, self.addapp_first)
+            self.addapp_delay, self.addapp_first, on_result)
 
     def on_button_lossless_clicked(self, widget):
-        (self.lossless_enabled, self.lossless_multiplier,
-         self.lossless_flow, self.lossless_performance,
-         self.lossless_hdr, self.lossless_present) = show_lossless_dialog(
+        def on_result(result):
+            (self.lossless_enabled, self.lossless_multiplier,
+             self.lossless_flow, self.lossless_performance,
+             self.lossless_hdr, self.lossless_present) = result
+        show_lossless_dialog(
             self, self.lossless_enabled, self.lossless_multiplier,
             self.lossless_flow, self.lossless_performance,
-            self.lossless_hdr, self.lossless_present)
+            self.lossless_hdr, self.lossless_present, on_result)
 
     def load_config(self):
         cfg = ConfigManager()
@@ -409,9 +413,8 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
         self.destroy()
 
     def set_image_shortcut_icon(self):
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(faugus_png)
-        scaled_pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.BILINEAR)
-        return Gtk.Image.new_from_pixbuf(scaled_pixbuf)
+        texture = self.new_texture_from_image(faugus_png_raster, 50, 50)
+        return new_picture(texture)
 
     def on_button_shortcut_icon_clicked(self, widget):
         self.set_sensitive(False)
@@ -422,29 +425,45 @@ class CreateShortcut(Gtk.Window, HiDpiMixin):
             os.makedirs(self.icon_directory, exist_ok=True)
             status = extract_ico(path, self.icon_converted, best_frame=False)
             if status == "no_icons":
-                self.button_shortcut_icon.set_image(self.set_image_shortcut_icon())
+                self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
         choose_shortcut_icon(self)
         self.set_sensitive(True)
 
     def validate_fields(self):
         title = self.entry_title.get_text()
-        self.entry_title.get_style_context().remove_class("entry")
+        self.entry_title.remove_css_class("entry")
 
         if not title:
-            self.entry_title.get_style_context().add_class("entry")
+            self.entry_title.add_css_class("entry")
             return False
 
         return True
 
+
 def main():
-    apply_dark_theme()
+    suppress_adwaita_theme_warning()
+    fix_legacy_shortcut_icons()
+
     exec_path = sys.argv[1]
 
-    win = CreateShortcut(exec_path)
-    win.connect("destroy", Gtk.main_quit)
-    win.show_all()
-    Gtk.main()
+    cfg = ConfigManager()
+    apply_interface_customization(
+        cfg.config.get('interface-theme', 'system'),
+        cfg.config.get('accent-color', 'system'),
+    )
+
+    app = Gtk.Application(application_id="io.github.Faugus.faugus-launcher")
+
+    def on_activate(app):
+        win = CreateShortcut(exec_path)
+        win.set_application(app)
+        win.connect("destroy", lambda *a: app.quit())
+        win.present()
+
+    app.connect("activate", on_activate)
+    app.run(None)
+
 
 if __name__ == "__main__":
     main()

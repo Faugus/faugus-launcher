@@ -7,6 +7,7 @@ from faugus.path_manager import *
 from faugus.steam_setup import get_all_shortcut_paths
 from faugus.utils import load_json_file, save_json_file
 
+
 def update_desktop_path(shortcut_path, new_dir_path):
     try:
         with open(shortcut_path, 'r', encoding='utf-8') as f:
@@ -21,6 +22,7 @@ def update_desktop_path(shortcut_path, new_dir_path):
         print(f"Shortcut successfully updated: {shortcut_path}")
     except Exception as e:
         print(f"Error updating shortcut {shortcut_path}: {e}")
+
 
 def update_steam_shortcut(game_title, new_start_dir, new_exe):
     for shortcut_path in get_all_shortcut_paths():
@@ -48,6 +50,7 @@ def update_steam_shortcut(game_title, new_start_dir, new_exe):
             with open(shortcut_path, 'wb') as f:
                 vdf.binary_dump(shortcuts, f)
             print(f"Steam shortcut updated for: {game_title}")
+
 
 def update_ea_path(prefix):
     ea_base_dir = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop"

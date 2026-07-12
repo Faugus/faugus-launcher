@@ -13,6 +13,7 @@ if IS_FLATPAK:
 else:
     app_dir = PathManager.user_data('applications')
 
+
 def get_desktop_dir():
     try:
         desktop_dir = subprocess.check_output(['xdg-user-dir', 'DESKTOP'], text=True).strip()
@@ -21,7 +22,9 @@ def get_desktop_dir():
         print("xdg-user-dir not found or failed; falling back to ~/Desktop")
         return str(Path.home() / 'Desktop')
 
+
 desktop_dir = get_desktop_dir()
+
 
 def fix_desktop_exec():
     replacements = [
@@ -69,6 +72,7 @@ def fix_desktop_exec():
 
             except Exception as e:
                 print(f"Error processing {file_path}: {e}")
+
 
 def fix_steam_shortcuts():
     if not os.path.exists(steam_shortcuts_path):
@@ -124,6 +128,7 @@ def fix_steam_shortcuts():
             vdf.binary_dump(shortcuts, f)
     except Exception as e:
         print(f"Error saving shortcuts.vdf: {e}")
+
 
 if __name__ == "__main__":
     fix_desktop_exec()

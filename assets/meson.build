@@ -1,6 +1,8 @@
 install_data(
   'faugus-banner.png',
+  'faugus-launcher-raster.png',
   'faugus-notification.ogg',
+  'gamecontrollerdb.txt',
 )
 
 install_data(

@@ -1,6 +1,7 @@
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gdk
+from faugus.utils import hide_dialog_action_area
 
 LAYOUT_LOWER = [
     [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
@@ -26,17 +27,19 @@ LAYOUT_SYMBOLS = [
     [("Cancel", 3), ("Space", 8), ("Clear", 3)]
 ]
 
+
 class VirtualKeyboard(Gtk.Dialog):
-    def __init__(self, parent, entry):
-        super().__init__(title="Faugus Launcher", transient_for=parent, modal=True)
-        self.set_wmclass("faugus-launcher", "faugus-launcher")
+    def __init__(self, parent, entry, on_close=None):
+        super().__init__(title="Faugus", transient_for=parent, modal=True)
+        hide_dialog_action_area(self)
 
         self.entry = entry
+        self.on_close = on_close
         self.mode = "lower"
         self.original_text = self.entry.get_text()
 
         self.set_resizable(False)
-        self.get_style_context().add_class("tv-keyboard")
+        self.add_css_class("tv-keyboard")
         self.apply_css()
 
         vbox = self.get_content_area()
@@ -50,14 +53,13 @@ class VirtualKeyboard(Gtk.Dialog):
         self.display_entry.set_alignment(0.5)
         self.display_entry.set_can_focus(False)
         self.display_entry.connect("changed", self.on_display_changed)
-        vbox.pack_start(self.display_entry, False, False, 0)
+        vbox.append(self.display_entry)
 
         self.grid = Gtk.Grid(row_spacing=8, column_spacing=8)
         self.grid.set_halign(Gtk.Align.CENTER)
-        vbox.pack_start(self.grid, True, True, 0)
+        vbox.append(self.grid)
 
         self.build_keys()
-        self.show_all()
         self.connect("response", self.on_response)
 
     def apply_css(self):
@@ -78,15 +80,18 @@ class VirtualKeyboard(Gtk.Dialog):
         """
         style_provider = Gtk.CssProvider()
         style_provider.load_from_data(css)
-        Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(),
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
             style_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
     def build_keys(self):
-        for child in self.grid.get_children():
+        child = self.grid.get_first_child()
+        while child:
+            next_child = child.get_next_sibling()
             self.grid.remove(child)
+            child = next_child
 
         if self.mode == "symbols":
             layout = LAYOUT_SYMBOLS
@@ -114,7 +119,7 @@ class VirtualKeyboard(Gtk.Dialog):
                 if (label == "Shift" and self.mode == "shift") or \
                    (label == "Caps" and self.mode == "caps") or \
                    (label in ("?123", "ABC") and self.mode == "symbols"):
-                    btn.get_style_context().add_class("suggested-action")
+                    btn.add_css_class("suggested-action")
 
                 if label == "Back":
                     btn.connect("clicked", self.on_backspace)
@@ -151,7 +156,6 @@ class VirtualKeyboard(Gtk.Dialog):
 
             self.mode = "lower"
             self.build_keys()
-            self.show_all()
 
             new_btn = self.grid.get_child_at(col, row)
             if new_btn:
@@ -175,7 +179,6 @@ class VirtualKeyboard(Gtk.Dialog):
             self.mode = target_mode
 
         self.build_keys()
-        self.show_all()
 
         new_btn = self.grid.get_child_at(col, row)
         if new_btn:
@@ -191,7 +194,6 @@ class VirtualKeyboard(Gtk.Dialog):
             self.mode = "symbols"
 
         self.build_keys()
-        self.show_all()
 
         new_btn = self.grid.get_child_at(col, row)
         if new_btn:
@@ -203,15 +205,21 @@ class VirtualKeyboard(Gtk.Dialog):
 
     def on_enter(self, button):
         self.entry.emit("activate")
-        self.destroy()
+        self._close()
 
     def on_cancel(self, button):
         self.entry.set_text(self.original_text)
         self.display_entry.set_text(self.original_text)
-        self.destroy()
+        self._close()
 
     def on_response(self, dialog, response_id):
         if response_id == Gtk.ResponseType.CANCEL:
             self.entry.set_text(self.original_text)
             self.display_entry.set_text(self.original_text)
+        self._close()
+
+    def _close(self):
+        callback = self.on_close
         self.destroy()
+        if callback:
+            callback()

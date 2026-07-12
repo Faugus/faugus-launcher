@@ -1,5 +1,6 @@
 from faugus.language_config import *
 
+
 class ConfigManager:
     def __init__(self):
         self.default_config = {
@@ -37,6 +38,8 @@ class ConfigManager:
             'backup-dest-dir': '',
             'backup-last-date': '',
             'window-behavior': 'None',
+            'interface-theme': 'system',
+            'accent-color': 'system',
             'width': '1280',
             'height': '720',
             'banner-size': '100',

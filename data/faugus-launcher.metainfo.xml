@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>faugus-launcher.desktop</id>
-  <name>Faugus Launcher</name>
+  <name>Faugus</name>
   <developer_name>Faugus</developer_name>
   <summary>A simple and lightweight app for running games using UMU-Launcher</summary>
   <url type="homepage">https://github.com/Faugus/faugus-launcher</url>
@@ -82,16 +82,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="1.22.8-1" date="2026-07-06">
+    <release version="2.0.0-1" date="2026-07-12">
       <description>
         <ul>
-          <li>Updated umu-launcher to version 1.4.1.</li>
-          <li>Icons are now png instead of ico.</li>
-          <li>Removed prefix lock logic.</li>
-          <li>More code refactoring.</li>
-          <li>Updated German translation.</li>
-          <li>Updated Japanese translation.</li>
-          <li>Updated Russian translation.</li>
+          <li>Faugus 2.0 experimental release.</li>
         </ul>
       </description>
     </release>

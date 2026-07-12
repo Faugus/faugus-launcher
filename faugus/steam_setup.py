@@ -2,8 +2,11 @@ import os
 import subprocess
 
 from pathlib import Path
+import gi
+gi.require_version('GdkPixbuf', '2.0')
 from faugus.path_manager import PathManager, IS_FLATPAK
 from gi.repository import GdkPixbuf
+
 
 def _check_command(cmd):
     try:
@@ -14,11 +17,14 @@ def _check_command(cmd):
     except FileNotFoundError:
         return False
 
+
 def has_steam_flatpak():
     return _check_command(["flatpak", "info", "com.valvesoftware.Steam"])
 
+
 def has_steam_native():
     return _check_command(["which", "steam"])
+
 
 def detect_steam_version():
     if has_steam_native():
@@ -28,6 +34,7 @@ def detect_steam_version():
     else:
         return None
 
+
 def detect_steam_folder():
     steam_version = detect_steam_version()
     if steam_version == "flatpak":
@@ -35,6 +42,7 @@ def detect_steam_folder():
     if steam_version == "native":
         return (Path(PathManager.user_home(".steam/steam")), False)
     return (None, False)
+
 
 steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()
 userdata = steam_folder / "userdata" if steam_folder else None
@@ -47,6 +55,7 @@ lossless_dll = (
     else ""
 )
 
+
 def get_all_shortcut_paths():
     paths = []
     if userdata:
@@ -58,6 +67,7 @@ def get_all_shortcut_paths():
         except (FileNotFoundError, PermissionError):
             pass
     return paths
+
 
 def read_library_folders():
     libraries = []
@@ -72,6 +82,7 @@ def read_library_folders():
                 libraries.append(Path(path))
 
     return libraries
+
 
 def read_installed_games():
     if not steam_folder:
@@ -99,6 +110,7 @@ def read_installed_games():
                 games.append((appid, name))
 
     return sorted(games, key=lambda x: x[1].lower())
+
 
 def get_steam_icon_path(appid):
     if not librarycache or not librarycache.exists():

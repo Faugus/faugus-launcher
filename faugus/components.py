@@ -5,11 +5,12 @@ import requests
 import tarfile
 import shutil
 
-from faugus.path_manager import PathManager, faugus_launcher_share_dir, DOWNLOAD_DIR, umu_run
+from faugus.path_manager import faugus_launcher_share_dir, DOWNLOAD_DIR, umu_run
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
 UMU_VERSION_FILE = os.path.join(faugus_launcher_share_dir, "version.txt")
+
 
 def get_latest_umu_version():
     try:
@@ -21,11 +22,13 @@ def get_latest_umu_version():
     except Exception:
         return None
 
+
 def get_installed_umu_version():
     if os.path.exists(UMU_VERSION_FILE):
         with open(UMU_VERSION_FILE) as f:
             return f.read().strip()
     return None
+
 
 def download_umu_run(version):
     try:
@@ -48,6 +51,7 @@ def download_umu_run(version):
     except Exception:
         return
 
+
 def update_umu():
     latest = get_latest_umu_version()
     current = get_installed_umu_version()
@@ -60,10 +64,12 @@ def update_umu():
     else:
         print("UMU-Launcher is up to date.", flush=True)
 
+
 BE_URL = "https://github.com/Faugus/components/releases/download/{}/be.tar.gz"
 EAC_URL = "https://github.com/Faugus/components/releases/download/{}/eac.tar.gz"
 REPO_URL = "https://api.github.com/repos/Faugus/components/releases/latest"
 VERSION_FILE = f"{DOWNLOAD_DIR}/version.txt"
+
 
 def get_latest_version():
     try:
@@ -74,11 +80,13 @@ def get_latest_version():
     except Exception:
         return None
 
+
 def get_installed_version():
     if os.path.exists(VERSION_FILE):
         with open(VERSION_FILE, "r") as f:
             return f.read().strip()
     return None
+
 
 def download_and_extract(url, download_dir):
     try:
@@ -98,6 +106,7 @@ def download_and_extract(url, download_dir):
         os.remove(download_path)
     except Exception:
         return
+
 
 def check_for_updates():
     latest_version = get_latest_version()
@@ -126,6 +135,7 @@ def check_for_updates():
 def main():
     update_umu()
     check_for_updates()
+
 
 if __name__ == "__main__":
     main()

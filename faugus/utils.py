@@ -5,50 +5,40 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from faugus.path_manager import PathManager, IS_FLATPAK, games_json, presets_file, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun, icons_dir, faugus_banner, banners_dir, backup_dir, faugus_mono_icon, faugus_notification, eac_dir, be_dir, shortcut_icons_dir
-from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango
+import gi
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from faugus.path_manager import PathManager, games_json, presets_file, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun, icons_dir, banners_dir, faugus_notification
+from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
-def apply_dark_theme():
-    if IS_FLATPAK:
-        if (os.environ.get("XDG_CURRENT_DESKTOP")) == "KDE":
-            Gtk.Settings.get_default().set_property("gtk-theme-name", "Breeze")
-        try:
-            proxy = Gio.DBusProxy.new_sync(
-                Gio.bus_get_sync(Gio.BusType.SESSION, None), 0, None,
-                "org.freedesktop.portal.Desktop",
-                "/org/freedesktop/portal/desktop",
-                "org.freedesktop.portal.Settings", None)
-            is_dark = proxy.call_sync(
-                "Read", GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
-                0, -1, None).unpack()[0] == 1
-        except:
-            is_dark = False
-        Gtk.Settings.get_default().set_property("gtk-application-prefer-dark-theme", is_dark)
-    else:
-        is_dark_theme = False
-        try:
-            desktop_env = Gio.Settings.new("org.gnome.desktop.interface")
+
+def _log_writer_filter(log_level, fields, n_fields, user_data):
+    import ctypes
+    for f in fields:
+        if f.key == "MESSAGE":
             try:
-                is_dark_theme = desktop_env.get_string("color-scheme") == "prefer-dark"
+                if f.length == -1:
+                    message = ctypes.cast(f.value, ctypes.c_char_p).value.decode("utf-8", "replace")
+                else:
+                    message = ctypes.string_at(f.value, f.length).decode("utf-8", "replace")
             except Exception:
-                is_dark_theme = "-dark" in desktop_env.get_string("gtk-theme")
-        except Exception:
-            pass
-        if is_dark_theme:
-            settings = Gtk.Settings.get_default()
-            if settings:
-                settings.set_property("gtk-application-prefer-dark-theme", True)
+                message = ""
+            if "GtkGizmo" in message and "reported min" in message:
+                return GLib.LogWriterOutput.HANDLED
+            break
+    return GLib.log_writer_default(log_level, fields, user_data)
+
+
+GLib.log_set_writer_func(_log_writer_filter, None)
+
 
 class HiDpiMixin:
-    def new_surface_from_image(self: Gtk.Window, path, width=None, height=None, keep_aspect_ratio=False):
-        scale = self.get_scale_factor()
-        w = int(width * scale) if width else None
-        h = int(height * scale) if height else None
+    def new_texture_from_image(self: Gtk.Widget, path, width=None, height=None, keep_aspect_ratio=False):
 
-        pixbuf = safe_load_pixbuf(path, w, h, keep_aspect_ratio)
+        pixbuf = safe_load_pixbuf(path, width, height, keep_aspect_ratio)
 
-        surface = Gdk.cairo_surface_create_from_pixbuf(pixbuf, scale, None)
-        return surface
+        return Gdk.Texture.new_for_pixbuf(pixbuf)
+
 
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
     try:
@@ -76,10 +66,138 @@ def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
 
         return pixbuf
 
+
+def new_icon_image(icon_filename, size=16):
+    path = PathManager.get_icon(icon_filename)
+    icon_paintable = Gtk.IconPaintable.new_for_file(Gio.File.new_for_path(path), size, 1)
+    image = Gtk.Image.new_from_paintable(icon_paintable)
+    image.set_pixel_size(size)
+    return image
+
+
+def widget_children(widget):
+    children = []
+    child = widget.get_first_child()
+    while child:
+        children.append(child)
+        child = child.get_next_sibling()
+    return children
+
+
+def new_picture(paintable=None):
+    picture = Gtk.Picture.new_for_paintable(paintable) if paintable else Gtk.Picture()
+    picture.set_halign(Gtk.Align.CENTER)
+    picture.set_valign(Gtk.Align.CENTER)
+    picture.set_can_shrink(False)
+    picture.set_content_fit(Gtk.ContentFit.SCALE_DOWN)
+    return picture
+
+
+class IdComboBox(Gtk.DropDown):
+    __gsignals__ = {
+        'changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    }
+
+    def __init__(self):
+        super().__init__()
+        self._ids = []
+        self._suppress = False
+        self._ellipsize = False
+        self._max_width_chars = 20
+        self._store = Gtk.StringList()
+        self.set_model(self._store)
+        factory = Gtk.SignalListItemFactory()
+        factory.connect("setup", self._on_factory_setup)
+        factory.connect("bind", self._on_factory_bind)
+        self.set_factory(factory)
+        self.connect("notify::selected", self._on_notify_selected)
+
+    def _on_factory_setup(self, factory, list_item):
+        label = Gtk.Label(xalign=0)
+        list_item.set_child(label)
+
+    def _on_factory_bind(self, factory, list_item):
+        label = list_item.get_child()
+        item = list_item.get_item()
+        label.set_text(item.get_string() if item else "")
+        if self._ellipsize:
+            label.set_ellipsize(Pango.EllipsizeMode.END)
+            label.set_max_width_chars(self._max_width_chars)
+
+    def _on_notify_selected(self, *args):
+        if not self._suppress:
+            self.emit("changed")
+
+    def configure_ellipsize(self, max_width_chars=20):
+        self._ellipsize = True
+        self._max_width_chars = max_width_chars
+
+    def append(self, id_, text):
+        self._ids.append(id_)
+        self._suppress = True
+        self._store.append(text)
+        self._suppress = False
+
+    def append_text(self, text):
+        self.append(None, text)
+
+    def remove_all(self):
+        n = self._store.get_n_items()
+        if n:
+            self._suppress = True
+            self._store.splice(0, n, [])
+            self._suppress = False
+        self._ids = []
+
+    def get_active(self):
+        sel = self.get_selected()
+        return sel if sel != Gtk.INVALID_LIST_POSITION else -1
+
+    def set_active(self, index):
+        if index is None or index < 0:
+            self.set_selected(Gtk.INVALID_LIST_POSITION)
+        else:
+            self.set_selected(index)
+
+    def get_active_text(self):
+        item = self.get_selected_item()
+        return item.get_string() if item else None
+
+    def get_active_id(self):
+        idx = self.get_active()
+        if idx < 0 or idx >= len(self._ids):
+            return None
+        return self._ids[idx]
+
+    def set_active_id(self, id_):
+        try:
+            idx = self._ids.index(id_)
+        except ValueError:
+            return False
+        self.set_active(idx)
+        return True
+
+    def get_texts(self):
+        return [self._store.get_string(i) for i in range(self._store.get_n_items())]
+
+
+def hide_dialog_action_area(dialog):
+    outer = dialog.get_first_child()
+    if not outer:
+        return
+    content_box = outer.get_first_child()
+    if not content_box:
+        return
+    action_box = content_box.get_next_sibling()
+    if action_box:
+        action_box.set_visible(False)
+
+
 def ensure_parent_dir(path):
     parent = os.path.dirname(path)
     if parent:
         os.makedirs(parent, exist_ok=True)
+
 
 def load_json_file(filepath, default=None):
     try:
@@ -88,16 +206,32 @@ def load_json_file(filepath, default=None):
     except (FileNotFoundError, json.JSONDecodeError):
         return default if default is not None else []
 
+
 def save_json_file(data, filepath, indent=4):
     ensure_parent_dir(filepath)
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=indent, ensure_ascii=False)
+
 
 def format_title(title):
     title = title.strip().lower()
     title = re.sub(r"[^\w\s-]", "", title)
     title = re.sub(r"\s+", "-", title)
     return title
+
+
+def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None):
+    dialog = Gtk.FileChooserDialog(
+        title=title,
+        transient_for=parent,
+        modal=True,
+        action=action,
+    )
+    dialog.add_button(cancel_label or _("Cancel"), Gtk.ResponseType.CANCEL)
+    dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
+    dialog.set_default_response(Gtk.ResponseType.ACCEPT)
+    return dialog
+
 
 def add_windows_file_filters(filechooser):
     windows_filter = Gtk.FileFilter()
@@ -116,6 +250,7 @@ def add_windows_file_filters(filechooser):
     filechooser.add_filter(all_files_filter)
     filechooser.set_filter(windows_filter)
 
+
 def add_image_file_filters(filechooser, include_ico=True):
     image_filter = Gtk.FileFilter()
     image_filter.set_name(_("Image files"))
@@ -130,8 +265,10 @@ def add_image_file_filters(filechooser, include_ico=True):
         image_filter.add_pattern("*.ico")
     filechooser.add_filter(image_filter)
 
+
 def play_notification_sound():
     subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+
 
 def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
                        lossless_performance, lossless_hdr, lossless_present):
@@ -160,6 +297,7 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
         parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     return parts
 
+
 def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, game_arguments):
     with open(bat_path, "w") as f:
         f.write('@echo off\n')
@@ -180,6 +318,7 @@ def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, gam
             else:
                 f.write(f'start "" "z:{exe_path}"\n')
 
+
 def is_valid_image(file_path):
     try:
         pixbuf = safe_load_pixbuf(file_path)
@@ -187,8 +326,10 @@ def is_valid_image(file_path):
     except Exception:
         return False
 
-def show_invalid_image_dialog():
-    dialog = Gtk.Dialog(title="Faugus Launcher")
+
+def show_invalid_image_dialog(parent=None):
+    dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
+    hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
     play_notification_sound()
@@ -204,7 +345,6 @@ def show_invalid_image_dialog():
     button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
     content_area = dialog.get_content_area()
-    content_area.set_border_width(0)
     content_area.set_halign(Gtk.Align.CENTER)
     content_area.set_valign(Gtk.Align.CENTER)
     content_area.set_vexpand(True)
@@ -221,20 +361,21 @@ def show_invalid_image_dialog():
     box_bottom.set_margin_end(10)
     box_bottom.set_margin_bottom(10)
 
-    box_top.pack_start(label, True, True, 0)
-    box_top.pack_start(label2, True, True, 0)
-    box_bottom.pack_start(button_yes, True, True, 0)
+    box_top.append(label)
+    box_top.append(label2)
+    box_bottom.append(button_yes)
 
-    content_area.add(box_top)
-    content_area.add(box_bottom)
+    content_area.append(box_top)
+    content_area.append(box_bottom)
 
-    dialog.show_all()
-    dialog.run()
-    dialog.destroy()
+    dialog.connect("response", lambda d, r: d.destroy())
+    dialog.present()
+
 
 def on_entry_changed(widget, entry):
     if entry.get_text():
-        entry.get_style_context().remove_class("entry")
+        entry.remove_css_class("entry")
+
 
 def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     current_text = widget.get_text()
@@ -243,6 +384,7 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     else:
         tooltip.set_text(widget.get_tooltip_text())
     return True
+
 
 def disable_mangohud_gamemode_if_missing(obj):
     obj.mangohud_enabled = os.path.exists(mangohud_dir)
@@ -258,6 +400,7 @@ def disable_mangohud_gamemode_if_missing(obj):
         obj.checkbox_gamemode.set_active(False)
         obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
 
+
 def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
     obj.checkbox_mangohud.set_tooltip_text(
@@ -265,34 +408,37 @@ def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
     obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
 
+
 def choose_shortcut_icon(obj):
-    filechooser = Gtk.FileChooserNative.new(
-        _("Select an icon for the shortcut"),
+    filechooser = new_file_chooser(
         obj,
+        _("Select an icon for the shortcut"),
         Gtk.FileChooserAction.OPEN,
-        _("Open"),
-        _("Cancel")
     )
 
     add_image_file_filters(filechooser)
 
-    filechooser.set_current_folder(obj.icon_directory)
+    filechooser.set_current_folder(Gio.File.new_for_path(obj.icon_directory))
 
-    response = filechooser.run()
-    if response == Gtk.ResponseType.ACCEPT:
-        file_path = filechooser.get_filename()
-        if not file_path or not is_valid_image(file_path):
-            show_invalid_image_dialog()
-        else:
-            shutil.copyfile(file_path, obj.icon_temp)
-            surface = obj.new_surface_from_image(obj.icon_temp, 50, 50)
-            image = Gtk.Image.new_from_surface(surface)
-            obj.button_shortcut_icon.set_image(image)
+    def on_response(dialog, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            file_path = dialog.get_file().get_path()
+            if not file_path or not is_valid_image(file_path):
+                show_invalid_image_dialog(obj)
+            else:
+                shutil.copyfile(file_path, obj.icon_temp)
+                texture = obj.new_texture_from_image(obj.icon_temp, 50, 50)
+                image = new_picture(texture)
+                obj.button_shortcut_icon.set_child(image)
 
-    filechooser.destroy()
+        dialog.destroy()
 
-    if os.path.isdir(obj.icon_directory):
-        shutil.rmtree(obj.icon_directory)
+        if os.path.isdir(obj.icon_directory):
+            shutil.rmtree(obj.icon_directory)
+
+    filechooser.connect("response", on_response)
+    filechooser.present()
+
 
 def load_red_entry_css():
     css_provider = Gtk.CssProvider()
@@ -302,8 +448,23 @@ def load_red_entry_css():
     }
     """
     css_provider.load_from_data(css.encode('utf-8'))
-    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider,
-                                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
+    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
+                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+
+def load_frame_css():
+
+    css_provider = Gtk.CssProvider()
+    css = """
+    frame {
+        border: 1px solid alpha(@borders, 0.9);
+        border-radius: 6px;
+    }
+    """
+    css_provider.load_from_data(css.encode('utf-8'))
+    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
+                                              Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
 
 def extract_ico(exe_path, output_path, best_frame=False):
     tmp_dir = tempfile.mkdtemp()
@@ -374,28 +535,33 @@ def extract_ico(exe_path, output_path, best_frame=False):
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
+
 def make_donate_buttons():
     button_kofi = Gtk.Button(label="Ko-fi")
     button_kofi.connect("clicked", on_button_kofi_clicked)
-    button_kofi.get_style_context().add_class("kofi")
+    button_kofi.add_css_class("kofi")
 
     button_paypal = Gtk.Button(label="PayPal")
     button_paypal.connect("clicked", on_button_paypal_clicked)
-    button_paypal.get_style_context().add_class("paypal")
+    button_paypal.add_css_class("paypal")
 
     return button_kofi, button_paypal
+
 
 def on_button_search_protonfix_clicked(widget):
     import webbrowser
     webbrowser.open("https://umu.openwinecomponents.org/")
 
+
 def on_button_kofi_clicked(widget):
     import webbrowser
     webbrowser.open("https://ko-fi.com/K3K210EMDU")
 
+
 def on_button_paypal_clicked(widget):
     import webbrowser
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+
 
 def update_games_json():
     games = load_json_file(games_json, None)
@@ -431,13 +597,21 @@ def update_games_json():
                 game["icon"] = new_icon_path
                 changed = True
 
+            if game.get("banner"):
+                new_banner_path = os.path.join(banners_dir, f"{game_id}.png")
+                if game.get("banner") != new_banner_path:
+                    game["banner"] = new_banner_path
+                    changed = True
+
     if changed:
         save_json_file(games, games_json)
+
 
 def version_key(v):
     cleaned = re.sub(r'^[^\d]+', '', v)
     parts = re.split(r'(\d+)', cleaned)
     return [int(p) if p.isdigit() else p for p in parts]
+
 
 def populate_combobox_with_runners(combobox):
     combobox.append_text("Proton-CachyOS Latest (default)")
@@ -472,9 +646,8 @@ def populate_combobox_with_runners(combobox):
         print(f"Error accessing the directory: {e}")
 
     combobox.set_active(0)
-    cell_renderer = combobox.get_cells()[0]
-    cell_renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
-    cell_renderer.set_property("max-width-chars", 20)
+    combobox.configure_ellipsize(20)
+
 
 GAME_FIELDS = [
     "gameid", "title", "path", "prefix",
@@ -488,8 +661,10 @@ GAME_FIELDS = [
     "playtime", "hidden", "prevent_sleep", "category", "icon",
 ]
 
+
 def game_to_dict(game):
     return {field: getattr(game, field) for field in GAME_FIELDS}
+
 
 def game_to_save_dict(game, hidden=None):
     d = {**game_to_dict(game),
@@ -501,11 +676,13 @@ def game_to_save_dict(game, hidden=None):
         d["hidden"] = hidden
     return d
 
+
 def prepare_game_kwargs(data):
     defaults = {f: "" for f in GAME_FIELDS}
     defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
+
 
 def init_addon_defaults(obj):
     obj.addapp_enabled = False
@@ -520,8 +697,10 @@ def init_addon_defaults(obj):
     obj.lossless_hdr = False
     obj.lossless_present = False
 
-def show_launch_arguments_dialog(parent, current_launch_arguments):
-    dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)
+
+def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
+    dialog = Gtk.Dialog(title=_("Launch Arguments"), transient_for=parent)
+    hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
     dialog.set_modal(True)
     dialog.set_default_size(650, 400)
@@ -554,9 +733,9 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
         if path == str(len(store_presets) - 1) and new_text.strip() != "":
             store_presets.append([""])
 
-    def on_preset_key_press(widget, event):
-        if event.keyval == Gdk.KEY_Delete:
-            selection = widget.get_selection()
+    def on_preset_key_press(controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Delete:
+            selection = tree_presets.get_selection()
             model, treeiter = selection.get_selected()
             if treeiter is not None:
                 if model[treeiter][0] != "" or len(model) > 1:
@@ -567,25 +746,35 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
         return False
 
     renderer_presets.connect("edited", on_preset_edited)
-    tree_presets.connect("key-press-event", on_preset_key_press)
-    column_presets = Gtk.TreeViewColumn(_("Presets"), renderer_presets, text=0)
+    key_controller_presets = Gtk.EventControllerKey()
+    key_controller_presets.connect("key-pressed", on_preset_key_press)
+    tree_presets.add_controller(key_controller_presets)
+    column_presets = Gtk.TreeViewColumn("", renderer_presets, text=0)
     tree_presets.append_column(column_presets)
+    tree_presets.set_headers_visible(False)
     scroll_presets = Gtk.ScrolledWindow()
-    scroll_presets.add(tree_presets)
+    scroll_presets.set_child(tree_presets)
+
+    label_presets_header = Gtk.Label(label=_("Presets"))
+    label_presets_header.set_halign(Gtk.Align.START)
+
+    box_presets = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+    box_presets.set_hexpand(True)
+    box_presets.set_vexpand(True)
+    box_presets.append(label_presets_header)
+    box_presets.append(scroll_presets)
 
     btn_copy = Gtk.Button()
     btn_copy.set_size_request(50, 50)
     btn_copy.set_valign(Gtk.Align.CENTER)
 
-    img = Gtk.Image.new_from_icon_name("faugus-play-symbolic", Gtk.IconSize.BUTTON)
-
-    def flip_image(w, cr):
-        cr.translate(w.get_allocated_width(), 0)
-        cr.scale(-1, 1)
-        return False
-
-    img.connect("draw", flip_image)
-    btn_copy.set_image(img)
+    img = new_icon_image("faugus-play-symbolic.svg")
+    img.add_css_class("flip-x")
+    flip_css = Gtk.CssProvider()
+    flip_css.load_from_data(b".flip-x { transform: scaleX(-1); }")
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(), flip_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    btn_copy.set_child(img)
 
     store_args = Gtk.ListStore(str)
     current_args = current_launch_arguments.split("\n")
@@ -605,9 +794,9 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
         if path == str(len(store_args) - 1) and new_text.strip() != "":
             store_args.append([""])
 
-    def on_arg_key_press(widget, event):
-        if event.keyval == Gdk.KEY_Delete:
-            selection = widget.get_selection()
+    def on_arg_key_press(controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Delete:
+            selection = tree_args.get_selection()
             model, treeiter = selection.get_selected()
             if treeiter is not None:
                 if model[treeiter][0] != "" or len(model) > 1:
@@ -618,11 +807,23 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
         return False
 
     renderer_args.connect("edited", on_arg_edited)
-    tree_args.connect("key-press-event", on_arg_key_press)
-    column_args = Gtk.TreeViewColumn(_("Launch Arguments"), renderer_args, text=0)
+    key_controller_args = Gtk.EventControllerKey()
+    key_controller_args.connect("key-pressed", on_arg_key_press)
+    tree_args.add_controller(key_controller_args)
+    column_args = Gtk.TreeViewColumn("", renderer_args, text=0)
     tree_args.append_column(column_args)
+    tree_args.set_headers_visible(False)
     scroll_args = Gtk.ScrolledWindow()
-    scroll_args.add(tree_args)
+    scroll_args.set_child(tree_args)
+
+    label_args_header = Gtk.Label(label=_("Launch Arguments"))
+    label_args_header.set_halign(Gtk.Align.START)
+
+    box_args = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+    box_args.set_hexpand(True)
+    box_args.set_vexpand(True)
+    box_args.append(label_args_header)
+    box_args.append(scroll_args)
 
     sel_presets = tree_presets.get_selection()
     sel_args = tree_args.get_selection()
@@ -648,12 +849,12 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
 
     btn_copy.connect("clicked", on_copy_clicked)
 
-    hbox.pack_start(scroll_args, True, True, 0)
-    hbox.pack_start(btn_copy, False, False, 0)
-    hbox.pack_start(scroll_presets, True, True, 0)
+    hbox.append(box_args)
+    hbox.append(btn_copy)
+    hbox.append(box_presets)
 
     content_area = dialog.get_content_area()
-    content_area.pack_start(hbox, True, True, 0)
+    content_area.append(hbox)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
     button_cancel.set_size_request(150, -1)
@@ -669,28 +870,31 @@ def show_launch_arguments_dialog(parent, current_launch_arguments):
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)
-    bottom_box.pack_start(button_cancel, True, True, 0)
-    bottom_box.pack_start(button_ok, True, True, 0)
+    bottom_box.append(button_cancel)
+    bottom_box.append(button_ok)
 
-    content_area.pack_start(bottom_box, False, False, 0)
+    content_area.append(bottom_box)
 
-    dialog.show_all()
-    response = dialog.run()
+    def on_response(dialog, response):
+        result = current_launch_arguments
+        if response == Gtk.ResponseType.OK:
+            presets_to_save = [row[0] for row in store_presets if row[0].strip()]
+            with open(presets_file, "w") as f:
+                json.dump(presets_to_save, f)
 
-    result = current_launch_arguments
-    if response == Gtk.ResponseType.OK:
-        presets_to_save = [row[0] for row in store_presets if row[0].strip()]
-        with open(presets_file, "w") as f:
-            json.dump(presets_to_save, f)
+            args_to_save = [row[0] for row in store_args if row[0].strip()]
+            result = "\n".join(args_to_save)
 
-        args_to_save = [row[0] for row in store_args if row[0].strip()]
-        result = "\n".join(args_to_save)
+        dialog.destroy()
+        callback(result)
 
-    dialog.destroy()
-    return result
+    dialog.connect("response", on_response)
+    dialog.present()
 
-def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first):
-    dialog = Gtk.Dialog(title=_("Additional Application"), parent=parent, flags=0)
+
+def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first, callback):
+    dialog = Gtk.Dialog(title=_("Additional Application"), transient_for=parent)
+    hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
 
@@ -728,23 +932,26 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     entry_addapp.set_hexpand(True)
 
     button_search_addapp = Gtk.Button()
-    button_search_addapp.set_image(Gtk.Image.new_from_icon_name("system-search-symbolic", Gtk.IconSize.BUTTON))
+    button_search_addapp.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
     button_search_addapp.set_size_request(50, -1)
 
     def on_search_clicked(w):
-        filechooser = Gtk.FileChooserNative(
-            title=_("Select an additional application"),
-            action=Gtk.FileChooserAction.OPEN,
-            accept_label=_("Open"),
-            cancel_label=_("Cancel"),
+        filechooser = new_file_chooser(
+            dialog,
+            _("Select an additional application"),
+            Gtk.FileChooserAction.OPEN,
         )
         add_windows_file_filters(filechooser)
-        resp = filechooser.run()
-        if resp == Gtk.ResponseType.ACCEPT:
-            selected_file = filechooser.get_filename()
-            if selected_file:
-                entry_addapp.set_text(selected_file)
-        filechooser.destroy()
+
+        def on_search_response(dialog_fc, resp):
+            if resp == Gtk.ResponseType.ACCEPT:
+                selected_file = dialog_fc.get_file().get_path()
+                if selected_file:
+                    entry_addapp.set_text(selected_file)
+            dialog_fc.destroy()
+
+        filechooser.connect("response", on_search_response)
+        filechooser.present()
 
     button_search_addapp.connect("clicked", on_search_clicked)
 
@@ -785,7 +992,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     grid.attach(entry_delay,            0, 4, 4, 1)
     grid.attach(checkbox_addapp_first,  0, 5, 1, 1)
 
-    frame.add(grid)
+    frame.set_child(grid)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
     button_cancel.set_size_request(150, -1)
@@ -801,31 +1008,34 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)
-    bottom_box.pack_start(button_cancel, True, True, 0)
-    bottom_box.pack_start(button_ok, True, True, 0)
+    bottom_box.append(button_cancel)
+    bottom_box.append(button_ok)
 
     content_area = dialog.get_content_area()
-    content_area.pack_start(frame, True, True, 0)
-    content_area.pack_start(bottom_box, False, False, 0)
+    content_area.append(frame)
+    content_area.append(bottom_box)
 
-    dialog.show_all()
-    response = dialog.run()
+    def on_response(dialog, response):
+        result = (addapp_enabled, addapp, addapp_delay, addapp_first)
+        if response == Gtk.ResponseType.OK:
+            result = (
+                checkbox_enable.get_active(),
+                entry_addapp.get_text(),
+                entry_delay.get_text(),
+                checkbox_addapp_first.get_active(),
+            )
 
-    result = (addapp_enabled, addapp, addapp_delay, addapp_first)
-    if response == Gtk.ResponseType.OK:
-        result = (
-            checkbox_enable.get_active(),
-            entry_addapp.get_text(),
-            entry_delay.get_text(),
-            checkbox_addapp_first.get_active(),
-        )
+        dialog.destroy()
+        callback(result)
 
-    dialog.destroy()
-    return result
+    dialog.connect("response", on_response)
+    dialog.present()
+
 
 def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
-                         lossless_performance, lossless_hdr, lossless_present):
-    dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), parent=parent, flags=0)
+                         lossless_performance, lossless_hdr, lossless_present, callback):
+    dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), transient_for=parent)
+    hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
 
@@ -881,7 +1091,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
     label_present.set_halign(Gtk.Align.START)
 
-    combobox_present = Gtk.ComboBoxText()
+    combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode."))
 
     options = [
@@ -926,7 +1136,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     grid.attach(label_present,          0, 7, 1, 1)
     grid.attach(combobox_present,       0, 8, 1, 1)
 
-    frame.add(grid)
+    frame.set_child(grid)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
     button_cancel.set_size_request(150, -1)
@@ -942,33 +1152,79 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)
-    bottom_box.pack_start(button_cancel, True, True, 0)
-    bottom_box.pack_start(button_ok, True, True, 0)
+    bottom_box.append(button_cancel)
+    bottom_box.append(button_ok)
 
     content_area = dialog.get_content_area()
-    content_area.pack_start(frame, True, True, 0)
-    content_area.pack_start(bottom_box, False, False, 0)
+    content_area.append(frame)
+    content_area.append(bottom_box)
 
-    dialog.show_all()
-    response = dialog.run()
+    def on_response(dialog, response):
+        result = (lossless_enabled, lossless_multiplier, lossless_flow,
+                  lossless_performance, lossless_hdr, lossless_present)
+        if response == Gtk.ResponseType.OK:
+            present_text = combobox_present.get_active_text()
+            present_mapping = {
+                "VSync/FIFO (default)": "fifo",
+                "Mailbox": "mailbox",
+                "Immediate": "immediate",
+            }
+            result = (
+                checkbox_enable.get_active(),
+                spin_multiplier.get_value_as_int(),
+                scale_flow.get_value(),
+                checkbox_performance.get_active(),
+                checkbox_hdr.get_active(),
+                present_mapping.get(present_text, "fifo"),
+            )
 
-    result = (lossless_enabled, lossless_multiplier, lossless_flow,
-              lossless_performance, lossless_hdr, lossless_present)
-    if response == Gtk.ResponseType.OK:
-        present_text = combobox_present.get_active_text()
-        present_mapping = {
-            "VSync/FIFO (default)": "fifo",
-            "Mailbox": "mailbox",
-            "Immediate": "immediate",
-        }
-        result = (
-            checkbox_enable.get_active(),
-            spin_multiplier.get_value_as_int(),
-            scale_flow.get_value(),
-            checkbox_performance.get_active(),
-            checkbox_hdr.get_active(),
-            present_mapping.get(present_text, "fifo"),
-        )
+        dialog.destroy()
+        callback(result)
 
-    dialog.destroy()
-    return result
+    dialog.connect("response", on_response)
+    dialog.present()
+
+
+def suppress_adwaita_theme_warning():
+    def handler(domain, level, message, user_data):
+        if "gtk-application-prefer-dark-theme" in message:
+            return
+        GLib.log_default_handler(domain, level, message, user_data)
+
+    GLib.log_set_handler(
+        "Adwaita",
+        GLib.LogLevelFlags.LEVEL_WARNING | GLib.LogLevelFlags.FLAG_FATAL | GLib.LogLevelFlags.FLAG_RECURSION,
+        handler,
+        None,
+    )
+
+
+_OVERRIDE_PRIORITY = Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
+
+_accent_css_provider = None
+
+
+def apply_interface_customization(interface_theme, accent_color):
+    style_manager = Adw.StyleManager.get_default()
+    scheme_map = {
+        "light": Adw.ColorScheme.FORCE_LIGHT,
+        "dark": Adw.ColorScheme.FORCE_DARK,
+    }
+    style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
+
+    display = Gdk.Display.get_default()
+    global _accent_css_provider
+    if _accent_css_provider:
+        Gtk.StyleContext.remove_provider_for_display(display, _accent_css_provider)
+        _accent_css_provider = None
+
+    if accent_color and accent_color != "system":
+        provider = Gtk.CssProvider()
+        css = f"""
+        @define-color accent_color {accent_color};
+        @define-color accent_bg_color {accent_color};
+        @define-color theme_selected_bg_color {accent_color};
+        """
+        provider.load_from_data(css.encode("utf-8"))
+        Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
+        _accent_css_provider = provider
