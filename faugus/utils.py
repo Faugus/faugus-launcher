@@ -1219,12 +1219,29 @@ def apply_interface_customization(interface_theme, accent_color):
         _accent_css_provider = None
 
     if accent_color and accent_color != "system":
+        fg_color = _contrasting_fg_color(accent_color)
         provider = Gtk.CssProvider()
         css = f"""
         @define-color accent_color {accent_color};
         @define-color accent_bg_color {accent_color};
+        @define-color accent_fg_color {fg_color};
         @define-color theme_selected_bg_color {accent_color};
+        @define-color theme_selected_fg_color {fg_color};
+        window, .background {{
+            --accent-color: {accent_color};
+            --accent-bg-color: {accent_color};
+            --accent-fg-color: {fg_color};
+        }}
         """
         provider.load_from_data(css.encode("utf-8"))
         Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
         _accent_css_provider = provider
+
+
+def _contrasting_fg_color(rgb_color):
+    match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', rgb_color)
+    if not match:
+        return "#ffffff"
+    r, g, b = (int(v) / 255 for v in match.groups())
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return "#000000" if luminance > 0.55 else "#ffffff"
