@@ -489,6 +489,9 @@ def extract_ico(exe_path, output_path, best_frame=False):
         if not magick:
             return "error"
 
+        identify = shutil.which("identify")
+        identify_cmd = [identify] if identify else [magick, "identify"]
+
         if best_frame:
             subprocess.run(
                 [magick, temp_ico, os.path.join(tmp_dir, "frame_%d.png")],
@@ -509,7 +512,7 @@ def extract_ico(exe_path, output_path, best_frame=False):
             best, size = None, 0
             for f in png_files:
                 r = subprocess.run(
-                    [magick, "identify", "-format", "%wx%h", str(f)],
+                    identify_cmd + ["-format", "%wx%h", str(f)],
                     capture_output=True, text=True
                 )
                 if r.returncode == 0 and r.stdout:
