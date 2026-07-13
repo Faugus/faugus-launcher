@@ -155,7 +155,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             flowboxchild:selected:focus:not(.banner-container) .game {
                 background-color: @theme_selected_bg_color;
-                color: @theme_bg_color;
+                color: @theme_selected_fg_color;
+            }
+            .category-list row:selected {
+                background-color: @theme_selected_bg_color;
+                color: @theme_selected_fg_color;
+            }
+            .envar-list:selected {
+                background-color: @theme_selected_bg_color;
+                color: @theme_selected_fg_color;
             }
             flowboxchild.banner-container {
                 border: 4px solid transparent;
@@ -3743,6 +3751,7 @@ class Settings(Gtk.Dialog):
         self.liststore.append([""])
 
         treeview = Gtk.TreeView(model=self.liststore)
+        treeview.add_css_class("envar-list")
         treeview.set_has_tooltip(True)
         treeview.connect("query-tooltip", self.on_query_tooltip)
         envar_key_controller = Gtk.EventControllerKey()

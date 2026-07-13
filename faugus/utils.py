@@ -25,6 +25,8 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
                 message = ""
             if "GtkGizmo" in message and "reported min" in message:
                 return GLib.LogWriterOutput.HANDLED
+            if "gtk_css_node_insert_after" in message:
+                return GLib.LogWriterOutput.HANDLED
             break
     return GLib.log_writer_default(log_level, fields, user_data)
 
@@ -723,6 +725,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     store_presets.append([""])
 
     tree_presets = Gtk.TreeView(model=store_presets)
+    tree_presets.add_css_class("selected-list")
     tree_presets.set_hexpand(True)
     tree_presets.set_vexpand(True)
     renderer_presets = Gtk.CellRendererText()
@@ -771,7 +774,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     img = new_icon_image("faugus-play-symbolic.svg")
     img.add_css_class("flip-x")
     flip_css = Gtk.CssProvider()
-    flip_css.load_from_data(b".flip-x { transform: scaleX(-1); }")
+    flip_css.load_from_data(
+        b".flip-x { transform: scaleX(-1); }"
+        b".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
+    )
     Gtk.StyleContext.add_provider_for_display(
         Gdk.Display.get_default(), flip_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     btn_copy.set_child(img)
@@ -784,6 +790,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     store_args.append([""])
 
     tree_args = Gtk.TreeView(model=store_args)
+    tree_args.add_css_class("selected-list")
     tree_args.set_hexpand(True)
     tree_args.set_vexpand(True)
     renderer_args = Gtk.CellRendererText()
