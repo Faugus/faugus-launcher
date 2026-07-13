@@ -653,6 +653,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         scroll_box.set_margin_bottom(10)
         scroll_box.set_margin_start(10)
         scroll_box.set_margin_end(10)
+        scroll_box.set_hexpand(True)
 
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
@@ -862,7 +863,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 box_actions.append(self.button_sort)
                 box_actions.append(self.button_category)
                 box_actions.set_halign(Gtk.Align.END)
+                box_actions.set_valign(Gtk.Align.CENTER)
                 box_actions.set_hexpand(True)
+                box_actions.set_vexpand(False)
                 bottom_bar.set_end_widget(box_actions)
 
             center_grid = Gtk.Grid()
@@ -872,8 +875,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             center_grid.attach(self.entry_search, 2, 0, 1, 1)
             center_grid.attach(self.button_kill, 3, 0, 1, 1)
             center_grid.attach(self.button_play, 4, 0, 1, 1)
+            center_grid.set_valign(Gtk.Align.CENTER)
+            center_grid.set_vexpand(False)
 
             bottom_bar.set_center_widget(center_grid)
+            self.zoom_slider.set_valign(Gtk.Align.CENTER)
+            self.zoom_slider.set_vexpand(False)
 
             right_vbox.append(scroll_box)
             right_vbox.append(bottom_bar)
@@ -5153,6 +5160,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
+        self.button_shortcut_icon.set_vexpand(False)
+        self.button_shortcut_icon.set_valign(Gtk.Align.CENTER)
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
         self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
 
