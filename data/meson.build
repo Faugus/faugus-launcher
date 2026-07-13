@@ -7,10 +7,10 @@ install_data(
   install_dir: get_option('datadir') / 'metainfo',
 )
 
-icon_name = flatpak_build ? 'io.github.Faugus.faugus-launcher' : 'faugus-launcher'
+icon_name = 'io.github.Faugus.faugus-launcher'
 
-faugus_launcher_out = flatpak_build ? 'io.github.Faugus.faugus-launcher.desktop' : 'faugus-launcher.desktop'
-faugus_shortcut_out = flatpak_build ? 'io.github.Faugus.faugus-launcher.shortcut.desktop' : 'faugus-shortcut.desktop'
+faugus_launcher_out = 'io.github.Faugus.faugus-launcher.desktop'
+faugus_shortcut_out = 'io.github.Faugus.faugus-launcher.shortcut.desktop'
 
 faugus_launcher_desktop = configure_file(
   input: 'io.github.Faugus.faugus-launcher.desktop.in',
