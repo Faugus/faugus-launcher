@@ -1816,9 +1816,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.on_button_play_clicked()
 
     def on_key_press_event(self, controller, keyval, keycode, state):
-        if keyval in (Gdk.KEY_Up, Gdk.KEY_Down, Gdk.KEY_Left, Gdk.KEY_Right):
-            print(f"[keypress-debug] on_key_press_event arrow key, focus={self.get_focus()}")
-
         if keyval == Gdk.KEY_h and state & Gdk.ModifierType.CONTROL_MASK:
             try:
                 with open(config_file_dir, "r", encoding="utf-8") as f:
