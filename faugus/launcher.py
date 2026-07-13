@@ -4834,10 +4834,12 @@ class DeleteDialog(Gtk.Dialog):
 
         button_no = Gtk.Button(label=_("No"))
         button_no.set_size_request(150, -1)
+        button_no.set_hexpand(True)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
 
         button_yes = Gtk.Button(label=_("Yes"))
         button_yes.set_size_request(150, -1)
+        button_yes.set_hexpand(True)
         button_yes.connect("clicked", lambda x: self.response(Gtk.ResponseType.YES))
 
         self.checkbox = Gtk.CheckButton(label=_("Also remove the prefix:"))
