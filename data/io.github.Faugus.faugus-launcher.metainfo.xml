@@ -36,12 +36,6 @@
       <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
-    <p>Known issues with Flatpak:</p>
-    <ul>
-      <li>The 'stop' button won't close games.</li>
-      <li>Gamescope doesn't work.</li>
-      <li>It may not use the system theme in some DEs.</li>
-    </ul>
   </description>
   <categories>
     <category>Game</category>
