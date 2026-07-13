@@ -856,6 +856,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
 
     btn_copy.connect("clicked", on_copy_clicked)
 
+    size_group = Gtk.SizeGroup(mode=Gtk.SizeGroupMode.HORIZONTAL)
+    size_group.add_widget(box_args)
+    size_group.add_widget(box_presets)
+
     hbox.append(box_args)
     hbox.append(btn_copy)
     hbox.append(box_presets)
