@@ -17,6 +17,9 @@ from faugus.config_manager import ConfigManager
 from faugus.language_config import setup_gettext
 from faugus.tray_ipc import send_command, COMMAND_PRESENT, COMMAND_QUIT, COMMAND_LAUNCH
 
+
+GLib.log_set_handler("libayatana-appindicator", GLib.LogLevelFlags.LEVEL_WARNING, lambda *a: None)
+
 _ = setup_gettext('faugus-launcher')
 
 

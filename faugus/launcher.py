@@ -359,6 +359,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not self.system_tray:
             if tray_alive:
                 self.tray_process.terminate()
+                self.tray_process.wait(timeout=2)
             self.tray_process = None
             return
 
@@ -419,6 +420,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_quit(self, *_):
         if self.tray_process and self.tray_process.poll() is None:
             self.tray_process.terminate()
+            self.tray_process.wait(timeout=2)
         self.tray_server.stop()
         self.get_application().quit()
 
@@ -2191,9 +2193,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             settings_dialog.update_config_file()
             self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
 
-            self.system_tray = settings_dialog.checkbox_system_tray.get_active()
+            new_system_tray = settings_dialog.checkbox_system_tray.get_active()
+            new_mono_icon = settings_dialog.checkbox_mono_icon.get_active()
+            tray_needs_reload = (
+                self.system_tray != new_system_tray or
+                self.mono_icon != new_mono_icon
+            )
 
-            GLib.timeout_add(1000, self.load_tray_icon)
+            self.system_tray = new_system_tray
+            self.mono_icon = new_mono_icon
+
+            if tray_needs_reload:
+                GLib.timeout_add(1000, self.load_tray_icon)
 
             combobox_language = settings_dialog.combobox_language.get_active_text()
 
@@ -2393,6 +2404,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         with open(latest_games, 'w') as f:
             f.write('\n'.join(games))
+
+        if self.system_tray:
+            self.load_tray_icon()
 
     def on_button_kill_clicked(self, widget):
         if not IS_FLATPAK:
@@ -2651,6 +2665,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 with open(latest_games, 'w') as f:
                     f.write("\n".join(recent_games))
+
+                if self.system_tray:
+                    self.load_tray_icon()
 
         except FileNotFoundError:
             pass
@@ -4249,11 +4266,16 @@ class Settings(Gtk.Dialog):
                 self.update_envar_file()
                 self.update_config_file()
                 self.parent.manage_autostart_file(self.checkbox_start_boot.get_active(), self.checkbox_start_minimized.get_active())
-                if self.checkbox_system_tray.get_active():
-                    self.parent.system_tray = True
-                else:
-                    self.parent.system_tray = False
-                GLib.timeout_add(1000, self.parent.load_tray_icon)
+                new_system_tray = self.checkbox_system_tray.get_active()
+                new_mono_icon = self.checkbox_mono_icon.get_active()
+                tray_needs_reload = (
+                    self.parent.system_tray != new_system_tray or
+                    self.parent.mono_icon != new_mono_icon
+                )
+                self.parent.system_tray = new_system_tray
+                self.parent.mono_icon = new_mono_icon
+                if tray_needs_reload:
+                    GLib.timeout_add(1000, self.parent.load_tray_icon)
             else:
                 self.load_config()
 
