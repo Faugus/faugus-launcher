@@ -683,7 +683,7 @@ class FaugusRun(HiDpiMixin):
                 dialog = Gtk.Dialog(title="Faugus", modal=True)
                 hide_dialog_action_area(dialog)
                 dialog.set_resizable(False)
-                subprocess.Popen(["canberra-gtk-play", "-i", "dialog-information"])
+                play_notification_sound()
 
                 label = Gtk.Label()
                 label.set_label(_("The keys and values were successfully added to the registry."))

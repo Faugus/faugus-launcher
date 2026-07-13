@@ -268,8 +268,19 @@ def add_image_file_filters(filechooser, include_ico=True):
     filechooser.add_filter(image_filter)
 
 
+_active_media_streams = []
+
+
 def play_notification_sound():
-    subprocess.Popen(["canberra-gtk-play", "-f", faugus_notification])
+    media = Gtk.MediaFile.new_for_filename(faugus_notification)
+    _active_media_streams.append(media)
+
+    def on_notify_ended(stream, _pspec):
+        if stream.get_ended() and stream in _active_media_streams:
+            _active_media_streams.remove(stream)
+
+    media.connect("notify::ended", on_notify_ended)
+    media.play()
 
 
 def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
