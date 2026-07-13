@@ -4964,7 +4964,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_runner.set_margin_end(10)
         self.grid_runner.set_margin_top(10)
 
-        self.grid_shortcut = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.grid_shortcut = Gtk.Grid()
+        self.grid_shortcut.set_row_spacing(10)
+        self.grid_shortcut.set_column_spacing(10)
         self.grid_shortcut.set_margin_start(10)
         self.grid_shortcut.set_margin_end(10)
         self.grid_shortcut.set_margin_top(10)
@@ -5296,16 +5298,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_runner.set_hexpand(True)
 
         self.label_shortcut.set_hexpand(True)
-        self.grid_shortcut.append(self.checkbox_shortcut_desktop)
-        self.grid_shortcut.append(self.checkbox_shortcut_appmenu)
-        self.grid_shortcut.append(self.checkbox_shortcut_steam)
+        self.grid_shortcut.attach(self.checkbox_shortcut_desktop, 0, 0, 1, 1)
+        self.checkbox_shortcut_desktop.set_hexpand(True)
+        self.grid_shortcut.attach(self.checkbox_shortcut_appmenu, 0, 1, 1, 1)
+        self.checkbox_shortcut_appmenu.set_hexpand(True)
+        self.grid_shortcut.attach(self.checkbox_shortcut_steam, 0, 2, 1, 1)
+        self.checkbox_shortcut_steam.set_hexpand(True)
         self.grid_shortcut_icon.append(self.button_shortcut_icon)
-
-        self.box_shortcut = Gtk.Grid()
-        self.box_shortcut.set_column_spacing(10)
-        self.box_shortcut.attach(self.grid_shortcut, 0, 0, 1, 1)
-        self.grid_shortcut.set_hexpand(True)
-        self.box_shortcut.attach(self.grid_shortcut_icon, 1, 0, 1, 1)
+        self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 3)
 
         page1.append(self.grid_launcher)
         page1.append(self.grid_steam_title)
@@ -5314,7 +5314,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.append(self.grid_prefix)
         page1.append(self.grid_runner)
         page1.append(self.label_shortcut)
-        page1.append(self.box_shortcut)
+        page1.append(self.grid_shortcut)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
