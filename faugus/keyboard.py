@@ -47,6 +47,7 @@ class VirtualKeyboard(Gtk.Dialog):
         vbox.set_margin_start(10)
         vbox.set_margin_end(10)
         vbox.set_margin_top(10)
+        vbox.set_margin_bottom(10)
 
         self.display_entry = Gtk.Entry()
         self.display_entry.set_text(self.entry.get_text())

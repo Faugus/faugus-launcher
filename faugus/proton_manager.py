@@ -349,6 +349,7 @@ def main():
 
     def on_activate(app):
         win = ProtonDownloader()
+        win.connect("response", lambda d, r: d.destroy())
         win.connect("destroy", lambda *a: app.quit())
         win.present()
 

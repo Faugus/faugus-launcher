@@ -1314,6 +1314,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         content.append(box)
 
+        dialog.connect("response", lambda d, r: d.destroy())
         dialog.present()
 
     def on_shutdown(self, widget):

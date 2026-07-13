@@ -166,6 +166,7 @@ class BackupWindow(Gtk.Dialog):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
+        self.connect("response", lambda d, r: d.destroy())
 
         self.config = load_config()
 
