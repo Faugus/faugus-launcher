@@ -71,8 +71,8 @@ def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
 
 def new_icon_image(icon_filename, size=16):
     path = PathManager.get_icon(icon_filename)
-    icon_paintable = Gtk.IconPaintable.new_for_file(Gio.File.new_for_path(path), size, 1)
-    image = Gtk.Image.new_from_paintable(icon_paintable)
+    icon = Gio.FileIcon.new(Gio.File.new_for_path(path))
+    image = Gtk.Image.new_from_gicon(icon)
     image.set_pixel_size(size)
     return image
 
