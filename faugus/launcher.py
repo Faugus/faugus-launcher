@@ -4971,10 +4971,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_shortcut.set_margin_bottom(10)
 
         self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.grid_shortcut_icon.set_margin_start(10)
-        self.grid_shortcut_icon.set_margin_end(10)
-        self.grid_shortcut_icon.set_margin_top(10)
-        self.grid_shortcut_icon.set_margin_bottom(10)
+        self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
         self.grid_protonfix = Gtk.Grid()
         self.grid_protonfix.set_row_spacing(10)
@@ -5160,8 +5157,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
-        self.button_shortcut_icon.set_vexpand(False)
-        self.button_shortcut_icon.set_valign(Gtk.Align.CENTER)
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
         self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
 
@@ -5305,13 +5300,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_shortcut.append(self.checkbox_shortcut_appmenu)
         self.grid_shortcut.append(self.checkbox_shortcut_steam)
         self.grid_shortcut_icon.append(self.button_shortcut_icon)
-        self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
-        self.grid_shortcut_icon.set_halign(Gtk.Align.END)
-        self.grid_shortcut_icon.set_hexpand(True)
 
-        self.box_shortcut = Gtk.Box()
-        self.box_shortcut.append(self.grid_shortcut)
-        self.box_shortcut.append(self.grid_shortcut_icon)
+        self.box_shortcut = Gtk.Grid()
+        self.box_shortcut.set_column_spacing(10)
+        self.box_shortcut.attach(self.grid_shortcut, 0, 0, 1, 1)
+        self.grid_shortcut.set_hexpand(True)
+        self.box_shortcut.attach(self.grid_shortcut_icon, 1, 0, 1, 1)
 
         page1.append(self.grid_launcher)
         page1.append(self.grid_steam_title)
