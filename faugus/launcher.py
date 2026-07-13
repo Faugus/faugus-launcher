@@ -3461,7 +3461,7 @@ class Settings(Gtk.Dialog):
         css_provider = Gtk.CssProvider()
         css = """
         .entry {
-            border-color: Red;
+            border: 1px solid red;
         }
         .paypal {
             color: white;
@@ -5021,7 +5021,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         css_provider = Gtk.CssProvider()
         css = """
         .entry {
-            border-color: Red;
+            border: 1px solid red;
         }
         .combobox {
             border: 1px solid red;

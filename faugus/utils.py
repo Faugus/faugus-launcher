@@ -446,7 +446,7 @@ def load_red_entry_css():
     css_provider = Gtk.CssProvider()
     css = """
     .entry {
-        border-color: Red;
+        border: 1px solid red;
     }
     """
     css_provider.load_from_data(css.encode('utf-8'))
