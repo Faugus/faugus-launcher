@@ -2172,7 +2172,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if faugus_backup:
             os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-        if response_id in (Gtk.ResponseType.OK, Gtk.ResponseType.APPLY):
+        if response_id == Gtk.ResponseType.OK:
             default_prefix = settings_dialog.entry_default_prefix.get_text()
             validation_result = self.validate_settings_fields(settings_dialog, default_prefix)
             if not validation_result:
@@ -2231,13 +2231,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.load_config()
 
-            if response_id == Gtk.ResponseType.OK:
-                settings_dialog.destroy()
-            else:
-                settings_dialog.set_sensitive(True)
-
         else:
-            settings_dialog.destroy()
+            apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
+
+        settings_dialog.destroy()
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.remove_css_class("entry")
@@ -3723,10 +3720,6 @@ class Settings(Gtk.Dialog):
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_size_request(150, -1)
 
-        self.button_apply = Gtk.Button(label=_("Apply"))
-        self.button_apply.connect("clicked", lambda widget: self.response(Gtk.ResponseType.APPLY))
-        self.button_apply.set_size_request(150, -1)
-
         self.label_settings = Gtk.Label(label=_("Backup/Restore Settings"))
         self.label_settings.set_halign(Gtk.Align.START)
         self.label_settings.set_margin_end(10)
@@ -4021,10 +4014,8 @@ class Settings(Gtk.Dialog):
         box_bottom.set_margin_bottom(10)
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
-        self.button_apply.set_hexpand(True)
 
         box_bottom.append(self.button_cancel)
-        box_bottom.append(self.button_apply)
         box_bottom.append(self.button_ok)
 
         self.box.append(frame)
@@ -4149,6 +4140,8 @@ class Settings(Gtk.Dialog):
             self.accent_color = self.color_button.get_rgba().to_string()
         else:
             self.accent_color = "system"
+
+        apply_interface_customization(self.interface_theme, self.accent_color)
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
@@ -4601,6 +4594,8 @@ class Settings(Gtk.Dialog):
         window_behavior = cfg.config.get('window-behavior', '')
         self.interface_theme = cfg.config.get('interface-theme', 'system')
         self.accent_color = cfg.config.get('accent-color', 'system')
+        self.original_interface_theme = self.interface_theme
+        self.original_accent_color = self.accent_color
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
