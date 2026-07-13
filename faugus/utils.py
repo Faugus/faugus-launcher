@@ -1238,11 +1238,6 @@ def apply_interface_customization(interface_theme, accent_color):
         @define-color accent_fg_color {fg_color};
         @define-color theme_selected_bg_color {accent_color};
         @define-color theme_selected_fg_color {fg_color};
-        window, .background {{
-            --accent-color: {accent_color};
-            --accent-bg-color: {accent_color};
-            --accent-fg-color: {fg_color};
-        }}
         """
         provider.load_from_data(css.encode("utf-8"))
         Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
