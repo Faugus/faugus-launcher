@@ -22,13 +22,6 @@ install_data(
 )
 
 install_data(
-  'faugus_run.py',
-  rename: 'faugus-run',
-  install_mode: 'rwxr-xr-x',
-  install_dir: get_option('bindir'),
-)
-
-install_data(
   'LICENSE',
   install_dir: get_option('datadir') / 'licenses' / meson.project_name(),
 )
