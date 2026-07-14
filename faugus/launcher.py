@@ -2154,63 +2154,67 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if not validation_result:
                 return
 
-            if not settings_dialog.logging_warning:
-                if settings_dialog.checkbox_enable_logging.get_active():
-                    self.show_warning_dialog_main(
-                        self,
-                        _("Proton may generate huge log files."),
-                        _("Enable logging only when debugging a problem.")
-                    )
-                    settings_dialog.logging_warning = True
+            def finish_settings():
+                apply_interface_customization(settings_dialog.interface_theme, settings_dialog.accent_color)
 
-            apply_interface_customization(settings_dialog.interface_theme, settings_dialog.accent_color)
+                self.save_interface_settings()
+                settings_dialog.update_config_file()
+                self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
 
-            self.save_interface_settings()
-            settings_dialog.update_config_file()
-            self.manage_autostart_file(settings_dialog.checkbox_start_boot.get_active(), settings_dialog.checkbox_start_minimized.get_active())
+                new_system_tray = settings_dialog.checkbox_system_tray.get_active()
+                new_mono_icon = settings_dialog.checkbox_mono_icon.get_active()
+                tray_needs_reload = (
+                    self.system_tray != new_system_tray or
+                    self.mono_icon != new_mono_icon
+                )
 
-            new_system_tray = settings_dialog.checkbox_system_tray.get_active()
-            new_mono_icon = settings_dialog.checkbox_mono_icon.get_active()
-            tray_needs_reload = (
-                self.system_tray != new_system_tray or
-                self.mono_icon != new_mono_icon
-            )
+                self.system_tray = new_system_tray
+                self.mono_icon = new_mono_icon
 
-            self.system_tray = new_system_tray
-            self.mono_icon = new_mono_icon
+                if tray_needs_reload:
+                    self.load_tray_icon()
 
-            if tray_needs_reload:
-                self.load_tray_icon()
+                combobox_language = settings_dialog.combobox_language.get_active_text()
 
-            combobox_language = settings_dialog.combobox_language.get_active_text()
+                if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-            if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
-                os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+                if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-            if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
-                os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+                if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-            if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
-                os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+                if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-            if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
-                os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+                if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-            if self.show_categories != settings_dialog.checkbox_show_categories.get_active():
-                os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+                settings_dialog.update_envar_file()
 
-            settings_dialog.update_envar_file()
+                if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
+                    self.load_config()
+                    self.update_list()
 
-            if self.show_hidden != settings_dialog.checkbox_show_hidden.get_active():
                 self.load_config()
-                self.update_list()
 
-            self.load_config()
+                destroy_and_release(settings_dialog)
+
+            if not settings_dialog.logging_warning and settings_dialog.checkbox_enable_logging.get_active():
+                settings_dialog.logging_warning = True
+                self.show_warning_dialog_main(
+                    self,
+                    _("Proton may generate huge log files."),
+                    _("Enable logging only when debugging a problem."),
+                    callback=lambda confirmed: finish_settings()
+                )
+            else:
+                finish_settings()
 
         else:
             apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
-
-        destroy_and_release(settings_dialog)
+            destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.remove_css_class("entry")
@@ -2659,8 +2663,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
-    def show_warning_dialog_main(self, parent, text1, text2):
-        show_message_dialog(text1, text2, parent=parent)
+    def show_warning_dialog_main(self, parent, text1, text2, callback=None):
+        show_message_dialog(text1, text2, parent=parent, callback=callback)
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         banner_path_temp = add_game_dialog.banner_path_temp
@@ -4332,10 +4336,7 @@ class Settings(Gtk.Dialog):
         def proceed():
             from faugus.backup import BackupWindow
 
-            parent = self.parent
-            destroy_and_release(self)
-
-            backup_win = BackupWindow(parent)
+            backup_win = BackupWindow(self.parent)
             backup_win.present()
 
         self.check_modified(proceed)
