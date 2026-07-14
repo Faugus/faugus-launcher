@@ -41,6 +41,7 @@ class FaugusRun(HiDpiMixin):
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
+        self._post_hook_ran = False
 
         self.load_config()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
@@ -206,6 +207,23 @@ class FaugusRun(HiDpiMixin):
 
     def execute_final_command(self):
 
+        def run_game_hook(env_name, phase):
+            command = os.environ.get(env_name, "").strip()
+            if not command:
+                return True
+
+            hook_env = os.environ.copy()
+            hook_env["FAUGUS_HOOK_PHASE"] = phase
+            hook_env["FAUGUS_GAME_ID"] = hook_env.get("FAUGUSID", "")
+            print(f"\n=== {phase.upper()} HOOK ===\n{command}\n")
+            result = subprocess.run(command, shell=True, env=hook_env)
+            if result.returncode:
+                print(f"{phase.capitalize()} hook failed with exit code {result.returncode}.")
+                return False
+            return True
+
+        self.run_game_hook = run_game_hook
+
         def start_and_watch(cmd, is_game=False):
             log_file = None
             if self.enable_logging:
@@ -283,6 +301,10 @@ class FaugusRun(HiDpiMixin):
             start_and_watch(cmd)
 
         game_cmd = popen_prefix + shlex.split(self.message)
+        if not self.run_game_hook("FAUGUS_PRE_LAUNCH_COMMAND", "pre-launch"):
+            GLib.idle_add(self.close_splash_window)
+            GLib.idle_add(Gtk.main_quit)
+            return
         self.start_time = time.time()
         start_and_watch(game_cmd, is_game=True)
 
@@ -699,7 +721,7 @@ class FaugusRun(HiDpiMixin):
                 Gtk.main_quit()
                 sys.exit()
 
-    def on_process_exit(self, pid, condition):
+    def on_process_exit(self, pid=None, condition=None):
         import psutil
         def kill_child_proc():
 
@@ -750,6 +772,10 @@ class FaugusRun(HiDpiMixin):
         GLib.idle_add(Gtk.main_quit)
         kill_child_proc()
 
+        if not self._post_hook_ran:
+            self._post_hook_ran = True
+            self.run_game_hook("FAUGUS_POST_EXIT_COMMAND", "post-exit")
+
         return False
 
 def build_launch_command(game):
@@ -773,6 +799,8 @@ def build_launch_command(game):
     lossless_hdr = game.get("lossless_hdr", "")
     lossless_present = game.get("lossless_present", "")
     icon = game.get("icon", "")
+    pre_launch_command = game.get("pre_launch_command", "")
+    post_exit_command = game.get("post_exit_command", "")
 
     if gameid == "ea-app":
         path = update_ea_path(prefix)
@@ -784,6 +812,10 @@ def build_launch_command(game):
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
         command_parts.append(f"FAUGUSID={gameid}")
+    if pre_launch_command:
+        command_parts.append(f"FAUGUS_PRE_LAUNCH_COMMAND={shlex.quote(pre_launch_command)}")
+    if post_exit_command:
+        command_parts.append(f"FAUGUS_POST_EXIT_COMMAND={shlex.quote(post_exit_command)}")
     if disable_hidraw:
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if prevent_sleep:

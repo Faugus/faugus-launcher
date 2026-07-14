@@ -485,6 +485,7 @@ GAME_FIELDS = [
     "banner",
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
+    "pre_launch_command", "post_exit_command",
     "playtime", "hidden", "prevent_sleep", "category", "icon",
 ]
 
@@ -513,12 +514,101 @@ def init_addon_defaults(obj):
     obj.addapp_delay = ""
     obj.addapp_first = False
     obj.launch_arguments = ""
+    obj.pre_launch_command = ""
+    obj.post_exit_command = ""
     obj.lossless_enabled = False
     obj.lossless_multiplier = 1
     obj.lossless_flow = 100
     obj.lossless_performance = False
     obj.lossless_hdr = False
     obj.lossless_present = False
+
+def show_game_hooks_dialog(parent, pre_launch_command, post_exit_command):
+    dialog = Gtk.Dialog(title=_("Game Hooks"), parent=parent, flags=0)
+    dialog.set_resizable(True)
+    dialog.set_modal(True)
+    dialog.set_default_size(700, 500)
+
+    hooks_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+    hooks_box.set_margin_start(10)
+    hooks_box.set_margin_end(10)
+    hooks_box.set_margin_top(10)
+    hooks_box.set_margin_bottom(10)
+
+    pre_label = Gtk.Label(label=_("Pre-launch command"))
+    pre_label.set_halign(Gtk.Align.START)
+    pre_hint = Gtk.Label(label=_("Runs before the game starts; a non-zero exit cancels launch."))
+    pre_hint.set_halign(Gtk.Align.START)
+    pre_hint.get_style_context().add_class("dim-label")
+    pre_buffer = Gtk.TextBuffer()
+    pre_buffer.set_text(pre_launch_command)
+    pre_editor = Gtk.TextView(buffer=pre_buffer)
+    pre_editor.set_monospace(True)
+    pre_editor.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+    pre_editor.set_top_margin(6)
+    pre_editor.set_bottom_margin(6)
+    pre_scroll = Gtk.ScrolledWindow()
+    pre_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    pre_scroll.set_min_content_height(150)
+    pre_scroll.set_vexpand(True)
+    pre_scroll.add(pre_editor)
+
+    post_label = Gtk.Label(label=_("Post-exit command"))
+    post_label.set_halign(Gtk.Align.START)
+    post_hint = Gtk.Label(label=_("Runs after the tracked game process exits."))
+    post_hint.set_halign(Gtk.Align.START)
+    post_hint.get_style_context().add_class("dim-label")
+    post_buffer = Gtk.TextBuffer()
+    post_buffer.set_text(post_exit_command)
+    post_editor = Gtk.TextView(buffer=post_buffer)
+    post_editor.set_monospace(True)
+    post_editor.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+    post_editor.set_top_margin(6)
+    post_editor.set_bottom_margin(6)
+    post_scroll = Gtk.ScrolledWindow()
+    post_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    post_scroll.set_min_content_height(150)
+    post_scroll.set_vexpand(True)
+    post_scroll.add(post_editor)
+
+    hooks_box.pack_start(pre_label, False, False, 0)
+    hooks_box.pack_start(pre_hint, False, False, 0)
+    hooks_box.pack_start(pre_scroll, True, True, 0)
+    hooks_box.pack_start(post_label, False, False, 0)
+    hooks_box.pack_start(post_hint, False, False, 0)
+    hooks_box.pack_start(post_scroll, True, True, 0)
+
+    content_area = dialog.get_content_area()
+    content_area.pack_start(hooks_box, True, True, 0)
+
+    button_cancel = Gtk.Button(label=_("Cancel"))
+    button_cancel.set_size_request(150, -1)
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+    button_ok = Gtk.Button(label=_("Ok"))
+    button_ok.set_size_request(150, -1)
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_margin_start(10)
+    bottom_box.set_margin_end(10)
+    bottom_box.set_margin_bottom(10)
+    bottom_box.pack_start(button_cancel, True, True, 0)
+    bottom_box.pack_start(button_ok, True, True, 0)
+    content_area.pack_start(bottom_box, False, False, 0)
+
+    dialog.show_all()
+    response = dialog.run()
+    if response == Gtk.ResponseType.OK:
+        result = (
+            pre_buffer.get_text(pre_buffer.get_start_iter(), pre_buffer.get_end_iter(), False).strip(),
+            post_buffer.get_text(post_buffer.get_start_iter(), post_buffer.get_end_iter(), False).strip(),
+        )
+    else:
+        result = (pre_launch_command, post_exit_command)
+    dialog.destroy()
+    return result
 
 def show_launch_arguments_dialog(parent, current_launch_arguments):
     dialog = Gtk.Dialog(title=_("Launch Arguments"), parent=parent, flags=0)

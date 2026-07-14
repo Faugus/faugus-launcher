@@ -2444,6 +2444,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.launch_arguments = game.launch_arguments
+            edit_game_dialog.pre_launch_command = game.pre_launch_command
+            edit_game_dialog.post_exit_command = game.post_exit_command
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(_("Edit %s") % game.title)
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
@@ -2734,6 +2736,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             path = add_game_dialog.entry_path.get_text()
             launch_arguments = add_game_dialog.launch_arguments
+            pre_launch_command = add_game_dialog.pre_launch_command
+            post_exit_command = add_game_dialog.post_exit_command
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.combobox_runner.get_active_text()
@@ -2825,6 +2829,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 lossless_performance,
                 lossless_hdr,
                 lossless_present,
+                pre_launch_command,
+                post_exit_command,
                 playtime,
                 hidden,
                 prevent_sleep,
@@ -3096,6 +3102,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.path = edit_game_dialog.entry_path.get_text()
             game.prefix = os.path.normpath(edit_game_dialog.entry_prefix.get_text())
             game.launch_arguments = edit_game_dialog.launch_arguments
+            game.pre_launch_command = edit_game_dialog.pre_launch_command
+            game.post_exit_command = edit_game_dialog.post_exit_command
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
@@ -4569,6 +4577,8 @@ class Game:
         lossless_performance,
         lossless_hdr,
         lossless_present,
+        pre_launch_command,
+        post_exit_command,
         playtime,
         hidden,
         prevent_sleep,
@@ -4598,6 +4608,8 @@ class Game:
         self.lossless_performance = lossless_performance
         self.lossless_hdr = lossless_hdr
         self.lossless_present = lossless_present
+        self.pre_launch_command = pre_launch_command
+        self.post_exit_command = post_exit_command
         self.playtime = playtime
         self.hidden = hidden
         self.prevent_sleep = prevent_sleep
@@ -4962,6 +4974,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
         self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
+        self.button_game_hooks = Gtk.Button(label=_("Game Hooks"))
+        self.button_game_hooks.connect("clicked", self.on_button_game_hooks_clicked)
+        self.button_game_hooks.set_tooltip_text(_("Run commands before launch and after the game exits"))
+
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
         self.button_addapp.set_tooltip_text(
@@ -5160,6 +5176,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_launch_arguments.attach(self.button_launch_arguments, 0, 0, 1, 1)
         self.button_launch_arguments.set_hexpand(True)
 
+        self.grid_launch_arguments.attach(self.button_game_hooks, 0, 1, 1, 1)
+        self.button_game_hooks.set_hexpand(True)
+
         self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
         self.button_addapp.set_hexpand(True)
 
@@ -5274,6 +5293,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def on_button_launch_arguments_clicked(self, widget):
         self.launch_arguments = show_launch_arguments_dialog(self, self.launch_arguments)
+
+    def on_button_game_hooks_clicked(self, widget):
+        (self.pre_launch_command,
+         self.post_exit_command) = show_game_hooks_dialog(
+            self, self.pre_launch_command, self.post_exit_command)
 
     def on_button_addapp_clicked(self, widget):
         (self.addapp_enabled, self.addapp,
