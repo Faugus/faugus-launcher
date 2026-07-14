@@ -230,6 +230,20 @@ def ensure_parent_dir(path):
         os.makedirs(parent, exist_ok=True)
 
 
+def atomic_write(filepath, write_func):
+    ensure_parent_dir(filepath)
+    dir_name = os.path.dirname(filepath) or "."
+    fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".tmp-")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            write_func(f)
+        os.replace(tmp_path, filepath)
+    except BaseException:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        raise
+
+
 def load_json_file(filepath, default=None):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
@@ -239,9 +253,7 @@ def load_json_file(filepath, default=None):
 
 
 def save_json_file(data, filepath, indent=4):
-    ensure_parent_dir(filepath)
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=indent, ensure_ascii=False)
+    atomic_write(filepath, lambda f: json.dump(data, f, indent=indent, ensure_ascii=False))
 
 
 def format_title(title):

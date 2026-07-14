@@ -4674,9 +4674,10 @@ class Settings(Gtk.Dialog):
         if self.language == "":
             self.combobox_language.set_active(index_language)
         else:
+            language_primary = self.language.split("_")[0].split("-")[0].lower()
             for i, lang_name in enumerate(self.combobox_language.get_texts()):
                 lang_code = self.lang_codes.get(lang_name, "")
-                if lang_code == self.language:
+                if lang_code == self.language or lang_code.lower() == language_primary:
                     index_language = i
                     break
 

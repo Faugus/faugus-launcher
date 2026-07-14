@@ -1,4 +1,5 @@
 from faugus.language_config import *
+from faugus.utils import atomic_write
 
 
 class ConfigManager:
@@ -70,15 +71,14 @@ class ConfigManager:
             self.save_config()
 
     def save_config(self):
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        with open(config_file_dir, 'w') as f:
+        def write(f):
             for key, value in self.config.items():
                 if key in ['default-prefix', 'default-runner']:
                     f.write(f'{key}="{value}"\n')
                 else:
                     f.write(f'{key}={value}\n')
+
+        atomic_write(config_file_dir, write)
 
     def set_value(self, key, value):
         if key not in self.default_config:
