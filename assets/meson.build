@@ -7,7 +7,6 @@ install_data(
 
 install_data(
   'faugus-add-symbolic.svg',
-  'faugus-exit-symbolic.svg',
   'faugus-kill-symbolic.svg',
   'faugus-play-symbolic.svg',
   'faugus-settings-symbolic.svg',
