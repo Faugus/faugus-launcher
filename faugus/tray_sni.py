@@ -146,42 +146,27 @@ class TrayIcon:
         self.menu_items = []
         self.menu_revision = 0
 
-        self.service_name = f"org.kde.StatusNotifierItem-{os.getpid()}-1"
-        self.owner_id = None
         self.connection = None
+        self.watch_id = None
         self.item_reg_id = None
         self.menu_reg_id = None
 
     def start(self):
-        self.owner_id = Gio.bus_own_name(
-            Gio.BusType.SESSION,
-            self.service_name,
-            Gio.BusNameOwnerFlags.NONE,
-            self.on_bus_acquired,
-            None,
-            None,
+        address = Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, None)
+        connection = Gio.DBusConnection.new_for_address_sync(
+            address,
+            Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION,
+            None, None,
         )
-
-    def stop(self):
-        if self.connection:
-            if self.item_reg_id:
-                self.connection.unregister_object(self.item_reg_id)
-            if self.menu_reg_id:
-                self.connection.unregister_object(self.menu_reg_id)
-        if self.owner_id:
-            Gio.bus_unown_name(self.owner_id)
-        self.connection = None
-        self.owner_id = None
-
-    def on_bus_acquired(self, connection, name):
         self.connection = connection
+
         register = getattr(connection, "register_object_with_closures2", connection.register_object)
         self.item_reg_id = register(
             ITEM_PATH, self.item_info, self.on_item_method_call, self.on_item_get_property, None)
         self.menu_reg_id = register(
             MENU_PATH, self.menu_info, self.on_menu_method_call, self.on_menu_get_property, None)
 
-        Gio.bus_watch_name_on_connection(
+        self.watch_id = Gio.bus_watch_name_on_connection(
             connection,
             "org.kde.StatusNotifierWatcher",
             Gio.BusNameWatcherFlags.NONE,
@@ -189,13 +174,25 @@ class TrayIcon:
             None,
         )
 
+    def stop(self):
+        if self.watch_id:
+            Gio.bus_unwatch_name(self.watch_id)
+        if self.connection:
+            if self.item_reg_id:
+                self.connection.unregister_object(self.item_reg_id)
+            if self.menu_reg_id:
+                self.connection.unregister_object(self.menu_reg_id)
+            self.connection.close_sync(None)
+        self.connection = None
+        self.watch_id = None
+
     def on_watcher_appeared(self, connection, name, owner):
         connection.call(
             "org.kde.StatusNotifierWatcher",
             "/StatusNotifierWatcher",
             "org.kde.StatusNotifierWatcher",
             "RegisterStatusNotifierItem",
-            GLib.Variant("(s)", (self.service_name,)),
+            GLib.Variant("(s)", (ITEM_PATH,)),
             None,
             Gio.DBusCallFlags.NONE,
             -1,
