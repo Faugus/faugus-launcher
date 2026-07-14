@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gdk
-from faugus.utils import hide_dialog_action_area
+from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release
 
 LAYOUT_LOWER = [
     [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
@@ -64,7 +64,7 @@ class VirtualKeyboard(Gtk.Dialog):
         self.connect("response", self.on_response)
 
     def apply_css(self):
-        css = b"""
+        add_css_once("virtual_keyboard", """
         .tv-keyboard button {
             font-weight: bold;
             min-height: 40px;
@@ -78,14 +78,7 @@ class VirtualKeyboard(Gtk.Dialog):
             min-height: 40px;
             border-radius: 8px;
         }
-        """
-        style_provider = Gtk.CssProvider()
-        style_provider.load_from_data(css)
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            style_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
+        """)
 
     def build_keys(self):
         child = self.grid.get_first_child()
@@ -221,6 +214,6 @@ class VirtualKeyboard(Gtk.Dialog):
 
     def _close(self):
         callback = self.on_close
-        self.destroy()
+        destroy_and_release(self)
         if callback:
             callback()

@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser
+from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release
 
 
 def load_config():
@@ -166,7 +166,7 @@ class BackupWindow(Gtk.Dialog):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
-        self.connect("response", lambda d, r: d.destroy())
+        self.connect("response", lambda d, r: destroy_and_release(d))
 
         self.config = load_config()
 
@@ -200,7 +200,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.box_dest = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.entry_dest = Gtk.Entry()
-        self.entry_dest.connect("changed", on_entry_changed, self.entry_dest)
+        self.entry_dest.connect("changed", on_entry_changed)
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
         self.btn_browse = Gtk.Button()
@@ -344,7 +344,7 @@ class BackupWindow(Gtk.Dialog):
         def on_response(dialog, response):
             if response == Gtk.ResponseType.ACCEPT:
                 self.entry_dest.set_text(dialog.get_file().get_path())
-            dialog.destroy()
+            destroy_and_release(dialog)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -370,7 +370,7 @@ class BackupWindow(Gtk.Dialog):
             pass
 
     def on_cancel_clicked(self, widget):
-        self.destroy()
+        destroy_and_release(self)
 
     def on_ok_clicked(self, widget):
         self.config['backup-auto-enabled'] = str(self.check_auto.get_active())
@@ -405,7 +405,7 @@ class BackupWindow(Gtk.Dialog):
             except Exception:
                 pass
 
-        self.destroy()
+        destroy_and_release(self)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -36,6 +37,13 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
 
 
 GLib.log_set_writer_func(_log_writer_filter, None)
+
+
+_background_executor = ThreadPoolExecutor(max_workers=32, thread_name_prefix="faugus-worker")
+
+
+def run_in_background(fn, *args, **kwargs):
+    return _background_executor.submit(fn, *args, **kwargs)
 
 
 HIDPI_SCALE = 2
@@ -159,6 +167,13 @@ class IdComboBox(Gtk.DropDown):
         if not self._suppress:
             self.emit("changed")
 
+    def release(self):
+        factory = self.get_factory()
+        if factory:
+            factory.disconnect_by_func(self._on_factory_setup)
+            factory.disconnect_by_func(self._on_factory_bind)
+        self.disconnect_by_func(self._on_notify_selected)
+
     def configure_ellipsize(self, max_width_chars=20):
         self._ellipsize = True
         self._max_width_chars = max_width_chars
@@ -222,6 +237,36 @@ def hide_dialog_action_area(dialog):
     action_box = content_box.get_next_sibling()
     if action_box:
         action_box.set_visible(False)
+
+
+def _release_combo_boxes(widget):
+    if isinstance(widget, IdComboBox):
+        widget.release()
+    child = widget.get_first_child()
+    while child:
+        nxt = child.get_next_sibling()
+        _release_combo_boxes(child)
+        child = nxt
+
+
+def destroy_and_release(widget):
+    _release_combo_boxes(widget)
+
+    if isinstance(widget, Gtk.Window):
+        widget.set_focus(None)
+
+    if isinstance(widget, Gtk.Dialog):
+        content = widget.get_content_area()
+        child = content.get_first_child()
+        while child:
+            nxt = child.get_next_sibling()
+            content.remove(child)
+            child = nxt
+    elif hasattr(widget, "set_child"):
+        widget.set_child(None)
+
+    widget.destroy()
+    widget.__dict__.clear()
 
 
 def ensure_parent_dir(path):
@@ -430,9 +475,10 @@ def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel
     content_area.append(box_bottom)
 
     def on_response(d, response_id):
-        d.destroy()
+        confirmed = response_id == Gtk.ResponseType.OK
+        destroy_and_release(d)
         if callback:
-            callback(response_id == Gtk.ResponseType.OK)
+            callback(confirmed)
 
     dialog.connect("response", on_response)
     dialog.present()
@@ -447,9 +493,9 @@ def show_invalid_image_dialog(parent=None):
     )
 
 
-def on_entry_changed(widget, entry):
-    if entry.get_text():
-        entry.remove_css_class("entry")
+def on_entry_changed(widget):
+    if widget.get_text():
+        widget.remove_css_class("entry")
 
 
 def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
@@ -506,7 +552,7 @@ def choose_shortcut_icon(obj):
                 image = new_picture(texture)
                 obj.button_shortcut_icon.set_child(image)
 
-        dialog.destroy()
+        destroy_and_release(dialog)
 
         if os.path.isdir(obj.icon_directory):
             shutil.rmtree(obj.icon_directory)
@@ -515,30 +561,42 @@ def choose_shortcut_icon(obj):
     filechooser.present()
 
 
-def load_red_entry_css():
+_registered_css_keys = set()
+
+
+def add_css_once(key, css, priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION):
+    if key in _registered_css_keys:
+        return
+    _registered_css_keys.add(key)
+
     css_provider = Gtk.CssProvider()
-    css = """
-    .entry {
-        border: 1px solid red;
-    }
-    """
-    css_provider.load_from_data(css.encode('utf-8'))
-    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
-                                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
+    css_provider.load_from_data(css.encode('utf-8') if isinstance(css, str) else css)
+    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, priority)
+
+
+def load_red_entry_css():
+    add_css_once(
+        "red_entry",
+        """
+        .entry {
+            border: 1px solid red;
+        }
+        """,
+        Gtk.STYLE_PROVIDER_PRIORITY_USER,
+    )
 
 
 def load_frame_css():
-
-    css_provider = Gtk.CssProvider()
-    css = """
-    frame {
-        border: 1px solid alpha(@borders, 0.9);
-        border-radius: 6px;
-    }
-    """
-    css_provider.load_from_data(css.encode('utf-8'))
-    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
-                                              Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    add_css_once(
+        "frame",
+        """
+        frame {
+            border: 1px solid alpha(@borders, 0.9);
+            border-radius: 6px;
+        }
+        """,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+    )
 
 
 def extract_ico(exe_path, output_path, best_frame=False):
@@ -849,13 +907,11 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
 
     img = new_icon_image("faugus-play-symbolic.svg")
     img.add_css_class("flip-x")
-    flip_css = Gtk.CssProvider()
-    flip_css.load_from_data(
-        b".flip-x { transform: scaleX(-1); }"
-        b".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
+    add_css_once(
+        "launch_arguments_flip",
+        ".flip-x { transform: scaleX(-1); }"
+        ".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
     )
-    Gtk.StyleContext.add_provider_for_display(
-        Gdk.Display.get_default(), flip_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     btn_copy.set_child(img)
 
     store_args = Gtk.ListStore(str)
@@ -971,7 +1027,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
             args_to_save = [row[0] for row in store_args if row[0].strip()]
             result = "\n".join(args_to_save)
 
-        dialog.destroy()
+        destroy_and_release(dialog)
         callback(result)
 
     dialog.connect("response", on_response)
@@ -1034,7 +1090,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
                 selected_file = dialog_fc.get_file().get_path()
                 if selected_file:
                     entry_addapp.set_text(selected_file)
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_search_response)
         filechooser.present()
@@ -1110,7 +1166,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
                 checkbox_addapp_first.get_active(),
             )
 
-        dialog.destroy()
+        destroy_and_release(dialog)
         callback(result)
 
     dialog.connect("response", on_response)
@@ -1262,7 +1318,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                 present_mapping.get(present_text, "fifo"),
             )
 
-        dialog.destroy()
+        destroy_and_release(dialog)
         callback(result)
 
     dialog.connect("response", on_response)

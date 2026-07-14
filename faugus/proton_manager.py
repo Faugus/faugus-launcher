@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area
+from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -90,6 +90,8 @@ class ProtonDownloader(Gtk.Dialog):
         self.set_resizable(False)
         self.set_modal(True)
 
+        self.closed_event = threading.Event()
+
         self.content_area = self.get_content_area()
         self.content_area.set_halign(Gtk.Align.CENTER)
         self.content_area.set_valign(Gtk.Align.CENTER)
@@ -148,20 +150,17 @@ class ProtonDownloader(Gtk.Dialog):
         self.progress_label.set_visible(False)
 
     def get_releases(self):
+        closed_event = self.closed_event
         for key, variant in VARIANTS.items():
-            threading.Thread(
-                target=self.fetch_releases_from_url,
-                args=(variant, self.grids[key]),
-                daemon=True
-            ).start()
+            run_in_background(self.fetch_releases_from_url, variant, self.grids[key], closed_event)
 
-    def fetch_releases_from_url(self, variant, grid):
+    def fetch_releases_from_url(self, variant, grid, closed_event):
         page = 1
         seen_tags = set()
         url = variant["api_url"]
         prefix = variant["tag_prefix"]
 
-        while True:
+        while not closed_event.is_set():
             response = requests.get(url, params={"page": page, "per_page": 100})
             if response.status_code == 200:
                 page_releases = response.json()
@@ -169,6 +168,9 @@ class ProtonDownloader(Gtk.Dialog):
                     break
 
                 for release in page_releases:
+                    if closed_event.is_set():
+                        return
+
                     tag_name = release["tag_name"]
                     if tag_name in seen_tags:
                         continue
@@ -194,13 +196,16 @@ class ProtonDownloader(Gtk.Dialog):
                     if not has_valid_asset:
                         continue
 
-                    GLib.idle_add(self.add_release_to_grid, release, grid, variant)
+                    GLib.idle_add(self.add_release_to_grid, release, grid, variant, closed_event)
 
                 page += 1
             else:
                 break
 
-    def add_release_to_grid(self, release, grid, variant):
+    def add_release_to_grid(self, release, grid, variant, closed_event):
+        if closed_event.is_set():
+            return
+
         tag_name = release["tag_name"]
         display_tag_name = variant["tag_to_display"](tag_name)
 
@@ -285,17 +290,27 @@ class ProtonDownloader(Gtk.Dialog):
             self.enable_all_buttons()
 
     def download_and_extract(self, url, filename, tag_name, button):
+        closed_event = self.closed_event
+        progress_bar = self.progress_bar
+        progress_label = self.progress_label
+        update_button = self.update_button
+        enable_all_buttons = self.enable_all_buttons
+
         button.set_label(_("Downloading..."))
         button.set_sensitive(False)
-        self.progress_label.set_text(_("Downloading %s...") % tag_name)
-        self.progress_label.set_visible(True)
-        self.progress_bar.set_visible(True)
-        self.progress_bar.set_fraction(0)
-        self.progress_bar.set_text("0%")
+        progress_label.set_text(_("Downloading %s...") % tag_name)
+        progress_label.set_visible(True)
+        progress_bar.set_visible(True)
+        progress_bar.set_fraction(0)
+        progress_bar.set_text("0%")
 
         main_context = GLib.MainContext.default()
         while main_context.pending():
             main_context.iteration(False)
+
+        def safe_idle_add(*args):
+            if not closed_event.is_set():
+                GLib.idle_add(*args)
 
         def worker():
             try:
@@ -311,27 +326,27 @@ class ProtonDownloader(Gtk.Dialog):
                     pct = int(frac * 1000)
                     if pct != last_pct[0]:
                         last_pct[0] = pct
-                        GLib.idle_add(self.progress_bar.set_fraction, frac)
-                        GLib.idle_add(self.progress_bar.set_text, f"{pct / 10:.1f}%")
+                        safe_idle_add(progress_bar.set_fraction, frac)
+                        safe_idle_add(progress_bar.set_text, f"{pct / 10:.1f}%")
 
                 stream = _StreamProgress(response.raw, total_size, _progress)
 
                 with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
                     tar.extractall(path=compatibility_dir, filter="fully_trusted")
 
-                GLib.idle_add(self.update_button, button, _("Remove"))
-                GLib.idle_add(self.progress_bar.set_visible, False)
-                GLib.idle_add(self.progress_label.set_visible, False)
+                safe_idle_add(update_button, button, _("Remove"))
+                safe_idle_add(progress_bar.set_visible, False)
+                safe_idle_add(progress_label.set_visible, False)
 
             except Exception as e:
                 print(f"Error during download/extraction: {e}")
-                GLib.idle_add(self.update_button, button, _("Download"))
-                GLib.idle_add(self.progress_label.set_text, _("Error during download"))
+                safe_idle_add(update_button, button, _("Download"))
+                safe_idle_add(progress_label.set_text, _("Error during download"))
             finally:
-                GLib.idle_add(self.enable_all_buttons)
-                GLib.idle_add(button.grab_focus)
+                safe_idle_add(enable_all_buttons)
+                safe_idle_add(button.grab_focus)
 
-        threading.Thread(target=worker, daemon=True).start()
+        run_in_background(worker)
 
     def on_remove_clicked(self, widget, release, variant):
         tag_name = release["tag_name"]
@@ -349,7 +364,7 @@ def main():
 
     def on_activate(app):
         win = ProtonDownloader()
-        win.connect("response", lambda d, r: d.destroy())
+        win.connect("response", lambda d, r: (d.closed_event.set(), destroy_and_release(d)))
         win.connect("destroy", lambda *a: app.quit())
         win.present()
 

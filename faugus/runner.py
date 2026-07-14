@@ -302,8 +302,7 @@ class FaugusRun(HiDpiMixin):
             dialog.set_resizable(False)
             play_notification_sound()
 
-            css_provider = Gtk.CssProvider()
-            css = """
+            add_css_once("donate_dialog", """
             .paypal {
                 color: white;
                 background: #001C64;
@@ -312,10 +311,7 @@ class FaugusRun(HiDpiMixin):
                 color: white;
                 background: #1AC0FF;
             }
-            """
-            css_provider.load_from_data(css.encode('utf-8'))
-            Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
-                                                    Gtk.STYLE_PROVIDER_PRIORITY_USER)
+            """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
             content_area = dialog.get_content_area()
             content_area.set_halign(Gtk.Align.CENTER)
@@ -376,7 +372,7 @@ class FaugusRun(HiDpiMixin):
             def on_dialog_response(dialog, response_id):
                 if response_id == Gtk.ResponseType.OK:
                     result["checked"] = checkbox.get_active()
-                dialog.destroy()
+                destroy_and_release(dialog)
                 done.set()
 
             dialog.connect("response", on_dialog_response)
@@ -612,12 +608,12 @@ class FaugusRun(HiDpiMixin):
 
     def close_splash_window(self):
         if self.splash_window:
-            self.splash_window.destroy()
+            destroy_and_release(self.splash_window)
             self.splash_window = None
 
     def close_log_window(self):
         if self.log_window:
-            self.log_window.destroy()
+            destroy_and_release(self.log_window)
             self.log_window = None
 
     def on_log_window_close_request(self, window):

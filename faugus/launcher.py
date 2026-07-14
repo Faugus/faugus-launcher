@@ -128,8 +128,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not isinstance(self.running, dict):
             self.running = {}
 
-        self.provider = Gtk.CssProvider()
-        self.provider.load_from_data(b"""
+        add_css_once("main_window", """
             .game {
                 background-color: @theme_base_color;
                 color: @theme_text_color;
@@ -195,9 +194,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 opacity: 0.5;
                 transition: background-color 0.05s ease-in, opacity 0.05s ease-in;
             }
-        """)
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self.provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+        """, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         load_frame_css()
 
         self.context_menu = Gtk.Popover()
@@ -1207,7 +1204,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         btn_edit.connect("clicked", on_edit)
         btn_remove.connect("clicked", on_remove)
 
-        dialog.connect("response", lambda d, r: d.destroy())
+        dialog.connect("response", lambda d, r: destroy_and_release(d))
         dialog.present()
 
     def _save_categories(self, categories):
@@ -1297,13 +1294,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         box.set_margin_end(10)
 
         shutdown_btn = Gtk.Button(label=_("Shut down"))
-        shutdown_btn.connect("clicked", lambda w: (self.on_shutdown(w), dialog.destroy()))
+        shutdown_btn.connect("clicked", lambda w: (self.on_shutdown(w), destroy_and_release(dialog)))
 
         reboot_btn = Gtk.Button(label=_("Reboot"))
-        reboot_btn.connect("clicked", lambda w: (self.on_reboot(w), dialog.destroy()))
+        reboot_btn.connect("clicked", lambda w: (self.on_reboot(w), destroy_and_release(dialog)))
 
         close_btn = Gtk.Button(label=_("Close"))
-        close_btn.connect("clicked", lambda w: (self.on_close_fullscreen(w), dialog.destroy()))
+        close_btn.connect("clicked", lambda w: (self.on_close_fullscreen(w), destroy_and_release(dialog)))
 
         box.append(shutdown_btn)
         box.append(reboot_btn)
@@ -1311,7 +1308,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         content.append(box)
 
-        dialog.connect("response", lambda d, r: d.destroy())
+        dialog.connect("response", lambda d, r: destroy_and_release(d))
         dialog.present()
 
     def on_shutdown(self, widget):
@@ -1627,7 +1624,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 cmd = (sys.executable, "-m", "faugus.runner", command)
                 subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
 
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -1727,7 +1724,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         content_area.append(notebook)
         content_area.append(box_bottom)
 
-        dialog.connect("response", lambda d, r: d.destroy())
+        dialog.connect("response", lambda d, r: destroy_and_release(d))
         dialog.present()
 
     def on_duplicate_clicked(self):
@@ -1744,7 +1741,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game = self._dup_game
 
         if response != Gtk.ResponseType.OK:
-            dialog.destroy()
+            destroy_and_release(dialog)
             return
 
         new_title = dialog.entry_title.get_text().strip()
@@ -1800,7 +1797,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.update_list()
         self.select_game_by_title(new_title)
 
-        dialog.destroy()
+        destroy_and_release(dialog)
 
     def on_item_release_event(self, gesture, n_press, x, y):
         current_item = self.flowbox.get_child_at_pos(int(x), int(y))
@@ -2213,7 +2210,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
 
-        settings_dialog.destroy()
+        destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.remove_css_class("entry")
@@ -2549,7 +2546,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             delete_dialog.connect("response", self._on_confirm_delete_response, game)
 
     def _on_confirm_delete_response(self, dialog, response, game):
-        dialog.destroy()
+        remove_prefix = dialog.checkbox.get_active()
+        destroy_and_release(dialog)
 
         if response == Gtk.ResponseType.YES:
             gameid = game.gameid
@@ -2566,7 +2564,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.save_running()
                 self.update_icon()
 
-            if dialog.checkbox.get_active():
+            if remove_prefix:
                 prefix_path = os.path.expanduser(game.prefix)
 
                 try:
@@ -2665,6 +2663,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         show_message_dialog(text1, text2, parent=parent)
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
+        banner_path_temp = add_game_dialog.banner_path_temp
+        dialog_destroyed = False
+
+        def destroy_add_game_dialog():
+            add_game_dialog.closed_event.set()
+            destroy_and_release(add_game_dialog)
+
         if response_id == Gtk.ResponseType.OK:
             if not add_game_dialog.validate_fields(entry="path+prefix"):
                 return True
@@ -2804,7 +2809,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     return True
 
                 if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
-                    add_game_dialog.destroy()
+                    destroy_add_game_dialog()
+                    dialog_destroyed = True
                     self.launcher_screen(
                         title, launcher_id, title_formatted, runner, prefix, umu_run,
                         game, desktop_shortcut_state, appmenu_shortcut_state,
@@ -2841,10 +2847,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 os.remove(add_game_dialog.icon_temp)
             if os.path.isdir(add_game_dialog.icon_directory):
                 shutil.rmtree(add_game_dialog.icon_directory)
-            add_game_dialog.destroy()
-        if os.path.isfile(add_game_dialog.banner_path_temp):
-            os.remove(add_game_dialog.banner_path_temp)
-        add_game_dialog.destroy()
+            destroy_add_game_dialog()
+            dialog_destroyed = True
+        if os.path.isfile(banner_path_temp):
+            os.remove(banner_path_temp)
+        if not dialog_destroyed:
+            destroy_add_game_dialog()
 
     def launcher_screen(self, title, launcher, title_formatted, runner, prefix, umu_run, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
         self.box_launcher = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -3040,7 +3048,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 processo = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], env=subprocess_env())
                 GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
 
-            threading.Thread(target=start_download).start()
+            run_in_background(start_download)
 
             return file_path
 
@@ -3117,7 +3125,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if os.path.isdir(edit_game_dialog.icon_directory):
             shutil.rmtree(edit_game_dialog.icon_directory)
         os.remove(edit_game_dialog.banner_path_temp)
-        edit_game_dialog.destroy()
+        edit_game_dialog.closed_event.set()
+        destroy_and_release(edit_game_dialog)
 
     def add_shortcut(self, game, shortcut_state, shortcut, icon_temp, icon_final):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
@@ -3381,8 +3390,7 @@ class Settings(Gtk.Dialog):
         self.logging_warning = False
         self.modified = False
 
-        css_provider = Gtk.CssProvider()
-        css = """
+        add_css_once("settings_dialog", """
         .entry {
             border: 1px solid red;
         }
@@ -3394,10 +3402,7 @@ class Settings(Gtk.Dialog):
             color: white;
             background: #1AC0FF;
         }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.LANG_NAMES = {
             "af": "Afrikaans",
@@ -3550,7 +3555,7 @@ class Settings(Gtk.Dialog):
         self.entry_default_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_default_prefix.set_has_tooltip(True)
         self.entry_default_prefix.connect("query-tooltip", on_entry_query_tooltip)
-        self.entry_default_prefix.connect("changed", on_entry_changed, self.entry_default_prefix)
+        self.entry_default_prefix.connect("changed", on_entry_changed)
 
         self.button_search_prefix = Gtk.Button()
         self.button_search_prefix.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
@@ -4152,7 +4157,8 @@ class Settings(Gtk.Dialog):
         dialog.set_transient_for(self)
 
         def on_response(dialog, response_id):
-            dialog.destroy()
+            dialog.closed_event.set()
+            destroy_and_release(dialog)
 
             self.combobox_runner.remove_all()
             self.populate_combobox_with_runners()
@@ -4239,7 +4245,7 @@ class Settings(Gtk.Dialog):
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
 
-            threading.Thread(target=run_command, daemon=True).start()
+            run_in_background(run_command)
 
         self.check_modified(proceed)
 
@@ -4265,7 +4271,7 @@ class Settings(Gtk.Dialog):
                 process.wait()
                 GLib.idle_add(self.set_sensitive, True)
 
-            threading.Thread(target=run_command, daemon=True).start()
+            run_in_background(run_command)
 
         self.check_modified(proceed)
 
@@ -4311,11 +4317,11 @@ class Settings(Gtk.Dialog):
                         process = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
                         process.wait()
 
-                    threading.Thread(target=run_command, daemon=True).start()
+                    run_in_background(run_command)
                 else:
                     self.set_sensitive(True)
 
-                dialog_fc.destroy()
+                destroy_and_release(dialog_fc)
 
             filechooser.connect("response", on_response)
             filechooser.present()
@@ -4327,7 +4333,7 @@ class Settings(Gtk.Dialog):
             from faugus.backup import BackupWindow
 
             parent = self.parent
-            self.destroy()
+            destroy_and_release(self)
 
             backup_win = BackupWindow(parent)
             backup_win.present()
@@ -4349,11 +4355,11 @@ class Settings(Gtk.Dialog):
 
         def on_fc_response(dialog_fc, response):
             if response != Gtk.ResponseType.ACCEPT:
-                dialog_fc.destroy()
+                destroy_and_release(dialog_fc)
                 return
 
             zip_file = dialog_fc.get_file().get_path()
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
             if not os.path.isfile(zip_file):
                 self.show_warning_dialog_settings(
@@ -4431,7 +4437,7 @@ class Settings(Gtk.Dialog):
                 folder = dialog_fc.get_file().get_path()
                 if folder:
                     self.entry_default_prefix.set_text(folder)
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -4454,7 +4460,7 @@ class Settings(Gtk.Dialog):
                 selected_file = dialog_fc.get_file().get_path()
                 if selected_file and os.path.basename(selected_file) == "Lossless.dll":
                     self.entry_lossless.set_text(selected_file)
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -4768,6 +4774,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.set_modal(True)
         self.set_resizable(False)
 
+        self.closed_event = threading.Event()
+
         self.parent_window = parent
         self.interface_mode = interface_mode
 
@@ -4904,8 +4912,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_tools.set_margin_top(10)
         self.grid_tools.set_margin_bottom(10)
 
-        css_provider = Gtk.CssProvider()
-        css = """
+        add_css_once("addgame_dialog", """
         .entry {
             border: 1px solid red;
         }
@@ -4915,10 +4922,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         .add-game-banner {
             border-radius: 12px;
         }
-        """
-        css_provider.load_from_data(css.encode('utf-8'))
-        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider,
-                                                 Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.combobox_launcher = IdComboBox()
 
@@ -4943,7 +4947,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.connect("changed", on_entry_changed, self.entry_title)
+        self.entry_title.connect("changed", on_entry_changed)
         if interface_mode == "Banners":
             title_focus_controller = Gtk.EventControllerFocus()
             title_focus_controller.connect("leave", lambda c: self.on_entry_focus_out())
@@ -4955,7 +4959,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_path = Gtk.Label(label=_("Path"))
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
-        self.entry_path.connect("changed", on_entry_changed, self.entry_path)
+        self.entry_path.connect("changed", on_entry_changed)
         self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
         self.entry_path.set_has_tooltip(True)
         self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
@@ -4967,7 +4971,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_prefix = Gtk.Label(label=_("Prefix"))
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
-        self.entry_prefix.connect("changed", on_entry_changed, self.entry_prefix)
+        self.entry_prefix.connect("changed", on_entry_changed)
         self.entry_prefix.set_tooltip_text(_("/path/to/the/prefix"))
         self.entry_prefix.set_has_tooltip(True)
         self.entry_prefix.connect("query-tooltip", on_entry_query_tooltip)
@@ -5388,7 +5392,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     shutil.copyfile(file_path, self.banner_path_temp)
                     self.update_image_banner()
 
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -5432,35 +5436,47 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog.get_content_area().append(box_bottom)
 
         def on_response(dialog, response_id):
-            if response_id == Gtk.ResponseType.CANCEL:
-                dialog.destroy()
+            if response_id != Gtk.ResponseType.OK:
+                destroy_and_release(dialog)
                 return
 
-            if response_id == Gtk.ResponseType.OK:
-                url = entry.get_text().strip().replace(" ", "%20")
-                valid_exts = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg")
+            url = entry.get_text().strip().replace(" ", "%20")
+            valid_exts = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".svg")
 
-                if not url.lower().endswith(valid_exts):
-                    show_invalid_image_dialog()
-                    return
+            if not url.lower().endswith(valid_exts):
+                show_invalid_image_dialog()
+                return
 
-                try:
-                    import urllib.request
-                    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                    with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
-                        f.write(r.read())
+            try:
+                import urllib.request
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
+                    f.write(r.read())
 
-                    self.update_image_banner()
-                    dialog.destroy()
+                self.update_image_banner()
+                destroy_and_release(dialog)
 
-                except Exception:
-                    show_invalid_image_dialog()
+            except Exception:
+                show_invalid_image_dialog()
 
         dialog.connect("response", on_response)
         dialog.present()
 
     def get_banner(self):
         import requests
+
+        closed_event = self.closed_event
+        banner_path_temp = self.banner_path_temp
+        image_banner = self.image_banner
+        image_banner2 = self.image_banner2
+        new_texture_from_image = self.new_texture_from_image
+
+        def apply_banner():
+            if closed_event.is_set():
+                return
+            surface = new_texture_from_image(banner_path_temp, 260, 390, True)
+            image_banner.set_paintable(surface)
+            image_banner2.set_paintable(surface)
 
         def fetch_banner():
             game_name = self.entry_title.get_text().strip()
@@ -5473,15 +5489,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 response.raise_for_status()
                 image_url = response.text.strip('"')
 
-                with open(self.banner_path_temp, "wb") as image_file:
+                with open(banner_path_temp, "wb") as image_file:
                     image_file.write(requests.get(image_url).content)
 
-                GLib.idle_add(self.update_image_banner)
+                if not closed_event.is_set():
+                    GLib.idle_add(apply_banner)
 
             except requests.RequestException as e:
                 print(f"Error fetching the banner: {e}")
 
-        threading.Thread(target=fetch_banner, daemon=True).start()
+        run_in_background(fetch_banner)
 
     def update_image_banner(self):
         surface = self.new_texture_from_image(self.banner_path_temp, 260, 390, True)
@@ -5682,10 +5699,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     process = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
                     process.wait()
 
-                command_thread = threading.Thread(target=run_command)
-                command_thread.start()
+                run_in_background(run_command)
 
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -5772,8 +5788,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
 
-        command_thread = threading.Thread(target=run_command)
-        command_thread.start()
+        run_in_background(run_command)
 
     def on_button_winetricks_clicked(self, widget):
         self.set_sensitive(False)
@@ -5817,8 +5832,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             GLib.idle_add(self.set_sensitive, True)
             GLib.idle_add(self.parent_window.set_sensitive, True)
 
-        command_thread = threading.Thread(target=run_command)
-        command_thread.start()
+        run_in_background(run_command)
 
     def on_button_search_clicked(self, widget):
         if not self.entry_path.get_text():
@@ -5855,7 +5869,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if os.path.isdir(self.icon_directory):
                 shutil.rmtree(self.icon_directory)
 
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
@@ -5878,7 +5892,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 self.default_prefix = new_prefix
                 self.entry_prefix.set_text(self.default_prefix)
 
-            dialog_fc.destroy()
+            destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
