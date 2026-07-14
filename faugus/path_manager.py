@@ -165,7 +165,6 @@ gamemoderun = PathManager.find_binary('gamemoderun')
 launcher_path = PathManager.find_binary('faugus-launcher')
 app_dir = Path(PathManager.get_applications())
 desktop_dir = PathManager.user_desktop()
-tray_socket = os.path.join(os.environ.get('XDG_RUNTIME_DIR', faugus_launcher_dir), 'faugus-launcher-tray.sock')
 
 BACKUP_ITEMS = {
     "banners": banners_dir,

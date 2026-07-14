@@ -83,7 +83,7 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow vdf psutil libmanette imagemagick icoextract libayatana-appindicator vulkan-tools
+meson ninja pygobject requests pillow vdf psutil libmanette imagemagick icoextract vulkan-tools
 ```
 
 # Usage

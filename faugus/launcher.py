@@ -19,7 +19,7 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
-from faugus.tray_ipc import TrayServer
+from faugus.tray_sni import TrayIcon
 from faugus.migration import fix_legacy_shortcut_icons
 
 VERSION = "2.0.0"
@@ -113,10 +113,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.fullscreen_activated = False
         self.system_tray = False
-        self.tray_process = None
+        self.tray_icon = None
         self.mono_icon = False
-        self.tray_server = TrayServer(on_present=self.restore_window, on_quit=self.on_quit, on_launch=self.on_tray_launch)
-        self.tray_server.start()
 
         self.current_prefix = None
         self.games = []
@@ -362,20 +360,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         save_json_file(self.running, running_games)
 
     def load_tray_icon(self):
-        tray_alive = self.tray_process and self.tray_process.poll() is None
+        if self.tray_icon:
+            self.tray_icon.stop()
+            self.tray_icon = None
 
         if not self.system_tray:
-            if tray_alive:
-                self.tray_process.terminate()
-                self.tray_process.wait(timeout=2)
-            self.tray_process = None
             return
 
-        if tray_alive:
-            self.tray_process.terminate()
-            self.tray_process.wait(timeout=2)
-
-        self.tray_process = subprocess.Popen([sys.executable, "-m", "faugus.tray_helper"], env=subprocess_env())
+        self.tray_icon = TrayIcon(
+            mono_icon=self.mono_icon,
+            on_present=self.restore_window,
+            on_quit=self.on_quit,
+            on_launch=self.on_tray_launch,
+        )
+        self.tray_icon.start()
 
     def on_tray_launch(self, gameid):
         game = next((g for g in self.games if g.gameid == gameid), None)
@@ -426,10 +424,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.present()
 
     def on_quit(self, *_):
-        if self.tray_process and self.tray_process.poll() is None:
-            self.tray_process.terminate()
-            self.tray_process.wait(timeout=2)
-        self.tray_server.stop()
+        if self.tray_icon:
+            self.tray_icon.stop()
+            self.tray_icon = None
         self.get_application().quit()
 
     def prime_flowbox_cursor(self):
@@ -2223,7 +2220,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.mono_icon = new_mono_icon
 
             if tray_needs_reload:
-                GLib.timeout_add(1000, self.load_tray_icon)
+                self.load_tray_icon()
 
             combobox_language = settings_dialog.combobox_language.get_active_text()
 
@@ -4288,7 +4285,7 @@ class Settings(Gtk.Dialog):
                 self.parent.system_tray = new_system_tray
                 self.parent.mono_icon = new_mono_icon
                 if tray_needs_reload:
-                    GLib.timeout_add(1000, self.parent.load_tray_icon)
+                    self.parent.load_tray_icon()
             else:
                 self.load_config()
 
