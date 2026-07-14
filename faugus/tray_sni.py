@@ -82,6 +82,10 @@ MENU_XML = """
       <arg type="v" name="data" direction="in"/>
       <arg type="u" name="timestamp" direction="in"/>
     </method>
+    <method name="EventGroup">
+      <arg type="a(isvu)" name="events" direction="in"/>
+      <arg type="ai" name="idErrors" direction="out"/>
+    </method>
     <method name="AboutToShow">
       <arg type="i" name="id" direction="in"/>
       <arg type="b" name="needUpdate" direction="out"/>
@@ -208,7 +212,7 @@ class TrayIcon:
         if prop_name == "Id":
             return GLib.Variant("s", "faugus-launcher")
         if prop_name == "Title":
-            return GLib.Variant("s", "Faugus Launcher")
+            return GLib.Variant("s", "Faugus")
         if prop_name == "Status":
             return GLib.Variant("s", "Active")
         if prop_name == "WindowId":
@@ -223,7 +227,7 @@ class TrayIcon:
         if prop_name == "Menu":
             return GLib.Variant("o", MENU_PATH)
         if prop_name == "ToolTip":
-            return GLib.Variant("(sa(iiay)ss)", ("", [], "Faugus Launcher", ""))
+            return GLib.Variant("(sa(iiay)ss)", ("", [], "Faugus", ""))
         return None
 
     def on_item_method_call(self, connection, sender, path, interface, method, params, invocation):
@@ -317,10 +321,20 @@ class TrayIcon:
         elif method == "Event":
             item_id, event_id = params[0], params[1]
             if event_id == "clicked":
-                item = next((i for i in self.menu_items if i["id"] == item_id), None)
-                if item and item.get("action"):
-                    item["action"]()
+                self.trigger_item(item_id)
             invocation.return_value(None)
+
+        elif method == "EventGroup":
+            events = params[0]
+            for item_id, event_id, _data, _timestamp in events:
+                if event_id == "clicked":
+                    self.trigger_item(item_id)
+            invocation.return_value(GLib.Variant("(ai)", ([],)))
 
         else:
             invocation.return_value(None)
+
+    def trigger_item(self, item_id):
+        item = next((i for i in self.menu_items if i["id"] == item_id), None)
+        if item and item.get("action"):
+            item["action"]()
