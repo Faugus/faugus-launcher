@@ -296,6 +296,7 @@ class FaugusRun(HiDpiMixin):
 
         def build_and_show():
             dialog = Gtk.Dialog(title="Faugus")
+            dialog.set_default_size(10, 10)
             hide_dialog_action_area(dialog)
             dialog.set_decorated(False)
             dialog.set_resizable(False)
@@ -394,6 +395,7 @@ class FaugusRun(HiDpiMixin):
 
         def build_and_show():
             dialog = Gtk.Dialog(title="Faugus")
+            dialog.set_default_size(10, 10)
             hide_dialog_action_area(dialog)
             dialog.set_resizable(False)
             play_notification_sound()
@@ -508,7 +510,7 @@ class FaugusRun(HiDpiMixin):
         self.splash_window = Gtk.Window(title="Faugus")
         self.splash_window.set_decorated(False)
         self.splash_window.set_resizable(False)
-        self.splash_window.set_default_size(280, -1)
+        self.splash_window.set_default_size(280, 10)
 
         frame = Gtk.Frame()
         frame.set_label_align(0.5)
