@@ -513,10 +513,10 @@ class FaugusRun(HiDpiMixin):
         frame = Gtk.Frame()
         frame.set_label_align(0.5)
 
-        grid = Gtk.Grid()
-        grid.set_halign(Gtk.Align.CENTER)
-        grid.set_valign(Gtk.Align.CENTER)
-        frame.set_child(grid)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box.set_halign(Gtk.Align.CENTER)
+        box.set_valign(Gtk.Align.CENTER)
+        frame.set_child(box)
 
         game_icon = os.environ.get("SPLASHICON")
         if game_icon and os.path.exists(game_icon):
@@ -529,14 +529,14 @@ class FaugusRun(HiDpiMixin):
         image.set_margin_start(20)
         image.set_margin_end(20)
         image.set_margin_bottom(20)
-        grid.attach(image, 0, 0, 1, 1)
+        box.append(image)
 
         self.label = Gtk.Label()
         self.label.set_margin_start(20)
         self.label.set_margin_end(20)
         self.label.set_margin_bottom(20)
 
-        grid.attach(self.label, 0, 1, 1, 1)
+        box.append(self.label)
 
         self.splash_window.set_child(frame)
         self.splash_window.present()
