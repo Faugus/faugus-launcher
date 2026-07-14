@@ -1,12 +1,11 @@
 import os
 import json
-from pathlib import Path
 
 import gi
 gi.require_version('GdkPixbuf', '2.0')
 
 from gi.repository import GdkPixbuf, Gio, GLib
-from faugus.path_manager import IS_FLATPAK, PathManager, faugus_mono_icon, games_json, latest_games
+from faugus.path_manager import faugus_mono_icon, faugus_png, games_json, latest_games
 from faugus.language_config import setup_gettext
 
 _ = setup_gettext('faugus-launcher')
@@ -130,19 +129,7 @@ def load_icon_pixmap(svg_path, size=64):
 
 
 def resolve_icon_path(mono_icon):
-    if mono_icon:
-        if IS_FLATPAK:
-            mono_dest = Path(PathManager.user_data('faugus-launcher/faugus-mono.svg'))
-            mono_dest.parent.mkdir(parents=True, exist_ok=True)
-            if not mono_dest.exists():
-                import shutil
-                shutil.copy(faugus_mono_icon, mono_dest)
-            return str(mono_dest)
-        return faugus_mono_icon
-
-    if IS_FLATPAK:
-        return 'io.github.Faugus.faugus-launcher'
-    return PathManager.get_icon('faugus-launcher.svg')
+    return faugus_mono_icon if mono_icon else faugus_png
 
 
 class TrayIcon:
@@ -188,9 +175,10 @@ class TrayIcon:
 
     def on_bus_acquired(self, connection, name):
         self.connection = connection
-        self.item_reg_id = connection.register_object_with_closures2(
+        register = getattr(connection, "register_object_with_closures2", connection.register_object)
+        self.item_reg_id = register(
             ITEM_PATH, self.item_info, self.on_item_method_call, self.on_item_get_property, None)
-        self.menu_reg_id = connection.register_object_with_closures2(
+        self.menu_reg_id = register(
             MENU_PATH, self.menu_info, self.on_menu_method_call, self.on_menu_get_property, None)
 
         Gio.bus_watch_name_on_connection(
