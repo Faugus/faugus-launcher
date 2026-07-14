@@ -29,6 +29,8 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
                 return GLib.LogWriterOutput.HANDLED
             if "mapped without a transient parent" in message:
                 return GLib.LogWriterOutput.HANDLED
+            if "swapchain" in message:
+                return GLib.LogWriterOutput.HANDLED
             break
     return GLib.log_writer_default(log_level, fields, user_data)
 
