@@ -166,6 +166,8 @@ class TrayIcon:
         self.menu_reg_id = register(
             MENU_PATH, self.menu_info, self.on_menu_method_call, self.on_menu_get_property, None)
 
+        self.rebuild_menu()
+
         self.watch_id = Gio.bus_watch_name_on_connection(
             connection,
             "org.kde.StatusNotifierWatcher",
@@ -276,6 +278,7 @@ class TrayIcon:
         if item.get("separator"):
             return {"type": GLib.Variant("s", "separator")}
         return {
+            "type": GLib.Variant("s", "standard"),
             "label": GLib.Variant("s", item["label"]),
             "enabled": GLib.Variant("b", True),
             "visible": GLib.Variant("b", True),
