@@ -2147,13 +2147,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             flowbox_child.banner.set_paintable(surface)
 
     def get_game_artwork(self, path, game, width=None, height=None):
+        w = width * HIDPI_SCALE if width else None
+        h = height * HIDPI_SCALE if height else None
 
-        pixbuf = safe_load_pixbuf(path, width, height, False)
+        pixbuf = safe_load_pixbuf(path, w, h, False)
 
         if not self.is_game_installed(game):
             pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
 
-        return Gdk.Texture.new_for_pixbuf(pixbuf)
+        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+
+        if width and height:
+            return HiDpiPaintable(texture, width, height)
+        return texture
 
     def is_game_installed(self, game):
         if game.runner == "Steam":
@@ -2804,7 +2810,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 temp_banner_path = add_game_dialog.banner_path_temp
                 try:
                     command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
+                    subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
                 except subprocess.CalledProcessError as e:
                     print(f"Error resizing banner: {e}")
             else:
@@ -3158,7 +3164,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 temp_banner_path = edit_game_dialog.banner_path_temp
                 try:
                     command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, temp_banner_path, "-resize", "230x345!", banner], check=True)
+                    subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
                     game.banner = banner
                 except subprocess.CalledProcessError as e:
                     print(f"Error resizing banner: {e}")

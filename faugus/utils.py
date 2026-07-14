@@ -34,12 +34,37 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
 GLib.log_set_writer_func(_log_writer_filter, None)
 
 
+HIDPI_SCALE = 2
+
+
+class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
+    def __init__(self, texture, width, height):
+        super().__init__()
+        self._texture = texture
+        self._width = width
+        self._height = height
+
+    def do_get_intrinsic_width(self):
+        return self._width
+
+    def do_get_intrinsic_height(self):
+        return self._height
+
+    def do_snapshot(self, snapshot, width, height):
+        self._texture.snapshot(snapshot, width, height)
+
+
 class HiDpiMixin:
     def new_texture_from_image(self: Gtk.Widget, path, width=None, height=None, keep_aspect_ratio=False):
+        w = width * HIDPI_SCALE if width else None
+        h = height * HIDPI_SCALE if height else None
 
-        pixbuf = safe_load_pixbuf(path, width, height, keep_aspect_ratio)
+        pixbuf = safe_load_pixbuf(path, w, h, keep_aspect_ratio)
+        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
 
-        return Gdk.Texture.new_for_pixbuf(pixbuf)
+        if width and height:
+            return HiDpiPaintable(texture, width, height)
+        return texture
 
 
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):

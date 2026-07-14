@@ -54,11 +54,6 @@ class FaugusRun(HiDpiMixin):
         load_frame_css()
         signal.signal(signal.SIGUSR1, self.on_process_exit)
 
-    def get_scale_factor(self):
-        if hasattr(self, "_scale_widget") and self._scale_widget:
-            return self._scale_widget.get_scale_factor()
-        return 1
-
     def run(self):
         def run_process():
             self.start_process()
@@ -340,7 +335,6 @@ class FaugusRun(HiDpiMixin):
             box_top.set_margin_top(20)
             box_top.set_margin_bottom(20)
 
-            self._scale_widget = dialog
             texture = self.new_texture_from_image(faugus_png_raster, 75, 75)
             image = new_picture(texture)
 
@@ -529,7 +523,6 @@ class FaugusRun(HiDpiMixin):
             image_path = game_icon
         else:
             image_path = faugus_png_raster
-        self._scale_widget = self.splash_window
         texture = self.new_texture_from_image(image_path, 75, 75)
         image = new_picture(texture)
         image.set_margin_top(20)
