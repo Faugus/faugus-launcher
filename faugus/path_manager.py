@@ -174,6 +174,9 @@ BACKUP_ITEMS = {
     "envar.txt": envar_dir,
     "games.json": games_json,
     "latest-games.txt": latest_games,
+    "categories.txt": categories_file,
+    "custom-order.json": custom_order,
+    "presets.json": presets_file,
 }
 
 
