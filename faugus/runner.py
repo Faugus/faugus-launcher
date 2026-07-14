@@ -393,60 +393,14 @@ class FaugusRun(HiDpiMixin):
     def show_error_dialog(self, protonpath=None, network_error=False):
         done = Event()
 
+        if network_error:
+            text1, text2 = _("Internet connection error."), ""
+        else:
+            text1 = _("%s was not found.") % protonpath
+            text2 = _("Please install it or use another Proton version.")
+
         def build_and_show():
-            dialog = Gtk.Dialog(title="Faugus")
-            dialog.set_default_size(10, 10)
-            hide_dialog_action_area(dialog)
-            dialog.set_resizable(False)
-            play_notification_sound()
-
-            content_area = dialog.get_content_area()
-            content_area.set_halign(Gtk.Align.CENTER)
-            content_area.set_valign(Gtk.Align.CENTER)
-            content_area.set_vexpand(True)
-            content_area.set_hexpand(True)
-
-            box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-            box_top.set_margin_start(20)
-            box_top.set_margin_end(20)
-            box_top.set_margin_top(20)
-            box_top.set_margin_bottom(20)
-
-            if network_error:
-                label = Gtk.Label(label=_("Internet connection error."))
-                label.set_halign(Gtk.Align.CENTER)
-                box_top.append(label)
-            else:
-                label = Gtk.Label(label=_("%s was not found.") % protonpath)
-                label.set_halign(Gtk.Align.CENTER)
-
-                label2 = Gtk.Label(
-                    label=_("Please install it or use another Proton version.")
-                )
-                label2.set_halign(Gtk.Align.CENTER)
-
-                box_top.append(label)
-                box_top.append(label2)
-
-            button_ok = Gtk.Button(label=_("Ok"))
-            button_ok.set_size_request(150, -1)
-            button_ok.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
-
-            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            box_bottom.set_margin_start(10)
-            box_bottom.set_margin_end(10)
-            box_bottom.set_margin_bottom(10)
-            box_bottom.append(button_ok)
-
-            content_area.append(box_top)
-            content_area.append(box_bottom)
-
-            def on_response(dialog, response_id):
-                dialog.destroy()
-                done.set()
-
-            dialog.connect("response", on_response)
-            dialog.present()
+            show_message_dialog(text1, text2, callback=lambda ok: done.set())
             return False
 
         GLib.idle_add(build_and_show)
@@ -675,49 +629,14 @@ class FaugusRun(HiDpiMixin):
             last_part = parts[-1].strip('"')
 
             if last_part.endswith(".reg"):
-                dialog = Gtk.Dialog(title="Faugus", modal=True)
-                hide_dialog_action_area(dialog)
-                dialog.set_resizable(False)
-                play_notification_sound()
-
-                label = Gtk.Label()
-                label.set_label(_("The keys and values were successfully added to the registry."))
-                label.set_halign(Gtk.Align.CENTER)
-
-                button_yes = Gtk.Button(label=_("Ok"))
-                button_yes.set_size_request(150, -1)
-                button_yes.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
-
-                content_area = dialog.get_content_area()
-                content_area.set_halign(Gtk.Align.CENTER)
-                content_area.set_valign(Gtk.Align.CENTER)
-                content_area.set_vexpand(True)
-                content_area.set_hexpand(True)
-
-                box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-                box_top.set_margin_start(20)
-                box_top.set_margin_end(20)
-                box_top.set_margin_top(20)
-                box_top.set_margin_bottom(20)
-
-                box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                box_bottom.set_margin_start(10)
-                box_bottom.set_margin_end(10)
-                box_bottom.set_margin_bottom(10)
-
-                box_top.append(label)
-                box_bottom.append(button_yes)
-
-                content_area.append(box_top)
-                content_area.append(box_bottom)
-
-                def on_response(dialog, response_id):
-                    dialog.destroy()
+                def on_result(ok):
                     self.loop.quit()
                     sys.exit()
 
-                dialog.connect("response", on_response)
-                dialog.present()
+                show_message_dialog(
+                    _("The keys and values were successfully added to the registry."),
+                    callback=on_result,
+                )
                 return True
 
         return False

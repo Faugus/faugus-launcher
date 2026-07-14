@@ -87,11 +87,11 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
-        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_hexpand(True)
 
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", self.on_ok_clicked)
-        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_hexpand(True)
 
         load_red_entry_css()
         load_frame_css()
@@ -199,6 +199,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.box_tools.append(self.grid_shortcut_icon)
 
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_homogeneous(True)
         bottom_box.set_margin_start(10)
         bottom_box.set_margin_end(10)
         bottom_box.set_margin_bottom(10)

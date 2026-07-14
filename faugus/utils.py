@@ -381,22 +381,12 @@ def is_valid_image(file_path):
         return False
 
 
-def show_invalid_image_dialog(parent=None):
+def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel_label=None, callback=None, modal=True):
     dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
     hide_dialog_action_area(dialog)
-    dialog.set_modal(True)
+    dialog.set_modal(modal)
     dialog.set_resizable(False)
     play_notification_sound()
-
-    label = Gtk.Label(label=_("The selected file is not a valid image."))
-    label.set_halign(Gtk.Align.CENTER)
-
-    label2 = Gtk.Label(label=_("Please choose another one."))
-    label2.set_halign(Gtk.Align.CENTER)
-
-    button_yes = Gtk.Button(label=_("Ok"))
-    button_yes.set_size_request(150, -1)
-    button_yes.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
 
     content_area = dialog.get_content_area()
     content_area.set_halign(Gtk.Align.CENTER)
@@ -410,20 +400,51 @@ def show_invalid_image_dialog(parent=None):
     box_top.set_margin_top(20)
     box_top.set_margin_bottom(20)
 
+    label1 = Gtk.Label(label=text1)
+    label1.set_halign(Gtk.Align.CENTER)
+    box_top.append(label1)
+
+    if text2:
+        label2 = Gtk.Label(label=text2)
+        label2.set_halign(Gtk.Align.CENTER)
+        box_top.append(label2)
+
     box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    box_bottom.set_homogeneous(True)
     box_bottom.set_margin_start(10)
     box_bottom.set_margin_end(10)
     box_bottom.set_margin_bottom(10)
 
-    box_top.append(label)
-    box_top.append(label2)
-    box_bottom.append(button_yes)
+    if cancel_label:
+        button_cancel = Gtk.Button(label=cancel_label)
+        button_cancel.set_hexpand(True)
+        button_cancel.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.CANCEL))
+        box_bottom.append(button_cancel)
+
+    button_confirm = Gtk.Button(label=confirm_label or _("Ok"))
+    button_confirm.set_hexpand(True)
+    button_confirm.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+    box_bottom.append(button_confirm)
 
     content_area.append(box_top)
     content_area.append(box_bottom)
 
-    dialog.connect("response", lambda d, r: d.destroy())
+    def on_response(d, response_id):
+        d.destroy()
+        if callback:
+            callback(response_id == Gtk.ResponseType.OK)
+
+    dialog.connect("response", on_response)
     dialog.present()
+    return dialog
+
+
+def show_invalid_image_dialog(parent=None):
+    show_message_dialog(
+        _("The selected file is not a valid image."),
+        _("Please choose another one."),
+        parent=parent,
+    )
 
 
 def on_entry_changed(widget, entry):
@@ -923,16 +944,15 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     content_area.append(hbox)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_size_request(150, -1)
     button_cancel.set_hexpand(True)
     button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
 
     button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_size_request(150, -1)
     button_ok.set_hexpand(True)
     button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
 
     bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_homogeneous(True)
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)
@@ -1061,16 +1081,15 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     frame.set_child(grid)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_size_request(150, -1)
     button_cancel.set_hexpand(True)
     button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
 
     button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_size_request(150, -1)
     button_ok.set_hexpand(True)
     button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
 
     bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_homogeneous(True)
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)
@@ -1205,16 +1224,15 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     frame.set_child(grid)
 
     button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_size_request(150, -1)
     button_cancel.set_hexpand(True)
     button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
 
     button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_size_request(150, -1)
     button_ok.set_hexpand(True)
     button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
 
     bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_homogeneous(True)
     bottom_box.set_margin_start(10)
     bottom_box.set_margin_end(10)
     bottom_box.set_margin_bottom(10)

@@ -278,16 +278,15 @@ class BackupWindow(Gtk.Dialog):
         self.main_box.append(self.lbl_warning)
 
         self.btn_cancel = Gtk.Button(label=_("Cancel"))
-        self.btn_cancel.set_size_request(100, -1)
         self.btn_cancel.set_hexpand(True)
         self.btn_cancel.connect("clicked", self.on_cancel_clicked)
 
         self.btn_ok = Gtk.Button(label=_("Ok"))
-        self.btn_ok.set_size_request(100, -1)
         self.btn_ok.set_hexpand(True)
         self.btn_ok.connect("clicked", self.on_ok_clicked)
 
         self.bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        self.bottom_box.set_homogeneous(True)
         self.bottom_box.set_margin_start(10)
         self.bottom_box.set_margin_end(10)
         self.bottom_box.set_margin_bottom(10)

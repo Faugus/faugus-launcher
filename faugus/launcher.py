@@ -1679,11 +1679,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             subprocess.run(["xdg-open", os.path.dirname(self.proton_log)], check=True)
 
         button_copy_clipboard = Gtk.Button(label=_("Copy to clipboard"))
-        button_copy_clipboard.set_size_request(150, -1)
+        button_copy_clipboard.set_hexpand(True)
         button_copy_clipboard.connect("clicked", copy_to_clipboard)
 
         button_open_location = Gtk.Button(label=_("Open file location"))
-        button_open_location.set_size_request(150, -1)
+        button_open_location.set_hexpand(True)
         button_open_location.connect("clicked", open_location)
 
         notebook = Gtk.Notebook()
@@ -1717,6 +1717,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         content_area = dialog.get_content_area()
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_homogeneous(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
@@ -1900,45 +1901,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return False
 
     def running_dialog(self, title):
-        dialog = Gtk.Dialog(title="Faugus", transient_for=self)
-        hide_dialog_action_area(dialog)
-        dialog.set_modal(True)
-        dialog.set_resizable(False)
-        play_notification_sound()
-
-        label = Gtk.Label()
-        label.set_label(_("%s is already running.") % title)
-        label.set_halign(Gtk.Align.CENTER)
-
-        button_ok = Gtk.Button(label=_("Ok"))
-        button_ok.set_size_request(150, -1)
-        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
-
-        content_area = dialog.get_content_area()
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.append(label)
-        box_bottom.append(button_ok)
-
-        content_area.append(box_top)
-        content_area.append(box_bottom)
-
-        dialog.connect("response", lambda d, r: d.destroy())
-        dialog.present()
+        show_message_dialog(_("%s is already running.") % title, parent=self)
 
     def load_config(self):
         cfg = ConfigManager()
@@ -2699,51 +2662,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             pass
 
     def show_warning_dialog_main(self, parent, text1, text2):
-        dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
-        hide_dialog_action_area(dialog)
-        dialog.set_modal(True)
-        dialog.set_resizable(False)
-        play_notification_sound()
-
-        label1 = Gtk.Label()
-        label1.set_label(text1)
-        label1.set_halign(Gtk.Align.CENTER)
-
-        label2 = Gtk.Label()
-        label2.set_label(text2)
-        label2.set_halign(Gtk.Align.CENTER)
-
-        button_ok = Gtk.Button(label=_("Ok"))
-        button_ok.set_size_request(150, -1)
-        button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.YES))
-
-        content_area = dialog.get_content_area()
-        content_area.set_halign(Gtk.Align.CENTER)
-        content_area.set_valign(Gtk.Align.CENTER)
-        content_area.set_vexpand(True)
-        content_area.set_hexpand(True)
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.append(label1)
-        if text2:
-            box_top.append(label2)
-        box_bottom.append(button_ok)
-
-        content_area.append(box_top)
-        content_area.append(box_bottom)
-
-        dialog.connect("response", lambda d, r: d.destroy())
-        dialog.present()
+        show_message_dialog(text1, text2, parent=parent)
 
     def on_dialog_response(self, dialog, response_id, add_game_dialog):
         if response_id == Gtk.ResponseType.OK:
@@ -3730,11 +3649,11 @@ class Settings(Gtk.Dialog):
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
-        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_hexpand(True)
 
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
-        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_hexpand(True)
 
         self.label_settings = Gtk.Label(label=_("Backup/Restore Settings"))
         self.label_settings.set_halign(Gtk.Align.START)
@@ -4026,6 +3945,7 @@ class Settings(Gtk.Dialog):
         frame.set_child(box_main)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_homogeneous(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
@@ -4486,54 +4406,13 @@ class Settings(Gtk.Dialog):
         filechooser.present()
 
     def show_warning_dialog_settings(self, parent, title, buttons, callback):
-        dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
-        hide_dialog_action_area(dialog)
-        dialog.set_modal(True)
-        dialog.set_resizable(False)
-        play_notification_sound()
-
-        label = Gtk.Label(label=title)
-        label.set_halign(Gtk.Align.CENTER)
-
-        button_confirm = Gtk.Button(label=_("Yes"))
-        button_confirm.set_size_request(150, -1)
-        button_confirm.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
-
-        button_no = Gtk.Button(label=_("No"))
-        button_no.set_size_request(150, -1)
-        button_no.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
-
-        content_area = dialog.get_content_area()
-
-        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box_top.set_margin_start(20)
-        box_top.set_margin_end(20)
-        box_top.set_margin_top(20)
-        box_top.set_margin_bottom(20)
-
-        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        box_bottom.set_margin_start(10)
-        box_bottom.set_margin_end(10)
-        box_bottom.set_margin_bottom(10)
-
-        box_top.append(label)
-
-        if buttons:
-            box_bottom.append(button_no)
-        else:
-            button_confirm.set_label(_("Ok"))
-
-        box_bottom.append(button_confirm)
-
-        content_area.append(box_top)
-        content_area.append(box_bottom)
-
-        def on_response(dialog, response_id):
-            dialog.destroy()
-            callback(response_id == Gtk.ResponseType.OK)
-
-        dialog.connect("response", on_response)
-        dialog.present()
+        show_message_dialog(
+            title,
+            parent=parent,
+            confirm_label=_("Yes") if buttons else _("Ok"),
+            cancel_label=_("No") if buttons else None,
+            callback=callback,
+        )
 
     def on_button_search_prefix_clicked(self, widget):
         filechooser = new_file_chooser(
@@ -4775,11 +4654,11 @@ class DuplicateDialog(Gtk.Dialog):
 
         button_cancel = Gtk.Button(label=_("Cancel"))
         button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
-        button_cancel.set_size_request(150, -1)
+        button_cancel.set_hexpand(True)
 
         button_ok = Gtk.Button(label=_("Ok"))
         button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
-        button_ok.set_size_request(150, -1)
+        button_ok.set_hexpand(True)
 
         content_area = self.get_content_area()
         content_area.set_halign(Gtk.Align.CENTER)
@@ -4794,6 +4673,7 @@ class DuplicateDialog(Gtk.Dialog):
         box_top.set_margin_bottom(20)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_homogeneous(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
@@ -4837,12 +4717,10 @@ class DeleteDialog(Gtk.Dialog):
             warn_label.set_halign(Gtk.Align.CENTER)
 
         button_no = Gtk.Button(label=_("No"))
-        button_no.set_size_request(150, -1)
         button_no.set_hexpand(True)
         button_no.connect("clicked", lambda x: self.response(Gtk.ResponseType.NO))
 
         button_yes = Gtk.Button(label=_("Yes"))
-        button_yes.set_size_request(150, -1)
         button_yes.set_hexpand(True)
         button_yes.connect("clicked", lambda x: self.response(Gtk.ResponseType.YES))
 
@@ -4862,6 +4740,7 @@ class DeleteDialog(Gtk.Dialog):
         box_top.set_margin_bottom(20)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_homogeneous(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
@@ -5171,11 +5050,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
-        self.button_cancel.set_size_request(150, -1)
+        self.button_cancel.set_hexpand(True)
 
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
-        self.button_ok.set_size_request(150, -1)
+        self.button_ok.set_hexpand(True)
 
         self.load_config()
 
@@ -5363,6 +5242,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2.append(self.grid_tools)
 
         bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        bottom_box.set_homogeneous(True)
         bottom_box.set_margin_start(10)
         bottom_box.set_margin_end(10)
         bottom_box.set_margin_bottom(10)
@@ -5524,11 +5404,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         entry.set_tooltip_text("https://example.com/banner.png")
 
         button_ok = Gtk.Button(label=_("Ok"))
-        button_ok.set_size_request(120, -1)
+        button_ok.set_hexpand(True)
         button_ok.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.OK))
 
         button_cancel = Gtk.Button(label=_("Cancel"))
-        button_cancel.set_size_request(120, -1)
+        button_cancel.set_hexpand(True)
         button_cancel.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
 
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -5538,6 +5418,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         box_top.set_margin_bottom(10)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_homogeneous(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
