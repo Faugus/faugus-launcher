@@ -247,13 +247,16 @@ def _release_combo_boxes(widget):
         nxt = child.get_next_sibling()
         _release_combo_boxes(child)
         child = nxt
+    if isinstance(widget, Gtk.Popover):
+        widget.popdown()
+        widget.unparent()
 
 
 def destroy_and_release(widget):
-    _release_combo_boxes(widget)
-
     if isinstance(widget, Gtk.Window):
         widget.set_focus(None)
+
+    _release_combo_boxes(widget)
 
     if isinstance(widget, Gtk.Dialog):
         content = widget.get_content_area()
