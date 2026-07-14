@@ -535,6 +535,15 @@ def _navigate_popover(self, direction):
     popover.child_focus(direction)
 
 
+def _find_parent_popover(widget):
+    parent = widget.get_parent() if widget else None
+    while parent:
+        if isinstance(parent, Gtk.Popover):
+            return parent
+        parent = parent.get_parent()
+    return None
+
+
 def _handle_menu_button(self, button):
     popover = getattr(self, "active_popover", None)
     if not popover or not popover.get_visible():
@@ -546,8 +555,20 @@ def _handle_menu_button(self, button):
         GLib.idle_add(lambda: activate_focused_widget(self))
 
     elif role == "back":
+        anchor = popover.get_parent()
+        parent_popover = _find_parent_popover(anchor)
+
         popover.popdown()
-        self.active_popover = None
+
+        if parent_popover and parent_popover.get_visible() and anchor:
+            self.active_popover = parent_popover
+            self.set_focus_visible(True)
+            anchor.grab_focus()
+        elif parent_popover:
+            parent_popover.popdown()
+            self.active_popover = None
+        else:
+            self.active_popover = None
 
 
 def _find_column_list_view(widget):
