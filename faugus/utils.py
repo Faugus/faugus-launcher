@@ -85,6 +85,18 @@ def ensure_pixbuf_has_alpha(pixbuf):
     return pixbuf
 
 
+def is_valid_image_bytes(data):
+    if not data:
+        return False
+    try:
+        loader = GdkPixbuf.PixbufLoader()
+        loader.write(data)
+        loader.close()
+        return loader.get_pixbuf() is not None
+    except GLib.GError:
+        return False
+
+
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
     try:
         if w and h:

@@ -5968,6 +5968,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         return False
 
     def apply_downloaded_artwork(self, category, content):
+        if not is_valid_image_bytes(content):
+            print(f"Downloaded {category} artwork is corrupted or incomplete, ignoring.")
+            return False
         if category == "grid":
             with open(self.banner_path_temp, "wb") as f:
                 f.write(content)
@@ -6599,7 +6602,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if response == Gtk.ResponseType.ACCEPT:
                 path = dialog_fc.get_file().get_path()
 
-                if self.interface_mode == "Banners":
+                if self.interface_mode != "SteamGridDB":
                     os.makedirs(self.icon_directory, exist_ok=True)
                     status = extract_ico(path, self.icon_temp, best_frame=True)
                     if status == "ok":
