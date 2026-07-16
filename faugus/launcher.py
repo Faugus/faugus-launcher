@@ -5968,6 +5968,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         return False
 
     def apply_downloaded_artwork(self, category, content):
+        if category == "icon":
+            content = normalize_icon_bytes(content)
         if not is_valid_image_bytes(content):
             print(f"Downloaded {category} artwork is corrupted or incomplete, ignoring.")
             return False
@@ -5981,7 +5983,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.refresh_hero_preview()
         elif category == "icon":
             with open(self.icon_temp, "wb") as f:
-                f.write(normalize_icon_bytes(content))
+                f.write(content)
             self.refresh_icon_preview()
         return False
 

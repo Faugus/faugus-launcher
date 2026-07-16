@@ -92,11 +92,14 @@ def normalize_icon_bytes(data):
     from PIL import Image
     import io
 
-    with Image.open(io.BytesIO(data)) as icon:
-        frame = icon.convert("RGBA")
-        buf = io.BytesIO()
-        frame.save(buf, "PNG")
-        return buf.getvalue()
+    try:
+        with Image.open(io.BytesIO(data)) as icon:
+            frame = icon.convert("RGBA")
+            buf = io.BytesIO()
+            frame.save(buf, "PNG")
+            return buf.getvalue()
+    except Exception:
+        return data
 
 
 def is_valid_image_bytes(data):
