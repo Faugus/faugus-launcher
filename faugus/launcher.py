@@ -5393,6 +5393,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hero_placeholder1.add_css_class("hero-placeholder")
         hero_placeholder1.set_hexpand(True)
         hero_placeholder1.set_vexpand(True)
+        hero_placeholder1.set_size_request(-1, int(320 / (1920 / 620)))
 
         self.stack_hero_preview1 = Gtk.Stack()
         self.stack_hero_preview1.set_hhomogeneous(False)
@@ -5418,6 +5419,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hero_placeholder2.add_css_class("hero-placeholder")
         hero_placeholder2.set_hexpand(True)
         hero_placeholder2.set_vexpand(True)
+        hero_placeholder2.set_size_request(-1, int(320 / (1920 / 620)))
 
         self.stack_hero_preview2 = Gtk.Stack()
         self.stack_hero_preview2.set_hhomogeneous(False)
@@ -5689,11 +5691,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
 
-        def on_map(widget):
-            self.hero_preview1.queue_resize()
-            self.hero_preview2.queue_resize()
-
-        self.connect("map", on_map)
 
         self.present()
 
