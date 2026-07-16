@@ -5408,6 +5408,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.hero_preview1 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
         self.hero_preview1.set_child(self.stack_hero_preview1)
         self.hero_preview1.set_hexpand(True)
+        self.hero_preview1.set_halign(Gtk.Align.FILL)
 
         self.picture_hero2 = Gtk.Picture()
         self.picture_hero2.set_can_shrink(True)
@@ -5434,6 +5435,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.hero_preview2 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
         self.hero_preview2.set_child(self.stack_hero_preview2)
         self.hero_preview2.set_hexpand(True)
+        self.hero_preview2.set_halign(Gtk.Align.FILL)
 
         self.image_banner.set_hexpand(True)
         self.image_banner_stack = wrap_with_replaceable_placeholder(self.image_banner, 260, 390)
