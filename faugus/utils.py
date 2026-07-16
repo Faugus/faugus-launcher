@@ -79,11 +79,19 @@ class HiDpiMixin:
         return texture
 
 
+def ensure_pixbuf_has_alpha(pixbuf):
+    if pixbuf is not None and not pixbuf.get_has_alpha():
+        return pixbuf.add_alpha(False, 0, 0, 0)
+    return pixbuf
+
+
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
     try:
         if w and h:
-            return GdkPixbuf.Pixbuf.new_from_file_at_scale(path, w, h, keep_aspect_ratio)
-        return GdkPixbuf.Pixbuf.new_from_file(path)
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, w, h, keep_aspect_ratio)
+        else:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(path)
+        return ensure_pixbuf_has_alpha(pixbuf)
     except GLib.GError as e:
         if "Compressed icons" not in str(e):
             raise e
@@ -103,7 +111,7 @@ def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
         if w and h:
             pixbuf = pixbuf.scale_simple(w, h, GdkPixbuf.InterpType.BILINEAR)
 
-        return pixbuf
+        return ensure_pixbuf_has_alpha(pixbuf)
 
 
 def new_icon_image(icon_filename, size=16):
@@ -1863,7 +1871,7 @@ def show_steamgriddb_picker(obj, category):
                 loader = GdkPixbuf.PixbufLoader()
                 loader.write(data)
                 loader.close()
-                pixbuf = loader.get_pixbuf()
+                pixbuf = ensure_pixbuf_has_alpha(loader.get_pixbuf())
                 return (item, pixbuf)
             except Exception as e:
                 print(f"Error fetching thumbnail: {e}")

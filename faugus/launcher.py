@@ -906,7 +906,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 try:
                     if g and hasattr(g, 'icon') and g.icon:
                         if os.path.isfile(g.icon):
-                            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True)
+                            pixbuf = ensure_pixbuf_has_alpha(GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True))
                             source.set_icon(Gdk.Texture.new_for_pixbuf(pixbuf), 24, 24)
                         else:
                             theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
