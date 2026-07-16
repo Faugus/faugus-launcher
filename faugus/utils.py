@@ -97,6 +97,18 @@ def is_valid_image_bytes(data):
         return False
 
 
+def verified_content(response):
+    import requests
+
+    content = response.content
+    expected_length = response.headers.get("Content-Length")
+    if expected_length is not None and len(content) != int(expected_length):
+        raise requests.RequestException(
+            f"Truncated download: expected {expected_length} bytes, got {len(content)}"
+        )
+    return content
+
+
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
     try:
         if w and h:
@@ -1814,7 +1826,7 @@ def show_steamgriddb_picker(obj, category):
         def fetch_full():
             import requests
             try:
-                content = get_steamgriddb_session().get(url, timeout=15).content
+                content = verified_content(get_steamgriddb_session().get(url, timeout=15))
             except requests.RequestException as e:
                 print(f"Error fetching selected {category}: {e}")
                 GLib.idle_add(loading_setter, False)
@@ -1879,7 +1891,7 @@ def show_steamgriddb_picker(obj, category):
 
         def download_thumb(item):
             try:
-                data = session.get(item["thumb"], timeout=15).content
+                data = verified_content(session.get(item["thumb"], timeout=15))
                 loader = GdkPixbuf.PixbufLoader()
                 loader.write(data)
                 loader.close()

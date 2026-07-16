@@ -5822,7 +5822,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     print(f"SteamGridDB: no {category} found for '{game_name}'")
                     return
                 session = get_steamgriddb_session()
-                content = session.get(url, timeout=15).content
+                content = verified_content(session.get(url, timeout=15))
                 if not closed_event.is_set():
                     GLib.idle_add(self.apply_downloaded_artwork, category, content)
             except requests.RequestException as e:
@@ -6060,7 +6060,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
                     def download_one(category):
                         try:
-                            content = session.get(downloads[category], timeout=15).content
+                            content = verified_content(session.get(downloads[category], timeout=15))
                             if not closed_event.is_set():
                                 GLib.idle_add(self.apply_downloaded_artwork, category, content)
                         except requests.RequestException as e:
@@ -6089,7 +6089,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     response = requests.get(api_url)
                     response.raise_for_status()
                     image_url = response.text.strip('"')
-                    content = requests.get(image_url).content
+                    content = verified_content(requests.get(image_url))
 
                     if not closed_event.is_set():
                         GLib.idle_add(self.apply_downloaded_artwork, "grid", content)
