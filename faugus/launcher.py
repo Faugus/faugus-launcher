@@ -213,6 +213,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             .accent-background {
                 background-color: alpha(@accent_bg_color, 0.2);
             }
+            .steamgriddb-focus-tint {
+                background-color: transparent;
+                border-radius: 12px;
+                transition: background-color 150ms ease;
+            }
+            flowboxchild.steamgriddb-candidate:focus .steamgriddb-focus-tint {
+                background-color: alpha(@accent_bg_color, 0.2);
+            }
+            .steamgriddb-artwork-picker-overlay:focus-within .steamgriddb-focus-tint {
+                background-color: alpha(@accent_bg_color, 0.2);
+            }
         """, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         load_frame_css()
 
@@ -5260,6 +5271,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self._steamgriddb_steam_appid = None
         self._suggestion_source = None
         self._suggestion_programmatic = False
+        self._virtual_keyboard_active_for_title = False
 
         if interface_mode == "SteamGridDB":
             self.popover_suggestion = Gtk.Popover()
@@ -5470,6 +5482,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.hero_preview1 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
         self.hero_preview1.set_child(self.stack_hero_preview1)
         self.hero_preview1.set_hexpand(True)
+        self.hero_preview1.set_focusable(True)
 
         self.picture_hero2 = Gtk.Picture()
         self.picture_hero2.set_can_shrink(True)
@@ -5495,12 +5508,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.hero_preview2 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
         self.hero_preview2.set_child(self.stack_hero_preview2)
         self.hero_preview2.set_hexpand(True)
+        self.hero_preview2.set_focusable(True)
 
         self.image_banner.set_hexpand(True)
         self.image_banner_stack = wrap_with_replaceable_placeholder(self.image_banner, 260, 390)
+        self.image_banner_stack.set_focusable(True)
 
         self.image_banner2.set_hexpand(True)
         self.image_banner2_stack = wrap_with_replaceable_placeholder(self.image_banner2, 260, 390)
+        self.image_banner2_stack.set_focusable(True)
 
         image_click1 = Gtk.GestureClick()
         image_click1.set_button(Gdk.BUTTON_SECONDARY)
@@ -5528,9 +5544,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.image_banner_overlay, self.spinner_grid1 = wrap_with_spinner(self.image_banner_stack, dim_shape="banner")
         self.image_banner2_overlay, self.spinner_grid2 = wrap_with_spinner(self.image_banner2_stack, dim_shape="banner")
+        add_focus_tint(self.image_banner_overlay, size=(260, 390))
+        add_focus_tint(self.image_banner2_overlay, size=(260, 390))
 
         self.hero_preview1_overlay, self.spinner_hero1 = wrap_with_spinner(self.hero_preview1)
         self.hero_preview2_overlay, self.spinner_hero2 = wrap_with_spinner(self.hero_preview2)
+        add_focus_tint(self.hero_preview1_overlay)
+        add_focus_tint(self.hero_preview2_overlay)
 
         hero_click1 = Gtk.GestureClick()
         hero_click1.set_button(Gdk.BUTTON_PRIMARY)
@@ -6233,7 +6253,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.popover_suggestion.popdown()
 
     def on_title_changed_for_suggestions(self, entry):
-        if self._suggestion_programmatic:
+        if self._suggestion_programmatic or self._virtual_keyboard_active_for_title:
             return
 
         self._steamgriddb_suggestion_id = None
@@ -6320,6 +6340,22 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self._steamgriddb_suggestion_id = row.steamgriddb_id
         self.popover_suggestion.popdown()
         self.entry_title.grab_focus_without_selecting()
+        self.get_banner()
+
+    def fetch_title_suggestions_for_keyboard(self, term):
+        cfg = ConfigManager()
+        api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+        if not api_key:
+            return []
+        suggestions = fetch_steamgriddb_autocomplete(api_key, term, limit=10)
+        return [{"label": s["name"], "value": s} for s in suggestions]
+
+    def on_keyboard_suggestion_selected(self, item):
+        clean_name = re.sub(r'\s*\(\d{4}\)\s*$', '', item["name"]).strip()
+        self._suggestion_programmatic = True
+        self.entry_title.set_text(clean_name)
+        self._suggestion_programmatic = False
+        self._steamgriddb_suggestion_id = item["id"]
         self.get_banner()
 
     def on_combobox_changed(self, combobox):

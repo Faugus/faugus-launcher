@@ -5,7 +5,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Manette
 from faugus.keyboard import VirtualKeyboard
 from faugus.path_manager import PathManager
-from faugus.utils import widget_children, IdComboBox
+from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker
 
 MAPPED_BUTTONS = {
     "confirm": 5,
@@ -325,7 +325,7 @@ def _handle_button_down(self, button, win):
         if active_combo:
             _close_combo(self)
         elif is_dialog_active:
-            win.response(Gtk.ResponseType.CANCEL)
+            win.close()
 
     elif active_combo:
         return
@@ -341,6 +341,18 @@ def _handle_button_down(self, button, win):
             self.button_settings.emit("clicked")
         elif role == "start":
             GLib.idle_add(lambda: self.show_power_menu(None))
+
+    elif isinstance(getattr(win, "notebook", None), Gtk.Notebook):
+        if role == "lb":
+            win.notebook.set_current_page(0)
+        elif role == "rb":
+            win.notebook.set_current_page(1)
+
+    elif isinstance(win, VirtualKeyboard):
+        if role == "square":
+            win.on_backspace(None)
+        elif role == "triangle":
+            win.on_toggle_mode(win.get_focus(), "Shift")
 
 
 def _handle_treeview_confirm(treeview):
@@ -579,6 +591,15 @@ def _find_column_list_view(widget):
     return None
 
 
+def _is_descendant_of(widget, ancestor):
+    w = widget.get_parent()
+    while w is not None:
+        if w is ancestor:
+            return True
+        w = w.get_parent()
+    return False
+
+
 def _find_ancestor_by_typename(widget, type_name):
     while widget:
         if type(widget).__name__ == type_name:
@@ -653,6 +674,27 @@ def navigate_gamepad(direction):
 
     is_horizontal = direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)
     is_vertical = direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN)
+
+    listbox_suggestions = getattr(active_window, "listbox_suggestions", None)
+    if is_vertical and listbox_suggestions is not None and isinstance(focused, Gtk.ListBoxRow) \
+            and focused.get_parent() is listbox_suggestions:
+        index = focused.get_index()
+        if direction == Gtk.DirectionType.UP:
+            if index > 0:
+                target = listbox_suggestions.get_row_at_index(index - 1)
+                if target:
+                    target.grab_focus()
+            return
+        else:
+            target = listbox_suggestions.get_row_at_index(index + 1)
+            if target:
+                target.grab_focus()
+                return
+            grid = getattr(active_window, "grid", None)
+            first_key = grid.get_child_at(0, 0) if grid else None
+            if first_key:
+                first_key.grab_focus()
+            return
 
     if is_vertical and _find_ancestor_by_typename(focused, "GtkPathBar"):
         if direction == Gtk.DirectionType.UP:
@@ -754,7 +796,31 @@ def activate_focused_widget(self):
 
     if isinstance(focused, (Gtk.Entry, Gtk.Text)):
         parent = focused.get_root()
-        dialog = VirtualKeyboard(parent, focused, on_close=parent.present)
+        fetch_suggestions = None
+        on_suggestion_selected = None
+        entry_title = getattr(parent, "entry_title", None)
+        is_title_suggestion_field = (
+            entry_title is not None
+            and (focused is entry_title or _is_descendant_of(focused, entry_title))
+            and getattr(parent, "interface_mode", None) == "SteamGridDB"
+        )
+        if is_title_suggestion_field:
+            fetch_suggestions = parent.fetch_title_suggestions_for_keyboard
+            on_suggestion_selected = parent.on_keyboard_suggestion_selected
+            parent._virtual_keyboard_active_for_title = True
+            popover = getattr(parent, "popover_suggestion", None)
+            if popover is not None:
+                popover.popdown()
+
+        def on_keyboard_closed():
+            if is_title_suggestion_field:
+                parent._virtual_keyboard_active_for_title = False
+            parent.present()
+
+        dialog = VirtualKeyboard(
+            parent, focused, on_close=on_keyboard_closed,
+            fetch_suggestions=fetch_suggestions, on_suggestion_selected=on_suggestion_selected
+        )
         dialog.present()
 
     elif isinstance(focused, Gtk.Button):
@@ -785,6 +851,9 @@ def activate_focused_widget(self):
     elif isinstance(focused, Gtk.ListBoxRow):
         focused.emit("activate")
 
+    elif isinstance(focused, Gtk.FlowBoxChild) and hasattr(focused, "gamepad_activate"):
+        focused.gamepad_activate()
+
     elif isinstance(focused, Gtk.FlowBoxChild):
         game = self.selected()
         if game:
@@ -792,6 +861,16 @@ def activate_focused_widget(self):
                 self.running_dialog(game.title)
             else:
                 self.button_play.emit("clicked")
+
+    elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
+        getattr(active_window, "hero_preview1", None), getattr(active_window, "hero_preview2", None)
+    ):
+        show_steamgriddb_picker(active_window, "hero")
+
+    elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
+        getattr(active_window, "image_banner_stack", None), getattr(active_window, "image_banner2_stack", None)
+    ):
+        show_steamgriddb_picker(active_window, "grid")
 
     elif type(focused).__name__ == "GtkColorSwatch":
         chooser = focused.get_ancestor(Gtk.ColorChooser)

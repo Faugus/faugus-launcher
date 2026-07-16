@@ -207,6 +207,24 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
+def add_focus_tint(overlay, size=None):
+    tint = Gtk.Box()
+    tint.add_css_class("steamgriddb-focus-tint")
+    tint.set_can_target(False)
+    if size:
+        width, height = size
+        tint.set_size_request(width, height)
+        tint.set_halign(Gtk.Align.CENTER)
+        tint.set_valign(Gtk.Align.CENTER)
+    else:
+        tint.set_hexpand(True)
+        tint.set_vexpand(True)
+    overlay.add_overlay(tint)
+    overlay.set_measure_overlay(tint, False)
+    overlay.add_css_class("steamgriddb-artwork-picker-overlay")
+    return tint
+
+
 def create_accent_placeholder_paintable(width, height, alpha=0.4):
     dummy = Gtk.Box()
     found, rgba = dummy.get_style_context().lookup_color("accent_bg_color")
@@ -1750,11 +1768,10 @@ def show_steamgriddb_picker(obj, category):
         return
 
     if not game_name:
-        show_message_dialog(
-            _("No title entered."),
-            _("Enter a game title before choosing artwork."),
-            parent=obj,
-        )
+        load_red_entry_css()
+        obj.entry_title.add_css_class("entry")
+        if hasattr(obj, "notebook"):
+            obj.notebook.set_current_page(0)
         return
 
     titles = {
@@ -1867,6 +1884,16 @@ def show_steamgriddb_picker(obj, category):
             picture = new_picture(paintable)
             picture.set_cursor(Gdk.Cursor.new_from_name("pointer"))
 
+            picture_overlay = Gtk.Overlay()
+            picture_overlay.set_child(picture)
+            tint = Gtk.Box()
+            tint.add_css_class("steamgriddb-focus-tint")
+            tint.set_can_target(False)
+            tint.set_hexpand(True)
+            tint.set_vexpand(True)
+            picture_overlay.add_overlay(tint)
+            picture_overlay.set_measure_overlay(tint, False)
+
             child = Gtk.FlowBoxChild()
             if is_list:
                 child.set_size_request(thumb_w, -1)
@@ -1877,7 +1904,9 @@ def show_steamgriddb_picker(obj, category):
                 child.set_vexpand(True)
                 child.set_halign(Gtk.Align.FILL)
                 child.set_valign(Gtk.Align.FILL)
-            child.set_child(picture)
+            child.set_child(picture_overlay)
+            child.add_css_class("steamgriddb-candidate")
+            child.gamepad_activate = lambda u=item["url"]: apply_selection(u)
 
             click = Gtk.GestureClick()
             click.set_button(Gdk.BUTTON_PRIMARY)
