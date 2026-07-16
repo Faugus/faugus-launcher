@@ -62,7 +62,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
 
-        self.button_launch_arguments = Gtk.Button(label=_("Launch Arguments"))
+        self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
         self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
@@ -212,9 +212,11 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         shutil.rmtree(self.icon_directory, ignore_errors=True)
 
     def on_button_launch_arguments_clicked(self, widget):
-        def on_result(result):
+        def on_result(result, pre_launch_command, post_launch_command):
             self.launch_arguments = result
-        show_launch_arguments_dialog(self, self.launch_arguments, on_result)
+            self.pre_launch_command = pre_launch_command
+            self.post_launch_command = post_launch_command
+        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch_command, self.post_launch_command, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):
@@ -334,11 +336,17 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         command = ' '.join(command_parts)
 
+        hook_args = ""
+        if self.pre_launch_command:
+            hook_args += f' --pre-launch-command "{self.pre_launch_command}"'
+        if self.post_launch_command:
+            hook_args += f' --post-launch-command "{self.post_launch_command}"'
+
         if IS_FLATPAK:
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}--run "{command}"\n'
+                f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -348,7 +356,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}--run "{command}"\n'
+                f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'

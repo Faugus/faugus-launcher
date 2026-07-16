@@ -41,9 +41,11 @@ def set_env(key, value):
 
 
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None):
+    def __init__(self, message, command=None, pre_launch_command="", post_launch_command=""):
         self.message = message
         self.command = command
+        self.pre_launch_command = pre_launch_command
+        self.post_launch_command = post_launch_command
         self.process = None
         self.splash_window = None
         self.log_window = None
@@ -282,6 +284,12 @@ class FaugusRun(HiDpiMixin):
 
         for cmd in cmds_to_run:
             start_and_watch(cmd)
+
+        if self.pre_launch_command:
+            try:
+                subprocess.Popen(self.pre_launch_command, shell=True)
+            except Exception as e:
+                print(f"Error running pre-launch command: {e}")
 
         game_cmd = popen_prefix + shlex.split(self.message)
         self.start_time = time.time()
@@ -646,6 +654,12 @@ class FaugusRun(HiDpiMixin):
         end_time = time.time()
         runtime = int(end_time - getattr(self, "start_time", end_time))
 
+        if self.post_launch_command:
+            try:
+                subprocess.Popen(self.post_launch_command, shell=True)
+            except Exception as e:
+                print(f"Error running post-launch command: {e}")
+
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
@@ -823,6 +837,8 @@ def main():
     parser.add_argument("message", nargs='?')
     parser.add_argument("command", nargs='?', default=None)
     parser.add_argument("--game")
+    parser.add_argument("--pre-launch-command", default="")
+    parser.add_argument("--post-launch-command", default="")
 
     args = parser.parse_args()
 
@@ -832,9 +848,9 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None).run()
+        FaugusRun(launch_options, None, game.get("pre_launch_command", ""), game.get("post_launch_command", "")).run()
     else:
-        FaugusRun(args.message, args.command).run()
+        FaugusRun(args.message, args.command, args.pre_launch_command, args.post_launch_command).run()
 
 
 if __name__ == "__main__":

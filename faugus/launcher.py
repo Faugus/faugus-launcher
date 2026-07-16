@@ -2671,6 +2671,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.launch_arguments = game.launch_arguments
+            edit_game_dialog.pre_launch_command = game.pre_launch_command
+            edit_game_dialog.post_launch_command = game.post_launch_command
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(_("Edit %s") % game.title)
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
@@ -3022,6 +3024,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 category,
                 icon,
                 steamgriddb_id=add_game_dialog._steamgriddb_suggestion_id or "",
+                pre_launch_command=add_game_dialog.pre_launch_command,
+                post_launch_command=add_game_dialog.post_launch_command,
             )
 
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -3290,6 +3294,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.path = edit_game_dialog.entry_path.get_text()
             game.prefix = os.path.normpath(edit_game_dialog.entry_prefix.get_text())
             game.launch_arguments = edit_game_dialog.launch_arguments
+            game.pre_launch_command = edit_game_dialog.pre_launch_command
+            game.post_launch_command = edit_game_dialog.post_launch_command
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
@@ -4874,6 +4880,8 @@ class Game:
         category,
         icon,
         steamgriddb_id="",
+        pre_launch_command="",
+        post_launch_command="",
     ):
         self.gameid = gameid
         self.title = title
@@ -4904,6 +4912,8 @@ class Game:
         self.category = category
         self.icon = icon
         self.steamgriddb_id = steamgriddb_id
+        self.pre_launch_command = pre_launch_command
+        self.post_launch_command = post_launch_command
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -5264,7 +5274,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_game_arguments.set_has_tooltip(True)
         self.entry_game_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
-        self.button_launch_arguments = Gtk.Button(label=_("Launch Arguments"))
+        self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
         self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
@@ -5706,9 +5716,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.set_child(image)
 
     def on_button_launch_arguments_clicked(self, widget):
-        def on_result(result):
+        def on_result(result, pre_launch_command, post_launch_command):
             self.launch_arguments = result
-        show_launch_arguments_dialog(self, self.launch_arguments, on_result)
+            self.pre_launch_command = pre_launch_command
+            self.post_launch_command = post_launch_command
+        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch_command, self.post_launch_command, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):
@@ -6238,6 +6250,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         def cleanup_fields():
             self.entry_title.set_text("")
             self.launch_arguments = ""
+            self.pre_launch_command = ""
+            self.post_launch_command = ""
             self.entry_path.set_text("")
             self.entry_prefix.set_text("")
             self.checkbox_shortcut_desktop.set_active(False)

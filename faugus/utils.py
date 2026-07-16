@@ -988,7 +988,7 @@ GAME_FIELDS = [
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "prevent_sleep", "category", "icon",
-    "steamgriddb_id",
+    "steamgriddb_id", "pre_launch_command", "post_launch_command",
 ]
 
 
@@ -1020,6 +1020,8 @@ def init_addon_defaults(obj):
     obj.addapp_delay = ""
     obj.addapp_first = False
     obj.launch_arguments = ""
+    obj.pre_launch_command = ""
+    obj.post_launch_command = ""
     obj.lossless_enabled = False
     obj.lossless_multiplier = 1
     obj.lossless_flow = 100
@@ -1028,8 +1030,8 @@ def init_addon_defaults(obj):
     obj.lossless_present = False
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
-    dialog = Gtk.Dialog(title=_("Launch Arguments"), transient_for=parent)
+def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch_command, current_post_launch_command, callback):
+    dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
     dialog.set_modal(True)
@@ -1191,7 +1193,60 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     hbox.append(btn_copy)
     hbox.append(box_presets)
 
-    frame.set_child(hbox)
+    def build_hook_command_box(title, current_value, key):
+        label = Gtk.Label(label=title)
+        label.set_halign(Gtk.Align.START)
+
+        entry = Gtk.Entry()
+        entry.set_text(current_value)
+        entry.set_hexpand(True)
+
+        button_search = Gtk.Button()
+        button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        button_search.set_size_request(50, -1)
+
+        def on_search_clicked(widget):
+            filechooser = new_file_chooser(dialog, _("Select a command or script"), Gtk.FileChooserAction.OPEN)
+            set_file_chooser_start_folder(filechooser, key, entry.get_text() or None)
+
+            def on_response_fc(dialog_fc, response):
+                if response == Gtk.ResponseType.ACCEPT:
+                    selected_file = dialog_fc.get_file().get_path()
+                    if selected_file:
+                        entry.set_text(selected_file)
+                destroy_and_release(dialog_fc)
+
+            filechooser.connect("response", on_response_fc)
+            filechooser.present()
+
+        button_search.connect("clicked", on_search_clicked)
+
+        entry_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        entry_row.append(entry)
+        entry_row.append(button_search)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        box.append(label)
+        box.append(entry_row)
+        return box, entry
+
+    box_pre_launch, entry_pre_launch = build_hook_command_box(
+        _("Pre-launch Command/Script"), current_pre_launch_command, "pre_launch_command")
+    box_post_launch, entry_post_launch = build_hook_command_box(
+        _("Post-launch Command/Script"), current_post_launch_command, "post_launch_command")
+
+    hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    hbox_hooks.set_homogeneous(True)
+    hbox_hooks.set_margin_start(10)
+    hbox_hooks.set_margin_end(10)
+    hbox_hooks.set_margin_bottom(10)
+    hbox_hooks.append(box_pre_launch)
+    hbox_hooks.append(box_post_launch)
+
+    frame_content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    frame_content.append(hbox)
+    frame_content.append(hbox_hooks)
+    frame.set_child(frame_content)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)
@@ -1202,15 +1257,19 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
 
     def on_response(dialog, response):
         result = current_launch_arguments
+        pre_launch_command = current_pre_launch_command
+        post_launch_command = current_post_launch_command
         if response == Gtk.ResponseType.OK:
             presets_to_save = [row[0] for row in store_presets if row[0].strip()]
             save_json_file(presets_to_save, PRESETS_FILE)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
             result = "\n".join(args_to_save)
+            pre_launch_command = entry_pre_launch.get_text().strip()
+            post_launch_command = entry_post_launch.get_text().strip()
 
         destroy_and_release(dialog)
-        callback(result)
+        callback(result, pre_launch_command, post_launch_command)
 
     dialog.connect("response", on_response)
     dialog.present()
