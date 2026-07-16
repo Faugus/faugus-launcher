@@ -4999,6 +4999,12 @@ class DeleteDialog(Gtk.Dialog):
         content_area.set_vexpand(True)
         content_area.set_hexpand(True)
 
+        frame = Gtk.Frame()
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_top(10)
+        frame.set_margin_bottom(10)
+
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box_top.set_margin_start(20)
         box_top.set_margin_end(20)
@@ -5021,7 +5027,9 @@ class DeleteDialog(Gtk.Dialog):
         box_bottom.append(button_no)
         box_bottom.append(button_yes)
 
-        content_area.append(box_top)
+        frame.set_child(box_top)
+
+        content_area.append(frame)
         content_area.append(box_bottom)
 
         self.present()

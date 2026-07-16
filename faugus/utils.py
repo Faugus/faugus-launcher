@@ -1035,6 +1035,12 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     dialog.set_modal(True)
     dialog.set_default_size(650, 400)
 
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
+
     hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     hbox.set_margin_start(10)
     hbox.set_margin_end(10)
@@ -1185,8 +1191,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     hbox.append(btn_copy)
     hbox.append(box_presets)
 
+    frame.set_child(hbox)
+
     content_area = dialog.get_content_area()
-    content_area.append(hbox)
+    content_area.append(frame)
 
     bottom_box = build_dialog_ok_cancel_box(dialog)
 
