@@ -448,6 +448,56 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay.set_measure_overlay(content_widget, True)
         return overlay
 
+    def wrap_with_static_hero(self, content_widget, hero_path):
+        overlay = Gtk.Overlay()
+        overlay.set_hexpand(True)
+        overlay.set_vexpand(True)
+
+        base_box = Gtk.Box()
+        base_box.set_hexpand(True)
+        base_box.set_vexpand(True)
+        overlay.set_child(base_box)
+
+        hero_image_box = Gtk.Box()
+        hero_image_box.set_hexpand(True)
+        hero_image_box.set_vexpand(False)
+        hero_image_box.set_halign(Gtk.Align.FILL)
+        hero_image_box.set_valign(Gtk.Align.START)
+        hero_image_box.add_css_class("launcher-screen-hero-image")
+        overlay.add_overlay(hero_image_box)
+        overlay.set_measure_overlay(hero_image_box, False)
+
+        hero_ratio = 1920 / 620
+        hero_size_state = {"width": -1}
+
+        def on_hero_tick(widget, frame_clock, box=hero_image_box, state=hero_size_state):
+            width = widget.get_width()
+            if width > 0 and width != state["width"]:
+                state["width"] = width
+                box.set_size_request(-1, int(width / hero_ratio))
+            return True
+
+        overlay.add_tick_callback(on_hero_tick)
+
+        overlay.add_overlay(content_widget)
+        overlay.set_measure_overlay(content_widget, True)
+
+        hero_uri = Gio.File.new_for_path(hero_path).get_uri()
+        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+        hero_css = f"""
+        .launcher-screen-hero-image {{
+            background-image: linear-gradient(to bottom, rgba({window_r}, {window_g}, {window_b}, 0) 0%, rgba({window_r}, {window_g}, {window_b}, 1) 100%), url("{hero_uri}");
+            background-repeat: no-repeat, no-repeat;
+            background-position: center, center;
+            background-size: 100% 100%, 100% 100%;
+        }}
+        """
+        provider = Gtk.CssProvider()
+        provider.load_from_data(hero_css.encode("utf-8"))
+        hero_image_box.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+
+        return overlay
+
     def apply_background_mode_live(self, new_mode):
         show_hero = self.hero_overlay_enabled()
         old_had_overlay = self.background_mode == "dominant_color" or show_hero
@@ -3159,6 +3209,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
             self.download_launcher("wargaming", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
 
+        if self.interface_mode == "SteamGridDB" and os.path.isfile(icon_temp):
+            icon_surface = self.new_texture_from_image(icon_temp, 256, 256)
+            icon_picture = new_picture(icon_surface)
+            icon_picture.set_margin_bottom(20)
+            grid_launcher.attach(icon_picture, 0, 0, 1, 1)
+
         grid_launcher.attach(sizer_labels, 0, 1, 1, 1)
         sizer_labels.append(grid_labels)
         grid_labels.attach(self.label_download, 0, 0, 1, 1)
@@ -3170,7 +3226,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             self.box_main.remove(self.box_top)
             self.box_main.remove(self.box_bottom)
-        self.box_main.append(self.box_launcher)
+
+        hero_path = f"{HEROES_DIR}/{title_formatted}.png"
+        if self.hero_overlay_enabled() and os.path.isfile(hero_path):
+            self.box_launcher_display = self.wrap_with_static_hero(self.box_launcher, hero_path)
+        else:
+            self.box_launcher_display = self.box_launcher
+        self.box_main.append(self.box_launcher_display)
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
         retcode = processo.poll()
@@ -3178,7 +3240,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if retcode is not None:
             if os.path.exists(FAUGUS_TEMP):
                 shutil.rmtree(FAUGUS_TEMP)
-            self.box_main.remove(self.box_launcher)
+            self.box_main.remove(self.box_launcher_display)
             if self.interface_mode != "List":
                 self.box_main.append(self.main_hbox)
             else:
