@@ -411,6 +411,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 page.add_overlay(hero_image_box)
                 page.set_measure_overlay(hero_image_box, False)
 
+                hero_ratio = 1920 / 620
+                hero_size_state = {"width": -1}
+
+                def on_hero_page_tick(widget, frame_clock, box=hero_image_box, state=hero_size_state):
+                    width = widget.get_width()
+                    if width > 0 and width != state["width"]:
+                        state["width"] = width
+                        box.set_size_request(-1, int(width / hero_ratio))
+                    return True
+
+                page.add_tick_callback(on_hero_page_tick)
+
             color_provider = Gtk.CssProvider()
             color_box.get_style_context().add_provider(color_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
             image_provider = Gtk.CssProvider()
@@ -519,10 +531,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         else:
                             fade_r, fade_g, fade_b = window_r, window_g, window_b
 
-                        container_width = hero_image_box.get_width() or self.get_width() or 800
-                        hero_height = int(container_width * 620 / 1920)
-                        hero_image_box.set_size_request(-1, hero_height)
-
                         hero_css = f"""
                         .{image_class} {{
                             background-image: linear-gradient(to bottom, rgba({fade_r}, {fade_g}, {fade_b}, 0) 0%, rgba({fade_r}, {fade_g}, {fade_b}, 1) 100%), url("{hero_uri}");
@@ -531,8 +539,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             background-size: 100% 100%, 100% 100%;
                         }}
                         """
-                    elif hero_image_box is not None:
-                        hero_image_box.set_size_request(-1, -1)
 
             self._hero_color_providers[next_index].load_from_data(color_css.encode("utf-8"))
             self._hero_image_providers[next_index].load_from_data(hero_css.encode("utf-8"))
