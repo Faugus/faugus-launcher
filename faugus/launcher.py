@@ -5529,15 +5529,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         if interface_mode == "SteamGridDB":
             self.grid_page1.attach(self.hero_preview1_overlay, 0, 0, 2, 1)
-
-            def sync_hero_preview1_width(widget, frame_clock):
-                width = self.grid_page1.get_width()
-                if width <= 0:
-                    return True
-                self.hero_preview1.set_size_request(width, int(width / (1920 / 620)))
-                return False
-
-            self.grid_page1.add_tick_callback(sync_hero_preview1_width)
         self.grid_page1.attach(page1, 0, 1, 1, 1)
         if interface_mode in ("Banners", "SteamGridDB"):
             self.grid_page1.attach(self.image_banner_overlay, 1, 1, 1, 1)
@@ -5557,15 +5548,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         if interface_mode == "SteamGridDB":
             self.grid_page2.attach(self.hero_preview2_overlay, 0, 0, 2, 1)
-
-            def sync_hero_preview2_width(widget, frame_clock):
-                width = self.grid_page2.get_width()
-                if width <= 0:
-                    return True
-                self.hero_preview2.set_size_request(width, int(width / (1920 / 620)))
-                return False
-
-            self.grid_page2.add_tick_callback(sync_hero_preview2_width)
         self.grid_page2.attach(page2, 0, 1, 1, 1)
         if interface_mode in ("Banners", "SteamGridDB"):
             self.grid_page2.attach(self.image_banner2_overlay, 1, 1, 1, 1)
