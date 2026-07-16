@@ -5689,6 +5689,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
 
+        def on_map(widget):
+            self.hero_preview1.queue_resize()
+            self.hero_preview2.queue_resize()
+
+        self.connect("map", on_map)
+
         self.present()
 
     def on_combobox_steam_changed(self, combobox):
