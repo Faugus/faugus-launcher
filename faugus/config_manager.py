@@ -1,5 +1,5 @@
 from faugus.language_config import *
-from faugus.utils import atomic_write
+from faugus.utils import atomic_write, load_json_file, save_json_file
 
 
 class ConfigManager:
@@ -41,6 +41,9 @@ class ConfigManager:
             'window-behavior': 'None',
             'interface-theme': 'system',
             'accent-color': 'system',
+            'steamgriddb-api-key': '',
+            'background-mode': 'default',
+            'hero-enabled': 'True',
             'width': '1280',
             'height': '720',
             'banner-size': '100',
@@ -52,14 +55,7 @@ class ConfigManager:
         self.load_config()
 
     def load_config(self):
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        self.config[key] = value
+        self.config = load_json_file(config_file_dir, default={})
 
         updated = False
         for key, default_value in self.default_config.items():
@@ -71,14 +67,7 @@ class ConfigManager:
             self.save_config()
 
     def save_config(self):
-        def write(f):
-            for key, value in self.config.items():
-                if key in ['default-prefix', 'default-runner']:
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
-
-        atomic_write(config_file_dir, write)
+        save_json_file(self.config, config_file_dir)
 
     def set_value(self, key, value):
         if key not in self.default_config:

@@ -1,3 +1,4 @@
+import json
 import locale
 import gettext
 
@@ -21,11 +22,11 @@ def get_system_locale():
 
 def get_language_from_config():
     if os.path.exists(config_file_dir):
-        with open(config_file_dir, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith('language='):
-                    return line.split('=', 1)[1].strip()
+        try:
+            with open(config_file_dir, 'r', encoding='utf-8') as f:
+                return json.load(f).get('language')
+        except (OSError, json.JSONDecodeError):
+            return None
     return None
 
 

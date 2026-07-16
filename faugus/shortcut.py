@@ -376,7 +376,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher --run "{command}"\n'
+                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher {launcher_module_args}--run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -386,7 +386,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec={launcher_path} --run "{command}"\n'
+                f'Exec={launcher_path} {launcher_module_args}--run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'

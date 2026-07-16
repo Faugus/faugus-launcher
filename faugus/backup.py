@@ -12,28 +12,15 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release
+from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file
 
 
 def load_config():
-    config = {}
-    if os.path.isfile(config_file_dir):
-        with open(config_file_dir, 'r') as f:
-            for line in f.read().splitlines():
-                if '=' in line:
-                    key, value = line.split('=', 1)
-                    config[key.strip()] = value.strip().strip('"')
-    return config
+    return load_json_file(config_file_dir, default={})
 
 
 def save_config(config):
-    os.makedirs(os.path.dirname(config_file_dir), exist_ok=True)
-    with open(config_file_dir, 'w') as f:
-        for key, value in config.items():
-            if key in ['default-prefix', 'default-runner']:
-                f.write(f'{key}="{value}"\n')
-            else:
-                f.write(f'{key}={value}\n')
+    save_json_file(config, config_file_dir)
 
 
 def perform_backup(dest_path):
@@ -340,6 +327,8 @@ class BackupWindow(Gtk.Dialog):
             _("Select the backup destination"),
             Gtk.FileChooserAction.SELECT_FOLDER,
         )
+        entry_value = self.entry_dest.get_text()
+        set_file_chooser_start_folder(filechooser, "backup_destination", entry_value or None)
 
         def on_response(dialog, response):
             if response == Gtk.ResponseType.ACCEPT:

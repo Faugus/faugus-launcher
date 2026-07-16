@@ -177,6 +177,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             flowboxchild.banner-container:selected:focus {
                 border-color: @theme_selected_bg_color;
             }
+            .banner-placeholder,
+            .hero-placeholder {
+                background-color: alpha(@accent_bg_color, 0.4);
+            }
+            .banner-placeholder {
+                border-radius: 12px;
+            }
+            .spinner-dim-overlay {
+                background-color: alpha(black, 0.3);
+            }
+            .spinner-dim-overlay-banner {
+                border-radius: 12px;
+            }
+            .spinner-dim-overlay-icon {
+                border-radius: 8px;
+            }
             .launch-overlay {
                 background-color: @theme_text_color;
                 opacity: 0;
@@ -193,6 +209,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: alpha(@theme_text_color, 0.3);
                 opacity: 0.5;
                 transition: background-color 0.05s ease-in, opacity 0.05s ease-in;
+            }
+            .accent-background {
+                background-color: alpha(@accent_bg_color, 0.2);
             }
         """, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         load_frame_css()
@@ -275,7 +294,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode == "List":
             self.setup_interface()
-        if self.interface_mode in ("Blocks", "Banners"):
+        if self.interface_mode in ("Blocks", "Banners", "SteamGridDB"):
             if self.window_behavior == "Maximized":
                 self.maximize()
             if self.window_behavior == "Fullscreen":
@@ -295,7 +314,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         right_click.connect("pressed", on_right_click)
         self.flowbox.add_controller(right_click)
-        self.flowbox.connect("selected-children-changed", lambda *_: self.update_icon())
+        def on_selected_children_changed(*_):
+            GLib.idle_add(self.update_icon)
+            GLib.idle_add(self.schedule_background_update)
+
+        self.flowbox.connect("selected-children-changed", on_selected_children_changed)
 
         self.load_tray_icon()
 
@@ -325,6 +348,173 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not selected_items:
             return None
         return getattr(selected_items[0], 'game', None)
+
+    def hero_overlay_enabled(self):
+        return self.interface_mode == "SteamGridDB" and self.hero_enabled
+
+    def get_named_rgb(self, name, fallback=(30, 30, 34)):
+        found, rgba = Gtk.Box().get_style_context().lookup_color(name)
+        if not found:
+            return fallback
+        return (int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255))
+
+    def build_background_container(self, content_widget):
+        base_mode = self.background_mode
+        show_hero = self.hero_overlay_enabled()
+
+        if not show_hero and base_mode != "dominant_color":
+            if base_mode == "accent":
+                content_widget.add_css_class("accent-background")
+            return content_widget
+
+        overlay = Gtk.Overlay()
+
+        base_box = Gtk.Box()
+        base_box.set_hexpand(True)
+        base_box.set_vexpand(True)
+        if base_mode == "accent":
+            base_box.add_css_class("accent-background")
+        overlay.set_child(base_box)
+
+        self.hero_stack = Gtk.Stack()
+        self.hero_stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+        self.hero_stack.set_transition_duration(150)
+        self.hero_stack.set_hexpand(True)
+        self.hero_stack.set_vexpand(True)
+
+        self._hero_pages = []
+        self._hero_color_providers = []
+        self._hero_image_providers = []
+
+        for i in range(2):
+            page = Gtk.Overlay()
+
+            color_box = Gtk.Box()
+            color_box.set_hexpand(True)
+            color_box.set_vexpand(True)
+            color_box.add_css_class(f"hero-bg-color-{i}")
+            page.set_child(color_box)
+
+            hero_image_box = None
+            if show_hero:
+                hero_image_box = Gtk.Box()
+                hero_image_box.set_hexpand(True)
+                hero_image_box.set_vexpand(False)
+                hero_image_box.set_halign(Gtk.Align.FILL)
+                hero_image_box.set_valign(Gtk.Align.START)
+                hero_image_box.add_css_class(f"hero-bg-image-{i}")
+                page.add_overlay(hero_image_box)
+                page.set_measure_overlay(hero_image_box, False)
+
+            color_provider = Gtk.CssProvider()
+            color_box.get_style_context().add_provider(color_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+            image_provider = Gtk.CssProvider()
+            if hero_image_box is not None:
+                hero_image_box.get_style_context().add_provider(image_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+
+            page.color_box = color_box
+            page.hero_image_box = hero_image_box
+
+            self._hero_pages.append(page)
+            self._hero_color_providers.append(color_provider)
+            self._hero_image_providers.append(image_provider)
+
+            self.hero_stack.add_named(page, f"hero-{i}")
+
+        self._hero_page_index = 0
+        self.hero_stack.set_visible_child(self._hero_pages[0])
+
+        overlay.add_overlay(self.hero_stack)
+        overlay.set_measure_overlay(self.hero_stack, False)
+
+        overlay.add_overlay(content_widget)
+        overlay.set_measure_overlay(content_widget, True)
+        return overlay
+
+    def schedule_background_update(self):
+        if getattr(self, 'hero_stack', None) is None:
+            return
+
+        if getattr(self, '_hero_update_source', None):
+            GLib.source_remove(self._hero_update_source)
+
+        def fire():
+            self._hero_update_source = None
+            self.update_background()
+            return False
+
+        self._hero_update_source = GLib.timeout_add(120, fire)
+
+    def update_background(self):
+        hero_stack = getattr(self, 'hero_stack', None)
+        base_mode = self.background_mode
+        show_hero = self.hero_overlay_enabled()
+        if hero_stack is None or (not show_hero and base_mode != "dominant_color"):
+            return
+
+        def apply():
+            game = self.selected()
+            color_css = ""
+            hero_css = ""
+
+            next_index = 1 - self._hero_page_index
+            page = self._hero_pages[next_index]
+            color_box = page.color_box
+            hero_image_box = page.hero_image_box
+            color_class = f"hero-bg-color-{next_index}"
+            image_class = f"hero-bg-image-{next_index}"
+
+            if game:
+                if base_mode == "dominant_color":
+                    if self.interface_mode in ("Banners", "SteamGridDB"):
+                        color_source = f"{banners_dir}/{game.gameid}.png"
+                    else:
+                        color_source = f"{icons_dir}/{game.gameid}.png"
+                    if os.path.isfile(color_source):
+                        r, g, b = get_dominant_color(color_source)
+                        color_css = f".{color_class} {{ background-color: rgba({r}, {g}, {b}, 0.2); }}"
+
+                if show_hero and hero_image_box is not None:
+                    candidate = f"{heroes_dir}/{game.gameid}.png"
+                    if os.path.isfile(candidate):
+                        hero_uri = Gio.File.new_for_path(candidate).get_uri()
+
+                        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+                        if base_mode == "dominant_color" and color_css:
+                            fade_r = int(window_r * 0.8 + r * 0.2)
+                            fade_g = int(window_g * 0.8 + g * 0.2)
+                            fade_b = int(window_b * 0.8 + b * 0.2)
+                        elif base_mode == "accent":
+                            ar, ag, ab = self.get_named_rgb("accent_bg_color")
+                            fade_r = int(window_r * 0.8 + ar * 0.2)
+                            fade_g = int(window_g * 0.8 + ag * 0.2)
+                            fade_b = int(window_b * 0.8 + ab * 0.2)
+                        else:
+                            fade_r, fade_g, fade_b = window_r, window_g, window_b
+
+                        container_width = hero_image_box.get_width() or self.get_width() or 800
+                        hero_height = int(container_width * 620 / 1920)
+                        hero_image_box.set_size_request(-1, hero_height)
+
+                        hero_css = f"""
+                        .{image_class} {{
+                            background-image: linear-gradient(to bottom, rgba({fade_r}, {fade_g}, {fade_b}, 0) 0%, rgba({fade_r}, {fade_g}, {fade_b}, 1) 100%), url("{hero_uri}");
+                            background-repeat: no-repeat, no-repeat;
+                            background-position: center, center;
+                            background-size: 100% 100%, 100% 100%;
+                        }}
+                        """
+                    elif hero_image_box is not None:
+                        hero_image_box.set_size_request(-1, -1)
+
+            self._hero_color_providers[next_index].load_from_data(color_css.encode("utf-8"))
+            self._hero_image_providers[next_index].load_from_data(hero_css.encode("utf-8"))
+
+            hero_stack.set_visible_child(page)
+            self._hero_page_index = next_index
+            return False
+
+        GLib.idle_add(apply)
 
     def check_running(self):
         changed = False
@@ -426,34 +616,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.tray_icon = None
         self.get_application().quit()
 
-    def prime_flowbox_cursor(self):
-        if getattr(self, "_flowbox_cursor_primed", False):
-            return
+    def _focus_flowbox_child_at(self, index):
         self.set_focus(None)
-        if self.flowbox.child_focus(Gtk.DirectionType.TAB_FORWARD):
-            self._flowbox_cursor_primed = True
+        for _ in range(index + 1):
+            if not self.flowbox.child_focus(Gtk.DirectionType.TAB_FORWARD):
+                break
+        focused = self.flowbox.get_focus_child()
+        if focused is not None:
+            self.flowbox.select_child(focused)
 
     def select_first_child(self):
-        self.prime_flowbox_cursor()
-        for child in widget_children(self.flowbox):
-            if child.get_child_visible():
-                self.flowbox.grab_focus()
-                self.flowbox.select_child(child)
-                child.grab_focus()
-                self.flowbox.set_focus_child(child)
-                self.flowbox.emit("child-activated", child)
-                break
+        visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
+        if visible_children:
+            self._focus_flowbox_child_at(0)
 
     def select_game_by_title(self, title):
-        self.prime_flowbox_cursor()
-        for child in widget_children(self.flowbox):
-            if hasattr(child, 'game') and child.game and child.game.title == title:
-                self.flowbox.grab_focus()
-                self.flowbox.select_child(child)
-                child.grab_focus()
-                self.flowbox.set_focus_child(child)
-                self.flowbox.emit("child-activated", child)
-                break
+        def do_select():
+            visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
+            for index, child in enumerate(visible_children):
+                if hasattr(child, 'game') and child.game and child.game.title == title:
+                    self._focus_flowbox_child_at(index)
+                    break
+            return False
+
+        GLib.timeout_add(50, do_select)
 
     def on_flowbox_keynav_failed(self, flowbox, direction):
         flowbox.set_can_focus(False)
@@ -503,6 +689,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_search = Gtk.Entry()
         self.entry_search.set_placeholder_text(_("Search..."))
         self.entry_search.connect("changed", self.on_search_changed)
+        self.entry_search.connect("activate", self.on_search_activate)
         self.entry_search.set_size_request(170, 50)
 
         self.opt_alpha = _("Alphabetical")
@@ -554,10 +741,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.latest_games_order.clear()
             try:
-                if os.path.exists(latest_games):
-                    with open(latest_games) as f:
-                        for idx, gid in enumerate(map(str.strip, f)):
-                            self.latest_games_order[gid] = idx
+                for idx, gid in enumerate(load_json_file(latest_games, default=[])):
+                    self.latest_games_order[gid.strip()] = idx
             except:
                 pass
 
@@ -632,11 +817,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         continue
                     game = child.game
 
-                    if self.interface_mode == "Banners" and hasattr(child, 'banner'):
-                        banner_path = game.banner if os.path.isfile(game.banner) else faugus_banner
+                    if self.interface_mode in ("Banners", "SteamGridDB") and hasattr(child, 'banner'):
                         zoom_width = int(230 * (zoom_pct / 100.0))
                         zoom_height = int(zoom_width * 1.5)
-                        surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
+                        if os.path.isfile(game.banner):
+                            surface = self.get_game_artwork(game.banner, game, zoom_width, zoom_height)
+                        else:
+                            surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
                         child.banner.set_paintable(surface)
 
         self.zoom_slider.connect("value-changed", on_zoom_changed)
@@ -837,9 +1024,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.box_main.append(self.main_hbox)
 
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            self.main_hbox.append(right_vbox)
+            self.main_hbox.append(self.build_background_container(right_vbox))
 
-            self.zoom_slider.set_visible(self.interface_mode == "Banners")
+            self.zoom_slider.set_visible(self.interface_mode in ("Banners", "SteamGridDB"))
 
             bottom_bar = Gtk.CenterBox(orientation=Gtk.Orientation.HORIZONTAL)
             bottom_bar.set_margin_top(5)
@@ -915,8 +1102,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.box_bottom.append(grid_controls)
 
-            self.box_main.append(self.box_top)
-            self.box_main.append(self.box_bottom)
+            list_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            list_container.append(self.box_top)
+            list_container.append(self.box_bottom)
+
+            self.box_main.append(self.build_background_container(list_container))
 
         update_sort_data()
         self.load_games()
@@ -1011,6 +1201,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if hasattr(self, 'flowbox'):
             self.flowbox.invalidate_filter()
+
+            self.flowbox.unselect_all()
+            for child in widget_children(self.flowbox):
+                if child.get_child_visible():
+                    self.flowbox.select_child(child)
+                    break
 
     def on_manage_categories_clicked(self, widget):
         dialog = Gtk.Dialog(title=_("Manage Categories"), transient_for=self)
@@ -1208,16 +1404,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.present()
 
     def _save_categories(self, categories):
-        os.makedirs(os.path.dirname(categories_file), exist_ok=True)
-        with open(categories_file, "w", encoding="utf-8") as f:
-            for cat in categories:
-                f.write(f"{cat}\n")
+        save_json_file(list(categories), categories_file)
 
     def _get_current_categories(self):
-        if os.path.exists(categories_file):
-            with open(categories_file, "r", encoding="utf-8") as f:
-                return [line.strip() for line in f if line.strip()]
-        return []
+        return [cat.strip() for cat in load_json_file(categories_file, default=[]) if cat.strip()]
 
     def _update_games_category(self, old_cat, new_cat):
         try:
@@ -1369,14 +1559,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.submenu_category_box.remove(child)
             child = next_child
 
-        categories = []
-
-        if os.path.exists(categories_file):
-            with open(categories_file, "r", encoding="utf-8") as f:
-                categories = sorted(
-                    [line.strip() for line in f if line.strip()],
-                    key=str.lower
-                )
+        categories = sorted(
+            [cat.strip() for cat in load_json_file(categories_file, default=[]) if cat.strip()],
+            key=str.lower
+        )
 
         categories.insert(0, _("None"))
 
@@ -1567,11 +1753,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.flowbox.invalidate_filter()
 
+        self.flowbox.unselect_all()
+
+        target_child = None
+        first_visible = None
         for child in widget_children(self.flowbox):
+            if not child.get_child_visible():
+                continue
+            if first_visible is None:
+                first_visible = child
             if hasattr(child, "game") and child.game.gameid == selected_gameid:
-                self.flowbox.select_child(child)
-                self.flowbox.set_focus_child(child)
+                target_child = child
                 break
+
+        child_to_select = target_child if target_child is not None else first_visible
+        if child_to_select is not None:
+            self.flowbox.select_child(child_to_select)
+            self.flowbox.set_focus_child(child_to_select)
 
     def on_context_menu_game_location(self, menu_item):
         self.context_menu.popdown()
@@ -1591,6 +1789,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             _("Select a file to run inside the prefix"),
             Gtk.FileChooserAction.OPEN,
         )
+        set_file_chooser_start_folder(filechooser, "run_in_prefix")
 
         add_windows_file_filters(filechooser)
 
@@ -1821,32 +2020,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_key_press_event(self, controller, keyval, keycode, state):
         if keyval == Gdk.KEY_h and state & Gdk.ModifierType.CONTROL_MASK:
             try:
-                with open(config_file_dir, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
-
-                new_lines = []
-                found = False
-
-                for line in lines:
-                    stripped = line.strip()
-                    if stripped.lower().startswith("show-hidden"):
-                        sep_index = line.find("=")
-                        if sep_index != -1:
-                            left = line[:sep_index]
-                            right = line[sep_index + 1:].strip()
-                            new_value = "False" if right.lower() == "true" else "True"
-                            new_lines.append(f"{left}={new_value}\n")
-                            found = True
-                        else:
-                            new_lines.append(line)
-                    else:
-                        new_lines.append(line)
-
-                if not found:
-                    new_lines.append("show-hidden=True\n")
-
-                with open(config_file_dir, "w", encoding="utf-8") as f:
-                    f.writelines(new_lines)
+                config = ConfigManager()
+                current = config.config.get("show-hidden", "False")
+                config.set_value("show-hidden", "False" if current == "True" else "True")
+                config.save_config()
 
                 self.load_config()
                 self.update_list()
@@ -1907,6 +2084,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.close_on_launch = cfg.config.get('close-onlaunch', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
+        self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
+        self.hero_enabled = cfg.config.get('hero-enabled', 'True') == 'True'
         self.show_labels = cfg.config.get('show-labels', 'False') == 'True'
         self.enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
@@ -1936,6 +2115,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.games = sorted(self.games, key=lambda x: x.title.lower())
 
+        w = self.get_focus()
+        while w is not None:
+            if w is self.flowbox:
+                self.set_focus(None)
+                break
+            w = w.get_parent()
+
         self.flowbox.remove_all()
         for game in self.games:
             self.add_item_list(game)
@@ -1948,7 +2134,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode == "Blocks":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             hbox.set_size_request(200, -1)
-        if self.interface_mode == "Banners":
+        if self.interface_mode in ("Banners", "SteamGridDB"):
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         hbox.add_css_class("game")
@@ -1959,7 +2145,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         game_label = Gtk.Label.new(game.title)
 
-        if self.interface_mode in ("Blocks", "Banners"):
+        if self.interface_mode in ("Blocks", "Banners", "SteamGridDB"):
             game_label.set_wrap(True)
             game_label.set_lines(2)
             game_label.set_ellipsize(Pango.EllipsizeMode.END)
@@ -2026,7 +2212,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
-        if self.interface_mode == "Banners":
+        if self.interface_mode in ("Banners", "SteamGridDB"):
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
@@ -2045,15 +2231,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
-            banner_path = game.banner
-            if not os.path.isfile(game.banner):
-                banner_path = faugus_banner
-
             zoom_width = int(230 * (zoom_pct / 100.0))
             zoom_height = int(zoom_width * 1.5)
 
-            surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
-
+            if os.path.isfile(game.banner):
+                surface = self.get_game_artwork(game.banner, game, zoom_width, zoom_height)
+            else:
+                surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
             image2.set_paintable(surface)
 
             hbox.append(image2)
@@ -2091,16 +2275,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             flowbox_child.image.set_paintable(surface)
 
         if hasattr(flowbox_child, "banner"):
-            banner_path = game.banner
-            if not os.path.isfile(game.banner):
-                banner_path = faugus_banner
-
             zoom_pct = getattr(self, "banner_size", 100)
             zoom_width = int(230 * (zoom_pct / 100.0))
             zoom_height = int(zoom_width * 1.5)
 
-            surface = self.get_game_artwork(banner_path, game, zoom_width, zoom_height)
-
+            if os.path.isfile(game.banner):
+                surface = self.get_game_artwork(game.banner, game, zoom_width, zoom_height)
+            else:
+                surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
             flowbox_child.banner.set_paintable(surface)
 
     def get_game_artwork(self, path, game, width=None, height=None):
@@ -2132,10 +2314,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_search_changed(self, entry):
         self.flowbox.invalidate_filter()
 
+        self.flowbox.unselect_all()
         for child in widget_children(self.flowbox):
-            if child.get_visible():
+            if child.get_child_visible():
                 self.flowbox.select_child(child)
                 break
+
+    def on_search_activate(self, entry):
+        game = self.selected()
+        if not game:
+            return
+
+        if game.gameid in self.running:
+            self.running_dialog(game.title)
+        else:
+            self.on_button_play_clicked()
 
     def on_button_settings_clicked(self, widget):
 
@@ -2179,6 +2372,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
+                if self.background_mode != settings_dialog.combobox_background.get_active_id():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.hero_enabled != settings_dialog.checkbox_hero_background.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
                 if self.show_labels != settings_dialog.checkbox_show_labels.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
@@ -2201,16 +2400,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 destroy_and_release(settings_dialog)
 
-            if not settings_dialog.logging_warning and settings_dialog.checkbox_enable_logging.get_active():
-                settings_dialog.logging_warning = True
-                self.show_warning_dialog_main(
-                    self,
-                    _("Proton may generate huge log files."),
-                    _("Enable logging only when debugging a problem."),
-                    callback=lambda confirmed: finish_settings()
-                )
-            else:
-                finish_settings()
+            def proceed():
+                if not settings_dialog.logging_warning and settings_dialog.checkbox_enable_logging.get_active():
+                    settings_dialog.logging_warning = True
+                    self.show_warning_dialog_main(
+                        self,
+                        _("Proton may generate huge log files."),
+                        _("Enable logging only when debugging a problem."),
+                        callback=lambda confirmed: finish_settings()
+                    )
+                else:
+                    finish_settings()
+
+            proceed()
 
         else:
             apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
@@ -2218,12 +2420,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
         settings_dialog.entry_default_prefix.remove_css_class("entry")
+        settings_dialog.entry_steamgriddb_key.remove_css_class("entry")
+
+        valid = True
 
         if not default_prefix:
             settings_dialog.entry_default_prefix.add_css_class("entry")
-            return False
+            valid = False
 
-        return True
+        if (settings_dialog.combobox_interface.get_active_id() == "SteamGridDB"
+                and not settings_dialog.entry_steamgriddb_key.get_text().strip()):
+            settings_dialog.entry_steamgriddb_key.add_css_class("entry")
+            valid = False
+
+        return valid
 
     def manage_autostart_file(self, start_boot, start_minimized):
         autostart_path = PathManager.user_home('.config/autostart/faugus-launcher.desktop')
@@ -2297,10 +2507,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed:
                 self.latest_games_order.clear()
                 try:
-                    if os.path.exists(latest_games):
-                        with open(latest_games) as f:
-                            for idx, gid in enumerate(map(str.strip, f)):
-                                self.latest_games_order[gid] = idx
+                    for idx, gid in enumerate(load_json_file(latest_games, default=[])):
+                        self.latest_games_order[gid.strip()] = idx
                 except:
                     pass
                 if hasattr(self, 'flowbox'):
@@ -2368,19 +2576,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         GLib.idle_add(self.update_icon)
 
     def update_latest_games_file(self, gameid):
-        try:
-            with open(latest_games) as f:
-                games = f.read().splitlines()
-        except FileNotFoundError:
-            games = []
+        games = load_json_file(latest_games, default=[])
 
         valid_ids = {g.gameid for g in self.games}
 
         games = [g for g in games if g in valid_ids and g != gameid]
         games.insert(0, gameid)
 
-        with open(latest_games, 'w') as f:
-            f.write('\n'.join(games))
+        save_json_file(games, latest_games)
 
         if self.system_tray:
             self.load_tray_icon()
@@ -2443,7 +2646,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 index_runner = 1
 
             edit_game_dialog.combobox_runner.set_active(index_runner)
+            edit_game_dialog._suggestion_programmatic = True
             edit_game_dialog.entry_title.set_text(game.title)
+            edit_game_dialog._suggestion_programmatic = False
+            edit_game_dialog._steamgriddb_suggestion_id = getattr(game, "steamgriddb_id", "") or None
+            edit_game_dialog._steamgriddb_steam_appid = game.path if game_runner == "Steam" else None
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.launch_arguments = game.launch_arguments
@@ -2464,14 +2671,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.lossless_hdr = game.lossless_hdr
             edit_game_dialog.lossless_present = game.lossless_present
 
-            banner_path = game.banner
-            if not os.path.isfile(banner_path):
-                banner_path = faugus_banner
+            if os.path.isfile(game.banner):
+                shutil.copyfile(game.banner, edit_game_dialog.banner_path_temp)
+            elif os.path.isfile(edit_game_dialog.banner_path_temp):
+                os.remove(edit_game_dialog.banner_path_temp)
+            edit_game_dialog.update_image_banner()
 
-            shutil.copyfile(banner_path, edit_game_dialog.banner_path_temp)
-            surface = self.new_texture_from_image(banner_path, 260, 390, True)
-            edit_game_dialog.image_banner.set_paintable(surface)
-            edit_game_dialog.image_banner2.set_paintable(surface)
+            hero_path = f"{heroes_dir}/{game.gameid}.png"
+            if os.path.isfile(hero_path):
+                shutil.copyfile(hero_path, edit_game_dialog.hero_path_temp)
+                edit_game_dialog.update_hero_preview(edit_game_dialog.hero_path_temp)
 
             icon_path = game.icon
             if not os.path.isfile(icon_path):
@@ -2635,14 +2844,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def remove_latest_and_order(self, gameid):
         try:
-            with open(latest_games, 'r') as f:
-                recent_games = f.read().splitlines()
+            recent_games = load_json_file(latest_games, default=[])
 
             if gameid in recent_games:
                 recent_games.remove(gameid)
 
-                with open(latest_games, 'w') as f:
-                    f.write("\n".join(recent_games))
+                save_json_file(recent_games, latest_games)
 
                 if self.system_tray:
                     self.load_tray_icon()
@@ -2730,14 +2937,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
 
-            if self.interface_mode == "Banners":
-                banner = os.path.join(banners_dir, f"{title_formatted}.png")
+            if self.interface_mode in ("Banners", "SteamGridDB"):
                 temp_banner_path = add_game_dialog.banner_path_temp
-                try:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
-                except subprocess.CalledProcessError as e:
-                    print(f"Error resizing banner: {e}")
+                if os.path.isfile(temp_banner_path):
+                    banner = os.path.join(banners_dir, f"{title_formatted}.png")
+                    try:
+                        command_magick = shutil.which("magick") or shutil.which("convert")
+                        subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
+                    except subprocess.CalledProcessError as e:
+                        print(f"Error resizing banner: {e}")
+                else:
+                    banner = ""
+
+                temp_hero_path = add_game_dialog.hero_path_temp
+                if os.path.isfile(temp_hero_path):
+                    hero = os.path.join(heroes_dir, f"{title_formatted}.png")
+                    try:
+                        command_magick = shutil.which("magick") or shutil.which("convert")
+                        subprocess.run([command_magick, temp_hero_path, "-resize", "1920x620!", hero], check=True)
+                    except subprocess.CalledProcessError as e:
+                        print(f"Error resizing hero: {e}")
             else:
                 banner = ""
 
@@ -2793,6 +3012,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 prevent_sleep,
                 category,
                 icon,
+                steamgriddb_id=add_game_dialog._steamgriddb_suggestion_id or "",
             )
 
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -3081,21 +3301,34 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.lossless_hdr = edit_game_dialog.lossless_hdr
             game.lossless_present = edit_game_dialog.lossless_present
             game.prevent_sleep = edit_game_dialog.checkbox_prevent_sleep.get_active()
+            game.steamgriddb_id = edit_game_dialog._steamgriddb_suggestion_id or ""
 
             title_formatted = format_title(game.title)
 
             game.gameid = title_formatted
             game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
 
-            if self.interface_mode == "Banners":
-                banner = os.path.join(banners_dir, f"{title_formatted}.png")
+            if self.interface_mode in ("Banners", "SteamGridDB"):
                 temp_banner_path = edit_game_dialog.banner_path_temp
-                try:
-                    command_magick = shutil.which("magick") or shutil.which("convert")
-                    subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
-                    game.banner = banner
-                except subprocess.CalledProcessError as e:
-                    print(f"Error resizing banner: {e}")
+                if os.path.isfile(temp_banner_path):
+                    banner = os.path.join(banners_dir, f"{title_formatted}.png")
+                    try:
+                        command_magick = shutil.which("magick") or shutil.which("convert")
+                        subprocess.run([command_magick, temp_banner_path, "-resize", "460x690!", banner], check=True)
+                        game.banner = banner
+                    except subprocess.CalledProcessError as e:
+                        print(f"Error resizing banner: {e}")
+                else:
+                    game.banner = ""
+
+                temp_hero_path = edit_game_dialog.hero_path_temp
+                if os.path.isfile(temp_hero_path):
+                    hero = os.path.join(heroes_dir, f"{title_formatted}.png")
+                    try:
+                        command_magick = shutil.which("magick") or shutil.which("convert")
+                        subprocess.run([command_magick, temp_hero_path, "-resize", "1920x620!", hero], check=True)
+                    except subprocess.CalledProcessError as e:
+                        print(f"Error resizing hero: {e}")
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.png'
@@ -3128,7 +3361,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if os.path.isdir(edit_game_dialog.icon_directory):
             shutil.rmtree(edit_game_dialog.icon_directory)
-        os.remove(edit_game_dialog.banner_path_temp)
+        if os.path.isfile(edit_game_dialog.banner_path_temp):
+            os.remove(edit_game_dialog.banner_path_temp)
         edit_game_dialog.closed_event.set()
         destroy_and_release(edit_game_dialog)
 
@@ -3162,7 +3396,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher --game {game.gameid}\n'
+                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher {launcher_module_args}--game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -3172,7 +3406,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={game.title}\n'
-                f'Exec={launcher_path} --game {game.gameid}\n'
+                f'Exec={launcher_path} {launcher_module_args}--game {game.gameid}\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -3219,14 +3453,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 else:
                     if IS_STEAM_FLATPAK:
                         exe = '"flatpak-spawn"'
-                        launch_options = f'--host {launcher_path} --game {game.gameid}'
+                        launch_options = f'--host {launcher_path} {launcher_module_args}--game {game.gameid}'
                     else:
                         exe = f'"{launcher_path}"'
-                        launch_options = f'--game {game.gameid}'
+                        launch_options = f'{launcher_module_args}--game {game.gameid}'
+
+                asset_id = generate_steam_shortcut_id(exe, title)
 
                 if existing_app_id:
                     game_info = shortcuts["shortcuts"][existing_app_id]
                     game_info.update({
+                        "appid": to_signed_int32(asset_id),
                         "Exe": exe,
                         "StartDir": game_directory,
                         "icon": icon,
@@ -3236,7 +3473,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     new_app_id = max([int(k) for k in shortcuts["shortcuts"].keys() if k.isdigit()] or [0]) + 1
 
                     shortcuts["shortcuts"][str(new_app_id)] = {
-                        "appid": new_app_id,
+                        "appid": to_signed_int32(asset_id),
                         "AppName": title,
                         "Exe": exe,
                         "StartDir": game_directory,
@@ -3253,6 +3490,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         "FlatpakAppID": "",
                     }
                 save_shortcuts(shortcuts, path)
+
+                grid_dir = os.path.join(os.path.dirname(path), "grid")
+                os.makedirs(grid_dir, exist_ok=True)
+
+                grid_src = f"{banners_dir}/{game.gameid}.png"
+                hero_src = f"{heroes_dir}/{game.gameid}.png"
+
+                if os.path.isfile(grid_src):
+                    shutil.copy2(grid_src, os.path.join(grid_dir, f"{asset_id}p.png"))
+
+                if os.path.isfile(hero_src):
+                    shutil.copy2(hero_src, os.path.join(grid_dir, f"{asset_id}_hero.png"))
 
         def remove_shortcuts(title):
             for path in get_all_shortcut_paths():
@@ -3305,10 +3554,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def remove_banner_icon(self, game):
         banner_file_path = f"{banners_dir}/{game.gameid}.png"
         icon_file_path = f"{icons_dir}/{game.gameid}.png"
+        hero_file_path = f"{heroes_dir}/{game.gameid}.png"
         if os.path.exists(banner_file_path):
             os.remove(banner_file_path)
         if os.path.exists(icon_file_path):
             os.remove(icon_file_path)
+        if os.path.exists(hero_file_path):
+            os.remove(hero_file_path)
 
     def remove_shortcut(self, game, shortcut):
         applications_shortcut_path = f"{app_dir}/{game.gameid}.desktop"
@@ -3511,13 +3763,26 @@ class Settings(Gtk.Dialog):
         self.label_language.set_halign(Gtk.Align.START)
         self.combobox_language = IdComboBox()
 
-        self.label_interface = Gtk.Label(label=_("Interface Mode"))
+        self.label_interface = Gtk.Label(label=_("Mode"))
         self.label_interface.set_halign(Gtk.Align.START)
         self.combobox_interface = IdComboBox()
         self.combobox_interface.connect("changed", self.on_combobox_interface_changed)
         self.combobox_interface.append("List", _("List"))
         self.combobox_interface.append("Blocks", _("Blocks"))
         self.combobox_interface.append("Banners", _("Banners"))
+        self.combobox_interface.append("SteamGridDB", _("SteamGridDB"))
+
+        self.label_background = Gtk.Label(label=_("Background"))
+        self.label_background.set_halign(Gtk.Align.START)
+        self.combobox_background = IdComboBox()
+        self.combobox_background.append("default", _("Default"))
+        self.combobox_background.append("accent", _("Accent color"))
+        self.combobox_background.append("dominant_color", _("Dominant color"))
+
+        self.checkbox_hero_background = Gtk.CheckButton(label=_("Show hero"))
+
+        self.label_ui_customization = Gtk.Label(label=_("UI Customization"))
+        self.label_ui_customization.set_halign(Gtk.Align.START)
 
         self.label_theme = Gtk.Label(label=_("Theme"))
         self.label_theme.set_halign(Gtk.Align.START)
@@ -3542,6 +3807,9 @@ class Settings(Gtk.Dialog):
         self.box_accent.append(self.combobox_accent)
         self.box_accent.append(self.color_button)
 
+        self.label_window_behavior = Gtk.Label(label=_("Window Behavior"))
+        self.label_window_behavior.set_halign(Gtk.Align.START)
+
         self.combobox_window_behavior = IdComboBox()
         self.combobox_window_behavior.append("None", _("Default window size"))
         self.combobox_window_behavior.append("Remember", _("Remember window size"))
@@ -3551,6 +3819,15 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_show_labels = Gtk.CheckButton(label=_("Show labels"))
         self.checkbox_show_labels.set_active(False)
+
+        self.label_steamgriddb_key = Gtk.Label()
+        self.label_steamgriddb_key.set_markup(
+            f'<a href="https://www.steamgriddb.com/profile/preferences/api">{_("SteamGridDB API Key")}</a>'
+        )
+        self.label_steamgriddb_key.set_use_markup(True)
+        self.label_steamgriddb_key.set_halign(Gtk.Align.START)
+
+        self.entry_steamgriddb_key = Gtk.Entry()
 
         self.label_default_prefix = Gtk.Label(label=_("Default Prefixes Location"))
         self.label_default_prefix.set_halign(Gtk.Align.START)
@@ -3652,7 +3929,6 @@ class Settings(Gtk.Dialog):
         self.label_support = Gtk.Label(label=_("Support the Project"))
         self.label_support.set_halign(Gtk.Align.START)
         self.label_support.set_margin_end(10)
-        self.label_support.set_margin_top(10)
 
         button_kofi, button_paypal = make_donate_buttons()
 
@@ -3667,7 +3943,6 @@ class Settings(Gtk.Dialog):
         self.label_settings = Gtk.Label(label=_("Backup/Restore Settings"))
         self.label_settings.set_halign(Gtk.Align.START)
         self.label_settings.set_margin_end(10)
-        self.label_settings.set_margin_top(10)
 
         button_backup = Gtk.Button(label=_("Backup"))
         button_backup.connect("clicked", self.on_button_backup_clicked)
@@ -3806,14 +4081,6 @@ class Settings(Gtk.Dialog):
         grid_envar.set_margin_end(10)
         grid_envar.set_margin_bottom(10)
 
-        grid_interface_mode = Gtk.Grid()
-        grid_interface_mode.set_row_spacing(10)
-        grid_interface_mode.set_column_spacing(10)
-        grid_interface_mode.set_margin_start(10)
-        grid_interface_mode.set_margin_end(10)
-        grid_interface_mode.set_margin_top(10)
-        grid_interface_mode.set_margin_bottom(10)
-
         grid_theme_accent = Gtk.Grid()
         grid_theme_accent.set_row_spacing(10)
         grid_theme_accent.set_column_spacing(10)
@@ -3821,6 +4088,13 @@ class Settings(Gtk.Dialog):
         grid_theme_accent.set_margin_end(10)
         grid_theme_accent.set_margin_top(10)
         grid_theme_accent.set_margin_bottom(10)
+
+        grid_theme_rest = Gtk.Grid()
+        grid_theme_rest.set_row_spacing(10)
+        grid_theme_rest.set_column_spacing(10)
+        grid_theme_rest.set_margin_start(10)
+        grid_theme_rest.set_margin_end(10)
+        grid_theme_rest.set_margin_bottom(10)
 
         grid_support = Gtk.Grid()
         grid_support.set_column_homogeneous(True)
@@ -3892,26 +4166,33 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_disable, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_disable_updates, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_close_after_launch, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_categories, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_show_hidden, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 12, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 13, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_boot, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_start_minimized, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_enable_wow64, 0, 11, 1, 1)
 
-        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
-        grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
+        grid_theme_accent.attach(self.label_ui_customization, 0, 0, 1, 1)
+
+        grid_theme_accent.attach(self.label_interface, 0, 1, 1, 1)
+        grid_theme_accent.attach(self.combobox_interface, 0, 2, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
-        grid_theme_accent.attach(self.label_theme, 0, 0, 1, 1)
-        grid_theme_accent.attach(self.combobox_theme, 0, 1, 1, 1)
+        grid_theme_rest.attach(self.label_theme, 0, 0, 1, 1)
+        grid_theme_rest.attach(self.combobox_theme, 0, 1, 1, 1)
         self.combobox_theme.set_hexpand(True)
-        grid_theme_accent.attach(self.label_accent, 0, 2, 1, 1)
-        grid_theme_accent.attach(self.box_accent, 0, 3, 1, 1)
+        grid_theme_rest.attach(self.label_accent, 0, 2, 1, 1)
+        grid_theme_rest.attach(self.box_accent, 0, 3, 1, 1)
         self.combobox_accent.set_hexpand(True)
+
+        grid_theme_rest.attach(self.label_background, 0, 4, 1, 1)
+        grid_theme_rest.attach(self.combobox_background, 0, 5, 1, 1)
+        self.combobox_background.set_hexpand(True)
+
+        grid_theme_rest.attach(self.checkbox_show_categories, 0, 6, 1, 1)
+        grid_theme_rest.attach(self.checkbox_show_hidden, 0, 7, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
@@ -3921,9 +4202,14 @@ class Settings(Gtk.Dialog):
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
 
-        self.grid_big_interface.attach(self.combobox_window_behavior, 0, 0, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_show_labels, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.label_steamgriddb_key, 0, 0, 1, 1)
+        self.grid_big_interface.attach(self.entry_steamgriddb_key, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.label_window_behavior, 0, 2, 1, 1)
+        self.grid_big_interface.attach(self.combobox_window_behavior, 0, 3, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_show_labels, 0, 4, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_hero_background, 0, 5, 1, 1)
         self.combobox_window_behavior.set_hexpand(True)
+        self.entry_steamgriddb_key.set_hexpand(True)
 
         grid_support.attach(self.label_support, 0, 0, 2, 1)
         grid_support.attach(button_kofi, 0, 1, 1, 1)
@@ -3937,18 +4223,18 @@ class Settings(Gtk.Dialog):
         box_left.append(grid_logs)
         box_left.append(grid_language)
 
+        box_mid.append(grid_envar)
         box_mid.append(grid_miscellaneous)
-        box_mid.append(grid_support)
+        box_mid.append(grid_backup)
 
-        box_right.append(grid_envar)
         box_right.append(grid_theme_accent)
-        box_right.append(grid_interface_mode)
         box_right.append(self.grid_big_interface)
-        box_right.append(grid_backup)
+        box_right.append(grid_theme_rest)
+        box_right.append(grid_support)
 
         box_main.attach(box_left, 0, 0, 1, 1)
-        box_main.attach(box_mid, 1, 0, 1, 1)
-        box_main.attach(box_right, 2, 0, 1, 1)
+        box_main.attach(box_right, 1, 0, 1, 1)
+        box_main.attach(box_mid, 2, 0, 1, 1)
         box_left.set_hexpand(True)
         box_mid.set_hexpand(True)
         frame.set_child(box_main)
@@ -4074,9 +4360,21 @@ class Settings(Gtk.Dialog):
         if active_id == "Blocks":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(False)
+            self.label_steamgriddb_key.set_visible(False)
+            self.entry_steamgriddb_key.set_visible(False)
+            self.checkbox_hero_background.set_visible(False)
         if active_id == "Banners":
             self.grid_big_interface.set_visible(True)
             self.checkbox_show_labels.set_visible(True)
+            self.label_steamgriddb_key.set_visible(False)
+            self.entry_steamgriddb_key.set_visible(False)
+            self.checkbox_hero_background.set_visible(False)
+        if active_id == "SteamGridDB":
+            self.grid_big_interface.set_visible(True)
+            self.checkbox_show_labels.set_visible(True)
+            self.label_steamgriddb_key.set_visible(True)
+            self.entry_steamgriddb_key.set_visible(True)
+            self.checkbox_hero_background.set_visible(True)
 
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
@@ -4088,6 +4386,9 @@ class Settings(Gtk.Dialog):
             self.accent_color = "system"
 
         apply_interface_customization(self.interface_theme, self.accent_color)
+
+        if hasattr(self.parent, 'schedule_background_update'):
+            self.parent.schedule_background_update()
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
@@ -4129,7 +4430,10 @@ class Settings(Gtk.Dialog):
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
         config.set_value("enable-wow64", self.checkbox_enable_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
+        config.set_value("background-mode", self.combobox_background.get_active_id())
+        config.set_value("hero-enabled", self.checkbox_hero_background.get_active())
         config.set_value("show-labels", self.checkbox_show_labels.get_active())
+        config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("start-minimized", self.checkbox_start_minimized.get_active())
@@ -4149,9 +4453,7 @@ class Settings(Gtk.Dialog):
     def update_envar_file(self):
         if hasattr(self, "liststore"):
             values = [row[0] for row in self.liststore if row[0].strip() != ""]
-            with open(envar_dir, "w", encoding="utf-8") as f:
-                for val in values:
-                    f.write(val + "\n")
+            save_json_file(values, envar_dir)
 
     def on_button_proton_manager_clicked(self, widget):
         current_runner = self.combobox_runner.get_active_text()
@@ -4288,6 +4590,7 @@ class Settings(Gtk.Dialog):
                 _("Select a file to run inside the prefix"),
                 Gtk.FileChooserAction.OPEN,
             )
+            set_file_chooser_start_folder(filechooser, "run_in_prefix")
 
             add_windows_file_filters(filechooser)
 
@@ -4347,6 +4650,7 @@ class Settings(Gtk.Dialog):
             _("Select a backup file to restore"),
             Gtk.FileChooserAction.OPEN,
         )
+        set_file_chooser_start_folder(filechooser, "restore_backup")
 
         zip_filter = Gtk.FileFilter()
         zip_filter.set_name(_("ZIP files"))
@@ -4384,10 +4688,16 @@ class Settings(Gtk.Dialog):
                 for item in os.listdir(temp_dir):
                     if item == ".faugus_marker":
                         continue
+                    src = os.path.join(temp_dir, item)
+
                     dst = BACKUP_ITEMS.get(item)
                     if dst is None:
+                        legacy = LEGACY_FORMAT_ITEMS.get(item)
+                        if legacy is None:
+                            continue
+                        dst, kind = legacy
+                        convert_legacy_format_file(src, dst, kind)
                         continue
-                    src = os.path.join(temp_dir, item)
 
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
 
@@ -4427,11 +4737,9 @@ class Settings(Gtk.Dialog):
             _("Select a prefix location"),
             Gtk.FileChooserAction.SELECT_FOLDER,
         )
-
-        if os.path.isdir(self.default_prefix):
-            filechooser.set_current_folder(Gio.File.new_for_path(self.default_prefix))
-        else:
-            filechooser.set_current_folder(Gio.File.new_for_path(os.path.expanduser("~")))
+        entry_value = self.entry_default_prefix.get_text()
+        preferred_path = os.path.expanduser(entry_value) if entry_value else None
+        set_file_chooser_start_folder(filechooser, "settings_default_prefix", preferred_path)
 
         def on_response(dialog_fc, response):
             if response == Gtk.ResponseType.ACCEPT:
@@ -4449,6 +4757,9 @@ class Settings(Gtk.Dialog):
             _("Select the Lossless.dll file"),
             Gtk.FileChooserAction.OPEN,
         )
+        entry_value = self.entry_lossless.get_text()
+        preferred_path = os.path.expanduser(entry_value) if entry_value else None
+        set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
 
         filter_dll = Gtk.FileFilter()
         filter_dll.set_name("Lossless.dll")
@@ -4484,7 +4795,10 @@ class Settings(Gtk.Dialog):
         self.start_boot = cfg.config.get('start-boot', 'False') == 'True'
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
+        background_mode = cfg.config.get('background-mode', 'default').strip('"')
+        hero_enabled = cfg.config.get('hero-enabled', 'True') == 'True'
         show_labels = cfg.config.get('show-labels', 'False') == 'True'
+        steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         enable_logging = cfg.config.get('enable-logging', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
@@ -4529,12 +4843,15 @@ class Settings(Gtk.Dialog):
         self.checkbox_start_boot.set_active(self.start_boot)
         self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_show_labels.set_active(show_labels)
+        self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_enable_logging.set_active(enable_logging)
         self.checkbox_show_hidden.set_active(show_hidden)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_enable_wow64.set_active(enable_wow64)
         self.combobox_interface.set_active_id(self.interface_mode)
+        self.combobox_background.set_active_id(background_mode)
+        self.checkbox_hero_background.set_active(hero_enabled)
 
         loaded_theme = self.interface_theme
         loaded_accent = self.accent_color
@@ -4573,11 +4890,7 @@ class Settings(Gtk.Dialog):
     def load_liststore_from_file(self, filename=envar_dir):
         self.liststore.clear()
 
-        try:
-            with open(filename, "r", encoding="utf-8") as f:
-                lines = [line.strip() for line in f.readlines() if line.strip()]
-        except FileNotFoundError:
-            lines = []
+        lines = [line.strip() for line in load_json_file(filename, default=[]) if line.strip()]
 
         for line in lines:
             self.liststore.append([line])
@@ -4616,6 +4929,7 @@ class Game:
         prevent_sleep,
         category,
         icon,
+        steamgriddb_id="",
     ):
         self.gameid = gameid
         self.title = title
@@ -4645,6 +4959,7 @@ class Game:
         self.prevent_sleep = prevent_sleep
         self.category = category
         self.icon = icon
+        self.steamgriddb_id = steamgriddb_id
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -4785,8 +5100,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if not os.path.exists(banners_dir):
             os.makedirs(banners_dir)
 
+        if not os.path.exists(heroes_dir):
+            os.makedirs(heroes_dir)
+
         self.banner_path_temp = os.path.join(banners_dir, "banner_temp.png")
-        shutil.copyfile(faugus_banner, self.banner_path_temp)
+        if os.path.isfile(self.banner_path_temp):
+            os.remove(self.banner_path_temp)
+        self.hero_path_temp = os.path.join(banners_dir, "hero_temp.png")
+        if os.path.isfile(self.hero_path_temp):
+            os.remove(self.hero_path_temp)
         self.icon_directory = f"{icons_dir}/icon_temp/"
 
         if not os.path.exists(self.icon_directory):
@@ -4923,6 +5245,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         .add-game-banner {
             border-radius: 12px;
         }
+        .suggestion-popover list,
+        .suggestion-popover row {
+            background: transparent;
+        }
+        .suggestion-popover row:hover {
+            background-color: alpha(@accent_bg_color, 0.15);
+        }
+        .suggestion-popover row:active {
+            background-color: alpha(@accent_bg_color, 0.25);
+        }
         """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.combobox_launcher = IdComboBox()
@@ -4949,13 +5281,53 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", on_entry_changed)
-        if interface_mode == "Banners":
+        if interface_mode in ("Banners", "SteamGridDB"):
             title_focus_controller = Gtk.EventControllerFocus()
             title_focus_controller.connect("leave", lambda c: self.on_entry_focus_out())
             self.entry_title.add_controller(title_focus_controller)
         self.entry_title.set_tooltip_text(_("Game Title"))
         self.entry_title.set_has_tooltip(True)
         self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
+
+        self._steamgriddb_suggestion_id = None
+        self._steamgriddb_steam_appid = None
+        self._suggestion_source = None
+        self._suggestion_programmatic = False
+
+        if interface_mode == "SteamGridDB":
+            self.suggestion_popover = Gtk.Popover()
+            self.suggestion_popover.set_has_arrow(False)
+            self.suggestion_popover.set_autohide(False)
+            self.suggestion_popover.add_css_class("suggestion-popover")
+            self.suggestion_popover.set_parent(self.entry_title)
+
+            self.suggestion_listbox = Gtk.ListBox()
+            self.suggestion_listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+            self.suggestion_listbox.connect("row-activated", self.on_suggestion_row_activated)
+
+            suggestion_scroll = Gtk.ScrolledWindow()
+            suggestion_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            suggestion_scroll.set_max_content_height(250)
+            suggestion_scroll.set_propagate_natural_height(True)
+            suggestion_scroll.set_size_request(300, -1)
+            suggestion_scroll.set_child(self.suggestion_listbox)
+
+            self.suggestion_popover.set_child(suggestion_scroll)
+
+            self.entry_title.connect("changed", self.on_title_changed_for_suggestions)
+
+            title_key_controller = Gtk.EventControllerKey()
+            title_key_controller.connect("key-pressed", self.on_title_key_pressed)
+            self.entry_title.add_controller(title_key_controller)
+
+            title_suggestion_focus_controller = Gtk.EventControllerFocus()
+            title_suggestion_focus_controller.connect("leave", lambda c: self.on_title_focus_leave_for_suggestions())
+            self.entry_title.add_controller(title_suggestion_focus_controller)
+
+            suggestion_click_outside_controller = Gtk.GestureClick()
+            suggestion_click_outside_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+            suggestion_click_outside_controller.connect("pressed", self.on_dialog_click_for_suggestions)
+            self.add_controller(suggestion_click_outside_controller)
 
         self.label_path = Gtk.Label(label=_("Path"))
         self.label_path.set_halign(Gtk.Align.START)
@@ -5050,8 +5422,22 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
-        self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
+        self.button_shortcut_icon.connect(
+            "clicked",
+            lambda w: self.on_button_shortcut_icon_clicked(w)
+            if self.interface_mode != "SteamGridDB"
+            else show_steamgriddb_picker(self, "icon")
+        )
         self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
+        self.button_shortcut_icon_overlay, self.spinner_icon = wrap_with_spinner(self.button_shortcut_icon, dim_shape="icon")
+
+        icon_click_secondary = Gtk.GestureClick()
+        icon_click_secondary.set_button(Gdk.BUTTON_SECONDARY)
+        if interface_mode == "SteamGridDB":
+            icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "icon"))
+        else:
+            icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_button_shortcut_icon_clicked(self.button_shortcut_icon))
+        self.button_shortcut_icon.add_controller(icon_click_secondary)
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -5093,15 +5479,111 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.image_banner2.add_css_class("add-game-banner")
         self.image_banner2.set_overflow(Gtk.Overflow.HIDDEN)
 
+        self.hero_picture1 = Gtk.Picture()
+        self.hero_picture1.set_can_shrink(True)
+        self.hero_picture1.set_content_fit(Gtk.ContentFit.COVER)
+        self.hero_picture1.set_hexpand(True)
+        self.hero_picture1.set_vexpand(True)
+
+        hero_placeholder1 = Gtk.Box()
+        hero_placeholder1.add_css_class("hero-placeholder")
+        hero_placeholder1.set_hexpand(True)
+        hero_placeholder1.set_vexpand(True)
+
+        self.hero_preview_stack1 = Gtk.Stack()
+        self.hero_preview_stack1.set_hhomogeneous(False)
+        self.hero_preview_stack1.set_vhomogeneous(False)
+        self.hero_preview_stack1.set_transition_type(Gtk.StackTransitionType.NONE)
+        self.hero_preview_stack1.set_hexpand(True)
+        self.hero_preview_stack1.set_vexpand(True)
+        self.hero_preview_stack1.add_named(hero_placeholder1, "placeholder")
+        self.hero_preview_stack1.add_named(self.hero_picture1, "picture")
+        self.hero_preview_stack1.set_visible_child_name("placeholder")
+
+        self.hero_preview1 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
+        self.hero_preview1.set_child(self.hero_preview_stack1)
+        self.hero_preview1.set_hexpand(True)
+
+        self.hero_picture2 = Gtk.Picture()
+        self.hero_picture2.set_can_shrink(True)
+        self.hero_picture2.set_content_fit(Gtk.ContentFit.COVER)
+        self.hero_picture2.set_hexpand(True)
+        self.hero_picture2.set_vexpand(True)
+
+        hero_placeholder2 = Gtk.Box()
+        hero_placeholder2.add_css_class("hero-placeholder")
+        hero_placeholder2.set_hexpand(True)
+        hero_placeholder2.set_vexpand(True)
+
+        self.hero_preview_stack2 = Gtk.Stack()
+        self.hero_preview_stack2.set_hhomogeneous(False)
+        self.hero_preview_stack2.set_vhomogeneous(False)
+        self.hero_preview_stack2.set_transition_type(Gtk.StackTransitionType.NONE)
+        self.hero_preview_stack2.set_hexpand(True)
+        self.hero_preview_stack2.set_vexpand(True)
+        self.hero_preview_stack2.add_named(hero_placeholder2, "placeholder")
+        self.hero_preview_stack2.add_named(self.hero_picture2, "picture")
+        self.hero_preview_stack2.set_visible_child_name("placeholder")
+
+        self.hero_preview2 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
+        self.hero_preview2.set_child(self.hero_preview_stack2)
+        self.hero_preview2.set_hexpand(True)
+
+        self.image_banner.set_hexpand(True)
+        self.image_banner_stack = wrap_with_replaceable_placeholder(self.image_banner, 260, 390)
+
+        self.image_banner2.set_hexpand(True)
+        self.image_banner2_stack = wrap_with_replaceable_placeholder(self.image_banner2, 260, 390)
+
         image_click1 = Gtk.GestureClick()
         image_click1.set_button(Gdk.BUTTON_SECONDARY)
         image_click1.connect("pressed", self.on_image_clicked)
-        self.image_banner.add_controller(image_click1)
+        self.image_banner_stack.add_controller(image_click1)
 
         image_click2 = Gtk.GestureClick()
         image_click2.set_button(Gdk.BUTTON_SECONDARY)
         image_click2.connect("pressed", self.on_image_clicked)
-        self.image_banner2.add_controller(image_click2)
+        self.image_banner2_stack.add_controller(image_click2)
+
+        def on_grid_primary_click(gesture, n_press, x, y):
+            if self.interface_mode == "SteamGridDB":
+                show_steamgriddb_picker(self, "grid")
+
+        image_click1_primary = Gtk.GestureClick()
+        image_click1_primary.set_button(Gdk.BUTTON_PRIMARY)
+        image_click1_primary.connect("pressed", on_grid_primary_click)
+        self.image_banner_stack.add_controller(image_click1_primary)
+
+        image_click2_primary = Gtk.GestureClick()
+        image_click2_primary.set_button(Gdk.BUTTON_PRIMARY)
+        image_click2_primary.connect("pressed", on_grid_primary_click)
+        self.image_banner2_stack.add_controller(image_click2_primary)
+
+        self.image_banner_overlay, self.spinner_grid1 = wrap_with_spinner(self.image_banner_stack, dim_shape="banner")
+        self.image_banner2_overlay, self.spinner_grid2 = wrap_with_spinner(self.image_banner2_stack, dim_shape="banner")
+
+        self.hero_preview1_overlay, self.spinner_hero1 = wrap_with_spinner(self.hero_preview1)
+        self.hero_preview2_overlay, self.spinner_hero2 = wrap_with_spinner(self.hero_preview2)
+
+        hero_click1 = Gtk.GestureClick()
+        hero_click1.set_button(Gdk.BUTTON_PRIMARY)
+        hero_click1.connect("pressed", lambda g, n, x, y: show_steamgriddb_picker(self, "hero"))
+        self.hero_preview1.add_controller(hero_click1)
+
+        hero_click2 = Gtk.GestureClick()
+        hero_click2.set_button(Gdk.BUTTON_PRIMARY)
+        hero_click2.connect("pressed", lambda g, n, x, y: show_steamgriddb_picker(self, "hero"))
+        self.hero_preview2.add_controller(hero_click2)
+
+        hero_click_secondary1 = Gtk.GestureClick()
+        hero_click_secondary1.set_button(Gdk.BUTTON_SECONDARY)
+        hero_click_secondary1.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "hero"))
+        self.hero_preview1.add_controller(hero_click_secondary1)
+
+        hero_click_secondary2 = Gtk.GestureClick()
+        hero_click_secondary2.set_button(Gdk.BUTTON_SECONDARY)
+        hero_click_secondary2.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "hero"))
+        self.hero_preview2.add_controller(hero_click_secondary2)
 
         self.menu = Gtk.Popover()
         self.menu.set_has_arrow(False)
@@ -5137,9 +5619,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_box1.append(tab_label1)
         self.tab_box1.set_hexpand(True)
 
-        self.grid_page1.attach(page1, 0, 0, 1, 1)
-        if interface_mode == "Banners":
-            self.grid_page1.attach(self.image_banner, 1, 0, 1, 1)
+        if interface_mode == "SteamGridDB":
+            self.grid_page1.attach(self.hero_preview1_overlay, 0, 0, 2, 1)
+        self.grid_page1.attach(page1, 0, 1, 1, 1)
+        if interface_mode in ("Banners", "SteamGridDB"):
+            self.grid_page1.attach(self.image_banner_overlay, 1, 1, 1, 1)
         page1.set_hexpand(True)
         self.image_banner.set_hexpand(True)
 
@@ -5154,9 +5638,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_box2.append(tab_label2)
         self.tab_box2.set_hexpand(True)
 
-        self.grid_page2.attach(page2, 0, 0, 1, 1)
-        if interface_mode == "Banners":
-            self.grid_page2.attach(self.image_banner2, 1, 0, 1, 1)
+        if interface_mode == "SteamGridDB":
+            self.grid_page2.attach(self.hero_preview2_overlay, 0, 0, 2, 1)
+        self.grid_page2.attach(page2, 0, 1, 1, 1)
+        if interface_mode in ("Banners", "SteamGridDB"):
+            self.grid_page2.attach(self.image_banner2_overlay, 1, 1, 1, 1)
         page2.set_hexpand(True)
         self.image_banner2.set_hexpand(True)
 
@@ -5195,7 +5681,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_appmenu.set_hexpand(True)
         self.grid_shortcut.attach(self.checkbox_shortcut_steam, 0, 2, 1, 1)
         self.checkbox_shortcut_steam.set_hexpand(True)
-        self.grid_shortcut_icon.append(self.button_shortcut_icon)
+        self.grid_shortcut_icon.append(self.button_shortcut_icon_overlay)
         self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 3)
 
         page1.append(self.grid_launcher)
@@ -5301,12 +5787,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
         self.grid_steam_title.set_visible(False)
-        if interface_mode != "Banners":
+        self.update_image_banner()
+        if interface_mode not in ("Banners", "SteamGridDB"):
             self.image_banner.set_visible(False)
             self.image_banner2.set_visible(False)
-        surface = self.new_texture_from_image(self.banner_path_temp, 260, 390, True)
-        self.image_banner.set_paintable(surface)
-        self.image_banner2.set_paintable(surface)
 
         self.present()
 
@@ -5319,14 +5803,21 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if not title or not steamid:
             return
 
+        self._suggestion_programmatic = True
         self.entry_title.set_text(title)
+        self._suggestion_programmatic = False
+        self._steamgriddb_suggestion_id = None
+        self._steamgriddb_steam_appid = steamid
+        if getattr(self, 'suggestion_popover', None) is not None:
+            self.suggestion_popover.popdown()
+
         self.entry_path.set_text(steamid)
 
         icon_path = get_steam_icon_path(steamid)
         if not icon_path:
             icon_path = faugus_png
 
-        self.on_entry_focus_out()
+        self.get_banner()
 
         shutil.copyfile(icon_path, os.path.expanduser(self.icon_temp))
         surface = self.new_texture_from_image(self.icon_temp, 50, 50)
@@ -5356,7 +5847,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.lossless_flow, self.lossless_performance,
             self.lossless_hdr, self.lossless_present, on_result)
 
-    def on_image_clicked(self, gesture, n_press, x, y):
+    def on_image_clicked(self, gesture, n_press, x, y, category="grid"):
+        self._menu_category = category
         image = gesture.get_widget()
         if self.menu.get_parent():
             self.menu.unparent()
@@ -5366,21 +5858,92 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.menu.set_pointing_to(rect)
         self.menu.popup()
 
+    def artwork_target(self, category):
+        if category == "hero":
+            return self.hero_path_temp, lambda: self.update_hero_preview(self.hero_path_temp)
+        if category == "icon":
+            return self.icon_temp, self.refresh_icon_preview
+        return self.banner_path_temp, self.update_image_banner
+
     def on_refresh(self, widget):
         self.menu.popdown()
-        if self.entry_title.get_text() != "":
-            self.get_banner()
+        category = getattr(self, '_menu_category', 'grid')
+        dest_path, refresh = self.artwork_target(category)
+
+        if self.entry_title.get_text() == "":
+            if os.path.isfile(dest_path):
+                os.remove(dest_path)
+            refresh()
+            return
+
+        if self.interface_mode == "SteamGridDB":
+            self.refresh_single_artwork(category)
         else:
-            shutil.copyfile(faugus_banner, self.banner_path_temp)
-            self.update_image_banner()
+            self.get_banner()
+
+    def refresh_single_artwork(self, category):
+        import requests
+
+        game_name = self.entry_title.get_text().strip()
+        if not game_name:
+            return
+
+        cfg = ConfigManager()
+        api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+        if not api_key:
+            return
+
+        suggestion_id = self._steamgriddb_suggestion_id
+        steam_appid = self._steamgriddb_steam_appid
+        closed_event = self.closed_event
+
+        loading_setter = {
+            "icon": self.set_icon_loading,
+            "grid": self.set_grid_loading,
+            "hero": self.set_hero_loading,
+        }[category]
+        key = {"icon": "icons", "grid": "grids", "hero": "heroes"}[category]
+
+        loading_setter(True)
+
+        def worker():
+            try:
+                candidates = fetch_steamgriddb_candidates(
+                    api_key, game_name, limit=1, game_id=suggestion_id, steam_appid=steam_appid
+                )
+                url = candidates[key][0]["url"] if candidates[key] else None
+                if not url:
+                    print(f"SteamGridDB: no {category} found for '{game_name}'")
+                    return
+                session = get_steamgriddb_session()
+                content = session.get(url, timeout=15).content
+                if not closed_event.is_set():
+                    GLib.idle_add(self.apply_downloaded_artwork, category, content)
+            except requests.RequestException as e:
+                print(f"Error refreshing SteamGridDB {category}: {e}")
+            finally:
+                if not closed_event.is_set():
+                    GLib.idle_add(loading_setter, False)
+
+        run_in_background(worker)
 
     def on_load_file(self, widget):
         self.menu.popdown()
+        category = getattr(self, '_menu_category', 'grid')
+        dest_path, refresh = self.artwork_target(category)
+
+        titles = {
+            "grid": _("Select an image for the banner"),
+            "hero": _("Select an image for the hero"),
+            "icon": _("Select an image for the icon"),
+        }
+
         filechooser = new_file_chooser(
             self,
-            _("Select an image for the banner"),
+            titles.get(category, titles["grid"]),
             Gtk.FileChooserAction.OPEN,
         )
+        set_file_chooser_start_folder(filechooser, f"artwork_{category}")
 
         add_image_file_filters(filechooser, include_ico=False)
 
@@ -5390,8 +5953,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 if not file_path or not is_valid_image(file_path):
                     show_invalid_image_dialog()
                 else:
-                    shutil.copyfile(file_path, self.banner_path_temp)
-                    self.update_image_banner()
+                    shutil.copyfile(file_path, dest_path)
+                    refresh()
 
             destroy_and_release(dialog_fc)
 
@@ -5400,6 +5963,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def on_load_url(self, widget):
         self.menu.popdown()
+        category = getattr(self, '_menu_category', 'grid')
+        dest_path, refresh = self.artwork_target(category)
         dialog = Gtk.Dialog(title=_("Enter the image URL"), transient_for=self)
         hide_dialog_action_area(dialog)
         dialog.set_modal(True)
@@ -5451,10 +6016,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             try:
                 import urllib.request
                 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                with urllib.request.urlopen(req) as r, open(self.banner_path_temp, "wb") as f:
+                with urllib.request.urlopen(req) as r, open(dest_path, "wb") as f:
                     f.write(r.read())
 
-                self.update_image_banner()
+                refresh()
                 destroy_and_release(dialog)
 
             except Exception:
@@ -5463,58 +6028,331 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog.connect("response", on_response)
         dialog.present()
 
+    def set_grid_loading(self, loading):
+        spinner1 = getattr(self, 'spinner_grid1', None)
+        spinner2 = getattr(self, 'spinner_grid2', None)
+        if spinner1 and spinner2:
+            set_spinner_loading((spinner1, spinner2), loading)
+        return False
+
+    def set_hero_loading(self, loading):
+        spinner1 = getattr(self, 'spinner_hero1', None)
+        spinner2 = getattr(self, 'spinner_hero2', None)
+        if spinner1 and spinner2:
+            set_spinner_loading((spinner1, spinner2), loading)
+        return False
+
+    def set_icon_loading(self, loading):
+        spinner = getattr(self, 'spinner_icon', None)
+        if spinner:
+            set_spinner_loading((spinner,), loading)
+        return False
+
+    def refresh_grid_preview(self):
+        self.update_image_banner()
+        return False
+
+    def refresh_icon_preview(self):
+        surface = self.new_texture_from_image(self.icon_temp, 50, 50)
+        self.button_shortcut_icon.set_child(new_picture(surface))
+        return False
+
+    def refresh_hero_preview(self):
+        self.update_hero_preview(self.hero_path_temp)
+        return False
+
+    def apply_downloaded_artwork(self, category, content):
+        if category == "grid":
+            with open(self.banner_path_temp, "wb") as f:
+                f.write(content)
+            self.refresh_grid_preview()
+        elif category == "hero":
+            with open(self.hero_path_temp, "wb") as f:
+                f.write(content)
+            self.refresh_hero_preview()
+        elif category == "icon":
+            with open(self.icon_temp, "wb") as f:
+                f.write(content)
+            self.refresh_icon_preview()
+        return False
+
+    def update_hero_preview(self, hero_path):
+        if hero_path and os.path.isfile(hero_path):
+            surface = self.new_texture_from_image(hero_path, 480, 155, True)
+            self.hero_picture1.set_paintable(surface)
+            self.hero_picture2.set_paintable(surface)
+            self.hero_preview_stack1.set_visible_child_name("picture")
+            self.hero_preview_stack2.set_visible_child_name("picture")
+        else:
+            self.hero_preview_stack1.set_visible_child_name("placeholder")
+            self.hero_preview_stack2.set_visible_child_name("placeholder")
+
     def get_banner(self):
         import requests
 
         closed_event = self.closed_event
         banner_path_temp = self.banner_path_temp
-        image_banner = self.image_banner
-        image_banner2 = self.image_banner2
-        new_texture_from_image = self.new_texture_from_image
+        hero_path_temp = self.hero_path_temp
+        interface_mode = self.interface_mode
 
-        def apply_banner():
-            if closed_event.is_set():
-                return
-            surface = new_texture_from_image(banner_path_temp, 260, 390, True)
-            image_banner.set_paintable(surface)
-            image_banner2.set_paintable(surface)
+        game_name = self.entry_title.get_text().strip()
+        if not game_name:
+            return
+
+        suggestion_id = self._steamgriddb_suggestion_id
+        steam_appid = self._steamgriddb_steam_appid
+
+        cfg = ConfigManager()
+        api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+
+        fetch_icon = bool(api_key) and interface_mode == "SteamGridDB"
+        fetch_grid = interface_mode in ("Banners", "SteamGridDB")
+        fetch_hero = interface_mode == "SteamGridDB" and bool(api_key)
+
+        if fetch_icon:
+            self.set_icon_loading(True)
+        if fetch_grid:
+            self.set_grid_loading(True)
+        if fetch_hero:
+            self.set_hero_loading(True)
 
         def fetch_banner():
-            game_name = self.entry_title.get_text().strip()
-            if not game_name:
-                return
-
-            api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
             try:
-                response = requests.get(api_url)
-                response.raise_for_status()
-                image_url = response.text.strip('"')
+                fetch_sgdb_icon = bool(api_key) and interface_mode == "SteamGridDB"
+                fetch_sgdb_grid_hero = interface_mode == "SteamGridDB" and bool(api_key)
 
-                with open(banner_path_temp, "wb") as image_file:
-                    image_file.write(requests.get(image_url).content)
+                icon_url = grid_url = hero_url = None
+                if fetch_sgdb_icon or fetch_sgdb_grid_hero:
+                    session = get_steamgriddb_session()
+                    candidates = fetch_steamgriddb_candidates(
+                        api_key, game_name, limit=1, game_id=suggestion_id, steam_appid=steam_appid
+                    )
 
-                if not closed_event.is_set():
-                    GLib.idle_add(apply_banner)
+                    if fetch_sgdb_icon:
+                        icon_url = candidates["icons"][0]["url"] if candidates["icons"] else None
+                        if not icon_url:
+                            print(f"SteamGridDB: no icon found for '{game_name}'")
 
-            except requests.RequestException as e:
-                print(f"Error fetching the banner: {e}")
+                    if fetch_sgdb_grid_hero:
+                        grid_url = candidates["grids"][0]["url"] if candidates["grids"] else None
+                        hero_url = candidates["heroes"][0]["url"] if candidates["heroes"] else None
+                        if not grid_url:
+                            print(f"SteamGridDB: no grid found for '{game_name}'")
+                        if not hero_url:
+                            print(f"SteamGridDB: no hero found for '{game_name}'")
+
+                    downloads = {}
+                    if icon_url:
+                        downloads["icon"] = icon_url
+                    if grid_url:
+                        downloads["grid"] = grid_url
+                    if hero_url:
+                        downloads["hero"] = hero_url
+
+                    def download_one(category):
+                        try:
+                            content = session.get(downloads[category], timeout=15).content
+                            if not closed_event.is_set():
+                                GLib.idle_add(self.apply_downloaded_artwork, category, content)
+                        except requests.RequestException as e:
+                            print(f"Error fetching SteamGridDB {category}: {e}")
+
+                    if downloads:
+                        with ThreadPoolExecutor(max_workers=len(downloads)) as pool:
+                            list(pool.map(download_one, downloads.keys()))
+
+                if fetch_sgdb_grid_hero:
+                    if not grid_url and os.path.isfile(banner_path_temp):
+                        os.remove(banner_path_temp)
+                        if not closed_event.is_set():
+                            GLib.idle_add(self.refresh_grid_preview)
+                    if not hero_url and os.path.isfile(hero_path_temp):
+                        os.remove(hero_path_temp)
+                        if not closed_event.is_set():
+                            GLib.idle_add(self.refresh_hero_preview)
+                    return
+
+                if interface_mode not in ("Banners", "SteamGridDB"):
+                    return
+
+                api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
+                try:
+                    response = requests.get(api_url)
+                    response.raise_for_status()
+                    image_url = response.text.strip('"')
+                    content = requests.get(image_url).content
+
+                    if not closed_event.is_set():
+                        GLib.idle_add(self.apply_downloaded_artwork, "grid", content)
+
+                except requests.RequestException as e:
+                    print(f"Error fetching the banner: {e}")
+
+            finally:
+                if fetch_icon:
+                    GLib.idle_add(self.set_icon_loading, False)
+                if fetch_grid:
+                    GLib.idle_add(self.set_grid_loading, False)
+                if fetch_hero:
+                    GLib.idle_add(self.set_hero_loading, False)
 
         run_in_background(fetch_banner)
 
     def update_image_banner(self):
-        surface = self.new_texture_from_image(self.banner_path_temp, 260, 390, True)
-        self.image_banner.set_paintable(surface)
-        self.image_banner2.set_paintable(surface)
+        if os.path.isfile(self.banner_path_temp):
+            surface = self.new_texture_from_image(self.banner_path_temp, 260, 390, True)
+            self.image_banner.set_paintable(surface)
+            self.image_banner2.set_paintable(surface)
+            self.image_banner_stack.set_visible_child_name("picture")
+            self.image_banner2_stack.set_visible_child_name("picture")
+        else:
+            self.image_banner_stack.set_visible_child_name("placeholder")
+            self.image_banner2_stack.set_visible_child_name("placeholder")
 
     def on_entry_focus_out(self):
+        if self._steamgriddb_suggestion_id is not None:
+            return
         if self.entry_title.get_text() != "":
             self.get_banner()
         else:
-            shutil.copyfile(faugus_banner, self.banner_path_temp)
+            if os.path.isfile(self.banner_path_temp):
+                os.remove(self.banner_path_temp)
             self.update_image_banner()
+
+    def on_title_key_pressed(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Escape and self.suggestion_popover.get_visible():
+            self.suggestion_popover.popdown()
+            return True
+        return False
+
+    def on_title_focus_leave_for_suggestions(self):
+        closed_event = self.closed_event
+        entry_title = self.entry_title
+        suggestion_popover = self.suggestion_popover
+
+        def check():
+            if closed_event.is_set():
+                return False
+            root = entry_title.get_root()
+            focus_widget = root.get_focus() if root else None
+            w = focus_widget
+            while w is not None:
+                if w is suggestion_popover:
+                    return False
+                w = w.get_parent()
+            suggestion_popover.popdown()
+            return False
+
+        GLib.idle_add(check)
+
+    def on_dialog_click_for_suggestions(self, gesture, n_press, x, y):
+        if not self.suggestion_popover.get_visible():
+            return
+
+        picked = self.pick(x, y, Gtk.PickFlags.DEFAULT)
+        w = picked
+        while w is not None:
+            if w is self.suggestion_popover or w is self.entry_title:
+                return
+            w = w.get_parent()
+
+        self.suggestion_popover.popdown()
+
+    def on_title_changed_for_suggestions(self, entry):
+        if self._suggestion_programmatic:
+            return
+
+        self._steamgriddb_suggestion_id = None
+        self._steamgriddb_steam_appid = None
+
+        if self._suggestion_source:
+            GLib.source_remove(self._suggestion_source)
+            self._suggestion_source = None
+
+        text = entry.get_text().strip()
+        if not text:
+            self.suggestion_popover.popdown()
+            return
+
+        cfg = ConfigManager()
+        api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+        if not api_key:
+            return
+
+        closed_event = self.closed_event
+        entry_title = self.entry_title
+        suggestion_listbox = self.suggestion_listbox
+        suggestion_popover = self.suggestion_popover
+
+        def fire():
+            self._suggestion_source = None
+            if closed_event.is_set():
+                return False
+            self.fetch_title_suggestions(
+                text, api_key, closed_event, entry_title, suggestion_listbox, suggestion_popover
+            )
+            return False
+
+        self._suggestion_source = GLib.timeout_add(350, fire)
+
+    def fetch_title_suggestions(self, term, api_key, closed_event, entry_title, suggestion_listbox, suggestion_popover):
+        def worker():
+            suggestions = fetch_steamgriddb_autocomplete(api_key, term, limit=10)
+            if not closed_event.is_set():
+                GLib.idle_add(
+                    self.populate_suggestions, term, suggestions,
+                    closed_event, entry_title, suggestion_listbox, suggestion_popover
+                )
+
+        run_in_background(worker)
+
+    def populate_suggestions(self, term, suggestions, closed_event, entry_title, suggestion_listbox, suggestion_popover):
+        if closed_event.is_set():
+            return False
+        if entry_title.get_text().strip() != term:
+            return False
+
+        child = suggestion_listbox.get_first_child()
+        while child:
+            nxt = child.get_next_sibling()
+            suggestion_listbox.remove(child)
+            child = nxt
+
+        if not suggestions:
+            suggestion_popover.popdown()
+            return False
+
+        for item in suggestions:
+            row = Gtk.ListBoxRow()
+            label = Gtk.Label(label=item["name"])
+            label.set_halign(Gtk.Align.START)
+            label.set_margin_start(8)
+            label.set_margin_end(8)
+            label.set_margin_top(6)
+            label.set_margin_bottom(6)
+            row.set_child(label)
+            row.steamgriddb_id = item["id"]
+            row.steamgriddb_name = item["name"]
+            suggestion_listbox.append(row)
+
+        suggestion_popover.popup()
+        return False
+
+    def on_suggestion_row_activated(self, listbox, row):
+        clean_name = re.sub(r'\s*\(\d{4}\)\s*$', '', row.steamgriddb_name).strip()
+        self._suggestion_programmatic = True
+        self.entry_title.set_text(clean_name)
+        self._suggestion_programmatic = False
+        self._steamgriddb_suggestion_id = row.steamgriddb_id
+        self.suggestion_popover.popdown()
+        self.entry_title.grab_focus_without_selecting()
+        self.get_banner()
 
     def on_combobox_changed(self, combobox):
         active_id = combobox.get_active_id()
+
+        cfg = ConfigManager()
+        steamgriddb_enabled = bool(cfg.config.get('steamgriddb-api-key', '').strip('"'))
 
         def cleanup_fields():
             self.entry_title.set_text("")
@@ -5531,8 +6369,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
             self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
             self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
-            shutil.copyfile(faugus_banner, self.banner_path_temp)
+            if os.path.isfile(self.banner_path_temp):
+                os.remove(self.banner_path_temp)
+            if os.path.isfile(self.hero_path_temp):
+                os.remove(self.hero_path_temp)
             self.update_image_banner()
+            self.update_hero_preview(self.hero_path_temp)
 
             for w in (self.combobox_steam_title, self.entry_title,
                       self.entry_prefix, self.entry_path):
@@ -5592,7 +6434,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-            self.button_shortcut_icon.set_visible(False)
+            self.button_shortcut_icon.set_visible(steamgriddb_enabled and self.interface_mode != "Banners")
 
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
 
@@ -5625,7 +6467,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if path:
                 self.entry_path.set_text(f"{self.entry_prefix.get_text()}/{path}")
 
-        if self.interface_mode == "Banners":
+        if self.interface_mode in ("Banners", "SteamGridDB"):
             if self.entry_title.get_text():
                 self.get_banner()
 
@@ -5663,6 +6505,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             _("Select a file to run inside the prefix"),
             Gtk.FileChooserAction.OPEN,
         )
+        set_file_chooser_start_folder(filechooser, "run_in_prefix")
 
         add_windows_file_filters(filechooser)
 
@@ -5836,18 +6679,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         run_in_background(run_command)
 
     def on_button_search_clicked(self, widget):
-        if not self.entry_path.get_text():
-            initial_folder = os.path.expanduser("~/")
-        else:
-            initial_folder = os.path.dirname(self.entry_path.get_text())
+        entry_value = self.entry_path.get_text()
+        preferred_path = os.path.dirname(entry_value) if entry_value else None
 
         filechooser = new_file_chooser(
             self,
             _("Select the game's .exe"),
             Gtk.FileChooserAction.OPEN,
         )
-
-        filechooser.set_current_folder(Gio.File.new_for_path(initial_folder))
+        set_file_chooser_start_folder(filechooser, "game_exe", preferred_path)
 
         if self.combobox_launcher.get_active_id() != "linux":
             add_windows_file_filters(filechooser)
@@ -5856,19 +6696,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if response == Gtk.ResponseType.ACCEPT:
                 path = dialog_fc.get_file().get_path()
 
-                os.makedirs(self.icon_directory, exist_ok=True)
-
-                status = extract_ico(path, self.icon_temp, best_frame=True)
-                if status == "ok":
-                    surface = self.new_texture_from_image(self.icon_temp, 50, 50)
-                    self.button_shortcut_icon.set_child(new_picture(surface))
-                elif status == "no_icons":
-                    self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
+                if self.interface_mode == "Banners":
+                    os.makedirs(self.icon_directory, exist_ok=True)
+                    status = extract_ico(path, self.icon_temp, best_frame=True)
+                    if status == "ok":
+                        surface = self.new_texture_from_image(self.icon_temp, 50, 50)
+                        self.button_shortcut_icon.set_child(new_picture(surface))
+                    elif status == "no_icons":
+                        self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
                 self.entry_path.set_text(path)
-
-            if os.path.isdir(self.icon_directory):
-                shutil.rmtree(self.icon_directory)
 
             destroy_and_release(dialog_fc)
 

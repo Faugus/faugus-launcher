@@ -245,16 +245,15 @@ class TrayIcon:
         items = []
         item_id = 1
 
-        if os.path.exists(latest_games):
-            with open(latest_games) as f:
-                for gameid in map(str.strip, f):
-                    if len(items) >= 5:
-                        break
-                    title = games_by_id.get(gameid)
-                    if not title:
-                        continue
-                    items.append({"id": item_id, "label": title, "action": lambda gid=gameid: self.on_launch(gid)})
-                    item_id += 1
+        for gameid in load_json_file(latest_games, default=[]):
+            gameid = gameid.strip()
+            if len(items) >= 5:
+                break
+            title = games_by_id.get(gameid)
+            if not title:
+                continue
+            items.append({"id": item_id, "label": title, "action": lambda gid=gameid: self.on_launch(gid)})
+            item_id += 1
 
         if items:
             items.append({"id": item_id, "separator": True})

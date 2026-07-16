@@ -1,5 +1,6 @@
 import os
 import subprocess
+import zlib
 
 from pathlib import Path
 import gi
@@ -54,6 +55,17 @@ lossless_dll = (
     if steam_folder and (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll").is_file()
     else ""
 )
+
+
+def generate_steam_shortcut_id(exe, appname):
+    return zlib.crc32((exe + appname).encode('utf-8')) | 0x80000000
+
+
+def to_signed_int32(value):
+    value &= 0xFFFFFFFF
+    if value >= 0x80000000:
+        value -= 0x100000000
+    return value
 
 
 def get_all_shortcut_paths():

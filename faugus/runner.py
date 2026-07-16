@@ -423,21 +423,16 @@ class FaugusRun(HiDpiMixin):
     def load_env_from_file(self, filename=envar_dir):
         env_from_file = {}
 
-        try:
-            with open(filename, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or "=" not in line:
-                        continue
+        for line in load_json_file(filename, default=[]):
+            line = line.strip()
+            if not line or "=" not in line:
+                continue
 
-                    key, value = line.split("=", 1)
-                    key, value = key.strip(), value.strip()
+            key, value = line.split("=", 1)
+            key, value = key.strip(), value.strip()
 
-                    os.environ[key] = value
-                    env_from_file[key] = value
-
-        except FileNotFoundError:
-            pass
+            os.environ[key] = value
+            env_from_file[key] = value
 
         return env_from_file
 

@@ -132,6 +132,103 @@ def new_picture(paintable=None):
     return picture
 
 
+def wrap_with_spinner(widget, dim_shape="none"):
+    dim = Gtk.Box()
+    dim.add_css_class("spinner-dim-overlay")
+    if dim_shape != "none":
+        dim.add_css_class(f"spinner-dim-overlay-{dim_shape}")
+        dim.set_overflow(Gtk.Overflow.HIDDEN)
+    dim.set_visible(False)
+    dim.set_can_target(False)
+    dim.set_hexpand(True)
+    dim.set_vexpand(True)
+    dim.set_margin_top(widget.get_margin_top())
+    dim.set_margin_bottom(widget.get_margin_bottom())
+    dim.set_margin_start(widget.get_margin_start())
+    dim.set_margin_end(widget.get_margin_end())
+
+    spinner = Gtk.Spinner()
+    spinner.set_size_request(32, 32)
+    spinner.set_halign(Gtk.Align.CENTER)
+    spinner.set_valign(Gtk.Align.CENTER)
+    spinner.set_visible(False)
+    spinner.set_can_target(False)
+    spinner.dim_overlay = dim
+
+    overlay = Gtk.Overlay()
+    overlay.set_hexpand(widget.get_hexpand())
+    overlay.set_vexpand(widget.get_vexpand())
+    overlay.set_halign(widget.get_halign())
+    overlay.set_valign(widget.get_valign())
+    overlay.set_child(widget)
+    overlay.add_overlay(dim)
+    overlay.add_overlay(spinner)
+    return overlay, spinner
+
+
+def create_accent_placeholder_paintable(width, height, alpha=0.4):
+    dummy = Gtk.Box()
+    found, rgba = dummy.get_style_context().lookup_color("accent_bg_color")
+    if not found:
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue, rgba.alpha = 0.5, 0.5, 0.5, 1.0
+
+    w = width * HIDPI_SCALE
+    h = height * HIDPI_SCALE
+    pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, w, h)
+    r = int(rgba.red * 255)
+    g = int(rgba.green * 255)
+    b = int(rgba.blue * 255)
+    a = int(alpha * 255)
+    pixbuf.fill((r << 24) | (g << 16) | (b << 8) | a)
+    texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+    return HiDpiPaintable(texture, width, height)
+
+
+def wrap_with_replaceable_placeholder(picture, width, height):
+    margin_top = picture.get_margin_top()
+    margin_bottom = picture.get_margin_bottom()
+    margin_start = picture.get_margin_start()
+    margin_end = picture.get_margin_end()
+    picture.set_margin_top(0)
+    picture.set_margin_bottom(0)
+    picture.set_margin_start(0)
+    picture.set_margin_end(0)
+
+    placeholder = Gtk.Box()
+    placeholder.add_css_class("banner-placeholder")
+    placeholder.set_size_request(width, height)
+
+    stack = Gtk.Stack()
+    stack.set_hhomogeneous(False)
+    stack.set_vhomogeneous(False)
+    stack.set_transition_type(Gtk.StackTransitionType.NONE)
+    stack.set_hexpand(picture.get_hexpand())
+    stack.set_vexpand(picture.get_vexpand())
+    stack.set_halign(picture.get_halign())
+    stack.set_valign(picture.get_valign())
+    stack.set_margin_top(margin_top)
+    stack.set_margin_bottom(margin_bottom)
+    stack.set_margin_start(margin_start)
+    stack.set_margin_end(margin_end)
+    stack.add_named(placeholder, "placeholder")
+    stack.add_named(picture, "picture")
+    stack.set_visible_child_name("placeholder")
+    return stack
+
+
+def set_spinner_loading(spinners, loading):
+    for spinner in spinners:
+        spinner.set_visible(loading)
+        if loading:
+            spinner.start()
+        else:
+            spinner.stop()
+        dim = getattr(spinner, 'dim_overlay', None)
+        if dim is not None:
+            dim.set_visible(loading)
+
+
 class IdComboBox(Gtk.DropDown):
     __gsignals__ = {
         'changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
@@ -322,6 +419,33 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
     dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
     dialog.set_default_response(Gtk.ResponseType.ACCEPT)
     return dialog
+
+
+_filechooser_state_path = PathManager.user_state("faugus-launcher", "filechooser_folders.json")
+_last_filechooser_folder = load_json_file(_filechooser_state_path, default={})
+
+
+def set_file_chooser_start_folder(filechooser, key, preferred_path=None):
+    folder = None
+    if preferred_path:
+        candidate = preferred_path if os.path.isdir(preferred_path) else os.path.dirname(preferred_path)
+        if candidate and os.path.isdir(candidate):
+            folder = candidate
+    if not folder:
+        folder = _last_filechooser_folder.get(key)
+    if not folder or not os.path.isdir(folder):
+        folder = os.path.expanduser("~")
+
+    filechooser.set_current_folder(Gio.File.new_for_path(folder))
+
+    def remember_folder(fc, response):
+        current = fc.get_current_folder()
+        path = current.get_path() if current else None
+        if path and _last_filechooser_folder.get(key) != path:
+            _last_filechooser_folder[key] = path
+            save_json_file(_last_filechooser_folder, _filechooser_state_path)
+
+    filechooser.connect("response", remember_folder)
 
 
 def add_windows_file_filters(filechooser):
@@ -798,6 +922,7 @@ GAME_FIELDS = [
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "prevent_sleep", "category", "icon",
+    "steamgriddb_id",
 ]
 
 
@@ -1383,3 +1508,355 @@ def _contrasting_fg_color(rgb_color):
     r, g, b = (int(v) / 255 for v in match.groups())
     luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
     return "#000000" if luminance > 0.55 else "#ffffff"
+
+
+_steamgriddb_session = None
+
+
+def get_steamgriddb_session():
+    global _steamgriddb_session
+    if _steamgriddb_session is None:
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+
+        session = requests.Session()
+        retry = Retry(
+            total=3,
+            backoff_factor=0.3,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET"],
+        )
+        adapter = HTTPAdapter(max_retries=retry, pool_maxsize=16)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        _steamgriddb_session = session
+    return _steamgriddb_session
+
+
+def fetch_steamgriddb_autocomplete(api_key, term, limit=10):
+    import requests
+    from urllib.parse import quote
+
+    session = get_steamgriddb_session()
+    headers = {"Authorization": f"Bearer {api_key}"}
+    try:
+        response = session.get(
+            f"https://www.steamgriddb.com/api/v2/search/autocomplete/{quote(term)}",
+            headers=headers, timeout=10,
+        )
+        response.raise_for_status()
+        results = response.json().get("data") or []
+        return [{"id": item["id"], "name": item["name"]} for item in results[:limit] if item.get("name")]
+    except requests.RequestException:
+        return []
+
+
+def fetch_steamgriddb_candidates(api_key, game_name, limit=12, game_id=None, steam_appid=None):
+    import requests
+    from urllib.parse import quote
+
+    session = get_steamgriddb_session()
+    headers = {"Authorization": f"Bearer {api_key}"}
+    result = {"game_id": None, "grids": [], "heroes": [], "icons": []}
+
+    try:
+        if steam_appid is not None:
+            id_type, lookup_id = "steam", steam_appid
+        else:
+            if game_id is None:
+                search = session.get(
+                    f"https://www.steamgriddb.com/api/v2/search/autocomplete/{quote(game_name)}",
+                    headers=headers, timeout=10,
+                )
+                search.raise_for_status()
+                results = search.json().get("data") or []
+                if not results:
+                    return result
+                game_id = results[0]["id"]
+            id_type, lookup_id = "game", game_id
+            result["game_id"] = game_id
+
+        endpoints = {
+            "grids": (f"https://www.steamgriddb.com/api/v2/grids/{id_type}/{lookup_id}", {"dimensions": "600x900"}),
+            "heroes": (f"https://www.steamgriddb.com/api/v2/heroes/{id_type}/{lookup_id}", {}),
+            "icons": (f"https://www.steamgriddb.com/api/v2/icons/{id_type}/{lookup_id}", {}),
+        }
+
+        def fetch_one(key):
+            url, params = endpoints[key]
+            try:
+                response = session.get(url, headers=headers, params=params, timeout=10)
+                if response.ok:
+                    data = response.json().get("data") or []
+                    return key, [
+                        {"url": item["url"], "thumb": item.get("thumb") or item["url"]}
+                        for item in data[:limit] if item.get("url")
+                    ]
+            except requests.RequestException:
+                pass
+            return key, []
+
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            for key, items in pool.map(fetch_one, endpoints.keys()):
+                result[key] = items
+
+        return result
+    except requests.RequestException:
+        return result
+
+
+def show_steamgriddb_picker(obj, category):
+    from faugus.config_manager import ConfigManager
+
+    cfg = ConfigManager()
+    api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+    game_name = obj.entry_title.get_text().strip()
+    game_id = getattr(obj, '_steamgriddb_suggestion_id', None)
+    steam_appid = getattr(obj, '_steamgriddb_steam_appid', None)
+
+    if not api_key:
+        show_message_dialog(
+            _("No SteamGridDB API key configured."),
+            _("Add your API key in Settings first."),
+            parent=obj,
+        )
+        return
+
+    if not game_name:
+        show_message_dialog(
+            _("No title entered."),
+            _("Enter a game title before choosing artwork."),
+            parent=obj,
+        )
+        return
+
+    titles = {
+        "grid": _("Choose a grid"),
+        "hero": _("Choose a hero"),
+        "icon": _("Choose an icon"),
+    }
+    ratios = {"grid": 600 / 900, "hero": 1920 / 620, "icon": 1.0}
+    keys = {"grid": "grids", "hero": "heroes", "icon": "icons"}
+
+    dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
+    hide_dialog_action_area(dialog)
+    dialog.set_modal(True)
+    dialog.set_default_size(720, 480)
+
+    closed_state = [False]
+
+    def on_close_request(*_a):
+        closed_state[0] = True
+        return False
+    dialog.connect("close-request", on_close_request)
+
+    spinner = Gtk.Spinner()
+    spinner.set_size_request(32, 32)
+    spinner.start()
+    spinner_box = Gtk.Box(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+    spinner_box.set_vexpand(True)
+    spinner_box.set_hexpand(True)
+    spinner_box.append(spinner)
+
+    is_list = category == "hero"
+
+    items_container = Gtk.FlowBox()
+    items_container.set_selection_mode(Gtk.SelectionMode.NONE)
+    items_container.set_row_spacing(8)
+    items_container.set_column_spacing(8)
+    items_container.set_margin_start(10)
+    items_container.set_margin_end(10)
+    items_container.set_margin_top(10)
+    items_container.set_margin_bottom(10)
+
+    if is_list:
+        items_container.set_halign(Gtk.Align.FILL)
+        items_container.set_valign(Gtk.Align.START)
+        items_container.set_min_children_per_line(1)
+        items_container.set_max_children_per_line(1)
+        items_container.set_homogeneous(True)
+    else:
+        items_container.set_halign(Gtk.Align.CENTER)
+        items_container.set_valign(Gtk.Align.CENTER)
+        items_container.set_min_children_per_line(2)
+        items_container.set_max_children_per_line(20)
+
+    scrolled = Gtk.ScrolledWindow()
+    scrolled.set_vexpand(True)
+    scrolled.set_hexpand(True)
+    scrolled.set_child(items_container)
+
+    stack = Gtk.Stack()
+    stack.add_named(spinner_box, "loading")
+    stack.add_named(scrolled, "content")
+    stack.set_visible_child_name("loading")
+
+    dialog.get_content_area().append(stack)
+
+    thumb_w = 660 if is_list else 160
+    thumb_h = int(thumb_w / ratios.get(category, 1.0))
+
+    loading_setter = {
+        "grid": obj.set_grid_loading,
+        "hero": obj.set_hero_loading,
+        "icon": obj.set_icon_loading,
+    }[category]
+
+    def apply_selection(url):
+        GLib.idle_add(loading_setter, True)
+
+        def fetch_full():
+            import requests
+            try:
+                content = get_steamgriddb_session().get(url, timeout=15).content
+            except requests.RequestException as e:
+                print(f"Error fetching selected {category}: {e}")
+                GLib.idle_add(loading_setter, False)
+                return
+
+            if closed_state[0]:
+                return
+
+            def apply_ui():
+                if closed_state[0]:
+                    return False
+                obj.apply_downloaded_artwork(category, content)
+                loading_setter(False)
+                destroy_and_release(dialog)
+                return False
+            GLib.idle_add(apply_ui)
+        run_in_background(fetch_full)
+
+    def populate(items):
+        if closed_state[0]:
+            return False
+        if not items:
+            empty_label = Gtk.Label(label=_("No results found."))
+            empty_label.set_margin_top(20)
+            items_container.append(empty_label)
+        for item, pixbuf in items:
+            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+            paintable = HiDpiPaintable(texture, thumb_w, thumb_h)
+            picture = new_picture(paintable)
+            picture.set_cursor(Gdk.Cursor.new_from_name("pointer"))
+
+            child = Gtk.FlowBoxChild()
+            if is_list:
+                child.set_size_request(thumb_w, -1)
+                child.set_halign(Gtk.Align.FILL)
+                child.set_valign(Gtk.Align.START)
+            else:
+                child.set_hexpand(True)
+                child.set_vexpand(True)
+                child.set_halign(Gtk.Align.FILL)
+                child.set_valign(Gtk.Align.FILL)
+            child.set_child(picture)
+
+            click = Gtk.GestureClick()
+            click.set_button(Gdk.BUTTON_PRIMARY)
+            click.connect("pressed", lambda g, n, x, y, u=item["url"]: apply_selection(u))
+            picture.add_controller(click)
+
+            items_container.append(child)
+        stack.set_visible_child_name("content")
+        return False
+
+    def fetch_candidates():
+        import requests
+
+        candidates = fetch_steamgriddb_candidates(
+            api_key, game_name, limit=24, game_id=game_id, steam_appid=steam_appid
+        )
+        items = candidates.get(keys.get(category), [])
+
+        session = get_steamgriddb_session()
+
+        def download_thumb(item):
+            try:
+                data = session.get(item["thumb"], timeout=15).content
+                loader = GdkPixbuf.PixbufLoader()
+                loader.write(data)
+                loader.close()
+                pixbuf = loader.get_pixbuf()
+                return (item, pixbuf)
+            except Exception as e:
+                print(f"Error fetching thumbnail: {e}")
+                return None
+
+        results = []
+        if items:
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                downloaded = list(pool.map(download_thumb, items))
+            results = [d for d in downloaded if d]
+
+        if not closed_state[0]:
+            GLib.idle_add(populate, results)
+
+    run_in_background(fetch_candidates)
+
+    dialog.present()
+
+
+def get_average_color(image_path):
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+    small = pixbuf.scale_simple(32, 32, GdkPixbuf.InterpType.BILINEAR)
+
+    width = small.get_width()
+    height = small.get_height()
+    rowstride = small.get_rowstride()
+    n_channels = small.get_n_channels()
+    pixels = small.get_pixels()
+
+    r_total = g_total = b_total = 0
+    count = width * height
+
+    for y in range(height):
+        row_offset = y * rowstride
+        for x in range(width):
+            offset = row_offset + x * n_channels
+            r_total += pixels[offset]
+            g_total += pixels[offset + 1]
+            b_total += pixels[offset + 2]
+
+    return r_total // count, g_total // count, b_total // count
+
+
+def get_dominant_color(image_path):
+    import colorsys
+
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
+    small = pixbuf.scale_simple(64, 64, GdkPixbuf.InterpType.BILINEAR)
+
+    width = small.get_width()
+    height = small.get_height()
+    rowstride = small.get_rowstride()
+    n_channels = small.get_n_channels()
+    pixels = small.get_pixels()
+
+    num_bins = 24
+    hue_bins = {}
+
+    for y in range(height):
+        row_offset = y * rowstride
+        for x in range(width):
+            offset = row_offset + x * n_channels
+            r, g, b = pixels[offset], pixels[offset + 1], pixels[offset + 2]
+
+            h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+
+            if v < 0.15 or v > 0.95 or s < 0.25:
+                continue
+
+            bin_idx = int(h * num_bins) % num_bins
+            bucket = hue_bins.setdefault(bin_idx, [0.0, 0.0, 0.0, 0.0])
+            bucket[0] += r * s
+            bucket[1] += g * s
+            bucket[2] += b * s
+            bucket[3] += s
+
+    if not hue_bins:
+        return get_average_color(image_path)
+
+    r_total, g_total, b_total, weight = max(hue_bins.values(), key=lambda bucket: bucket[3])
+    return int(r_total / weight), int(g_total / weight), int(b_total / weight)
