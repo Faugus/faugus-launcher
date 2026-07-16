@@ -158,6 +158,7 @@ FAUGUS_LAUNCHER_SHARE_DIR = PathManager.user_data('faugus-launcher')
 FAUGUS_LAUNCHER_STATE_DIR = PathManager.user_state('faugus-launcher')
 FAUGUS_TEMP = PathManager.user_state('faugus-launcher/faugus_temp')
 RUNNING_GAMES = PathManager.user_state('faugus-launcher/running_games.json')
+FILECHOOSER_FOLDERS_FILE = PathManager.user_state('faugus-launcher/filechooser_folders.json')
 ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
 PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 UMU_RUN = PathManager.user_data('faugus-launcher/umu-run')
@@ -185,6 +186,7 @@ BACKUP_ITEMS = {
     "categories.json": CATEGORIES_FILE,
     "custom-order.json": CUSTOM_ORDER,
     "presets.json": PRESETS_FILE,
+    "filechooser_folders.json": FILECHOOSER_FOLDERS_FILE,
 }
 
 

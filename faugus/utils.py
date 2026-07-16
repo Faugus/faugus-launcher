@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -269,11 +269,36 @@ class IdComboBox(Gtk.DropDown):
         if factory:
             factory.disconnect_by_func(self._on_factory_setup)
             factory.disconnect_by_func(self._on_factory_bind)
+        list_factory = self.get_list_factory()
+        if list_factory:
+            list_factory.disconnect_by_func(self._on_factory_setup)
+            list_factory.disconnect_by_func(self._on_list_factory_bind)
         self.disconnect_by_func(self._on_notify_selected)
 
     def configure_ellipsize(self, max_width_chars=20):
         self._ellipsize = True
         self._max_width_chars = max_width_chars
+
+    def _on_list_factory_bind(self, factory, list_item):
+        self._on_factory_bind(factory, list_item)
+        if list_item.get_position() == 0:
+            list_item.set_selectable(False)
+            list_item.set_activatable(False)
+            label = list_item.get_child()
+            label.set_visible(False)
+            row_widget = label.get_parent()
+            if row_widget:
+                row_widget.add_css_class("hidden-combo-row")
+
+    def disable_first_item_selection(self):
+        add_css_once(
+            "hidden_combo_row",
+            "row.hidden-combo-row { min-height: 0px; padding: 0px; margin: 0px; border: none; }",
+        )
+        list_factory = Gtk.SignalListItemFactory()
+        list_factory.connect("setup", self._on_factory_setup)
+        list_factory.connect("bind", self._on_list_factory_bind)
+        self.set_list_factory(list_factory)
 
     def append(self, id_, text):
         self._ids.append(id_)
@@ -459,8 +484,7 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
     return dialog
 
 
-_filechooser_state_path = PathManager.user_state("faugus-launcher", "filechooser_folders.json")
-_last_filechooser_folder = load_json_file(_filechooser_state_path, default={})
+_last_filechooser_folder = load_json_file(FILECHOOSER_FOLDERS_FILE, default={})
 
 
 def set_file_chooser_start_folder(filechooser, key, preferred_path=None):
@@ -481,7 +505,7 @@ def set_file_chooser_start_folder(filechooser, key, preferred_path=None):
         path = current.get_path() if current else None
         if path and _last_filechooser_folder.get(key) != path:
             _last_filechooser_folder[key] = path
-            save_json_file(_last_filechooser_folder, _filechooser_state_path)
+            save_json_file(_last_filechooser_folder, FILECHOOSER_FOLDERS_FILE)
 
     filechooser.connect("response", remember_folder)
 

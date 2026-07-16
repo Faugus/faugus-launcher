@@ -362,9 +362,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_mode = self.background_mode
         show_hero = self.hero_overlay_enabled()
 
+        self._bg_no_overlay_widget = None
+        self._bg_base_box = None
+
         if not show_hero and base_mode != "dominant_color":
             if base_mode == "accent":
                 content_widget.add_css_class("accent-background")
+            self._bg_no_overlay_widget = content_widget
             return content_widget
 
         overlay = Gtk.Overlay()
@@ -375,6 +379,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if base_mode == "accent":
             base_box.add_css_class("accent-background")
         overlay.set_child(base_box)
+        self._bg_base_box = base_box
 
         self.stack_hero = Gtk.Stack()
         self.stack_hero.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
@@ -430,6 +435,28 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay.add_overlay(content_widget)
         overlay.set_measure_overlay(content_widget, True)
         return overlay
+
+    def apply_background_mode_live(self, new_mode):
+        show_hero = self.hero_overlay_enabled()
+        old_had_overlay = self.background_mode == "dominant_color" or show_hero
+        new_had_overlay = new_mode == "dominant_color" or show_hero
+        if old_had_overlay != new_had_overlay:
+            return False
+
+        old_mode = self.background_mode
+        self.background_mode = new_mode
+
+        widget = self._bg_no_overlay_widget if not old_had_overlay else self._bg_base_box
+        if widget is not None:
+            if old_mode == "accent":
+                widget.remove_css_class("accent-background")
+            if new_mode == "accent":
+                widget.add_css_class("accent-background")
+
+        if old_had_overlay:
+            self.schedule_background_update()
+
+        return True
 
     def schedule_background_update(self):
         if getattr(self, 'stack_hero', None) is None:
@@ -2404,6 +2431,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         else:
             apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
+            self.apply_background_mode_live(settings_dialog.original_background_mode)
             destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
@@ -3755,6 +3783,7 @@ class Settings(Gtk.Dialog):
         self.combobox_background.append("default", _("Default"))
         self.combobox_background.append("accent", _("Accent color"))
         self.combobox_background.append("dominant_color", _("Dominant color"))
+        self.combobox_background.connect("changed", self.on_background_changed)
 
         self.checkbox_hero_background = Gtk.CheckButton(label=_("Show hero"))
 
@@ -4290,6 +4319,11 @@ class Settings(Gtk.Dialog):
         if hasattr(self.parent, 'schedule_background_update'):
             self.parent.schedule_background_update()
 
+    def on_background_changed(self, widget):
+        new_mode = self.combobox_background.get_active_id()
+        if hasattr(self.parent, 'apply_background_mode_live'):
+            self.parent.apply_background_mode_live(new_mode)
+
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
             self.checkbox_start_minimized.set_sensitive(False)
@@ -4701,6 +4735,7 @@ class Settings(Gtk.Dialog):
         self.accent_color = cfg.config.get('accent-color', 'system')
         self.original_interface_theme = self.interface_theme
         self.original_accent_color = self.accent_color
+        self.original_background_mode = background_mode
 
         self.checkbox_close_after_launch.set_active(close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
@@ -5097,6 +5132,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 continue
 
             self.combobox_steam_title.append(appid, name)
+
+        self.combobox_steam_title.disable_first_item_selection()
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
