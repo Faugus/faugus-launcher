@@ -49,6 +49,7 @@ class ConfigManager:
             'banner-size': '100',
             'sort': 'alpha',
             'category': 'all',
+            'steam-user': 'all',
         }
 
         self.config = {}

@@ -2,6 +2,7 @@ import os
 import subprocess
 import zlib
 
+import vdf
 from pathlib import Path
 import gi
 gi.require_version('GdkPixbuf', '2.0')
@@ -68,17 +69,46 @@ def to_signed_int32(value):
     return value
 
 
-def get_all_shortcut_paths():
-    paths = []
-    if USERDATA:
+def list_steam_account_ids():
+    if not USERDATA:
+        return []
+    try:
+        return [f for f in os.listdir(USERDATA)
+                if os.path.isdir(os.path.join(USERDATA, f)) and f.isdigit()]
+    except (FileNotFoundError, PermissionError):
+        return []
+
+
+def get_all_shortcut_paths(account_id=None):
+    if not USERDATA:
+        return []
+    if account_id and account_id != "all":
+        return [USERDATA / account_id / "config/shortcuts.vdf"]
+    return [USERDATA / sid / "config/shortcuts.vdf" for sid in list_steam_account_ids()]
+
+
+def read_steam_users():
+    account_ids = list_steam_account_ids()
+    if not account_ids:
+        return []
+
+    names = {}
+    login_users_path = steam_folder / "config/loginusers.vdf" if steam_folder else None
+    if login_users_path and login_users_path.exists():
         try:
-            steam_ids = [f for f in os.listdir(USERDATA)
-                         if os.path.isdir(os.path.join(USERDATA, f)) and f.isdigit()]
-            for sid in steam_ids:
-                paths.append(USERDATA / sid / "config/shortcuts.vdf")
-        except (FileNotFoundError, PermissionError):
+            with open(login_users_path, "r", errors="ignore") as f:
+                data = vdf.load(f)
+            for steamid64_str, info in data.get("users", {}).items():
+                try:
+                    account_id = str(int(steamid64_str) - 76561197960265728)
+                except ValueError:
+                    continue
+                names[account_id] = info.get("PersonaName") or account_id
+        except Exception:
             pass
-    return paths
+
+    users = [(aid, names.get(aid, aid)) for aid in account_ids]
+    return sorted(users, key=lambda u: u[1].lower())
 
 
 def read_library_folders():
@@ -96,9 +126,32 @@ def read_library_folders():
     return libraries
 
 
-def read_installed_games():
+def read_user_appids(account_id):
+    if not USERDATA:
+        return None
+
+    path = USERDATA / account_id / "config/localconfig.vdf"
+    if not path.exists():
+        return None
+
+    try:
+        with open(path, "r", errors="ignore") as f:
+            data = vdf.load(f)
+    except Exception:
+        return None
+
+    steam_node = data.get("UserLocalConfigStore", {}).get("Software", {}).get("Valve", {}).get("Steam", {})
+    apps = steam_node.get("apps") or steam_node.get("Apps") or {}
+    return set(apps.keys())
+
+
+def read_installed_games(account_id=None):
     if not steam_folder:
         return []
+
+    allowed_appids = None
+    if account_id and account_id != "all":
+        allowed_appids = read_user_appids(account_id)
 
     games = []
     libraries = read_library_folders()
@@ -111,6 +164,10 @@ def read_installed_games():
 
         for manifest in steamapps_dir.glob("appmanifest_*.acf"):
             appid = manifest.stem.split("_")[-1]
+
+            if allowed_appids is not None and appid not in allowed_appids:
+                continue
+
             name = None
 
             with open(manifest, "r", errors="ignore") as f:
