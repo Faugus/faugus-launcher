@@ -109,11 +109,11 @@ class ProtonDownloader(Gtk.Dialog):
         self.notebook.set_margin_bottom(10)
         self.content_area.append(self.notebook)
 
-        self.progress_label = Gtk.Label(label="")
-        self.progress_label.set_margin_start(10)
-        self.progress_label.set_margin_end(10)
-        self.progress_label.set_margin_bottom(10)
-        self.content_area.append(self.progress_label)
+        self.label_progress = Gtk.Label(label="")
+        self.label_progress.set_margin_start(10)
+        self.label_progress.set_margin_end(10)
+        self.label_progress.set_margin_bottom(10)
+        self.content_area.append(self.label_progress)
 
         self.progress_bar = Gtk.ProgressBar()
         self.progress_bar.set_margin_start(10)
@@ -147,7 +147,7 @@ class ProtonDownloader(Gtk.Dialog):
 
         self.get_releases()
         self.progress_bar.set_visible(False)
-        self.progress_label.set_visible(False)
+        self.label_progress.set_visible(False)
 
     def get_releases(self):
         closed_event = self.closed_event
@@ -228,14 +228,14 @@ class ProtonDownloader(Gtk.Dialog):
         display_name = variant["tag_to_display"](tag_name)
 
         for name in (tag_name, display_name):
-            p = compatibility_dir / name
+            p = COMPATIBILITY_DIR / name
             if p.exists():
                 return p
 
-        if compatibility_dir.exists():
+        if COMPATIBILITY_DIR.exists():
             tag_lower = tag_name.lower()
             display_lower = display_name.lower()
-            for folder in compatibility_dir.iterdir():
+            for folder in COMPATIBILITY_DIR.iterdir():
                 if not folder.is_dir():
                     continue
                 fn_lower = folder.name.lower()
@@ -244,7 +244,7 @@ class ProtonDownloader(Gtk.Dialog):
                 if tag_lower in fn_lower or display_lower in fn_lower:
                     return folder
 
-        return compatibility_dir / display_name
+        return COMPATIBILITY_DIR / display_name
 
     def update_button(self, button, new_label):
         button.set_label(new_label)
@@ -258,7 +258,7 @@ class ProtonDownloader(Gtk.Dialog):
             self.on_remove_clicked(widget, release, variant)
         else:
             self.progress_bar.set_visible(True)
-            self.progress_label.set_visible(True)
+            self.label_progress.set_visible(True)
             self.on_download_clicked(widget, release, variant)
 
     def disable_all_buttons(self):
@@ -292,14 +292,14 @@ class ProtonDownloader(Gtk.Dialog):
     def download_and_extract(self, url, filename, tag_name, button):
         closed_event = self.closed_event
         progress_bar = self.progress_bar
-        progress_label = self.progress_label
+        label_progress = self.label_progress
         update_button = self.update_button
         enable_all_buttons = self.enable_all_buttons
 
         button.set_label(_("Downloading..."))
         button.set_sensitive(False)
-        progress_label.set_text(_("Downloading %s...") % tag_name)
-        progress_label.set_visible(True)
+        label_progress.set_text(_("Downloading %s...") % tag_name)
+        label_progress.set_visible(True)
         progress_bar.set_visible(True)
         progress_bar.set_fraction(0)
         progress_bar.set_text("0%")
@@ -314,7 +314,7 @@ class ProtonDownloader(Gtk.Dialog):
 
         def worker():
             try:
-                compatibility_dir.mkdir(parents=True, exist_ok=True)
+                COMPATIBILITY_DIR.mkdir(parents=True, exist_ok=True)
 
                 response = requests.get(url, stream=True, timeout=30)
                 response.raise_for_status()
@@ -332,16 +332,16 @@ class ProtonDownloader(Gtk.Dialog):
                 stream = _StreamProgress(response.raw, total_size, _progress)
 
                 with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
-                    tar.extractall(path=compatibility_dir, filter="fully_trusted")
+                    tar.extractall(path=COMPATIBILITY_DIR, filter="fully_trusted")
 
                 safe_idle_add(update_button, button, _("Remove"))
                 safe_idle_add(progress_bar.set_visible, False)
-                safe_idle_add(progress_label.set_visible, False)
+                safe_idle_add(label_progress.set_visible, False)
 
             except Exception as e:
                 print(f"Error during download/extraction: {e}")
                 safe_idle_add(update_button, button, _("Download"))
-                safe_idle_add(progress_label.set_text, _("Error during download"))
+                safe_idle_add(label_progress.set_text, _("Error during download"))
             finally:
                 safe_idle_add(enable_all_buttons)
                 safe_idle_add(button.grab_focus)

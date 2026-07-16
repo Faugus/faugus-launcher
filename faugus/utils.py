@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, games_json, presets_file, compatibility_dir, proton_cachyos, mangohud_dir, gamemoderun, icons_dir, banners_dir, faugus_notification
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -336,6 +336,44 @@ def hide_dialog_action_area(dialog):
         action_box.set_visible(False)
 
 
+def build_grid(margin_top=True, margin_bottom=True, column_homogeneous=False):
+    grid = Gtk.Grid()
+    grid.set_row_spacing(10)
+    grid.set_column_spacing(10)
+    if column_homogeneous:
+        grid.set_column_homogeneous(True)
+    grid.set_margin_start(10)
+    grid.set_margin_end(10)
+    if margin_top:
+        grid.set_margin_top(10)
+    if margin_bottom:
+        grid.set_margin_bottom(10)
+    return grid
+
+
+def build_bottom_button_box(button_cancel, button_ok):
+    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    bottom_box.set_homogeneous(True)
+    bottom_box.set_margin_start(10)
+    bottom_box.set_margin_end(10)
+    bottom_box.set_margin_bottom(10)
+    bottom_box.append(button_cancel)
+    bottom_box.append(button_ok)
+    return bottom_box
+
+
+def build_dialog_ok_cancel_box(dialog):
+    button_cancel = Gtk.Button(label=_("Cancel"))
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
+
+    button_ok = Gtk.Button(label=_("Ok"))
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
+
+    return build_bottom_button_box(button_cancel, button_ok)
+
+
 def _release_combo_boxes(widget):
     if isinstance(widget, IdComboBox):
         widget.release()
@@ -485,7 +523,7 @@ _active_media_streams = []
 
 
 def play_notification_sound():
-    media = Gtk.MediaFile.new_for_filename(faugus_notification)
+    media = Gtk.MediaFile.new_for_filename(FAUGUS_NOTIFICATION)
     _active_media_streams.append(media)
 
     def on_notify_ended(stream, _pspec):
@@ -635,14 +673,14 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
 
 
 def disable_mangohud_gamemode_if_missing(obj):
-    obj.mangohud_enabled = os.path.exists(mangohud_dir)
+    obj.mangohud_enabled = os.path.exists(MANGOHUD_DIR)
     if not obj.mangohud_enabled:
         obj.checkbox_mangohud.set_sensitive(False)
         obj.checkbox_mangohud.set_active(False)
         obj.checkbox_mangohud.set_tooltip_text(
             _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
 
-    obj.gamemode_enabled = os.path.exists(gamemoderun) or os.path.exists("/usr/games/gamemoderun")
+    obj.gamemode_enabled = os.path.exists(GAMEMODERUN) or os.path.exists("/usr/games/gamemoderun")
     if not obj.gamemode_enabled:
         obj.checkbox_gamemode.set_sensitive(False)
         obj.checkbox_gamemode.set_active(False)
@@ -827,7 +865,7 @@ def on_button_paypal_clicked(widget):
 
 
 def update_games_json():
-    games = load_json_file(games_json, None)
+    games = load_json_file(GAMES_JSON, None)
     if games is None:
         return
 
@@ -848,8 +886,8 @@ def update_games_json():
         game_id = game.get("gameid")
 
         if game_id:
-            ico_path = os.path.join(icons_dir, f"{game_id}.ico")
-            png_path = os.path.join(icons_dir, f"{game_id}.png")
+            ico_path = os.path.join(ICONS_DIR, f"{game_id}.ico")
+            png_path = os.path.join(ICONS_DIR, f"{game_id}.png")
 
             if os.path.exists(ico_path):
                 new_icon_path = ico_path
@@ -861,13 +899,17 @@ def update_games_json():
                 changed = True
 
             if game.get("banner"):
-                new_banner_path = os.path.join(banners_dir, f"{game_id}.png")
+                new_banner_path = os.path.join(BANNERS_DIR, f"{game_id}.png")
                 if game.get("banner") != new_banner_path:
                     game["banner"] = new_banner_path
                     changed = True
 
     if changed:
-        save_json_file(games, games_json)
+        save_json_file(games, GAMES_JSON)
+
+
+def resolve_protonpath(runner):
+    return PROTON_CACHYOS if runner == "Proton-CachyOS (System)" else runner
 
 
 def version_key(v):
@@ -883,14 +925,14 @@ def populate_combobox_with_runners(combobox):
     combobox.append_text("DW-Proton Latest")
     combobox.append_text("UMU-Proton Latest")
 
-    if os.path.exists(proton_cachyos):
+    if os.path.exists(PROTON_CACHYOS):
         combobox.append_text("Proton-CachyOS (System)")
 
     try:
-        if os.path.exists(compatibility_dir):
+        if os.path.exists(COMPATIBILITY_DIR):
             versions = []
-            for entry in os.listdir(compatibility_dir):
-                entry_path = os.path.join(compatibility_dir, entry)
+            for entry in os.listdir(COMPATIBILITY_DIR):
+                entry_path = os.path.join(COMPATIBILITY_DIR, entry)
                 if (
                     os.path.isdir(entry_path)
                     and entry not in ("UMU-Latest", "LegacyRuntime")
@@ -977,13 +1019,8 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
 
     store_presets = Gtk.ListStore(str)
 
-    if os.path.exists(presets_file):
-        try:
-            with open(presets_file, "r") as f:
-                for item in json.load(f):
-                    store_presets.append([item])
-        except Exception:
-            pass
+    for item in load_json_file(PRESETS_FILE, default=[]):
+        store_presets.append([item])
     store_presets.append([""])
 
     tree_presets = Gtk.TreeView(model=store_presets)
@@ -1127,21 +1164,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     content_area = dialog.get_content_area()
     content_area.append(hbox)
 
-    button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_hexpand(True)
-    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
-
-    button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_hexpand(True)
-    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
-
-    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    bottom_box.set_homogeneous(True)
-    bottom_box.set_margin_start(10)
-    bottom_box.set_margin_end(10)
-    bottom_box.set_margin_bottom(10)
-    bottom_box.append(button_cancel)
-    bottom_box.append(button_ok)
+    bottom_box = build_dialog_ok_cancel_box(dialog)
 
     content_area.append(bottom_box)
 
@@ -1149,8 +1172,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
         result = current_launch_arguments
         if response == Gtk.ResponseType.OK:
             presets_to_save = [row[0] for row in store_presets if row[0].strip()]
-            with open(presets_file, "w") as f:
-                json.dump(presets_to_save, f)
+            save_json_file(presets_to_save, PRESETS_FILE)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
             result = "\n".join(args_to_save)
@@ -1264,21 +1286,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
 
     frame.set_child(grid)
 
-    button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_hexpand(True)
-    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
-
-    button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_hexpand(True)
-    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
-
-    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    bottom_box.set_homogeneous(True)
-    bottom_box.set_margin_start(10)
-    bottom_box.set_margin_end(10)
-    bottom_box.set_margin_bottom(10)
-    bottom_box.append(button_cancel)
-    bottom_box.append(button_ok)
+    bottom_box = build_dialog_ok_cancel_box(dialog)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)
@@ -1407,21 +1415,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
 
     frame.set_child(grid)
 
-    button_cancel = Gtk.Button(label=_("Cancel"))
-    button_cancel.set_hexpand(True)
-    button_cancel.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.CANCEL))
-
-    button_ok = Gtk.Button(label=_("Ok"))
-    button_ok.set_hexpand(True)
-    button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
-
-    bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    bottom_box.set_homogeneous(True)
-    bottom_box.set_margin_start(10)
-    bottom_box.set_margin_end(10)
-    bottom_box.set_margin_bottom(10)
-    bottom_box.append(button_cancel)
-    bottom_box.append(button_ok)
+    bottom_box = build_dialog_ok_cancel_box(dialog)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)

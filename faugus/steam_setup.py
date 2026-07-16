@@ -46,11 +46,11 @@ def detect_steam_folder():
 
 
 steam_folder, IS_STEAM_FLATPAK = detect_steam_folder()
-userdata = steam_folder / "userdata" if steam_folder else None
-library = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
-librarycache = steam_folder / "appcache/librarycache" if steam_folder else None
+USERDATA = steam_folder / "userdata" if steam_folder else None
+LIBRARY = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
+LIBRARYCACHE = steam_folder / "appcache/librarycache" if steam_folder else None
 
-lossless_dll = (
+LOSSLESS_DLL = (
     (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll")
     if steam_folder and (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll").is_file()
     else ""
@@ -70,12 +70,12 @@ def to_signed_int32(value):
 
 def get_all_shortcut_paths():
     paths = []
-    if userdata:
+    if USERDATA:
         try:
-            steam_ids = [f for f in os.listdir(userdata)
-                         if os.path.isdir(os.path.join(userdata, f)) and f.isdigit()]
+            steam_ids = [f for f in os.listdir(USERDATA)
+                         if os.path.isdir(os.path.join(USERDATA, f)) and f.isdigit()]
             for sid in steam_ids:
-                paths.append(userdata / sid / "config/shortcuts.vdf")
+                paths.append(USERDATA / sid / "config/shortcuts.vdf")
         except (FileNotFoundError, PermissionError):
             pass
     return paths
@@ -84,10 +84,10 @@ def get_all_shortcut_paths():
 def read_library_folders():
     libraries = []
 
-    if not library or not library.exists():
+    if not LIBRARY or not LIBRARY.exists():
         return libraries
 
-    with open(library, "r", errors="ignore") as f:
+    with open(LIBRARY, "r", errors="ignore") as f:
         for line in f:
             if '"path"' in line:
                 path = line.split('"')[-2]
@@ -125,10 +125,10 @@ def read_installed_games():
 
 
 def get_steam_icon_path(appid):
-    if not librarycache or not librarycache.exists():
+    if not LIBRARYCACHE or not LIBRARYCACHE.exists():
         return None
 
-    cache = librarycache / str(appid)
+    cache = LIBRARYCACHE / str(appid)
     if not cache.exists():
         return None
 

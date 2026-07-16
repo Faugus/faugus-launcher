@@ -12,7 +12,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
 from faugus.utils import *
 from faugus.config_manager import *
-from faugus.steam_setup import lossless_dll
+from faugus.steam_setup import LOSSLESS_DLL
 from faugus.migration import fix_legacy_shortcut_icons
 
 if IS_FLATPAK:
@@ -33,9 +33,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.set_title(game_title)
         print(self.file_path)
 
-        self.icon_directory = f"{shortcut_icons_dir}/icon_temp/"
+        self.icon_directory = f"{SHORTCUT_ICONS_DIR}/icon_temp/"
 
-        self.icons_path = shortcut_icons_dir
+        self.icons_path = SHORTCUT_ICONS_DIR
         self.icon_converted = os.path.expanduser(f'{self.icons_path}/icon_temp/icon.png')
         self.icon_temp = f'{self.icons_path}/icon_temp.png'
 
@@ -108,47 +108,17 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         frame.set_margin_top(10)
         frame.set_margin_bottom(10)
 
-        self.grid_title = Gtk.Grid()
-        self.grid_title.set_row_spacing(10)
-        self.grid_title.set_column_spacing(10)
-        self.grid_title.set_margin_start(10)
-        self.grid_title.set_margin_end(10)
-        self.grid_title.set_margin_top(10)
+        self.grid_title = build_grid(margin_bottom=False)
 
-        self.grid_protonfix = Gtk.Grid()
-        self.grid_protonfix.set_row_spacing(10)
-        self.grid_protonfix.set_column_spacing(10)
-        self.grid_protonfix.set_margin_start(10)
-        self.grid_protonfix.set_margin_end(10)
-        self.grid_protonfix.set_margin_top(10)
+        self.grid_protonfix = build_grid(margin_bottom=False)
 
-        self.grid_launch_arguments = Gtk.Grid()
-        self.grid_launch_arguments.set_row_spacing(10)
-        self.grid_launch_arguments.set_column_spacing(10)
-        self.grid_launch_arguments.set_margin_start(10)
-        self.grid_launch_arguments.set_margin_end(10)
-        self.grid_launch_arguments.set_margin_top(10)
+        self.grid_launch_arguments = build_grid(margin_bottom=False)
 
-        self.grid_game_arguments = Gtk.Grid()
-        self.grid_game_arguments.set_row_spacing(10)
-        self.grid_game_arguments.set_column_spacing(10)
-        self.grid_game_arguments.set_margin_start(10)
-        self.grid_game_arguments.set_margin_end(10)
-        self.grid_game_arguments.set_margin_top(10)
+        self.grid_game_arguments = build_grid(margin_bottom=False)
 
-        self.grid_lossless = Gtk.Grid()
-        self.grid_lossless.set_row_spacing(10)
-        self.grid_lossless.set_column_spacing(10)
-        self.grid_lossless.set_margin_start(10)
-        self.grid_lossless.set_margin_end(10)
-        self.grid_lossless.set_margin_top(10)
+        self.grid_lossless = build_grid(margin_bottom=False)
 
-        self.grid_addapp = Gtk.Grid()
-        self.grid_addapp.set_row_spacing(10)
-        self.grid_addapp.set_column_spacing(10)
-        self.grid_addapp.set_margin_start(10)
-        self.grid_addapp.set_margin_end(10)
-        self.grid_addapp.set_margin_top(10)
+        self.grid_addapp = build_grid(margin_bottom=False)
 
         self.grid_title.attach(self.label_title, 0, 0, 4, 1)
         self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
@@ -198,33 +168,25 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.box_tools.append(self.grid_tools)
         self.box_tools.append(self.grid_shortcut_icon)
 
-        bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        bottom_box.set_homogeneous(True)
-        bottom_box.set_margin_start(10)
-        bottom_box.set_margin_end(10)
-        bottom_box.set_margin_bottom(10)
-
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
+        bottom_box = build_bottom_button_box(self.button_cancel, self.button_ok)
 
-        bottom_box.append(self.button_cancel)
-        bottom_box.append(self.button_ok)
-
-        self.main_grid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.main_grid.append(self.grid_title)
-        self.main_grid.append(self.grid_protonfix)
-        self.main_grid.append(self.grid_game_arguments)
-        self.main_grid.append(self.grid_launch_arguments)
-        self.main_grid.append(self.grid_addapp)
-        self.main_grid.append(self.grid_lossless)
-        self.main_grid.append(self.box_tools)
+        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_main.append(self.grid_title)
+        self.box_main.append(self.grid_protonfix)
+        self.box_main.append(self.grid_game_arguments)
+        self.box_main.append(self.grid_launch_arguments)
+        self.box_main.append(self.grid_addapp)
+        self.box_main.append(self.grid_lossless)
+        self.box_main.append(self.box_tools)
 
         self.load_config()
 
         disable_mangohud_gamemode_if_missing(self)
 
-        if os.path.exists(lsfgvk_path):
-            if lossless_dll or os.path.exists(self.lossless_location):
+        if os.path.exists(LSFGVK_PATH):
+            if LOSSLESS_DLL or os.path.exists(self.lossless_location):
                 self.button_lossless.set_sensitive(True)
             else:
                 self.button_lossless.set_sensitive(False)
@@ -233,7 +195,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             self.button_lossless.set_sensitive(False)
             self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
 
-        frame.set_child(self.main_grid)
+        frame.set_child(self.box_main)
         self.box.append(frame)
         self.box.append(bottom_box)
         self.set_child(self.box)
@@ -311,9 +273,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         if os.path.isfile(os.path.expanduser(self.icon_temp)):
             os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.png')
 
-        new_icon_path = f"{shortcut_icons_dir}/{title_formatted}.png"
+        new_icon_path = f"{SHORTCUT_ICONS_DIR}/{title_formatted}.png"
         if not os.path.exists(new_icon_path):
-            new_icon_path = faugus_png
+            new_icon_path = FAUGUS_PNG
 
         protonfix = self.entry_protonfix.get_text()
 
@@ -358,7 +320,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         if mangohud:
             command_parts.append("mangohud")
 
-        command_parts.append(f"'{umu_run}'")
+        command_parts.append(f"'{UMU_RUN}'")
 
         if self.addapp_enabled:
             escaped_addapp_bat = addapp_bat.replace("'", "'\\''")
@@ -376,7 +338,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec=flatpak run --command={launcher_path} io.github.Faugus.faugus-launcher {launcher_module_args}--run "{command}"\n'
+                f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}--run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
@@ -386,24 +348,24 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_file_content = (
                 f'[Desktop Entry]\n'
                 f'Name={title}\n'
-                f'Exec={launcher_path} {launcher_module_args}--run "{command}"\n'
+                f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}--run "{command}"\n'
                 f'Icon={new_icon_path}\n'
                 f'Type=Application\n'
                 f'Categories=Game;\n'
                 f'Path={game_directory}\n'
             )
 
-        os.makedirs(app_dir, exist_ok=True)
-        os.makedirs(desktop_dir, exist_ok=True)
+        os.makedirs(APP_DIR, exist_ok=True)
+        os.makedirs(DESKTOP_DIR, exist_ok=True)
 
-        applications_shortcut_path = f"{app_dir}/{title_formatted}.desktop"
+        applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
 
         with open(applications_shortcut_path, 'w') as desktop_file:
             desktop_file.write(desktop_file_content)
 
         os.chmod(applications_shortcut_path, 0o755)
 
-        desktop_shortcut_path = f"{desktop_dir}/{title_formatted}.desktop"
+        desktop_shortcut_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
         os.chmod(desktop_shortcut_path, 0o755)
 
@@ -414,7 +376,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         destroy_and_release(self)
 
     def set_image_shortcut_icon(self):
-        texture = self.new_texture_from_image(faugus_png_raster, 50, 50)
+        texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 50, 50)
         return new_picture(texture)
 
     def on_button_shortcut_icon_clicked(self, widget):

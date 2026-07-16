@@ -49,12 +49,12 @@ class VirtualKeyboard(Gtk.Dialog):
         vbox.set_margin_top(10)
         vbox.set_margin_bottom(10)
 
-        self.display_entry = Gtk.Entry()
-        self.display_entry.set_text(self.entry.get_text())
-        self.display_entry.set_alignment(0.5)
-        self.display_entry.set_can_focus(False)
-        self.display_entry.connect("changed", self.on_display_changed)
-        vbox.append(self.display_entry)
+        self.entry_display = Gtk.Entry()
+        self.entry_display.set_text(self.entry.get_text())
+        self.entry_display.set_alignment(0.5)
+        self.entry_display.set_can_focus(False)
+        self.entry_display.connect("changed", self.on_display_changed)
+        vbox.append(self.entry_display)
 
         self.grid = Gtk.Grid(row_spacing=8, column_spacing=8)
         self.grid.set_halign(Gtk.Align.CENTER)
@@ -136,13 +136,13 @@ class VirtualKeyboard(Gtk.Dialog):
                 col_offset += span
 
     def on_display_changed(self, editable):
-        self.entry.set_text(self.display_entry.get_text())
+        self.entry.set_text(self.entry_display.get_text())
 
     def on_key_clicked(self, button, char):
-        text = self.display_entry.get_text()
+        text = self.entry_display.get_text()
         new_text = text + char
-        self.display_entry.set_text(new_text)
-        self.display_entry.set_position(len(new_text))
+        self.entry_display.set_text(new_text)
+        self.entry_display.set_position(len(new_text))
 
         if self.mode == "shift":
             col = getattr(button, 'grid_col', 0)
@@ -156,11 +156,11 @@ class VirtualKeyboard(Gtk.Dialog):
                 new_btn.grab_focus()
 
     def on_backspace(self, button):
-        text = self.display_entry.get_text()
+        text = self.entry_display.get_text()
         if len(text) > 0:
             new_text = text[:-1]
-            self.display_entry.set_text(new_text)
-            self.display_entry.set_position(len(new_text))
+            self.entry_display.set_text(new_text)
+            self.entry_display.set_position(len(new_text))
 
     def on_toggle_mode(self, button, mode_type):
         col = getattr(button, 'grid_col', 0)
@@ -194,8 +194,8 @@ class VirtualKeyboard(Gtk.Dialog):
             new_btn.grab_focus()
 
     def on_clear(self, button):
-        self.display_entry.set_text("")
-        self.display_entry.set_position(0)
+        self.entry_display.set_text("")
+        self.entry_display.set_position(0)
 
     def on_enter(self, button):
         self.entry.emit("activate")
@@ -203,13 +203,13 @@ class VirtualKeyboard(Gtk.Dialog):
 
     def on_cancel(self, button):
         self.entry.set_text(self.original_text)
-        self.display_entry.set_text(self.original_text)
+        self.entry_display.set_text(self.original_text)
         self._close()
 
     def on_response(self, dialog, response_id):
         if response_id == Gtk.ResponseType.CANCEL:
             self.entry.set_text(self.original_text)
-            self.display_entry.set_text(self.original_text)
+            self.entry_display.set_text(self.original_text)
         self._close()
 
     def _close(self):

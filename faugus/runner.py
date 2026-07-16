@@ -27,7 +27,7 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-os.makedirs(compatibility_dir, exist_ok=True)
+os.makedirs(COMPATIBILITY_DIR, exist_ok=True)
 fix_legacy_shortcut_icons()
 
 _ = setup_gettext('faugus-run')
@@ -84,8 +84,8 @@ class FaugusRun(HiDpiMixin):
         if not self.splash_disable and not self.disable_updates:
             GLib.idle_add(self.show_splash)
 
-        set_env("PROTON_EAC_RUNTIME", eac_dir)
-        set_env("PROTON_BATTLEYE_RUNTIME", be_dir)
+        set_env("PROTON_EAC_RUNTIME", EAC_DIR)
+        set_env("PROTON_BATTLEYE_RUNTIME", BE_DIR)
 
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
@@ -137,7 +137,7 @@ class FaugusRun(HiDpiMixin):
             if self.enable_logging:
                 set_env("UMU_LOG", "1")
 
-                target_dir = f"{logs_dir}/{self.log_dir}"
+                target_dir = f"{LOGS_DIR}/{self.log_dir}"
                 set_env("PROTON_LOG_DIR", target_dir)
                 set_env("PROTON_LOG", "1")
 
@@ -149,17 +149,14 @@ class FaugusRun(HiDpiMixin):
         if not os.environ.get("WINEPREFIX"):
             if not os.environ.get("PROTONPATH") == "umu-sniper":
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
-                if self.default_runner == "Proton-CachyOS (System)":
-                    set_env("PROTONPATH", f"{proton_cachyos}")
-                else:
-                    set_env("PROTONPATH", f"{self.default_runner}")
+                set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
 
         if not os.environ.get("GAMEID"):
             set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "DW-Proton Latest" and protonpath != "umu-sniper":
-            if protonpath == "Proton-CachyOS (System)" and not os.path.exists(proton_cachyos):
+            if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
             elif protonpath == "Linux-Native":
@@ -167,33 +164,33 @@ class FaugusRun(HiDpiMixin):
             elif protonpath == "Steam":
                 pass
             else:
-                protonpath_path = compatibility_dir / protonpath
+                protonpath_path = COMPATIBILITY_DIR / protonpath
                 if not protonpath_path.is_dir():
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
-            self.proton_exists = (compatibility_dir / "Proton-EM Latest").is_dir()
+            self.proton_exists = (COMPATIBILITY_DIR / "Proton-EM Latest").is_dir()
 
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
-            self.proton_exists = (compatibility_dir / "Proton-GE Latest").is_dir()
+            self.proton_exists = (COMPATIBILITY_DIR / "Proton-GE Latest").is_dir()
 
         if protonpath == "Proton-CachyOS Latest":
             self.proton_latest = "--cachyos"
-            self.proton_exists = (compatibility_dir / "Proton-CachyOS Latest").is_dir()
+            self.proton_exists = (COMPATIBILITY_DIR / "Proton-CachyOS Latest").is_dir()
 
         if protonpath == "DW-Proton Latest":
             self.proton_latest = "--dw"
-            self.proton_exists = (compatibility_dir / "DW-Proton Latest").is_dir()
+            self.proton_exists = (COMPATIBILITY_DIR / "DW-Proton Latest").is_dir()
 
         self.components_exists = (
-            os.path.exists(eac_dir) and
-            os.path.exists(be_dir) and
-            os.path.exists(umu_run)
+            os.path.exists(EAC_DIR) and
+            os.path.exists(BE_DIR) and
+            os.path.exists(UMU_RUN)
         )
 
-        env_from_file = self.load_env_from_file(envar_dir)
+        env_from_file = self.load_env_from_file(ENVAR_DIR)
         if env_from_file:
             print("\n=== GLOBAL ENVIRONMENT VARIABLES ===")
             for key in sorted(env_from_file):
@@ -213,7 +210,7 @@ class FaugusRun(HiDpiMixin):
         def start_and_watch(cmd, is_game=False):
             log_file = None
             if self.enable_logging:
-                log_path = Path(logs_dir) / self.log_dir
+                log_path = Path(LOGS_DIR) / self.log_dir
                 log_path.mkdir(parents=True, exist_ok=True)
                 log_file = open(log_path / "umu.log", "a", encoding="utf-8")
 
@@ -332,7 +329,7 @@ class FaugusRun(HiDpiMixin):
             box_top.set_margin_top(20)
             box_top.set_margin_bottom(20)
 
-            texture = self.new_texture_from_image(faugus_png_raster, 75, 75)
+            texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 75, 75)
             image = new_picture(texture)
 
             label = Gtk.Label(label=_("Are you enjoying Faugus?"))
@@ -420,7 +417,7 @@ class FaugusRun(HiDpiMixin):
 
         self.message = " ".join(shlex.quote(t) for t in new_tokens)
 
-    def load_env_from_file(self, filename=envar_dir):
+    def load_env_from_file(self, filename=ENVAR_DIR):
         env_from_file = {}
 
         for line in load_json_file(filename, default=[]):
@@ -469,7 +466,7 @@ class FaugusRun(HiDpiMixin):
         if game_icon and os.path.exists(game_icon):
             image_path = game_icon
         else:
-            image_path = faugus_png_raster
+            image_path = FAUGUS_PNG_RASTER
         texture = self.new_texture_from_image(image_path, 75, 75)
         image = new_picture(texture)
         image.set_margin_top(20)
@@ -656,7 +653,7 @@ class FaugusRun(HiDpiMixin):
         game_id = os.environ.get("FAUGUSID")
 
         if game_id:
-            games = load_json_file(games_json, [])
+            games = load_json_file(GAMES_JSON, [])
             if games:
                 for game in games:
                     if game.get("gameid") == game_id:
@@ -664,10 +661,10 @@ class FaugusRun(HiDpiMixin):
                         game["playtime"] = old_time + runtime
                         break
 
-                save_json_file(games, games_json)
+                save_json_file(games, GAMES_JSON)
 
         if self.enable_logging:
-            target_dir = f"{logs_dir}/{self.log_dir}"
+            target_dir = f"{LOGS_DIR}/{self.log_dir}"
 
             if os.path.exists(target_dir):
                 for file in os.listdir(target_dir):
@@ -734,7 +731,7 @@ def build_launch_command(game):
             command_parts.append('PROTONPATH=umu-sniper')
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
-            command_parts.append(f"PROTONPATH={proton_cachyos}")
+            command_parts.append(f"PROTONPATH={PROTON_CACHYOS}")
         else:
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH='{runner}'")
@@ -743,13 +740,13 @@ def build_launch_command(game):
     command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
     if launch_arguments:
         command_parts.append(os.path.expanduser(launch_arguments))
-    if gamemode and os.path.exists(gamemoderun):
+    if gamemode and os.path.exists(GAMEMODERUN):
         command_parts.append("gamemoderun")
-    if mangohud and os.path.exists(mangohud_dir):
+    if mangohud and os.path.exists(MANGOHUD_DIR):
         command_parts.append("mangohud")
 
     if runner != "Steam":
-        command_parts.append(f"'{umu_run}'")
+        command_parts.append(f"'{UMU_RUN}'")
 
     if addapp_checkbox == "addapp_enabled":
         command_parts.append(shlex.quote(addapp_bat))
@@ -776,7 +773,7 @@ def build_launch_command(game):
 
 
 def load_game_from_json(gameid):
-    games = load_json_file(games_json, None)
+    games = load_json_file(GAMES_JSON, None)
     if games is None:
         return None
 

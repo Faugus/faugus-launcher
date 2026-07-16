@@ -12,19 +12,19 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file
+from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box
 
 
 def load_config():
-    return load_json_file(config_file_dir, default={})
+    return load_json_file(CONFIG_FILE_DIR, default={})
 
 
 def save_config(config):
-    save_json_file(config, config_file_dir)
+    save_json_file(config, CONFIG_FILE_DIR)
 
 
 def perform_backup(dest_path):
-    temp_dir = os.path.join(faugus_temp, "temp-backup")
+    temp_dir = os.path.join(FAUGUS_TEMP, "temp-backup")
     os.makedirs(temp_dir, exist_ok=True)
 
     for item, src in BACKUP_ITEMS.items():
@@ -40,7 +40,7 @@ def perform_backup(dest_path):
         f.write("faugus-launcher-backup")
 
     current_date = datetime.now().strftime("%Y-%m-%d")
-    zip_path = os.path.join(faugus_temp, f"faugus-launcher-{current_date}")
+    zip_path = os.path.join(FAUGUS_TEMP, f"faugus-launcher-{current_date}")
 
     shutil.make_archive(zip_path, "zip", temp_dir)
     shutil.rmtree(temp_dir)
@@ -177,9 +177,9 @@ class BackupWindow(Gtk.Dialog):
         self.frame.set_child(self.main_box)
         self.root_box.append(self.frame)
 
-        self.lbl_path = Gtk.Label(label=_("Backup Destination"))
-        self.lbl_path.set_halign(Gtk.Align.START)
-        self.main_box.append(self.lbl_path)
+        self.label_path = Gtk.Label(label=_("Backup Destination"))
+        self.label_path.set_halign(Gtk.Align.START)
+        self.main_box.append(self.label_path)
 
         dest_dir = self.config.get('backup-dest-dir', '')
         if not dest_dir:
@@ -190,26 +190,26 @@ class BackupWindow(Gtk.Dialog):
         self.entry_dest.connect("changed", on_entry_changed)
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
-        self.btn_browse = Gtk.Button()
-        self.btn_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
-        self.btn_browse.connect("clicked", self.on_browse_clicked)
-        self.btn_browse.set_size_request(50, -1)
+        self.button_browse = Gtk.Button()
+        self.button_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_browse.connect("clicked", self.on_browse_clicked)
+        self.button_browse.set_size_request(50, -1)
         self.box_dest.append(self.entry_dest)
-        self.box_dest.append(self.btn_browse)
+        self.box_dest.append(self.button_browse)
         self.main_box.append(self.box_dest)
 
-        self.btn_manual = Gtk.Button(label=_("Backup now"))
-        self.btn_manual.set_margin_top(10)
-        self.btn_manual.connect("clicked", self.on_manual_clicked)
-        self.main_box.append(self.btn_manual)
+        self.button_manual = Gtk.Button(label=_("Backup now"))
+        self.button_manual.set_margin_top(10)
+        self.button_manual.connect("clicked", self.on_manual_clicked)
+        self.main_box.append(self.button_manual)
 
         self.box_switch = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.check_auto = Gtk.CheckButton(label=_("Automatic Backup"))
-        self.check_auto.set_margin_top(10)
+        self.checkbox_auto = Gtk.CheckButton(label=_("Automatic Backup"))
+        self.checkbox_auto.set_margin_top(10)
         is_enabled = self.config.get('backup-auto-enabled', 'False') == 'True'
-        self.check_auto.set_active(is_enabled)
-        self.check_auto.connect("toggled", self.on_check_toggled)
-        self.box_switch.append(self.check_auto)
+        self.checkbox_auto.set_active(is_enabled)
+        self.checkbox_auto.connect("toggled", self.on_check_toggled)
+        self.box_switch.append(self.checkbox_auto)
         self.main_box.append(self.box_switch)
 
         self.box_freq = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
@@ -256,29 +256,23 @@ class BackupWindow(Gtk.Dialog):
         last_date = self.config.get('backup-last-date')
         if not last_date or not last_date.strip():
             last_date = _("No backup yet")
-        self.lbl_last_backup = Gtk.Label(label=f"{_('Last backup:')} {last_date}")
-        self.lbl_last_backup.set_margin_top(10)
-        self.main_box.append(self.lbl_last_backup)
+        self.label_last_backup = Gtk.Label(label=f"{_('Last backup:')} {last_date}")
+        self.label_last_backup.set_margin_top(10)
+        self.main_box.append(self.label_last_backup)
 
-        self.lbl_warning = Gtk.Label(label=_("Prefixes and Protons will not be backed up!"))
-        self.lbl_warning.set_markup(f'<span color="red">{_("Prefixes and Protons will not be backed up!")}</span>')
-        self.main_box.append(self.lbl_warning)
+        self.label_warning = Gtk.Label(label=_("Prefixes and Protons will not be backed up!"))
+        self.label_warning.set_markup(f'<span color="red">{_("Prefixes and Protons will not be backed up!")}</span>')
+        self.main_box.append(self.label_warning)
 
-        self.btn_cancel = Gtk.Button(label=_("Cancel"))
-        self.btn_cancel.set_hexpand(True)
-        self.btn_cancel.connect("clicked", self.on_cancel_clicked)
+        self.button_cancel = Gtk.Button(label=_("Cancel"))
+        self.button_cancel.set_hexpand(True)
+        self.button_cancel.connect("clicked", self.on_cancel_clicked)
 
-        self.btn_ok = Gtk.Button(label=_("Ok"))
-        self.btn_ok.set_hexpand(True)
-        self.btn_ok.connect("clicked", self.on_ok_clicked)
+        self.button_ok = Gtk.Button(label=_("Ok"))
+        self.button_ok.set_hexpand(True)
+        self.button_ok.connect("clicked", self.on_ok_clicked)
 
-        self.bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.bottom_box.set_homogeneous(True)
-        self.bottom_box.set_margin_start(10)
-        self.bottom_box.set_margin_end(10)
-        self.bottom_box.set_margin_bottom(10)
-        self.bottom_box.append(self.btn_cancel)
-        self.bottom_box.append(self.btn_ok)
+        self.bottom_box = build_bottom_button_box(self.button_cancel, self.button_ok)
 
         self.root_box.append(self.bottom_box)
 
@@ -309,7 +303,7 @@ class BackupWindow(Gtk.Dialog):
         self.update_ui_state()
 
     def update_ui_state(self):
-        is_active = self.check_auto.get_active()
+        is_active = self.checkbox_auto.get_active()
 
         self.radio_daily.set_sensitive(is_active)
         self.radio_weekly.set_sensitive(is_active)
@@ -354,7 +348,7 @@ class BackupWindow(Gtk.Dialog):
             new_date = perform_backup(dest_path)
             self.config['backup-last-date'] = new_date
             save_config(self.config)
-            self.lbl_last_backup.set_text(f"{_('Last backup:')} {new_date}")
+            self.label_last_backup.set_text(f"{_('Last backup:')} {new_date}")
         except Exception:
             pass
 
@@ -362,7 +356,7 @@ class BackupWindow(Gtk.Dialog):
         destroy_and_release(self)
 
     def on_ok_clicked(self, widget):
-        self.config['backup-auto-enabled'] = str(self.check_auto.get_active())
+        self.config['backup-auto-enabled'] = str(self.checkbox_auto.get_active())
 
         if self.radio_daily.get_active():
             self.config['backup-frequency'] = 'daily'
@@ -377,9 +371,9 @@ class BackupWindow(Gtk.Dialog):
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
         save_config(self.config)
 
-        setup_autostart(self.check_auto.get_active())
+        setup_autostart(self.checkbox_auto.get_active())
 
-        if self.check_auto.get_active() and should_run_backup(self.config):
+        if self.checkbox_auto.get_active() and should_run_backup(self.config):
             try:
                 dest_dir = self.config.get('backup-dest-dir', '')
                 if not dest_dir:

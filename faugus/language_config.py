@@ -21,9 +21,9 @@ def get_system_locale():
 
 
 def get_language_from_config():
-    if os.path.exists(config_file_dir):
+    if os.path.exists(CONFIG_FILE_DIR):
         try:
-            with open(config_file_dir, 'r', encoding='utf-8') as f:
+            with open(CONFIG_FILE_DIR, 'r', encoding='utf-8') as f:
                 return json.load(f).get('language')
         except (OSError, json.JSONDecodeError):
             return None
@@ -34,11 +34,11 @@ lang = get_language_from_config()
 if not lang:
     lang = get_system_locale()
 
-_source_languages_dir = os.path.join(faugus_source_root, 'languages')
+_SOURCE_LANGUAGES_DIR = os.path.join(FAUGUS_SOURCE_ROOT, 'languages')
 
 LOCALE_DIR = (
-    _source_languages_dir
-    if os.path.isdir(_source_languages_dir)
+    _SOURCE_LANGUAGES_DIR
+    if os.path.isdir(_SOURCE_LANGUAGES_DIR)
     else PathManager.system_data('locale')
 )
 

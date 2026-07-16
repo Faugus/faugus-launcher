@@ -3,13 +3,13 @@ from pathlib import Path
 
 import vdf
 
-from faugus.path_manager import PathManager, app_dir, desktop_dir, icons_dir, shortcut_icons_dir
+from faugus.path_manager import PathManager, APP_DIR, DESKTOP_DIR, ICONS_DIR, SHORTCUT_ICONS_DIR
 
 _LEGACY_ICON_BASES = (
     PathManager.user_config('faugus-launcher/icons'),
     PathManager.user_config('faugus-launcher/icons-nolauncher'),
 )
-_NEW_ICON_BASES = (icons_dir, shortcut_icons_dir)
+_NEW_ICON_BASES = (ICONS_DIR, SHORTCUT_ICONS_DIR)
 
 
 def _rewrite_icon_path(value):
@@ -47,7 +47,7 @@ def _fix_desktop_file(path):
 
 
 def _fix_desktop_shortcuts():
-    for directory in (app_dir, desktop_dir):
+    for directory in (APP_DIR, DESKTOP_DIR):
         d = Path(directory)
         if not d.is_dir():
             continue

@@ -5,11 +5,11 @@ import requests
 import tarfile
 import shutil
 
-from faugus.path_manager import faugus_launcher_share_dir, DOWNLOAD_DIR, umu_run
+from faugus.path_manager import FAUGUS_LAUNCHER_SHARE_DIR, DOWNLOAD_DIR, UMU_RUN
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
-UMU_VERSION_FILE = os.path.join(faugus_launcher_share_dir, "version.txt")
+UMU_VERSION_FILE = os.path.join(FAUGUS_LAUNCHER_SHARE_DIR, "version.txt")
 
 
 def get_latest_umu_version():
@@ -32,17 +32,17 @@ def get_installed_umu_version():
 
 def download_umu_run(version):
     try:
-        os.makedirs(faugus_launcher_share_dir, exist_ok=True)
+        os.makedirs(FAUGUS_LAUNCHER_SHARE_DIR, exist_ok=True)
         url = UMU_URL_TEMPLATE.format(version)
         r = requests.get(url, timeout=10)
 
         if r.status_code != 200:
             return
 
-        with open(umu_run, "wb") as f:
+        with open(UMU_RUN, "wb") as f:
             f.write(r.content)
 
-        os.chmod(umu_run, 0o755)
+        os.chmod(UMU_RUN, 0o755)
 
         with open(UMU_VERSION_FILE, "w") as f:
             f.write(version)
@@ -59,7 +59,7 @@ def update_umu():
     if latest is None:
         return
 
-    if latest != current or not os.path.exists(umu_run):
+    if latest != current or not os.path.exists(UMU_RUN):
         download_umu_run(latest)
     else:
         print("UMU-Launcher is up to date.", flush=True)

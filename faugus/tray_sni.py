@@ -5,7 +5,7 @@ import gi
 gi.require_version('GdkPixbuf', '2.0')
 
 from gi.repository import GdkPixbuf, Gio, GLib
-from faugus.path_manager import faugus_mono_icon, faugus_png, games_json, latest_games
+from faugus.path_manager import FAUGUS_MONO_ICON, FAUGUS_PNG, GAMES_JSON, LATEST_GAMES
 from faugus.language_config import setup_gettext
 
 _ = setup_gettext('faugus-launcher')
@@ -133,7 +133,7 @@ def load_icon_pixmap(svg_path, size=64):
 
 
 def resolve_icon_path(mono_icon):
-    return faugus_mono_icon if mono_icon else faugus_png
+    return FAUGUS_MONO_ICON if mono_icon else FAUGUS_PNG
 
 
 class TrayIcon:
@@ -237,7 +237,7 @@ class TrayIcon:
 
     def rebuild_menu(self):
         games_by_id = {}
-        for entry in load_json_file(games_json, []):
+        for entry in load_json_file(GAMES_JSON, []):
             gameid = entry.get("gameid")
             if gameid:
                 games_by_id[gameid] = entry.get("title", gameid)
@@ -245,7 +245,7 @@ class TrayIcon:
         items = []
         item_id = 1
 
-        for gameid in load_json_file(latest_games, default=[]):
+        for gameid in load_json_file(LATEST_GAMES, default=[]):
             gameid = gameid.strip()
             if len(items) >= 5:
                 break

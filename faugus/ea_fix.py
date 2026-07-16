@@ -95,7 +95,7 @@ def update_ea_path(prefix):
 
     new_executable_dir = os.path.dirname(new_path)
 
-    games = load_json_file(games_json, [])
+    games = load_json_file(GAMES_JSON, [])
 
     changed = False
 
@@ -108,8 +108,8 @@ def update_ea_path(prefix):
             game_title = game.get("title") or game.get("name") or "EA App"
 
             if gameid:
-                applications_shortcut_path = f"{app_dir}/{gameid}.desktop"
-                desktop_shortcut_path = f"{desktop_dir}/{gameid}.desktop"
+                applications_shortcut_path = f"{APP_DIR}/{gameid}.desktop"
+                desktop_shortcut_path = f"{DESKTOP_DIR}/{gameid}.desktop"
 
                 if os.path.exists(applications_shortcut_path):
                     update_desktop_path(applications_shortcut_path, new_executable_dir)
@@ -121,6 +121,6 @@ def update_ea_path(prefix):
                 update_steam_shortcut(game_title, new_executable_dir, new_path)
 
     if changed:
-        save_json_file(games, games_json)
+        save_json_file(games, GAMES_JSON)
 
     return new_path

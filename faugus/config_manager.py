@@ -6,7 +6,7 @@ class ConfigManager:
     def __init__(self):
         self.default_config = {
             'close-onlaunch': 'False',
-            'default-prefix': prefixes_dir,
+            'default-prefix': PREFIXES_DIR,
             'mangohud': 'False',
             'gamemode': 'False',
             'disable-hidraw': 'False',
@@ -55,7 +55,7 @@ class ConfigManager:
         self.load_config()
 
     def load_config(self):
-        self.config = load_json_file(config_file_dir, default={})
+        self.config = load_json_file(CONFIG_FILE_DIR, default={})
 
         updated = False
         for key, default_value in self.default_config.items():
@@ -63,11 +63,11 @@ class ConfigManager:
                 self.config[key] = default_value
                 updated = True
 
-        if updated or not os.path.isfile(config_file_dir):
+        if updated or not os.path.isfile(CONFIG_FILE_DIR):
             self.save_config()
 
     def save_config(self):
-        save_json_file(self.config, config_file_dir)
+        save_json_file(self.config, CONFIG_FILE_DIR)
 
     def set_value(self, key, value):
         if key not in self.default_config:
