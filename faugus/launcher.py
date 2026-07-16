@@ -906,7 +906,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 try:
                     if g and hasattr(g, 'icon') and g.icon:
                         if os.path.isfile(g.icon):
-                            pixbuf = ensure_pixbuf_has_alpha(GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True))
+                            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True)
                             source.set_icon(Gdk.Texture.new_for_pixbuf(pixbuf), 24, 24)
                         else:
                             theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
@@ -3189,11 +3189,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 game.path = update_ea_path(game.prefix)
 
             if os.path.exists(game.path):
-                extracted_icon = self.extract_best_icon(game.path, game.gameid)
+                if self.interface_mode != "SteamGridDB":
+                    extracted_icon = self.extract_best_icon(game.path, game.gameid)
 
-                if extracted_icon:
-                    icon_temp = extracted_icon
-                    icon_final = icon_temp
+                    if extracted_icon:
+                        icon_temp = extracted_icon
+                        icon_final = icon_temp
                 print(f"{title} installed.")
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
