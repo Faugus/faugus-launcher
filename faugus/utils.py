@@ -85,6 +85,20 @@ def ensure_pixbuf_has_alpha(pixbuf):
     return pixbuf
 
 
+def normalize_icon_bytes(data):
+    if not data or data[:4] != b"\x00\x00\x01\x00":
+        return data
+
+    from PIL import Image
+    import io
+
+    with Image.open(io.BytesIO(data)) as icon:
+        frame = icon.convert("RGBA")
+        buf = io.BytesIO()
+        frame.save(buf, "PNG")
+        return buf.getvalue()
+
+
 def is_valid_image_bytes(data):
     if not data:
         return False
