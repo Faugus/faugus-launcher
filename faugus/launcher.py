@@ -6331,7 +6331,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.checkbox_disable_hidraw.set_visible(True)
             self.button_shortcut_icon.set_visible(steamgriddb_enabled and self.interface_mode != "Banners")
 
+            self._suggestion_programmatic = True
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
+            self._suggestion_programmatic = False
+            if getattr(self, 'popover_suggestion', None) is not None:
+                self.popover_suggestion.popdown()
 
             if active_id == "battle":
                 self.launch_arguments = "WINE_SIMULATE_WRITECOPY=1\nPROTON_ENABLE_WAYLAND=0"
