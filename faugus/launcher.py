@@ -5391,6 +5391,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         hero_placeholder1 = Gtk.Box()
         hero_placeholder1.add_css_class("hero-placeholder")
+        hero_placeholder1.set_size_request(320, int(320 / (1920 / 620)))
         hero_placeholder1.set_hexpand(True)
         hero_placeholder1.set_vexpand(True)
 
@@ -5416,6 +5417,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         hero_placeholder2 = Gtk.Box()
         hero_placeholder2.add_css_class("hero-placeholder")
+        hero_placeholder2.set_size_request(320, int(320 / (1920 / 620)))
         hero_placeholder2.set_hexpand(True)
         hero_placeholder2.set_vexpand(True)
 
