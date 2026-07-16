@@ -5393,7 +5393,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hero_placeholder1.add_css_class("hero-placeholder")
         hero_placeholder1.set_hexpand(True)
         hero_placeholder1.set_vexpand(True)
-        hero_placeholder1.set_size_request(-1, int(320 / (1920 / 620)))
 
         self.stack_hero_preview1 = Gtk.Stack()
         self.stack_hero_preview1.set_hhomogeneous(False)
@@ -5419,7 +5418,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hero_placeholder2.add_css_class("hero-placeholder")
         hero_placeholder2.set_hexpand(True)
         hero_placeholder2.set_vexpand(True)
-        hero_placeholder2.set_size_request(-1, int(320 / (1920 / 620)))
 
         self.stack_hero_preview2 = Gtk.Stack()
         self.stack_hero_preview2.set_hhomogeneous(False)
@@ -5525,8 +5523,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_box1.append(tab_label1)
         self.tab_box1.set_hexpand(True)
 
-        if interface_mode == "SteamGridDB":
-            self.grid_page1.attach(self.hero_preview1_overlay, 0, 0, 2, 1)
         self.grid_page1.attach(page1, 0, 1, 1, 1)
         if interface_mode in ("Banners", "SteamGridDB"):
             self.grid_page1.attach(self.image_banner_overlay, 1, 1, 1, 1)
@@ -5544,8 +5540,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_box2.append(tab_label2)
         self.tab_box2.set_hexpand(True)
 
-        if interface_mode == "SteamGridDB":
-            self.grid_page2.attach(self.hero_preview2_overlay, 0, 0, 2, 1)
         self.grid_page2.attach(page2, 0, 1, 1, 1)
         if interface_mode in ("Banners", "SteamGridDB"):
             self.grid_page2.attach(self.image_banner2_overlay, 1, 1, 1, 1)
@@ -5599,6 +5593,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.append(self.label_shortcut)
         page1.append(self.grid_shortcut)
 
+        if interface_mode == "SteamGridDB":
+            hero_row1_width = self.grid_page1.measure(Gtk.Orientation.HORIZONTAL, -1).natural
+            hero_placeholder1.set_size_request(-1, int(hero_row1_width / (1920 / 620)))
+            self.grid_page1.attach(self.hero_preview1_overlay, 0, 0, 2, 1)
+
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
         self.entry_protonfix.set_hexpand(True)
@@ -5637,6 +5636,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2.append(self.grid_addapp)
         page2.append(self.grid_lossless)
         page2.append(self.grid_tools)
+
+        if interface_mode == "SteamGridDB":
+            hero_row2_width = self.grid_page2.measure(Gtk.Orientation.HORIZONTAL, -1).natural
+            hero_placeholder2.set_size_request(-1, int(hero_row2_width / (1920 / 620)))
+            self.grid_page2.attach(self.hero_preview2_overlay, 0, 0, 2, 1)
 
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
