@@ -2829,6 +2829,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
 
             if getattr(game, 'steam_user', ''):
+                persona_name = dict(edit_game_dialog.steam_owners).get(game.steam_user, game.steam_user)
+                edit_game_dialog.combobox_steam_owner.append(
+                    game.steam_user, f"{persona_name} ({game.steam_user})", short_text=persona_name)
                 edit_game_dialog.combobox_steam_owner.set_active_id_silent(game.steam_user)
                 edit_game_dialog.populate_steam_title_combobox(game.steam_user)
 
@@ -5352,10 +5355,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_steam_owner.set_halign(Gtk.Align.START)
         self.combobox_steam_owner = IdComboBox()
         steam_owners = read_steam_users()
+        self.steam_owners = steam_owners
         for account_id, persona_name in steam_owners:
             self.combobox_steam_owner.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
         if steam_owners:
             self.combobox_steam_owner.set_active(0)
+        else:
+            self.combobox_steam_owner.append(None, "")
+            self.combobox_steam_owner.set_active(0)
+        self.combobox_steam_owner.set_sensitive(bool(steam_owners))
         self.combobox_steam_owner.connect("changed", self.on_combobox_steam_owner_changed)
 
         self.label_steam_title = Gtk.Label(label=_("Title"))
@@ -5520,6 +5528,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         for account_id, persona_name in self.steam_users:
             self.combobox_steam_user.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
         if self.steam_users:
+            self.combobox_steam_user.set_active(0)
+        else:
+            self.combobox_steam_user.append(None, "")
             self.combobox_steam_user.set_active(0)
         self.combobox_steam_user.connect("changed", self.on_combobox_steam_user_changed)
 
@@ -6492,44 +6503,44 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self._steamgriddb_suggestion_id = item["id"]
         self.get_banner()
 
+    def cleanup_fields(self):
+        self.entry_title.set_text("")
+        self.launch_arguments = ""
+        self.pre_launch_command = ""
+        self.post_launch_command = ""
+        self.entry_path.set_text("")
+        self.entry_prefix.set_text("")
+        self.checkbox_shortcut_desktop.set_active(False)
+        self.checkbox_shortcut_appmenu.set_active(False)
+        self.checkbox_shortcut_steam.set_active(False)
+        self.entry_protonfix.set_text("")
+        self.entry_game_arguments.set_text("")
+        self.checkbox_mangohud.set_active(self.default_mangohud)
+        self.checkbox_gamemode.set_active(self.default_gamemode)
+        self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
+        self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
+        self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
+        if os.path.isfile(self.banner_path_temp):
+            os.remove(self.banner_path_temp)
+        if os.path.isfile(self.hero_path_temp):
+            os.remove(self.hero_path_temp)
+        self.update_image_banner()
+        self.update_hero_preview(self.hero_path_temp)
+
+        self.combobox_steam_title.set_active(0)
+
+        for w in (self.combobox_steam_title, self.entry_title,
+                  self.entry_prefix, self.entry_path):
+            w.remove_css_class("entry")
+
     def on_combobox_changed(self, combobox, skip_cleanup=False):
         active_id = combobox.get_active_id()
 
         cfg = ConfigManager()
         steamgriddb_enabled = bool(cfg.config.get('steamgriddb-api-key', '').strip('"'))
 
-        def cleanup_fields():
-            self.entry_title.set_text("")
-            self.launch_arguments = ""
-            self.pre_launch_command = ""
-            self.post_launch_command = ""
-            self.entry_path.set_text("")
-            self.entry_prefix.set_text("")
-            self.checkbox_shortcut_desktop.set_active(False)
-            self.checkbox_shortcut_appmenu.set_active(False)
-            self.checkbox_shortcut_steam.set_active(False)
-            self.entry_protonfix.set_text("")
-            self.entry_game_arguments.set_text("")
-            self.checkbox_mangohud.set_active(self.default_mangohud)
-            self.checkbox_gamemode.set_active(self.default_gamemode)
-            self.checkbox_disable_hidraw.set_active(self.default_disable_hidraw)
-            self.checkbox_prevent_sleep.set_active(self.default_prevent_sleep)
-            self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
-            if os.path.isfile(self.banner_path_temp):
-                os.remove(self.banner_path_temp)
-            if os.path.isfile(self.hero_path_temp):
-                os.remove(self.hero_path_temp)
-            self.update_image_banner()
-            self.update_hero_preview(self.hero_path_temp)
-
-            self.combobox_steam_title.set_active(0)
-
-            for w in (self.combobox_steam_title, self.entry_title,
-                      self.entry_prefix, self.entry_path):
-                w.remove_css_class("entry")
-
         if not skip_cleanup:
-            cleanup_fields()
+            self.cleanup_fields()
 
         self.grid_title.set_visible(False)
         self.grid_steam_title.set_visible(False)
@@ -6731,6 +6742,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             new_combobox.append(appid, name)
         new_combobox.disable_first_item_selection()
         new_combobox.set_hexpand(True)
+        new_combobox.set_sensitive(bool(getattr(self, 'steam_owners', None)))
         new_combobox.connect("changed", self.on_combobox_steam_changed)
 
         old_combobox = self.combobox_steam_title
@@ -6745,6 +6757,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def on_combobox_steam_owner_changed(self, combobox):
         steam_user = combobox.get_active_id()
+        self.cleanup_fields()
         GLib.timeout_add(200, self._populate_steam_title_combobox_once, steam_user)
 
     def _populate_steam_title_combobox_once(self, steam_user):
