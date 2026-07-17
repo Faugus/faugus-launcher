@@ -620,16 +620,74 @@ def _find_descendant_by_typename(widget, type_name):
     return None
 
 
-def _find_paned_side(widget):
-    child = widget
-    parent = widget.get_parent()
-    while parent:
-        if isinstance(parent, Gtk.Paned):
-            side = "start" if child == parent.get_start_child() else "end"
-            return parent, side
-        child = parent
-        parent = parent.get_parent()
-    return None, None
+def _collect_focusable(widget, out):
+    if not widget.get_mapped():
+        return
+    if widget.get_sensitive() and widget.get_focusable() and not isinstance(widget, Gtk.Label):
+        out.append(widget)
+    child = widget.get_first_child()
+    while child:
+        _collect_focusable(child, out)
+        child = child.get_next_sibling()
+
+
+def _focus_nearest_in_direction(current, direction, root):
+    ok, current_bounds = current.compute_bounds(root)
+    if not ok:
+        return False
+    cx0, cy0 = current_bounds.origin.x, current_bounds.origin.y
+    cx1, cy1 = cx0 + current_bounds.size.width, cy0 + current_bounds.size.height
+
+    candidates = []
+    _collect_focusable(root, candidates)
+
+    aligned = []
+    others = []
+    for candidate in candidates:
+        if candidate is current:
+            continue
+        ok, bounds = candidate.compute_bounds(root)
+        if not ok:
+            continue
+        x0, y0 = bounds.origin.x, bounds.origin.y
+        x1, y1 = x0 + bounds.size.width, y0 + bounds.size.height
+
+        if direction == Gtk.DirectionType.LEFT and x1 > cx0:
+            continue
+        if direction == Gtk.DirectionType.RIGHT and x0 < cx1:
+            continue
+        if direction == Gtk.DirectionType.UP and y1 > cy0:
+            continue
+        if direction == Gtk.DirectionType.DOWN and y0 < cy1:
+            continue
+
+        if direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
+            primary_dist = (cx0 - x1) if direction == Gtk.DirectionType.LEFT else (x0 - cx1)
+            cross_overlap = min(cy1, y1) - max(cy0, y0)
+            cross_dist = abs((y0 + y1) / 2 - (cy0 + cy1) / 2)
+        else:
+            primary_dist = (cy0 - y1) if direction == Gtk.DirectionType.UP else (y0 - cy1)
+            cross_overlap = min(cx1, x1) - max(cx0, x0)
+            cross_dist = abs((x0 + x1) / 2 - (cx0 + cx1) / 2)
+
+        entry = (primary_dist, cross_dist, candidate)
+        if cross_overlap > 0:
+            aligned.append(entry)
+        else:
+            others.append(entry)
+
+    pool = aligned if aligned else others
+    if not pool:
+        return False
+
+    pool.sort(key=lambda e: (e[0], e[1]))
+    target = pool[0][2]
+    target.grab_focus()
+    if isinstance(target, Gtk.FlowBoxChild):
+        parent = target.get_parent()
+        if isinstance(parent, Gtk.FlowBox):
+            parent.select_child(target)
+    return True
 
 
 def _navigate_column_list(list_view, direction):
@@ -713,24 +771,12 @@ def navigate_gamepad(direction):
         if _navigate_column_list(column_list, direction):
             return
 
-    if is_horizontal:
-        paned, side = _find_paned_side(focused)
-        if paned:
-            target = None
-            if side == "start" and direction == Gtk.DirectionType.RIGHT:
-                target = paned.get_end_child()
-            elif side == "end" and direction == Gtk.DirectionType.LEFT:
-                target = paned.get_start_child()
-            if target:
-                target.child_focus(Gtk.DirectionType.TAB_FORWARD)
-                return
-
     if isinstance(focused, Gtk.TreeView):
         model = focused.get_model()
         path, _ = focused.get_cursor()
 
         if is_horizontal:
-            active_window.child_focus(Gtk.DirectionType.TAB_FORWARD if direction == Gtk.DirectionType.RIGHT else Gtk.DirectionType.TAB_BACKWARD)
+            _focus_nearest_in_direction(focused, direction, active_window)
             return
 
         if model and is_vertical:
@@ -743,13 +789,19 @@ def navigate_gamepad(direction):
                     new_path = Gtk.TreePath(new_index)
                     focused.set_cursor(new_path)
                     focused.scroll_to_cell(new_path, None, False, 0.0, 0.0)
-                else:
-                    active_window.child_focus(Gtk.DirectionType.TAB_BACKWARD if direction == Gtk.DirectionType.UP else Gtk.DirectionType.TAB_FORWARD)
+                elif not _focus_nearest_in_direction(focused, direction, active_window) and direction == Gtk.DirectionType.UP:
+                    titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
+                    if isinstance(titlebar, Gtk.HeaderBar):
+                        titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
             return
 
     elif is_horizontal:
         dir_str = "right" if direction == Gtk.DirectionType.RIGHT else "left"
         if adjust_widget_value(focused, dir_str):
+            return
+
+    if is_horizontal:
+        if _focus_nearest_in_direction(focused, direction, active_window):
             return
 
     active_window.child_focus(direction)
