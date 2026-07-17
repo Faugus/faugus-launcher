@@ -26,7 +26,7 @@ _ = setup_gettext('faugus-launcher')
 class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
     def __init__(self, file_path):
         super().__init__(title="Faugus")
-        self.file_path = file_path
+        self.file_path = expand_path(file_path)
         self.set_resizable(False)
 
         game_title = os.path.basename(file_path)
@@ -239,7 +239,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
         prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
-        self.lossless_location = cfg.config.get('lossless-location', '')
+        self.lossless_location = expand_path(cfg.config.get('lossless-location', ''))
 
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)
@@ -263,7 +263,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         title_formatted = format_title(title)
 
         addapp_bat = f"{os.path.dirname(self.file_path)}/faugus-{title_formatted}.bat"
-        game_arguments = self.entry_game_arguments.get_text()
+        game_arguments = expand_path(self.entry_game_arguments.get_text())
 
         if self.addapp_enabled:
             write_addapp_bat(addapp_bat, self.file_path, self.addapp, self.addapp_delay, self.addapp_first, game_arguments)
@@ -285,9 +285,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 other_args.append(arg)
 
-        launch_arguments = " ".join(env_vars + other_args)
+        launch_arguments = expand_path(" ".join(env_vars + other_args))
 
-        game_arguments = self.entry_game_arguments.get_text()
+        game_arguments = expand_path(self.entry_game_arguments.get_text())
         lossless_enabled = self.lossless_enabled
         lossless_multiplier = self.lossless_multiplier
         lossless_flow = self.lossless_flow

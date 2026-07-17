@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box
+from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box, expand_path
 
 
 def load_config():
@@ -24,6 +24,7 @@ def save_config(config):
 
 
 def perform_backup(dest_path):
+    dest_path = expand_path(dest_path)
     temp_dir = os.path.join(FAUGUS_TEMP, "temp-backup")
     os.makedirs(temp_dir, exist_ok=True)
 
@@ -321,7 +322,7 @@ class BackupWindow(Gtk.Dialog):
             Gtk.FileChooserAction.SELECT_FOLDER,
         )
         entry_value = self.entry_dest.get_text()
-        set_file_chooser_start_folder(filechooser, "backup_destination", entry_value or None)
+        set_file_chooser_start_folder(filechooser, "backup_destination", expand_path(entry_value) or None)
 
         def on_response(dialog, response):
             if response == Gtk.ResponseType.ACCEPT:

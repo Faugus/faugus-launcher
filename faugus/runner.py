@@ -447,8 +447,8 @@ class FaugusRun(HiDpiMixin):
         self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
         self.splash_disable = self.cfg.config.get('splash-disable', 'False') == 'True'
         self.default_runner = self.cfg.config.get('default-runner', '')
-        self.lossless_location = self.cfg.config.get('lossless-location', '')
-        self.default_prefix = self.cfg.config.get('default-prefix', '')
+        self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
+        self.default_prefix = expand_path(self.cfg.config.get('default-prefix', ''))
         self.enable_logging = self.cfg.config.get('enable-logging', 'False') == 'True'
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
         self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
@@ -704,13 +704,13 @@ class FaugusRun(HiDpiMixin):
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
-    path = game.get("path", "")
-    prefix = game.get("prefix", "")
-    launch_arguments = game.get("launch_arguments", "")
-    game_arguments = game.get("game_arguments", "")
+    path = expand_path(game.get("path", ""))
+    prefix = expand_path(game.get("prefix", ""))
+    launch_arguments = expand_path(game.get("launch_arguments", ""))
+    game_arguments = expand_path(game.get("game_arguments", ""))
     protonfix = game.get("protonfix", "")
     runner = game.get("runner", "")
-    addapp_bat = game.get("addapp_bat", "")
+    addapp_bat = expand_path(game.get("addapp_bat", ""))
     mangohud = game.get("mangohud", "")
     gamemode = game.get("gamemode", "")
     disable_hidraw = game.get("disable_hidraw", "")
@@ -753,7 +753,7 @@ def build_launch_command(game):
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
     if launch_arguments:
-        command_parts.append(os.path.expanduser(launch_arguments))
+        command_parts.append(launch_arguments)
     if gamemode and os.path.exists(GAMEMODERUN):
         command_parts.append("gamemoderun")
     if mangohud and os.path.exists(MANGOHUD_DIR):

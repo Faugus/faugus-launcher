@@ -682,6 +682,9 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
 
 
 def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, game_arguments):
+    bat_path = expand_path(bat_path)
+    exe_path = expand_path(exe_path)
+    addapp = expand_path(addapp)
     with open(bat_path, "w") as f:
         f.write('@echo off\n')
         if not addapp_first:
@@ -981,6 +984,12 @@ def on_button_kofi_clicked(widget):
 def on_button_paypal_clicked(widget):
     import webbrowser
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+
+
+def expand_path(value):
+    if not value:
+        return value
+    return os.path.expandvars(os.path.expanduser(value))
 
 
 def update_games_json():

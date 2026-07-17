@@ -1802,16 +1802,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.menu_prefix_location.set_visible(True)
             self.menu_run.set_visible(True)
 
-        if os.path.dirname(game.path):
+        game_path = expand_path(game.path)
+        game_prefix = expand_path(game.prefix)
+
+        if os.path.dirname(game_path):
             self.menu_game_location.set_sensitive(True)
-            self.current_game = os.path.dirname(game.path)
+            self.current_game = os.path.dirname(game_path)
         else:
             self.menu_game_location.set_sensitive(False)
             self.current_game = None
 
-        if os.path.isdir(game.prefix):
+        if os.path.isdir(game_prefix):
             self.menu_prefix_location.set_sensitive(True)
-            self.current_prefix = game.prefix
+            self.current_prefix = game_prefix
         else:
             self.menu_prefix_location.set_sensitive(False)
             self.current_prefix = None
@@ -1991,11 +1994,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def on_response(dialog_fc, response):
             if response == Gtk.ResponseType.ACCEPT:
-                prefix = game.prefix
+                prefix = expand_path(game.prefix)
                 runner = game.runner
                 title_formatted = format_title(game.title)
                 file_run = dialog_fc.get_file().get_path()
-                game_directory = os.path.dirname(game.path)
+                game_directory = os.path.dirname(expand_path(game.path))
                 cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
                 escaped_file_run = file_run.replace("'", "'\\''")
                 command_parts = []
@@ -2167,9 +2170,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if os.path.exists(banner):
             shutil.copyfile(banner, new_banner)
 
-        new_addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
-        if os.path.exists(game.addapp_bat):
-            shutil.copyfile(game.addapp_bat, new_addapp_bat)
+        new_addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
+        if os.path.exists(expand_path(game.addapp_bat)):
+            shutil.copyfile(expand_path(game.addapp_bat), new_addapp_bat)
 
         game.title = new_title
         game.banner = new_banner
@@ -2503,7 +2506,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     return True
             return False
 
-        return os.path.exists(game.path)
+        return os.path.exists(expand_path(game.path))
 
     def on_search_changed(self, entry):
         self.flowbox.invalidate_filter()
@@ -2694,7 +2697,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 GLib.timeout_add(150, remove_anim)
 
         gameid = game.gameid
-        game_directory = os.path.dirname(game.path)
+        game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
         def update_latest_and_sort():
@@ -2988,7 +2991,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.update_icon()
 
             if remove_prefix:
-                prefix_path = os.path.expanduser(game.prefix)
+                prefix_path = expand_path(game.prefix)
 
                 try:
                     shutil.rmtree(prefix_path)
@@ -3009,8 +3012,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.remove_steam_shortcut(title)
             self.remove_banner_icon(game)
 
-            if os.path.exists(game.addapp_bat):
-                os.remove(game.addapp_bat)
+            addapp_bat_path = expand_path(game.addapp_bat)
+            if os.path.exists(addapp_bat_path):
+                os.remove(addapp_bat_path)
 
             self._deleted_gameid = gameid
             self.save_games()
@@ -3137,7 +3141,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             title_formatted = format_title(title)
 
-            addapp_bat = f"{os.path.dirname(path)}/faugus-{title_formatted}.bat"
+            addapp_bat = f"{os.path.dirname(expand_path(path))}/faugus-{title_formatted}.bat"
 
             if self.interface_mode in ("Banners", "SteamGridDB"):
                 temp_banner_path = add_game_dialog.banner_path_temp
@@ -3391,9 +3395,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if game.gameid == "ea-app":
                 game.path = update_ea_path(game.prefix)
 
-            if os.path.exists(game.path):
+            if os.path.exists(expand_path(game.path)):
                 if self.interface_mode != "SteamGridDB":
-                    extracted_icon = self.extract_best_icon(game.path, game.gameid)
+                    extracted_icon = self.extract_best_icon(expand_path(game.path), game.gameid)
 
                     if extracted_icon:
                         icon_temp = extracted_icon
@@ -3406,8 +3410,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.update_list()
                 self.select_game_by_title(title)
             else:
-                if os.path.exists(game.prefix):
-                    shutil.rmtree(game.prefix)
+                if os.path.exists(expand_path(game.prefix)):
+                    shutil.rmtree(expand_path(game.prefix))
                 self.remove_shortcut(game, "both")
                 self.remove_steam_shortcut(title)
                 self.remove_banner_icon(game)
@@ -3528,7 +3532,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             title_formatted = format_title(game.title)
 
             game.gameid = title_formatted
-            game.addapp_bat = f"{os.path.dirname(game.path)}/faugus-{title_formatted}.bat"
+            game.addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
 
             if self.interface_mode in ("Banners", "SteamGridDB"):
                 temp_banner_path = edit_game_dialog.banner_path_temp
@@ -3613,7 +3617,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not os.path.exists(new_icon_path):
             new_icon_path = FAUGUS_PNG
 
-        game_directory = os.path.dirname(game.path)
+        game_directory = os.path.dirname(expand_path(game.path))
 
         if IS_FLATPAK:
             desktop_file_content = (
@@ -3772,7 +3776,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not os.path.exists(new_icon_path):
             new_icon_path = FAUGUS_PNG
 
-        game_directory = os.path.dirname(game.path)
+        game_directory = os.path.dirname(expand_path(game.path))
 
         add_game_to_steam(game.title, game_directory, new_icon_path)
 
@@ -4558,9 +4562,9 @@ class Settings(Gtk.Dialog):
 
     def update_config_file(self):
         combobox_language = self.combobox_language.get_active_text()
-        entry_default_prefix = os.path.expanduser(self.entry_default_prefix.get_text())
+        entry_default_prefix = self.entry_default_prefix.get_text()
         combobox_default_runner = self.get_default_runner()
-        entry_lossless = os.path.expanduser(self.entry_lossless.get_text())
+        entry_lossless = self.entry_lossless.get_text()
         language = self.lang_codes.get(combobox_language, "en_US")
         logging_warning = self.logging_warning
 
@@ -4881,7 +4885,7 @@ class Settings(Gtk.Dialog):
             Gtk.FileChooserAction.SELECT_FOLDER,
         )
         entry_value = self.entry_default_prefix.get_text()
-        preferred_path = os.path.expanduser(entry_value) if entry_value else None
+        preferred_path = expand_path(entry_value) if entry_value else None
         set_file_chooser_start_folder(filechooser, "settings_default_prefix", preferred_path)
 
         def on_response(dialog_fc, response):
@@ -4901,7 +4905,7 @@ class Settings(Gtk.Dialog):
             Gtk.FileChooserAction.OPEN,
         )
         entry_value = self.entry_lossless.get_text()
-        preferred_path = os.path.expanduser(entry_value) if entry_value else None
+        preferred_path = expand_path(entry_value) if entry_value else None
         set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
 
         filter_dll = Gtk.FileFilter()
@@ -6671,7 +6675,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if response == Gtk.ResponseType.ACCEPT:
                 file_run = dialog_fc.get_file().get_path()
                 title = self.entry_title.get_text()
-                prefix = self.entry_prefix.get_text()
+                prefix = expand_path(self.entry_prefix.get_text())
                 title_formatted = format_title(title)
                 runner = self.combobox_runner.get_active_text()
                 game_directory = os.path.dirname(file_run)
@@ -6759,7 +6763,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if not validation_result:
             return
 
-        path = self.entry_path.get_text()
+        path = expand_path(self.entry_path.get_text())
 
         if os.path.isfile(path):
             os.makedirs(self.icon_directory, exist_ok=True)
@@ -6785,7 +6789,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
     def update_prefix_entry(self, entry):
 
         title_formatted = format_title(entry.get_text())
-        prefix = os.path.expanduser(self.default_prefix) + "/" + title_formatted
+        prefix = f"{self.default_prefix}/{title_formatted}"
         self.entry_prefix.set_text(prefix)
 
     def on_button_winecfg_clicked(self, widget):
@@ -6797,7 +6801,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             return
 
         title = self.entry_title.get_text()
-        prefix = self.entry_prefix.get_text()
+        prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_text()
 
@@ -6836,7 +6840,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             return
 
         title = self.entry_title.get_text()
-        prefix = self.entry_prefix.get_text()
+        prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_text()
 
@@ -6910,9 +6914,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         )
 
         if not self.entry_prefix.get_text():
-            filechooser.set_current_folder(Gio.File.new_for_path(os.path.expanduser(self.default_prefix)))
+            filechooser.set_current_folder(Gio.File.new_for_path(expand_path(self.default_prefix)))
         else:
-            filechooser.set_current_folder(Gio.File.new_for_path(self.entry_prefix.get_text()))
+            filechooser.set_current_folder(Gio.File.new_for_path(expand_path(self.entry_prefix.get_text())))
 
         def on_response(dialog_fc, response):
             if response == Gtk.ResponseType.ACCEPT:
@@ -7013,7 +7017,7 @@ def run_file(file_path):
         command_parts.append("PROTON_DISABLE_HIDRAW=1")
     if prevent_sleep:
         command_parts.append("PREVENT_SLEEP=1")
-    command_parts.append(os.path.expanduser(f'WINEPREFIX="{default_prefix}/default"'))
+    command_parts.append(f'WINEPREFIX="{expand_path(default_prefix)}/default"')
     if default_runner:
         command_parts.append(f'PROTONPATH="{resolve_protonpath(default_runner)}"')
     if gamemode:
