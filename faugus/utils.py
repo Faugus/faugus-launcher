@@ -809,9 +809,9 @@ def disable_mangohud_gamemode_if_missing(obj):
 def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_mangohud = Gtk.CheckButton(label="MangoHud")
     obj.checkbox_mangohud.set_tooltip_text(
-        _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."))
+        _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"))
     obj.checkbox_gamemode = Gtk.CheckButton(label="GameMode")
-    obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance."))
+    obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance"))
 
 
 def choose_shortcut_icon(obj):
@@ -1289,17 +1289,19 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     hbox.append(btn_copy)
     hbox.append(box_presets)
 
-    def build_hook_command_box(title, current_value, key):
+    def build_hook_command_box(title, current_value, key, tooltip):
         label = Gtk.Label(label=title)
         label.set_halign(Gtk.Align.START)
 
         entry = Gtk.Entry()
         entry.set_text(current_value)
         entry.set_hexpand(True)
+        entry.set_tooltip_text(tooltip)
 
         button_search = Gtk.Button()
         button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
         button_search.set_size_request(50, -1)
+        button_search.set_tooltip_text(tooltip)
 
         def on_search_clicked(widget):
             filechooser = new_file_chooser(dialog, _("Select a command or script"), Gtk.FileChooserAction.OPEN)
@@ -1327,9 +1329,11 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         return box, entry
 
     box_pre_launch, entry_pre_launch = build_hook_command_box(
-        _("Pre-launch Command/Script"), current_pre_launch_command, "pre_launch_command")
+        _("Pre-launch Command/Script"), current_pre_launch_command, "pre_launch_command",
+        _("Command or script to run before the game"))
     box_post_launch, entry_post_launch = build_hook_command_box(
-        _("Post-launch Command/Script"), current_post_launch_command, "post_launch_command")
+        _("Post-launch Command/Script"), current_post_launch_command, "post_launch_command",
+        _("Command or script to run after the game"))
 
     hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     hbox_hooks.set_homogeneous(True)
@@ -1405,7 +1409,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
 
     entry_addapp = Gtk.Entry()
     entry_addapp.set_text(cur_path)
-    entry_addapp.set_tooltip_text(_("/path/to/the/app"))
+    entry_addapp.set_tooltip_text(_("Path to the application"))
     entry_addapp.set_has_tooltip(True)
     entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
     entry_addapp.set_hexpand(True)
@@ -1533,7 +1537,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     spin_multiplier = Gtk.SpinButton()
     spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
     spin_multiplier.set_numeric(True)
-    spin_multiplier.set_tooltip_text(_("Multiply the FPS."))
+    spin_multiplier.set_tooltip_text(_("Multiply the FPS"))
 
     label_flow = Gtk.Label(label=_("Flow Scale"))
     label_flow.set_halign(Gtk.Align.START)
@@ -1542,21 +1546,21 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     scale_flow.set_digits(0)
     scale_flow.set_hexpand(True)
     scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
-    scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution."))
+    scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution"))
 
     checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
-    checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality."))
+    checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality"))
     checkbox_performance.set_active(performance)
 
     checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
-    checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior."))
+    checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior"))
     checkbox_hdr.set_active(hdr)
 
     label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
     label_present.set_halign(Gtk.Align.START)
 
     combobox_present = IdComboBox()
-    combobox_present.set_tooltip_text(_("Override the present mode."))
+    combobox_present.set_tooltip_text(_("Override the present mode"))
 
     options = [
         "VSync/FIFO (default)",

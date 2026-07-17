@@ -190,6 +190,7 @@ class BackupWindow(Gtk.Dialog):
         self.entry_dest.connect("changed", on_entry_changed)
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
+        self.entry_dest.set_tooltip_text(_("Backup destination path"))
         self.button_browse = Gtk.Button()
         self.button_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
         self.button_browse.connect("clicked", self.on_browse_clicked)
@@ -227,7 +228,6 @@ class BackupWindow(Gtk.Dialog):
         self.box_weekly = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
 
         self.combo_weekly = IdComboBox()
-        self.combo_weekly.set_tooltip_text(_("Day of the week"))
         days = [
             ("Monday", _("Monday")),
             ("Tuesday", _("Tuesday")),
@@ -248,7 +248,6 @@ class BackupWindow(Gtk.Dialog):
 
         adj = Gtk.Adjustment(value=1, lower=1, upper=31, step_increment=1, page_increment=5, page_size=0)
         self.spin_monthly = Gtk.SpinButton(adjustment=adj, numeric=True)
-        self.spin_monthly.set_tooltip_text(_("Day of the month"))
         self.spin_monthly.set_hexpand(True)
         self.box_monthly.append(self.spin_monthly)
         self.main_box.append(self.box_monthly)

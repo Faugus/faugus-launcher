@@ -882,7 +882,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.button_add = create_button("faugus-add-symbolic", self.on_button_add_clicked)
         self.button_settings = create_button("faugus-settings-symbolic", self.on_button_settings_clicked)
-        self.button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Force close all running games"))
+        self.button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Kill all running games"))
         self.button_play = create_button("faugus-play-symbolic", self.on_button_play_clicked)
 
         self.entry_search = Gtk.Entry()
@@ -2937,7 +2937,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
-                edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
+                edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running") % game.title)
 
     def check_steam_shortcut(self, title, steam_user=None):
         for path in get_all_shortcut_paths(steam_user if steam_user is not None else self.steam_user):
@@ -4059,7 +4059,7 @@ class Settings(Gtk.Dialog):
         self.label_default_prefix.set_halign(Gtk.Align.START)
 
         self.entry_default_prefix = Gtk.Entry()
-        self.entry_default_prefix.set_tooltip_text(_("/path/to/the/prefix"))
+        self.entry_default_prefix.set_tooltip_text(_("The location where prefixes are created"))
         self.entry_default_prefix.set_has_tooltip(True)
         self.entry_default_prefix.connect("query-tooltip", on_entry_query_tooltip)
         self.entry_default_prefix.connect("changed", on_entry_changed)
@@ -4073,7 +4073,7 @@ class Settings(Gtk.Dialog):
         self.label_lossless.set_halign(Gtk.Align.START)
 
         self.entry_lossless = Gtk.Entry()
-        self.entry_lossless.set_tooltip_text(_("/path/to/Lossless.dll"))
+        self.entry_lossless.set_tooltip_text(_("Lossless.dll location"))
         self.entry_lossless.set_has_tooltip(True)
         self.entry_lossless.connect("query-tooltip", on_entry_query_tooltip)
 
@@ -4125,7 +4125,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_show_categories = Gtk.CheckButton(label=_("Show categories and sort buttons"))
 
         self.checkbox_show_hidden = Gtk.CheckButton(label=_("Show hidden games"))
-        self.checkbox_show_hidden.set_tooltip_text(_("Press Ctrl+H to show/hide games."))
+        self.checkbox_show_hidden.set_tooltip_text(_("Ctrl+H toggles hidden games"))
 
         self.checkbox_gamepad_navigation = Gtk.CheckButton(label=_("Gamepad navigation"))
         self.checkbox_gamepad_navigation.set_active(False)
@@ -4146,10 +4146,11 @@ class Settings(Gtk.Dialog):
         self.button_run_default = Gtk.Button(label=_("Run"))
         self.button_run_default.set_size_request(120, -1)
         self.button_run_default.connect("clicked", self.on_button_run_default_clicked)
-        self.button_run_default.set_tooltip_text(_("Run a file inside the prefix"))
+        self.button_run_default.set_tooltip_text(_("Run a file in the prefix"))
 
         create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
+        self.checkbox_disable_hidraw.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         self.label_support = Gtk.Label(label=_("Support the Project"))
@@ -5121,7 +5122,6 @@ class DuplicateDialog(Gtk.Dialog):
         label_title = Gtk.Label(label=_("Title"))
         label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
-        self.entry_title.set_tooltip_text(_("Game Title"))
 
         button_cancel = Gtk.Button(label=_("Cancel"))
         button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -5387,7 +5387,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             title_focus_controller = Gtk.EventControllerFocus()
             title_focus_controller.connect("leave", lambda c: self.on_entry_focus_out())
             self.entry_title.add_controller(title_focus_controller)
-        self.entry_title.set_tooltip_text(_("Game Title"))
         self.entry_title.set_has_tooltip(True)
         self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
@@ -5436,7 +5435,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_path.set_halign(Gtk.Align.START)
         self.entry_path = Gtk.Entry()
         self.entry_path.connect("changed", on_entry_changed)
-        self.entry_path.set_tooltip_text(_("/path/to/the/exe"))
+        self.entry_path.set_tooltip_text(_("Path to the game executable"))
         self.entry_path.set_has_tooltip(True)
         self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search = Gtk.Button()
@@ -5448,7 +5447,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
         self.entry_prefix.connect("changed", on_entry_changed)
-        self.entry_prefix.set_tooltip_text(_("/path/to/the/prefix"))
+        self.entry_prefix.set_tooltip_text(_("Path to the prefix"))
         self.entry_prefix.set_has_tooltip(True)
         self.entry_prefix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_prefix = Gtk.Button()
@@ -5475,24 +5474,24 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
-        self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
+        self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
         self.entry_game_arguments.set_has_tooltip(True)
         self.entry_game_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
-        self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
         self.button_addapp.set_tooltip_text(
-            _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
+            _("Additional application to run with the game"))
 
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
+        self.checkbox_disable_hidraw.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         self.button_winecfg = Gtk.Button(label="Winecfg")
@@ -5506,7 +5505,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_run = Gtk.Button(label=_("Run"))
         self.button_run.set_size_request(120, -1)
         self.button_run.connect("clicked", self.on_button_run_clicked)
-        self.button_run.set_tooltip_text(_("Run a file inside the prefix"))
+        self.button_run.set_tooltip_text(_("Run a file in the prefix"))
 
         self.label_shortcut = Gtk.Label(label=_("Shortcut"))
         self.label_shortcut.set_margin_start(10)
@@ -5514,14 +5513,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_shortcut.set_margin_top(10)
         self.label_shortcut.set_halign(Gtk.Align.START)
         self.checkbox_shortcut_desktop = Gtk.CheckButton(label=_("Desktop"))
-        self.checkbox_shortcut_desktop.set_tooltip_text(
-            _("Add or remove a shortcut from the Desktop."))
         self.checkbox_shortcut_appmenu = Gtk.CheckButton(label=_("App Menu"))
-        self.checkbox_shortcut_appmenu.set_tooltip_text(
-            _("Add or remove a shortcut from the Application Menu."))
         self.checkbox_shortcut_steam = Gtk.CheckButton(label=_("Steam"))
-        self.checkbox_shortcut_steam.set_tooltip_text(
-            _("Add or remove a shortcut from Steam. Steam needs to be restarted."))
 
         self.steam_users = read_steam_users()
         self.combobox_steam_user = IdComboBox()
@@ -5542,7 +5535,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if self.interface_mode != "SteamGridDB"
             else show_steamgriddb_picker(self, "icon")
         )
-        self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
         self.button_shortcut_icon_overlay, self.spinner_icon = wrap_with_spinner(self.button_shortcut_icon, dim_shape="icon")
 
         icon_click_secondary = Gtk.GestureClick()
@@ -5898,10 +5890,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         if not self.steam_users:
             self.checkbox_shortcut_steam.set_sensitive(False)
-            self.checkbox_shortcut_steam.set_tooltip_text(
-                _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
+            self.checkbox_shortcut_steam.set_tooltip_text(_("No Steam users found"))
             self.combobox_steam_user.set_sensitive(False)
-            self.combobox_steam_user.set_tooltip_text(_("No Steam users found."))
+            self.combobox_steam_user.set_tooltip_text(_("No Steam users found"))
 
         self.lossless_location = ConfigManager().config.get('lossless-location', '')
         if os.path.exists(LSFGVK_PATH):
@@ -5909,10 +5900,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 self.button_lossless.set_sensitive(True)
             else:
                 self.button_lossless.set_sensitive(False)
-                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and set the location."))
+                self.button_lossless.set_tooltip_text(_("Lossless.dll not found"))
         else:
             self.button_lossless.set_sensitive(False)
-            self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
+            self.button_lossless.set_tooltip_text(_("Vulkan Layer not found"))
 
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
@@ -6105,7 +6096,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         dialog.set_resizable(False)
 
         entry = Gtk.Entry()
-        entry.set_tooltip_text("https://example.com/banner.png")
 
         button_ok = Gtk.Button(label=_("Ok"))
         button_ok.set_hexpand(True)

@@ -45,7 +45,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", on_entry_changed)
-        self.entry_title.set_tooltip_text(_("Game Title"))
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
         self.label_protonfix.set_halign(Gtk.Align.START)
@@ -60,29 +59,26 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
-        self.entry_game_arguments.set_tooltip_text(_("e.g.: -d3d11 -fullscreen"))
+        self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
 
         self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
-        self.button_launch_arguments.set_tooltip_text(_("e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"))
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
         self.button_addapp.set_tooltip_text(
-            _("Additional application to run with the game, like Cheat Engine, Trainers, Mods..."))
+            _("Additional application to run with the game"))
 
         self.button_lossless = Gtk.Button(label=_("Lossless Scaling Frame Generation"))
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
-        self.button_shortcut_icon.set_tooltip_text(_("Select an icon for the shortcut"))
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
-        self.checkbox_disable_hidraw.set_tooltip_text(
-            _("May fix controller issues with some games. Only works with GE-Proton10 or Proton-EM-10."))
+        self.checkbox_disable_hidraw.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
