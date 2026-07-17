@@ -207,9 +207,11 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
-def add_focus_tint(overlay, size=None):
+def add_focus_tint(overlay, size=None, square=False):
     tint = Gtk.Box()
     tint.add_css_class("steamgriddb-focus-tint")
+    if square:
+        tint.add_css_class("steamgriddb-focus-tint-square")
     tint.set_can_target(False)
     if size:
         width, height = size

@@ -218,6 +218,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border-radius: 12px;
                 transition: background-color 150ms ease;
             }
+            .steamgriddb-focus-tint.steamgriddb-focus-tint-square {
+                border-radius: 0;
+            }
             flowboxchild.steamgriddb-candidate:focus .steamgriddb-focus-tint {
                 background-color: alpha(@accent_bg_color, 0.2);
             }
@@ -5662,8 +5665,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.hero_preview1_overlay, self.spinner_hero1 = wrap_with_spinner(self.hero_preview1)
         self.hero_preview2_overlay, self.spinner_hero2 = wrap_with_spinner(self.hero_preview2)
-        add_focus_tint(self.hero_preview1_overlay)
-        add_focus_tint(self.hero_preview2_overlay)
+        add_focus_tint(self.hero_preview1_overlay, square=True)
+        add_focus_tint(self.hero_preview2_overlay, square=True)
 
         hero_click1 = Gtk.GestureClick()
         hero_click1.set_button(Gdk.BUTTON_PRIMARY)
