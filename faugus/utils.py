@@ -429,6 +429,17 @@ class IdComboBox(Gtk.DropDown):
         self.set_active(idx)
         return True
 
+    def set_active_id_silent(self, id_):
+        self._suppress = True
+        result = self.set_active_id(id_)
+        self._suppress = False
+        return result
+
+    def set_active_silent(self, index):
+        self._suppress = True
+        self.set_active(index)
+        self._suppress = False
+
     def get_texts(self):
         return [self._store.get_string(i) for i in range(self._store.get_n_items())]
 

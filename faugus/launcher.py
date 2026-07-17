@@ -2819,20 +2819,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog = AddGame(self, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
-            if getattr(game, 'steam_user', ''):
-                edit_game_dialog.combobox_steam_owner.set_active_id(game.steam_user)
-
-            for i, text in enumerate(edit_game_dialog.combobox_steam_title.get_texts()):
-                if text == title:
-                    edit_game_dialog.combobox_steam_title.set_active(i)
-                    break
-
             game_runner = convert_runner(game.runner)
 
             if game_runner == "Linux-Native":
-                edit_game_dialog.combobox_launcher.set_active_id("linux")
+                edit_game_dialog.combobox_launcher.set_active_id_silent("linux")
+                edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
             if game_runner == "Steam":
-                edit_game_dialog.combobox_launcher.set_active_id("steam")
+                edit_game_dialog.combobox_launcher.set_active_id_silent("steam")
+                edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
+
+            if getattr(game, 'steam_user', ''):
+                edit_game_dialog.combobox_steam_owner.set_active_id_silent(game.steam_user)
+                edit_game_dialog.populate_steam_title_combobox(game.steam_user)
+
+            for i, text in enumerate(edit_game_dialog.combobox_steam_title.get_texts()):
+                if text == title:
+                    edit_game_dialog.combobox_steam_title.set_active_silent(i)
+                    break
 
             index_runner = 0
 
@@ -2927,6 +2930,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
+            edit_game_dialog.combobox_steam_owner.set_sensitive(False)
 
             if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
@@ -6488,7 +6492,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self._steamgriddb_suggestion_id = item["id"]
         self.get_banner()
 
-    def on_combobox_changed(self, combobox):
+    def on_combobox_changed(self, combobox, skip_cleanup=False):
         active_id = combobox.get_active_id()
 
         cfg = ConfigManager()
@@ -6524,7 +6528,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                       self.entry_prefix, self.entry_path):
                 w.remove_css_class("entry")
 
-        cleanup_fields()
+        if not skip_cleanup:
+            cleanup_fields()
 
         self.grid_title.set_visible(False)
         self.grid_steam_title.set_visible(False)
