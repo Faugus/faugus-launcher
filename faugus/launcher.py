@@ -373,6 +373,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_mode = self.background_mode
         show_hero = self.hero_overlay_enabled()
 
+        self._bg_content_widget = content_widget
         self._bg_no_overlay_widget = None
         self._bg_base_box = None
 
@@ -464,9 +465,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay.set_hexpand(True)
         overlay.set_vexpand(True)
 
-        base_box = Gtk.Box()
-        base_box.set_hexpand(True)
-        base_box.set_vexpand(True)
+        base_box = self.setup_launcher_base_box()
         overlay.set_child(base_box)
 
         hero_image_box = Gtk.Box()
@@ -493,31 +492,104 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay.add_overlay(content_widget)
         overlay.set_measure_overlay(content_widget, True)
 
-        hero_uri = Gio.File.new_for_path(hero_path).get_uri()
-        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
-        hero_css = f"""
-        .launcher-screen-hero-image {{
-            background-image: linear-gradient(to bottom, rgba({window_r}, {window_g}, {window_b}, 0) 0%, rgba({window_r}, {window_g}, {window_b}, 1) 100%), url("{hero_uri}");
-            background-repeat: no-repeat, no-repeat;
-            background-position: center, center;
-            background-size: 100% 100%, 100% 100%;
-        }}
-        """
         provider = Gtk.CssProvider()
-        provider.load_from_data(hero_css.encode("utf-8"))
         hero_image_box.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
 
+        self.launcher_hero_image_box = hero_image_box
+        self.launcher_hero_provider = provider
+        self.launcher_hero_path = hero_path
+        self.update_launcher_hero_css()
+
         return overlay
+
+    def wrap_launcher_no_hero_background(self, content_widget):
+        base_box = self.setup_launcher_base_box(content_widget)
+
+        self.launcher_hero_image_box = None
+        self.launcher_hero_provider = None
+        self.launcher_hero_path = None
+        self.update_launcher_hero_css()
+
+        return base_box
+
+    def setup_launcher_base_box(self, existing_box=None):
+        base_box = existing_box if existing_box is not None else Gtk.Box()
+        base_box.set_hexpand(True)
+        base_box.set_vexpand(True)
+        base_box.add_css_class("launcher-screen-base")
+
+        base_provider = Gtk.CssProvider()
+        base_box.get_style_context().add_provider(base_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+
+        self.launcher_hero_base_box = base_box
+        self.launcher_hero_base_provider = base_provider
+        return base_box
+
+    def update_launcher_hero_css(self):
+        base_box = getattr(self, 'launcher_hero_base_box', None)
+        base_provider = getattr(self, 'launcher_hero_base_provider', None)
+        if base_box is None or base_provider is None:
+            return
+
+        hero_image_box = getattr(self, 'launcher_hero_image_box', None)
+        provider = getattr(self, 'launcher_hero_provider', None)
+        hero_path = getattr(self, 'launcher_hero_path', None)
+
+        base_mode = self.background_mode
+        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+
+        if base_mode == "dominant_color":
+            dominant = getattr(self, 'launcher_hero_dominant_rgb', None)
+            if dominant is None and self.interface_mode in ("Banners", "SteamGridDB"):
+                color_source = f"{BANNERS_DIR}/banner_temp.png"
+                if os.path.isfile(color_source):
+                    dominant = get_dominant_color(color_source)
+                    self.launcher_hero_dominant_rgb = dominant
+
+            if dominant:
+                r, g, b = dominant
+                fade_r = int(window_r * 0.8 + r * 0.2)
+                fade_g = int(window_g * 0.8 + g * 0.2)
+                fade_b = int(window_b * 0.8 + b * 0.2)
+            else:
+                fade_r, fade_g, fade_b = window_r, window_g, window_b
+        elif base_mode == "accent":
+            ar, ag, ab = self.get_named_rgb("accent_bg_color")
+            fade_r = int(window_r * 0.8 + ar * 0.2)
+            fade_g = int(window_g * 0.8 + ag * 0.2)
+            fade_b = int(window_b * 0.8 + ab * 0.2)
+        else:
+            fade_r, fade_g, fade_b = window_r, window_g, window_b
+
+        base_css = f"""
+        .launcher-screen-base {{
+            background-color: rgb({fade_r}, {fade_g}, {fade_b});
+        }}
+        """
+        base_provider.load_from_data(base_css.encode("utf-8"))
+
+        if hero_image_box is not None and provider is not None and hero_path is not None:
+            hero_uri = Gio.File.new_for_path(hero_path).get_uri()
+            hero_css = f"""
+            .launcher-screen-hero-image {{
+                background-image: linear-gradient(to bottom, rgba({fade_r}, {fade_g}, {fade_b}, 0) 0%, rgba({fade_r}, {fade_g}, {fade_b}, 1) 100%), url("{hero_uri}");
+                background-repeat: no-repeat, no-repeat;
+                background-position: center, center;
+                background-size: 100% 100%, 100% 100%;
+            }}
+            """
+            provider.load_from_data(hero_css.encode("utf-8"))
 
     def apply_background_mode_live(self, new_mode):
         show_hero = self.hero_overlay_enabled()
         old_had_overlay = self.background_mode == "dominant_color" or show_hero
         new_had_overlay = new_mode == "dominant_color" or show_hero
-        if old_had_overlay != new_had_overlay:
-            return False
 
         old_mode = self.background_mode
         self.background_mode = new_mode
+
+        if old_had_overlay != new_had_overlay:
+            return self.rebuild_background_container()
 
         widget = self._bg_no_overlay_widget if not old_had_overlay else self._bg_base_box
         if widget is not None:
@@ -526,12 +598,42 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if new_mode == "accent":
                 widget.add_css_class("accent-background")
 
+        self.update_launcher_hero_css()
+
         if old_had_overlay:
             self.schedule_background_update()
 
         return True
 
+    def rebuild_background_container(self):
+        content_widget = getattr(self, '_bg_content_widget', None)
+        wrapper = self.main_hbox if self.interface_mode != "List" else getattr(self, 'list_hbox', None)
+        if content_widget is None or wrapper is None:
+            return False
+
+        child = wrapper.get_first_child()
+        while child:
+            nxt = child.get_next_sibling()
+            wrapper.remove(child)
+            child = nxt
+
+        content_parent = content_widget.get_parent()
+        if content_parent is not None:
+            if isinstance(content_parent, Gtk.Overlay):
+                content_parent.remove_overlay(content_widget)
+            else:
+                content_parent.remove(content_widget)
+
+        wrapper.append(self.build_background_container(content_widget))
+
+        if self.hero_overlay_enabled() or self.background_mode == "dominant_color":
+            self.schedule_background_update()
+
+        return True
+
     def schedule_background_update(self):
+        self.update_launcher_hero_css()
+
         if getattr(self, 'stack_hero', None) is None:
             return
 
@@ -1193,7 +1295,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             list_container.append(self.box_top)
             list_container.append(self.box_bottom)
 
-            self.box_main.append(self.build_background_container(list_container))
+            self.list_hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self.box_main.append(self.list_hbox)
+            self.list_hbox.append(self.build_background_container(list_container))
 
         update_sort_data()
         self.load_games()
@@ -2702,6 +2806,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.show()
+        add_game_dialog.combobox_launcher.grab_focus()
 
     def on_button_edit_clicked(self, widget):
         game = self.selected()
@@ -3239,14 +3344,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode != "List":
             self.box_main.remove(self.main_hbox)
         else:
-            self.box_main.remove(self.box_top)
-            self.box_main.remove(self.box_bottom)
+            self.box_main.remove(self.list_hbox)
 
         hero_path = f"{HEROES_DIR}/{title_formatted}.png"
         if self.hero_overlay_enabled() and os.path.isfile(hero_path):
             self.box_launcher_display = self.wrap_with_static_hero(self.box_launcher, hero_path)
         else:
-            self.box_launcher_display = self.box_launcher
+            self.box_launcher_display = self.wrap_launcher_no_hero_background(self.box_launcher)
         self.box_main.append(self.box_launcher_display)
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
@@ -3256,11 +3360,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(FAUGUS_TEMP):
                 shutil.rmtree(FAUGUS_TEMP)
             self.box_main.remove(self.box_launcher_display)
+            self.launcher_hero_base_box = None
+            self.launcher_hero_base_provider = None
+            self.launcher_hero_image_box = None
+            self.launcher_hero_provider = None
+            self.launcher_hero_path = None
+            self.launcher_hero_dominant_rgb = None
             if self.interface_mode != "List":
                 self.box_main.append(self.main_hbox)
             else:
-                self.box_main.append(self.box_top)
-                self.box_main.append(self.box_bottom)
+                self.box_main.append(self.list_hbox)
 
             if game.gameid == "ea-app":
                 game.path = update_ea_path(game.prefix)
@@ -6450,7 +6559,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.checkbox_disable_hidraw.set_visible(True)
-            self.button_shortcut_icon.set_visible(steamgriddb_enabled and self.interface_mode != "Banners")
+            self.button_shortcut_icon.set_visible(steamgriddb_enabled and self.interface_mode == "SteamGridDB")
 
             self._suggestion_programmatic = True
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
