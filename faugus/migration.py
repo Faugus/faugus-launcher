@@ -96,3 +96,8 @@ def fix_legacy_shortcut_icons():
         _fix_steam_shortcuts()
     except Exception:
         pass
+    try:
+        from faugus.utils import update_games_json
+        update_games_json()
+    except Exception:
+        pass

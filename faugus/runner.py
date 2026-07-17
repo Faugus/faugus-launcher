@@ -854,5 +854,4 @@ def main():
 
 
 if __name__ == "__main__":
-    update_games_json()
     main()
