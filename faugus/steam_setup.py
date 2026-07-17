@@ -126,32 +126,9 @@ def read_library_folders():
     return libraries
 
 
-def read_user_appids(account_id):
-    if not USERDATA:
-        return None
-
-    path = USERDATA / account_id / "config/localconfig.vdf"
-    if not path.exists():
-        return None
-
-    try:
-        with open(path, "r", errors="ignore") as f:
-            data = vdf.load(f)
-    except Exception:
-        return None
-
-    steam_node = data.get("UserLocalConfigStore", {}).get("Software", {}).get("Valve", {}).get("Steam", {})
-    apps = steam_node.get("apps") or steam_node.get("Apps") or {}
-    return set(apps.keys())
-
-
 def read_installed_games(account_id=None):
     if not steam_folder:
         return []
-
-    allowed_appids = None
-    if account_id and account_id != "all":
-        allowed_appids = read_user_appids(account_id)
 
     games = []
     libraries = read_library_folders()
@@ -165,15 +142,25 @@ def read_installed_games(account_id=None):
         for manifest in steamapps_dir.glob("appmanifest_*.acf"):
             appid = manifest.stem.split("_")[-1]
 
-            if allowed_appids is not None and appid not in allowed_appids:
-                continue
-
             name = None
+            last_owner = None
 
             with open(manifest, "r", errors="ignore") as f:
                 for line in f:
-                    if '"name"' in line:
+                    if '"name"' in line and name is None:
                         name = line.split('"')[-2]
+                    if '"LastOwner"' in line:
+                        last_owner = line.split('"')[-2]
+
+            if account_id and account_id != "all":
+                owner_account_id = None
+                if last_owner:
+                    try:
+                        owner_account_id = str(int(last_owner) - 76561197960265728)
+                    except ValueError:
+                        owner_account_id = None
+                if owner_account_id != account_id:
+                    continue
 
             if name:
                 games.append((appid, name))

@@ -358,14 +358,17 @@ class IdComboBox(Gtk.DropDown):
 
     def _on_list_factory_bind(self, factory, list_item):
         self._on_factory_bind(factory, list_item)
-        if list_item.get_position() == 0:
-            list_item.set_selectable(False)
-            list_item.set_activatable(False)
-            label = list_item.get_child()
-            label.set_visible(False)
-            row_widget = label.get_parent()
-            if row_widget:
+        label = list_item.get_child()
+        row_widget = label.get_parent()
+        is_first = list_item.get_position() == 0
+        list_item.set_selectable(not is_first)
+        list_item.set_activatable(not is_first)
+        label.set_visible(not is_first)
+        if row_widget:
+            if is_first:
                 row_widget.add_css_class("hidden-combo-row")
+            else:
+                row_widget.remove_css_class("hidden-combo-row")
 
     def disable_first_item_selection(self):
         add_css_once(
@@ -1070,6 +1073,7 @@ GAME_FIELDS = [
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "prevent_sleep", "category", "icon",
     "steamgriddb_id", "pre_launch_command", "post_launch_command",
+    "steam_user",
 ]
 
 
