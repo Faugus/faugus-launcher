@@ -298,6 +298,7 @@ class IdComboBox(Gtk.DropDown):
     def __init__(self):
         super().__init__()
         self._ids = []
+        self._short_label_map = {}
         self._suppress = False
         self._ellipsize = False
         self._max_width_chars = 20
@@ -307,6 +308,11 @@ class IdComboBox(Gtk.DropDown):
         factory.connect("setup", self._on_factory_setup)
         factory.connect("bind", self._on_factory_bind)
         self.set_factory(factory)
+        list_factory = Gtk.SignalListItemFactory()
+        list_factory.connect("setup", self._on_factory_setup)
+        list_factory.connect("bind", self._on_full_text_list_factory_bind)
+        self.set_list_factory(list_factory)
+        self._list_factory_bind_func = self._on_full_text_list_factory_bind
         self.connect("notify::selected", self._on_notify_selected)
 
     def _on_factory_setup(self, factory, list_item):
@@ -314,6 +320,16 @@ class IdComboBox(Gtk.DropDown):
         list_item.set_child(label)
 
     def _on_factory_bind(self, factory, list_item):
+        label = list_item.get_child()
+        item = list_item.get_item()
+        text = item.get_string() if item else ""
+        text = self._short_label_map.get(text, text)
+        label.set_text(text)
+        if self._ellipsize:
+            label.set_ellipsize(Pango.EllipsizeMode.END)
+            label.set_max_width_chars(self._max_width_chars)
+
+    def _on_full_text_list_factory_bind(self, factory, list_item):
         label = list_item.get_child()
         item = list_item.get_item()
         label.set_text(item.get_string() if item else "")
@@ -333,7 +349,7 @@ class IdComboBox(Gtk.DropDown):
         list_factory = self.get_list_factory()
         if list_factory:
             list_factory.disconnect_by_func(self._on_factory_setup)
-            list_factory.disconnect_by_func(self._on_list_factory_bind)
+            list_factory.disconnect_by_func(self._list_factory_bind_func)
         self.disconnect_by_func(self._on_notify_selected)
 
     def configure_ellipsize(self, max_width_chars=20):
@@ -360,9 +376,12 @@ class IdComboBox(Gtk.DropDown):
         list_factory.connect("setup", self._on_factory_setup)
         list_factory.connect("bind", self._on_list_factory_bind)
         self.set_list_factory(list_factory)
+        self._list_factory_bind_func = self._on_list_factory_bind
 
-    def append(self, id_, text):
+    def append(self, id_, text, short_text=None):
         self._ids.append(id_)
+        if short_text:
+            self._short_label_map[text] = short_text
         self._suppress = True
         self._store.append(text)
         self._suppress = False
@@ -377,6 +396,7 @@ class IdComboBox(Gtk.DropDown):
             self._store.splice(0, n, [])
             self._suppress = False
         self._ids = []
+        self._short_label_map = {}
 
     def get_active(self):
         sel = self.get_selected()

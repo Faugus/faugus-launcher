@@ -2913,16 +2913,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_prevent_sleep.set_active(False)
 
-            if get_all_shortcut_paths(self.steam_user):
-                if self.check_steam_shortcut(title):
+            if edit_game_dialog.steam_users:
+                matched_user = self.find_steam_shortcut_user(title)
+                if matched_user:
+                    edit_game_dialog.combobox_steam_user.set_active_id(matched_user)
                     edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
                     edit_game_dialog.checkbox_shortcut_steam.set_active(False)
-            else:
-                edit_game_dialog.checkbox_shortcut_steam.set_active(False)
-                edit_game_dialog.checkbox_shortcut_steam.set_sensitive(False)
-                edit_game_dialog.checkbox_shortcut_steam.set_tooltip_text(
-                    _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
 
             edit_game_dialog.check_existing_shortcut()
 
@@ -2933,8 +2930,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.button_winetricks.set_sensitive(False)
                 edit_game_dialog.button_winetricks.set_tooltip_text(_("%s is running. Please close it first.") % game.title)
 
-    def check_steam_shortcut(self, title):
-        for path in get_all_shortcut_paths(self.steam_user):
+    def check_steam_shortcut(self, title, steam_user=None):
+        for path in get_all_shortcut_paths(steam_user if steam_user is not None else self.steam_user):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
@@ -2946,6 +2943,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 except SyntaxError:
                     continue
         return False
+
+    def find_steam_shortcut_user(self, title):
+        for account_id, _ in read_steam_users():
+            if self.check_steam_shortcut(title, account_id):
+                return account_id
+        return None
 
     def on_button_delete_clicked(self, *_):
         self.reload_playtimes()
@@ -3210,6 +3213,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
             appmenu_shortcut_state = add_game_dialog.checkbox_shortcut_appmenu.get_active()
             steam_shortcut_state = add_game_dialog.checkbox_shortcut_steam.get_active()
+            steam_user_selected = add_game_dialog.combobox_steam_user.get_active_id()
 
             def check_internet_connection():
                 import socket
@@ -3230,7 +3234,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.launcher_screen(
                         title, launcher_id, title_formatted, runner, prefix, UMU_RUN,
                         game, desktop_shortcut_state, appmenu_shortcut_state,
-                        steam_shortcut_state, icon_temp, icon_final
+                        steam_shortcut_state, icon_temp, icon_final, steam_user_selected
                     )
 
             game_info = game_to_dict(game)
@@ -3248,7 +3252,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if launcher_id in ("windows", "linux", "steam"):
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, steam_user_selected)
 
                 if addapp_checkbox == "addapp_enabled":
                     write_addapp_bat(addapp_bat, path, addapp, addapp_delay, addapp_first, game_arguments)
@@ -3270,7 +3274,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not dialog_destroyed:
             destroy_add_game_dialog()
 
-    def launcher_screen(self, title, launcher, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
+    def launcher_screen(self, title, launcher, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
         self.box_launcher = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_launcher.set_hexpand(True)
         self.box_launcher.set_vexpand(True)
@@ -3310,27 +3314,27 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if launcher == "battle":
             self.label_download.set_text(_("Downloading") + " Battle.net...")
-            self.download_launcher("battle", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("battle", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "ea":
             self.label_download.set_text(_("Downloading") + " EA App...")
-            self.download_launcher("ea", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("ea", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "epic":
             self.label_download.set_text(_("Downloading") + " Epic Games...")
-            self.download_launcher("epic", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("epic", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "ubisoft":
             self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
-            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "rockstar":
             self.label_download.set_text(_("Downloading") + " Rockstar Launcher...")
-            self.download_launcher("rockstar", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("rockstar", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "wargaming":
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
-            self.download_launcher("wargaming", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final)
+            self.download_launcher("wargaming", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         if self.interface_mode == "SteamGridDB" and os.path.isfile(icon_temp):
             icon_surface = self.new_texture_from_image(icon_temp, 256, 256)
@@ -3356,7 +3360,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.box_launcher_display = self.wrap_launcher_no_hero_background(self.box_launcher)
         self.box_main.append(self.box_launcher_display)
 
-    def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title):
+    def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title, steam_user=None):
         retcode = processo.poll()
 
         if retcode is not None:
@@ -3387,7 +3391,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 print(f"{title} installed.")
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, steam_user)
                 self.add_item_list(game)
                 self.update_list()
                 self.select_game_by_title(title)
@@ -3413,7 +3417,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         status = extract_ico(exe_path, final, best_frame=True)
         return final if status == "ok" else None
 
-    def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final):
+    def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.msi",
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
@@ -3476,7 +3480,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.bar_download.set_visible(False)
                 self.label_download2.set_visible(True)
                 processo = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], env=subprocess_env())
-                GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title)
+                GLib.timeout_add(100, self.monitor_process, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title, steam_user)
 
             run_in_background(start_download)
 
@@ -3554,7 +3558,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
             self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final)
+            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, edit_game_dialog.combobox_steam_user.get_active_id())
 
             if game.addapp_checkbox == True:
                 write_addapp_bat(game.addapp_bat, game.path, game.addapp, game.addapp_delay, game.addapp_first, game.game_arguments)
@@ -3637,9 +3641,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 desktop_file.write(desktop_file_content)
             os.chmod(desktop_shortcut_path, 0o755)
 
-    def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final):
+    def add_steam_shortcut(self, game, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
+        steam_user = steam_user if steam_user is not None else self.steam_user
+
         def add_game_to_steam(title, game_directory, icon):
-            for path in get_all_shortcut_paths(self.steam_user):
+            for path in get_all_shortcut_paths(steam_user):
                 shortcuts = load_shortcuts(path)
 
                 if "shortcuts" not in shortcuts:
@@ -3712,7 +3718,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     shutil.copy2(hero_src, os.path.join(grid_dir, f"{asset_id}_hero.png"))
 
         def remove_shortcuts(title):
-            for path in get_all_shortcut_paths(self.steam_user):
+            for path in get_all_shortcut_paths(steam_user):
                 if os.path.exists(path):
                     try:
                         with open(path, 'rb') as f:
@@ -4163,17 +4169,6 @@ class Settings(Gtk.Dialog):
         self.update_button_label()
         self.button_clearlogs.connect("clicked", self.on_clear_logs_clicked)
 
-        self.label_steam_user = Gtk.Label(label=_("Steam User"))
-        self.label_steam_user.set_halign(Gtk.Align.START)
-        self.combobox_steam_user = IdComboBox()
-        self.combobox_steam_user.append("all", _("All"))
-        steam_users = read_steam_users()
-        for account_id, persona_name in steam_users:
-            self.combobox_steam_user.append(account_id, f"{persona_name} ({account_id})")
-        if not steam_users:
-            self.combobox_steam_user.set_sensitive(False)
-            self.combobox_steam_user.set_tooltip_text(_("No Steam users found."))
-
         self.label_envar = Gtk.Label(label=_("Global Environment Variables"))
         self.label_envar.set_halign(Gtk.Align.START)
         self.label_envar.set_margin_top(10)
@@ -4250,8 +4245,6 @@ class Settings(Gtk.Dialog):
 
         grid_logs = build_grid()
 
-        grid_steam_user = build_grid()
-
         grid_miscellaneous = build_grid()
 
         grid_envar = build_grid(margin_top=False)
@@ -4305,10 +4298,6 @@ class Settings(Gtk.Dialog):
         grid_logs.attach(self.checkbox_enable_logging, 0, 0, 1, 1)
         grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
         self.button_clearlogs.set_hexpand(True)
-
-        grid_steam_user.attach(self.label_steam_user, 0, 0, 1, 1)
-        grid_steam_user.attach(self.combobox_steam_user, 0, 1, 1, 1)
-        self.combobox_steam_user.set_hexpand(True)
 
         grid_miscellaneous.attach(self.label_miscellaneous, 0, 0, 1, 1)
         grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 1, 1, 1)
@@ -4368,7 +4357,6 @@ class Settings(Gtk.Dialog):
         box_left.append(grid_runner)
         box_left.append(self.label_default_prefix_tools)
         box_left.append(grid_tools)
-        box_left.append(grid_steam_user)
         box_left.append(grid_lossless)
         box_left.append(grid_logs)
         box_left.append(grid_language)
@@ -4596,7 +4584,6 @@ class Settings(Gtk.Dialog):
         config.set_value("window-behavior", self.combobox_window_behavior.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
         config.set_value("accent-color", self.accent_color)
-        config.set_value("steam-user", self.combobox_steam_user.get_active_id())
         config.save_config()
 
         self.set_sensitive(False)
@@ -4997,7 +4984,6 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.set_active_id(self.interface_mode)
         self.combobox_background.set_active_id(background_mode)
         self.checkbox_hero_background.set_active(hero_enabled)
-        self.combobox_steam_user.set_active_id(cfg.config.get('steam-user', 'all'))
 
         loaded_theme = self.interface_theme
         loaded_accent = self.accent_color
@@ -5515,6 +5501,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_steam.set_tooltip_text(
             _("Add or remove a shortcut from Steam. Steam needs to be restarted."))
 
+        self.steam_users = read_steam_users()
+        self.combobox_steam_user = IdComboBox()
+        for account_id, persona_name in self.steam_users:
+            self.combobox_steam_user.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
+        if self.steam_users:
+            self.combobox_steam_user.set_active(0)
+        self.combobox_steam_user.connect("changed", self.on_combobox_steam_user_changed)
+
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
         self.button_shortcut_icon.connect(
@@ -5780,8 +5774,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_appmenu.set_hexpand(True)
         self.grid_shortcut.attach(self.checkbox_shortcut_steam, 0, 2, 1, 1)
         self.checkbox_shortcut_steam.set_hexpand(True)
+        self.grid_shortcut.attach(self.combobox_steam_user, 2, 2, 1, 1)
+        self.combobox_steam_user.set_hexpand(True)
         self.grid_shortcut_icon.append(self.button_shortcut_icon_overlay)
-        self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 3)
+        self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 2)
 
         page1.append(self.grid_launcher)
         page1.append(self.grid_steam_title)
@@ -5870,10 +5866,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        if not get_all_shortcut_paths(getattr(self.parent_window, 'steam_user', 'all')):
+        if not self.steam_users:
             self.checkbox_shortcut_steam.set_sensitive(False)
             self.checkbox_shortcut_steam.set_tooltip_text(
                 _("Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS FOUND."))
+            self.combobox_steam_user.set_sensitive(False)
+            self.combobox_steam_user.set_tooltip_text(_("No Steam users found."))
 
         self.lossless_location = ConfigManager().config.get('lossless-location', '')
         if os.path.exists(LSFGVK_PATH):
@@ -6686,6 +6684,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         image = new_picture(surface)
 
         return image
+
+    def on_combobox_steam_user_changed(self, combobox):
+        title = self.entry_title.get_text().strip()
+        if not title:
+            return
+        steam_user = combobox.get_active_id()
+        if hasattr(self.parent_window, 'check_steam_shortcut'):
+            has_shortcut = self.parent_window.check_steam_shortcut(title, steam_user)
+            self.checkbox_shortcut_steam.set_active(has_shortcut)
 
     def on_button_shortcut_icon_clicked(self, widget):
         validation_result = self.validate_fields(entry="path")
