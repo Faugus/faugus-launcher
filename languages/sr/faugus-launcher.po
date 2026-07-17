@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25 11:42-0300\n"
+"POT-Creation-Date: 2026-07-17 18:42-0300\n"
 "PO-Revision-Date: 2026-03-29 12:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: Serbian (Latin)\n"
@@ -15,441 +15,914 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /usr/bin/faugus-launcher:233 /usr/bin/faugus-launcher:309
-msgid "Play"
-msgstr "Igraj"
+#: faugus/backup.py:152
+#, fuzzy
+msgid "Backup Settings"
+msgstr "Rezervna kopija/Vraćanje podešavanja"
 
-#: /usr/bin/faugus-launcher:237
-msgid "Edit"
-msgstr "Izmeni"
+#: faugus/backup.py:180
+msgid "Backup Destination"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:241
-msgid "Delete"
-msgstr "Obriši"
+#: faugus/backup.py:193
+msgid "Backup destination path"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:245
-msgid "Duplicate"
-msgstr "Dupliraj"
+#: faugus/backup.py:202
+#, fuzzy
+msgid "Backup now"
+msgstr "Rezervna kopija"
 
-#: /usr/bin/faugus-launcher:249 /usr/bin/faugus-launcher:793
-msgid "Hide"
-msgstr "Sakrij"
+#: faugus/backup.py:208
+msgid "Automatic Backup"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:253 /usr/bin/faugus-launcher:798
-msgid "Add to favorites"
-msgstr "Dodaj u omiljene"
+#: faugus/backup.py:217
+msgid "Daily"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:257
-msgid "Open game location"
-msgstr "Otvori lokaciju igre"
+#: faugus/backup.py:218
+msgid "Weekly"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:261
-msgid "Open prefix location"
-msgstr "Otvori lokaciju prefiksa"
+#: faugus/backup.py:220
+msgid "Monthly"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:265
-msgid "Run file inside the prefix"
-msgstr "Pokreni datoteku unutar prefiksa"
+#: faugus/backup.py:232
+msgid "Monday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:269
-msgid "Show logs"
-msgstr "Prikaži zapise"
+#: faugus/backup.py:233
+msgid "Tuesday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:309
-msgid "Stop"
-msgstr "Zaustavi"
+#: faugus/backup.py:234
+msgid "Wednesday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:398
-msgid "Open Faugus Launcher"
-msgstr "Otvori Faugus Launcher"
+#: faugus/backup.py:235
+msgid "Thursday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:402
-msgid "Quit"
-msgstr "Izađi"
+#: faugus/backup.py:236
+msgid "Friday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:481 /usr/bin/faugus-launcher:591
-msgid "Force close all running games"
-msgstr "Prisilno zatvori sve pokrenute igre"
+#: faugus/backup.py:237
+msgid "Saturday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:509 /usr/bin/faugus-launcher:630
-msgid "Search..."
-msgstr "Pretraži..."
+#: faugus/backup.py:238
+msgid "Sunday"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:718
-msgid "Shut down"
-msgstr "Isključi"
+#: faugus/backup.py:257
+msgid "No backup yet"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:719
-msgid "Reboot"
-msgstr "Ponovo pokreni"
+#: faugus/backup.py:258 faugus/backup.py:350
+msgid "Last backup:"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:720
-msgid "Close"
-msgstr "Zatvori"
+#: faugus/backup.py:262 faugus/backup.py:263
+#, fuzzy
+msgid "Prefixes and Protons will not be backed up!"
+msgstr "Prefiksi i pokretači neće biti sačuvani u rezervnoj kopiji!"
 
-#: /usr/bin/faugus-launcher:791
-msgid "Remove from hidden"
-msgstr "Ukloni iz skrivenih"
-
-#: /usr/bin/faugus-launcher:796
-msgid "Remove from favorites"
-msgstr "Ukloni iz omiljenih"
-
-#: /usr/bin/faugus-launcher:849
-msgid "hour"
-msgstr "sat"
-
-#: /usr/bin/faugus-launcher:850
-msgid "hours"
-msgstr "sati"
-
-#: /usr/bin/faugus-launcher:851
-msgid "minute"
-msgstr "minut"
-
-#: /usr/bin/faugus-launcher:852
-msgid "minutes"
-msgstr "minuti"
-
-#: /usr/bin/faugus-launcher:960 /usr/bin/faugus-launcher:3965
-#: /usr/bin/faugus-launcher:6030
-msgid "Select a file to run inside the prefix"
-msgstr "Izaberite datoteku za pokretanje unutar prefiksa"
-
-#: /usr/bin/faugus-launcher:963 /usr/bin/faugus-launcher:3968
-#: /usr/bin/faugus-launcher:4094 /usr/bin/faugus-launcher:4213
-#: /usr/bin/faugus-launcher:4236 /usr/bin/faugus-launcher:5456
-#: /usr/bin/faugus-launcher:5650 /usr/bin/faugus-launcher:6033
-#: /usr/bin/faugus-launcher:6163 /usr/bin/faugus-launcher:6398
-#: /usr/bin/faugus-launcher:6471
-msgid "Open"
-msgstr "Otvori"
-
-#: /usr/bin/faugus-launcher:964 /usr/bin/faugus-launcher:3284
-#: /usr/bin/faugus-launcher:3969 /usr/bin/faugus-launcher:4062
-#: /usr/bin/faugus-launcher:4095 /usr/bin/faugus-launcher:4214
-#: /usr/bin/faugus-launcher:4237 /usr/bin/faugus-launcher:4425
-#: /usr/bin/faugus-launcher:4859 /usr/bin/faugus-launcher:5229
-#: /usr/bin/faugus-launcher:5365 /usr/bin/faugus-launcher:5457
-#: /usr/bin/faugus-launcher:5501 /usr/bin/faugus-launcher:5651
-#: /usr/bin/faugus-launcher:6034 /usr/bin/faugus-launcher:6164
-#: /usr/bin/faugus-launcher:6399 /usr/bin/faugus-launcher:6472
+#: faugus/backup.py:266 faugus/launcher.py:4162 faugus/launcher.py:5126
+#: faugus/launcher.py:5548 faugus/launcher.py:6104 faugus/shortcut.py:84
+#: faugus/utils.py:486 faugus/utils.py:576
 msgid "Cancel"
 msgstr "Otkaži"
 
-#: /usr/bin/faugus-launcher:968 /usr/bin/faugus-launcher:3973
-#: /usr/bin/faugus-launcher:5655 /usr/bin/faugus-launcher:6038
-#: /usr/bin/faugus-launcher:6406
-msgid "Windows files"
-msgstr "Windows datoteke"
+#: faugus/backup.py:270 faugus/launcher.py:4166 faugus/launcher.py:4872
+#: faugus/launcher.py:5130 faugus/launcher.py:5552 faugus/launcher.py:6100
+#: faugus/shortcut.py:88 faugus/utils.py:490 faugus/utils.py:753
+msgid "Ok"
+msgstr "U redu"
 
-#: /usr/bin/faugus-launcher:976 /usr/bin/faugus-launcher:3981
-#: /usr/bin/faugus-launcher:5663 /usr/bin/faugus-launcher:6046
-#: /usr/bin/faugus-launcher:6414
-msgid "All files"
-msgstr "Sve datoteke"
+#: faugus/backup.py:320
+#, fuzzy
+msgid "Select the backup destination"
+msgstr "Izaberite datoteku rezervne kopije za vraćanje"
 
-#: /usr/bin/faugus-launcher:1022
+#: faugus/launcher.py:263 faugus/launcher.py:351
+msgid "Play"
+msgstr "Igraj"
+
+#: faugus/launcher.py:266 faugus/launcher.py:1454
+msgid "Edit"
+msgstr "Izmeni"
+
+#: faugus/launcher.py:269
+msgid "Delete"
+msgstr "Obriši"
+
+#: faugus/launcher.py:272
+msgid "Duplicate"
+msgstr "Dupliraj"
+
+#: faugus/launcher.py:275 faugus/launcher.py:1750
+msgid "Hide"
+msgstr "Sakrij"
+
+#: faugus/launcher.py:278
+msgid "Category"
+msgstr ""
+
+#: faugus/launcher.py:295
+msgid "Open game location"
+msgstr "Otvori lokaciju igre"
+
+#: faugus/launcher.py:298
+msgid "Open prefix location"
+msgstr "Otvori lokaciju prefiksa"
+
+#: faugus/launcher.py:301
+msgid "Run file inside the prefix"
+msgstr "Pokreni datoteku unutar prefiksa"
+
+#: faugus/launcher.py:304
+msgid "Show logs"
+msgstr "Prikaži zapise"
+
+#: faugus/launcher.py:351
+msgid "Stop"
+msgstr "Zaustavi"
+
+#: faugus/launcher.py:788 faugus/launcher.py:914 faugus/launcher.py:1191
+#: faugus/launcher.py:1355 faugus/launcher.py:1489 faugus/launcher.py:1546
+#: faugus/launcher.py:1590
+msgid "All"
+msgstr ""
+
+#: faugus/launcher.py:790 faugus/launcher.py:916 faugus/launcher.py:1201
+#: faugus/launcher.py:1355 faugus/launcher.py:1489 faugus/launcher.py:1546
+msgid "Uncategorized"
+msgstr ""
+
+#: faugus/launcher.py:885
+#, fuzzy
+msgid "Kill all running games"
+msgstr "Prisilno zatvori sve pokrenute igre"
+
+#: faugus/launcher.py:889
+msgid "Search..."
+msgstr "Pretraži..."
+
+#: faugus/launcher.py:894
+msgid "Alphabetical"
+msgstr ""
+
+#: faugus/launcher.py:895
+#, fuzzy
+msgid "Playtime"
+msgstr "Igraj"
+
+#: faugus/launcher.py:896
+msgid "Last played"
+msgstr ""
+
+#: faugus/launcher.py:897 faugus/launcher.py:4025
+msgid "Custom"
+msgstr ""
+
+#: faugus/launcher.py:1202 faugus/launcher.py:1205 faugus/launcher.py:1489
+#: faugus/launcher.py:1546 faugus/launcher.py:1589 faugus/launcher.py:1763
+#: faugus/launcher.py:1774 faugus/launcher.py:1926
+msgid "None"
+msgstr ""
+
+#: faugus/launcher.py:1376
+msgid "Manage categories..."
+msgstr ""
+
+#: faugus/launcher.py:1408
+msgid "Manage Categories"
+msgstr ""
+
+#: faugus/launcher.py:1453
+msgid "Add"
+msgstr ""
+
+#: faugus/launcher.py:1455 faugus/proton_manager.py:222
+#: faugus/proton_manager.py:337
+msgid "Remove"
+msgstr "Ukloni"
+
+#: faugus/launcher.py:1682
+msgid "Shut down"
+msgstr "Isključi"
+
+#: faugus/launcher.py:1685
+msgid "Reboot"
+msgstr "Ponovo pokreni"
+
+#: faugus/launcher.py:1688
+msgid "Close"
+msgstr "Zatvori"
+
+#: faugus/launcher.py:1748
+msgid "Remove from hidden"
+msgstr "Ukloni iz skrivenih"
+
+#: faugus/launcher.py:1846
+msgid "hour"
+msgstr "sat"
+
+#: faugus/launcher.py:1847
+msgid "hours"
+msgstr "sati"
+
+#: faugus/launcher.py:1848
+msgid "minute"
+msgstr "minut"
+
+#: faugus/launcher.py:1849
+msgid "minutes"
+msgstr "minuti"
+
+#: faugus/launcher.py:1985 faugus/launcher.py:4739 faugus/launcher.py:6663
+msgid "Select a file to run inside the prefix"
+msgstr "Izaberite datoteku za pokretanje unutar prefiksa"
+
+#: faugus/launcher.py:2031
 #, python-format
 msgid "%s Logs"
 msgstr "%s Zapisi"
 
-#: /usr/bin/faugus-launcher:1061
+#: faugus/launcher.py:2070
 msgid "Copy to clipboard"
 msgstr "Kopiraj u ostavu"
 
-#: /usr/bin/faugus-launcher:1065
+#: faugus/launcher.py:2074
 msgid "Open file location"
 msgstr "Otvori lokaciju datoteke"
 
-#: /usr/bin/faugus-launcher:1151 /usr/bin/faugus-launcher:2136
+#: faugus/launcher.py:2153 faugus/launcher.py:3102
 #, python-format
 msgid "%s already exists."
 msgstr "%s već postoji."
 
-#: /usr/bin/faugus-launcher:1356
+#: faugus/launcher.py:2271
 #, python-format
 msgid "%s is already running."
 msgstr "%s je već pokrenut."
 
-#: /usr/bin/faugus-launcher:1359 /usr/bin/faugus-launcher:2079
-#: /usr/bin/faugus-launcher:3289 /usr/bin/faugus-launcher:4156
-#: /usr/bin/faugus-launcher:4429 /usr/bin/faugus-launcher:4864
-#: /usr/bin/faugus-launcher:5234 /usr/bin/faugus-launcher:5370
-#: /usr/bin/faugus-launcher:5497 /usr/bin/faugus-launcher:5569
-#: /usr/bin/faugus-launcher:6197
-msgid "Ok"
-msgstr "U redu"
-
-#: /usr/bin/faugus-launcher:1621
+#: faugus/launcher.py:2602
 msgid "Proton may generate huge log files."
 msgstr "Proton može generisati ogromne datoteke zapisa."
 
-#: /usr/bin/faugus-launcher:1621
+#: faugus/launcher.py:2603
 msgid "Enable logging only when debugging a problem."
 msgstr "Omogućite beleženje samo prilikom rešavanja problema."
 
-#: /usr/bin/faugus-launcher:1857
+#: faugus/launcher.py:2864
 #, python-format
 msgid "Edit %s"
 msgstr "Izmeni %s"
 
-#: /usr/bin/faugus-launcher:1914 /usr/bin/faugus-launcher:5093
-msgid ""
-"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
-"USERS FOUND."
-msgstr ""
-"Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut. "
-"NISU PRONAĐENI KORISNICI STEAM-A."
+#: faugus/launcher.py:2940
+#, fuzzy, python-format
+msgid "%s is running"
+msgstr "%s je već pokrenut."
 
-#: /usr/bin/faugus-launcher:1925
-#, python-format
-msgid "%s is running. Please close it first."
-msgstr "%s je pokrenut. Molimo prvo ga zatvorite."
-
-#: /usr/bin/faugus-launcher:1997
+#: faugus/launcher.py:3002
 msgid "Failed to remove prefix."
 msgstr "Neuspešno uklanjanje prefiksa."
 
-#: /usr/bin/faugus-launcher:2257
+#: faugus/launcher.py:3238
 msgid "No internet connection."
 msgstr "Nema internet konekcije."
 
-#: /usr/bin/faugus-launcher:2381 /usr/bin/faugus-launcher:2537
+#: faugus/launcher.py:3314 faugus/launcher.py:3466
 #, python-format
 msgid "Installing %s..."
 msgstr "Instaliranje %s..."
 
-#: /usr/bin/faugus-launcher:2392
-msgid "Finish installation"
-msgstr "Završi instalaciju"
-
-#: /usr/bin/faugus-launcher:2399 /usr/bin/faugus-launcher:2404
-#: /usr/bin/faugus-launcher:2409 /usr/bin/faugus-launcher:2414
-#: /usr/bin/faugus-launcher:2419 /usr/bin/faugus-launcher:2424
+#: faugus/launcher.py:3326 faugus/launcher.py:3330 faugus/launcher.py:3334
+#: faugus/launcher.py:3338 faugus/launcher.py:3342 faugus/launcher.py:3346
+#: faugus/runner.py:559
 msgid "Downloading"
 msgstr "Preuzimanje"
 
-#: /usr/bin/faugus-launcher:2486
+#: faugus/launcher.py:3418
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s nije instaliran!"
 
-#: /usr/bin/faugus-launcher:2531
+#: faugus/launcher.py:3460
 msgid "Download complete"
 msgstr "Preuzimanje završeno"
 
-#: /usr/bin/faugus-launcher:2534
+#: faugus/launcher.py:3463
 #, python-format
 msgid "Error during download: %s"
 msgstr "Greška tokom preuzimanja: %s"
 
-#: /usr/bin/faugus-launcher:2539 /usr/bin/faugus-launcher:2542
-#: /usr/bin/faugus-launcher:2552
+#: faugus/launcher.py:3468 faugus/launcher.py:3471 faugus/launcher.py:3481
 msgid "Please close the login window and wait."
 msgstr "Molimo zatvorite prozor za prijavu i sačekajte."
 
-#: /usr/bin/faugus-launcher:2551
+#: faugus/launcher.py:3480
 msgid "Please don't change the installation path."
 msgstr "Molimo ne menjajte putanju instalacije."
 
-#: /usr/bin/faugus-launcher:2555
+#: faugus/launcher.py:3484
 msgid "Please close Wargaming to finish the installation."
 msgstr "Molimo zatvorite Wargaming da biste završili instalaciju."
 
-#: /usr/bin/faugus-launcher:2989
+#: faugus/launcher.py:3865
 msgid "Settings"
 msgstr "Podešavanja"
 
-#: /usr/bin/faugus-launcher:3113
+#: faugus/launcher.py:3987
 msgid "Language"
 msgstr "Jezik"
 
-#: /usr/bin/faugus-launcher:3118
-msgid "Interface Mode"
-msgstr "Režim interfejsa"
+#: faugus/launcher.py:3991
+#, fuzzy
+msgid "Mode"
+msgstr "HDR režim"
 
-#: /usr/bin/faugus-launcher:3122
+#: faugus/launcher.py:3995
 msgid "List"
 msgstr "Lista"
 
-#: /usr/bin/faugus-launcher:3123
+#: faugus/launcher.py:3996
 msgid "Blocks"
 msgstr "Blokovi"
 
-#: /usr/bin/faugus-launcher:3124
+#: faugus/launcher.py:3997
 msgid "Banners"
 msgstr "Baneri"
 
-#: /usr/bin/faugus-launcher:3127
+#: faugus/launcher.py:3998
+#, fuzzy
+msgid "SteamGridDB"
+msgstr "Steam"
+
+#: faugus/launcher.py:4000
+#, fuzzy
+msgid "Background"
+msgstr "Rezervna kopija"
+
+#: faugus/launcher.py:4003
+#, fuzzy
+msgid "Default"
+msgstr "Podrazumevani Proton"
+
+#: faugus/launcher.py:4004
+msgid "Accent color"
+msgstr ""
+
+#: faugus/launcher.py:4005
+msgid "Dominant color"
+msgstr ""
+
+#: faugus/launcher.py:4008
+#, fuzzy
+msgid "Show hero"
+msgstr "Prikaži zapise"
+
+#: faugus/launcher.py:4010
+msgid "UI Customization"
+msgstr ""
+
+#: faugus/launcher.py:4013
+msgid "Theme"
+msgstr ""
+
+#: faugus/launcher.py:4016 faugus/launcher.py:4024
+msgid "Auto"
+msgstr ""
+
+#: faugus/launcher.py:4017
+msgid "Light"
+msgstr ""
+
+#: faugus/launcher.py:4018
+msgid "Dark"
+msgstr ""
+
+#: faugus/launcher.py:4021
+msgid "Accent Color"
+msgstr ""
+
+#: faugus/launcher.py:4036
+msgid "Window Behavior"
+msgstr ""
+
+#: faugus/launcher.py:4040
+msgid "Default window size"
+msgstr ""
+
+#: faugus/launcher.py:4041
+msgid "Remember window size"
+msgstr ""
+
+#: faugus/launcher.py:4042
 msgid "Start maximized"
 msgstr "Pokreni maksimizovano"
 
-#: /usr/bin/faugus-launcher:3132
+#: faugus/launcher.py:4043
 msgid "Start in fullscreen"
 msgstr "Pokreni u punom ekranu"
 
-#: /usr/bin/faugus-launcher:3135
+#: faugus/launcher.py:4044
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter menja pun ekran"
 
-#: /usr/bin/faugus-launcher:3137
+#: faugus/launcher.py:4046
 msgid "Show labels"
 msgstr "Prikaži oznake"
 
-#: /usr/bin/faugus-launcher:3140
-msgid "Smaller banners"
-msgstr "Manji baneri"
+#: faugus/launcher.py:4051
+msgid "SteamGridDB API Key"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:3144
+#: faugus/launcher.py:4058
 msgid "Default Prefixes Location"
 msgstr "Podrazumevana lokacija prefiksa"
 
-#: /usr/bin/faugus-launcher:3148 /usr/bin/faugus-launcher:4758
-msgid "/path/to/the/prefix"
-msgstr "/putanja/do/prefiksa"
+#: faugus/launcher.py:4062
+msgid "The location where prefixes are created"
+msgstr ""
 
-#: /usr/bin/faugus-launcher:3158
+#: faugus/launcher.py:4072
 msgid "Lossless Scaling Location"
 msgstr "Lokacija za Lossless Scaling"
 
-#: /usr/bin/faugus-launcher:3162
-msgid "/path/to/Lossless.dll"
-msgstr "/putanja/do/Lossless.dll"
+#: faugus/launcher.py:4076
+#, fuzzy
+msgid "Lossless.dll location"
+msgstr "Lokacija za Lossless Scaling"
 
-#: /usr/bin/faugus-launcher:3171
+#: faugus/launcher.py:4085
 msgid "Default Prefix Tools"
 msgstr "Podrazumevani alati prefiksa"
 
-#: /usr/bin/faugus-launcher:3178
+#: faugus/launcher.py:4091
 msgid "Default Proton"
 msgstr "Podrazumevani Proton"
 
-#: /usr/bin/faugus-launcher:3182
+#: faugus/launcher.py:4095
 msgid "Proton Manager"
 msgstr "Proton Menadžer"
 
-#: /usr/bin/faugus-launcher:3185
+#: faugus/launcher.py:4098
 msgid "Miscellaneous"
 msgstr "Razno"
 
-#: /usr/bin/faugus-launcher:3192
+#: faugus/launcher.py:4101
 msgid "Use discrete GPU"
 msgstr "Koristi diskretnu grafičku karticu"
 
-#: /usr/bin/faugus-launcher:3196
+#: faugus/launcher.py:4103
 msgid "Close when running a game/app"
 msgstr "Zatvori prilikom pokretanja igre/aplikacije"
 
-#: /usr/bin/faugus-launcher:3200
-msgid "System tray icon"
-msgstr "Ikona u sistemskoj traci"
-
-#: /usr/bin/faugus-launcher:3205
+#: faugus/launcher.py:4105
 msgid "Start on boot"
 msgstr "Pokreni pri podizanju sistema"
 
-#: /usr/bin/faugus-launcher:3209
+#: faugus/launcher.py:4107
+msgid "System tray icon"
+msgstr "Ikona u sistemskoj traci"
+
+#: faugus/launcher.py:4110
+#, fuzzy
+msgid "Start minimized to tray"
+msgstr "Pokreni maksimizovano"
+
+#: faugus/launcher.py:4113
 msgid "Monochrome icon"
 msgstr "Monohromatska ikona"
 
-#: /usr/bin/faugus-launcher:3214
+#: faugus/launcher.py:4116
 msgid "Disable splash window"
 msgstr "Onemogući uvodni prozor"
 
-#: /usr/bin/faugus-launcher:3217
+#: faugus/launcher.py:4119
 msgid "Disable automatic updates"
 msgstr "Onemogući automatska ažuriranja"
 
-#: /usr/bin/faugus-launcher:3221
+#: faugus/launcher.py:4122
 msgid "Enable logging"
 msgstr "Omogući beleženje"
 
-#: /usr/bin/faugus-launcher:3224
+#: faugus/launcher.py:4125
+msgid "Show categories and sort buttons"
+msgstr ""
+
+#: faugus/launcher.py:4127
 msgid "Show hidden games"
 msgstr "Prikaži skrivene igre"
 
-#: /usr/bin/faugus-launcher:3226
-msgid "Press Ctrl+H to show/hide games."
+#: faugus/launcher.py:4128
+#, fuzzy
+msgid "Ctrl+H toggles hidden games"
 msgstr "Pritisnite Ctrl+H da biste prikazali/sakrili igre."
 
-#: /usr/bin/faugus-launcher:3228
+#: faugus/launcher.py:4130
+msgid "Gamepad navigation"
+msgstr ""
+
+#: faugus/launcher.py:4133
 msgid "Use Wayland driver (experimental)"
 msgstr "Koristi Wayland drajver (eksperimentalno)"
 
-#: /usr/bin/faugus-launcher:3230 /usr/bin/faugus-launcher:3236
-msgid "Only works with GE-Proton10 or Proton-EM-10."
-msgstr "Radi samo sa GE-Proton10 ili Proton-EM-10."
-
-#: /usr/bin/faugus-launcher:3233
-msgid "Enable HDR (experimental)"
-msgstr "Omogući HDR (eksperimentalno)"
-
-#: /usr/bin/faugus-launcher:3238
+#: faugus/launcher.py:4136
 msgid "Enable WOW64 (experimental)"
 msgstr "Omogući WOW64 (eksperimentalno)"
 
-#: /usr/bin/faugus-launcher:3240
-msgid ""
-"Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
-msgstr "Radi samo sa GE-Proton10-9 ili novijim i Proton-EM-10-24 ili novijim."
-
-#: /usr/bin/faugus-launcher:3253 /usr/bin/faugus-launcher:4831
+#: faugus/launcher.py:4146 faugus/launcher.py:5505
 msgid "Run"
 msgstr "Pokreni"
 
-#: /usr/bin/faugus-launcher:3256 /usr/bin/faugus-launcher:4834
-msgid "Run a file inside the prefix"
+#: faugus/launcher.py:4149 faugus/launcher.py:5508
+#, fuzzy
+msgid "Run a file in the prefix"
 msgstr "Pokreni datoteku unutar prefiksa"
 
-#: /usr/bin/faugus-launcher:3261 /usr/bin/faugus-launcher:4812
-msgid ""
-"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
-msgstr ""
-"Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još "
-"mnogo toga."
-
-#: /usr/bin/faugus-launcher:3263 /usr/bin/faugus-launcher:4814
-msgid "Tweaks your system to improve performance."
-msgstr "Podešava vaš sistem radi boljih performansi."
-
-#: /usr/bin/faugus-launcher:3264 /usr/bin/faugus-launcher:4815
+#: faugus/launcher.py:4152 faugus/launcher.py:5493 faugus/shortcut.py:80
 msgid "Disable Hidraw"
 msgstr "Onemogući Hidraw"
 
-#: /usr/bin/faugus-launcher:3266 /usr/bin/faugus-launcher:4817
-msgid ""
-"May fix controller issues with some games. Only works with GE-Proton10 or "
-"Proton-EM-10."
+#: faugus/launcher.py:4153 faugus/launcher.py:5494 faugus/shortcut.py:81
+msgid "May fix gamepad issues with some games"
 msgstr ""
-"Može popraviti probleme sa kontrolerom u nekim igrama. Radi samo sa GE-"
-"Proton10 ili Proton-EM-10."
 
-#: /usr/bin/faugus-launcher:3267 /usr/bin/faugus-launcher:4818
+#: faugus/launcher.py:4154 faugus/launcher.py:5495 faugus/shortcut.py:82
 msgid "Prevent Sleep"
 msgstr "Spreči spavanje"
 
-#: /usr/bin/faugus-launcher:3269
+#: faugus/launcher.py:4156
 msgid "Support the Project"
 msgstr "Podržite projekat"
 
-#: /usr/bin/faugus-launcher:3293
+#: faugus/launcher.py:4170
 msgid "Backup/Restore Settings"
 msgstr "Rezervna kopija/Vraćanje podešavanja"
 
-#: /usr/bin/faugus-launcher:3300
+#: faugus/launcher.py:4174
 msgid "Backup"
 msgstr "Rezervna kopija"
 
-#: /usr/bin/faugus-launcher:3304
+#: faugus/launcher.py:4177
 msgid "Restore"
 msgstr "Vrati"
 
-#: /usr/bin/faugus-launcher:3311
+#: faugus/launcher.py:4184
 msgid "Global Environment Variables"
 msgstr "Globalne promenljive okruženja"
 
-#: /usr/bin/faugus-launcher:3585 /usr/bin/faugus-launcher:5081
+#: faugus/launcher.py:4451
+#, python-format
+msgid "Clear Logs (%s)"
+msgstr "Obriši zapise (%s)"
+
+#: faugus/launcher.py:4454
+msgid "Clear Logs"
+msgstr "Obriši zapise"
+
+#: faugus/launcher.py:4683
+msgid "Do you want to save the changes?"
+msgstr "Da li želite da sačuvate izmene?"
+
+#: faugus/launcher.py:4793
+msgid "Select a backup file to restore"
+msgstr "Izaberite datoteku rezervne kopije za vraćanje"
+
+#: faugus/launcher.py:4799
+msgid "ZIP files"
+msgstr "ZIP datoteke"
+
+#: faugus/launcher.py:4814 faugus/launcher.py:4824
+#, fuzzy
+msgid "This is not a valid Faugus backup file."
+msgstr "Ovo nije ispravna datoteka rezervne kopije Faugus Launcher-a."
+
+#: faugus/launcher.py:4863
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "Da li ste sigurni da želite da prepišete podešavanja?"
+
+#: faugus/launcher.py:4872 faugus/launcher.py:5194
+msgid "Yes"
+msgstr "Da"
+
+#: faugus/launcher.py:4873 faugus/launcher.py:5190
+msgid "No"
+msgstr "Ne"
+
+#: faugus/launcher.py:4880 faugus/launcher.py:6908
+msgid "Select a prefix location"
+msgstr "Izaberite lokaciju prefiksa"
+
+#: faugus/launcher.py:4900
+msgid "Select the Lossless.dll file"
+msgstr "Izaberite Lossless.dll datoteku"
+
+#: faugus/launcher.py:5117
+#, python-format
+msgid "Duplicate %s"
+msgstr "Dupliraj %s"
+
+#: faugus/launcher.py:5122 faugus/launcher.py:5369 faugus/launcher.py:5382
+#: faugus/shortcut.py:44
+msgid "Title"
+msgstr "Naslov"
+
+#: faugus/launcher.py:5166
+#, python-format
+msgid "Delete %s"
+msgstr "Obriši %s"
+
+#: faugus/launcher.py:5173
+#, python-format
+msgid "Are you sure you want to delete %s?"
+msgstr "Da li ste sigurni da želite da obrišete %s?"
+
+#: faugus/launcher.py:5182
+#, python-format
+msgid "WARNING: This prefix is used by %d other games."
+msgstr "UPOZORENJE: Ovaj prefiks koriste još %d druge igre."
+
+#: faugus/launcher.py:5184
+msgid "WARNING: This prefix is used by 1 other game."
+msgstr "UPOZORENJE: Ovaj prefiks koristi još 1 druga igra."
+
+#: faugus/launcher.py:5198
+msgid "Also remove the prefix:"
+msgstr "Takođe ukloni prefiks:"
+
+#: faugus/launcher.py:5245
+msgid "New Game/App"
+msgstr "Nova igra/aplikacija"
+
+#: faugus/launcher.py:5354
+#, fuzzy
+msgid "Steam User"
+msgstr "Steam igra"
+
+#: faugus/launcher.py:5434 faugus/utils.py:1407
+msgid "Path"
+msgstr "Putanja"
+
+#: faugus/launcher.py:5438
+msgid "Path to the game executable"
+msgstr ""
+
+#: faugus/launcher.py:5446
+msgid "Prefix"
+msgstr "Prefiks"
+
+#: faugus/launcher.py:5450
+#, fuzzy
+msgid "Path to the prefix"
+msgstr "/putanja/do/prefiksa"
+
+#: faugus/launcher.py:5458
+msgid "Proton"
+msgstr "Proton"
+
+#: faugus/launcher.py:5474 faugus/shortcut.py:59
+msgid "Game Arguments"
+msgstr "Argumenti igre"
+
+#: faugus/launcher.py:5477 faugus/shortcut.py:62
+#, fuzzy
+msgid "-d3d11 -fullscreen"
+msgstr "npr.: -d3d11 -fullscreen"
+
+#: faugus/launcher.py:5481 faugus/shortcut.py:64 faugus/utils.py:1130
+#, fuzzy
+msgid "Launch Settings"
+msgstr "Podešavanja"
+
+#: faugus/launcher.py:5484 faugus/shortcut.py:67 faugus/utils.py:1379
+msgid "Additional Application"
+msgstr "Dodatna aplikacija"
+
+#: faugus/launcher.py:5487 faugus/shortcut.py:70
+#, fuzzy
+msgid "Additional application to run with the game"
+msgstr ""
+"Dodatna aplikacija za pokretanje uz igru, kao što su Cheat Engine, treneri, "
+"modovi..."
+
+#: faugus/launcher.py:5489 faugus/shortcut.py:72 faugus/utils.py:1505
+msgid "Lossless Scaling Frame Generation"
+msgstr "Lossless Scaling Frame Generation"
+
+#: faugus/launcher.py:5510
+msgid "Shortcut"
+msgstr "Prečica"
+
+#: faugus/launcher.py:5515
+msgid "Desktop"
+msgstr "Radna površina"
+
+#: faugus/launcher.py:5516
+msgid "App Menu"
+msgstr "Meni aplikacija"
+
+#: faugus/launcher.py:5517
+msgid "Steam"
+msgstr "Steam"
+
+#: faugus/launcher.py:5718
+msgid "Refresh"
+msgstr "Osveži"
+
+#: faugus/launcher.py:5721
+msgid "Load from file"
+msgstr "Učitaj iz datoteke"
+
+#: faugus/launcher.py:5724
+msgid "Load from URL"
+msgstr "Učitaj sa URL-a"
+
+#: faugus/launcher.py:5729
+msgid "Game/App"
+msgstr "Igra/aplikacija"
+
+#: faugus/launcher.py:5746
+msgid "Tools"
+msgstr "Alati"
+
+#: faugus/launcher.py:5893 faugus/launcher.py:5895
+msgid "No Steam users found"
+msgstr ""
+
+#: faugus/launcher.py:5903
+#, fuzzy
+msgid "Lossless.dll not found"
+msgstr "%s nije pronađen."
+
+#: faugus/launcher.py:5906
+#, fuzzy
+msgid "Vulkan Layer not found"
+msgstr "%s nije pronađen."
+
+#: faugus/launcher.py:6061
+msgid "Select an image for the banner"
+msgstr "Izaberite sliku za baner"
+
+#: faugus/launcher.py:6062
+#, fuzzy
+msgid "Select an image for the hero"
+msgstr "Izaberite sliku za baner"
+
+#: faugus/launcher.py:6063
+#, fuzzy
+msgid "Select an image for the icon"
+msgstr "Izaberite sliku za baner"
+
+#: faugus/launcher.py:6093
+msgid "Enter the image URL"
+msgstr "Unesite URL slike"
+
+#: faugus/launcher.py:6633
+msgid "Windows Game"
+msgstr "Windows igra"
+
+#: faugus/launcher.py:6634
+msgid "Linux Game"
+msgstr "Linux igra"
+
+#: faugus/launcher.py:6635
+msgid "Steam Game"
+msgstr "Steam igra"
+
+#: faugus/launcher.py:6877
+msgid "Select the game's .exe"
+msgstr "Izaberite .exe datoteku igre"
+
+#: faugus/proton_manager.py:88
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Menadžer"
+
+#: faugus/proton_manager.py:222 faugus/proton_manager.py:343
+#: faugus/proton_manager.py:357
+msgid "Download"
+msgstr "Preuzmi"
+
+#: faugus/proton_manager.py:299
+msgid "Downloading..."
+msgstr "Preuzimanje..."
+
+#: faugus/proton_manager.py:301
+#, python-format
+msgid "Downloading %s..."
+msgstr "Preuzimanje %s..."
+
+#: faugus/proton_manager.py:344
+msgid "Error during download"
+msgstr "Greška prilikom preuzimanja"
+
+#: faugus/runner.py:117
+msgid "Starting Steam game..."
+msgstr "Pokretanje Steam igre..."
+
+#: faugus/runner.py:343
+#, fuzzy
+msgid "Are you enjoying Faugus?"
+msgstr "Da li vam se sviđa Faugus Launcher?"
+
+#: faugus/runner.py:347
+msgid "Please consider donating"
+msgstr "Molimo razmotrite donaciju"
+
+#: faugus/runner.py:353
+msgid "Never show this message again"
+msgstr "Nikada više ne prikazuj ovu poruku"
+
+#: faugus/runner.py:363
+msgid "Continue"
+msgstr "Nastavi"
+
+#: faugus/runner.py:398
+msgid "Internet connection error."
+msgstr "Greška sa internet konekcijom."
+
+#: faugus/runner.py:400
+#, python-format
+msgid "%s was not found."
+msgstr "%s nije pronađen."
+
+#: faugus/runner.py:401
+msgid "Please install it or use another Proton version."
+msgstr "Molimo instalirajte ga ili koristite drugu verziju Protona."
+
+#: faugus/runner.py:533
+msgid "Components are up to date"
+msgstr "Komponente su ažurirane"
+
+#: faugus/runner.py:557
+msgid "Updating"
+msgstr "Ažuriranje"
+
+#: faugus/runner.py:561
+msgid "Extracting"
+msgstr "Raspakivanje"
+
+#: faugus/runner.py:567
+msgid "is up to date"
+msgstr "je ažurirano"
+
+#: faugus/runner.py:633
+msgid "The keys and values were successfully added to the registry."
+msgstr "Ključevi i vrednosti su uspešno dodati u registar."
+
+#: faugus/shortcut.py:189
+#, fuzzy
+msgid ""
+"Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and set "
+"the location."
+msgstr ""
+"Lossless.dll NIJE PRONAĐEN. Ako je instaliran, idite u podešavanja Faugus "
+"Launcher-a i postavite lokaciju."
+
+#: faugus/shortcut.py:192
+msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
+msgstr "Lossless Scaling Vulkan Layer NIJE INSTALIRAN."
+
+#: faugus/tray_sni.py:262
+#, fuzzy
+msgid "Open Faugus"
+msgstr "Otvori Faugus Launcher"
+
+#: faugus/tray_sni.py:264
+msgid "Quit"
+msgstr "Izađi"
+
+#: faugus/utils.py:577
+msgid "Open"
+msgstr "Otvori"
+
+#: faugus/utils.py:610
+msgid "Windows files"
+msgstr "Windows datoteke"
+
+#: faugus/utils.py:618
+msgid "All files"
+msgstr "Sve datoteke"
+
+#: faugus/utils.py:628
+msgid "Image files"
+msgstr "Slikovne datoteke"
+
+#: faugus/utils.py:774
+msgid "The selected file is not a valid image."
+msgstr "Izabrana datoteka nije ispravna slika."
+
+#: faugus/utils.py:775
+msgid "Please choose another one."
+msgstr "Molimo izaberite drugu."
+
+#: faugus/utils.py:800
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
@@ -457,406 +930,228 @@ msgstr ""
 "Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još "
 "mnogo toga. NIJE INSTALIRANO."
 
-#: /usr/bin/faugus-launcher:3591 /usr/bin/faugus-launcher:5087
+#: faugus/utils.py:806
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
 msgstr "Podešava vaš sistem radi boljih performansi. NIJE INSTALIRANO."
 
-#: /usr/bin/faugus-launcher:3629
-#, python-format
-msgid "Clear Logs (%s)"
-msgstr "Obriši zapise (%s)"
-
-#: /usr/bin/faugus-launcher:3632
-msgid "Clear Logs"
-msgstr "Obriši zapise"
-
-#: /usr/bin/faugus-launcher:3882
-msgid "Do you want to save the changes?"
-msgstr "Da li želite da sačuvate izmene?"
-
-#: /usr/bin/faugus-launcher:4030
-msgid "Prefixes and runners will not be backed up!"
-msgstr "Prefiksi i pokretači neće biti sačuvani u rezervnoj kopiji!"
-
-#: /usr/bin/faugus-launcher:4058
-msgid "Save the backup file as..."
-msgstr "Sačuvaj rezervnu kopiju kao..."
-
-#: /usr/bin/faugus-launcher:4061
-msgid "Save"
-msgstr "Sačuvaj"
-
-#: /usr/bin/faugus-launcher:4091
-msgid "Select a backup file to restore"
-msgstr "Izaberite datoteku rezervne kopije za vraćanje"
-
-#: /usr/bin/faugus-launcher:4099
-msgid "ZIP files"
-msgstr "ZIP datoteke"
-
-#: /usr/bin/faugus-launcher:4110 /usr/bin/faugus-launcher:4120
-msgid "This is not a valid Faugus Launcher backup file."
-msgstr "Ovo nije ispravna datoteka rezervne kopije Faugus Launcher-a."
-
-#: /usr/bin/faugus-launcher:4123
-msgid "Are you sure you want to overwrite the settings?"
-msgstr "Da li ste sigurni da želite da prepišete podešavanja?"
-
-#: /usr/bin/faugus-launcher:4160 /usr/bin/faugus-launcher:4487
-msgid "No"
-msgstr "Ne"
-
-#: /usr/bin/faugus-launcher:4164 /usr/bin/faugus-launcher:4491
-msgid "Yes"
-msgstr "Da"
-
-#: /usr/bin/faugus-launcher:4210 /usr/bin/faugus-launcher:6468
-msgid "Select a prefix location"
-msgstr "Izaberite lokaciju prefiksa"
-
-#: /usr/bin/faugus-launcher:4233
-msgid "Select the Lossless.dll file"
-msgstr "Izaberite Lossless.dll datoteku"
-
-#: /usr/bin/faugus-launcher:4417
-#, python-format
-msgid "Duplicate %s"
-msgstr "Dupliraj %s"
-
-#: /usr/bin/faugus-launcher:4420 /usr/bin/faugus-launcher:4710
-#: /usr/bin/faugus-launcher:4728
-msgid "Title"
-msgstr "Naslov"
-
-#: /usr/bin/faugus-launcher:4423 /usr/bin/faugus-launcher:4734
-msgid "Game Title"
-msgstr "Naslov igre"
-
-#: /usr/bin/faugus-launcher:4464
-#, python-format
-msgid "Delete %s"
-msgstr "Obriši %s"
-
-#: /usr/bin/faugus-launcher:4469
-#, python-format
-msgid "Are you sure you want to delete %s?"
-msgstr "Da li ste sigurni da želite da obrišete %s?"
-
-#: /usr/bin/faugus-launcher:4479
-#, python-format
-msgid "WARNING: This prefix is used by %d other games."
-msgstr "UPOZORENJE: Ovaj prefiks koriste još %d druge igre."
-
-#: /usr/bin/faugus-launcher:4481
-msgid "WARNING: This prefix is used by 1 other game."
-msgstr "UPOZORENJE: Ovaj prefiks koristi još 1 druga igra."
-
-#: /usr/bin/faugus-launcher:4495
-msgid "Also remove the prefix:"
-msgstr "Takođe ukloni prefiks:"
-
-#: /usr/bin/faugus-launcher:4539
-msgid "New Game/App"
-msgstr "Nova igra/aplikacija"
-
-#: /usr/bin/faugus-launcher:4739 /usr/bin/faugus-launcher:5171
-msgid "Path"
-msgstr "Putanja"
-
-#: /usr/bin/faugus-launcher:4745
-msgid "/path/to/the/exe"
-msgstr "/putanja/do/exe_datoteke"
-
-#: /usr/bin/faugus-launcher:4754
-msgid "Prefix"
-msgstr "Prefiks"
-
-#: /usr/bin/faugus-launcher:4767
-msgid "Proton"
-msgstr "Proton"
-
-#: /usr/bin/faugus-launcher:4785
-msgid "Launch Arguments"
-msgstr "Argumenti pokretanja"
-
-#: /usr/bin/faugus-launcher:4788
-msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
-msgstr "npr.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
-
-#: /usr/bin/faugus-launcher:4793
-msgid "Game Arguments"
-msgstr "Argumenti igre"
-
-#: /usr/bin/faugus-launcher:4796
-msgid "e.g.: -d3d11 -fullscreen"
-msgstr "npr.: -d3d11 -fullscreen"
-
-#: /usr/bin/faugus-launcher:4800 /usr/bin/faugus-launcher:5145
-msgid "Additional Application"
-msgstr "Dodatna aplikacija"
-
-#: /usr/bin/faugus-launcher:4803
+#: faugus/utils.py:812
+#, fuzzy
 msgid ""
-"Additional application to run with the game, like Cheat Engine, Trainers, "
-"Mods..."
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
 msgstr ""
-"Dodatna aplikacija za pokretanje uz igru, kao što su Cheat Engine, treneri, "
-"modovi..."
+"Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još "
+"mnogo toga."
 
-#: /usr/bin/faugus-launcher:4806 /usr/bin/faugus-launcher:5263
-msgid "Lossless Scaling Frame Generation"
-msgstr "Lossless Scaling Frame Generation"
+#: faugus/utils.py:814
+#, fuzzy
+msgid "Tweaks your system to improve performance"
+msgstr "Podešava vaš sistem radi boljih performansi."
 
-#: /usr/bin/faugus-launcher:4837
-msgid "Shortcut"
-msgstr "Prečica"
-
-#: /usr/bin/faugus-launcher:4842
-msgid "Desktop"
-msgstr "Radna površina"
-
-#: /usr/bin/faugus-launcher:4844
-msgid "Add or remove a shortcut from the Desktop."
-msgstr "Dodajte ili uklonite prečicu sa radne površine."
-
-#: /usr/bin/faugus-launcher:4845
-msgid "App Menu"
-msgstr "Meni aplikacija"
-
-#: /usr/bin/faugus-launcher:4847
-msgid "Add or remove a shortcut from the Application Menu."
-msgstr "Dodajte ili uklonite prečicu iz menija aplikacija."
-
-#: /usr/bin/faugus-launcher:4848
-msgid "Steam"
-msgstr "Steam"
-
-#: /usr/bin/faugus-launcher:4850
-msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
-msgstr ""
-"Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut."
-
-#: /usr/bin/faugus-launcher:4856 /usr/bin/faugus-launcher:6160
+#: faugus/utils.py:820
 msgid "Select an icon for the shortcut"
 msgstr "Izaberite ikonu za prečicu"
 
-#: /usr/bin/faugus-launcher:4907
-msgid "Refresh"
-msgstr "Osveži"
-
-#: /usr/bin/faugus-launcher:4911
-msgid "Load from file"
-msgstr "Učitaj iz datoteke"
-
-#: /usr/bin/faugus-launcher:4915
-msgid "Load from URL"
-msgstr "Učitaj sa URL-a"
-
-#: /usr/bin/faugus-launcher:4923
-msgid "Game/App"
-msgstr "Igra/aplikacija"
-
-#: /usr/bin/faugus-launcher:4939
-msgid "Tools"
-msgstr "Alati"
-
-#: /usr/bin/faugus-launcher:5101
-msgid ""
-"Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
-"and set the location."
+#: faugus/utils.py:1188
+msgid "Presets"
 msgstr ""
-"Lossless.dll NIJE PRONAĐEN. Ako je instaliran, idite u podešavanja Faugus "
-"Launcher-a i postavite lokaciju."
 
-#: /usr/bin/faugus-launcher:5104
-msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
-msgstr "Lossless Scaling Vulkan Layer NIJE INSTALIRAN."
+#: faugus/utils.py:1251
+msgid "Launch Arguments"
+msgstr "Argumenti pokretanja"
 
-#: /usr/bin/faugus-launcher:5167 /usr/bin/faugus-launcher:5287
+#: faugus/utils.py:1307
+#, fuzzy
+msgid "Select a command or script"
+msgstr "Izaberite ikonu za prečicu"
+
+#: faugus/utils.py:1332
+msgid "Pre-launch Command/Script"
+msgstr ""
+
+#: faugus/utils.py:1333
+msgid "Command or script to run before the game"
+msgstr ""
+
+#: faugus/utils.py:1335
+msgid "Post-launch Command/Script"
+msgstr ""
+
+#: faugus/utils.py:1336
+msgid "Command or script to run after the game"
+msgstr ""
+
+#: faugus/utils.py:1403 faugus/utils.py:1531
 msgid "Enable"
 msgstr "Omogući"
 
-#: /usr/bin/faugus-launcher:5176
-msgid "/path/to/the/app"
-msgstr "/putanja/do/aplikacije"
-
-#: /usr/bin/faugus-launcher:5186
-msgid "Delay (seconds)"
-msgstr "Kašnjenje (sekunde)"
-
-#: /usr/bin/faugus-launcher:5203
-msgid "Run the application first"
+#: faugus/utils.py:1412
+#, fuzzy
+msgid "Path to the application"
 msgstr "Prvo pokreni aplikaciju"
 
-#: /usr/bin/faugus-launcher:5291
-msgid "Multiplier"
-msgstr "Multiplikator"
-
-#: /usr/bin/faugus-launcher:5296
-msgid "Multiply the FPS."
-msgstr "Multiplikuj FPS."
-
-#: /usr/bin/faugus-launcher:5298
-msgid "Flow Scale"
-msgstr "Flow Scale"
-
-#: /usr/bin/faugus-launcher:5305
-msgid "Lower the internal motion estimation resolution."
-msgstr "Smanjite internu rezoluciju procene kretanja."
-
-#: /usr/bin/faugus-launcher:5307
-msgid "Performance Mode"
-msgstr "Režim performansi"
-
-#: /usr/bin/faugus-launcher:5308
-msgid "Massively improve performance at the cost of quality."
-msgstr "Značajno poboljšava performanse na račun kvaliteta."
-
-#: /usr/bin/faugus-launcher:5311
-msgid "HDR Mode"
-msgstr "HDR režim"
-
-#: /usr/bin/faugus-launcher:5312
-msgid "Enable special HDR-only behavior."
-msgstr "Omogući specijalno ponašanje samo za HDR."
-
-#: /usr/bin/faugus-launcher:5315
-msgid "Present Mode (Experimental)"
-msgstr "Režim prikaza (eksperimentalno)"
-
-#: /usr/bin/faugus-launcher:5319
-msgid "Override the present mode."
-msgstr "Nadjačaj režim prikaza."
-
-#: /usr/bin/faugus-launcher:5453
-msgid "Select an image for the banner"
-msgstr "Izaberite sliku za baner"
-
-#: /usr/bin/faugus-launcher:5461 /usr/bin/faugus-launcher:6168
-msgid "Image files"
-msgstr "Slikovne datoteke"
-
-#: /usr/bin/faugus-launcher:5488
-msgid "Enter the image URL"
-msgstr "Unesite URL slike"
-
-#: /usr/bin/faugus-launcher:5563 /usr/bin/faugus-launcher:6190
-msgid "The selected file is not a valid image."
-msgstr "Izabrana datoteka nije ispravna slika."
-
-#: /usr/bin/faugus-launcher:5566 /usr/bin/faugus-launcher:6194
-msgid "Please choose another one."
-msgstr "Molimo izaberite drugu."
-
-#: /usr/bin/faugus-launcher:5647
+#: faugus/utils.py:1424
 msgid "Select an additional application"
 msgstr "Izaberite dodatnu aplikaciju"
 
-#: /usr/bin/faugus-launcher:5940
-msgid "Windows Game"
-msgstr "Windows igra"
+#: faugus/utils.py:1441
+msgid "Delay (seconds)"
+msgstr "Kašnjenje (sekunde)"
 
-#: /usr/bin/faugus-launcher:5941
-msgid "Linux Game"
-msgstr "Linux igra"
+#: faugus/utils.py:1454
+msgid "Run the application first"
+msgstr "Prvo pokreni aplikaciju"
 
-#: /usr/bin/faugus-launcher:5942
-msgid "Steam Game"
-msgstr "Steam igra"
+#: faugus/utils.py:1535
+msgid "Multiplier"
+msgstr "Multiplikator"
 
-#: /usr/bin/faugus-launcher:6395
-msgid "Select the game's .exe"
-msgstr "Izaberite .exe datoteku igre"
+#: faugus/utils.py:1540
+#, fuzzy
+msgid "Multiply the FPS"
+msgstr "Multiplikuj FPS."
 
-#: /usr/bin/faugus-proton-manager:72
-msgid "Faugus Proton Manager"
-msgstr "Faugus Proton Menadžer"
+#: faugus/utils.py:1542
+msgid "Flow Scale"
+msgstr "Flow Scale"
 
-#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
-#: /usr/bin/faugus-proton-manager:474
-msgid "Remove"
-msgstr "Ukloni"
+#: faugus/utils.py:1549
+#, fuzzy
+msgid "Lower the internal motion estimation resolution"
+msgstr "Smanjite internu rezoluciju procene kretanja."
 
-#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
-#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
-msgid "Download"
-msgstr "Preuzmi"
+#: faugus/utils.py:1551
+msgid "Performance Mode"
+msgstr "Režim performansi"
 
-#: /usr/bin/faugus-proton-manager:351
-msgid "Downloading..."
-msgstr "Preuzimanje..."
+#: faugus/utils.py:1552
+#, fuzzy
+msgid "Massively improve performance at the cost of quality"
+msgstr "Značajno poboljšava performanse na račun kvaliteta."
 
-#: /usr/bin/faugus-proton-manager:353
+#: faugus/utils.py:1555
+msgid "HDR Mode"
+msgstr "HDR režim"
+
+#: faugus/utils.py:1556
+#, fuzzy
+msgid "Enable special HDR-only behavior"
+msgstr "Omogući specijalno ponašanje samo za HDR."
+
+#: faugus/utils.py:1559
+msgid "Present Mode (Experimental)"
+msgstr "Režim prikaza (eksperimentalno)"
+
+#: faugus/utils.py:1563
+#, fuzzy
+msgid "Override the present mode"
+msgstr "Nadjačaj režim prikaza."
+
+#: faugus/utils.py:1805
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1806
+msgid "Add your API key in Settings first."
+msgstr ""
+
+#: faugus/utils.py:1819
+msgid "Choose a grid"
+msgstr ""
+
+#: faugus/utils.py:1820
+msgid "Choose a hero"
+msgstr ""
+
+#: faugus/utils.py:1821
+#, fuzzy
+msgid "Choose an icon"
+msgstr "Ikona u sistemskoj traci"
+
+#: faugus/utils.py:1919
+msgid "No results found."
+msgstr ""
+
+#~ msgid "Add to favorites"
+#~ msgstr "Dodaj u omiljene"
+
+#~ msgid "Remove from favorites"
+#~ msgstr "Ukloni iz omiljenih"
+
+#~ msgid ""
+#~ "Add or remove a shortcut from Steam. Steam needs to be restarted. NO "
+#~ "STEAM USERS FOUND."
+#~ msgstr ""
+#~ "Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut. "
+#~ "NISU PRONAĐENI KORISNICI STEAM-A."
+
 #, python-format
-msgid "Downloading %s..."
-msgstr "Preuzimanje %s..."
+#~ msgid "%s is running. Please close it first."
+#~ msgstr "%s je pokrenut. Molimo prvo ga zatvorite."
 
-#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#~ msgid "Finish installation"
+#~ msgstr "Završi instalaciju"
+
+#~ msgid "Interface Mode"
+#~ msgstr "Režim interfejsa"
+
+#~ msgid "Smaller banners"
+#~ msgstr "Manji baneri"
+
+#~ msgid "/path/to/Lossless.dll"
+#~ msgstr "/putanja/do/Lossless.dll"
+
+#~ msgid "Only works with GE-Proton10 or Proton-EM-10."
+#~ msgstr "Radi samo sa GE-Proton10 ili Proton-EM-10."
+
+#~ msgid "Enable HDR (experimental)"
+#~ msgstr "Omogući HDR (eksperimentalno)"
+
+#~ msgid ""
+#~ "Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
+#~ msgstr ""
+#~ "Radi samo sa GE-Proton10-9 ili novijim i Proton-EM-10-24 ili novijim."
+
+#~ msgid ""
+#~ "May fix controller issues with some games. Only works with GE-Proton10 or "
+#~ "Proton-EM-10."
+#~ msgstr ""
+#~ "Može popraviti probleme sa kontrolerom u nekim igrama. Radi samo sa GE-"
+#~ "Proton10 ili Proton-EM-10."
+
+#~ msgid "Save the backup file as..."
+#~ msgstr "Sačuvaj rezervnu kopiju kao..."
+
+#~ msgid "Save"
+#~ msgstr "Sačuvaj"
+
+#~ msgid "Game Title"
+#~ msgstr "Naslov igre"
+
+#~ msgid "/path/to/the/exe"
+#~ msgstr "/putanja/do/exe_datoteke"
+
+#~ msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+#~ msgstr "npr.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
+
+#~ msgid "Add or remove a shortcut from the Desktop."
+#~ msgstr "Dodajte ili uklonite prečicu sa radne površine."
+
+#~ msgid "Add or remove a shortcut from the Application Menu."
+#~ msgstr "Dodajte ili uklonite prečicu iz menija aplikacija."
+
+#~ msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
+#~ msgstr ""
+#~ "Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut."
+
+#~ msgid "/path/to/the/app"
+#~ msgstr "/putanja/do/aplikacije"
+
 #, python-format
-msgid "Extracting %s..."
-msgstr "Raspakivanje %s..."
+#~ msgid "Extracting %s..."
+#~ msgstr "Raspakivanje %s..."
 
-#: /usr/bin/faugus-proton-manager:421
-msgid "Error during download"
-msgstr "Greška prilikom preuzimanja"
+#~ msgid "Extracting..."
+#~ msgstr "Raspakivanje..."
 
-#: /usr/bin/faugus-proton-manager:428
-msgid "Extracting..."
-msgstr "Raspakivanje..."
-
-#: /usr/bin/faugus-proton-manager:480
-msgid "Error during extraction"
-msgstr "Greška prilikom raspakivanja"
-
-#: /usr/bin/faugus-run:131
-msgid "Starting Steam game..."
-msgstr "Pokretanje Steam igre..."
-
-#: /usr/bin/faugus-run:367
-msgid "Are you enjoying Faugus Launcher?"
-msgstr "Da li vam se sviđa Faugus Launcher?"
-
-#: /usr/bin/faugus-run:371
-msgid "Please consider donating"
-msgstr "Molimo razmotrite donaciju"
-
-#: /usr/bin/faugus-run:383
-msgid "Never show this message again"
-msgstr "Nikada više ne prikazuj ovu poruku"
-
-#: /usr/bin/faugus-run:393
-msgid "Continue"
-msgstr "Nastavi"
-
-#: /usr/bin/faugus-run:450
-msgid "Internet connection error."
-msgstr "Greška sa internet konekcijom."
-
-#: /usr/bin/faugus-run:454
-#, python-format
-msgid "%s was not found."
-msgstr "%s nije pronađen."
-
-#: /usr/bin/faugus-run:458
-msgid "Please install it or use another Proton version."
-msgstr "Molimo instalirajte ga ili koristite drugu verziju Protona."
-
-#: /usr/bin/faugus-run:649
-msgid "Components are up to date"
-msgstr "Komponente su ažurirane"
-
-#: /usr/bin/faugus-run:671
-msgid "Updating"
-msgstr "Ažuriranje"
-
-#: /usr/bin/faugus-run:675
-msgid "Extracting"
-msgstr "Raspakivanje"
-
-#: /usr/bin/faugus-run:681
-msgid "is up to date"
-msgstr "je ažurirano"
-
-#: /usr/bin/faugus-run:743
-msgid "The keys and values were successfully added to the registry."
-msgstr "Ključevi i vrednosti su uspešno dodati u registar."
+#~ msgid "Error during extraction"
+#~ msgstr "Greška prilikom raspakivanja"
