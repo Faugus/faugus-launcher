@@ -872,6 +872,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             popover.set_child(vbox)
             popover.connect("closed", lambda p: p.unparent())
+            if self.gamepad_navigation:
+                self.active_popover = popover
             popover.popup()
 
             if focus_btn:
@@ -1275,6 +1277,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         vbox.append(btn_manage)
 
         popover.set_child(vbox)
+        if self.gamepad_navigation:
+            self.active_popover = popover
         popover.popup()
 
         if focus_btn:

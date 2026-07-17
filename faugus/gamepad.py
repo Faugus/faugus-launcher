@@ -353,6 +353,8 @@ def _handle_button_down(self, button, win):
             win.on_backspace(None)
         elif role == "triangle":
             win.on_toggle_mode(win.get_focus(), "Shift")
+        elif role == "start":
+            win.on_enter(None)
 
 
 def _handle_treeview_confirm(treeview):
