@@ -86,6 +86,13 @@ sudo ninja install
 meson ninja pygobject requests pillow vdf psutil libmanette imagemagick icoextract vulkan-tools
 ```
 
+## Translations
+[![Translation status](https://hosted.weblate.org/widget/faugus-launcher/faugus-launcher/svg-badge.svg)](https://hosted.weblate.org/engage/faugus-launcher/)
+
+Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus-launcher/faugus-launcher/) — no need to edit `.po` files by hand or open a pull request. Sign in, pick your language, and translate directly in the browser; changes are submitted back to this repository as a pull request automatically.
+
+The list of translatable strings is kept up to date automatically whenever the source code changes, so new strings show up on Weblate without any manual step from translators.
+
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
 
