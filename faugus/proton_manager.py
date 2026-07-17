@@ -22,7 +22,7 @@ if IS_FLATPAK:
 else:
     GLib.set_prgname("faugus-launcher")
 
-_ = setup_gettext('faugus-proton-manager')
+_ = setup_gettext('faugus-launcher')
 
 VARIANTS = {
     "cachyos": {

@@ -940,6 +940,89 @@ msgstr "Prefixe und Proton-Versionen werden nicht gesichert!"
 msgid "Select the backup destination"
 msgstr "Wählen Sie den Speicherort für die Sicherung aus"
 
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:27
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Manager"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:251
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:399
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:416
+msgid "Download"
+msgstr "Herunterladen"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:343
+msgid "Downloading..."
+msgstr "Herunterladen..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:345
+#, python-format
+msgid "Downloading %s..."
+msgstr "%s wird heruntergeladen..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:374
+#, python-format
+msgid "Extracting %s..."
+msgstr "Extrahiere %s..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:400
+msgid "Error during download"
+msgstr "Fehler beim Herunterladen"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
+msgid "Starting Steam game..."
+msgstr "Starte Steam-Spiel..."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Gefällt dir der Faugus Launcher?"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
+msgid "Please consider donating"
+msgstr "Bitte eine Spende erwägen"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
+msgid "Never show this message again"
+msgstr "Diese Meldung nicht mehr anzeigen"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
+msgid "Continue"
+msgstr "Weiter"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
+msgid "Internet connection error."
+msgstr "Fehler bei der Internetverbindung."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
+#, python-format
+msgid "%s was not found."
+msgstr "%s wurde nicht gefunden."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
+msgid "Please install it or use another Proton version."
+msgstr ""
+"Bitte installieren Sie es oder verwenden Sie eine andere Proton-Version."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
+msgid "Components are up to date"
+msgstr "Komponenten sind auf dem neuesten Stand"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
+msgid "Updating"
+msgstr "Aktualisiere"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
+msgid "Extracting"
+msgstr "Extrahiere"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
+msgid "is up to date"
+msgstr "ist auf dem neusten Stand"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
+msgid "The keys and values were successfully added to the registry."
+msgstr ""
+"Die Schlüssel und Werte wurden erfolgreich zur Registrierung hinzugefügt."
+
 #~ msgid "Add to favorites"
 #~ msgstr "Zu Favoriten hinzufügen"
 
@@ -969,3 +1052,9 @@ msgstr "Wählen Sie den Speicherort für die Sicherung aus"
 
 #~ msgid "Image files"
 #~ msgstr "Bilddateien"
+
+#~ msgid "Extracting..."
+#~ msgstr "Extrahiere %s..."
+
+#~ msgid "Error during extraction"
+#~ msgstr "Fehler beim Extrahieren"

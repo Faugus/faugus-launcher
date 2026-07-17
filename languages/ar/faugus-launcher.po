@@ -126,11 +126,11 @@ msgstr "تحرير {title}"
 
 #: /usr/bin/faugus-launcher:1832 /usr/bin/faugus-launcher:4993
 msgid ""
-"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM USERS "
-"FOUND."
+"Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
+"USERS FOUND."
 msgstr ""
-"إضافة أو إزالة اختصار من Steam. يجب إعادة تشغيل Steam. لم يتم العثور على مستخدمي "
-"Steam."
+"إضافة أو إزالة اختصار من Steam. يجب إعادة تشغيل Steam. لم يتم العثور على "
+"مستخدمي Steam."
 
 #: /usr/bin/faugus-launcher:1842 /usr/bin/faugus-launcher:1844
 #: /usr/bin/faugus-launcher:1846
@@ -306,10 +306,11 @@ msgstr "تشغيل ملف داخل prefix"
 
 #: /usr/bin/faugus-launcher:3058 /usr/bin/faugus-launcher:4742
 #: /usr/bin/faugus-launcher:6291
-msgid "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
+msgid ""
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
 msgstr ""
-"يعرض نافذة على الشاشة تعرض عدد الإطارات(FPS)، ودرجة حرارة الجهاز، وأداء المعالج "
-"وكرت الشاشة والمزيد."
+"يعرض نافذة على الشاشة تعرض عدد الإطارات(FPS)، ودرجة حرارة الجهاز، وأداء "
+"المعالج وكرت الشاشة والمزيد."
 
 #: /usr/bin/faugus-launcher:3060 /usr/bin/faugus-launcher:4744
 #: /usr/bin/faugus-launcher:6293
@@ -326,7 +327,8 @@ msgstr "تعطيل Hidraw"
 msgid ""
 "May fix controller issues with some games. Only works with GE-Proton10-3 or "
 "superior."
-msgstr "قد يصلح مشاكل التحكم في بعض الألعاب. يعمل فقط مع GE-Proton10-3 أو أحدث."
+msgstr ""
+"قد يصلح مشاكل التحكم في بعض الألعاب. يعمل فقط مع GE-Proton10-3 أو أحدث."
 
 #: /usr/bin/faugus-launcher:3065
 msgid "Support the Project"
@@ -386,11 +388,11 @@ msgstr "المزامنة التكيفية"
 #: /usr/bin/faugus-launcher:3419 /usr/bin/faugus-launcher:4981
 #: /usr/bin/faugus-launcher:6441
 msgid ""
-"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT "
-"INSTALLED."
+"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
+"NOT INSTALLED."
 msgstr ""
-"يعرض نافذة على الشاشة تعرض عدد الإطارات(FPS)، ودرجة حرارة الجهاز، وأداء المعالج "
-"وكرت الشاشة والمزيد. غير مثبت."
+"يعرض نافذة على الشاشة تعرض عدد الإطارات(FPS)، ودرجة حرارة الجهاز، وأداء "
+"المعالج وكرت الشاشة والمزيد. غير مثبت."
 
 #: /usr/bin/faugus-launcher:3425 /usr/bin/faugus-launcher:4987
 #: /usr/bin/faugus-launcher:6447
@@ -538,8 +540,10 @@ msgstr "تطبيق إضافي"
 
 #: /usr/bin/faugus-launcher:4726
 msgid ""
-"Additional application to run with the game, like Cheat Engine, Trainers, Mods..."
-msgstr "تطبيق إضافي لتشغيله مع اللعبة، مثل Cheat Engine أو المدربين أو التعديلات..."
+"Additional application to run with the game, like Cheat Engine, Trainers, "
+"Mods..."
+msgstr ""
+"تطبيق إضافي لتشغيله مع اللعبة، مثل Cheat Engine أو المدربين أو التعديلات..."
 
 #: /usr/bin/faugus-launcher:4729 /usr/bin/faugus-launcher:6278
 msgid "/path/to/the/app"
@@ -661,3 +665,117 @@ msgstr "معطيات غير صحيحة"
 #: /usr/bin/faugus-launcher:7167
 msgid "Faugus Launcher is already running."
 msgstr "Faugus Launcher قيد التشغيل بالفعل."
+
+#: /usr/bin/faugus-proton-manager:76
+msgid "Faugus GE-Proton Manager"
+msgstr "برنامج Faugus GE-Proton"
+
+#: /usr/bin/faugus-proton-manager:153
+msgid "Error fetching releases:"
+msgstr "خطأ في جلب الإصدارات:"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:242
+msgid "Remove"
+msgstr "إزالة"
+
+#: /usr/bin/faugus-proton-manager:170 /usr/bin/faugus-proton-manager:267
+msgid "Download"
+msgstr "تنزيل"
+
+#: /usr/bin/faugus-proton-manager:205
+msgid "Downloading"
+msgstr "جاري التنزيل"
+
+#: /usr/bin/faugus-proton-manager:208
+msgid "Downloading..."
+msgstr "جاري التنزيل..."
+
+#: /usr/bin/faugus-proton-manager:209
+#, python-brace-format
+msgid "Downloading {tag}..."
+msgstr "جاري تنزيل {tag}..."
+
+#: /usr/bin/faugus-proton-manager:234
+msgid "Extracting..."
+msgstr "جاري الاستخراج..."
+
+#: /usr/bin/faugus-proton-manager:235
+#, python-brace-format
+msgid "Extracting {tag}..."
+msgstr "جاري استخراج {tag}..."
+
+#: /usr/bin/faugus-proton-manager:260
+#, python-brace-format
+msgid "Failed to extract {tar_file_path}: {error}"
+msgstr "فشل في استخراج {tar_file_path}: {error}"
+
+#: /usr/bin/faugus-proton-manager:269
+#, python-brace-format
+msgid "Failed to remove {version_path}: {error}"
+msgstr "فشل في إزالة {version_path}: {error}"
+
+#: /usr/bin/faugus-run:126
+#, python-brace-format
+msgid "{path} was not found."
+msgstr "لم يتم العثور على {path}"
+
+#: /usr/bin/faugus-run:130
+msgid "Please install it or use another Proton version."
+msgstr "يرجى تثبيته أو استخدام إصدار آخر من Proton."
+
+#: /usr/bin/faugus-run:362
+#, python-brace-format
+msgid "Using {path}"
+msgstr "يتم استخدام {path}"
+
+#: /usr/bin/faugus-run:433
+msgid "Updating BattlEye..."
+msgstr "جارٍ تحديث BattlEye..."
+
+#: /usr/bin/faugus-run:435
+msgid "Updating Easy Anti-Cheat..."
+msgstr "جارٍ تحديث Easy Anti-cheat..."
+
+#: /usr/bin/faugus-run:437
+msgid "Components are up to date"
+msgstr "جميع المكونات محدّثة"
+
+#: /usr/bin/faugus-run:439
+msgid "Downloading GE-Proton..."
+msgstr "جارٍ تنزيل GE-Proton..."
+
+#: /usr/bin/faugus-run:441
+msgid "Downloading UMU-Proton..."
+msgstr "جارٍ تنزيل UMU-Proton..."
+
+#: /usr/bin/faugus-run:443
+msgid "Downloading Steam Runtime..."
+msgstr "جارٍ تنزيل Steam Runtime..."
+
+#: /usr/bin/faugus-run:445
+msgid "Extracting Steam Runtime..."
+msgstr "جارٍ استخراج Steam Runtime..."
+
+#: /usr/bin/faugus-run:447
+msgid "Extracting GE-Proton..."
+msgstr "جارٍ استخراج GE-Proton..."
+
+#: /usr/bin/faugus-run:449
+msgid "Extracting UMU-Proton..."
+msgstr "جارٍ استخراج UMU-Proton..."
+
+#: /usr/bin/faugus-run:451 /usr/bin/faugus-run:457
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton مواكب لآخر التحديثات"
+
+#: /usr/bin/faugus-run:453 /usr/bin/faugus-run:459
+msgid "UMU-Proton is up to date"
+msgstr "مواكب لآخر التحديثات. UMU-Proton"
+
+#: /usr/bin/faugus-run:455 /usr/bin/faugus-run:461
+msgid "Steam Runtime is up to date"
+msgstr "مواكب لآخر التحديثات Steam Runtime"
+
+#: /usr/bin/faugus-run:510
+msgid "The keys and values were successfully added to the registry."
+msgstr "تمت إضافة المفاتيح والقيم إلى السجل بنجاح."

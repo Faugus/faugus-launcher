@@ -426,8 +426,8 @@ msgid ""
 "May fix controller issues with some games. Only works with GE-Proton10 or "
 "Proton-EM-10."
 msgstr ""
-"Bazı oyunlarda kontrol aygıtı sorunlarını giderebilir. Sadece GE-Proton10 "
-"ya da Proton-EM-10 ile çalışır."
+"Bazı oyunlarda kontrol aygıtı sorunlarını giderebilir. Sadece GE-Proton10 ya "
+"da Proton-EM-10 ile çalışır."
 
 #: /usr/bin/faugus-launcher:3496 /usr/bin/faugus-launcher:5111
 msgid "Prevent Sleep"
@@ -463,8 +463,7 @@ msgstr ""
 
 #: /usr/bin/faugus-launcher:3820 /usr/bin/faugus-launcher:5380
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
-msgstr ""
-"Performans arttırmak için sisteminizde ayarlamalar yapar. YÜKLÜ DEĞİL."
+msgstr "Performans arttırmak için sisteminizde ayarlamalar yapar. YÜKLÜ DEĞİL."
 
 #: /usr/bin/faugus-launcher:3858
 #, python-format
@@ -762,3 +761,96 @@ msgstr "Steam Oyunu"
 #: /usr/bin/faugus-launcher:6715
 msgid "Select the game's .exe"
 msgstr "Oyunun .exe dosyasını seç"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Yöneticisi"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
+msgid "Remove"
+msgstr "Kaldır"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+msgid "Download"
+msgstr "İndir"
+
+#: /usr/bin/faugus-proton-manager:351
+msgid "Downloading..."
+msgstr "İndiriliyor..."
+
+#: /usr/bin/faugus-proton-manager:353
+#, python-format
+msgid "Downloading %s..."
+msgstr "İndiriliyor %s..."
+
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
+msgid "Extracting %s..."
+msgstr "Ayıklanıyor %s..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "İndirme sırasında hata oluştu"
+
+#: /usr/bin/faugus-proton-manager:428
+msgid "Extracting..."
+msgstr "Ayıklanıyor..."
+
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "Ayıklama sırasında hata oluştu"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Steam oyunu başlatılıyor..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Faugus Launcher'ı kullanmaktan memnun musunuz?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Lütfen bağış yapmayı düşünün"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Bu mesajı bir daha gösterme"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Devam"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "İnternet bağlantı problemi."
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s bulunamadı."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Lütfen bunu yükleyin veya başka bir Proton sürümü deneyin."
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Bileşenler güncel"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Güncelleniyor"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Ayıklanıyor"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "güncel"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "Anahtarlar ve değerler başarıyla kayıtlara eklendi."

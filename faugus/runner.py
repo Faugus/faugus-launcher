@@ -30,7 +30,7 @@ else:
 os.makedirs(COMPATIBILITY_DIR, exist_ok=True)
 fix_legacy_shortcut_icons()
 
-_ = setup_gettext('faugus-run')
+_ = setup_gettext('faugus-launcher')
 
 _env_set = set()
 

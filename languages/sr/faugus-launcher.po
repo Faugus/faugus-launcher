@@ -198,7 +198,9 @@ msgstr "Izmeni %s"
 msgid ""
 "Add or remove a shortcut from Steam. Steam needs to be restarted. NO STEAM "
 "USERS FOUND."
-msgstr "Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut. NISU PRONAĐENI KORISNICI STEAM-A."
+msgstr ""
+"Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut. "
+"NISU PRONAĐENI KORISNICI STEAM-A."
 
 #: /usr/bin/faugus-launcher:1925
 #, python-format
@@ -403,7 +405,9 @@ msgstr "Pokreni datoteku unutar prefiksa"
 #: /usr/bin/faugus-launcher:3261 /usr/bin/faugus-launcher:4812
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more."
-msgstr "Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još mnogo toga."
+msgstr ""
+"Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još "
+"mnogo toga."
 
 #: /usr/bin/faugus-launcher:3263 /usr/bin/faugus-launcher:4814
 msgid "Tweaks your system to improve performance."
@@ -417,7 +421,9 @@ msgstr "Onemogući Hidraw"
 msgid ""
 "May fix controller issues with some games. Only works with GE-Proton10 or "
 "Proton-EM-10."
-msgstr "Može popraviti probleme sa kontrolerom u nekim igrama. Radi samo sa GE-Proton10 ili Proton-EM-10."
+msgstr ""
+"Može popraviti probleme sa kontrolerom u nekim igrama. Radi samo sa GE-"
+"Proton10 ili Proton-EM-10."
 
 #: /usr/bin/faugus-launcher:3267 /usr/bin/faugus-launcher:4818
 msgid "Prevent Sleep"
@@ -447,7 +453,9 @@ msgstr "Globalne promenljive okruženja"
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
 "NOT INSTALLED."
-msgstr "Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još mnogo toga. NIJE INSTALIRANO."
+msgstr ""
+"Prikazuje sloj za praćenje FPS-a, temperature, opterećenja CPU/GPU-a i još "
+"mnogo toga. NIJE INSTALIRANO."
 
 #: /usr/bin/faugus-launcher:3591 /usr/bin/faugus-launcher:5087
 msgid "Tweaks your system to improve performance. NOT INSTALLED."
@@ -591,7 +599,9 @@ msgstr "Dodatna aplikacija"
 msgid ""
 "Additional application to run with the game, like Cheat Engine, Trainers, "
 "Mods..."
-msgstr "Dodatna aplikacija za pokretanje uz igru, kao što su Cheat Engine, treneri, modovi..."
+msgstr ""
+"Dodatna aplikacija za pokretanje uz igru, kao što su Cheat Engine, treneri, "
+"modovi..."
 
 #: /usr/bin/faugus-launcher:4806 /usr/bin/faugus-launcher:5263
 msgid "Lossless Scaling Frame Generation"
@@ -623,7 +633,8 @@ msgstr "Steam"
 
 #: /usr/bin/faugus-launcher:4850
 msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
-msgstr "Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut."
+msgstr ""
+"Dodajte ili uklonite prečicu iz Steam-a. Steam mora biti ponovo pokrenut."
 
 #: /usr/bin/faugus-launcher:4856 /usr/bin/faugus-launcher:6160
 msgid "Select an icon for the shortcut"
@@ -653,7 +664,9 @@ msgstr "Alati"
 msgid ""
 "Lossless.dll NOT FOUND. If it's installed, go to Faugus Launcher's settings "
 "and set the location."
-msgstr "Lossless.dll NIJE PRONAĐEN. Ako je instaliran, idite u podešavanja Faugus Launcher-a i postavite lokaciju."
+msgstr ""
+"Lossless.dll NIJE PRONAĐEN. Ako je instaliran, idite u podešavanja Faugus "
+"Launcher-a i postavite lokaciju."
 
 #: /usr/bin/faugus-launcher:5104
 msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
@@ -754,3 +767,96 @@ msgstr "Steam igra"
 #: /usr/bin/faugus-launcher:6395
 msgid "Select the game's .exe"
 msgstr "Izaberite .exe datoteku igre"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Menadžer"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
+msgid "Remove"
+msgstr "Ukloni"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+msgid "Download"
+msgstr "Preuzmi"
+
+#: /usr/bin/faugus-proton-manager:351
+msgid "Downloading..."
+msgstr "Preuzimanje..."
+
+#: /usr/bin/faugus-proton-manager:353
+#, python-format
+msgid "Downloading %s..."
+msgstr "Preuzimanje %s..."
+
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
+msgid "Extracting %s..."
+msgstr "Raspakivanje %s..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "Greška prilikom preuzimanja"
+
+#: /usr/bin/faugus-proton-manager:428
+msgid "Extracting..."
+msgstr "Raspakivanje..."
+
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "Greška prilikom raspakivanja"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Pokretanje Steam igre..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Da li vam se sviđa Faugus Launcher?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Molimo razmotrite donaciju"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Nikada više ne prikazuj ovu poruku"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Nastavi"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "Greška sa internet konekcijom."
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s nije pronađen."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Molimo instalirajte ga ili koristite drugu verziju Protona."
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Komponente su ažurirane"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Ažuriranje"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Raspakivanje"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "je ažurirano"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "Ključevi i vrednosti su uspešno dodati u registar."

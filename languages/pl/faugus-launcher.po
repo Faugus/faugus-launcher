@@ -773,6 +773,99 @@ msgstr "Gra ze Steam"
 msgid "Select the game's .exe"
 msgstr "Wybierz .exe gry"
 
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Menadżer Protona"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
+msgid "Remove"
+msgstr "Usuń"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+msgid "Download"
+msgstr "Pobierz"
+
+#: /usr/bin/faugus-proton-manager:351
+msgid "Downloading..."
+msgstr "Pobieranie..."
+
+#: /usr/bin/faugus-proton-manager:353
+#, python-format
+msgid "Downloading %s..."
+msgstr "Pobieranie %s..."
+
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
+msgid "Extracting %s..."
+msgstr "Wypakowywanie %s..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "Błąd podczas pobierania"
+
+#: /usr/bin/faugus-proton-manager:428
+msgid "Extracting..."
+msgstr "Wypakowywanie..."
+
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "Błąd podczas wypakowywania"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Uruchamianie gry Steam..."
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Czy podoba Ci się Faugus Launcher?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Rozważ przekazanie dobrowolnej wpłaty"
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Nigdy nie pokazuj więcej"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Kontynuuj"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "Błąd połączenia"
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "%s nie została znaleziona."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Proszę zainstalować lub użyć innej wersji Protona."
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Komponenty są aktualne"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Aktualizowanie"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Wypakowywanie"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "jest aktualny"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "Klucze i wartości zostały poprawnie dodane do rejestru."
+
 #~ msgid "Downloading Battle.net..."
 #~ msgstr "Pobieranie Battle.net..."
 
@@ -898,3 +991,66 @@ msgstr "Wybierz .exe gry"
 
 #~ msgid "Faugus Launcher is already running."
 #~ msgstr "Faugus Launcher jest już uruchomiony."
+
+#~ msgid "Error fetching releases:"
+#~ msgstr "Błąd odczytu wydań:"
+
+#, python-brace-format
+#~ msgid "Downloading {tag}..."
+#~ msgstr "Pobieranie {tag}..."
+
+#, python-brace-format
+#~ msgid "Extracting {tag}..."
+#~ msgstr "Wypakowywanie {tag}..."
+
+#, python-brace-format
+#~ msgid "Extracting... {percent}%"
+#~ msgstr "Wypakowywanie... {percent}%"
+
+#, python-brace-format
+#~ msgid "Failed to extract {tar_file_path}: {error}"
+#~ msgstr "Nie udało się wypakować {tar_file_path}: {error}"
+
+#, python-brace-format
+#~ msgid "Failed to remove {version_path}: {error}"
+#~ msgstr "Nie udało się usunąć {version_path}: {error}"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "Używa %s"
+
+#~ msgid "Updating UMU-Launcher..."
+#~ msgstr "Aktualizacja Środowiska UMU..."
+
+#~ msgid "UMU-Launcher is up to date"
+#~ msgstr "UMU jest aktualny"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Aktualizacja BattlEye..."
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Aktualizacja Easy Anti-Cheat..."
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Pobieranie UMU-Proton..."
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Pobieranie Steam Runtime..."
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Wypakowywanie UMU-Proton..."
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton jest aktualny"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime jest aktualny"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "Pobieranie Proton-EM..."
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "Wypakowywanie Proton-EM..."
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM jest aktualny"

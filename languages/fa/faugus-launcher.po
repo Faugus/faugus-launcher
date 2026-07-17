@@ -737,5 +737,128 @@ msgstr "بازی استیم"
 msgid "Select the game's .exe"
 msgstr "فایل .exe بازی را انتخاب کنید"
 
+#: /usr/bin/faugus-proton-manager:128
+msgid "Faugus Proton Manager"
+msgstr ""
+
+#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:406
+msgid "Remove"
+msgstr "حذف"
+
+#: /usr/bin/faugus-proton-manager:289 /usr/bin/faugus-proton-manager:417
+msgid "Download"
+msgstr "دانلود"
+
+#: /usr/bin/faugus-proton-manager:352
+msgid "Downloading..."
+msgstr "در حال دانلود..."
+
+#: /usr/bin/faugus-proton-manager:354
+#, python-format
+msgid "Downloading %s..."
+msgstr "در حال دانلود %s..."
+
+#: /usr/bin/faugus-proton-manager:377
+msgid "Extracting..."
+msgstr "در حال استخراج..."
+
+#: /usr/bin/faugus-proton-manager:379
+#, python-format
+msgid "Extracting %s..."
+msgstr "در حال استخراج %s..."
+
+#: /usr/bin/faugus-run:85
+msgid "Starting Steam game..."
+msgstr "در حال باز کردن گیم استیم..."
+
+#: /usr/bin/faugus-run:277
+msgid "Internet connection error."
+msgstr "خطای در به اینترنت."
+
+#: /usr/bin/faugus-run:281
+#, python-format
+msgid "%s was not found."
+msgstr "%s یافت نشد."
+
+#: /usr/bin/faugus-run:285
+msgid "Please install it or use another Proton version."
+msgstr "لطفاً آن را نصب کنید یا از نسخه پروتون دیگری استفاده کنید."
+
+#: /usr/bin/faugus-run:468
+msgid "Updating UMU-Launcher..."
+msgstr "در حال بروزرسانی UMU-Launcher..."
+
+#: /usr/bin/faugus-run:470
+msgid "UMU-Launcher is up to date"
+msgstr "UMU-Launcher به‌روز است"
+
+#: /usr/bin/faugus-run:472
+msgid "Updating BattlEye..."
+msgstr "در حال بروزرسانی BattlEye..."
+
+#: /usr/bin/faugus-run:474
+msgid "Updating Easy Anti-Cheat..."
+msgstr "ر حال بروزرسانی Easy Anti-Cheat..."
+
+#: /usr/bin/faugus-run:476
+msgid "Components are up to date"
+msgstr "همه پیش نیاز ها بروز هستند"
+
+#: /usr/bin/faugus-run:478
+msgid "Downloading UMU-Proton..."
+msgstr "در حال دانلود UMU-Proton..."
+
+#: /usr/bin/faugus-run:480
+msgid "Downloading Steam Runtime..."
+msgstr "در حال دانلود Steam Runtime..."
+
+#: /usr/bin/faugus-run:482
+msgid "Extracting Steam Runtime..."
+msgstr "در حال استخراج Steam Runtime..."
+
+#: /usr/bin/faugus-run:484
+msgid "Extracting UMU-Proton..."
+msgstr "در حال استخراج UMU-Proton..."
+
+#: /usr/bin/faugus-run:486 /usr/bin/faugus-run:492
+msgid "UMU-Proton is up to date"
+msgstr "UMU-Proton به روز است"
+
+#: /usr/bin/faugus-run:488 /usr/bin/faugus-run:494
+msgid "Steam Runtime is up to date"
+msgstr "Steam Runtime به روز است"
+
+#: /usr/bin/faugus-run:490 /usr/bin/faugus-run:501
+msgid "GE-Proton is up to date"
+msgstr "GE-Proton به روز است"
+
+#: /usr/bin/faugus-run:497
+msgid "Downloading GE-Proton..."
+msgstr "در حال دانلود GE-Proton..."
+
+#: /usr/bin/faugus-run:499
+msgid "Extracting GE-Proton..."
+msgstr "در حال استخراج GE-Proton..."
+
+#: /usr/bin/faugus-run:503
+msgid "Downloading Proton-EM..."
+msgstr "در حال دانلود Proton-EM..."
+
+#: /usr/bin/faugus-run:505
+msgid "Extracting Proton-EM..."
+msgstr "در حال استخراج Proton-EM..."
+
+#: /usr/bin/faugus-run:507
+msgid "Proton-EM is up to date"
+msgstr "Proton-EM به روز است"
+
+#: /usr/bin/faugus-run:564
+msgid "The keys and values were successfully added to the registry."
+msgstr "کلیدها و مقادیر با موفقیت به رجیستری اضافه شدند."
+
 #~ msgid "Invalid Image"
 #~ msgstr "تصویر غیرقابل قبول"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "در حال استفاده از %s"

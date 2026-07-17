@@ -936,6 +936,87 @@ msgstr "Não será feito backup dos prefixos e Protons!"
 msgid "Select the backup destination"
 msgstr "Selecione um destino para o backup"
 
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:27
+msgid "Faugus Proton Manager"
+msgstr "Faugus Gerenciador de Proton"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:251
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:399
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:416
+msgid "Download"
+msgstr "Baixar"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:343
+msgid "Downloading..."
+msgstr "Baixando..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:345
+#, python-format
+msgid "Downloading %s..."
+msgstr "Baixando %s..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:374
+#, python-format
+msgid "Extracting %s..."
+msgstr "Extraindo %s..."
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:400
+msgid "Error during download"
+msgstr "Erro durante o download"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
+msgid "Starting Steam game..."
+msgstr "Iniciando jogo da Steam..."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Tá curtindo o Faugus Launcher?"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
+msgid "Please consider donating"
+msgstr "Por favor considere fazer uma doação"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
+msgid "Never show this message again"
+msgstr "Nunca mais exibir essa mensagem"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
+msgid "Continue"
+msgstr "Continuar"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
+msgid "Internet connection error."
+msgstr "Erro de conexão com a internet."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
+#, python-format
+msgid "%s was not found."
+msgstr "%s não encontrado."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
+msgid "Please install it or use another Proton version."
+msgstr "Por favor instale-o ou use outra versão do Proton."
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
+msgid "Components are up to date"
+msgstr "Componentes estão atualizados"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
+msgid "Updating"
+msgstr "Atualizando"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
+msgid "Extracting"
+msgstr "Extraindo"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
+msgid "is up to date"
+msgstr "está atualizado"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
+msgid "The keys and values were successfully added to the registry."
+msgstr "As chaves e valores foram adicionados ao registro corretamente."
+
 #~ msgid "Enable HDR (experimental)"
 #~ msgstr "Ativar HDR (experimental)"
 
@@ -1116,3 +1197,84 @@ msgstr "Selecione um destino para o backup"
 
 #~ msgid "Session mode activated"
 #~ msgstr "Modo sessão ativado"
+
+#~ msgid "Extracting..."
+#~ msgstr "Extraindo..."
+
+#~ msgid "Error during extraction"
+#~ msgstr "Erro durante a extração"
+
+#, python-brace-format
+#~ msgid "Downloading {tag}..."
+#~ msgstr "Baixando {tag}..."
+
+#, python-brace-format
+#~ msgid "Extracting {tag}..."
+#~ msgstr "Extraindo {tag}..."
+
+#~ msgid "Error fetching releases:"
+#~ msgstr "Erro ao buscar versões:"
+
+#, python-brace-format
+#~ msgid "Extracting... {percent}%"
+#~ msgstr "Extraindo... {percent}%"
+
+#, python-brace-format
+#~ msgid "Failed to extract {tar_file_path}: {error}"
+#~ msgstr "Falha ao extrair {tar_file_path}: {error}"
+
+#, python-brace-format
+#~ msgid "Failed to remove {version_path}: {error}"
+#~ msgstr "Falha ao remover {version_path}: {error}"
+
+#~ msgid "Updating UMU-Launcher..."
+#~ msgstr "Atualizando UMU-Launcher..."
+
+#~ msgid "UMU-Launcher is up to date"
+#~ msgstr "UMU-Launcher está atualizado"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Atualizando BattlEye..."
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Atualizando Easy Anti-Cheat..."
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Baixando UMU-Proton..."
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Baixando Steam Runtime..."
+
+#~ msgid "Extracting Steam Runtime..."
+#~ msgstr "Extraindo Steam Runtime..."
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Extraindo UMU-Proton..."
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton está atualizado"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime está atualizado"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "Baixando Proton-EM..."
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "Extraindo Proton-EM..."
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM está atualizado"
+
+#~ msgid "Downloading Proton-CachyOS..."
+#~ msgstr "Baixando Proton-CachyOS..."
+
+#~ msgid "Extracting Proton-CachyOS..."
+#~ msgstr "Extraindo Proton-CachyOS..."
+
+#~ msgid "Proton-CachyOS is up to date"
+#~ msgstr "Proton-CachyOS está atualizado"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "Usando %s"

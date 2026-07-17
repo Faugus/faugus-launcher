@@ -926,6 +926,87 @@ msgstr "将不会备份 Prefix 和 Proton!"
 msgid "Select the backup destination"
 msgstr "选择备份的目标路径"
 
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:27
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton 管理器"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:251
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:399
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:416
+msgid "Download"
+msgstr "下载"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:343
+msgid "Downloading..."
+msgstr "正在下载……"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:345
+#, python-format
+msgid "Downloading %s..."
+msgstr "正在下载 %s……"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:374
+#, python-format
+msgid "Extracting %s..."
+msgstr "正在解压 %s……"
+
+#: /usr/lib/python3.14/site-packages/faugus/proton_manager.py:400
+msgid "Error during download"
+msgstr "下载时出现错误"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:115
+msgid "Starting Steam game..."
+msgstr "启动 Steam 游戏……"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:351
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "你喜欢 Faugus 启动器的体验吗?"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:355
+msgid "Please consider donating"
+msgstr "请考虑赞助支持"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:367
+msgid "Never show this message again"
+msgstr "不再显示此消息"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:377
+msgid "Continue"
+msgstr "继续"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:426
+msgid "Internet connection error."
+msgstr "网络连接错误"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:430
+#, python-format
+msgid "%s was not found."
+msgstr "未找到 %s"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:434
+msgid "Please install it or use another Proton version."
+msgstr "请安装或使用其他版本的 Proton"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:588
+msgid "Components are up to date"
+msgstr "组件已是最新"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:612
+msgid "Updating"
+msgstr "更新中"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:616
+msgid "Extracting"
+msgstr "解压中"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:622
+msgid "is up to date"
+msgstr "是最新的"
+
+#: /usr/lib/python3.14/site-packages/faugus/runner.py:688
+msgid "The keys and values were successfully added to the registry."
+msgstr "键值均已成功添加至注册表"
+
 #~ msgid "New"
 #~ msgstr "新建"
 
@@ -996,3 +1077,43 @@ msgstr "选择备份的目标路径"
 
 #~ msgid "Invalid Image"
 #~ msgstr "无效的图像"
+
+#~ msgid "Extracting..."
+#~ msgstr "正在解压……"
+
+#~ msgid "Error during extraction"
+#~ msgstr "解压时出现错误"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "正使用%s"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "正在更新BattlEye……"
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "正在更新Easy Anti-Cheat……"
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "正在下载UMU-Proton……"
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr " 正在下载Steam Runtime……"
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "正在解压UMU-Proton……"
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton已是最新"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "Steam Runtime已是最新"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "正在下载Proton-EM……"
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "正在解压Proton-EM……"
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM已是最新"

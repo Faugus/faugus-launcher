@@ -819,3 +819,96 @@ msgstr "Steam-spill"
 #: /usr/lib/python3.14/site-packages/faugus/launcher.py:6458
 msgid "Select the game's .exe"
 msgstr "Velg spillets .exe"
+
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus Proton Manager"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:414
+#: /usr/bin/faugus-proton-manager:474
+msgid "Remove"
+msgstr "Fjern"
+
+#: /usr/bin/faugus-proton-manager:267 /usr/bin/faugus-proton-manager:420
+#: /usr/bin/faugus-proton-manager:481 /usr/bin/faugus-proton-manager:491
+msgid "Download"
+msgstr "Last ned"
+
+#: /usr/bin/faugus-proton-manager:351
+msgid "Downloading..."
+msgstr "Laster ned..."
+
+#: /usr/bin/faugus-proton-manager:353
+#, python-format
+msgid "Downloading %s..."
+msgstr "Laster ned %s..."
+
+#: /usr/bin/faugus-proton-manager:380 /usr/bin/faugus-proton-manager:430
+#, python-format
+msgid "Extracting %s..."
+msgstr "Pakker ut %s..."
+
+#: /usr/bin/faugus-proton-manager:421
+msgid "Error during download"
+msgstr "Feil ved nedlasting"
+
+#: /usr/bin/faugus-proton-manager:428
+msgid "Extracting..."
+msgstr "Pakker ut..."
+
+#: /usr/bin/faugus-proton-manager:480
+msgid "Error during extraction"
+msgstr "Feil ved utpakking"
+
+#: /usr/bin/faugus-run:132
+msgid "Starting Steam game..."
+msgstr "Starter Steam-spill..."
+
+#: /usr/bin/faugus-run:359
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Er du fornøyd med Faugus Launcher?"
+
+#: /usr/bin/faugus-run:363
+msgid "Please consider donating"
+msgstr "Vennligst vurder å donere"
+
+#: /usr/bin/faugus-run:375
+msgid "Never show this message again"
+msgstr "Aldri vis denne meldingen igjen"
+
+#: /usr/bin/faugus-run:385
+msgid "Continue"
+msgstr "Fortsett"
+
+#: /usr/bin/faugus-run:442
+msgid "Internet connection error."
+msgstr "Problem med internett-tilkobling"
+
+#: /usr/bin/faugus-run:446
+#, python-format
+msgid "%s was not found."
+msgstr "%s ble ikke funnet."
+
+#: /usr/bin/faugus-run:450
+msgid "Please install it or use another Proton version."
+msgstr "Vennligst installer eller bruk en annen versjon av Proton."
+
+#: /usr/bin/faugus-run:599
+msgid "Components are up to date"
+msgstr "Komponent er fullstendig oppdatert"
+
+#: /usr/bin/faugus-run:621
+msgid "Updating"
+msgstr "Oppdaterer"
+
+#: /usr/bin/faugus-run:625
+msgid "Extracting"
+msgstr "Pakker ut"
+
+#: /usr/bin/faugus-run:631
+msgid "is up to date"
+msgstr "er oppdatert"
+
+#: /usr/bin/faugus-run:694
+msgid "The keys and values were successfully added to the registry."
+msgstr "Nøkler og verdier ble lagt til i registeret."

@@ -861,6 +861,94 @@ msgstr "Steam-game"
 msgid "Select the game's .exe"
 msgstr "Kies het .exe-bestand van de game"
 
+#: /usr/bin/faugus-proton-manager:72
+msgid "Faugus Proton Manager"
+msgstr "Faugus GE-Proton-beheer"
+
+#: /usr/bin/faugus-proton-manager:232 /usr/bin/faugus-proton-manager:365
+#: /usr/bin/faugus-proton-manager:426 /usr/bin/faugus-proton-manager:436
+msgid "Download"
+msgstr "Downloaden"
+
+#: /usr/bin/faugus-proton-manager:296
+msgid "Downloading..."
+msgstr "Bezig met downloaden…"
+
+#: /usr/bin/faugus-proton-manager:298
+#, python-format
+msgid "Downloading %s..."
+msgstr "Bezig met downloaden van ‘%s’…"
+
+#: /usr/bin/faugus-proton-manager:325 /usr/bin/faugus-proton-manager:375
+#, python-format
+msgid "Extracting %s..."
+msgstr "Bezig met uitpakken van ‘%s’…"
+
+#: /usr/bin/faugus-proton-manager:366
+msgid "Error during download"
+msgstr "Het downloaden is mislukt"
+
+#: /usr/bin/faugus-proton-manager:373
+msgid "Extracting..."
+msgstr "Bezig met uitpakken…"
+
+#: /usr/bin/faugus-proton-manager:425
+msgid "Error during extraction"
+msgstr "Het uitpakken is mislukt"
+
+#: /usr/bin/faugus-run:131
+msgid "Starting Steam game..."
+msgstr "Bezig met starten van Steam-game…"
+
+#: /usr/bin/faugus-run:367
+msgid "Are you enjoying Faugus Launcher?"
+msgstr "Gebruik je Faugus graag?"
+
+#: /usr/bin/faugus-run:371
+msgid "Please consider donating"
+msgstr "Overweeg dan een donatie."
+
+#: /usr/bin/faugus-run:383
+msgid "Never show this message again"
+msgstr "Bericht niet meer tonen"
+
+#: /usr/bin/faugus-run:393
+msgid "Continue"
+msgstr "Doorgaan"
+
+#: /usr/bin/faugus-run:450
+msgid "Internet connection error."
+msgstr "Er is geen internetverbinding."
+
+#: /usr/bin/faugus-run:454
+#, python-format
+msgid "%s was not found."
+msgstr "‘%s’ is niet aangetroffen."
+
+#: /usr/bin/faugus-run:458
+msgid "Please install it or use another Proton version."
+msgstr "Installeer dit of maak gebruik van een andere Proton-versie."
+
+#: /usr/bin/faugus-run:649
+msgid "Components are up to date"
+msgstr "Je beschikt over de nieuwste onderdelen"
+
+#: /usr/bin/faugus-run:671
+msgid "Updating"
+msgstr "Bezig met bijwerken…"
+
+#: /usr/bin/faugus-run:675
+msgid "Extracting"
+msgstr "Bezig met uitpakken…"
+
+#: /usr/bin/faugus-run:681
+msgid "is up to date"
+msgstr "is bijgewerkt"
+
+#: /usr/bin/faugus-run:743
+msgid "The keys and values were successfully added to the registry."
+msgstr "De sleutels en waarden zijn toegevoegd aan het register."
+
 #~ msgid "Add to favorites"
 #~ msgstr "Toevoegen aan favorieten"
 
@@ -978,3 +1066,69 @@ msgstr "Kies het .exe-bestand van de game"
 
 #~ msgid "Faugus Launcher is already running."
 #~ msgstr "Faugus-starter is al actief."
+
+#~ msgid "Error fetching releases:"
+#~ msgstr "De versies kunnen niet worden opgehaald:"
+
+#, python-brace-format
+#~ msgid "Downloading {tag}..."
+#~ msgstr "Bezig met downloaden van {tag}…"
+
+#, python-brace-format
+#~ msgid "Extracting {tag}..."
+#~ msgstr "Bezig met uitpakken van {tag}…"
+
+#, python-brace-format
+#~ msgid "Extracting... {percent}%"
+#~ msgstr "Bezig met uitpakken… {percent}%"
+
+#, python-brace-format
+#~ msgid "Failed to extract {tar_file_path}: {error}"
+#~ msgstr "‘{tar_file_path}’ kan niet worden uitgepakt: {error}"
+
+#, python-brace-format
+#~ msgid "Failed to remove {version_path}: {error}"
+#~ msgstr "‘{version_path}’ kan niet worden verwijderd: {error}"
+
+#~ msgid "Updating UMU-Launcher..."
+#~ msgstr "Bezig met bijwerken van UMU-Launcher…"
+
+#~ msgid "UMU-Launcher is up to date"
+#~ msgstr "UMU-Launcher is bijgewerkt"
+
+#~ msgid "Updating BattlEye..."
+#~ msgstr "Bezig met bijwerken van BattlEye…"
+
+#~ msgid "Updating Easy Anti-Cheat..."
+#~ msgstr "Bezig met bijwerken van Easy Anti-Cheat…"
+
+#~ msgid "Downloading UMU-Proton..."
+#~ msgstr "Bezig met downloaden van UMU-Proton…"
+
+#~ msgid "Downloading Steam Runtime..."
+#~ msgstr "Bezig met downloaden van Steam-runtime…"
+
+#~ msgid "Extracting Steam Runtime..."
+#~ msgstr "Bezig met uitpakken van Steam-runtime…"
+
+#~ msgid "Extracting UMU-Proton..."
+#~ msgstr "Bezig met uitpakken van UMU-Proton…"
+
+#~ msgid "UMU-Proton is up to date"
+#~ msgstr "UMU-Proton is bijgewerkt"
+
+#~ msgid "Steam Runtime is up to date"
+#~ msgstr "De Steam-runtime is bijgewerkt"
+
+#~ msgid "Downloading Proton-EM..."
+#~ msgstr "Bezig met downloaden van Proton-EM…"
+
+#~ msgid "Extracting Proton-EM..."
+#~ msgstr "Bezig met uitpakken van Proton-EM…"
+
+#~ msgid "Proton-EM is up to date"
+#~ msgstr "Proton-EM is bijgewerkt"
+
+#, python-format
+#~ msgid "Using %s"
+#~ msgstr "Gebruikmakend van ‘%s’"
