@@ -1,10 +1,12 @@
 from faugus.language_config import *
+from faugus.utils import atomic_write, load_json_file, save_json_file
+
 
 class ConfigManager:
     def __init__(self):
         self.default_config = {
             'close-onlaunch': 'False',
-            'default-prefix': prefixes_dir,
+            'default-prefix': PREFIXES_DIR,
             'mangohud': 'False',
             'gamemode': 'False',
             'disable-hidraw': 'False',
@@ -37,25 +39,24 @@ class ConfigManager:
             'backup-dest-dir': '',
             'backup-last-date': '',
             'window-behavior': 'None',
+            'interface-theme': 'system',
+            'accent-color': 'system',
+            'steamgriddb-api-key': '',
+            'background-mode': 'default',
+            'hero-enabled': 'True',
             'width': '1280',
             'height': '720',
             'banner-size': '100',
             'sort': 'alpha',
             'category': 'all',
+            'steam-user': 'all',
         }
 
         self.config = {}
         self.load_config()
 
     def load_config(self):
-        if os.path.isfile(config_file_dir):
-            with open(config_file_dir, 'r') as f:
-                for line in f.read().splitlines():
-                    if '=' in line:
-                        key, value = line.split('=', 1)
-                        key = key.strip()
-                        value = value.strip().strip('"')
-                        self.config[key] = value
+        self.config = load_json_file(CONFIG_FILE_DIR, default={})
 
         updated = False
         for key, default_value in self.default_config.items():
@@ -63,19 +64,11 @@ class ConfigManager:
                 self.config[key] = default_value
                 updated = True
 
-        if updated or not os.path.isfile(config_file_dir):
+        if updated or not os.path.isfile(CONFIG_FILE_DIR):
             self.save_config()
 
     def save_config(self):
-        if not os.path.exists(faugus_launcher_dir):
-            os.makedirs(faugus_launcher_dir)
-
-        with open(config_file_dir, 'w') as f:
-            for key, value in self.config.items():
-                if key in ['default-prefix', 'default-runner']:
-                    f.write(f'{key}="{value}"\n')
-                else:
-                    f.write(f'{key}={value}\n')
+        save_json_file(self.config, CONFIG_FILE_DIR)
 
     def set_value(self, key, value):
         if key not in self.default_config:

@@ -1,0 +1,39 @@
+name: Update translation template
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "faugus/**.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-pot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Regenerate languages/faugus-launcher.pot
+        run: |
+          xgettext --language=Python --keyword=_ --from-code=UTF-8 \
+            --package-name=faugus-launcher \
+            --output=languages/faugus-launcher.pot \
+            faugus/*.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- languages/faugus-launcher.pot; then
+            echo "No string changes, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add languages/faugus-launcher.pot
+          git commit -m "Update translation template (faugus-launcher.pot)"
+          git push

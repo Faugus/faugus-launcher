@@ -1,8 +1,14 @@
 #!/bin/sh
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+export PYTHONPATH="$SCRIPT_DIR${PYTHONPATH:+:$PYTHONPATH}"
+if [ -d "$SCRIPT_DIR/assets/icons" ]; then
+	export XDG_DATA_DIRS="$SCRIPT_DIR/assets:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+fi
+
 case "$1" in
 	--shortcut) exec /usr/bin/python3 -m faugus.shortcut "$2";;
 	--game)     exec /usr/bin/python3 -m faugus.runner --game "$2";;
-	--run)      exec /usr/bin/python3 -m faugus.runner "$2";;
+	--run)      msg="$2"; shift 2; exec /usr/bin/python3 -m faugus.runner "$msg" "$@";;
 	*)          exec /usr/bin/python3 -m faugus.launcher "$@";;
 esac
