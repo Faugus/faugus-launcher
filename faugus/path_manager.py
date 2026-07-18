@@ -1,9 +1,21 @@
 #!/usr/bin/python3
 
+import json
 import os
+import sys
 from pathlib import Path
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+
+FAUGUS_SOURCE_ROOT = str(Path(__file__).resolve().parent.parent)
+
+
+def subprocess_env():
+    env = os.environ.copy()
+    existing = env.get('PYTHONPATH', '')
+    env['PYTHONPATH'] = FAUGUS_SOURCE_ROOT + (os.pathsep + existing if existing else '')
+    return env
+
 
 class PathManager:
     @staticmethod
@@ -34,6 +46,11 @@ class PathManager:
         return str(xdg_config_home.joinpath(*relative_paths))
 
     @staticmethod
+    def user_state(*relative_paths):
+        xdg_state_home = Path(os.getenv('XDG_STATE_HOME', Path.home() / '.local/state'))
+        return str(xdg_state_home.joinpath(*relative_paths))
+
+    @staticmethod
     def find_binary(binary_name):
         paths = os.getenv('PATH', '').split(':')
         for path in paths:
@@ -43,9 +60,18 @@ class PathManager:
         return ""
 
     @staticmethod
+    def get_asset(filename):
+        source_path = os.path.join(FAUGUS_SOURCE_ROOT, 'assets', filename)
+        if os.path.exists(source_path):
+            return source_path
+        return PathManager.system_data('faugus-launcher', filename)
+
+    @staticmethod
     def get_icon(icon_name):
         icon_paths = [
+            os.path.join(FAUGUS_SOURCE_ROOT, 'assets', icon_name),
             PathManager.user_data('icons', icon_name),
+            PathManager.system_data('icons/hicolor/scalable/actions', icon_name),
             PathManager.system_data('icons/hicolor/scalable/apps', icon_name),
             PathManager.system_data('icons', icon_name)
         ]
@@ -86,13 +112,14 @@ class PathManager:
 
         return PathManager.user_home('Desktop')
 
-lsfgvk_flatpak_paths = [
+
+LSFGVK_FLATPAK_PATHS = [
     Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk.so"),
     Path(os.path.expanduser('~/.local/lib/liblsfg-vk.so')),
     Path("/usr/lib/extensions/vulkan/lsfgvk/lib/liblsfg-vk-layer.so"),
     Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
 ]
-lsfgvk_native_paths = [
+LSFGVK_NATIVE_PATHS = [
     Path("/usr/lib/liblsfg-vk.so"),
     Path("/usr/lib64/liblsfg-vk.so"),
     Path("/usr/local/lib/liblsfg-vk.so"),
@@ -102,39 +129,159 @@ lsfgvk_native_paths = [
     Path(os.path.expanduser('~/.local/lib/liblsfg-vk-layer.so')),
 ]
 
-_lsfgvk_candidates = lsfgvk_flatpak_paths if IS_FLATPAK else lsfgvk_native_paths
-lsfgvk_path = next((p for p in _lsfgvk_candidates if p.exists()), _lsfgvk_candidates[-1])
+_LSFGVK_CANDIDATES = LSFGVK_FLATPAK_PATHS if IS_FLATPAK else LSFGVK_NATIVE_PATHS
+LSFGVK_PATH = next((p for p in _LSFGVK_CANDIDATES if p.exists()), _LSFGVK_CANDIDATES[-1])
 
-faugus_png = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_FLATPAK else PathManager.get_icon('faugus-launcher.svg')
+FAUGUS_PNG = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_FLATPAK else PathManager.get_icon('faugus-launcher.svg')
 
-faugus_notification = PathManager.system_data('faugus-launcher/faugus-notification.ogg')
-faugus_banner = PathManager.system_data('faugus-launcher/faugus-banner.png')
-banners_dir = PathManager.user_config('faugus-launcher/banners')
-backup_dir = PathManager.user_config("faugus-launcher/games-backup")
-faugus_mono_icon = PathManager.get_icon('faugus-mono.svg')
-eac_dir = PathManager.user_config("faugus-launcher/components/eac")
-be_dir = PathManager.user_config("faugus-launcher/components/be")
-DOWNLOAD_DIR = PathManager.user_config('faugus-launcher/components')
-shortcut_icons_dir = PathManager.user_config('faugus-launcher/icons-nolauncher')
-faugus_launcher_dir = PathManager.user_config('faugus-launcher')
-prefixes_dir = PathManager.user_home('Faugus')
-config_file_dir = PathManager.user_config('faugus-launcher/config.ini')
-logs_dir = PathManager.user_config('faugus-launcher/logs')
-envar_dir = PathManager.user_config('faugus-launcher/envar.txt')
-games_json = PathManager.user_config('faugus-launcher/games.json')
-presets_file = PathManager.user_config('faugus-launcher/presets.json')
-latest_games = PathManager.user_config('faugus-launcher/latest-games.txt')
-categories_file = PathManager.user_config('faugus-launcher/categories.txt')
-custom_order = PathManager.user_config('faugus-launcher/custom-order.json')
-faugus_launcher_share_dir = PathManager.user_data('faugus-launcher')
-faugus_temp = PathManager.user_data('faugus-launcher/faugus_temp')
-running_games = PathManager.user_data('faugus-launcher/running_games.json')
-icons_dir = PathManager.user_config('faugus-launcher/icons')
-proton_cachyos = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
-umu_run = PathManager.user_data('faugus-launcher/umu-run')
-compatibility_dir = Path(PathManager.get_compatibilitytools())
-mangohud_dir = PathManager.find_binary('mangohud')
-gamemoderun = PathManager.find_binary('gamemoderun')
-launcher_path = PathManager.find_binary('faugus-launcher')
-app_dir = Path(PathManager.get_applications())
-desktop_dir = PathManager.user_desktop()
+FAUGUS_NOTIFICATION = PathManager.get_asset('faugus-notification.ogg')
+FAUGUS_PNG_RASTER = PathManager.get_asset('faugus-launcher-raster.png')
+BANNERS_DIR = PathManager.user_data('faugus-launcher/banners')
+HEROES_DIR = PathManager.user_data('faugus-launcher/heroes')
+BACKUP_DIR = PathManager.user_data("faugus-launcher/games-backup")
+FAUGUS_MONO_ICON = PathManager.get_icon('faugus-mono.svg')
+EAC_DIR = PathManager.user_data("faugus-launcher/components/eac")
+BE_DIR = PathManager.user_data("faugus-launcher/components/be")
+DOWNLOAD_DIR = PathManager.user_data('faugus-launcher/components')
+SHORTCUT_ICONS_DIR = PathManager.user_data('faugus-launcher/icons-nolauncher')
+FAUGUS_LAUNCHER_DIR = PathManager.user_config('faugus-launcher')
+PREFIXES_DIR = PathManager.user_home('Faugus')
+CONFIG_FILE_DIR = PathManager.user_config('faugus-launcher/config.json')
+LOGS_DIR = PathManager.user_data('faugus-launcher/logs')
+ENVAR_DIR = PathManager.user_config('faugus-launcher/envar.json')
+GAMES_JSON = PathManager.user_data('faugus-launcher/games.json')
+PRESETS_FILE = PathManager.user_data('faugus-launcher/presets.json')
+LATEST_GAMES = PathManager.user_state('faugus-launcher/latest-games.json')
+CATEGORIES_FILE = PathManager.user_data('faugus-launcher/categories.json')
+CUSTOM_ORDER = PathManager.user_data('faugus-launcher/custom-order.json')
+FAUGUS_LAUNCHER_SHARE_DIR = PathManager.user_data('faugus-launcher')
+FAUGUS_LAUNCHER_STATE_DIR = PathManager.user_state('faugus-launcher')
+FAUGUS_TEMP = PathManager.user_state('faugus-launcher/faugus_temp')
+RUNNING_GAMES = PathManager.user_state('faugus-launcher/running_games.json')
+FILECHOOSER_FOLDERS_FILE = PathManager.user_state('faugus-launcher/filechooser_folders.json')
+ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
+PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
+UMU_RUN = PathManager.user_data('faugus-launcher/umu-run')
+COMPATIBILITY_DIR = Path(PathManager.get_compatibilitytools())
+MANGOHUD_DIR = PathManager.find_binary('mangohud')
+GAMEMODERUN = PathManager.find_binary('gamemoderun')
+LAUNCHER_PATH = PathManager.find_binary('faugus-launcher')
+if LAUNCHER_PATH:
+    LAUNCHER_MODULE_ARGS = ""
+else:
+    LAUNCHER_PATH = sys.executable
+    LAUNCHER_MODULE_ARGS = "-m faugus.launcher "
+APP_DIR = Path(PathManager.get_applications())
+DESKTOP_DIR = PathManager.user_desktop()
+
+BACKUP_ITEMS = {
+    "banners": BANNERS_DIR,
+    "heroes": HEROES_DIR,
+    "games-backup": BACKUP_DIR,
+    "icons": ICONS_DIR,
+    "config.json": CONFIG_FILE_DIR,
+    "envar.json": ENVAR_DIR,
+    "games.json": GAMES_JSON,
+    "latest-games.json": LATEST_GAMES,
+    "categories.json": CATEGORIES_FILE,
+    "custom-order.json": CUSTOM_ORDER,
+    "presets.json": PRESETS_FILE,
+    "filechooser_folders.json": FILECHOOSER_FOLDERS_FILE,
+}
+
+
+def _migrate_legacy_item(old_path, new_path):
+    old = Path(old_path)
+    new = Path(new_path)
+    if old == new or not old.exists() or new.exists():
+        return
+    try:
+        new.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            old.rename(new)
+        except OSError:
+            import shutil as _shutil
+            _shutil.move(str(old), str(new))
+    except OSError:
+        pass
+
+
+def _migrate_legacy_paths():
+    legacy_config = PathManager.user_config('faugus-launcher')
+    legacy_data = PathManager.user_data('faugus-launcher')
+
+    for name in ('games.json', 'icons', 'icons-nolauncher', 'banners',
+                 'games-backup', 'categories.txt', 'custom-order.json',
+                 'presets.json', 'logs', 'components'):
+        _migrate_legacy_item(
+            os.path.join(legacy_config, name),
+            os.path.join(FAUGUS_LAUNCHER_SHARE_DIR, name),
+        )
+
+    _migrate_legacy_item(
+        os.path.join(legacy_config, 'latest-games.txt'),
+        os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'latest-games.txt'),
+    )
+
+    for name in ('running_games.json', 'faugus_temp'):
+        _migrate_legacy_item(
+            os.path.join(legacy_data, name),
+            os.path.join(FAUGUS_LAUNCHER_STATE_DIR, name),
+        )
+
+
+def _parse_kv_file(path):
+    data = {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f.read().splitlines():
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    data[key.strip()] = value.strip().strip('"')
+    except OSError:
+        pass
+    return data
+
+
+def _parse_lines_file(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return [line.strip() for line in f if line.strip()]
+    except OSError:
+        return []
+
+
+def _write_json_atomic(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp_path = path + '.tmp'
+    with open(tmp_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+    os.replace(tmp_path, path)
+
+
+LEGACY_FORMAT_ITEMS = {
+    'config.ini': (CONFIG_FILE_DIR, 'kv'),
+    'envar.txt': (ENVAR_DIR, 'lines'),
+    'latest-games.txt': (LATEST_GAMES, 'lines'),
+    'categories.txt': (CATEGORIES_FILE, 'lines'),
+}
+
+
+def convert_legacy_format_file(old_path, new_path, kind):
+    data = _parse_kv_file(old_path) if kind == 'kv' else _parse_lines_file(old_path)
+    _write_json_atomic(new_path, data)
+
+
+def _migrate_legacy_formats():
+    for old_name, (new_path, kind) in LEGACY_FORMAT_ITEMS.items():
+        old_path = os.path.join(os.path.dirname(new_path), old_name)
+        if os.path.isfile(old_path) and not os.path.isfile(new_path):
+            try:
+                convert_legacy_format_file(old_path, new_path, kind)
+                os.remove(old_path)
+            except OSError:
+                pass
+
+
+_migrate_legacy_paths()
+_migrate_legacy_formats()

@@ -38,7 +38,7 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install -y wget
 mkdir -p ~/faugus-launcher
-wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/1.22.8/faugus-launcher_1.22.8-1_all.deb
+wget -P ~/faugus-launcher https://github.com/Faugus/faugus-launcher/releases/download/2.0.0/faugus-launcher_2.0.0-1_all.deb
 sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
@@ -83,7 +83,7 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow vdf psutil pygame imagemagick icoextract libayatana-appindicator libcanberra vulkan-tools
+meson ninja pygobject requests pillow vdf psutil libmanette imagemagick icoextract vulkan-tools
 ```
 
 # Usage

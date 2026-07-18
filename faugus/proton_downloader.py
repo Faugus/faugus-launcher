@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 import json
 import platform
@@ -7,7 +7,7 @@ import urllib.request
 import shutil
 import argparse
 
-from faugus.path_manager import PathManager, compatibility_dir
+from faugus.path_manager import COMPATIBILITY_DIR
 
 CONFIGS = {
     "cachyos": {
@@ -59,6 +59,7 @@ FOREIGN_ARCH_TOKENS = {
     "arm64": ("x86_64", "amd64"),
 }
 
+
 def select_asset(assets, archive_exts):
     foreign_tokens = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
     if isinstance(archive_exts, str):
@@ -97,6 +98,7 @@ def get_latest_tag_and_url(api, archive_ext):
 
     return data["tag_name"], asset["browser_download_url"], asset["name"]
 
+
 def get_installed_version(proton_dir):
     version_file = proton_dir / "version"
     if not version_file.exists():
@@ -107,6 +109,7 @@ def get_installed_version(proton_dir):
         return None
 
     return parts[1]
+
 
 def normalize_version(v):
     if not v:
@@ -123,6 +126,7 @@ def normalize_version(v):
          .rstrip("+")
          .strip("-")
     )
+
 
 def rewrite_compatibilitytool_vdf(proton_dir, display_name):
     (proton_dir / "compatibilitytool.vdf").write_text(
@@ -142,8 +146,9 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
 '''
     )
 
+
 def install_proton_latest(proton_dir, url, asset_name, label):
-    tmp = compatibility_dir / "__proton_tmp__"
+    tmp = COMPATIBILITY_DIR / "__proton_tmp__"
 
     try:
         print(f"Downloading & extracting {label}...", flush=True)
@@ -165,10 +170,11 @@ def install_proton_latest(proton_dir, url, asset_name, label):
     extracted.rename(proton_dir)
     shutil.rmtree(tmp)
 
+
 def ensure_latest(kind):
     cfg = CONFIGS[kind]
 
-    proton_dir = compatibility_dir / cfg["latest_dir"]
+    proton_dir = COMPATIBILITY_DIR / cfg["latest_dir"]
     proton_dir.parent.mkdir(parents=True, exist_ok=True)
 
     latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
@@ -184,6 +190,7 @@ def ensure_latest(kind):
     install_proton_latest(proton_dir, url, asset_name, cfg["name"])
     rewrite_compatibilitytool_vdf(proton_dir, cfg["latest_dir"])
 
+
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
@@ -196,6 +203,7 @@ def main():
     for key in vars(args):
         if getattr(args, key):
             ensure_latest(key)
+
 
 if __name__ == "__main__":
     main()

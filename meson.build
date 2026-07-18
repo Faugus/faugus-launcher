@@ -1,6 +1,6 @@
 project(
   'faugus-launcher',
-  version: '1.22.8',
+  version: '2.0.0',
   meson_version: '>=1.2.0',
   license: 'MIT',
   license_files: 'LICENSE',
@@ -17,13 +17,6 @@ subdir('faugus')
 
 install_data(
   'faugus-launcher',
-  install_mode: 'rwxr-xr-x',
-  install_dir: get_option('bindir'),
-)
-
-install_data(
-  'faugus_run.py',
-  rename: 'faugus-run',
   install_mode: 'rwxr-xr-x',
   install_dir: get_option('bindir'),
 )

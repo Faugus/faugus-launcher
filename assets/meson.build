@@ -1,11 +1,11 @@
 install_data(
-  'faugus-banner.png',
+  'faugus-launcher-raster.png',
   'faugus-notification.ogg',
+  'gamecontrollerdb.txt',
 )
 
 install_data(
   'faugus-add-symbolic.svg',
-  'faugus-exit-symbolic.svg',
   'faugus-kill-symbolic.svg',
   'faugus-play-symbolic.svg',
   'faugus-settings-symbolic.svg',
