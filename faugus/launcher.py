@@ -2532,7 +2532,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         settings_dialog = Settings(self)
         settings_dialog.connect("response", self.on_settings_dialog_response, settings_dialog)
 
-        settings_dialog.show()
+        settings_dialog.present()
 
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
         if faugus_backup:
@@ -2810,7 +2810,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog = AddGame(self, self.interface_mode)
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
-        add_game_dialog.show()
+        add_game_dialog.present()
         add_game_dialog.combobox_launcher.grab_focus()
 
     def on_button_edit_clicked(self, widget):
@@ -4763,7 +4763,7 @@ class Settings(Gtk.Dialog):
         def proceed():
             from faugus.backup import BackupWindow
 
-            backup_win = BackupWindow(self.parent)
+            backup_win = BackupWindow(self)
             backup_win.present()
 
         self.check_modified(proceed)
@@ -6767,7 +6767,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], env=subprocess_env())
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
-            GLib.idle_add(self.parent_window.set_sensitive, True)
 
         run_in_background(run_command)
 
@@ -6808,7 +6807,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command, "winetricks"], env=subprocess_env())
             process.wait()
             GLib.idle_add(self.set_sensitive, True)
-            GLib.idle_add(self.parent_window.set_sensitive, True)
 
         run_in_background(run_command)
 
