@@ -287,5 +287,14 @@ def _migrate_legacy_formats():
                 pass
 
 
+def _backup_before_legacy_migration():
+    try:
+        from faugus.migration import _backup_before_migration
+        _backup_before_migration()
+    except Exception:
+        pass
+
+
+_backup_before_legacy_migration()
 _migrate_legacy_paths()
 _migrate_legacy_formats()

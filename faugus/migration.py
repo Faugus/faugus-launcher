@@ -1,15 +1,13 @@
 import os
+import shlex
 import shutil
+import tempfile
 from datetime import date
 from pathlib import Path
 
 import vdf
 
-from faugus.path_manager import PathManager, APP_DIR, DESKTOP_DIR, ICONS_DIR, SHORTCUT_ICONS_DIR, COVERS_DIR, BANNERS_DIR, GAMES_JSON, CONFIG_FILE_DIR, FILECHOOSER_FOLDERS_FILE
-
-MIGRATION_BACKUP_DIR = PathManager.user_data('faugus-launcher/migration-backups')
-
-_MIGRATION_BACKUP_FILES = (GAMES_JSON, CONFIG_FILE_DIR, FILECHOOSER_FOLDERS_FILE)
+from faugus.path_manager import PathManager, APP_DIR, DESKTOP_DIR, ICONS_DIR, SHORTCUT_ICONS_DIR, COVERS_DIR, BANNERS_DIR, GAMES_JSON, CONFIG_FILE_DIR, FILECHOOSER_FOLDERS_FILE, FAUGUS_LAUNCHER_DIR, FAUGUS_LAUNCHER_SHARE_DIR, FAUGUS_LAUNCHER_STATE_DIR
 
 _LEGACY_ICON_BASES = (
     PathManager.user_config('faugus-launcher/icons'),
@@ -39,16 +37,6 @@ def _rewrite_desktop_lines(lines):
                 new_lines[i] = f'Icon={new_value}\n'
                 changed = True
     return changed, new_lines
-
-
-def _desktop_file_needs_fix(path):
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-    except OSError:
-        return False
-    changed, _ = _rewrite_desktop_lines(lines)
-    return changed
 
 
 def _fix_desktop_file(path):
@@ -227,43 +215,6 @@ def _migrate_filechooser_folder_keys():
         save_json_file(folders, FILECHOOSER_FOLDERS_FILE)
 
 
-_RESTORE_SCRIPT = '''#!/usr/bin/env python3
-import json
-import os
-import shutil
-
-def main():
-    backup_dir = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(backup_dir, "manifest.json"), "r", encoding="utf-8") as f:
-        entries = json.load(f)
-
-    print(f"This will restore {len(entries)} file(s) to their original location,")
-    print("undoing the Faugus Launcher migration:")
-    for entry in entries:
-        print(f"  {entry['backup']} -> {entry['original']}")
-
-    if input("Proceed? [y/N] ").strip().lower() != "y":
-        print("Cancelled.")
-        return
-
-    for entry in entries:
-        src = os.path.join(backup_dir, entry["backup"])
-        dst = entry["original"]
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.copy2(src, dst)
-        print(f"Restored {dst}")
-
-    print("Done. Restart Faugus Launcher for the changes to take effect.")
-
-if __name__ == "__main__":
-    main()
-'''
-
-
-def _collect_json_backups():
-    return [(Path(f), "", Path(f).name) for f in _MIGRATION_BACKUP_FILES if os.path.isfile(f)]
-
-
 def _collect_desktop_backups():
     entries = []
     for directory, subdir in ((DESKTOP_DIR, "desktop-shortcuts"), (APP_DIR, "appmenu-shortcuts")):
@@ -271,8 +222,7 @@ def _collect_desktop_backups():
         if not d.is_dir():
             continue
         for entry in d.glob('*.desktop'):
-            if _desktop_file_needs_fix(entry):
-                entries.append((entry, subdir, entry.name))
+            entries.append((entry, subdir, entry.name))
     return entries
 
 
@@ -288,42 +238,117 @@ def _collect_steam_shortcut_backups():
     return entries
 
 
+def _restore_action_dir(original, backup_rel):
+    quoted_dir = shlex.quote(original)
+    quoted_src = shlex.quote('/' + backup_rel)
+    return (
+        f'DIR={quoted_dir}\n'
+        f'if [ -L "$DIR" ]; then DIR=$(readlink -f "$DIR"); fi\n'
+        f'if [ -d "$DIR" ]; then find "$DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {{}} +; else mkdir -p "$DIR"; fi\n'
+        f'cp -a "$SCRIPT_DIR"{quoted_src}/. "$DIR/"\n'
+        f'printf \'Restored %s\\n\' {quoted_dir}'
+    )
+
+
+def _restore_action_file(original, backup_rel):
+    quoted_dst = shlex.quote(original)
+    quoted_dst_dir = shlex.quote(os.path.dirname(original))
+    quoted_src = shlex.quote('/' + backup_rel)
+    return (
+        f'mkdir -p {quoted_dst_dir}\n'
+        f'cp -a "$SCRIPT_DIR"{quoted_src} {quoted_dst}\n'
+        f'printf \'Restored %s\\n\' {quoted_dst}'
+    )
+
+
+def _clear_action(original):
+    quoted_dir = shlex.quote(original)
+    return (
+        f'DIR={quoted_dir}\n'
+        f'if [ -L "$DIR" ]; then DIR=$(readlink -f "$DIR"); fi\n'
+        f'if [ -d "$DIR" ]; then find "$DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {{}} +; else mkdir -p "$DIR"; fi\n'
+        f'printf \'Cleared %s\\n\' {quoted_dir}'
+    )
+
+
+def _build_restore_script(dir_snapshots, file_snapshots, clear_only_dirs):
+    preview = []
+    actions = []
+
+    for entry in dir_snapshots:
+        preview.append(f'printf \'  %s\\n\' {shlex.quote(entry["original"] + "/")}')
+        actions.append(_restore_action_dir(entry["original"], entry["backup"]))
+
+    for entry in file_snapshots:
+        preview.append(f'printf \'  %s\\n\' {shlex.quote(entry["original"])}')
+        actions.append(_restore_action_file(entry["original"], entry["backup"]))
+
+    for original in clear_only_dirs:
+        preview.append(f'printf \'  %s (cleared)\\n\' {shlex.quote(original + "/")}')
+        actions.append(_clear_action(original))
+
+    preview_block = "\n".join(preview)
+    actions_block = "\n\n".join(actions)
+
+    return f'''#!/bin/sh
+set -e
+
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+
+echo "This restores Faugus Launcher's data to exactly how it was"
+echo "before the migration ran, replacing the current contents of:"
+{preview_block}
+
+printf 'Proceed? [y/N] '
+read ANSWER
+case "$ANSWER" in
+    y|Y) ;;
+    *) echo "Cancelled."; exit 0 ;;
+esac
+
+{actions_block}
+
+echo "Done. Restart Faugus Launcher for the changes to take effect."
+'''
+
+
 def _backup_before_migration():
-    from faugus.utils import save_json_file
-
-    backup_dir = Path(MIGRATION_BACKUP_DIR) / f"faugus-migration-backup-{date.today().isoformat()}"
-    if backup_dir.exists():
+    backup_root = Path(PathManager.user_home('Faugus Backup'))
+    zip_path = backup_root / f"faugus-migration-backup-{date.today().isoformat()}.zip"
+    if zip_path.exists():
         return
 
-    to_back_up = _collect_json_backups() + _collect_desktop_backups() + _collect_steam_shortcut_backups()
-    if not to_back_up:
-        return
+    staging_dir = Path(tempfile.mkdtemp(prefix="faugus-migration-backup-"))
 
-    backup_dir.mkdir(parents=True, exist_ok=True)
+    dir_snapshots = []
+    for label, src in (
+        ("config", FAUGUS_LAUNCHER_DIR),
+        ("data", FAUGUS_LAUNCHER_SHARE_DIR),
+    ):
+        real_src = os.path.realpath(src) if os.path.islink(src) else src
+        if os.path.isdir(real_src):
+            shutil.copytree(real_src, staging_dir / label)
+            dir_snapshots.append({"backup": label, "original": str(src)})
 
-    manifest = []
-    for src_path, subdir, basename in to_back_up:
-        target_dir = backup_dir / subdir if subdir else backup_dir
+    file_snapshots = []
+    for src_path, subdir, basename in _collect_desktop_backups() + _collect_steam_shortcut_backups():
+        target_dir = staging_dir / subdir
         target_dir.mkdir(parents=True, exist_ok=True)
         backup_path = target_dir / basename
         shutil.copy2(src_path, backup_path)
-        manifest.append({
-            "original": str(src_path),
-            "backup": str(backup_path.relative_to(backup_dir)),
-        })
+        file_snapshots.append({"backup": str(backup_path.relative_to(staging_dir)), "original": str(src_path)})
 
-    save_json_file(manifest, backup_dir / "manifest.json")
-
-    restore_script = backup_dir / "restore.py"
-    restore_script.write_text(_RESTORE_SCRIPT, encoding="utf-8")
+    script_text = _build_restore_script(dir_snapshots, file_snapshots, [str(FAUGUS_LAUNCHER_STATE_DIR)])
+    restore_script = staging_dir / "restore.sh"
+    restore_script.write_text(script_text, encoding="utf-8")
     restore_script.chmod(0o755)
+
+    backup_root.mkdir(parents=True, exist_ok=True)
+    shutil.make_archive(str(zip_path.with_suffix("")), "zip", root_dir=str(staging_dir))
+    shutil.rmtree(staging_dir)
 
 
 def fix_legacy_shortcut_icons():
-    try:
-        _backup_before_migration()
-    except Exception:
-        pass
     try:
         _fix_desktop_shortcuts()
     except Exception:
