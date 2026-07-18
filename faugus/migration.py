@@ -4,7 +4,7 @@ from pathlib import Path
 
 import vdf
 
-from faugus.path_manager import PathManager, APP_DIR, DESKTOP_DIR, ICONS_DIR, SHORTCUT_ICONS_DIR, COVERS_DIR, BANNERS_DIR, GAMES_JSON, CONFIG_FILE_DIR
+from faugus.path_manager import PathManager, APP_DIR, DESKTOP_DIR, ICONS_DIR, SHORTCUT_ICONS_DIR, COVERS_DIR, BANNERS_DIR, GAMES_JSON, CONFIG_FILE_DIR, FILECHOOSER_FOLDERS_FILE
 
 _LEGACY_ICON_BASES = (
     PathManager.user_config('faugus-launcher/icons'),
@@ -120,7 +120,14 @@ def _migrate_games_json_fields():
     if games is None:
         return
 
-    field_renames = {"banner": "cover", "disable_hidraw": "sdl_enabled", "prevent_sleep": "no_sleep"}
+    field_renames = {
+        "banner": "cover",
+        "disable_hidraw": "sdl_enabled",
+        "prevent_sleep": "no_sleep",
+        "pre_launch_command": "pre_launch",
+        "post_launch_command": "post_launch",
+        "addapp_checkbox": "addapp_enabled",
+    }
 
     changed = False
     for game in games:
@@ -180,6 +187,25 @@ def _migrate_config_json_values():
         save_json_file(config, CONFIG_FILE_DIR)
 
 
+def _migrate_filechooser_folder_keys():
+    from faugus.utils import load_json_file, save_json_file
+
+    folders = load_json_file(FILECHOOSER_FOLDERS_FILE, None)
+    if folders is None:
+        return
+
+    key_renames = {"pre_launch_command": "pre_launch", "post_launch_command": "post_launch"}
+
+    changed = False
+    for old_key, new_key in key_renames.items():
+        if old_key in folders:
+            folders[new_key] = folders.pop(old_key)
+            changed = True
+
+    if changed:
+        save_json_file(folders, FILECHOOSER_FOLDERS_FILE)
+
+
 def fix_legacy_shortcut_icons():
     try:
         _fix_desktop_shortcuts()
@@ -204,5 +230,9 @@ def fix_legacy_shortcut_icons():
         pass
     try:
         _migrate_config_json_values()
+    except Exception:
+        pass
+    try:
+        _migrate_filechooser_folder_keys()
     except Exception:
         pass

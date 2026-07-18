@@ -2832,10 +2832,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
 
             if getattr(game, 'steam_user', ''):
-                persona_name = dict(edit_game_dialog.steam_owners).get(game.steam_user, game.steam_user)
-                edit_game_dialog.combobox_steam_owner.append(
+                persona_name = dict(edit_game_dialog.steam_users).get(game.steam_user, game.steam_user)
+                edit_game_dialog.combobox_steam_user.append(
                     game.steam_user, f"{persona_name} ({game.steam_user})", short_text=persona_name)
-                edit_game_dialog.combobox_steam_owner.set_active_id_silent(game.steam_user)
+                edit_game_dialog.combobox_steam_user.set_active_id_silent(game.steam_user)
                 edit_game_dialog.populate_steam_title_combobox(game.steam_user)
 
             for i, text in enumerate(edit_game_dialog.combobox_steam_title.get_texts()):
@@ -2861,14 +2861,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog.entry_path.set_text(game.path)
             edit_game_dialog.entry_prefix.set_text(game.prefix)
             edit_game_dialog.launch_arguments = game.launch_arguments
-            edit_game_dialog.pre_launch_command = game.pre_launch_command
-            edit_game_dialog.post_launch_command = game.post_launch_command
+            edit_game_dialog.pre_launch = game.pre_launch
+            edit_game_dialog.post_launch = game.post_launch
             edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
             edit_game_dialog.set_title(_("Edit %s") % game.title)
             edit_game_dialog.entry_protonfix.set_text(game.protonfix)
             edit_game_dialog.grid_launcher.set_visible(False)
 
-            edit_game_dialog.addapp_enabled = game.addapp_checkbox
+            edit_game_dialog.addapp_enabled = game.addapp_enabled
             edit_game_dialog.addapp = game.addapp
             edit_game_dialog.addapp_delay = game.addapp_delay
             edit_game_dialog.addapp_first = game.addapp_first
@@ -2924,10 +2924,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_no_sleep.set_active(False)
 
-            if edit_game_dialog.steam_users:
+            if edit_game_dialog.steam_shortcut_users:
                 matched_user = self.find_steam_shortcut_user(title)
                 if matched_user:
-                    edit_game_dialog.combobox_steam_user.set_active_id(matched_user)
+                    edit_game_dialog.combobox_steam_shortcut_user.set_active_id(matched_user)
                     edit_game_dialog.checkbox_shortcut_steam.set_active(True)
                 else:
                     edit_game_dialog.checkbox_shortcut_steam.set_active(False)
@@ -2936,7 +2936,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
-            edit_game_dialog.combobox_steam_owner.set_sensitive(False)
+            edit_game_dialog.combobox_steam_user.set_sensitive(False)
 
             if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
@@ -3180,13 +3180,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 mangohud = ""
                 gamemode = ""
                 sdl_enabled = ""
-                addapp_checkbox = ""
+                addapp_enabled = ""
                 no_sleep = ""
             else:
                 mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
                 gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
                 sdl_enabled = True if add_game_dialog.checkbox_sdl.get_active() else ""
-                addapp_checkbox = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
+                addapp_enabled = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
                 no_sleep = True if add_game_dialog.checkbox_no_sleep.get_active() else ""
 
             game = Game(
@@ -3201,7 +3201,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 sdl_enabled,
                 protonfix,
                 runner,
-                addapp_checkbox,
+                addapp_enabled,
                 addapp,
                 addapp_bat,
                 addapp_delay,
@@ -3219,15 +3219,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 category,
                 icon,
                 steamgriddb_id=add_game_dialog._steamgriddb_suggestion_id or "",
-                pre_launch_command=add_game_dialog.pre_launch_command,
-                post_launch_command=add_game_dialog.post_launch_command,
-                steam_user=add_game_dialog.combobox_steam_owner.get_active_id() if launcher_id == "steam" else "",
+                pre_launch=add_game_dialog.pre_launch,
+                post_launch=add_game_dialog.post_launch,
+                steam_user=add_game_dialog.combobox_steam_user.get_active_id() if launcher_id == "steam" else "",
             )
 
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
             appmenu_shortcut_state = add_game_dialog.checkbox_shortcut_appmenu.get_active()
             steam_shortcut_state = add_game_dialog.checkbox_shortcut_steam.get_active()
-            steam_user_selected = add_game_dialog.combobox_steam_user.get_active_id()
+            steam_shortcut_user_selected = add_game_dialog.combobox_steam_shortcut_user.get_active_id()
 
             def check_internet_connection():
                 import socket
@@ -3248,7 +3248,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.launcher_screen(
                         title, launcher_id, title_formatted, runner, prefix, UMU_RUN,
                         game, desktop_shortcut_state, appmenu_shortcut_state,
-                        steam_shortcut_state, icon_temp, icon_final, steam_user_selected
+                        steam_shortcut_state, icon_temp, icon_final, steam_shortcut_user_selected
                     )
 
             game_info = game_to_dict(game)
@@ -3266,9 +3266,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if launcher_id in ("windows", "linux", "steam"):
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, steam_user_selected)
+                self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, steam_shortcut_user_selected)
 
-                if addapp_checkbox == "addapp_enabled":
+                if addapp_enabled == "addapp_enabled":
                     write_addapp_bat(addapp_bat, path, addapp, addapp_delay, addapp_first, game_arguments)
 
                 self.add_item_list(game)
@@ -3508,15 +3508,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.path = edit_game_dialog.entry_path.get_text()
             game.prefix = os.path.normpath(edit_game_dialog.entry_prefix.get_text())
             game.launch_arguments = edit_game_dialog.launch_arguments
-            game.pre_launch_command = edit_game_dialog.pre_launch_command
-            game.post_launch_command = edit_game_dialog.post_launch_command
+            game.pre_launch = edit_game_dialog.pre_launch
+            game.post_launch = edit_game_dialog.post_launch
             game.game_arguments = edit_game_dialog.entry_game_arguments.get_text()
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.sdl_enabled = edit_game_dialog.checkbox_sdl.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.combobox_runner.get_active_text()
-            game.addapp_checkbox = edit_game_dialog.addapp_enabled
+            game.addapp_enabled = edit_game_dialog.addapp_enabled
             game.addapp = edit_game_dialog.addapp
             game.addapp_delay = edit_game_dialog.addapp_delay
             game.addapp_first = edit_game_dialog.addapp_first
@@ -3565,7 +3565,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 game.runner = "Linux-Native"
             if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
                 game.runner = "Steam"
-                game.steam_user = edit_game_dialog.combobox_steam_owner.get_active_id()
+                game.steam_user = edit_game_dialog.combobox_steam_user.get_active_id()
 
             desktop_shortcut_state = edit_game_dialog.checkbox_shortcut_desktop.get_active()
             appmenu_shortcut_state = edit_game_dialog.checkbox_shortcut_appmenu.get_active()
@@ -3573,9 +3573,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
             self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
-            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, edit_game_dialog.combobox_steam_user.get_active_id())
+            self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, edit_game_dialog.combobox_steam_shortcut_user.get_active_id())
 
-            if game.addapp_checkbox == True:
+            if game.addapp_enabled == True:
                 write_addapp_bat(game.addapp_bat, game.path, game.addapp, game.addapp_delay, game.addapp_first, game.game_arguments)
 
             self.save_games()
@@ -5003,7 +5003,7 @@ class Game:
         sdl_enabled,
         protonfix,
         runner,
-        addapp_checkbox,
+        addapp_enabled,
         addapp,
         addapp_bat,
         addapp_delay,
@@ -5021,8 +5021,8 @@ class Game:
         category,
         icon,
         steamgriddb_id="",
-        pre_launch_command="",
-        post_launch_command="",
+        pre_launch="",
+        post_launch="",
         steam_user="",
     ):
         self.gameid = gameid
@@ -5036,7 +5036,7 @@ class Game:
         self.sdl_enabled = sdl_enabled
         self.protonfix = protonfix
         self.runner = runner
-        self.addapp_checkbox = addapp_checkbox
+        self.addapp_enabled = addapp_enabled
         self.addapp = addapp
         self.addapp_bat = addapp_bat
         self.addapp_delay = addapp_delay
@@ -5054,8 +5054,8 @@ class Game:
         self.category = category
         self.icon = icon
         self.steamgriddb_id = steamgriddb_id
-        self.pre_launch_command = pre_launch_command
-        self.post_launch_command = post_launch_command
+        self.pre_launch = pre_launch
+        self.post_launch = post_launch
         self.steam_user = steam_user
 
 
@@ -5247,7 +5247,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_title = build_grid(margin_bottom=False)
 
-        self.grid_steam_owner = build_grid(margin_bottom=False)
+        self.grid_steam_user = build_grid(margin_bottom=False)
 
         self.grid_steam_title = build_grid(margin_bottom=False)
 
@@ -5298,20 +5298,20 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.combobox_launcher = IdComboBox()
 
-        self.label_steam_owner = Gtk.Label(label=_("Steam User"))
-        self.label_steam_owner.set_halign(Gtk.Align.START)
-        self.combobox_steam_owner = IdComboBox()
-        steam_owners = read_steam_users()
-        self.steam_owners = steam_owners
-        for account_id, persona_name in steam_owners:
-            self.combobox_steam_owner.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
-        if steam_owners:
-            self.combobox_steam_owner.set_active(0)
+        self.label_steam_user = Gtk.Label(label=_("Steam User"))
+        self.label_steam_user.set_halign(Gtk.Align.START)
+        self.combobox_steam_user = IdComboBox()
+        steam_users = read_steam_users()
+        self.steam_users = steam_users
+        for account_id, persona_name in steam_users:
+            self.combobox_steam_user.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
+        if steam_users:
+            self.combobox_steam_user.set_active(0)
         else:
-            self.combobox_steam_owner.append(None, "")
-            self.combobox_steam_owner.set_active(0)
-        self.combobox_steam_owner.set_sensitive(bool(steam_owners))
-        self.combobox_steam_owner.connect("changed", self.on_combobox_steam_owner_changed)
+            self.combobox_steam_user.append(None, "")
+            self.combobox_steam_user.set_active(0)
+        self.combobox_steam_user.set_sensitive(bool(steam_users))
+        self.combobox_steam_user.connect("changed", self.on_combobox_steam_user_changed)
 
         self.label_steam_title = Gtk.Label(label=_("Title"))
         self.label_steam_title.set_halign(Gtk.Align.START)
@@ -5323,8 +5323,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             "Steamworks Common Redistributables",
         ]
 
-        initial_steam_owner = self.combobox_steam_owner.get_active_id() if steam_owners else 'all'
-        self.populate_steam_title_combobox(initial_steam_owner)
+        initial_steam_user = self.combobox_steam_user.get_active_id() if steam_users else 'all'
+        self.populate_steam_title_combobox(initial_steam_user)
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
@@ -5463,16 +5463,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_appmenu = Gtk.CheckButton(label=_("App Menu"))
         self.checkbox_shortcut_steam = Gtk.CheckButton(label=_("Steam"))
 
-        self.steam_users = read_steam_users()
-        self.combobox_steam_user = IdComboBox()
-        for account_id, persona_name in self.steam_users:
-            self.combobox_steam_user.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
-        if self.steam_users:
-            self.combobox_steam_user.set_active(0)
+        self.steam_shortcut_users = read_steam_users()
+        self.combobox_steam_shortcut_user = IdComboBox()
+        for account_id, persona_name in self.steam_shortcut_users:
+            self.combobox_steam_shortcut_user.append(account_id, f"{persona_name} ({account_id})", short_text=persona_name)
+        if self.steam_shortcut_users:
+            self.combobox_steam_shortcut_user.set_active(0)
         else:
-            self.combobox_steam_user.append(None, "")
-            self.combobox_steam_user.set_active(0)
-        self.combobox_steam_user.connect("changed", self.on_combobox_steam_user_changed)
+            self.combobox_steam_shortcut_user.append(None, "")
+            self.combobox_steam_shortcut_user.set_active(0)
+        self.combobox_steam_shortcut_user.connect("changed", self.on_combobox_steam_shortcut_user_changed)
 
         self.button_shortcut_icon = Gtk.Button()
         self.button_shortcut_icon.set_size_request(120, -1)
@@ -5709,9 +5709,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.set_hexpand(True)
         self.combobox_launcher.set_valign(Gtk.Align.CENTER)
 
-        self.grid_steam_owner.attach(self.label_steam_owner, 0, 0, 4, 1)
-        self.grid_steam_owner.attach(self.combobox_steam_owner, 0, 1, 4, 1)
-        self.combobox_steam_owner.set_hexpand(True)
+        self.grid_steam_user.attach(self.label_steam_user, 0, 0, 4, 1)
+        self.grid_steam_user.attach(self.combobox_steam_user, 0, 1, 4, 1)
+        self.combobox_steam_user.set_hexpand(True)
 
         self.grid_steam_title.attach(self.label_steam_title, 0, 0, 4, 1)
         self.grid_steam_title.attach(self.combobox_steam_title, 0, 1, 4, 1)
@@ -5742,13 +5742,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_appmenu.set_hexpand(True)
         self.grid_shortcut.attach(self.checkbox_shortcut_steam, 0, 2, 1, 1)
         self.checkbox_shortcut_steam.set_hexpand(True)
-        self.grid_shortcut.attach(self.combobox_steam_user, 2, 2, 1, 1)
-        self.combobox_steam_user.set_hexpand(True)
+        self.grid_shortcut.attach(self.combobox_steam_shortcut_user, 2, 2, 1, 1)
+        self.combobox_steam_shortcut_user.set_hexpand(True)
         self.grid_shortcut_icon.append(self.button_shortcut_icon_overlay)
         self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 2)
 
         page1.append(self.grid_launcher)
-        page1.append(self.grid_steam_owner)
+        page1.append(self.grid_steam_user)
         page1.append(self.grid_steam_title)
         page1.append(self.grid_title)
         page1.append(self.grid_path)
@@ -5835,11 +5835,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        if not self.steam_users:
+        if not self.steam_shortcut_users:
             self.checkbox_shortcut_steam.set_sensitive(False)
             self.checkbox_shortcut_steam.set_tooltip_text(_("No Steam users found"))
-            self.combobox_steam_user.set_sensitive(False)
-            self.combobox_steam_user.set_tooltip_text(_("No Steam users found"))
+            self.combobox_steam_shortcut_user.set_sensitive(False)
+            self.combobox_steam_shortcut_user.set_tooltip_text(_("No Steam users found"))
 
         if os.path.exists(LSFGVK_PATH):
             self.button_lossless.set_sensitive(True)
@@ -5850,7 +5850,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
         self.grid_steam_title.set_visible(False)
-        self.grid_steam_owner.set_visible(False)
+        self.grid_steam_user.set_visible(False)
         self.update_image_cover()
         if interface_mode not in ("Covers", "SteamGridDB"):
             self.image_cover.set_visible(False)
@@ -5890,11 +5890,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.set_child(image)
 
     def on_button_launch_settings_clicked(self, widget):
-        def on_result(result, pre_launch_command, post_launch_command):
+        def on_result(result, pre_launch, post_launch):
             self.launch_arguments = result
-            self.pre_launch_command = pre_launch_command
-            self.post_launch_command = post_launch_command
-        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch_command, self.post_launch_command, on_result)
+            self.pre_launch = pre_launch
+            self.post_launch = post_launch
+        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch, self.post_launch, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):
@@ -6438,8 +6438,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
     def cleanup_fields(self):
         self.entry_title.set_text("")
         self.launch_arguments = ""
-        self.pre_launch_command = ""
-        self.post_launch_command = ""
+        self.pre_launch = ""
+        self.post_launch = ""
         self.entry_path.set_text("")
         self.entry_prefix.set_text("")
         self.checkbox_shortcut_desktop.set_active(False)
@@ -6476,7 +6476,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_title.set_visible(False)
         self.grid_steam_title.set_visible(False)
-        self.grid_steam_owner.set_visible(False)
+        self.grid_steam_user.set_visible(False)
         self.grid_path.set_visible(False)
         self.grid_runner.set_visible(False)
         self.grid_prefix.set_visible(False)
@@ -6488,7 +6488,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_sdl.set_visible(False)
         self.checkbox_no_sleep.set_visible(True)
         self.checkbox_shortcut_steam.set_visible(True)
-        self.combobox_steam_user.set_visible(True)
+        self.combobox_steam_shortcut_user.set_visible(True)
         self.grid_page2.set_visible(True)
         self.tab_box2.set_visible(True)
         self.notebook.set_show_tabs(True)
@@ -6514,9 +6514,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         elif active_id == "steam":
             self.grid_steam_title.set_visible(True)
-            self.grid_steam_owner.set_visible(True)
+            self.grid_steam_user.set_visible(True)
             self.checkbox_shortcut_steam.set_visible(False)
-            self.combobox_steam_user.set_visible(False)
+            self.combobox_steam_shortcut_user.set_visible(False)
             self.grid_page2.set_visible(False)
             self.tab_box2.set_visible(False)
             self.notebook.set_show_tabs(False)
@@ -6655,7 +6655,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         return image
 
-    def on_combobox_steam_user_changed(self, combobox):
+    def on_combobox_steam_shortcut_user_changed(self, combobox):
         title = self.entry_title.get_text().strip()
         if not title:
             return
@@ -6674,7 +6674,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             new_combobox.append(appid, name)
         new_combobox.disable_first_item_selection()
         new_combobox.set_hexpand(True)
-        new_combobox.set_sensitive(bool(getattr(self, 'steam_owners', None)))
+        new_combobox.set_sensitive(bool(getattr(self, 'steam_users', None)))
         new_combobox.connect("changed", self.on_combobox_steam_changed)
 
         old_combobox = self.combobox_steam_title
@@ -6687,7 +6687,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.combobox_steam_title = new_combobox
 
-    def on_combobox_steam_owner_changed(self, combobox):
+    def on_combobox_steam_user_changed(self, combobox):
         steam_user = combobox.get_active_id()
         self.cleanup_fields()
         GLib.timeout_add(200, self._populate_steam_title_combobox_once, steam_user)

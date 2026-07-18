@@ -41,11 +41,11 @@ def set_env(key, value):
 
 
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None, pre_launch_command="", post_launch_command=""):
+    def __init__(self, message, command=None, pre_launch="", post_launch=""):
         self.message = message
         self.command = command
-        self.pre_launch_command = pre_launch_command
-        self.post_launch_command = post_launch_command
+        self.pre_launch = pre_launch
+        self.post_launch = post_launch
         self.process = None
         self.splash_window = None
         self.log_window = None
@@ -285,9 +285,9 @@ class FaugusRun(HiDpiMixin):
         for cmd in cmds_to_run:
             start_and_watch(cmd)
 
-        if self.pre_launch_command:
+        if self.pre_launch:
             try:
-                subprocess.Popen(self.pre_launch_command, shell=True)
+                subprocess.Popen(self.pre_launch, shell=True)
             except Exception as e:
                 print(f"Error running pre-launch command: {e}")
 
@@ -654,9 +654,9 @@ class FaugusRun(HiDpiMixin):
         end_time = time.time()
         runtime = int(end_time - getattr(self, "start_time", end_time))
 
-        if self.post_launch_command:
+        if self.post_launch:
             try:
-                subprocess.Popen(self.post_launch_command, shell=True)
+                subprocess.Popen(self.post_launch, shell=True)
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
@@ -715,7 +715,7 @@ def build_launch_command(game):
     gamemode = game.get("gamemode", "")
     sdl_enabled = game.get("sdl_enabled", "")
     no_sleep = game.get("no_sleep", "")
-    addapp_checkbox = game.get("addapp_checkbox", "")
+    addapp_enabled = game.get("addapp_enabled", "")
     lossless_enabled = game.get("lossless_enabled", "")
     lossless_multiplier = game.get("lossless_multiplier", "")
     lossless_flow = game.get("lossless_flow", "")
@@ -762,7 +762,7 @@ def build_launch_command(game):
     if runner != "Steam":
         command_parts.append(f"'{UMU_RUN}'")
 
-    if addapp_checkbox == "addapp_enabled":
+    if addapp_enabled == "addapp_enabled":
         command_parts.append(shlex.quote(addapp_bat))
     else:
         if runner != "Steam":
@@ -837,8 +837,8 @@ def main():
     parser.add_argument("message", nargs='?')
     parser.add_argument("command", nargs='?', default=None)
     parser.add_argument("--game")
-    parser.add_argument("--pre-launch-command", default="")
-    parser.add_argument("--post-launch-command", default="")
+    parser.add_argument("--pre-launch", default="")
+    parser.add_argument("--post-launch", default="")
 
     args = parser.parse_args()
 
@@ -848,9 +848,9 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None, game.get("pre_launch_command", ""), game.get("post_launch_command", "")).run()
+        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", "")).run()
     else:
-        FaugusRun(args.message, args.command, args.pre_launch_command, args.post_launch_command).run()
+        FaugusRun(args.message, args.command, args.pre_launch, args.post_launch).run()
 
 
 if __name__ == "__main__":

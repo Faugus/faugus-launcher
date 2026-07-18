@@ -1087,12 +1087,12 @@ GAME_FIELDS = [
     "launch_arguments", "game_arguments",
     "mangohud", "gamemode", "sdl_enabled",
     "protonfix", "runner",
-    "addapp_checkbox", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
+    "addapp_enabled", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
     "cover",
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "no_sleep", "category", "icon",
-    "steamgriddb_id", "pre_launch_command", "post_launch_command",
+    "steamgriddb_id", "pre_launch", "post_launch",
     "steam_user",
 ]
 
@@ -1106,7 +1106,7 @@ def game_to_save_dict(game, hidden=None):
          "mangohud": True if game.mangohud else "",
          "gamemode": True if game.gamemode else "",
          "sdl_enabled": True if game.sdl_enabled else "",
-         "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else ""}
+         "addapp_enabled": "addapp_enabled" if game.addapp_enabled else ""}
     if hidden is not None:
         d["hidden"] = hidden
     return d
@@ -1125,8 +1125,8 @@ def init_addon_defaults(obj):
     obj.addapp_delay = ""
     obj.addapp_first = False
     obj.launch_arguments = ""
-    obj.pre_launch_command = ""
-    obj.post_launch_command = ""
+    obj.pre_launch = ""
+    obj.post_launch = ""
     obj.lossless_enabled = False
     obj.lossless_multiplier = 1
     obj.lossless_flow = 100
@@ -1135,7 +1135,7 @@ def init_addon_defaults(obj):
     obj.lossless_present = False
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch_command, current_post_launch_command, callback):
+def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
     dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
@@ -1338,10 +1338,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         return box, entry
 
     box_pre_launch, entry_pre_launch = build_hook_command_box(
-        _("Pre-launch"), current_pre_launch_command, "pre_launch_command",
+        _("Pre-launch"), current_pre_launch, "pre_launch",
         _("Command or script to run before the game"))
     box_post_launch, entry_post_launch = build_hook_command_box(
-        _("Post-launch"), current_post_launch_command, "post_launch_command",
+        _("Post-launch"), current_post_launch, "post_launch",
         _("Command or script to run after the game"))
 
     hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -1366,19 +1366,19 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
     def on_response(dialog, response):
         result = current_launch_arguments
-        pre_launch_command = current_pre_launch_command
-        post_launch_command = current_post_launch_command
+        pre_launch = current_pre_launch
+        post_launch = current_post_launch
         if response == Gtk.ResponseType.OK:
             presets_to_save = [row[0] for row in store_presets if row[0].strip()]
             save_json_file(presets_to_save, PRESETS_FILE)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
             result = "\n".join(args_to_save)
-            pre_launch_command = entry_pre_launch.get_text().strip()
-            post_launch_command = entry_post_launch.get_text().strip()
+            pre_launch = entry_pre_launch.get_text().strip()
+            post_launch = entry_post_launch.get_text().strip()
 
         destroy_and_release(dialog)
-        callback(result, pre_launch_command, post_launch_command)
+        callback(result, pre_launch, post_launch)
 
     dialog.connect("response", on_response)
     dialog.present()

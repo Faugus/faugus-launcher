@@ -203,11 +203,11 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         shutil.rmtree(self.icon_directory, ignore_errors=True)
 
     def on_button_launch_settings_clicked(self, widget):
-        def on_result(result, pre_launch_command, post_launch_command):
+        def on_result(result, pre_launch, post_launch):
             self.launch_arguments = result
-            self.pre_launch_command = pre_launch_command
-            self.post_launch_command = post_launch_command
-        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch_command, self.post_launch_command, on_result)
+            self.pre_launch = pre_launch
+            self.post_launch = post_launch
+        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch, self.post_launch, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):
@@ -327,10 +327,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         command = ' '.join(command_parts)
 
         hook_args = ""
-        if self.pre_launch_command:
-            hook_args += f' --pre-launch-command "{self.pre_launch_command}"'
-        if self.post_launch_command:
-            hook_args += f' --post-launch-command "{self.post_launch_command}"'
+        if self.pre_launch:
+            hook_args += f' --pre-launch "{self.pre_launch}"'
+        if self.post_launch:
+            hook_args += f' --post-launch "{self.post_launch}"'
 
         if IS_FLATPAK:
             desktop_file_content = (
