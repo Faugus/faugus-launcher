@@ -44,6 +44,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", on_entry_changed)
+        self.entry_title.set_has_tooltip(True)
+        self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
         self.label_protonfix.set_halign(Gtk.Align.START)
@@ -79,6 +81,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
+        self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", self.on_cancel_clicked)

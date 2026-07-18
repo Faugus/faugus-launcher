@@ -4143,6 +4143,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
+        self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
 
         self.label_support = Gtk.Label(label=_("Support the Project"))
         self.label_support.set_halign(Gtk.Align.START)
@@ -5069,6 +5070,8 @@ class DuplicateDialog(Gtk.Dialog):
         label_title = Gtk.Label(label=_("Title"))
         label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
+        self.entry_title.set_has_tooltip(True)
+        self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         button_cancel = Gtk.Button(label=_("Cancel"))
         button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
@@ -5311,6 +5314,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.combobox_steam_user.append(None, "")
             self.combobox_steam_user.set_active(0)
         self.combobox_steam_user.set_sensitive(bool(steam_users))
+        if not steam_users:
+            self.combobox_steam_user.set_tooltip_text(_("No Steam users found"))
         self.combobox_steam_user.connect("changed", self.on_combobox_steam_user_changed)
 
         self.label_steam_title = Gtk.Label(label=_("Title"))
@@ -5410,8 +5415,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_protonfix.set_halign(Gtk.Align.START)
         self.entry_protonfix = Gtk.Entry()
         self.entry_protonfix.set_tooltip_text("UMU ID")
-        self.entry_protonfix.set_has_tooltip(True)
-        self.entry_protonfix.connect("query-tooltip", on_entry_query_tooltip)
         self.button_search_protonfix = Gtk.Button()
         self.button_search_protonfix.set_child(
             Gtk.Image.new_from_icon_name("system-search-symbolic"))
@@ -5422,8 +5425,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
-        self.entry_game_arguments.set_has_tooltip(True)
-        self.entry_game_arguments.connect("query-tooltip", on_entry_query_tooltip)
 
         self.button_launch_settings = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_settings.connect("clicked", self.on_button_launch_settings_clicked)
@@ -5440,6 +5441,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
+        self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
 
         self.button_winecfg = Gtk.Button(label="Winecfg")
         self.button_winecfg.set_size_request(120, -1)

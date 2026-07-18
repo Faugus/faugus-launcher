@@ -788,9 +788,16 @@ def on_entry_changed(widget):
 def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     current_text = widget.get_text()
     if current_text.strip():
+        text_width = widget.create_pango_layout(current_text).get_pixel_size()[0]
+        if text_width <= widget.get_width() - 16:
+            return False
         tooltip.set_text(current_text)
-    else:
-        tooltip.set_text(widget.get_tooltip_text())
+        return True
+
+    static_tooltip = widget.get_tooltip_text()
+    if not static_tooltip:
+        return False
+    tooltip.set_text(static_tooltip)
     return True
 
 
@@ -800,13 +807,13 @@ def disable_mangohud_gamemode_if_missing(obj):
         obj.checkbox_mangohud.set_sensitive(False)
         obj.checkbox_mangohud.set_active(False)
         obj.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
+            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\nMangoHud not found"))
 
     obj.gamemode_enabled = os.path.exists(GAMEMODERUN) or os.path.exists("/usr/games/gamemoderun")
     if not obj.gamemode_enabled:
         obj.checkbox_gamemode.set_sensitive(False)
         obj.checkbox_gamemode.set_active(False)
-        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance\nGameMode not found"))
 
 
 def create_mangohud_gamemode_checkboxes(obj):

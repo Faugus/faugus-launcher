@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box, expand_path
+from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, hide_dialog_action_area, IdComboBox, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box, expand_path
 
 
 def load_config():
@@ -192,6 +192,8 @@ class BackupWindow(Gtk.Dialog):
         self.entry_dest.set_text(dest_dir)
         self.entry_dest.set_hexpand(True)
         self.entry_dest.set_tooltip_text(_("Backup destination path"))
+        self.entry_dest.set_has_tooltip(True)
+        self.entry_dest.connect("query-tooltip", on_entry_query_tooltip)
         self.button_browse = Gtk.Button()
         self.button_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
         self.button_browse.connect("clicked", self.on_browse_clicked)
