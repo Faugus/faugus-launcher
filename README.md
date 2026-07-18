@@ -1,4 +1,4 @@
-# Faugus Launcher
+# Faugus
 A simple and lightweight app for running Windows games using [UMU-Launcher](https://github.com/Open-Wine-Components/umu-launcher)
 
 ### Support the project
@@ -69,10 +69,8 @@ sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpa
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.config/faugus-launcher/
 ```
-### Known issues:
-- The 'stop' button won't close games/apps
+### Known issue:
 - Gamescope doesn't work
-- It may not use the system theme in some DEs
 
 ## Build from source
 ```
@@ -83,15 +81,13 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow vdf psutil libmanette imagemagick icoextract vulkan-tools
+meson ninja pygobject requests pillow vdf psutil dbus-python gtk4 libadwaita libmanette icoextract
 ```
 
 ## Translations
 [![Translation status](https://hosted.weblate.org/widget/faugus-launcher/faugus-launcher/svg-badge.svg)](https://hosted.weblate.org/engage/faugus-launcher/)
 
-Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus-launcher/faugus-launcher/) — no need to edit `.po` files by hand or open a pull request. Sign in, pick your language, and translate directly in the browser; changes are submitted back to this repository as a pull request automatically.
-
-The list of translatable strings is kept up to date automatically whenever the source code changes, so new strings show up on Weblate without any manual step from translators.
+Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus-launcher/faugus-launcher/) — Sign in, pick your language, and translate directly in the browser.
 
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
@@ -102,19 +98,9 @@ The list of translatable strings is kept up to date automatically whenever the s
 ~/Faugus/
 ```
 
-### Runners location
+### Protons location
 ```
 ~/.local/share/Steam/compatibilitytools.d/
-```
-
-### Shortcut locations
-For Desktop Environments that support icons on the Desktop
-```
-~/Desktop/
-```
-For Application Launchers
-```
-~/.local/share/applications/
 ```
 
 ### Gamepad mapping
