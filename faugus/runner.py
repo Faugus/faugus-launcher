@@ -40,6 +40,41 @@ def set_env(key, value):
     _env_set.add(key)
 
 
+def warm_up_gpu():
+    import ctypes
+
+    try:
+        vulkan = ctypes.CDLL("libvulkan.so.1")
+
+        class VkInstanceCreateInfo(ctypes.Structure):
+            _fields_ = [
+                ("sType", ctypes.c_int),
+                ("pNext", ctypes.c_void_p),
+                ("flags", ctypes.c_uint32),
+                ("pApplicationInfo", ctypes.c_void_p),
+                ("enabledLayerCount", ctypes.c_uint32),
+                ("ppEnabledLayerNames", ctypes.c_void_p),
+                ("enabledExtensionCount", ctypes.c_uint32),
+                ("ppEnabledExtensionNames", ctypes.c_void_p),
+            ]
+
+        create_info = VkInstanceCreateInfo(
+            sType=1, pNext=None, flags=0, pApplicationInfo=None,
+            enabledLayerCount=0, ppEnabledLayerNames=None,
+            enabledExtensionCount=0, ppEnabledExtensionNames=None
+        )
+
+        instance = ctypes.c_void_p()
+        if vulkan.vkCreateInstance(ctypes.byref(create_info), None, ctypes.byref(instance)) != 0:
+            return
+
+        count = ctypes.c_uint32(0)
+        vulkan.vkEnumeratePhysicalDevices(instance, ctypes.byref(count), None)
+        vulkan.vkDestroyInstance(instance, None)
+    except OSError:
+        pass
+
+
 class FaugusRun(HiDpiMixin):
     def __init__(self, message, command=None, pre_launch="", post_launch="", gameid=""):
         self.message = message
@@ -92,11 +127,7 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
-            subprocess.Popen(
-                ["vulkaninfo", "--summary"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+            warm_up_gpu()
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.wow64_enabled:
