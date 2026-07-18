@@ -670,6 +670,7 @@ class FaugusRun(HiDpiMixin):
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
+        self.cfg.load_config()
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
