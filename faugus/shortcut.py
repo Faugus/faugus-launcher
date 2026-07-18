@@ -12,7 +12,6 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
 from faugus.utils import *
 from faugus.config_manager import *
-from faugus.steam_setup import LOSSLESS_DLL
 from faugus.migration import fix_legacy_shortcut_icons
 
 if IS_FLATPAK:
@@ -182,14 +181,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         disable_mangohud_gamemode_if_missing(self)
 
         if os.path.exists(LSFGVK_PATH):
-            if LOSSLESS_DLL or os.path.exists(self.lossless_location):
-                self.button_lossless.set_sensitive(True)
-            else:
-                self.button_lossless.set_sensitive(False)
-                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and set the location."))
+            self.button_lossless.set_sensitive(True)
         else:
             self.button_lossless.set_sensitive(False)
-            self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
+            self.button_lossless.set_tooltip_text(_("Vulkan Layer not found"))
 
         frame.set_child(self.box_main)
         self.box.append(frame)
@@ -239,7 +234,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
         sdl_enabled = cfg.config.get('sdl-enabled', 'False') == 'True'
         no_sleep = cfg.config.get('no-sleep-enabled', 'False') == 'True'
-        self.lossless_location = expand_path(cfg.config.get('lossless-location', ''))
 
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)

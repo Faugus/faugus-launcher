@@ -4073,19 +4073,6 @@ class Settings(Gtk.Dialog):
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
         self.button_search_prefix.set_size_request(50, -1)
 
-        self.label_lossless = Gtk.Label(label=_("Lossless Scaling Location"))
-        self.label_lossless.set_halign(Gtk.Align.START)
-
-        self.entry_lossless = Gtk.Entry()
-        self.entry_lossless.set_tooltip_text(_("Lossless.dll location"))
-        self.entry_lossless.set_has_tooltip(True)
-        self.entry_lossless.connect("query-tooltip", on_entry_query_tooltip)
-
-        self.button_search_lossless = Gtk.Button()
-        self.button_search_lossless.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
-        self.button_search_lossless.connect("clicked", self.on_button_search_lossless_clicked)
-        self.button_search_lossless.set_size_request(50, -1)
-
         self.label_default_prefix_tools = Gtk.Label(label=_("Default Prefix Tools"))
         self.label_default_prefix_tools.set_halign(Gtk.Align.START)
         self.label_default_prefix_tools.set_margin_start(10)
@@ -4187,7 +4174,6 @@ class Settings(Gtk.Dialog):
 
         self.label_envar = Gtk.Label(label=_("Global Environment Variables"))
         self.label_envar.set_halign(Gtk.Align.START)
-        self.label_envar.set_margin_top(10)
 
         self.liststore = Gtk.ListStore(str)
         self.liststore.append([""])
@@ -4255,15 +4241,13 @@ class Settings(Gtk.Dialog):
 
         grid_runner = build_grid()
 
-        grid_lossless = build_grid()
-
         grid_tools = build_grid()
 
         grid_logs = build_grid()
 
         grid_miscellaneous = build_grid()
 
-        grid_envar = build_grid(margin_top=False)
+        grid_envar = build_grid()
 
         grid_theme_accent = build_grid()
 
@@ -4292,13 +4276,8 @@ class Settings(Gtk.Dialog):
         grid_runner.attach(self.combobox_runner, 0, 7, 1, 1)
         grid_runner.attach(self.button_proton_manager, 0, 8, 1, 1)
 
-        grid_lossless.attach(self.label_lossless, 0, 0, 1, 1)
-        grid_lossless.attach(self.entry_lossless, 0, 1, 3, 1)
-        grid_lossless.attach(self.button_search_lossless, 3, 1, 1, 1)
-
         self.combobox_runner.set_hexpand(True)
         self.button_proton_manager.set_hexpand(True)
-        self.entry_lossless.set_hexpand(True)
 
         box_buttons.append(self.button_winetricks_default)
         box_buttons.append(self.button_winecfg_default)
@@ -4373,12 +4352,11 @@ class Settings(Gtk.Dialog):
         box_left.append(grid_runner)
         box_left.append(self.label_default_prefix_tools)
         box_left.append(grid_tools)
-        box_left.append(grid_lossless)
-        box_left.append(grid_logs)
+        box_left.append(grid_envar)
         box_left.append(grid_language)
 
-        box_mid.append(grid_envar)
         box_mid.append(grid_miscellaneous)
+        box_mid.append(grid_logs)
         box_mid.append(grid_backup)
 
         box_right.append(grid_theme_accent)
@@ -4564,7 +4542,6 @@ class Settings(Gtk.Dialog):
         combobox_language = self.combobox_language.get_active_text()
         entry_default_prefix = self.entry_default_prefix.get_text()
         combobox_default_runner = self.get_default_runner()
-        entry_lossless = self.entry_lossless.get_text()
         language = self.lang_codes.get(combobox_language, "en_US")
         logging_warning = self.logging_warning
 
@@ -4572,7 +4549,6 @@ class Settings(Gtk.Dialog):
         config.set_value("language", language)
         config.set_value("default-prefix", entry_default_prefix)
         config.set_value("default-runner", combobox_default_runner)
-        config.set_value("lossless-location", entry_lossless)
         config.set_value("mangohud", self.checkbox_mangohud.get_active())
         config.set_value("gamemode", self.checkbox_gamemode.get_active())
         config.set_value("sdl-enabled", self.checkbox_sdl.get_active())
@@ -4898,32 +4874,6 @@ class Settings(Gtk.Dialog):
         filechooser.connect("response", on_response)
         filechooser.present()
 
-    def on_button_search_lossless_clicked(self, widget):
-        filechooser = new_file_chooser(
-            self,
-            _("Select the Lossless.dll file"),
-            Gtk.FileChooserAction.OPEN,
-        )
-        entry_value = self.entry_lossless.get_text()
-        preferred_path = expand_path(entry_value) if entry_value else None
-        set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
-
-        filter_dll = Gtk.FileFilter()
-        filter_dll.set_name("Lossless.dll")
-        filter_dll.add_pattern("Lossless.dll")
-        filechooser.add_filter(filter_dll)
-        filechooser.set_filter(filter_dll)
-
-        def on_response(dialog_fc, response):
-            if response == Gtk.ResponseType.ACCEPT:
-                selected_file = dialog_fc.get_file().get_path()
-                if selected_file and os.path.basename(selected_file) == "Lossless.dll":
-                    self.entry_lossless.set_text(selected_file)
-            destroy_and_release(dialog_fc)
-
-        filechooser.connect("response", on_response)
-        filechooser.present()
-
     def load_config(self):
         cfg = ConfigManager()
 
@@ -4934,7 +4884,6 @@ class Settings(Gtk.Dialog):
         sdl_enabled = cfg.config.get('sdl-enabled', 'False') == 'True'
         no_sleep = cfg.config.get('no-sleep-enabled', 'False') == 'True'
         self.default_runner = cfg.config.get('default-runner', '').strip('"')
-        lossless_location = cfg.config.get('lossless-location', '').strip('"')
         discrete_gpu = cfg.config.get('discrete-gpu', 'False') == 'True'
         splash_window_enabled = cfg.config.get('splash-window-enabled', 'True') == 'True'
         automatic_updates = cfg.config.get('automatic-updates', 'True') == 'True'
@@ -4969,12 +4918,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_gamemode.set_active(gamemode)
         self.checkbox_sdl.set_active(sdl_enabled)
         self.checkbox_no_sleep.set_active(no_sleep)
-
-        if not lossless_location:
-            if LOSSLESS_DLL:
-                self.entry_lossless.set_text(str(LOSSLESS_DLL))
-        else:
-            self.entry_lossless.set_text(lossless_location)
 
         self.default_runner = convert_runner(self.default_runner)
         index_runner = 0
@@ -5898,13 +5841,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.combobox_steam_user.set_sensitive(False)
             self.combobox_steam_user.set_tooltip_text(_("No Steam users found"))
 
-        self.lossless_location = ConfigManager().config.get('lossless-location', '')
         if os.path.exists(LSFGVK_PATH):
-            if LOSSLESS_DLL or os.path.exists(self.lossless_location):
-                self.button_lossless.set_sensitive(True)
-            else:
-                self.button_lossless.set_sensitive(False)
-                self.button_lossless.set_tooltip_text(_("Lossless.dll not found"))
+            self.button_lossless.set_sensitive(True)
         else:
             self.button_lossless.set_sensitive(False)
             self.button_lossless.set_tooltip_text(_("Vulkan Layer not found"))

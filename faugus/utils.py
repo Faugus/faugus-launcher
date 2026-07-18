@@ -1537,6 +1537,63 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     hdr = val if (val := lossless_hdr) != "" else False
     present = val if (val := lossless_present) != "" else "VSync/FIFO (default)"
 
+    from faugus.config_manager import ConfigManager
+    from faugus.steam_setup import LOSSLESS_DLL
+
+    cfg = ConfigManager()
+    current_location = cfg.config.get('lossless-location', '').strip('"')
+    if not current_location and LOSSLESS_DLL:
+        current_location = str(LOSSLESS_DLL)
+
+    label_location = Gtk.Label(label=_("Lossless Scaling Location"))
+    label_location.set_halign(Gtk.Align.START)
+
+    load_red_entry_css()
+
+    entry_location = Gtk.Entry()
+    entry_location.set_text(current_location)
+    entry_location.set_hexpand(True)
+    entry_location.set_tooltip_text(_("Lossless.dll location"))
+    entry_location.set_has_tooltip(True)
+    entry_location.connect("query-tooltip", on_entry_query_tooltip)
+    entry_location.connect("changed", on_entry_changed)
+
+    button_search_location = Gtk.Button()
+    button_search_location.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+    button_search_location.set_size_request(50, -1)
+
+    def on_search_location_clicked(widget):
+        filechooser = new_file_chooser(
+            dialog,
+            _("Select the Lossless.dll file"),
+            Gtk.FileChooserAction.OPEN,
+        )
+        entry_value = entry_location.get_text()
+        preferred_path = expand_path(entry_value) if entry_value else None
+        set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
+
+        filter_dll = Gtk.FileFilter()
+        filter_dll.set_name("Lossless.dll")
+        filter_dll.add_pattern("Lossless.dll")
+        filechooser.add_filter(filter_dll)
+        filechooser.set_filter(filter_dll)
+
+        def on_response_fc(dialog_fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                selected_file = dialog_fc.get_file().get_path()
+                if selected_file and os.path.basename(selected_file) == "Lossless.dll":
+                    entry_location.set_text(selected_file)
+            destroy_and_release(dialog_fc)
+
+        filechooser.connect("response", on_response_fc)
+        filechooser.present()
+
+    button_search_location.connect("clicked", on_search_location_clicked)
+
+    box_location = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    box_location.append(entry_location)
+    box_location.append(button_search_location)
+
     checkbox_enable = Gtk.CheckButton(label=_("Enable"))
     checkbox_enable.set_active(enabled)
     checkbox_enable.set_halign(Gtk.Align.START)
@@ -1591,6 +1648,9 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
 
     def on_enable_toggled(cb):
         active = cb.get_active()
+        label_location.set_sensitive(active)
+        entry_location.set_sensitive(active)
+        button_search_location.set_sensitive(active)
         label_multiplier.set_sensitive(active)
         spin_multiplier.set_sensitive(active)
         label_flow.set_sensitive(active)
@@ -1604,14 +1664,16 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     on_enable_toggled(checkbox_enable)
 
     grid.attach(checkbox_enable,        0, 0, 1, 1)
-    grid.attach(label_multiplier,       0, 1, 1, 1)
-    grid.attach(spin_multiplier,        0, 2, 1, 1)
-    grid.attach(label_flow,             0, 3, 1, 1)
-    grid.attach(scale_flow,             0, 4, 1, 1)
-    grid.attach(checkbox_performance,   0, 5, 1, 1)
-    grid.attach(checkbox_hdr,           0, 6, 1, 1)
-    grid.attach(label_present,          0, 7, 1, 1)
-    grid.attach(combobox_present,       0, 8, 1, 1)
+    grid.attach(label_location,         0, 1, 1, 1)
+    grid.attach(box_location,           0, 2, 1, 1)
+    grid.attach(label_multiplier,       0, 3, 1, 1)
+    grid.attach(spin_multiplier,        0, 4, 1, 1)
+    grid.attach(label_flow,             0, 5, 1, 1)
+    grid.attach(scale_flow,             0, 6, 1, 1)
+    grid.attach(checkbox_performance,   0, 7, 1, 1)
+    grid.attach(checkbox_hdr,           0, 8, 1, 1)
+    grid.attach(label_present,          0, 9, 1, 1)
+    grid.attach(combobox_present,       0, 10, 1, 1)
 
     frame.set_child(grid)
 
@@ -1625,6 +1687,10 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
         result = (lossless_enabled, lossless_multiplier, lossless_flow,
                   lossless_performance, lossless_hdr, lossless_present)
         if response == Gtk.ResponseType.OK:
+            if checkbox_enable.get_active() and not entry_location.get_text():
+                entry_location.add_css_class("entry")
+                return
+
             present_text = combobox_present.get_active_text()
             present_mapping = {
                 "VSync/FIFO (default)": "fifo",
@@ -1639,6 +1705,8 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                 checkbox_hdr.get_active(),
                 present_mapping.get(present_text, "fifo"),
             )
+            cfg.set_value("lossless-location", entry_location.get_text())
+            cfg.save_config()
 
         destroy_and_release(dialog)
         callback(result)
