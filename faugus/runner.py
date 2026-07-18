@@ -40,12 +40,48 @@ def set_env(key, value):
     _env_set.add(key)
 
 
+def warm_up_gpu():
+    import ctypes
+
+    try:
+        vulkan = ctypes.CDLL("libvulkan.so.1")
+
+        class VkInstanceCreateInfo(ctypes.Structure):
+            _fields_ = [
+                ("sType", ctypes.c_int),
+                ("pNext", ctypes.c_void_p),
+                ("flags", ctypes.c_uint32),
+                ("pApplicationInfo", ctypes.c_void_p),
+                ("enabledLayerCount", ctypes.c_uint32),
+                ("ppEnabledLayerNames", ctypes.c_void_p),
+                ("enabledExtensionCount", ctypes.c_uint32),
+                ("ppEnabledExtensionNames", ctypes.c_void_p),
+            ]
+
+        create_info = VkInstanceCreateInfo(
+            sType=1, pNext=None, flags=0, pApplicationInfo=None,
+            enabledLayerCount=0, ppEnabledLayerNames=None,
+            enabledExtensionCount=0, ppEnabledExtensionNames=None
+        )
+
+        instance = ctypes.c_void_p()
+        if vulkan.vkCreateInstance(ctypes.byref(create_info), None, ctypes.byref(instance)) != 0:
+            return
+
+        count = ctypes.c_uint32(0)
+        vulkan.vkEnumeratePhysicalDevices(instance, ctypes.byref(count), None)
+        vulkan.vkDestroyInstance(instance, None)
+    except OSError:
+        pass
+
+
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None, pre_launch_command="", post_launch_command=""):
+    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid=""):
         self.message = message
         self.command = command
-        self.pre_launch_command = pre_launch_command
-        self.post_launch_command = post_launch_command
+        self.pre_launch = pre_launch
+        self.post_launch = post_launch
+        self.gameid = gameid
         self.process = None
         self.splash_window = None
         self.log_window = None
@@ -54,7 +90,7 @@ class FaugusRun(HiDpiMixin):
 
         self.load_config()
         load_frame_css()
-        signal.signal(signal.SIGUSR1, self.on_process_exit)
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGUSR1, lambda: self.on_process_exit(None, None))
 
     def run(self):
         def run_process():
@@ -83,7 +119,7 @@ class FaugusRun(HiDpiMixin):
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        if not self.splash_disable and not self.disable_updates:
+        if self.splash_window_enabled and self.automatic_updates:
             GLib.idle_add(self.show_splash)
 
         set_env("PROTON_EAC_RUNTIME", EAC_DIR)
@@ -91,14 +127,10 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_env("DRI_PRIME", "1")
-            subprocess.Popen(
-                ["vulkaninfo", "--summary"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+            warm_up_gpu()
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
-        if self.enable_wow64:
+        if self.wow64_enabled:
             set_env("PROTON_USE_WOW64", "1")
 
         set_env("UMU_USE_STEAM", "1")
@@ -132,11 +164,11 @@ class FaugusRun(HiDpiMixin):
                 set_env("LSFG_DLL_PATH", self.lossless_location)
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
-        if self.enable_logging:
+        if self.logging_enabled:
             self.log_dir = os.environ.get("LOG_DIR") or "default"
 
         if not os.environ.get("PROTONPATH") == "umu-sniper":
-            if self.enable_logging:
+            if self.logging_enabled:
                 set_env("UMU_LOG", "1")
 
                 target_dir = f"{LOGS_DIR}/{self.log_dir}"
@@ -211,14 +243,14 @@ class FaugusRun(HiDpiMixin):
 
         def start_and_watch(cmd, is_game=False):
             log_file = None
-            if self.enable_logging:
+            if self.logging_enabled:
                 log_path = Path(LOGS_DIR) / self.log_dir
                 log_path.mkdir(parents=True, exist_ok=True)
                 log_file = open(log_path / "umu.log", "a", encoding="utf-8")
 
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                bufsize=8192, text=True
+                bufsize=8192, text=True, start_new_session=is_game
             )
 
             def watch_stream(stream, lf=None):
@@ -261,7 +293,7 @@ class FaugusRun(HiDpiMixin):
                     log_file.close()
 
         popen_prefix = []
-        if os.environ.get("PREVENT_SLEEP"):
+        if os.environ.get("NO_SLEEP"):
             try:
                 import dbus
                 iface = dbus.Interface(dbus.SessionBus().get_object("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop"), "org.freedesktop.portal.Inhibit")
@@ -273,7 +305,7 @@ class FaugusRun(HiDpiMixin):
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
-        force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates
+        force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or not self.automatic_updates
         if not force_off or not self.components_exists:
             cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
@@ -285,9 +317,9 @@ class FaugusRun(HiDpiMixin):
         for cmd in cmds_to_run:
             start_and_watch(cmd)
 
-        if self.pre_launch_command:
+        if self.pre_launch:
             try:
-                subprocess.Popen(self.pre_launch_command, shell=True)
+                subprocess.Popen(self.pre_launch, shell=True)
             except Exception as e:
                 print(f"Error running pre-launch command: {e}")
 
@@ -445,16 +477,16 @@ class FaugusRun(HiDpiMixin):
         self.cfg = ConfigManager()
 
         self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
-        self.splash_disable = self.cfg.config.get('splash-disable', 'False') == 'True'
+        self.splash_window_enabled = self.cfg.config.get('splash-window-enabled', 'True') == 'True'
         self.default_runner = self.cfg.config.get('default-runner', '')
-        self.lossless_location = self.cfg.config.get('lossless-location', '')
-        self.default_prefix = self.cfg.config.get('default-prefix', '')
-        self.enable_logging = self.cfg.config.get('enable-logging', 'False') == 'True'
+        self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
+        self.default_prefix = expand_path(self.cfg.config.get('default-prefix', ''))
+        self.logging_enabled = self.cfg.config.get('logging-enabled', 'False') == 'True'
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
+        self.wow64_enabled = self.cfg.config.get('wow64-enabled', 'False') == 'True'
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
-        self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
+        self.automatic_updates = self.cfg.config.get('automatic-updates', 'True') == 'True'
 
     def show_splash(self):
         self.splash_window = Gtk.Window(title="Faugus")
@@ -642,7 +674,16 @@ class FaugusRun(HiDpiMixin):
 
         def kill_child_proc():
 
-            if self.process and self.process.poll() is None:
+            if self.gameid:
+                kill_by_faugusid(self.gameid)
+
+            if self.process:
+                try:
+                    pgid = os.getpgid(self.process.pid)
+                    os.killpg(pgid, signal.SIGKILL)
+                    return
+                except (ProcessLookupError, OSError):
+                    pass
                 try:
                     parent = psutil.Process(self.process.pid)
                     for child in parent.children(recursive=True):
@@ -654,12 +695,13 @@ class FaugusRun(HiDpiMixin):
         end_time = time.time()
         runtime = int(end_time - getattr(self, "start_time", end_time))
 
-        if self.post_launch_command:
+        if self.post_launch:
             try:
-                subprocess.Popen(self.post_launch_command, shell=True)
+                subprocess.Popen(self.post_launch, shell=True)
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
+        self.cfg.load_config()
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.cfg.set_value("playtime", self.playtime + runtime)
         self.cfg.save_config()
@@ -677,7 +719,7 @@ class FaugusRun(HiDpiMixin):
 
                 save_json_file(games, GAMES_JSON)
 
-        if self.enable_logging:
+        if self.logging_enabled:
             target_dir = f"{LOGS_DIR}/{self.log_dir}"
 
             if os.path.exists(target_dir):
@@ -704,18 +746,18 @@ class FaugusRun(HiDpiMixin):
 
 def build_launch_command(game):
     gameid = game.get("gameid", "")
-    path = game.get("path", "")
-    prefix = game.get("prefix", "")
-    launch_arguments = game.get("launch_arguments", "")
-    game_arguments = game.get("game_arguments", "")
+    path = expand_path(game.get("path", ""))
+    prefix = expand_path(game.get("prefix", ""))
+    launch_arguments = expand_path(game.get("launch_arguments", ""))
+    game_arguments = expand_path(game.get("game_arguments", ""))
     protonfix = game.get("protonfix", "")
     runner = game.get("runner", "")
-    addapp_bat = game.get("addapp_bat", "")
+    addapp_bat = expand_path(game.get("addapp_bat", ""))
     mangohud = game.get("mangohud", "")
     gamemode = game.get("gamemode", "")
-    disable_hidraw = game.get("disable_hidraw", "")
-    prevent_sleep = game.get("prevent_sleep", "")
-    addapp_checkbox = game.get("addapp_checkbox", "")
+    sdl_enabled = game.get("sdl_enabled", "")
+    no_sleep = game.get("no_sleep", "")
+    addapp_enabled = game.get("addapp_enabled", "")
     lossless_enabled = game.get("lossless_enabled", "")
     lossless_multiplier = game.get("lossless_multiplier", "")
     lossless_flow = game.get("lossless_flow", "")
@@ -734,10 +776,10 @@ def build_launch_command(game):
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
         command_parts.append(f"FAUGUSID={gameid}")
-    if disable_hidraw:
-        command_parts.append("PROTON_DISABLE_HIDRAW=1")
-    if prevent_sleep:
-        command_parts.append("PREVENT_SLEEP=1")
+    if sdl_enabled:
+        command_parts.append("PROTON_PREFER_SDL=1")
+    if no_sleep:
+        command_parts.append("NO_SLEEP=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     if runner:
@@ -753,7 +795,7 @@ def build_launch_command(game):
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
     if launch_arguments:
-        command_parts.append(os.path.expanduser(launch_arguments))
+        command_parts.append(launch_arguments)
     if gamemode and os.path.exists(GAMEMODERUN):
         command_parts.append("gamemoderun")
     if mangohud and os.path.exists(MANGOHUD_DIR):
@@ -762,7 +804,7 @@ def build_launch_command(game):
     if runner != "Steam":
         command_parts.append(f"'{UMU_RUN}'")
 
-    if addapp_checkbox == "addapp_enabled":
+    if addapp_enabled == "addapp_enabled":
         command_parts.append(shlex.quote(addapp_bat))
     else:
         if runner != "Steam":
@@ -837,8 +879,8 @@ def main():
     parser.add_argument("message", nargs='?')
     parser.add_argument("command", nargs='?', default=None)
     parser.add_argument("--game")
-    parser.add_argument("--pre-launch-command", default="")
-    parser.add_argument("--post-launch-command", default="")
+    parser.add_argument("--pre-launch", default="")
+    parser.add_argument("--post-launch", default="")
 
     args = parser.parse_args()
 
@@ -848,11 +890,10 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None, game.get("pre_launch_command", ""), game.get("post_launch_command", "")).run()
+        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game).run()
     else:
-        FaugusRun(args.message, args.command, args.pre_launch_command, args.post_launch_command).run()
+        FaugusRun(args.message, args.command, args.pre_launch, args.post_launch).run()
 
 
 if __name__ == "__main__":
-    update_games_json()
     main()

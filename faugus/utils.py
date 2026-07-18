@@ -4,12 +4,11 @@ import re
 import shutil
 import subprocess
 import tempfile
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -44,6 +43,26 @@ _background_executor = ThreadPoolExecutor(max_workers=32, thread_name_prefix="fa
 
 def run_in_background(fn, *args, **kwargs):
     return _background_executor.submit(fn, *args, **kwargs)
+
+
+def kill_by_faugusid(gameid):
+    if not gameid:
+        return
+
+    script = r'''
+MARKER="FAUGUSID=$1"
+for d in /proc/[0-9]*; do
+    pid=${d#/proc/}
+    if tr "\0" "\n" < "$d/environ" 2>/dev/null | grep -qxF "$MARKER"; then
+        kill -9 "$pid" 2>/dev/null
+    fi
+done
+'''
+    cmd = ["flatpak-spawn", "--host", "sh", "-c", script, "_", gameid] if IS_FLATPAK else ["sh", "-c", script, "_", gameid]
+    try:
+        subprocess.run(cmd, capture_output=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        pass
 
 
 HIDPI_SCALE = 2
@@ -94,6 +113,32 @@ def normalize_icon_bytes(data):
             return buf.getvalue()
     except Exception:
         return data
+
+
+def resize_icon_bytes(data, size=256):
+    if not data:
+        return data
+
+    from PIL import Image
+    import io
+
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            if img.size == (size, size):
+                return data
+            img = img.convert("RGBA").resize((size, size), Image.LANCZOS)
+            buf = io.BytesIO()
+            img.save(buf, "PNG")
+            return buf.getvalue()
+    except Exception:
+        return data
+
+
+def resize_image_file(src_path, dst_path, width, height):
+    from PIL import Image
+
+    with Image.open(src_path) as img:
+        img.convert("RGBA").resize((width, height), Image.LANCZOS).save(dst_path, "PNG")
 
 
 def is_valid_image_bytes(data):
@@ -257,7 +302,7 @@ def wrap_with_replaceable_placeholder(picture, width, height):
     picture.set_margin_end(0)
 
     placeholder = Gtk.Box()
-    placeholder.add_css_class("banner-placeholder")
+    placeholder.add_css_class("cover-placeholder")
     placeholder.set_size_request(width, height)
 
     stack = Gtk.Stack()
@@ -682,6 +727,9 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
 
 
 def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, game_arguments):
+    bat_path = expand_path(bat_path)
+    exe_path = expand_path(exe_path)
+    addapp = expand_path(addapp)
     with open(bat_path, "w") as f:
         f.write('@echo off\n')
         if not addapp_first:
@@ -785,9 +833,16 @@ def on_entry_changed(widget):
 def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     current_text = widget.get_text()
     if current_text.strip():
+        text_width = widget.create_pango_layout(current_text).get_pixel_size()[0]
+        if text_width <= widget.get_width() - 16:
+            return False
         tooltip.set_text(current_text)
-    else:
-        tooltip.set_text(widget.get_tooltip_text())
+        return True
+
+    static_tooltip = widget.get_tooltip_text()
+    if not static_tooltip:
+        return False
+    tooltip.set_text(static_tooltip)
     return True
 
 
@@ -797,13 +852,13 @@ def disable_mangohud_gamemode_if_missing(obj):
         obj.checkbox_mangohud.set_sensitive(False)
         obj.checkbox_mangohud.set_active(False)
         obj.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. NOT INSTALLED."))
+            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\nMangoHud not found"))
 
     obj.gamemode_enabled = os.path.exists(GAMEMODERUN) or os.path.exists("/usr/games/gamemoderun")
     if not obj.gamemode_enabled:
         obj.checkbox_gamemode.set_sensitive(False)
         obj.checkbox_gamemode.set_active(False)
-        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance. NOT INSTALLED."))
+        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance\nGameMode not found"))
 
 
 def create_mangohud_gamemode_checkboxes(obj):
@@ -900,52 +955,11 @@ def extract_ico(exe_path, output_path, best_frame=False):
             print(f"Error extracting icon: {result.stderr}")
             return "error"
 
-        magick = shutil.which("magick") or shutil.which("convert")
-        if not magick:
-            return "error"
+        from PIL import Image
 
-        identify = shutil.which("identify")
-        identify_cmd = [identify] if identify else [magick, "identify"]
-
-        if best_frame:
-            subprocess.run(
-                [magick, temp_ico, os.path.join(tmp_dir, "frame_%d.png")],
-                capture_output=True
-            )
-
-            if os.path.isfile(temp_ico):
-                os.remove(temp_ico)
-
-            def get_index(filepath):
-                match = re.search(r'frame_(\d+)\.png', filepath.name)
-                return int(match.group(1)) if match else 999
-
-            png_files = sorted(Path(tmp_dir).glob("frame_*.png"), key=get_index)
-            if not png_files:
-                return "error"
-
-            best, size = None, 0
-            for f in png_files:
-                r = subprocess.run(
-                    identify_cmd + ["-format", "%wx%h", str(f)],
-                    capture_output=True, text=True
-                )
-                if r.returncode == 0 and r.stdout:
-                    w, h = map(int, r.stdout.strip().split("x"))
-                    current_size = w * h
-                    if current_size > size:
-                        best, size = str(f), current_size
-
-            if not best:
-                return "error"
-
-            subprocess.run(
-                [magick, best, "-resize", "256x256!", output_path], check=True
-            )
-        else:
-            subprocess.run(
-                [magick, temp_ico, "-resize", "256x256!", output_path], check=True
-            )
+        with Image.open(temp_ico) as icon:
+            frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+            frame.save(output_path, "PNG")
 
         return "ok"
 
@@ -983,6 +997,12 @@ def on_button_paypal_clicked(widget):
     webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
 
+def expand_path(value):
+    if not value:
+        return value
+    return os.path.expandvars(os.path.expanduser(value))
+
+
 def update_games_json():
     games = load_json_file(GAMES_JSON, None)
     if games is None:
@@ -1017,10 +1037,10 @@ def update_games_json():
                 game["icon"] = new_icon_path
                 changed = True
 
-            if game.get("banner"):
-                new_banner_path = os.path.join(BANNERS_DIR, f"{game_id}.png")
-                if game.get("banner") != new_banner_path:
-                    game["banner"] = new_banner_path
+            if game.get("cover"):
+                new_cover_path = os.path.join(COVERS_DIR, f"{game_id}.png")
+                if game.get("cover") != new_cover_path:
+                    game["cover"] = new_cover_path
                     changed = True
 
     if changed:
@@ -1076,14 +1096,14 @@ def populate_combobox_with_runners(combobox):
 GAME_FIELDS = [
     "gameid", "title", "path", "prefix",
     "launch_arguments", "game_arguments",
-    "mangohud", "gamemode", "disable_hidraw",
+    "mangohud", "gamemode", "sdl_enabled",
     "protonfix", "runner",
-    "addapp_checkbox", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
-    "banner",
+    "addapp_enabled", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
+    "cover",
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
-    "playtime", "hidden", "prevent_sleep", "category", "icon",
-    "steamgriddb_id", "pre_launch_command", "post_launch_command",
+    "playtime", "hidden", "no_sleep", "category", "icon",
+    "steamgriddb_id", "pre_launch", "post_launch",
     "steam_user",
 ]
 
@@ -1096,8 +1116,8 @@ def game_to_save_dict(game, hidden=None):
     d = {**game_to_dict(game),
          "mangohud": True if game.mangohud else "",
          "gamemode": True if game.gamemode else "",
-         "disable_hidraw": True if game.disable_hidraw else "",
-         "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else ""}
+         "sdl_enabled": True if game.sdl_enabled else "",
+         "addapp_enabled": "addapp_enabled" if game.addapp_enabled else ""}
     if hidden is not None:
         d["hidden"] = hidden
     return d
@@ -1105,7 +1125,7 @@ def game_to_save_dict(game, hidden=None):
 
 def prepare_game_kwargs(data):
     defaults = {f: "" for f in GAME_FIELDS}
-    defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
+    defaults.update({"playtime": 0, "hidden": False, "no_sleep": False,
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
 
@@ -1116,8 +1136,8 @@ def init_addon_defaults(obj):
     obj.addapp_delay = ""
     obj.addapp_first = False
     obj.launch_arguments = ""
-    obj.pre_launch_command = ""
-    obj.post_launch_command = ""
+    obj.pre_launch = ""
+    obj.post_launch = ""
     obj.lossless_enabled = False
     obj.lossless_multiplier = 1
     obj.lossless_flow = 100
@@ -1126,7 +1146,7 @@ def init_addon_defaults(obj):
     obj.lossless_present = False
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch_command, current_post_launch_command, callback):
+def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
     dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
@@ -1329,10 +1349,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         return box, entry
 
     box_pre_launch, entry_pre_launch = build_hook_command_box(
-        _("Pre-launch Command/Script"), current_pre_launch_command, "pre_launch_command",
+        _("Pre-launch"), current_pre_launch, "pre_launch",
         _("Command or script to run before the game"))
     box_post_launch, entry_post_launch = build_hook_command_box(
-        _("Post-launch Command/Script"), current_post_launch_command, "post_launch_command",
+        _("Post-launch"), current_post_launch, "post_launch",
         _("Command or script to run after the game"))
 
     hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -1357,19 +1377,19 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
     def on_response(dialog, response):
         result = current_launch_arguments
-        pre_launch_command = current_pre_launch_command
-        post_launch_command = current_post_launch_command
+        pre_launch = current_pre_launch
+        post_launch = current_post_launch
         if response == Gtk.ResponseType.OK:
             presets_to_save = [row[0] for row in store_presets if row[0].strip()]
             save_json_file(presets_to_save, PRESETS_FILE)
 
             args_to_save = [row[0] for row in store_args if row[0].strip()]
             result = "\n".join(args_to_save)
-            pre_launch_command = entry_pre_launch.get_text().strip()
-            post_launch_command = entry_post_launch.get_text().strip()
+            pre_launch = entry_pre_launch.get_text().strip()
+            post_launch = entry_post_launch.get_text().strip()
 
         destroy_and_release(dialog)
-        callback(result, pre_launch_command, post_launch_command)
+        callback(result, pre_launch, post_launch)
 
     dialog.connect("response", on_response)
     dialog.present()
@@ -1528,6 +1548,63 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     hdr = val if (val := lossless_hdr) != "" else False
     present = val if (val := lossless_present) != "" else "VSync/FIFO (default)"
 
+    from faugus.config_manager import ConfigManager
+    from faugus.steam_setup import LOSSLESS_DLL
+
+    cfg = ConfigManager()
+    current_location = cfg.config.get('lossless-location', '').strip('"')
+    if not current_location and LOSSLESS_DLL:
+        current_location = str(LOSSLESS_DLL)
+
+    label_location = Gtk.Label(label=_("Lossless Scaling Location"))
+    label_location.set_halign(Gtk.Align.START)
+
+    load_red_entry_css()
+
+    entry_location = Gtk.Entry()
+    entry_location.set_text(current_location)
+    entry_location.set_hexpand(True)
+    entry_location.set_tooltip_text(_("Lossless.dll location"))
+    entry_location.set_has_tooltip(True)
+    entry_location.connect("query-tooltip", on_entry_query_tooltip)
+    entry_location.connect("changed", on_entry_changed)
+
+    button_search_location = Gtk.Button()
+    button_search_location.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+    button_search_location.set_size_request(50, -1)
+
+    def on_search_location_clicked(widget):
+        filechooser = new_file_chooser(
+            dialog,
+            _("Select the Lossless.dll file"),
+            Gtk.FileChooserAction.OPEN,
+        )
+        entry_value = entry_location.get_text()
+        preferred_path = expand_path(entry_value) if entry_value else None
+        set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
+
+        filter_dll = Gtk.FileFilter()
+        filter_dll.set_name("Lossless.dll")
+        filter_dll.add_pattern("Lossless.dll")
+        filechooser.add_filter(filter_dll)
+        filechooser.set_filter(filter_dll)
+
+        def on_response_fc(dialog_fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                selected_file = dialog_fc.get_file().get_path()
+                if selected_file and os.path.basename(selected_file) == "Lossless.dll":
+                    entry_location.set_text(selected_file)
+            destroy_and_release(dialog_fc)
+
+        filechooser.connect("response", on_response_fc)
+        filechooser.present()
+
+    button_search_location.connect("clicked", on_search_location_clicked)
+
+    box_location = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    box_location.append(entry_location)
+    box_location.append(button_search_location)
+
     checkbox_enable = Gtk.CheckButton(label=_("Enable"))
     checkbox_enable.set_active(enabled)
     checkbox_enable.set_halign(Gtk.Align.START)
@@ -1582,6 +1659,9 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
 
     def on_enable_toggled(cb):
         active = cb.get_active()
+        label_location.set_sensitive(active)
+        entry_location.set_sensitive(active)
+        button_search_location.set_sensitive(active)
         label_multiplier.set_sensitive(active)
         spin_multiplier.set_sensitive(active)
         label_flow.set_sensitive(active)
@@ -1595,14 +1675,16 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     on_enable_toggled(checkbox_enable)
 
     grid.attach(checkbox_enable,        0, 0, 1, 1)
-    grid.attach(label_multiplier,       0, 1, 1, 1)
-    grid.attach(spin_multiplier,        0, 2, 1, 1)
-    grid.attach(label_flow,             0, 3, 1, 1)
-    grid.attach(scale_flow,             0, 4, 1, 1)
-    grid.attach(checkbox_performance,   0, 5, 1, 1)
-    grid.attach(checkbox_hdr,           0, 6, 1, 1)
-    grid.attach(label_present,          0, 7, 1, 1)
-    grid.attach(combobox_present,       0, 8, 1, 1)
+    grid.attach(label_location,         0, 1, 1, 1)
+    grid.attach(box_location,           0, 2, 1, 1)
+    grid.attach(label_multiplier,       0, 3, 1, 1)
+    grid.attach(spin_multiplier,        0, 4, 1, 1)
+    grid.attach(label_flow,             0, 5, 1, 1)
+    grid.attach(scale_flow,             0, 6, 1, 1)
+    grid.attach(checkbox_performance,   0, 7, 1, 1)
+    grid.attach(checkbox_hdr,           0, 8, 1, 1)
+    grid.attach(label_present,          0, 9, 1, 1)
+    grid.attach(combobox_present,       0, 10, 1, 1)
 
     frame.set_child(grid)
 
@@ -1616,6 +1698,10 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
         result = (lossless_enabled, lossless_multiplier, lossless_flow,
                   lossless_performance, lossless_hdr, lossless_present)
         if response == Gtk.ResponseType.OK:
+            if checkbox_enable.get_active() and not entry_location.get_text():
+                entry_location.add_css_class("entry")
+                return
+
             present_text = combobox_present.get_active_text()
             present_mapping = {
                 "VSync/FIFO (default)": "fifo",
@@ -1630,6 +1716,8 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                 checkbox_hdr.get_active(),
                 present_mapping.get(present_text, "fifo"),
             )
+            cfg.set_value("lossless-location", entry_location.get_text())
+            cfg.save_config()
 
         destroy_and_release(dialog)
         callback(result)
@@ -1816,12 +1904,12 @@ def show_steamgriddb_picker(obj, category):
         return
 
     titles = {
-        "grid": _("Choose a grid"),
-        "hero": _("Choose a hero"),
+        "cover": _("Choose a cover"),
+        "banner": _("Choose a banner"),
         "icon": _("Choose an icon"),
     }
-    ratios = {"grid": 600 / 900, "hero": 1920 / 620, "icon": 1.0}
-    keys = {"grid": "grids", "hero": "heroes", "icon": "icons"}
+    ratios = {"cover": 600 / 900, "banner": 1920 / 620, "icon": 1.0}
+    keys = {"cover": "grids", "banner": "heroes", "icon": "icons"}
 
     dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
     hide_dialog_action_area(dialog)
@@ -1843,7 +1931,7 @@ def show_steamgriddb_picker(obj, category):
     spinner_box.set_hexpand(True)
     spinner_box.append(spinner)
 
-    is_list = category == "hero"
+    is_list = category == "banner"
 
     items_container = Gtk.FlowBox()
     items_container.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -1882,8 +1970,8 @@ def show_steamgriddb_picker(obj, category):
     thumb_h = int(thumb_w / ratios.get(category, 1.0))
 
     loading_setter = {
-        "grid": obj.set_grid_loading,
-        "hero": obj.set_hero_loading,
+        "cover": obj.set_cover_loading,
+        "banner": obj.set_banner_loading,
         "icon": obj.set_icon_loading,
     }[category]
 

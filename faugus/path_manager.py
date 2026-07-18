@@ -136,8 +136,8 @@ FAUGUS_PNG = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_
 
 FAUGUS_NOTIFICATION = PathManager.get_asset('faugus-notification.ogg')
 FAUGUS_PNG_RASTER = PathManager.get_asset('faugus-launcher-raster.png')
+COVERS_DIR = PathManager.user_data('faugus-launcher/covers')
 BANNERS_DIR = PathManager.user_data('faugus-launcher/banners')
-HEROES_DIR = PathManager.user_data('faugus-launcher/heroes')
 BACKUP_DIR = PathManager.user_data("faugus-launcher/games-backup")
 FAUGUS_MONO_ICON = PathManager.get_icon('faugus-mono.svg')
 EAC_DIR = PathManager.user_data("faugus-launcher/components/eac")
@@ -157,7 +157,7 @@ CUSTOM_ORDER = PathManager.user_data('faugus-launcher/custom-order.json')
 FAUGUS_LAUNCHER_SHARE_DIR = PathManager.user_data('faugus-launcher')
 FAUGUS_LAUNCHER_STATE_DIR = PathManager.user_state('faugus-launcher')
 FAUGUS_TEMP = PathManager.user_state('faugus-launcher/faugus_temp')
-RUNNING_GAMES = PathManager.user_state('faugus-launcher/running_games.json')
+RUNNING_GAMES = PathManager.user_state('faugus-launcher/running-games.json')
 FILECHOOSER_FOLDERS_FILE = PathManager.user_state('faugus-launcher/filechooser_folders.json')
 ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
 PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
@@ -175,8 +175,8 @@ APP_DIR = Path(PathManager.get_applications())
 DESKTOP_DIR = PathManager.user_desktop()
 
 BACKUP_ITEMS = {
+    "covers": COVERS_DIR,
     "banners": BANNERS_DIR,
-    "heroes": HEROES_DIR,
     "games-backup": BACKUP_DIR,
     "icons": ICONS_DIR,
     "config.json": CONFIG_FILE_DIR,
@@ -187,6 +187,10 @@ BACKUP_ITEMS = {
     "custom-order.json": CUSTOM_ORDER,
     "presets.json": PRESETS_FILE,
     "filechooser_folders.json": FILECHOOSER_FOLDERS_FILE,
+}
+
+LEGACY_BACKUP_DIR_ITEMS = {
+    "heroes": BANNERS_DIR,
 }
 
 
@@ -210,7 +214,7 @@ def _migrate_legacy_paths():
     legacy_config = PathManager.user_config('faugus-launcher')
     legacy_data = PathManager.user_data('faugus-launcher')
 
-    for name in ('games.json', 'icons', 'icons-nolauncher', 'banners',
+    for name in ('games.json', 'icons', 'icons-nolauncher', 'covers',
                  'games-backup', 'categories.txt', 'custom-order.json',
                  'presets.json', 'logs', 'components'):
         _migrate_legacy_item(
@@ -223,11 +227,18 @@ def _migrate_legacy_paths():
         os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'latest-games.txt'),
     )
 
-    for name in ('running_games.json', 'faugus_temp'):
-        _migrate_legacy_item(
-            os.path.join(legacy_data, name),
-            os.path.join(FAUGUS_LAUNCHER_STATE_DIR, name),
-        )
+    _migrate_legacy_item(
+        os.path.join(legacy_data, 'running_games.json'),
+        RUNNING_GAMES,
+    )
+    _migrate_legacy_item(
+        os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'running_games.json'),
+        RUNNING_GAMES,
+    )
+    _migrate_legacy_item(
+        os.path.join(legacy_data, 'faugus_temp'),
+        os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'faugus_temp'),
+    )
 
 
 def _parse_kv_file(path):
@@ -283,5 +294,14 @@ def _migrate_legacy_formats():
                 pass
 
 
+def _backup_before_legacy_migration():
+    try:
+        from faugus.migration import _backup_before_migration
+        _backup_before_migration()
+    except Exception:
+        pass
+
+
+_backup_before_legacy_migration()
 _migrate_legacy_paths()
 _migrate_legacy_formats()

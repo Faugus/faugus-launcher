@@ -5,7 +5,7 @@ import vdf
 
 from faugus.path_manager import *
 from faugus.steam_setup import get_all_shortcut_paths
-from faugus.utils import load_json_file, save_json_file
+from faugus.utils import load_json_file, save_json_file, expand_path
 
 
 def update_desktop_path(shortcut_path, new_dir_path):
@@ -53,6 +53,7 @@ def update_steam_shortcut(game_title, new_start_dir, new_exe):
 
 
 def update_ea_path(prefix):
+    prefix = expand_path(prefix)
     ea_base_dir = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop"
     target_ea_desktop = f"{ea_base_dir}/EA Desktop"
     new_path = f"{target_ea_desktop}/EALauncher.exe"

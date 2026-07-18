@@ -12,7 +12,6 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, GLib
 from faugus.utils import *
 from faugus.config_manager import *
-from faugus.steam_setup import LOSSLESS_DLL
 from faugus.migration import fix_legacy_shortcut_icons
 
 if IS_FLATPAK:
@@ -26,7 +25,7 @@ _ = setup_gettext('faugus-launcher')
 class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
     def __init__(self, file_path):
         super().__init__(title="Faugus")
-        self.file_path = file_path
+        self.file_path = expand_path(file_path)
         self.set_resizable(False)
 
         game_title = os.path.basename(file_path)
@@ -45,6 +44,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", on_entry_changed)
+        self.entry_title.set_has_tooltip(True)
+        self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
         self.label_protonfix.set_halign(Gtk.Align.START)
@@ -61,8 +62,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
 
-        self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
-        self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
+        self.button_launch_settings = Gtk.Button(label=_("Launch Settings"))
+        self.button_launch_settings.connect("clicked", self.on_button_launch_settings_clicked)
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
@@ -77,9 +78,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
-        self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
-        self.checkbox_disable_hidraw.set_tooltip_text(_("May fix gamepad issues with some games"))
-        self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
+        self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
+        self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
+        self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
+        self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
@@ -108,7 +110,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_protonfix = build_grid(margin_bottom=False)
 
-        self.grid_launch_arguments = build_grid(margin_bottom=False)
+        self.grid_launch_settings = build_grid(margin_bottom=False)
 
         self.grid_game_arguments = build_grid(margin_bottom=False)
 
@@ -129,8 +131,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        self.grid_launch_arguments.attach(self.button_launch_arguments, 0, 0, 1, 1)
-        self.button_launch_arguments.set_hexpand(True)
+        self.grid_launch_settings.attach(self.button_launch_settings, 0, 0, 1, 1)
+        self.button_launch_settings.set_hexpand(True)
 
         self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
         self.button_addapp.set_hexpand(True)
@@ -152,8 +154,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_tools.append(self.checkbox_mangohud)
         self.grid_tools.append(self.checkbox_gamemode)
-        self.grid_tools.append(self.checkbox_prevent_sleep)
-        self.grid_tools.append(self.checkbox_disable_hidraw)
+        self.grid_tools.append(self.checkbox_no_sleep)
+        self.grid_tools.append(self.checkbox_sdl)
 
         self.grid_shortcut_icon.append(self.button_shortcut_icon)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
@@ -172,7 +174,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.box_main.append(self.grid_title)
         self.box_main.append(self.grid_protonfix)
         self.box_main.append(self.grid_game_arguments)
-        self.box_main.append(self.grid_launch_arguments)
+        self.box_main.append(self.grid_launch_settings)
         self.box_main.append(self.grid_addapp)
         self.box_main.append(self.grid_lossless)
         self.box_main.append(self.box_tools)
@@ -182,14 +184,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         disable_mangohud_gamemode_if_missing(self)
 
         if os.path.exists(LSFGVK_PATH):
-            if LOSSLESS_DLL or os.path.exists(self.lossless_location):
-                self.button_lossless.set_sensitive(True)
-            else:
-                self.button_lossless.set_sensitive(False)
-                self.button_lossless.set_tooltip_text(_("Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and set the location."))
+            self.button_lossless.set_sensitive(True)
         else:
             self.button_lossless.set_sensitive(False)
-            self.button_lossless.set_tooltip_text(_("Lossless Scaling Vulkan Layer NOT INSTALLED."))
+            self.button_lossless.set_tooltip_text(_("Vulkan Layer not found"))
 
         frame.set_child(self.box_main)
         self.box.append(frame)
@@ -207,12 +205,12 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         shutil.rmtree(self.icon_directory, ignore_errors=True)
 
-    def on_button_launch_arguments_clicked(self, widget):
-        def on_result(result, pre_launch_command, post_launch_command):
+    def on_button_launch_settings_clicked(self, widget):
+        def on_result(result, pre_launch, post_launch):
             self.launch_arguments = result
-            self.pre_launch_command = pre_launch_command
-            self.post_launch_command = post_launch_command
-        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch_command, self.post_launch_command, on_result)
+            self.pre_launch = pre_launch
+            self.post_launch = post_launch
+        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch, self.post_launch, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):
@@ -237,14 +235,13 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         mangohud = cfg.config.get('mangohud', 'False') == 'True'
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
-        disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
-        prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
-        self.lossless_location = cfg.config.get('lossless-location', '')
+        sdl_enabled = cfg.config.get('sdl-enabled', 'False') == 'True'
+        no_sleep = cfg.config.get('no-sleep-enabled', 'False') == 'True'
 
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)
-        self.checkbox_disable_hidraw.set_active(disable_hidraw)
-        self.checkbox_prevent_sleep.set_active(prevent_sleep)
+        self.checkbox_sdl.set_active(sdl_enabled)
+        self.checkbox_no_sleep.set_active(no_sleep)
 
     def on_cancel_clicked(self, widget):
         if os.path.isfile(self.icon_temp):
@@ -263,7 +260,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         title_formatted = format_title(title)
 
         addapp_bat = f"{os.path.dirname(self.file_path)}/faugus-{title_formatted}.bat"
-        game_arguments = self.entry_game_arguments.get_text()
+        game_arguments = expand_path(self.entry_game_arguments.get_text())
 
         if self.addapp_enabled:
             write_addapp_bat(addapp_bat, self.file_path, self.addapp, self.addapp_delay, self.addapp_first, game_arguments)
@@ -285,9 +282,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 other_args.append(arg)
 
-        launch_arguments = " ".join(env_vars + other_args)
+        launch_arguments = expand_path(" ".join(env_vars + other_args))
 
-        game_arguments = self.entry_game_arguments.get_text()
+        game_arguments = expand_path(self.entry_game_arguments.get_text())
         lossless_enabled = self.lossless_enabled
         lossless_multiplier = self.lossless_multiplier
         lossless_flow = self.lossless_flow
@@ -297,17 +294,17 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         mangohud = True if self.checkbox_mangohud.get_active() else ""
         gamemode = True if self.checkbox_gamemode.get_active() else ""
-        disable_hidraw = True if self.checkbox_disable_hidraw.get_active() else ""
-        prevent_sleep = True if self.checkbox_prevent_sleep.get_active() else ""
+        sdl_enabled = True if self.checkbox_sdl.get_active() else ""
+        no_sleep = True if self.checkbox_no_sleep.get_active() else ""
 
         game_directory = os.path.dirname(self.file_path)
 
         command_parts = []
 
-        if disable_hidraw:
-            command_parts.append("PROTON_DISABLE_HIDRAW=1")
-        if prevent_sleep:
-            command_parts.append("PREVENT_SLEEP=1")
+        if sdl_enabled:
+            command_parts.append("PROTON_PREFER_SDL=1")
+        if no_sleep:
+            command_parts.append("NO_SLEEP=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         if launch_arguments:
@@ -333,10 +330,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         command = ' '.join(command_parts)
 
         hook_args = ""
-        if self.pre_launch_command:
-            hook_args += f' --pre-launch-command "{self.pre_launch_command}"'
-        if self.post_launch_command:
-            hook_args += f' --post-launch-command "{self.post_launch_command}"'
+        if self.pre_launch:
+            hook_args += f' --pre-launch "{self.pre_launch}"'
+        if self.post_launch:
+            hook_args += f' --post-launch "{self.post_launch}"'
 
         if IS_FLATPAK:
             desktop_file_content = (
