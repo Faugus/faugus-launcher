@@ -4,7 +4,6 @@ import re
 import shutil
 import subprocess
 import tempfile
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
@@ -114,6 +113,32 @@ def normalize_icon_bytes(data):
             return buf.getvalue()
     except Exception:
         return data
+
+
+def resize_icon_bytes(data, size=256):
+    if not data:
+        return data
+
+    from PIL import Image
+    import io
+
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            if img.size == (size, size):
+                return data
+            img = img.convert("RGBA").resize((size, size), Image.LANCZOS)
+            buf = io.BytesIO()
+            img.save(buf, "PNG")
+            return buf.getvalue()
+    except Exception:
+        return data
+
+
+def resize_image_file(src_path, dst_path, width, height):
+    from PIL import Image
+
+    with Image.open(src_path) as img:
+        img.convert("RGBA").resize((width, height), Image.LANCZOS).save(dst_path, "PNG")
 
 
 def is_valid_image_bytes(data):
@@ -930,52 +955,11 @@ def extract_ico(exe_path, output_path, best_frame=False):
             print(f"Error extracting icon: {result.stderr}")
             return "error"
 
-        magick = shutil.which("magick") or shutil.which("convert")
-        if not magick:
-            return "error"
+        from PIL import Image
 
-        identify = shutil.which("identify")
-        identify_cmd = [identify] if identify else [magick, "identify"]
-
-        if best_frame:
-            subprocess.run(
-                [magick, temp_ico, os.path.join(tmp_dir, "frame_%d.png")],
-                capture_output=True
-            )
-
-            if os.path.isfile(temp_ico):
-                os.remove(temp_ico)
-
-            def get_index(filepath):
-                match = re.search(r'frame_(\d+)\.png', filepath.name)
-                return int(match.group(1)) if match else 999
-
-            png_files = sorted(Path(tmp_dir).glob("frame_*.png"), key=get_index)
-            if not png_files:
-                return "error"
-
-            best, size = None, 0
-            for f in png_files:
-                r = subprocess.run(
-                    identify_cmd + ["-format", "%wx%h", str(f)],
-                    capture_output=True, text=True
-                )
-                if r.returncode == 0 and r.stdout:
-                    w, h = map(int, r.stdout.strip().split("x"))
-                    current_size = w * h
-                    if current_size > size:
-                        best, size = str(f), current_size
-
-            if not best:
-                return "error"
-
-            subprocess.run(
-                [magick, best, "-resize", "256x256!", output_path], check=True
-            )
-        else:
-            subprocess.run(
-                [magick, temp_ico, "-resize", "256x256!", output_path], check=True
-            )
+        with Image.open(temp_ico) as icon:
+            frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+            frame.save(output_path, "PNG")
 
         return "ok"
 

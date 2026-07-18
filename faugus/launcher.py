@@ -3138,9 +3138,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if os.path.isfile(temp_cover_path):
                     cover = os.path.join(COVERS_DIR, f"{title_formatted}.png")
                     try:
-                        command_magick = shutil.which("magick") or shutil.which("convert")
-                        subprocess.run([command_magick, temp_cover_path, "-resize", "460x690!", cover], check=True)
-                    except subprocess.CalledProcessError as e:
+                        resize_image_file(temp_cover_path, cover, 460, 690)
+                    except Exception as e:
                         print(f"Error resizing cover: {e}")
                 else:
                     cover = ""
@@ -3149,9 +3148,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if os.path.isfile(temp_banner_path):
                     banner = os.path.join(BANNERS_DIR, f"{title_formatted}.png")
                     try:
-                        command_magick = shutil.which("magick") or shutil.which("convert")
-                        subprocess.run([command_magick, temp_banner_path, "-resize", "1920x620!", banner], check=True)
-                    except subprocess.CalledProcessError as e:
+                        resize_image_file(temp_banner_path, banner, 1920, 620)
+                    except Exception as e:
                         print(f"Error resizing banner: {e}")
             else:
                 cover = ""
@@ -3529,10 +3527,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if os.path.isfile(temp_cover_path):
                     cover = os.path.join(COVERS_DIR, f"{title_formatted}.png")
                     try:
-                        command_magick = shutil.which("magick") or shutil.which("convert")
-                        subprocess.run([command_magick, temp_cover_path, "-resize", "460x690!", cover], check=True)
+                        resize_image_file(temp_cover_path, cover, 460, 690)
                         game.cover = cover
-                    except subprocess.CalledProcessError as e:
+                    except Exception as e:
                         print(f"Error resizing cover: {e}")
                 else:
                     game.cover = ""
@@ -3541,9 +3538,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if os.path.isfile(temp_banner_path):
                     banner = os.path.join(BANNERS_DIR, f"{title_formatted}.png")
                     try:
-                        command_magick = shutil.which("magick") or shutil.which("convert")
-                        subprocess.run([command_magick, temp_banner_path, "-resize", "1920x620!", banner], check=True)
-                    except subprocess.CalledProcessError as e:
+                        resize_image_file(temp_banner_path, banner, 1920, 620)
+                    except Exception as e:
                         print(f"Error resizing banner: {e}")
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
@@ -6122,6 +6118,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
     def apply_downloaded_artwork(self, category, content):
         if category == "icon":
             content = normalize_icon_bytes(content)
+            content = resize_icon_bytes(content, 256)
         if not is_valid_image_bytes(content):
             print(f"Downloaded {category} artwork is corrupted or incomplete, ignoring.")
             return False
