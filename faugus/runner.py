@@ -41,11 +41,12 @@ def set_env(key, value):
 
 
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None, pre_launch="", post_launch=""):
+    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid=""):
         self.message = message
         self.command = command
         self.pre_launch = pre_launch
         self.post_launch = post_launch
+        self.gameid = gameid
         self.process = None
         self.splash_window = None
         self.log_window = None
@@ -54,7 +55,7 @@ class FaugusRun(HiDpiMixin):
 
         self.load_config()
         load_frame_css()
-        signal.signal(signal.SIGUSR1, self.on_process_exit)
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGUSR1, lambda: self.on_process_exit(None, None))
 
     def run(self):
         def run_process():
@@ -218,7 +219,7 @@ class FaugusRun(HiDpiMixin):
 
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                bufsize=8192, text=True
+                bufsize=8192, text=True, start_new_session=is_game
             )
 
             def watch_stream(stream, lf=None):
@@ -642,7 +643,16 @@ class FaugusRun(HiDpiMixin):
 
         def kill_child_proc():
 
-            if self.process and self.process.poll() is None:
+            if self.gameid:
+                kill_by_faugusid(self.gameid)
+
+            if self.process:
+                try:
+                    pgid = os.getpgid(self.process.pid)
+                    os.killpg(pgid, signal.SIGKILL)
+                    return
+                except (ProcessLookupError, OSError):
+                    pass
                 try:
                     parent = psutil.Process(self.process.pid)
                     for child in parent.children(recursive=True):
@@ -848,7 +858,7 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", "")).run()
+        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game).run()
     else:
         FaugusRun(args.message, args.command, args.pre_launch, args.post_launch).run()
 

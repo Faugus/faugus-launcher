@@ -354,10 +354,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_play.set_child(new_icon_image(f"{icon}.svg"))
         self.menu_play.get_child().set_text(text)
 
-        if IS_FLATPAK:
-            self.button_play.set_sensitive(not is_running)
-            self.menu_play.set_sensitive(not is_running)
-
     def selected(self):
         selected_items = self.flowbox.get_selected_children()
         if not selected_items:
@@ -719,12 +715,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def check_running(self):
         changed = False
 
-        for gameid, proc in list(self.processes.items()):
-            if proc.poll() is not None:
-                del self.processes[gameid]
-                self.running.pop(gameid, None)
-                changed = True
-
         for gameid, pid in list(self.running.items()):
             if gameid not in self.processes:
                 try:
@@ -732,8 +722,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         pid = next(iter(pid.values()))
                     os.kill(pid, 0)
                 except OSError:
-                    del self.running[gameid]
-                    changed = True
+                    if not IS_FLATPAK:
+                        del self.running[gameid]
+                        changed = True
 
         if changed:
             self.save_running()
@@ -2673,8 +2664,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_play.set_sensitive(False)
 
         def reenable():
-            if not IS_FLATPAK:
-                self.button_play.set_sensitive(True)
+            self.button_play.set_sensitive(True)
             return False
         GLib.timeout_add(1000, reenable)
 
@@ -2730,7 +2720,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             try:
                 os.kill(self.running[gameid], signal.SIGUSR1)
             except ProcessLookupError:
-                pass
+                kill_by_faugusid(gameid)
 
             self.running.pop(gameid, None)
             self.processes.pop(gameid, None)
@@ -2788,17 +2778,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.load_tray_icon()
 
     def on_button_kill_clicked(self, widget):
-        if not IS_FLATPAK:
-            for gameid, pid in list(self.running.items()):
-                try:
-                    os.kill(pid, signal.SIGUSR1)
-                except ProcessLookupError:
-                    pass
+        for gameid, pid in list(self.running.items()):
+            try:
+                os.kill(pid, signal.SIGUSR1)
+            except ProcessLookupError:
+                kill_by_faugusid(gameid)
 
-            self.running.clear()
-            self.processes.clear()
-            self.save_running()
-            self.update_icon()
+        self.running.clear()
+        self.processes.clear()
+        self.save_running()
+        self.update_icon()
 
         subprocess.run(r"""
     for pid in $(ls -l /proc/*/exe 2>/dev/null | grep -E 'wine(64)?-preloader|wineserver|winedevice.exe' | awk -F'/' '{print $3}'); do

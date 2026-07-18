@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -44,6 +44,26 @@ _background_executor = ThreadPoolExecutor(max_workers=32, thread_name_prefix="fa
 
 def run_in_background(fn, *args, **kwargs):
     return _background_executor.submit(fn, *args, **kwargs)
+
+
+def kill_by_faugusid(gameid):
+    if not gameid:
+        return
+
+    script = r'''
+MARKER="FAUGUSID=$1"
+for d in /proc/[0-9]*; do
+    pid=${d#/proc/}
+    if tr "\0" "\n" < "$d/environ" 2>/dev/null | grep -qxF "$MARKER"; then
+        kill -9 "$pid" 2>/dev/null
+    fi
+done
+'''
+    cmd = ["flatpak-spawn", "--host", "sh", "-c", script, "_", gameid] if IS_FLATPAK else ["sh", "-c", script, "_", gameid]
+    try:
+        subprocess.run(cmd, capture_output=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        pass
 
 
 HIDPI_SCALE = 2
