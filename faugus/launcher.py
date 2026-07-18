@@ -299,7 +299,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.menu_prefix_location = context_menu_button(_("Open prefix location"))
         self.menu_prefix_location.connect("clicked", self.on_context_menu_prefix_location)
 
-        self.menu_run = context_menu_button(_("Run file inside the prefix"))
+        self.menu_run = context_menu_button(_("Run file in the prefix"))
         self.menu_run.connect("clicked", self.on_context_menu_run)
 
         self.menu_show_logs = context_menu_button(_("Show logs"))
@@ -1977,7 +1977,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
         filechooser = new_file_chooser(
             self,
-            _("Select a file to run inside the prefix"),
+            _("Select a file to run in the prefix"),
             Gtk.FileChooserAction.OPEN,
         )
         set_file_chooser_start_folder(filechooser, "run_in_prefix")
@@ -4703,7 +4703,7 @@ class Settings(Gtk.Dialog):
 
             filechooser = new_file_chooser(
                 self,
-                _("Select a file to run inside the prefix"),
+                _("Select a file to run in the prefix"),
                 Gtk.FileChooserAction.OPEN,
             )
             set_file_chooser_start_folder(filechooser, "run_in_prefix")
@@ -6591,7 +6591,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         filechooser = new_file_chooser(
             self,
-            _("Select a file to run inside the prefix"),
+            _("Select a file to run in the prefix"),
             Gtk.FileChooserAction.OPEN,
         )
         set_file_chooser_start_folder(filechooser, "run_in_prefix")
