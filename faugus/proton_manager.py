@@ -7,7 +7,7 @@ import shutil
 import threading
 import warnings
 
-from faugus.proton_downloader import select_asset, get_tar_mode
+from faugus.proton_downloader import CONFIGS, select_asset, get_tar_mode
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -23,47 +23,6 @@ else:
     GLib.set_prgname("faugus-launcher")
 
 _ = setup_gettext('faugus-launcher')
-
-VARIANTS = {
-    "cachyos": {
-        "name": "Proton-CachyOS",
-        "tab_label": "Proton-CachyOS",
-        "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
-        "tag_prefix": "cachyos-",
-        "archive_ext": ["x86_64.tar.xz"],
-        "latest_dir": "Proton-CachyOS Latest",
-        "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
-    },
-    "ge": {
-        "name": "GE-Proton",
-        "tab_label": "GE-Proton",
-        "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
-        "tag_prefix": "GE-Proton",
-        "archive_ext": [".tar.gz", ".tar.xz"],
-        "latest_dir": "Proton-GE Latest",
-        "min_version": (9, 1),
-        "tag_to_display": lambda tag: tag,
-    },
-    "em": {
-        "name": "Proton-EM",
-        "tab_label": "Proton-EM",
-        "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
-        "tag_prefix": "EM-",
-        "archive_ext": [".tar.xz"],
-        "latest_dir": "Proton-EM Latest",
-        "tag_to_display": lambda tag: f"proton-{tag}",
-    },
-    "dw": {
-        "name": "DW-Proton",
-        "tab_label": "DW-Proton",
-        "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
-        "tag_prefix": "dwproton-",
-        "archive_ext": ["x86_64.tar.xz"],
-        "latest_dir": "DW-Proton Latest",
-        "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
-    },
-}
-
 
 class _StreamProgress:
     def __init__(self, raw, total_size, progress_callback):
@@ -122,7 +81,7 @@ class ProtonDownloader(Gtk.Dialog):
         self.content_area.append(self.progress_bar)
 
         self.grids = {}
-        for key, variant in VARIANTS.items():
+        for key, variant in CONFIGS.items():
             grid = Gtk.Grid()
             grid.set_hexpand(True)
             grid.set_row_spacing(5)
@@ -151,7 +110,7 @@ class ProtonDownloader(Gtk.Dialog):
 
     def get_releases(self):
         closed_event = self.closed_event
-        for key, variant in VARIANTS.items():
+        for key, variant in CONFIGS.items():
             run_in_background(self.fetch_releases_from_url, variant, self.grids[key], closed_event)
 
     def fetch_releases_from_url(self, variant, grid, closed_event):

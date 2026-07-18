@@ -10,6 +10,7 @@ import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
+from faugus.proton_downloader import CONFIGS
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -1038,10 +1039,13 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append_text("Proton-CachyOS Latest (default)")
-    combobox.append_text("GE-Proton Latest")
-    combobox.append_text("Proton-EM Latest")
-    combobox.append_text("DW-Proton Latest")
+    latest_dirs = [cfg["latest_dir"] for cfg in CONFIGS.values()]
+
+    for i, cfg in enumerate(CONFIGS.values()):
+        label = f"{cfg['name']} Latest"
+        if i == 0:
+            label += " (default)"
+        combobox.append_text(label)
     combobox.append_text("UMU-Proton Latest")
 
     if os.path.exists(PROTON_CACHYOS):
@@ -1055,10 +1059,7 @@ def populate_combobox_with_runners(combobox):
                 if (
                     os.path.isdir(entry_path)
                     and entry not in ("UMU-Latest", "LegacyRuntime")
-                    and not entry.startswith("Proton-GE Latest")
-                    and not entry.startswith("Proton-EM Latest")
-                    and not entry.startswith("DW-Proton Latest")
-                    and not entry.startswith("Proton-CachyOS Latest")
+                    and not any(entry.startswith(d) for d in latest_dirs)
                 ):
                     versions.append(entry)
 

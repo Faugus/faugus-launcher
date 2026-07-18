@@ -10,29 +10,46 @@ import argparse
 from faugus.path_manager import COMPATIBILITY_DIR
 
 CONFIGS = {
+    "cachyos": {
+        "name": "Proton-CachyOS",
+        "tab_label": "Proton-CachyOS",
+        "latest_dir": "Proton-CachyOS Latest",
+        "api": "https://api.github.com/repos/CachyOS/proton-cachyos/releases/latest",
+        "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
+        "tag_prefix": "cachyos-",
+        "archive_ext": ["x86_64.tar.xz"],
+        "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
+    },
     "ge": {
-        "label": "GE-Proton",
-        "dir": "Proton-GE Latest",
+        "name": "GE-Proton",
+        "tab_label": "GE-Proton",
+        "latest_dir": "Proton-GE Latest",
         "api": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest",
-        "archive_ext": ".tar.gz",
+        "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
+        "tag_prefix": "GE-Proton",
+        "archive_ext": [".tar.gz", ".tar.xz"],
+        "tag_to_display": lambda tag: tag,
+        "min_version": (9, 1),
     },
     "em": {
-        "label": "Proton-EM",
-        "dir": "Proton-EM Latest",
+        "name": "Proton-EM",
+        "tab_label": "Proton-EM",
+        "latest_dir": "Proton-EM Latest",
         "api": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases/latest",
-        "archive_ext": ".tar.xz",
-    },
-    "cachyos": {
-        "label": "Proton-CachyOS",
-        "dir": "Proton-CachyOS Latest",
-        "api": "https://api.github.com/repos/CachyOS/proton-cachyos/releases/latest",
-        "archive_ext": "x86_64.tar.xz",
+        "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
+        "tag_prefix": "EM-",
+        "archive_ext": [".tar.xz"],
+        "tag_to_display": lambda tag: f"proton-{tag}",
     },
     "dw": {
-        "label": "DW-Proton",
-        "dir": "DW-Proton Latest",
+        "name": "DW-Proton",
+        "tab_label": "DW-Proton",
+        "latest_dir": "DW-Proton Latest",
         "api": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases/latest",
-        "archive_ext": "x86_64.tar.xz",
+        "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
+        "tag_prefix": "dwproton-",
+        "archive_ext": ["x86_64.tar.xz"],
+        "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
 }
 
@@ -157,7 +174,7 @@ def install_proton_latest(proton_dir, url, asset_name, label):
 def ensure_latest(kind):
     cfg = CONFIGS[kind]
 
-    proton_dir = COMPATIBILITY_DIR / cfg["dir"]
+    proton_dir = COMPATIBILITY_DIR / cfg["latest_dir"]
     proton_dir.parent.mkdir(parents=True, exist_ok=True)
 
     latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
@@ -167,11 +184,11 @@ def ensure_latest(kind):
     installed = get_installed_version(proton_dir)
 
     if installed and normalize_version(installed) == normalize_version(latest_tag):
-        print(f"{cfg['label']} is up to date.", flush=True)
+        print(f"{cfg['name']} is up to date.", flush=True)
         return
 
-    install_proton_latest(proton_dir, url, asset_name, cfg["label"])
-    rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
+    install_proton_latest(proton_dir, url, asset_name, cfg["name"])
+    rewrite_compatibilitytool_vdf(proton_dir, cfg["latest_dir"])
 
 
 def main():
