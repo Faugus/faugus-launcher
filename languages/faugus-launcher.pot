@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-18 19:42-0300\n"
+"POT-Creation-Date: 2026-07-18 23:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,11 +81,7 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:261 faugus/backup.py:353
-msgid "Last backup:"
-msgstr ""
-
-#: faugus/backup.py:265 faugus/backup.py:266
+#: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
 msgstr ""
 
@@ -423,10 +419,6 @@ msgstr ""
 
 #: faugus/launcher.py:4036
 msgid "Labels"
-msgstr ""
-
-#: faugus/launcher.py:4041
-msgid "SteamGridDB API Key"
 msgstr ""
 
 #: faugus/launcher.py:4048
