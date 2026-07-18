@@ -1964,11 +1964,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_context_menu_game_location(self, menu_item):
         self.context_menu.popdown()
-        subprocess.run(["xdg-open", self.current_game], check=True)
+        subprocess.Popen(["xdg-open", self.current_game])
 
     def on_context_menu_prefix_location(self, menu_item):
         self.context_menu.popdown()
-        subprocess.run(["xdg-open", self.current_prefix], check=True)
+        subprocess.Popen(["xdg-open", self.current_prefix])
 
     def on_context_menu_run(self, menu_item):
         self.context_menu.popdown()
