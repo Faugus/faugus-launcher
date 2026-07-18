@@ -101,25 +101,32 @@ def _migrate_artwork_directory(old_dir, new_dir):
     old_path = Path(old_dir)
     new_path = Path(new_dir)
     if not old_path.is_dir() or old_path == new_path:
-        return
+        return False
     if not new_path.exists():
-        old_path.rename(new_path)
-        return
+        shutil.move(str(old_path), str(new_path))
+        return True
+    moved = False
     for entry in old_path.iterdir():
         target = new_path / entry.name
         if not target.exists():
             shutil.move(str(entry), str(target))
+            moved = True
     try:
         old_path.rmdir()
     except OSError:
         pass
+    return moved
 
 
 def _migrate_artwork_directories():
-    legacy_banners = PathManager.user_data('faugus-launcher/banners')
-    legacy_heroes = PathManager.user_data('faugus-launcher/heroes')
-    _migrate_artwork_directory(legacy_banners, COVERS_DIR)
-    _migrate_artwork_directory(legacy_heroes, BANNERS_DIR)
+    legacy_banners = PathManager.user_config('faugus-launcher/banners')
+    legacy_heroes_config = PathManager.user_config('faugus-launcher/heroes')
+    legacy_heroes_data = PathManager.user_data('faugus-launcher/heroes')
+    migrated = False
+    migrated |= _migrate_artwork_directory(legacy_banners, COVERS_DIR)
+    migrated |= _migrate_artwork_directory(legacy_heroes_config, BANNERS_DIR)
+    migrated |= _migrate_artwork_directory(legacy_heroes_data, BANNERS_DIR)
+    return migrated
 
 
 def _migrate_games_json_fields():
@@ -349,6 +356,8 @@ def _backup_before_migration():
 
 
 def fix_legacy_shortcut_icons():
+    artwork_migrated = False
+
     try:
         _fix_desktop_shortcuts()
     except Exception:
@@ -363,7 +372,7 @@ def fix_legacy_shortcut_icons():
     except Exception:
         pass
     try:
-        _migrate_artwork_directories()
+        artwork_migrated = _migrate_artwork_directories()
     except Exception:
         pass
     try:
@@ -378,3 +387,5 @@ def fix_legacy_shortcut_icons():
         _migrate_filechooser_folder_keys()
     except Exception:
         pass
+
+    return artwork_migrated

@@ -157,7 +157,7 @@ CUSTOM_ORDER = PathManager.user_data('faugus-launcher/custom-order.json')
 FAUGUS_LAUNCHER_SHARE_DIR = PathManager.user_data('faugus-launcher')
 FAUGUS_LAUNCHER_STATE_DIR = PathManager.user_state('faugus-launcher')
 FAUGUS_TEMP = PathManager.user_state('faugus-launcher/faugus_temp')
-RUNNING_GAMES = PathManager.user_state('faugus-launcher/running_games.json')
+RUNNING_GAMES = PathManager.user_state('faugus-launcher/running-games.json')
 FILECHOOSER_FOLDERS_FILE = PathManager.user_state('faugus-launcher/filechooser_folders.json')
 ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
 PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
@@ -227,11 +227,18 @@ def _migrate_legacy_paths():
         os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'latest-games.txt'),
     )
 
-    for name in ('running_games.json', 'faugus_temp'):
-        _migrate_legacy_item(
-            os.path.join(legacy_data, name),
-            os.path.join(FAUGUS_LAUNCHER_STATE_DIR, name),
-        )
+    _migrate_legacy_item(
+        os.path.join(legacy_data, 'running_games.json'),
+        RUNNING_GAMES,
+    )
+    _migrate_legacy_item(
+        os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'running_games.json'),
+        RUNNING_GAMES,
+    )
+    _migrate_legacy_item(
+        os.path.join(legacy_data, 'faugus_temp'),
+        os.path.join(FAUGUS_LAUNCHER_STATE_DIR, 'faugus_temp'),
+    )
 
 
 def _parse_kv_file(path):

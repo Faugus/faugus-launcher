@@ -44,7 +44,8 @@ faugus_backup = False
 os.makedirs(FAUGUS_LAUNCHER_SHARE_DIR, exist_ok=True)
 os.makedirs(FAUGUS_LAUNCHER_DIR, exist_ok=True)
 os.makedirs(FAUGUS_LAUNCHER_STATE_DIR, exist_ok=True)
-fix_legacy_shortcut_icons()
+if fix_legacy_shortcut_icons():
+    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
 _ = setup_gettext('faugus-launcher')
 
