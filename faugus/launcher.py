@@ -334,7 +334,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.flowbox.connect("selected-children-changed", on_selected_children_changed)
 
-        self.load_tray_icon()
+        GLib.idle_add(self.load_tray_icon)
 
         if self.gamepad_navigation:
             import faugus.gamepad as gamepad
