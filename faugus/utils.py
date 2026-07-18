@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, BANNERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 
@@ -257,7 +257,7 @@ def wrap_with_replaceable_placeholder(picture, width, height):
     picture.set_margin_end(0)
 
     placeholder = Gtk.Box()
-    placeholder.add_css_class("banner-placeholder")
+    placeholder.add_css_class("cover-placeholder")
     placeholder.set_size_request(width, height)
 
     stack = Gtk.Stack()
@@ -1026,10 +1026,10 @@ def update_games_json():
                 game["icon"] = new_icon_path
                 changed = True
 
-            if game.get("banner"):
-                new_banner_path = os.path.join(BANNERS_DIR, f"{game_id}.png")
-                if game.get("banner") != new_banner_path:
-                    game["banner"] = new_banner_path
+            if game.get("cover"):
+                new_cover_path = os.path.join(COVERS_DIR, f"{game_id}.png")
+                if game.get("cover") != new_cover_path:
+                    game["cover"] = new_cover_path
                     changed = True
 
     if changed:
@@ -1085,13 +1085,13 @@ def populate_combobox_with_runners(combobox):
 GAME_FIELDS = [
     "gameid", "title", "path", "prefix",
     "launch_arguments", "game_arguments",
-    "mangohud", "gamemode", "disable_hidraw",
+    "mangohud", "gamemode", "sdl_enabled",
     "protonfix", "runner",
     "addapp_checkbox", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
-    "banner",
+    "cover",
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
     "lossless_performance", "lossless_hdr", "lossless_present",
-    "playtime", "hidden", "prevent_sleep", "category", "icon",
+    "playtime", "hidden", "no_sleep", "category", "icon",
     "steamgriddb_id", "pre_launch_command", "post_launch_command",
     "steam_user",
 ]
@@ -1105,7 +1105,7 @@ def game_to_save_dict(game, hidden=None):
     d = {**game_to_dict(game),
          "mangohud": True if game.mangohud else "",
          "gamemode": True if game.gamemode else "",
-         "disable_hidraw": True if game.disable_hidraw else "",
+         "sdl_enabled": True if game.sdl_enabled else "",
          "addapp_checkbox": "addapp_enabled" if game.addapp_checkbox else ""}
     if hidden is not None:
         d["hidden"] = hidden
@@ -1114,7 +1114,7 @@ def game_to_save_dict(game, hidden=None):
 
 def prepare_game_kwargs(data):
     defaults = {f: "" for f in GAME_FIELDS}
-    defaults.update({"playtime": 0, "hidden": False, "prevent_sleep": False,
+    defaults.update({"playtime": 0, "hidden": False, "no_sleep": False,
                      "category": False, "icon": ""})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
 
@@ -1338,10 +1338,10 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         return box, entry
 
     box_pre_launch, entry_pre_launch = build_hook_command_box(
-        _("Pre-launch Command/Script"), current_pre_launch_command, "pre_launch_command",
+        _("Pre-launch"), current_pre_launch_command, "pre_launch_command",
         _("Command or script to run before the game"))
     box_post_launch, entry_post_launch = build_hook_command_box(
-        _("Post-launch Command/Script"), current_post_launch_command, "post_launch_command",
+        _("Post-launch"), current_post_launch_command, "post_launch_command",
         _("Command or script to run after the game"))
 
     hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -1825,12 +1825,12 @@ def show_steamgriddb_picker(obj, category):
         return
 
     titles = {
-        "grid": _("Choose a grid"),
-        "hero": _("Choose a hero"),
+        "cover": _("Choose a cover"),
+        "banner": _("Choose a banner"),
         "icon": _("Choose an icon"),
     }
-    ratios = {"grid": 600 / 900, "hero": 1920 / 620, "icon": 1.0}
-    keys = {"grid": "grids", "hero": "heroes", "icon": "icons"}
+    ratios = {"cover": 600 / 900, "banner": 1920 / 620, "icon": 1.0}
+    keys = {"cover": "grids", "banner": "heroes", "icon": "icons"}
 
     dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
     hide_dialog_action_area(dialog)
@@ -1852,7 +1852,7 @@ def show_steamgriddb_picker(obj, category):
     spinner_box.set_hexpand(True)
     spinner_box.append(spinner)
 
-    is_list = category == "hero"
+    is_list = category == "banner"
 
     items_container = Gtk.FlowBox()
     items_container.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -1891,8 +1891,8 @@ def show_steamgriddb_picker(obj, category):
     thumb_h = int(thumb_w / ratios.get(category, 1.0))
 
     loading_setter = {
-        "grid": obj.set_grid_loading,
-        "hero": obj.set_hero_loading,
+        "cover": obj.set_cover_loading,
+        "banner": obj.set_banner_loading,
         "icon": obj.set_icon_loading,
     }[category]
 

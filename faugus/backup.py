@@ -178,9 +178,9 @@ class BackupWindow(Gtk.Dialog):
         self.frame.set_child(self.main_box)
         self.root_box.append(self.frame)
 
-        self.label_path = Gtk.Label(label=_("Backup Destination"))
-        self.label_path.set_halign(Gtk.Align.START)
-        self.main_box.append(self.label_path)
+        self.label_backup_destination = Gtk.Label(label=_("Backup Destination"))
+        self.label_backup_destination.set_halign(Gtk.Align.START)
+        self.main_box.append(self.label_backup_destination)
 
         dest_dir = self.config.get('backup-dest-dir', '')
         if not dest_dir:
@@ -200,18 +200,18 @@ class BackupWindow(Gtk.Dialog):
         self.box_dest.append(self.button_browse)
         self.main_box.append(self.box_dest)
 
-        self.button_manual = Gtk.Button(label=_("Backup now"))
-        self.button_manual.set_margin_top(10)
-        self.button_manual.connect("clicked", self.on_manual_clicked)
-        self.main_box.append(self.button_manual)
+        self.button_backup_now = Gtk.Button(label=_("Backup now"))
+        self.button_backup_now.set_margin_top(10)
+        self.button_backup_now.connect("clicked", self.on_backup_now_clicked)
+        self.main_box.append(self.button_backup_now)
 
         self.box_switch = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        self.checkbox_auto = Gtk.CheckButton(label=_("Automatic Backup"))
-        self.checkbox_auto.set_margin_top(10)
+        self.checkbox_automatic_backup = Gtk.CheckButton(label=_("Automatic Backup"))
+        self.checkbox_automatic_backup.set_margin_top(10)
         is_enabled = self.config.get('backup-auto-enabled', 'False') == 'True'
-        self.checkbox_auto.set_active(is_enabled)
-        self.checkbox_auto.connect("toggled", self.on_check_toggled)
-        self.box_switch.append(self.checkbox_auto)
+        self.checkbox_automatic_backup.set_active(is_enabled)
+        self.checkbox_automatic_backup.connect("toggled", self.on_check_toggled)
+        self.box_switch.append(self.checkbox_automatic_backup)
         self.main_box.append(self.box_switch)
 
         self.box_freq = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
@@ -228,7 +228,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.box_weekly = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
 
-        self.combo_weekly = IdComboBox()
+        self.combobox_weekly = IdComboBox()
         days = [
             ("Monday", _("Monday")),
             ("Tuesday", _("Tuesday")),
@@ -239,10 +239,10 @@ class BackupWindow(Gtk.Dialog):
             ("Sunday", _("Sunday"))
         ]
         for day_id, day_name in days:
-            self.combo_weekly.append(day_id, day_name)
-        self.combo_weekly.set_active(0)
-        self.combo_weekly.set_hexpand(True)
-        self.box_weekly.append(self.combo_weekly)
+            self.combobox_weekly.append(day_id, day_name)
+        self.combobox_weekly.set_active(0)
+        self.combobox_weekly.set_hexpand(True)
+        self.box_weekly.append(self.combobox_weekly)
         self.main_box.append(self.box_weekly)
 
         self.box_monthly = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
@@ -286,7 +286,7 @@ class BackupWindow(Gtk.Dialog):
 
         target_day = int(self.config.get('backup-target-day', '0'))
         if freq_val == 'weekly' and 0 <= target_day < 7:
-            self.combo_weekly.set_active(target_day)
+            self.combobox_weekly.set_active(target_day)
         elif freq_val == 'monthly' and 1 <= target_day <= 31:
             self.spin_monthly.set_value(target_day)
 
@@ -303,13 +303,13 @@ class BackupWindow(Gtk.Dialog):
         self.update_ui_state()
 
     def update_ui_state(self):
-        is_active = self.checkbox_auto.get_active()
+        is_active = self.checkbox_automatic_backup.get_active()
 
         self.radio_daily.set_sensitive(is_active)
         self.radio_weekly.set_sensitive(is_active)
         self.radio_monthly.set_sensitive(is_active)
 
-        self.combo_weekly.set_sensitive(is_active)
+        self.combobox_weekly.set_sensitive(is_active)
         self.spin_monthly.set_sensitive(is_active)
 
         self.box_weekly.set_visible(is_active and self.radio_weekly.get_active())
@@ -332,7 +332,7 @@ class BackupWindow(Gtk.Dialog):
         filechooser.connect("response", on_response)
         filechooser.present()
 
-    def on_manual_clicked(self, widget):
+    def on_backup_now_clicked(self, widget):
         if not self.entry_dest.get_text():
             self.entry_dest.add_css_class("entry")
             return
@@ -356,14 +356,14 @@ class BackupWindow(Gtk.Dialog):
         destroy_and_release(self)
 
     def on_ok_clicked(self, widget):
-        self.config['backup-auto-enabled'] = str(self.checkbox_auto.get_active())
+        self.config['backup-auto-enabled'] = str(self.checkbox_automatic_backup.get_active())
 
         if self.radio_daily.get_active():
             self.config['backup-frequency'] = 'daily'
             self.config['backup-target-day'] = '0'
         elif self.radio_weekly.get_active():
             self.config['backup-frequency'] = 'weekly'
-            self.config['backup-target-day'] = str(self.combo_weekly.get_active())
+            self.config['backup-target-day'] = str(self.combobox_weekly.get_active())
         elif self.radio_monthly.get_active():
             self.config['backup-frequency'] = 'monthly'
             self.config['backup-target-day'] = str(int(self.spin_monthly.get_value()))
@@ -371,9 +371,9 @@ class BackupWindow(Gtk.Dialog):
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
         save_config(self.config)
 
-        setup_autostart(self.checkbox_auto.get_active())
+        setup_autostart(self.checkbox_automatic_backup.get_active())
 
-        if self.checkbox_auto.get_active() and should_run_backup(self.config):
+        if self.checkbox_automatic_backup.get_active() and should_run_backup(self.config):
             try:
                 dest_dir = self.config.get('backup-dest-dir', '')
                 if not dest_dir:

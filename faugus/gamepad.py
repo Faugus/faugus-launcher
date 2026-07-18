@@ -917,14 +917,14 @@ def activate_focused_widget(self):
                 self.button_play.emit("clicked")
 
     elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
-        getattr(active_window, "hero_preview1", None), getattr(active_window, "hero_preview2", None)
+        getattr(active_window, "banner_preview1", None), getattr(active_window, "banner_preview2", None)
     ):
-        show_steamgriddb_picker(active_window, "hero")
+        show_steamgriddb_picker(active_window, "banner")
 
     elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
-        getattr(active_window, "image_banner_stack", None), getattr(active_window, "image_banner2_stack", None)
+        getattr(active_window, "image_cover_stack", None), getattr(active_window, "image_cover2_stack", None)
     ):
-        show_steamgriddb_picker(active_window, "grid")
+        show_steamgriddb_picker(active_window, "cover")
 
     elif type(focused).__name__ == "GtkColorSwatch":
         chooser = focused.get_ancestor(Gtk.ColorChooser)

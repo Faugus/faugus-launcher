@@ -83,7 +83,7 @@ class FaugusRun(HiDpiMixin):
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        if not self.splash_disable and not self.disable_updates:
+        if self.splash_window_enabled and self.automatic_updates:
             GLib.idle_add(self.show_splash)
 
         set_env("PROTON_EAC_RUNTIME", EAC_DIR)
@@ -98,7 +98,7 @@ class FaugusRun(HiDpiMixin):
             )
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
-        if self.enable_wow64:
+        if self.wow64_enabled:
             set_env("PROTON_USE_WOW64", "1")
 
         set_env("UMU_USE_STEAM", "1")
@@ -132,11 +132,11 @@ class FaugusRun(HiDpiMixin):
                 set_env("LSFG_DLL_PATH", self.lossless_location)
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
 
-        if self.enable_logging:
+        if self.logging_enabled:
             self.log_dir = os.environ.get("LOG_DIR") or "default"
 
         if not os.environ.get("PROTONPATH") == "umu-sniper":
-            if self.enable_logging:
+            if self.logging_enabled:
                 set_env("UMU_LOG", "1")
 
                 target_dir = f"{LOGS_DIR}/{self.log_dir}"
@@ -211,7 +211,7 @@ class FaugusRun(HiDpiMixin):
 
         def start_and_watch(cmd, is_game=False):
             log_file = None
-            if self.enable_logging:
+            if self.logging_enabled:
                 log_path = Path(LOGS_DIR) / self.log_dir
                 log_path.mkdir(parents=True, exist_ok=True)
                 log_file = open(log_path / "umu.log", "a", encoding="utf-8")
@@ -261,7 +261,7 @@ class FaugusRun(HiDpiMixin):
                     log_file.close()
 
         popen_prefix = []
-        if os.environ.get("PREVENT_SLEEP"):
+        if os.environ.get("NO_SLEEP"):
             try:
                 import dbus
                 iface = dbus.Interface(dbus.SessionBus().get_object("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop"), "org.freedesktop.portal.Inhibit")
@@ -273,7 +273,7 @@ class FaugusRun(HiDpiMixin):
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
-        force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or self.disable_updates
+        force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or not self.automatic_updates
         if not force_off or not self.components_exists:
             cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
@@ -445,16 +445,16 @@ class FaugusRun(HiDpiMixin):
         self.cfg = ConfigManager()
 
         self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
-        self.splash_disable = self.cfg.config.get('splash-disable', 'False') == 'True'
+        self.splash_window_enabled = self.cfg.config.get('splash-window-enabled', 'True') == 'True'
         self.default_runner = self.cfg.config.get('default-runner', '')
         self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
         self.default_prefix = expand_path(self.cfg.config.get('default-prefix', ''))
-        self.enable_logging = self.cfg.config.get('enable-logging', 'False') == 'True'
+        self.logging_enabled = self.cfg.config.get('logging-enabled', 'False') == 'True'
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
-        self.enable_wow64 = self.cfg.config.get('enable-wow64', 'False') == 'True'
+        self.wow64_enabled = self.cfg.config.get('wow64-enabled', 'False') == 'True'
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
-        self.disable_updates = self.cfg.config.get('disable-updates', 'False') == 'True'
+        self.automatic_updates = self.cfg.config.get('automatic-updates', 'True') == 'True'
 
     def show_splash(self):
         self.splash_window = Gtk.Window(title="Faugus")
@@ -677,7 +677,7 @@ class FaugusRun(HiDpiMixin):
 
                 save_json_file(games, GAMES_JSON)
 
-        if self.enable_logging:
+        if self.logging_enabled:
             target_dir = f"{LOGS_DIR}/{self.log_dir}"
 
             if os.path.exists(target_dir):
@@ -713,8 +713,8 @@ def build_launch_command(game):
     addapp_bat = expand_path(game.get("addapp_bat", ""))
     mangohud = game.get("mangohud", "")
     gamemode = game.get("gamemode", "")
-    disable_hidraw = game.get("disable_hidraw", "")
-    prevent_sleep = game.get("prevent_sleep", "")
+    sdl_enabled = game.get("sdl_enabled", "")
+    no_sleep = game.get("no_sleep", "")
     addapp_checkbox = game.get("addapp_checkbox", "")
     lossless_enabled = game.get("lossless_enabled", "")
     lossless_multiplier = game.get("lossless_multiplier", "")
@@ -734,10 +734,10 @@ def build_launch_command(game):
     if gameid:
         command_parts.append(f"LOG_DIR='{gameid}'")
         command_parts.append(f"FAUGUSID={gameid}")
-    if disable_hidraw:
-        command_parts.append("PROTON_DISABLE_HIDRAW=1")
-    if prevent_sleep:
-        command_parts.append("PREVENT_SLEEP=1")
+    if sdl_enabled:
+        command_parts.append("PROTON_PREFER_SDL=1")
+    if no_sleep:
+        command_parts.append("NO_SLEEP=1")
     if protonfix:
         command_parts.append(f"GAMEID={protonfix}")
     if runner:

@@ -61,8 +61,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_game_arguments = Gtk.Entry()
         self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
 
-        self.button_launch_arguments = Gtk.Button(label=_("Launch Settings"))
-        self.button_launch_arguments.connect("clicked", self.on_button_launch_arguments_clicked)
+        self.button_launch_settings = Gtk.Button(label=_("Launch Settings"))
+        self.button_launch_settings.connect("clicked", self.on_button_launch_settings_clicked)
 
         self.button_addapp = Gtk.Button(label=_("Additional Application"))
         self.button_addapp.connect("clicked", self.on_button_addapp_clicked)
@@ -77,9 +77,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
-        self.checkbox_disable_hidraw = Gtk.CheckButton(label=_("Disable Hidraw"))
-        self.checkbox_disable_hidraw.set_tooltip_text(_("May fix gamepad issues with some games"))
-        self.checkbox_prevent_sleep = Gtk.CheckButton(label=_("Prevent Sleep"))
+        self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
+        self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
+        self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
         self.button_cancel.connect("clicked", self.on_cancel_clicked)
@@ -108,7 +108,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_protonfix = build_grid(margin_bottom=False)
 
-        self.grid_launch_arguments = build_grid(margin_bottom=False)
+        self.grid_launch_settings = build_grid(margin_bottom=False)
 
         self.grid_game_arguments = build_grid(margin_bottom=False)
 
@@ -129,8 +129,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
 
-        self.grid_launch_arguments.attach(self.button_launch_arguments, 0, 0, 1, 1)
-        self.button_launch_arguments.set_hexpand(True)
+        self.grid_launch_settings.attach(self.button_launch_settings, 0, 0, 1, 1)
+        self.button_launch_settings.set_hexpand(True)
 
         self.grid_addapp.attach(self.button_addapp, 0, 0, 1, 1)
         self.button_addapp.set_hexpand(True)
@@ -152,8 +152,8 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_tools.append(self.checkbox_mangohud)
         self.grid_tools.append(self.checkbox_gamemode)
-        self.grid_tools.append(self.checkbox_prevent_sleep)
-        self.grid_tools.append(self.checkbox_disable_hidraw)
+        self.grid_tools.append(self.checkbox_no_sleep)
+        self.grid_tools.append(self.checkbox_sdl)
 
         self.grid_shortcut_icon.append(self.button_shortcut_icon)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
@@ -172,7 +172,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.box_main.append(self.grid_title)
         self.box_main.append(self.grid_protonfix)
         self.box_main.append(self.grid_game_arguments)
-        self.box_main.append(self.grid_launch_arguments)
+        self.box_main.append(self.grid_launch_settings)
         self.box_main.append(self.grid_addapp)
         self.box_main.append(self.grid_lossless)
         self.box_main.append(self.box_tools)
@@ -207,7 +207,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         shutil.rmtree(self.icon_directory, ignore_errors=True)
 
-    def on_button_launch_arguments_clicked(self, widget):
+    def on_button_launch_settings_clicked(self, widget):
         def on_result(result, pre_launch_command, post_launch_command):
             self.launch_arguments = result
             self.pre_launch_command = pre_launch_command
@@ -237,14 +237,14 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         mangohud = cfg.config.get('mangohud', 'False') == 'True'
         gamemode = cfg.config.get('gamemode', 'False') == 'True'
-        disable_hidraw = cfg.config.get('disable-hidraw', 'False') == 'True'
-        prevent_sleep = cfg.config.get('prevent-sleep', 'False') == 'True'
+        sdl_enabled = cfg.config.get('sdl-enabled', 'False') == 'True'
+        no_sleep = cfg.config.get('no-sleep-enabled', 'False') == 'True'
         self.lossless_location = expand_path(cfg.config.get('lossless-location', ''))
 
         self.checkbox_mangohud.set_active(mangohud)
         self.checkbox_gamemode.set_active(gamemode)
-        self.checkbox_disable_hidraw.set_active(disable_hidraw)
-        self.checkbox_prevent_sleep.set_active(prevent_sleep)
+        self.checkbox_sdl.set_active(sdl_enabled)
+        self.checkbox_no_sleep.set_active(no_sleep)
 
     def on_cancel_clicked(self, widget):
         if os.path.isfile(self.icon_temp):
@@ -297,17 +297,17 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         mangohud = True if self.checkbox_mangohud.get_active() else ""
         gamemode = True if self.checkbox_gamemode.get_active() else ""
-        disable_hidraw = True if self.checkbox_disable_hidraw.get_active() else ""
-        prevent_sleep = True if self.checkbox_prevent_sleep.get_active() else ""
+        sdl_enabled = True if self.checkbox_sdl.get_active() else ""
+        no_sleep = True if self.checkbox_no_sleep.get_active() else ""
 
         game_directory = os.path.dirname(self.file_path)
 
         command_parts = []
 
-        if disable_hidraw:
-            command_parts.append("PROTON_DISABLE_HIDRAW=1")
-        if prevent_sleep:
-            command_parts.append("PREVENT_SLEEP=1")
+        if sdl_enabled:
+            command_parts.append("PROTON_PREFER_SDL=1")
+        if no_sleep:
+            command_parts.append("NO_SLEEP=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         if launch_arguments:
