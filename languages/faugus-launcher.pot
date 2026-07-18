@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-18 23:22+0000\n"
+"POT-Creation-Date: 2026-07-18 23:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -134,7 +134,7 @@ msgid "Open prefix location"
 msgstr ""
 
 #: faugus/launcher.py:302
-msgid "Run file inside the prefix"
+msgid "Run file in the prefix"
 msgstr ""
 
 #: faugus/launcher.py:305
@@ -236,7 +236,7 @@ msgid "minutes"
 msgstr ""
 
 #: faugus/launcher.py:1980 faugus/launcher.py:4706 faugus/launcher.py:6594
-msgid "Select a file to run inside the prefix"
+msgid "Select a file to run in the prefix"
 msgstr ""
 
 #: faugus/launcher.py:2026
