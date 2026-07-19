@@ -319,15 +319,150 @@ echo "Done. Restart Faugus Launcher for the changes to take effect."
 '''
 
 
+def _prompt_backup_destination():
+    import gi
+    gi.require_version('Gtk', '4.0')
+    from gi.repository import Gtk, GLib
+
+    from faugus.utils import (
+        on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area,
+        new_file_chooser, set_file_chooser_start_folder, destroy_and_release,
+        build_bottom_button_box, expand_path,
+    )
+
+    result = {"path": None}
+    loop = GLib.MainLoop()
+
+    dialog = Gtk.Dialog(title="Faugus")
+    hide_dialog_action_area(dialog)
+    dialog.set_modal(True)
+    dialog.set_resizable(False)
+
+    load_red_entry_css()
+    load_frame_css()
+
+    root_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    dialog.get_content_area().append(root_box)
+
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
+
+    main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    main_box.set_margin_top(10)
+    main_box.set_margin_bottom(10)
+    main_box.set_margin_start(10)
+    main_box.set_margin_end(10)
+    frame.set_child(main_box)
+    root_box.append(frame)
+
+    label_title = Gtk.Label()
+    label_title.set_markup("<big><b>Welcome to Faugus 2.0</b></big>")
+    label_title.set_halign(Gtk.Align.START)
+    main_box.append(label_title)
+
+    label_body = Gtk.Label(
+        label=(
+            "A backup of your data is required to ensure\n"
+            "no data loss during the migration process.\n\n"
+            "Choose a location for the backup to be performed."
+        )
+    )
+    label_body.set_halign(Gtk.Align.CENTER)
+    label_body.set_wrap(True)
+    main_box.append(label_body)
+
+    default_dir = PathManager.user_home('Faugus Backup')
+
+    box_dest = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+    entry_dest = Gtk.Entry()
+    entry_dest.connect("changed", on_entry_changed)
+    entry_dest.set_text(default_dir)
+    entry_dest.set_hexpand(True)
+    button_browse = Gtk.Button()
+    button_browse.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+    button_browse.set_size_request(50, -1)
+    box_dest.append(entry_dest)
+    box_dest.append(button_browse)
+    main_box.append(box_dest)
+
+    def on_browse_clicked(widget):
+        filechooser = new_file_chooser(
+            dialog, "Select the backup destination", Gtk.FileChooserAction.SELECT_FOLDER,
+            accept_label="Open", cancel_label="Cancel",
+        )
+        set_file_chooser_start_folder(filechooser, "backup_destination", expand_path(entry_dest.get_text()) or None)
+
+        def on_response(fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                entry_dest.set_text(fc.get_file().get_path())
+            destroy_and_release(fc)
+
+        filechooser.connect("response", on_response)
+        filechooser.present()
+
+    button_browse.connect("clicked", on_browse_clicked)
+
+    def finish(path):
+        result["path"] = path
+        destroy_and_release(dialog)
+        loop.quit()
+
+    def on_ok_clicked(widget):
+        dest = expand_path(entry_dest.get_text().strip())
+        if not dest:
+            entry_dest.add_css_class("entry")
+            return
+        try:
+            os.makedirs(dest, exist_ok=True)
+        except OSError:
+            entry_dest.add_css_class("entry")
+            return
+        finish(dest)
+
+    def on_cancel_clicked(widget):
+        finish(None)
+
+    def on_close_request(widget):
+        finish(None)
+        return True
+
+    button_cancel = Gtk.Button(label="Cancel")
+    button_cancel.set_hexpand(True)
+    button_cancel.connect("clicked", on_cancel_clicked)
+
+    button_ok = Gtk.Button(label="Ok")
+    button_ok.set_hexpand(True)
+    button_ok.connect("clicked", on_ok_clicked)
+
+    root_box.append(build_bottom_button_box(button_cancel, button_ok))
+    dialog.connect("close-request", on_close_request)
+
+    dialog.present()
+    loop.run()
+
+    return result["path"]
+
+
 def _backup_before_migration():
-    backup_root = Path(PathManager.user_home('Faugus Backup'))
-    zip_path = backup_root / f"faugus-migration-backup-{date.today().isoformat()}.zip"
-    if zip_path.exists():
+    marker = Path(FAUGUS_LAUNCHER_STATE_DIR) / "migration-backup-done"
+    if marker.exists():
         return
+
+    chosen_dir = _prompt_backup_destination()
+    if not chosen_dir:
+        import sys
+        sys.exit(0)
+
+    backup_root = Path(chosen_dir)
+    zip_path = backup_root / f"faugus-migration-backup-{date.today().isoformat()}.zip"
 
     staging_dir = Path(tempfile.mkdtemp(prefix="faugus-migration-backup-"))
 
     dir_snapshots = []
+    clear_only_dirs = [str(FAUGUS_LAUNCHER_STATE_DIR)]
     for label, src in (
         ("config", FAUGUS_LAUNCHER_DIR),
         ("data", FAUGUS_LAUNCHER_SHARE_DIR),
@@ -336,6 +471,8 @@ def _backup_before_migration():
         if os.path.isdir(real_src):
             shutil.copytree(real_src, staging_dir / label)
             dir_snapshots.append({"backup": label, "original": str(src)})
+        else:
+            clear_only_dirs.append(str(src))
 
     file_snapshots = []
     for src_path, subdir, basename in _collect_desktop_backups() + _collect_steam_shortcut_backups():
@@ -345,7 +482,7 @@ def _backup_before_migration():
         shutil.copy2(src_path, backup_path)
         file_snapshots.append({"backup": str(backup_path.relative_to(staging_dir)), "original": str(src_path)})
 
-    script_text = _build_restore_script(dir_snapshots, file_snapshots, [str(FAUGUS_LAUNCHER_STATE_DIR)])
+    script_text = _build_restore_script(dir_snapshots, file_snapshots, clear_only_dirs)
     restore_script = staging_dir / "restore.sh"
     restore_script.write_text(script_text, encoding="utf-8")
     restore_script.chmod(0o755)
@@ -353,6 +490,9 @@ def _backup_before_migration():
     backup_root.mkdir(parents=True, exist_ok=True)
     shutil.make_archive(str(zip_path.with_suffix("")), "zip", root_dir=str(staging_dir))
     shutil.rmtree(staging_dir)
+
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.touch()
 
 
 def fix_legacy_shortcut_icons():
