@@ -69,8 +69,6 @@ sudo flatpak override com.valvesoftware.Steam --talk-name=org.freedesktop.Flatpa
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.var/app/io.github.Faugus.faugus-launcher/config/faugus-launcher/
 sudo flatpak override com.valvesoftware.Steam --filesystem=~/.config/faugus-launcher/
 ```
-### Known issue:
-- Gamescope doesn't work
 
 ## Build from source
 ```
@@ -121,16 +119,16 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 <br>
 
 **List**
-<img src=screenshots/main-list.png/>
+<br><img src=screenshots/main-list.png/>
 
 **Grid**
-<img src=screenshots/main-grid.png/>
+<br><img src=screenshots/main-grid.png/>
 
 **Covers**
-<img src=screenshots/main-covers.png/>
+<br><img src=screenshots/main-covers.png/>
 
 **SteamGridDB**
-<img src=screenshots/main-steamgriddb.png/>
+<br><img src=screenshots/main-steamgriddb.png/>
 
 </details>
 

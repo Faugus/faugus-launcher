@@ -36,6 +36,10 @@
       <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
+    <p>Known issue:</p>
+    <ul>
+      <li>Gamescope doesn't work.</li>
+    </ul>
   </description>
   <categories>
     <category>Game</category>
@@ -49,43 +53,47 @@
   <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/cb11688/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/cb11688/screenshots/main-blocks.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-grid.png</image>
       <caption>Main window: Grid interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f87129d/screenshots/main-banners.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-covers.png</image>
       <caption>Main window: Covers interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/7416fde/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-steamgriddb.png</image>
+      <caption>Main window: SteamGridDB interface mode</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/7416fde/screenshots/add-tools.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/add-tool.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f87129d/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/launch-settings.png</image>
+      <caption>Add/Edit Game: Launch Settings</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/cb11688/screenshots/proton-manager.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/proton-manager.png</image>
       <caption>Proton Manager</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/079f2d0/screenshots/shortcut-file.png</image>
-      <caption>Create shortcut from .exe file</caption>
     </screenshot>
   </screenshots>
   <releases>
     <release version="2.0.0-1" date="2026-07-12">
       <description>
         <ul>
-          <li>Faugus 2.0 experimental release.</li>
+          <li>Faugus 2.0</li>
         </ul>
       </description>
     </release>
