@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-19 12:48+0000\n"
+"POT-Creation-Date: 2026-07-19 14:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,14 +85,14 @@ msgstr ""
 msgid "Prefixes and Protons will not be backed up!"
 msgstr ""
 
-#: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5062
-#: faugus/launcher.py:5483 faugus/launcher.py:6034 faugus/shortcut.py:86
+#: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5057
+#: faugus/launcher.py:5478 faugus/launcher.py:6029 faugus/shortcut.py:86
 #: faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr ""
 
-#: faugus/backup.py:273 faugus/launcher.py:4144 faugus/launcher.py:4839
-#: faugus/launcher.py:5066 faugus/launcher.py:5487 faugus/launcher.py:6030
+#: faugus/backup.py:273 faugus/launcher.py:4144 faugus/launcher.py:4834
+#: faugus/launcher.py:5061 faugus/launcher.py:5482 faugus/launcher.py:6025
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr ""
@@ -235,7 +235,7 @@ msgstr ""
 msgid "minutes"
 msgstr ""
 
-#: faugus/launcher.py:1980 faugus/launcher.py:4706 faugus/launcher.py:6594
+#: faugus/launcher.py:1980 faugus/launcher.py:4701 faugus/launcher.py:6589
 msgid "Select a file to run in the prefix"
 msgstr ""
 
@@ -496,23 +496,23 @@ msgstr ""
 msgid "WOW64 (experimental)"
 msgstr ""
 
-#: faugus/launcher.py:4123 faugus/launcher.py:5440
+#: faugus/launcher.py:4123 faugus/launcher.py:5435
 msgid "Run"
 msgstr ""
 
-#: faugus/launcher.py:4126 faugus/launcher.py:5443
+#: faugus/launcher.py:4126 faugus/launcher.py:5438
 msgid "Run a file in the prefix"
 msgstr ""
 
-#: faugus/launcher.py:4130 faugus/launcher.py:5428 faugus/shortcut.py:82
+#: faugus/launcher.py:4130 faugus/launcher.py:5423 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr ""
 
-#: faugus/launcher.py:4131 faugus/launcher.py:5429 faugus/shortcut.py:83
+#: faugus/launcher.py:4131 faugus/launcher.py:5424 faugus/shortcut.py:83
 msgid "No Sleep"
 msgstr ""
 
-#: faugus/launcher.py:4132 faugus/launcher.py:5430 faugus/shortcut.py:84
+#: faugus/launcher.py:4132 faugus/launcher.py:5425 faugus/shortcut.py:84
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
 
@@ -536,201 +536,201 @@ msgstr ""
 msgid "Global Environment Variables"
 msgstr ""
 
-#: faugus/launcher.py:4420
+#: faugus/launcher.py:4415
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr ""
 
-#: faugus/launcher.py:4423
+#: faugus/launcher.py:4418
 msgid "Clear Logs"
 msgstr ""
 
-#: faugus/launcher.py:4650
+#: faugus/launcher.py:4645
 msgid "Do you want to save the changes?"
 msgstr ""
 
-#: faugus/launcher.py:4760
+#: faugus/launcher.py:4755
 msgid "Select a backup file to restore"
 msgstr ""
 
-#: faugus/launcher.py:4766
+#: faugus/launcher.py:4761
 msgid "ZIP files"
 msgstr ""
 
-#: faugus/launcher.py:4781 faugus/launcher.py:4791
+#: faugus/launcher.py:4776 faugus/launcher.py:4786
 msgid "This is not a valid Faugus backup file."
 msgstr ""
 
-#: faugus/launcher.py:4830
+#: faugus/launcher.py:4825
 msgid "Are you sure you want to overwrite the settings?"
 msgstr ""
 
-#: faugus/launcher.py:4839 faugus/launcher.py:5130
+#: faugus/launcher.py:4834 faugus/launcher.py:5125
 msgid "Yes"
 msgstr ""
 
-#: faugus/launcher.py:4840 faugus/launcher.py:5126
+#: faugus/launcher.py:4835 faugus/launcher.py:5121
 msgid "No"
 msgstr ""
 
-#: faugus/launcher.py:4847 faugus/launcher.py:6837
+#: faugus/launcher.py:4842 faugus/launcher.py:6832
 msgid "Select a prefix location"
 msgstr ""
 
-#: faugus/launcher.py:5051
+#: faugus/launcher.py:5046
 #, python-format
 msgid "Duplicate %s"
 msgstr ""
 
-#: faugus/launcher.py:5056 faugus/launcher.py:5307 faugus/launcher.py:5320
+#: faugus/launcher.py:5051 faugus/launcher.py:5302 faugus/launcher.py:5315
 #: faugus/shortcut.py:43
 msgid "Title"
 msgstr ""
 
-#: faugus/launcher.py:5102
+#: faugus/launcher.py:5097
 #, python-format
 msgid "Delete %s"
 msgstr ""
 
-#: faugus/launcher.py:5109
+#: faugus/launcher.py:5104
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr ""
 
-#: faugus/launcher.py:5118
+#: faugus/launcher.py:5113
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr ""
 
-#: faugus/launcher.py:5120
+#: faugus/launcher.py:5115
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr ""
 
-#: faugus/launcher.py:5134
+#: faugus/launcher.py:5129
 msgid "Also remove the prefix:"
 msgstr ""
 
-#: faugus/launcher.py:5181
+#: faugus/launcher.py:5176
 msgid "New Game/App"
 msgstr ""
 
-#: faugus/launcher.py:5290
+#: faugus/launcher.py:5285
 msgid "Steam User"
 msgstr ""
 
-#: faugus/launcher.py:5304 faugus/launcher.py:5828 faugus/launcher.py:5830
+#: faugus/launcher.py:5299 faugus/launcher.py:5823 faugus/launcher.py:5825
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:5372 faugus/utils.py:1427
+#: faugus/launcher.py:5367 faugus/utils.py:1427
 msgid "Path"
 msgstr ""
 
-#: faugus/launcher.py:5376
+#: faugus/launcher.py:5371
 msgid "Path to the game executable"
 msgstr ""
 
-#: faugus/launcher.py:5384
+#: faugus/launcher.py:5379
 msgid "Prefix"
 msgstr ""
 
-#: faugus/launcher.py:5388
+#: faugus/launcher.py:5383
 msgid "Path to the prefix"
 msgstr ""
 
-#: faugus/launcher.py:5396
+#: faugus/launcher.py:5391
 msgid "Proton"
 msgstr ""
 
-#: faugus/launcher.py:5410 faugus/shortcut.py:60
+#: faugus/launcher.py:5405 faugus/shortcut.py:60
 msgid "Game Arguments"
 msgstr ""
 
-#: faugus/launcher.py:5415 faugus/shortcut.py:65 faugus/utils.py:1150
+#: faugus/launcher.py:5410 faugus/shortcut.py:65 faugus/utils.py:1150
 msgid "Launch Settings"
 msgstr ""
 
-#: faugus/launcher.py:5418 faugus/shortcut.py:68 faugus/utils.py:1399
+#: faugus/launcher.py:5413 faugus/shortcut.py:68 faugus/utils.py:1399
 msgid "Additional Application"
 msgstr ""
 
-#: faugus/launcher.py:5421 faugus/shortcut.py:71
+#: faugus/launcher.py:5416 faugus/shortcut.py:71
 msgid "Additional application to run with the game"
 msgstr ""
 
-#: faugus/launcher.py:5423 faugus/shortcut.py:73 faugus/utils.py:1525
+#: faugus/launcher.py:5418 faugus/shortcut.py:73 faugus/utils.py:1525
 msgid "Lossless Scaling Frame Generation"
 msgstr ""
 
-#: faugus/launcher.py:5445
+#: faugus/launcher.py:5440
 msgid "Shortcut"
 msgstr ""
 
-#: faugus/launcher.py:5450
+#: faugus/launcher.py:5445
 msgid "Desktop"
 msgstr ""
 
-#: faugus/launcher.py:5451
+#: faugus/launcher.py:5446
 msgid "App Menu"
 msgstr ""
 
-#: faugus/launcher.py:5452
+#: faugus/launcher.py:5447
 msgid "Steam"
 msgstr ""
 
-#: faugus/launcher.py:5653
+#: faugus/launcher.py:5648
 msgid "Refresh"
 msgstr ""
 
-#: faugus/launcher.py:5656
+#: faugus/launcher.py:5651
 msgid "Load from file"
 msgstr ""
 
-#: faugus/launcher.py:5659
+#: faugus/launcher.py:5654
 msgid "Load from URL"
 msgstr ""
 
-#: faugus/launcher.py:5664
+#: faugus/launcher.py:5659
 msgid "Game/App"
 msgstr ""
 
-#: faugus/launcher.py:5681
+#: faugus/launcher.py:5676
 msgid "Tools"
 msgstr ""
 
-#: faugus/launcher.py:5836 faugus/shortcut.py:190
+#: faugus/launcher.py:5831 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
 msgstr ""
 
-#: faugus/launcher.py:5991
+#: faugus/launcher.py:5986
 msgid "Select an image for the cover"
 msgstr ""
 
-#: faugus/launcher.py:5992
+#: faugus/launcher.py:5987
 msgid "Select an image for the banner"
 msgstr ""
 
-#: faugus/launcher.py:5993
+#: faugus/launcher.py:5988
 msgid "Select an image for the icon"
 msgstr ""
 
-#: faugus/launcher.py:6023
+#: faugus/launcher.py:6018
 msgid "Enter the image URL"
 msgstr ""
 
-#: faugus/launcher.py:6564
+#: faugus/launcher.py:6559
 msgid "Windows Game"
 msgstr ""
 
-#: faugus/launcher.py:6565
+#: faugus/launcher.py:6560
 msgid "Linux Game"
 msgstr ""
 
-#: faugus/launcher.py:6566
+#: faugus/launcher.py:6561
 msgid "Steam Game"
 msgstr ""
 
-#: faugus/launcher.py:6806
+#: faugus/launcher.py:6801
 msgid "Select the game executable"
 msgstr ""
 
