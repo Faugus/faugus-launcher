@@ -2145,7 +2145,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if any(new_title.casefold() == g.title.casefold() for g in self.games):
             self.show_warning_dialog_main(
                 dialog,
-                _("%s already exists.") % new_title,
+                _("%s already exists") % new_title,
                 ""
             )
             return
@@ -2263,7 +2263,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return False
 
     def running_dialog(self, title):
-        show_message_dialog(_("%s is already running.") % title, parent=self)
+        show_message_dialog(_("%s is running") % title, parent=self)
 
     def load_config(self):
         cfg = ConfigManager()
@@ -2992,7 +2992,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     except Exception as e2:
                         self.show_warning_dialog_main(
                             self,
-                            _("Failed to remove prefix."),
+                            _("Failed to remove prefix"),
                             str(e2)
                         )
                 except FileNotFoundError:
@@ -3093,7 +3093,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if any(game.get("title", "").casefold() == title.casefold() for game in games):
                     self.show_warning_dialog_main(
                         add_game_dialog,
-                        _("%s already exists.") % title,
+                        _("%s already exists") % title,
                         ""
                     )
                     return True
@@ -3227,7 +3227,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if launcher_id not in ("windows", "linux", "steam"):
                 if not check_internet_connection():
-                    self.show_warning_dialog_main(add_game_dialog, _("No internet connection."), "")
+                    self.show_warning_dialog_main(add_game_dialog, _("No internet connection"), "")
                     return True
 
                 if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
@@ -3985,7 +3985,7 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.append("List", _("List"))
         self.combobox_interface.append("Grid", _("Grid"))
         self.combobox_interface.append("Covers", _("Covers"))
-        self.combobox_interface.append("SteamGridDB", _("SteamGridDB"))
+        self.combobox_interface.append("SteamGridDB", "SteamGridDB")
 
         self.label_background = Gtk.Label(label=_("Background"))
         self.label_background.set_halign(Gtk.Align.START)
@@ -4038,7 +4038,7 @@ class Settings(Gtk.Dialog):
 
         self.label_steamgriddb_key = Gtk.Label()
         self.label_steamgriddb_key.set_markup(
-            f'<a href="https://www.steamgriddb.com/profile/preferences/api">{_("SteamGridDB API Key")}</a>'
+            '<a href="https://www.steamgriddb.com/profile/preferences/api">SteamGridDB API Key</a>'
         )
         self.label_steamgriddb_key.set_use_markup(True)
         self.label_steamgriddb_key.set_halign(Gtk.Align.START)
@@ -6803,7 +6803,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         filechooser = new_file_chooser(
             self,
-            _("Select the game's .exe"),
+            _("Select the game executable"),
             Gtk.FileChooserAction.OPEN,
         )
         set_file_chooser_start_folder(filechooser, "game_exe", preferred_path)

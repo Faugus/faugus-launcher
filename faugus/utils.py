@@ -1890,8 +1890,8 @@ def show_steamgriddb_picker(obj, category):
 
     if not api_key:
         show_message_dialog(
-            _("No SteamGridDB API key configured."),
-            _("Add your API key in Settings first."),
+            "No SteamGridDB API key configured.",
+            "Add your API key in Settings first.",
             parent=obj,
         )
         return
@@ -2004,7 +2004,7 @@ def show_steamgriddb_picker(obj, category):
         if closed_state[0]:
             return False
         if not items:
-            empty_label = Gtk.Label(label=_("No results found."))
+            empty_label = Gtk.Label(label=_("No results found"))
             empty_label.set_margin_top(20)
             items_container.append(empty_label)
         for item, pixbuf in items:

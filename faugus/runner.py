@@ -427,9 +427,9 @@ class FaugusRun(HiDpiMixin):
         done = Event()
 
         if network_error:
-            text1, text2 = _("Internet connection error."), ""
+            text1, text2 = _("Internet connection error"), ""
         else:
-            text1 = _("%s was not found.") % protonpath
+            text1 = _("%s was not found") % protonpath
             text2 = _("Please install it or use another Proton version.")
 
         def build_and_show():
