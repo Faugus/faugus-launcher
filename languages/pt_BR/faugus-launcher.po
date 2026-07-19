@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-18 21:39-0300\n"
-"PO-Revision-Date: 2026-07-19 00:39+0000\n"
+"PO-Revision-Date: 2026-07-19 02:45+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -140,9 +140,8 @@ msgid "Open prefix location"
 msgstr "Abrir local do prefixo"
 
 #: faugus/launcher.py:302
-#, fuzzy
 msgid "Run file in the prefix"
-msgstr "Executa um arquivo no prefixo"
+msgstr "Executar arquivo no prefixo"
 
 #: faugus/launcher.py:305
 msgid "Show logs"
@@ -243,9 +242,8 @@ msgid "minutes"
 msgstr "minutos"
 
 #: faugus/launcher.py:1980 faugus/launcher.py:4706 faugus/launcher.py:6594
-#, fuzzy
 msgid "Select a file to run in the prefix"
-msgstr "Selecione um arquivo pra executar dentro do prefixo"
+msgstr "Selecione um arquivo para executar no prefixo"
 
 #: faugus/launcher.py:2026
 #, python-format
@@ -346,11 +344,11 @@ msgstr "Lista"
 
 #: faugus/launcher.py:3986
 msgid "Grid"
-msgstr ""
+msgstr "Grade"
 
 #: faugus/launcher.py:3987
 msgid "Covers"
-msgstr ""
+msgstr "Capas"
 
 #: faugus/launcher.py:3990
 msgid "Background"
@@ -369,13 +367,12 @@ msgid "Dominant color"
 msgstr "Cor dominante"
 
 #: faugus/launcher.py:3998
-#, fuzzy
 msgid "Banner"
-msgstr "Banners"
+msgstr "Banner"
 
 #: faugus/launcher.py:4000
 msgid "UI Customization"
-msgstr "Personalização da UI"
+msgstr "Personalização da Interface"
 
 #: faugus/launcher.py:4003
 msgid "Theme"
@@ -394,29 +391,24 @@ msgid "Accent Color"
 msgstr "Cor de Destaque"
 
 #: faugus/launcher.py:4026
-#, fuzzy
 msgid "Startup Window Size"
-msgstr "Tamanho padrão da janela"
+msgstr "Tamanho Inicial da Janela"
 
 #: faugus/launcher.py:4030
-#, fuzzy
 msgid "Default size"
-msgstr "Tamanho padrão da janela"
+msgstr "Tamanho padrão"
 
 #: faugus/launcher.py:4031
-#, fuzzy
 msgid "Remember size"
-msgstr "Lembrar tamanho da janela"
+msgstr "Lembrar tamanho"
 
 #: faugus/launcher.py:4032
-#, fuzzy
 msgid "Maximized"
-msgstr "Iniciar maximizado"
+msgstr "Maximizado"
 
 #: faugus/launcher.py:4033
-#, fuzzy
 msgid "Fullscreen"
-msgstr "-d3d11 -fullscreen"
+msgstr "Tela cheia"
 
 #: faugus/launcher.py:4034
 msgid "Alt+Enter toggles fullscreen"
@@ -424,7 +416,7 @@ msgstr "Alt+Enter alterna a tela cheia"
 
 #: faugus/launcher.py:4036
 msgid "Labels"
-msgstr ""
+msgstr "Rótulos"
 
 #: faugus/launcher.py:4048
 msgid "Default Prefixes Location"
@@ -451,17 +443,16 @@ msgid "Miscellaneous"
 msgstr "Diversos"
 
 #: faugus/launcher.py:4078
-#, fuzzy
 msgid "Discrete GPU"
-msgstr "Usar GPU dedicada"
+msgstr "GPU dedicada"
 
 #: faugus/launcher.py:4080
 msgid "Auto-close on launch"
-msgstr ""
+msgstr "Fechar automaticamente ao executar"
 
 #: faugus/launcher.py:4082
 msgid "Autostart"
-msgstr ""
+msgstr "Inicio automático"
 
 #: faugus/launcher.py:4084
 msgid "System tray icon"
@@ -469,35 +460,31 @@ msgstr "Ícone na bandeja do sistema"
 
 #: faugus/launcher.py:4087
 msgid "Minimized startup"
-msgstr ""
+msgstr "Iniciar minimizado"
 
 #: faugus/launcher.py:4090
 msgid "Monochrome icon"
 msgstr "Ícone monocromático"
 
 #: faugus/launcher.py:4093
-#, fuzzy
 msgid "Splash window"
-msgstr "Desativar janela de respingo"
+msgstr "Janela de respingo"
 
 #: faugus/launcher.py:4096
-#, fuzzy
 msgid "Automatic updates"
-msgstr "Desativar atualizações automáticas"
+msgstr "Atualizações automáticas"
 
 #: faugus/launcher.py:4099
 msgid "Logging"
-msgstr ""
+msgstr "Logs"
 
 #: faugus/launcher.py:4102
-#, fuzzy
 msgid "Categories and sort"
-msgstr "Exibir botões de categorias e ordem"
+msgstr "Categorias e ordem"
 
 #: faugus/launcher.py:4104
-#, fuzzy
 msgid "Hidden games"
-msgstr "Exibir jogos ocultos"
+msgstr "Jogos ocultos"
 
 #: faugus/launcher.py:4105
 msgid "Ctrl+H toggles hidden games"
@@ -508,14 +495,12 @@ msgid "Gamepad navigation"
 msgstr "Navegação com controle"
 
 #: faugus/launcher.py:4110
-#, fuzzy
 msgid "Wayland driver (experimental)"
-msgstr "Usar driver do Wayland (experimental)"
+msgstr "Driver do Wayland (experimental)"
 
 #: faugus/launcher.py:4113
-#, fuzzy
 msgid "WOW64 (experimental)"
-msgstr "Ativar WOW64 (experimental)"
+msgstr "WOW64 (experimental)"
 
 #: faugus/launcher.py:4123 faugus/launcher.py:5440
 msgid "Run"
@@ -527,7 +512,7 @@ msgstr "Executa um arquivo no prefixo"
 
 #: faugus/launcher.py:4129 faugus/launcher.py:5427 faugus/shortcut.py:81
 msgid "SDL"
-msgstr ""
+msgstr "SDL"
 
 #: faugus/launcher.py:4130 faugus/launcher.py:5428 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
@@ -535,11 +520,11 @@ msgstr "Pode corrigir problemas com o controle em alguns jogos"
 
 #: faugus/launcher.py:4131 faugus/launcher.py:5429 faugus/shortcut.py:83
 msgid "No Sleep"
-msgstr ""
+msgstr "Não Dormir"
 
 #: faugus/launcher.py:4132 faugus/launcher.py:5430 faugus/shortcut.py:84
 msgid "Prevents the system from suspending while gaming"
-msgstr ""
+msgstr "Previne o sistema de suspender durante a jogatina"
 
 #: faugus/launcher.py:4134
 msgid "Support the Project"
@@ -576,7 +561,7 @@ msgstr "Você deseja salvar as alterações?"
 
 #: faugus/launcher.py:4760
 msgid "Select a backup file to restore"
-msgstr "Selecione o arquivo de backup para restaurar"
+msgstr "Selecione um arquivo de backup para restaurar"
 
 #: faugus/launcher.py:4766
 msgid "ZIP files"
@@ -653,7 +638,7 @@ msgstr "Caminho"
 
 #: faugus/launcher.py:5376
 msgid "Path to the game executable"
-msgstr "Caminho para o executável"
+msgstr "Caminho para o executável do jogo"
 
 #: faugus/launcher.py:5384
 msgid "Prefix"
@@ -732,9 +717,8 @@ msgid "Vulkan Layer not found"
 msgstr "Vulkan Layer não encontrado"
 
 #: faugus/launcher.py:5991
-#, fuzzy
 msgid "Select an image for the cover"
-msgstr "Selecione uma imagem para o banner"
+msgstr "Selecione uma imagem para a capa"
 
 #: faugus/launcher.py:5992
 msgid "Select an image for the banner"
@@ -761,9 +745,8 @@ msgid "Steam Game"
 msgstr "Jogo da Steam"
 
 #: faugus/launcher.py:6806
-#, fuzzy
 msgid "Select the game executable"
-msgstr "Caminho para o executável"
+msgstr "Selecione o executável do jogo"
 
 #: faugus/proton_manager.py:88
 msgid "Faugus Proton Manager"
@@ -792,9 +775,8 @@ msgid "Starting Steam game..."
 msgstr "Iniciando jogo da Steam..."
 
 #: faugus/runner.py:375
-#, fuzzy
 msgid "Are you enjoying Faugus?"
-msgstr "Tá curtindo o Faugus Launcher?"
+msgstr "Tá curtindo o Faugus?"
 
 #: faugus/runner.py:379
 msgid "Please consider donating"
@@ -802,7 +784,7 @@ msgstr "Por favor considere fazer uma doação"
 
 #: faugus/runner.py:385
 msgid "Never show this message again"
-msgstr "Nunca mais exibir essa mensagem"
+msgstr "Nunca mais exibir esta mensagem"
 
 #: faugus/runner.py:395
 msgid "Continue"
@@ -874,19 +856,20 @@ msgid "Please choose another one."
 msgstr "Por favor escolha outro."
 
 #: faugus/utils.py:855
-#, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\n"
 "MangoHud not found"
 msgstr ""
-"Mostra um overlay para monitorar FPS, temperaturas, carga da CPU/GPU e mais"
+"Mostra um overlay para monitorar FPS, temperaturas, carga da CPU/GPU e mais\n"
+"MangoHud não encontrado"
 
 #: faugus/utils.py:861
-#, fuzzy
 msgid ""
 "Tweaks your system to improve performance\n"
 "GameMode not found"
-msgstr "Ajusta seu sistema para melhorar o desempenho"
+msgstr ""
+"Ajusta seu sistema para melhorar o desempenho\n"
+"GameMode não encontrado"
 
 #: faugus/utils.py:867
 msgid ""
@@ -916,7 +899,7 @@ msgstr "Selecione um comando ou script"
 
 #: faugus/utils.py:1352
 msgid "Pre-launch"
-msgstr ""
+msgstr "Pré-lançamento"
 
 #: faugus/utils.py:1353
 msgid "Command or script to run before the game"
@@ -924,7 +907,7 @@ msgstr "Comando ou script para ser executado antes do jogo"
 
 #: faugus/utils.py:1355
 msgid "Post-launch"
-msgstr ""
+msgstr "Pós-lançamento"
 
 #: faugus/utils.py:1356
 msgid "Command or script to run after the game"
@@ -1003,14 +986,12 @@ msgid "Override the present mode"
 msgstr "Substitui o modo de apresentação"
 
 #: faugus/utils.py:1907
-#, fuzzy
 msgid "Choose a cover"
-msgstr "Escolha um ícone"
+msgstr "Escolha uma capa"
 
 #: faugus/utils.py:1908
-#, fuzzy
 msgid "Choose a banner"
-msgstr "Escolha um ícone"
+msgstr "Escolha um banner"
 
 #: faugus/utils.py:1909
 msgid "Choose an icon"
