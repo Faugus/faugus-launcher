@@ -29,10 +29,10 @@
       <li>Winecfg: Wine's graphical interface to configure Windows versions, libraries, drivers, and integrations.</li>
       <li>MangoHud: Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more.</li>
       <li>Feral GameMode: Tweaks your system to improve performance.</li>
-      <li>Disable Hidraw: May fix controller issues in some games.</li>
+      <li>Prefer SDL: May fix controller issues in some games.</li>
       <li>Additional Application: An additional application to run with the game, like Cheat Engine, Trainers, Mods...</li>
       <li>Lossless Scaling Frame Generation: Create fake frames to increase the framerate.</li>
-      <li>Proton Manager: Download/Remove GE-Proton and Proton-EM builds.</li>
+      <li>Proton Manager: Download/Remove popular Proton builds.</li>
       <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
@@ -90,7 +90,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.0-1" date="2026-07-12">
+    <release version="2.0.0-1" date="2026-07-18">
       <description>
         <ul>
           <li>Faugus 2.0</li>
