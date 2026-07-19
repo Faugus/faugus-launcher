@@ -2651,7 +2651,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         "[Desktop Entry]\n"
                         "Type=Application\n"
                         "Name=Faugus\n"
-                        f"Exec=faugus-launcher{hide_arg}\n"
+                        f"Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}{hide_arg}\n"
                         "Icon=faugus-launcher\n"
                         "Categories=Game;\n"
                         "StartupWMClass=faugus-launcher\n"

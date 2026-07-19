@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
+APPIMAGE_PATH = os.environ.get('APPIMAGE')
 
 FAUGUS_SOURCE_ROOT = str(Path(__file__).resolve().parent.parent)
 
@@ -165,12 +166,16 @@ UMU_RUN = PathManager.user_data('faugus-launcher/umu-run')
 COMPATIBILITY_DIR = Path(PathManager.get_compatibilitytools())
 MANGOHUD_DIR = PathManager.find_binary('mangohud')
 GAMEMODERUN = PathManager.find_binary('gamemoderun')
-LAUNCHER_PATH = PathManager.find_binary('faugus-launcher')
-if LAUNCHER_PATH:
+if APPIMAGE_PATH:
+    LAUNCHER_PATH = APPIMAGE_PATH
     LAUNCHER_MODULE_ARGS = ""
 else:
-    LAUNCHER_PATH = sys.executable
-    LAUNCHER_MODULE_ARGS = "-m faugus.launcher "
+    LAUNCHER_PATH = PathManager.find_binary('faugus-launcher')
+    if LAUNCHER_PATH:
+        LAUNCHER_MODULE_ARGS = ""
+    else:
+        LAUNCHER_PATH = sys.executable
+        LAUNCHER_MODULE_ARGS = "-m faugus.launcher "
 APP_DIR = Path(PathManager.get_applications())
 DESKTOP_DIR = PathManager.user_desktop()
 
