@@ -60,7 +60,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
-        self.entry_game_arguments.set_tooltip_text(_("-d3d11 -fullscreen"))
+        self.entry_game_arguments.set_tooltip_text("-d3d11 -fullscreen")
 
         self.button_launch_settings = Gtk.Button(label=_("Launch Settings"))
         self.button_launch_settings.connect("clicked", self.on_button_launch_settings_clicked)
@@ -78,7 +78,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_shortcut_icon.connect("clicked", self.on_button_shortcut_icon_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
-        self.checkbox_sdl = Gtk.CheckButton(label=_("SDL"))
+        self.checkbox_sdl = Gtk.CheckButton(label="SDL")
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
         self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))

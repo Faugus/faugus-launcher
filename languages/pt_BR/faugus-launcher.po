@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-18 21:39-0300\n"
+"POT-Creation-Date: 2026-07-18 23:53-0300\n"
 "PO-Revision-Date: 2026-07-19 02:45+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
@@ -510,10 +510,6 @@ msgstr "Executar"
 msgid "Run a file in the prefix"
 msgstr "Executa um arquivo no prefixo"
 
-#: faugus/launcher.py:4129 faugus/launcher.py:5427 faugus/shortcut.py:81
-msgid "SDL"
-msgstr "SDL"
-
 #: faugus/launcher.py:4130 faugus/launcher.py:5428 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr "Pode corrigir problemas com o controle em alguns jogos"
@@ -655,10 +651,6 @@ msgstr "Proton"
 #: faugus/launcher.py:5410 faugus/shortcut.py:60
 msgid "Game Arguments"
 msgstr "Argumentos do Jogo"
-
-#: faugus/launcher.py:5413 faugus/shortcut.py:63
-msgid "-d3d11 -fullscreen"
-msgstr "-d3d11 -fullscreen"
 
 #: faugus/launcher.py:5415 faugus/shortcut.py:65 faugus/utils.py:1150
 msgid "Launch Settings"
@@ -1000,6 +992,9 @@ msgstr "Escolha um ícone"
 #: faugus/utils.py:2007
 msgid "No results found"
 msgstr "Nenhum resultado encontrado"
+
+#~ msgid "-d3d11 -fullscreen"
+#~ msgstr "ex.: -d3d11 -fullscreen"
 
 #~ msgid "Run file inside the prefix"
 #~ msgstr "Executar arquivo no prefixo"

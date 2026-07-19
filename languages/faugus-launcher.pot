@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-18 21:39-0300\n"
+"POT-Creation-Date: 2026-07-18 23:53-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -508,10 +508,6 @@ msgstr ""
 msgid "Run a file in the prefix"
 msgstr ""
 
-#: faugus/launcher.py:4129 faugus/launcher.py:5427 faugus/shortcut.py:81
-msgid "SDL"
-msgstr ""
-
 #: faugus/launcher.py:4130 faugus/launcher.py:5428 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr ""
@@ -652,10 +648,6 @@ msgstr ""
 
 #: faugus/launcher.py:5410 faugus/shortcut.py:60
 msgid "Game Arguments"
-msgstr ""
-
-#: faugus/launcher.py:5413 faugus/shortcut.py:63
-msgid "-d3d11 -fullscreen"
 msgstr ""
 
 #: faugus/launcher.py:5415 faugus/shortcut.py:65 faugus/utils.py:1150
