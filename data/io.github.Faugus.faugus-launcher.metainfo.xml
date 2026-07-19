@@ -36,7 +36,7 @@
       <li>Wine Wayland Driver support (Experimental).</li>
       <li>HDR Support (Experimental).</li>
     </ul>
-    <p>Known issue:</p>
+    <p>Flatpak known issue:</p>
     <ul>
       <li>Gamescope doesn't work.</li>
     </ul>
