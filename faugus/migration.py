@@ -446,9 +446,17 @@ def _prompt_backup_destination():
     return result["path"]
 
 
+def _has_existing_faugus_config():
+    config_dir = os.path.realpath(FAUGUS_LAUNCHER_DIR) if os.path.islink(FAUGUS_LAUNCHER_DIR) else FAUGUS_LAUNCHER_DIR
+    return os.path.isfile(os.path.join(config_dir, 'config.ini'))
+
+
 def _backup_before_migration():
     marker = Path(FAUGUS_LAUNCHER_STATE_DIR) / "migration-backup-done"
     if marker.exists():
+        return
+
+    if not _has_existing_faugus_config():
         return
 
     chosen_dir = _prompt_backup_destination()
