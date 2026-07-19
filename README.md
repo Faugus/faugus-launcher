@@ -79,7 +79,7 @@ sudo ninja install
 ```
 ### Dependencies:
 ```
-meson ninja pygobject requests pillow vdf psutil dbus-python gtk4 libadwaita libmanette icoextract
+meson ninja pygobject requests pillow vdf psutil dbus-python icoextract gtk4 libadwaita libmanette
 ```
 
 ## Translations
