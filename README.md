@@ -115,15 +115,41 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 | Power options | Options     | Menu     |
 
 # Screenshots
-### Main window
-<img src=screenshots/main-list.png/><br><br>
-<img src=screenshots/main-blocks.png/><br><br>
-<img src=screenshots/main-banners.png/><br>
-### Add/Edit game
-<img src=screenshots/add-main.png/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=screenshots/add-tools.png/><br>
-### Settings
-<img src=screenshots/settings.png/><br>
-### Proton Manager
-<img src=screenshots/proton-manager.png/><br>
-### Create shortcut from .exe file
-<img src=screenshots/shortcut-file.png/><br>
+
+<details>
+<summary><b>Main window</b></summary>
+<br>
+
+**List**
+<img src=screenshots/main-list.png/>
+
+**Grid**
+<img src=screenshots/main-grid.png/>
+
+**Covers**
+<img src=screenshots/main-covers.png/>
+
+**SteamGridDB**
+<img src=screenshots/main-steamgriddb.png/>
+
+</details>
+
+<details>
+<summary><b>Add/Edit game</b></summary>
+<br>
+<img src=screenshots/add-main.png/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=screenshots/add-tool.png/>
+<br><br>
+<img src=screenshots/launch-settings.png/>
+</details>
+
+<details>
+<summary><b>Settings</b></summary>
+<br>
+<img src=screenshots/settings.png/>
+</details>
+
+<details>
+<summary><b>Proton Manager</b></summary>
+<br>
+<img src=screenshots/proton-manager.png/>
+</details>
