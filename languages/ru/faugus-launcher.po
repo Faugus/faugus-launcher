@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 14:43+0000\n"
+"PO-Revision-Date: 2026-07-20 15:10+0000\n"
 "Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
@@ -162,7 +162,6 @@ msgid "Uncategorized"
 msgstr "Без категории"
 
 #: faugus/launcher.py:877
-#, fuzzy
 msgid "Kill all running games"
 msgstr "Принудительно закрыть все запущенные игры"
 
@@ -283,14 +282,12 @@ msgid "Edit %s"
 msgstr "Редактировать %s"
 
 #: faugus/launcher.py:2995
-#, fuzzy
 msgid "Failed to remove prefix"
-msgstr "Неудалось удалить префикс."
+msgstr "Не удалось удалить префикс"
 
 #: faugus/launcher.py:3230
-#, fuzzy
 msgid "No internet connection"
-msgstr "Нет подключения к интернету."
+msgstr "Нет подключения к интернету"
 
 #: faugus/launcher.py:3306 faugus/launcher.py:3458
 #, python-format
@@ -327,7 +324,7 @@ msgstr "Пожалуйста, не меняйте путь установки."
 
 #: faugus/launcher.py:3476
 msgid "Please close Wargaming to finish the installation."
-msgstr "Пожалуйста, закройте закройте Wargaming для завершения утановки."
+msgstr "Пожалуйста, закройте Wargaming для завершения установки."
 
 #: faugus/launcher.py:3855
 msgid "Settings"
@@ -370,7 +367,6 @@ msgid "Dominant color"
 msgstr "Преобладающий цвет"
 
 #: faugus/launcher.py:3998
-#, fuzzy
 msgid "Banner"
 msgstr "Баннеры"
 
@@ -395,29 +391,24 @@ msgid "Accent Color"
 msgstr "Вспомогательный цвет"
 
 #: faugus/launcher.py:4026
-#, fuzzy
 msgid "Startup Window Size"
-msgstr "Стандартный размер окна"
+msgstr "Размер окна при запуске"
 
 #: faugus/launcher.py:4030
-#, fuzzy
 msgid "Default size"
-msgstr "Стандартный размер окна"
+msgstr "Стандартный размер"
 
 #: faugus/launcher.py:4031
-#, fuzzy
 msgid "Remember size"
-msgstr "Запоминать размер окна"
+msgstr "Запоминать размер"
 
 #: faugus/launcher.py:4032
-#, fuzzy
 msgid "Maximized"
 msgstr "Запускать развёрнутым"
 
 #: faugus/launcher.py:4033
-#, fuzzy
 msgid "Fullscreen"
-msgstr "например: -d3d11 -fullscreen"
+msgstr "Полноэкранный режим"
 
 #: faugus/launcher.py:4034
 msgid "Alt+Enter toggles fullscreen"
@@ -425,7 +416,7 @@ msgstr "Alt+Enter переключает полноэкранный режим"
 
 #: faugus/launcher.py:4036
 msgid "Labels"
-msgstr ""
+msgstr "Названия"
 
 #: faugus/launcher.py:4048
 msgid "Default Prefixes Location"
