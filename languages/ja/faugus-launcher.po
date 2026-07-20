@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 13:07+0000\n"
+"PO-Revision-Date: 2026-07-20 13:27+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ja/>\n"
@@ -86,8 +86,7 @@ msgstr "まだバックアップされていません"
 
 #: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
-msgstr ""
-"プレフィックス (Prefixes) と プロトン (Protons) はバックアップされません！"
+msgstr "プレフィックス (Prefixes) と プロトン (Protons) はバックアップされません！"
 
 #: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5057
 #: faugus/launcher.py:5478 faugus/launcher.py:6029 faugus/shortcut.py:86
@@ -884,8 +883,7 @@ msgstr "別のものを選択してください。"
 #, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
-msgstr ""
-"FPS、温度、CPU/GPUの使用率などを監視するためのオーバーレイを表示します。"
+msgstr "FPS、温度、CPU/GPUの使用率などを監視するためのオーバーレイを表示します。"
 
 #: faugus/utils.py:856
 #, fuzzy
