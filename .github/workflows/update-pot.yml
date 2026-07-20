@@ -15,21 +15,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check translatable strings
+        id: check
+        if: github.event_name == 'push'
+        run: |
+          BEFORE="${{ github.event.before }}"
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only "$BEFORE" HEAD \
+                      -- ':(glob)faugus/**/*.py')
+          if [ -z "$CHANGED" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if echo "$CHANGED" | xargs -d '\n' grep -l '_(' > /dev/null 2>&1; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          for f in $CHANGED; do
+            [ ! -f "$f" ] && echo "skip=false" >> "$GITHUB_OUTPUT" && exit 0
+          done
+          echo "skip=true" >> "$GITHUB_OUTPUT"
 
       - name: Install gettext
+        if: steps.check.outputs.skip != 'true'
         run: sudo apt-get update && sudo apt-get install -y gettext
 
       - name: Regenerate languages/faugus-launcher.pot
+        if: steps.check.outputs.skip != 'true'
         run: |
           xgettext --language=Python --keyword=_ --from-code=UTF-8 \
             --package-name=faugus-launcher \
             --output=languages/faugus-launcher.pot \
             faugus/*.py
 
-      - name: Commit if changed
+      - name: Commit if translatable strings actually changed
+        if: steps.check.outputs.skip != 'true'
         run: |
-          if git diff --quiet -- languages/faugus-launcher.pot; then
-            echo "No string changes, nothing to commit."
+          if diff --ignore-matching-lines='^#:' \
+                   --ignore-matching-lines='^"POT-Creation-Date:' \
+                   <(git show HEAD:languages/faugus-launcher.pot) \
+                   languages/faugus-launcher.pot > /dev/null; then
+            echo "No translatable string changes, nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
