@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-07-20 14:26+0000\n"
-"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: nixxo <nixxo@protonmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -404,7 +404,7 @@ msgstr "Massimizzato"
 
 #: faugus/launcher.py:4033
 msgid "Fullscreen"
-msgstr "Schernio intero"
+msgstr "Schermo intero"
 
 #: faugus/launcher.py:4034
 msgid "Alt+Enter toggles fullscreen"
@@ -852,18 +852,16 @@ msgstr ""
 "altro"
 
 #: faugus/utils.py:856
-#, fuzzy
 msgid "MangoHud not found"
-msgstr "%s non è stato trovato"
+msgstr "MangoHud non trovato"
 
 #: faugus/utils.py:863 faugus/utils.py:871
 msgid "Tweaks your system to improve performance"
 msgstr "Modifica impostazioni del tuo sistema per migliorare le prestazioni"
 
 #: faugus/utils.py:863
-#, fuzzy
 msgid "GameMode not found"
-msgstr "%s non è stato trovato"
+msgstr "GameMode non trovato"
 
 #: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
@@ -970,15 +968,15 @@ msgstr "Modalità Present (sperimentale)"
 
 #: faugus/utils.py:1642
 msgid "Override the present mode"
-msgstr "Sovrascrivi la modalità attuale"
+msgstr "Sovrascrivi la modalità present"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "Chiave API di SteamGridDB non configurata."
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "Aggiungi la tua chiave API nelle Impostazioni."
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
