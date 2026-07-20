@@ -1892,8 +1892,8 @@ def show_steamgriddb_picker(obj, category):
 
     if not api_key:
         show_message_dialog(
-            "No SteamGridDB API key configured.",
-            "Add your API key in Settings first.",
+            _("No SteamGridDB API key configured."),
+            _("Add your API key in Settings first."),
             parent=obj,
         )
         return
