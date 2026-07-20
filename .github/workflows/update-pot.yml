@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths:
       - "faugus/**.py"
-      - "languages/**.po"
+  schedule:
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -25,12 +26,6 @@ jobs:
         run: |
           BEFORE="${{ github.event.before }}"
           if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          PO_CHANGED=$(git diff --name-only "$BEFORE" HEAD \
-                         -- ':(glob)languages/**/*.po')
-          if [ -n "$PO_CHANGED" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -95,4 +90,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add languages/
           git commit -m "Update translation template (faugus-launcher.pot)"
-          git push
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
