@@ -55,12 +55,12 @@ jobs:
             faugus/*.py
 
       - name: Commit if translatable strings actually changed
+        if: steps.check.outputs.skip != 'true'
         run: |
-          if diff <(grep '^msgid ' languages/faugus-launcher.pot \
-                    | grep -v '^msgid ""$' | sort) \
-                  <(git show HEAD:languages/faugus-launcher.pot \
-                    | grep '^msgid ' | grep -v '^msgid ""$' | sort) \
-                  > /dev/null 2>&1; then
+          if diff --ignore-matching-lines='^#:' \
+                   --ignore-matching-lines='^"POT-Creation-Date:' \
+                   <(git show HEAD:languages/faugus-launcher.pot) \
+                   languages/faugus-launcher.pot > /dev/null; then
             echo "No translatable string changes, nothing to commit."
             exit 0
           fi
