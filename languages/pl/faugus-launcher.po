@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 15:10+0000\n"
+"PO-Revision-Date: 2026-07-20 15:14+0000\n"
 "Last-Translator: Łukasz Zając <sec@rbtv.pl>\n"
 "Language-Team: Polish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/pl/>\n"
@@ -267,7 +267,7 @@ msgstr "Aktualnie jest uruchomiony %s."
 
 #: faugus/launcher.py:2597
 msgid "Proton may generate huge log files."
-msgstr "Proton może wygenerować duże pliki dziennika"
+msgstr "Proton może generować duże pliki dziennika"
 
 #: faugus/launcher.py:2598
 msgid "Enable logging only when debugging a problem."
@@ -284,7 +284,7 @@ msgstr "Nie udało się usunąć prefiksu."
 
 #: faugus/launcher.py:3230
 msgid "No internet connection"
-msgstr "Brak połączenia z siecią."
+msgstr "Brak połączenia z siecią"
 
 #: faugus/launcher.py:3306 faugus/launcher.py:3458
 #, python-format
@@ -295,7 +295,7 @@ msgstr "Instalacja %s..."
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
 #: faugus/runner.py:607
 msgid "Downloading"
-msgstr "Pobieranie..."
+msgstr "Pobieranie"
 
 #: faugus/launcher.py:3410
 #, python-format
@@ -857,7 +857,7 @@ msgstr "Nie znaleziono MangoHud"
 
 #: faugus/utils.py:863 faugus/utils.py:871
 msgid "Tweaks your system to improve performance"
-msgstr "Poprawia działanie systemu w celu zwiększenia wydajności."
+msgstr "Poprawia działanie systemu w celu zwiększenia wydajności"
 
 #: faugus/utils.py:863
 msgid "GameMode not found"
@@ -932,16 +932,14 @@ msgid "Multiplier"
 msgstr "Mnożnik"
 
 #: faugus/utils.py:1619
-#, fuzzy
 msgid "Multiply the FPS"
-msgstr "Mnoży FPSy"
+msgstr "Pomnóż FPSy"
 
 #: faugus/utils.py:1621
 msgid "Flow Scale"
 msgstr "Skala gęstości wektorów"
 
 #: faugus/utils.py:1628
-#, fuzzy
 msgid "Lower the internal motion estimation resolution"
 msgstr "Obniża rozdzielczość szacowania ruchu."
 
@@ -950,7 +948,6 @@ msgid "Performance Mode"
 msgstr "Tryb wydajności"
 
 #: faugus/utils.py:1631
-#, fuzzy
 msgid "Massively improve performance at the cost of quality"
 msgstr "Masowo zwiększa wydajność, kosztem jakości."
 
@@ -959,16 +956,14 @@ msgid "HDR Mode"
 msgstr "Tryb HDR"
 
 #: faugus/utils.py:1635
-#, fuzzy
 msgid "Enable special HDR-only behavior"
-msgstr "Włącz specjalne zachowanie przeznaczone wyłącznie dla HDR."
+msgstr "Włącz specjalne zachowanie przeznaczone wyłącznie dla HDR"
 
 #: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
 msgstr "Tryb wyświetlania (eksperymentalne)"
 
 #: faugus/utils.py:1642
-#, fuzzy
 msgid "Override the present mode"
 msgstr "Nadpisz tryb wyświetlania"
 
@@ -981,19 +976,16 @@ msgid "Add your API key in Settings first."
 msgstr "Najpierw dodaj swój klucz API w Ustawieniach."
 
 #: faugus/utils.py:1909
-#, fuzzy
 msgid "Choose a cover"
-msgstr "Ikona w zasobniku"
+msgstr "Wybierz okładkę"
 
 #: faugus/utils.py:1910
-#, fuzzy
 msgid "Choose a banner"
-msgstr "Ikona w zasobniku"
+msgstr "Wybierz baner"
 
 #: faugus/utils.py:1911
-#, fuzzy
 msgid "Choose an icon"
-msgstr "Ikona w zasobniku"
+msgstr "Wybierz ikonę"
 
 #: faugus/utils.py:2009
 msgid "No results found"
