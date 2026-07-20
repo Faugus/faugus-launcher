@@ -90,25 +90,11 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.0-1" date="2026-07-18">
+    <release version="2.0.1-1" date="2026-07-20">
       <description>
-        <p>Faugus 2.0: the app has been ported to GTK4, with a modern UI, better Wayland support, better Flatpak support, and better UI customization.</p>
         <ul>
-          <li>Added a new interface mode: SteamGridDB, which automatically downloads icons, covers and banners from SteamGridDB, with a picker window to manually choose specific assets, title-based suggestions, and an option to set your SteamGridDB API key</li>
-          <li>Added pre-launch and post-launch command/script options</li>
-          <li>Reworked the system tray icon, since ayatana-appindicator doesn't work with GTK4</li>
-          <li>Reworked gamepad navigation to use libmanette instead of pygame, fixing controller issues caused by distros shipping a different SDL version than pygame was built against</li>
-          <li>Added new UI customization options: light/dark theme, accent color, main screen background (default, accent color, or dominant color of the selected cover/icon), and an optional banner on the main screen in SteamGridDB mode</li>
-          <li>Added an option to select the Steam user, so games and Steam shortcuts are scoped to the chosen user</li>
-          <li>Changed file chooser behavior to open the current folder if set, otherwise remember the last used location, falling back to the home folder</li>
-          <li>Improved cover/icon resolution</li>
-          <li>General navigation improvements</li>
-          <li>Code restructuring, refactoring, and cleanup</li>
-          <li>Removed dependencies that were only needed to work around GTK3 limitations</li>
-          <li>Fixed a memory leak</li>
-          <li>Fixed settings occasionally being reset</li>
-          <li>Fixed the Stop/Kill buttons not detecting or closing running games under Flatpak</li>
-          <li>Added an AppImage build</li>
+          <li>Fixed games not launching in some system when Discrete GPU option is enabled</li>
+          <li>Fixed app stuck in the migration screen</li>
         </ul>
       </description>
     </release>
