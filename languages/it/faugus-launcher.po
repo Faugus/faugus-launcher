@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 13:26+0000\n"
-"Last-Translator: nixxo <nixxo@protonmail.com>\n"
+"PO-Revision-Date: 2026-07-20 14:26+0000\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -970,7 +970,7 @@ msgstr "Modalità Present (sperimentale)"
 
 #: faugus/utils.py:1642
 msgid "Override the present mode"
-msgstr "Sovrascrivi la modalità present"
+msgstr "Sovrascrivi la modalità attuale"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
@@ -982,7 +982,7 @@ msgstr ""
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
-msgstr "Sceglere una copertina"
+msgstr "Scegliere una copertina"
 
 #: faugus/utils.py:1910
 msgid "Choose a banner"
