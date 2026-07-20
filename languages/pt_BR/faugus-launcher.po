@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 13:27+0000\n"
+"PO-Revision-Date: 2026-07-20 14:26+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -967,11 +967,11 @@ msgstr "Substitui o modo de apresentação"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "Nenhuma chave SteamGridDB API configurada."
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "Adicione sua chave API nas Configurações primeiro."
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
