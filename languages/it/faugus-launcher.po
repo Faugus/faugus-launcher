@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 11:24+0000\n"
+"POT-Creation-Date: 2026-07-20 12:29+0000\n"
 "PO-Revision-Date: 2026-07-20 11:23+0000\n"
 "Last-Translator: nixxo <nixxo@protonmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -292,7 +292,7 @@ msgstr "Installazione di %s..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:591
+#: faugus/runner.py:595
 msgid "Downloading"
 msgstr "Scaricamento"
 
@@ -759,56 +759,56 @@ msgstr "Scaricamento di %s..."
 msgid "Error during download"
 msgstr "Errore durante lo scaricamento"
 
-#: faugus/runner.py:149
+#: faugus/runner.py:153
 msgid "Starting Steam game..."
 msgstr "Avvio gioco Steam..."
 
-#: faugus/runner.py:375
+#: faugus/runner.py:379
 msgid "Are you enjoying Faugus?"
 msgstr "Ti sta piacendo Faugus?"
 
-#: faugus/runner.py:379
+#: faugus/runner.py:383
 msgid "Please consider donating"
 msgstr "Prendi in considerazione una donazione"
 
-#: faugus/runner.py:385
+#: faugus/runner.py:389
 msgid "Never show this message again"
 msgstr "Non mostrare più questo messaggio"
 
-#: faugus/runner.py:395
+#: faugus/runner.py:399
 msgid "Continue"
 msgstr "Continua"
 
-#: faugus/runner.py:430
+#: faugus/runner.py:434
 msgid "Internet connection error"
 msgstr "Errore connessione internet"
 
-#: faugus/runner.py:432
+#: faugus/runner.py:436
 #, python-format
 msgid "%s was not found"
 msgstr "%s non è stato trovato"
 
-#: faugus/runner.py:433
+#: faugus/runner.py:437
 msgid "Please install it or use another Proton version."
 msgstr "Si prega di installarlo o usare un'altra versione di Proton."
 
-#: faugus/runner.py:565
+#: faugus/runner.py:569
 msgid "Components are up to date"
 msgstr "I componenti sono aggiornati"
 
-#: faugus/runner.py:589
+#: faugus/runner.py:593
 msgid "Updating"
 msgstr "Aggiornamento"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:597
 msgid "Extracting"
 msgstr "Estrazione"
 
-#: faugus/runner.py:599
+#: faugus/runner.py:603
 msgid "is up to date"
 msgstr "è aggiornato"
 
-#: faugus/runner.py:665
+#: faugus/runner.py:669
 msgid "The keys and values were successfully added to the registry."
 msgstr "Le chiavi e i valori sono stati aggiunti con successo al registro."
 

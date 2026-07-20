@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 11:24+0000\n"
+"POT-Creation-Date: 2026-07-20 12:29+0000\n"
 "PO-Revision-Date: 2026-03-12 13:55+0000\n"
 "Last-Translator: Sergiu Bivol <sergiu@cip.md>\n"
 "Language-Team: Romanian <kde-i18n-ro@kde.org>\n"
@@ -301,7 +301,7 @@ msgstr "Se instalează %s…"
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:591
+#: faugus/runner.py:595
 msgid "Downloading"
 msgstr "Se descarcă"
 
@@ -794,60 +794,60 @@ msgstr "Se descarcă %s…"
 msgid "Error during download"
 msgstr "Eroare la descărcare"
 
-#: faugus/runner.py:149
+#: faugus/runner.py:153
 msgid "Starting Steam game..."
 msgstr "Se pornește un joc Steam…"
 
-#: faugus/runner.py:375
+#: faugus/runner.py:379
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Vă place Lansatorul Faugus?"
 
-#: faugus/runner.py:379
+#: faugus/runner.py:383
 msgid "Please consider donating"
 msgstr "Vă rugăm să donați"
 
-#: faugus/runner.py:385
+#: faugus/runner.py:389
 msgid "Never show this message again"
 msgstr "Nu mai arăta acest mesaj niciodată"
 
-#: faugus/runner.py:395
+#: faugus/runner.py:399
 msgid "Continue"
 msgstr "Continuă"
 
-#: faugus/runner.py:430
+#: faugus/runner.py:434
 #, fuzzy
 msgid "Internet connection error"
 msgstr "Eroare de conexiune la Internet."
 
-#: faugus/runner.py:432
+#: faugus/runner.py:436
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s nu a fost găsit."
 
-#: faugus/runner.py:433
+#: faugus/runner.py:437
 msgid "Please install it or use another Proton version."
 msgstr "Instalați-l sau folosiți altă versiune de Proton."
 
-#: faugus/runner.py:565
+#: faugus/runner.py:569
 msgid "Components are up to date"
 msgstr "Componentele sunt la zi"
 
-#: faugus/runner.py:589
+#: faugus/runner.py:593
 msgid "Updating"
 msgstr ""
 
-#: faugus/runner.py:593
+#: faugus/runner.py:597
 #, fuzzy
 msgid "Extracting"
 msgstr "Se extrage…"
 
-#: faugus/runner.py:599
+#: faugus/runner.py:603
 #, fuzzy
 msgid "is up to date"
 msgstr "GE-Proton este la zi"
 
-#: faugus/runner.py:665
+#: faugus/runner.py:669
 msgid "The keys and values were successfully added to the registry."
 msgstr "Cheile și valorile au fost adăugate cu succes la registru."
 

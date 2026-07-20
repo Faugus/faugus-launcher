@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 11:24+0000\n"
+"POT-Creation-Date: 2026-07-20 12:29+0000\n"
 "PO-Revision-Date: 2026-03-23 18:30+0300\n"
 "Last-Translator: Gökay BALCI <g0kkai@duck.com>\n"
 "Language-Team: \n"
@@ -301,7 +301,7 @@ msgstr "%s yükleniyor..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:591
+#: faugus/runner.py:595
 msgid "Downloading"
 msgstr "İndiriliyor"
 
@@ -791,58 +791,58 @@ msgstr "İndiriliyor %s..."
 msgid "Error during download"
 msgstr "İndirme sırasında hata oluştu"
 
-#: faugus/runner.py:149
+#: faugus/runner.py:153
 msgid "Starting Steam game..."
 msgstr "Steam oyunu başlatılıyor..."
 
-#: faugus/runner.py:375
+#: faugus/runner.py:379
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Faugus Launcher'ı kullanmaktan memnun musunuz?"
 
-#: faugus/runner.py:379
+#: faugus/runner.py:383
 msgid "Please consider donating"
 msgstr "Lütfen bağış yapmayı düşünün"
 
-#: faugus/runner.py:385
+#: faugus/runner.py:389
 msgid "Never show this message again"
 msgstr "Bu mesajı bir daha gösterme"
 
-#: faugus/runner.py:395
+#: faugus/runner.py:399
 msgid "Continue"
 msgstr "Devam"
 
-#: faugus/runner.py:430
+#: faugus/runner.py:434
 #, fuzzy
 msgid "Internet connection error"
 msgstr "İnternet bağlantı problemi."
 
-#: faugus/runner.py:432
+#: faugus/runner.py:436
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s bulunamadı."
 
-#: faugus/runner.py:433
+#: faugus/runner.py:437
 msgid "Please install it or use another Proton version."
 msgstr "Lütfen bunu yükleyin veya başka bir Proton sürümü deneyin."
 
-#: faugus/runner.py:565
+#: faugus/runner.py:569
 msgid "Components are up to date"
 msgstr "Bileşenler güncel"
 
-#: faugus/runner.py:589
+#: faugus/runner.py:593
 msgid "Updating"
 msgstr "Güncelleniyor"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:597
 msgid "Extracting"
 msgstr "Ayıklanıyor"
 
-#: faugus/runner.py:599
+#: faugus/runner.py:603
 msgid "is up to date"
 msgstr "güncel"
 
-#: faugus/runner.py:665
+#: faugus/runner.py:669
 msgid "The keys and values were successfully added to the registry."
 msgstr "Anahtarlar ve değerler başarıyla kayıtlara eklendi."
 

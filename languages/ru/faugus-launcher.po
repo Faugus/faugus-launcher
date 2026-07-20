@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 11:24+0000\n"
+"POT-Creation-Date: 2026-07-20 12:29+0000\n"
 "PO-Revision-Date: 2026-07-06 22:55+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -297,7 +297,7 @@ msgstr "Установка %s..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:591
+#: faugus/runner.py:595
 msgid "Downloading"
 msgstr "Загрузка"
 
@@ -792,58 +792,58 @@ msgstr "Загрузка %s..."
 msgid "Error during download"
 msgstr "Ошибка во время загрузки"
 
-#: faugus/runner.py:149
+#: faugus/runner.py:153
 msgid "Starting Steam game..."
 msgstr "Запуск игры Steam..."
 
-#: faugus/runner.py:375
+#: faugus/runner.py:379
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Вам нравится Faugus Launcher?"
 
-#: faugus/runner.py:379
+#: faugus/runner.py:383
 msgid "Please consider donating"
 msgstr "Пожалуйста, поддержите донатом"
 
-#: faugus/runner.py:385
+#: faugus/runner.py:389
 msgid "Never show this message again"
 msgstr "Не показывать снова"
 
-#: faugus/runner.py:395
+#: faugus/runner.py:399
 msgid "Continue"
 msgstr "Продолжить"
 
-#: faugus/runner.py:430
+#: faugus/runner.py:434
 #, fuzzy
 msgid "Internet connection error"
 msgstr "Ошибка интернет соединения."
 
-#: faugus/runner.py:432
+#: faugus/runner.py:436
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s не найден."
 
-#: faugus/runner.py:433
+#: faugus/runner.py:437
 msgid "Please install it or use another Proton version."
 msgstr "Пожалуйста, установите его или используйте другую версию Proton."
 
-#: faugus/runner.py:565
+#: faugus/runner.py:569
 msgid "Components are up to date"
 msgstr "Компоненты не нуждается в обновлении"
 
-#: faugus/runner.py:589
+#: faugus/runner.py:593
 msgid "Updating"
 msgstr "Обновление"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:597
 msgid "Extracting"
 msgstr "Распаковка"
 
-#: faugus/runner.py:599
+#: faugus/runner.py:603
 msgid "is up to date"
 msgstr "не нуждается в обновлении"
 
-#: faugus/runner.py:665
+#: faugus/runner.py:669
 msgid "The keys and values were successfully added to the registry."
 msgstr "Ключи и значения были успешно добавлены в реестр."
 
