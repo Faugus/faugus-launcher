@@ -477,7 +477,7 @@ def _backup_before_migration():
     ):
         real_src = os.path.realpath(src) if os.path.islink(src) else src
         if os.path.isdir(real_src):
-            shutil.copytree(real_src, staging_dir / label)
+            shutil.copytree(real_src, staging_dir / label, symlinks=True)
             dir_snapshots.append({"backup": label, "original": str(src)})
         else:
             clear_only_dirs.append(str(src))
