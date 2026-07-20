@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-20 13:14+0000\n"
-"PO-Revision-Date: 2026-07-20 14:26+0000\n"
+"PO-Revision-Date: 2026-07-20 14:43+0000\n"
 "Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
@@ -338,9 +338,8 @@ msgid "Language"
 msgstr "Язык"
 
 #: faugus/launcher.py:3981
-#, fuzzy
 msgid "Mode"
-msgstr "Режим HDR"
+msgstr "Режим"
 
 #: faugus/launcher.py:3985
 msgid "List"
@@ -364,11 +363,11 @@ msgstr "По умолчанию"
 
 #: faugus/launcher.py:3994
 msgid "Accent color"
-msgstr ""
+msgstr "Вспомогательный цвет"
 
 #: faugus/launcher.py:3995
 msgid "Dominant color"
-msgstr ""
+msgstr "Преобладающий цвет"
 
 #: faugus/launcher.py:3998
 #, fuzzy
@@ -381,19 +380,19 @@ msgstr "Настройка интерфейса"
 
 #: faugus/launcher.py:4003
 msgid "Theme"
-msgstr ""
+msgstr "Тема"
 
 #: faugus/launcher.py:4007
 msgid "Light"
-msgstr ""
+msgstr "Светлая"
 
 #: faugus/launcher.py:4008
 msgid "Dark"
-msgstr ""
+msgstr "Тёмная"
 
 #: faugus/launcher.py:4011
 msgid "Accent Color"
-msgstr ""
+msgstr "Вспомогательный цвет"
 
 #: faugus/launcher.py:4026
 #, fuzzy
