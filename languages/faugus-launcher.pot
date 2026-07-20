@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-19 14:20+0000\n"
+"POT-Creation-Date: 2026-07-20 11:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -622,7 +622,7 @@ msgstr ""
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:5367 faugus/utils.py:1427
+#: faugus/launcher.py:5367 faugus/utils.py:1429
 msgid "Path"
 msgstr ""
 
@@ -646,11 +646,11 @@ msgstr ""
 msgid "Game Arguments"
 msgstr ""
 
-#: faugus/launcher.py:5410 faugus/shortcut.py:65 faugus/utils.py:1150
+#: faugus/launcher.py:5410 faugus/shortcut.py:65 faugus/utils.py:1152
 msgid "Launch Settings"
 msgstr ""
 
-#: faugus/launcher.py:5413 faugus/shortcut.py:68 faugus/utils.py:1399
+#: faugus/launcher.py:5413 faugus/shortcut.py:68 faugus/utils.py:1401
 msgid "Additional Application"
 msgstr ""
 
@@ -658,7 +658,7 @@ msgstr ""
 msgid "Additional application to run with the game"
 msgstr ""
 
-#: faugus/launcher.py:5418 faugus/shortcut.py:73 faugus/utils.py:1525
+#: faugus/launcher.py:5418 faugus/shortcut.py:73 faugus/utils.py:1527
 msgid "Lossless Scaling Frame Generation"
 msgstr ""
 
@@ -841,143 +841,139 @@ msgstr ""
 msgid "Please choose another one."
 msgstr ""
 
-#: faugus/utils.py:855
-msgid ""
-"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\n"
-"MangoHud not found"
-msgstr ""
-
-#: faugus/utils.py:861
-msgid ""
-"Tweaks your system to improve performance\n"
-"GameMode not found"
-msgstr ""
-
-#: faugus/utils.py:867
+#: faugus/utils.py:855 faugus/utils.py:869
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
 msgstr ""
 
-#: faugus/utils.py:869
+#: faugus/utils.py:856
+msgid "MangoHud not found"
+msgstr ""
+
+#: faugus/utils.py:863 faugus/utils.py:871
 msgid "Tweaks your system to improve performance"
 msgstr ""
 
-#: faugus/utils.py:875
+#: faugus/utils.py:863
+msgid "GameMode not found"
+msgstr ""
+
+#: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
 msgstr ""
 
-#: faugus/utils.py:1208
+#: faugus/utils.py:1210
 msgid "Presets"
 msgstr ""
 
-#: faugus/utils.py:1271
+#: faugus/utils.py:1273
 msgid "Launch Arguments"
 msgstr ""
 
-#: faugus/utils.py:1327
+#: faugus/utils.py:1329
 msgid "Select a command or script"
 msgstr ""
 
-#: faugus/utils.py:1352
+#: faugus/utils.py:1354
 msgid "Pre-launch"
 msgstr ""
 
-#: faugus/utils.py:1353
+#: faugus/utils.py:1355
 msgid "Command or script to run before the game"
 msgstr ""
 
-#: faugus/utils.py:1355
+#: faugus/utils.py:1357
 msgid "Post-launch"
 msgstr ""
 
-#: faugus/utils.py:1356
+#: faugus/utils.py:1358
 msgid "Command or script to run after the game"
 msgstr ""
 
-#: faugus/utils.py:1423 faugus/utils.py:1608
+#: faugus/utils.py:1425 faugus/utils.py:1610
 msgid "Enable"
 msgstr ""
 
-#: faugus/utils.py:1432
+#: faugus/utils.py:1434
 msgid "Path to the application"
 msgstr ""
 
-#: faugus/utils.py:1444
+#: faugus/utils.py:1446
 msgid "Select an additional application"
 msgstr ""
 
-#: faugus/utils.py:1461
+#: faugus/utils.py:1463
 msgid "Delay (seconds)"
 msgstr ""
 
-#: faugus/utils.py:1474
+#: faugus/utils.py:1476
 msgid "Run the application first"
 msgstr ""
 
-#: faugus/utils.py:1559
+#: faugus/utils.py:1561
 msgid "Lossless Scaling Location"
 msgstr ""
 
-#: faugus/utils.py:1567
+#: faugus/utils.py:1569
 msgid "Lossless.dll location"
 msgstr ""
 
-#: faugus/utils.py:1579
+#: faugus/utils.py:1581
 msgid "Select the Lossless.dll file"
 msgstr ""
 
-#: faugus/utils.py:1612
+#: faugus/utils.py:1614
 msgid "Multiplier"
 msgstr ""
 
-#: faugus/utils.py:1617
+#: faugus/utils.py:1619
 msgid "Multiply the FPS"
 msgstr ""
 
-#: faugus/utils.py:1619
+#: faugus/utils.py:1621
 msgid "Flow Scale"
 msgstr ""
 
-#: faugus/utils.py:1626
+#: faugus/utils.py:1628
 msgid "Lower the internal motion estimation resolution"
 msgstr ""
 
-#: faugus/utils.py:1628
+#: faugus/utils.py:1630
 msgid "Performance Mode"
 msgstr ""
 
-#: faugus/utils.py:1629
+#: faugus/utils.py:1631
 msgid "Massively improve performance at the cost of quality"
 msgstr ""
 
-#: faugus/utils.py:1632
+#: faugus/utils.py:1634
 msgid "HDR Mode"
 msgstr ""
 
-#: faugus/utils.py:1633
+#: faugus/utils.py:1635
 msgid "Enable special HDR-only behavior"
 msgstr ""
 
-#: faugus/utils.py:1636
+#: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
 msgstr ""
 
-#: faugus/utils.py:1640
+#: faugus/utils.py:1642
 msgid "Override the present mode"
 msgstr ""
 
-#: faugus/utils.py:1907
+#: faugus/utils.py:1909
 msgid "Choose a cover"
 msgstr ""
 
-#: faugus/utils.py:1908
+#: faugus/utils.py:1910
 msgid "Choose a banner"
 msgstr ""
 
-#: faugus/utils.py:1909
+#: faugus/utils.py:1911
 msgid "Choose an icon"
 msgstr ""
 
-#: faugus/utils.py:2007
+#: faugus/utils.py:2009
 msgid "No results found"
 msgstr ""
