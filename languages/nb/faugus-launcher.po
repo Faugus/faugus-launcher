@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-18 23:53-0300\n"
+"POT-Creation-Date: 2026-07-20 11:24+0000\n"
 "PO-Revision-Date: 2026-04-30 09:57-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -84,23 +84,19 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:261 faugus/backup.py:353
-msgid "Last backup:"
-msgstr ""
-
-#: faugus/backup.py:265 faugus/backup.py:266
+#: faugus/backup.py:265
 #, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix og kjører vil ikke bli sikkerhetskopiert!"
 
-#: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5062
-#: faugus/launcher.py:5483 faugus/launcher.py:6034 faugus/shortcut.py:86
+#: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5057
+#: faugus/launcher.py:5478 faugus/launcher.py:6029 faugus/shortcut.py:86
 #: faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: faugus/backup.py:273 faugus/launcher.py:4144 faugus/launcher.py:4839
-#: faugus/launcher.py:5066 faugus/launcher.py:5487 faugus/launcher.py:6030
+#: faugus/backup.py:273 faugus/launcher.py:4144 faugus/launcher.py:4834
+#: faugus/launcher.py:5061 faugus/launcher.py:5482 faugus/launcher.py:6025
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "Ok"
@@ -247,7 +243,7 @@ msgstr "minutt"
 msgid "minutes"
 msgstr "minutter"
 
-#: faugus/launcher.py:1980 faugus/launcher.py:4706 faugus/launcher.py:6594
+#: faugus/launcher.py:1980 faugus/launcher.py:4701 faugus/launcher.py:6589
 #, fuzzy
 msgid "Select a file to run in the prefix"
 msgstr "Velg fil som skal kjøres i prefix-miljø"
@@ -525,24 +521,24 @@ msgstr "Bruk Wayland driver (eksperimentell)"
 msgid "WOW64 (experimental)"
 msgstr "Aktiver WOW64 (Eksperimentell)"
 
-#: faugus/launcher.py:4123 faugus/launcher.py:5440
+#: faugus/launcher.py:4123 faugus/launcher.py:5435
 msgid "Run"
 msgstr "Kjør"
 
-#: faugus/launcher.py:4126 faugus/launcher.py:5443
+#: faugus/launcher.py:4126 faugus/launcher.py:5438
 #, fuzzy
 msgid "Run a file in the prefix"
 msgstr "Kjør en fil i prefix-miljø"
 
-#: faugus/launcher.py:4130 faugus/launcher.py:5428 faugus/shortcut.py:82
+#: faugus/launcher.py:4130 faugus/launcher.py:5423 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr ""
 
-#: faugus/launcher.py:4131 faugus/launcher.py:5429 faugus/shortcut.py:83
+#: faugus/launcher.py:4131 faugus/launcher.py:5424 faugus/shortcut.py:83
 msgid "No Sleep"
 msgstr ""
 
-#: faugus/launcher.py:4132 faugus/launcher.py:5430 faugus/shortcut.py:84
+#: faugus/launcher.py:4132 faugus/launcher.py:5425 faugus/shortcut.py:84
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
 
@@ -566,211 +562,211 @@ msgstr "Gjenopprett"
 msgid "Global Environment Variables"
 msgstr "Globale miljøvariabler"
 
-#: faugus/launcher.py:4420
+#: faugus/launcher.py:4415
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Tøm logg (%s)"
 
-#: faugus/launcher.py:4423
+#: faugus/launcher.py:4418
 msgid "Clear Logs"
 msgstr "Tøm logg"
 
-#: faugus/launcher.py:4650
+#: faugus/launcher.py:4645
 msgid "Do you want to save the changes?"
 msgstr "Vil du lagre endringene?"
 
-#: faugus/launcher.py:4760
+#: faugus/launcher.py:4755
 msgid "Select a backup file to restore"
 msgstr "Velg sikkerhetskopi for gjenoppretting"
 
-#: faugus/launcher.py:4766
+#: faugus/launcher.py:4761
 msgid "ZIP files"
 msgstr "ZIP-filer"
 
-#: faugus/launcher.py:4781 faugus/launcher.py:4791
+#: faugus/launcher.py:4776 faugus/launcher.py:4786
 #, fuzzy
 msgid "This is not a valid Faugus backup file."
 msgstr "Valgt sikkerhetskopi er ikke kompatibel med Faugus Launcher."
 
-#: faugus/launcher.py:4830
+#: faugus/launcher.py:4825
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Sikker på at du vil overskrive konfigurasjon?"
 
-#: faugus/launcher.py:4839 faugus/launcher.py:5130
+#: faugus/launcher.py:4834 faugus/launcher.py:5125
 msgid "Yes"
 msgstr "Ja"
 
-#: faugus/launcher.py:4840 faugus/launcher.py:5126
+#: faugus/launcher.py:4835 faugus/launcher.py:5121
 msgid "No"
 msgstr "Nei"
 
-#: faugus/launcher.py:4847 faugus/launcher.py:6837
+#: faugus/launcher.py:4842 faugus/launcher.py:6832
 msgid "Select a prefix location"
 msgstr "Velg prefix-lokasjon"
 
-#: faugus/launcher.py:5051
+#: faugus/launcher.py:5046
 #, python-format
 msgid "Duplicate %s"
 msgstr "Dupliser %s"
 
-#: faugus/launcher.py:5056 faugus/launcher.py:5307 faugus/launcher.py:5320
+#: faugus/launcher.py:5051 faugus/launcher.py:5302 faugus/launcher.py:5315
 #: faugus/shortcut.py:43
 msgid "Title"
 msgstr "Tittel"
 
-#: faugus/launcher.py:5102
+#: faugus/launcher.py:5097
 #, python-format
 msgid "Delete %s"
 msgstr "Slett %s"
 
-#: faugus/launcher.py:5109
+#: faugus/launcher.py:5104
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Er du sikker på du vil slette %s?"
 
-#: faugus/launcher.py:5118
+#: faugus/launcher.py:5113
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "ADVARSEL: Prefix er brukt av %d andre spill."
 
-#: faugus/launcher.py:5120
+#: faugus/launcher.py:5115
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "ADVARSEL: Prefix er brukt av 1 annet spill."
 
-#: faugus/launcher.py:5134
+#: faugus/launcher.py:5129
 msgid "Also remove the prefix:"
 msgstr "Fjern også prefix:"
 
-#: faugus/launcher.py:5181
+#: faugus/launcher.py:5176
 msgid "New Game/App"
 msgstr "Nytt Spill/Applikasjon"
 
-#: faugus/launcher.py:5290
+#: faugus/launcher.py:5285
 #, fuzzy
 msgid "Steam User"
 msgstr "Steam-spill"
 
-#: faugus/launcher.py:5304 faugus/launcher.py:5828 faugus/launcher.py:5830
+#: faugus/launcher.py:5299 faugus/launcher.py:5823 faugus/launcher.py:5825
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:5372 faugus/utils.py:1427
+#: faugus/launcher.py:5367 faugus/utils.py:1429
 msgid "Path"
 msgstr "Bane"
 
-#: faugus/launcher.py:5376
+#: faugus/launcher.py:5371
 msgid "Path to the game executable"
 msgstr ""
 
-#: faugus/launcher.py:5384
+#: faugus/launcher.py:5379
 msgid "Prefix"
 msgstr "Prefix"
 
-#: faugus/launcher.py:5388
+#: faugus/launcher.py:5383
 #, fuzzy
 msgid "Path to the prefix"
 msgstr "/bane/til/prefix"
 
-#: faugus/launcher.py:5396
+#: faugus/launcher.py:5391
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/launcher.py:5410 faugus/shortcut.py:60
+#: faugus/launcher.py:5405 faugus/shortcut.py:60
 msgid "Game Arguments"
 msgstr "Spillargumenter"
 
-#: faugus/launcher.py:5415 faugus/shortcut.py:65 faugus/utils.py:1150
+#: faugus/launcher.py:5410 faugus/shortcut.py:65 faugus/utils.py:1152
 #, fuzzy
 msgid "Launch Settings"
 msgstr "Konfigurasjon"
 
-#: faugus/launcher.py:5418 faugus/shortcut.py:68 faugus/utils.py:1399
+#: faugus/launcher.py:5413 faugus/shortcut.py:68 faugus/utils.py:1401
 msgid "Additional Application"
 msgstr "Tilleggsapplikasjon"
 
-#: faugus/launcher.py:5421 faugus/shortcut.py:71
+#: faugus/launcher.py:5416 faugus/shortcut.py:71
 #, fuzzy
 msgid "Additional application to run with the game"
 msgstr ""
 "En ekstra applikasjon som samkjres med spillet, som Cheat Engine, Trainers, "
 "Mods..."
 
-#: faugus/launcher.py:5423 faugus/shortcut.py:73 faugus/utils.py:1525
+#: faugus/launcher.py:5418 faugus/shortcut.py:73 faugus/utils.py:1527
 msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling Frame Generation"
 
-#: faugus/launcher.py:5445
+#: faugus/launcher.py:5440
 msgid "Shortcut"
 msgstr "Snarvei"
 
-#: faugus/launcher.py:5450
+#: faugus/launcher.py:5445
 msgid "Desktop"
 msgstr "Skrivebord"
 
-#: faugus/launcher.py:5451
+#: faugus/launcher.py:5446
 msgid "App Menu"
 msgstr "Applikasjonsmeny"
 
-#: faugus/launcher.py:5452
+#: faugus/launcher.py:5447
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:5653
+#: faugus/launcher.py:5648
 msgid "Refresh"
 msgstr "Oppdater"
 
-#: faugus/launcher.py:5656
+#: faugus/launcher.py:5651
 msgid "Load from file"
 msgstr "Last fra fil"
 
-#: faugus/launcher.py:5659
+#: faugus/launcher.py:5654
 msgid "Load from URL"
 msgstr "Last fra URL"
 
-#: faugus/launcher.py:5664
+#: faugus/launcher.py:5659
 msgid "Game/App"
 msgstr "Spill/Applikasjon"
 
-#: faugus/launcher.py:5681
+#: faugus/launcher.py:5676
 msgid "Tools"
 msgstr "Verktøy"
 
-#: faugus/launcher.py:5836 faugus/shortcut.py:190
+#: faugus/launcher.py:5831 faugus/shortcut.py:190
 #, fuzzy
 msgid "Vulkan Layer not found"
 msgstr "%s ble ikke funnet."
 
-#: faugus/launcher.py:5991
+#: faugus/launcher.py:5986
 #, fuzzy
 msgid "Select an image for the cover"
 msgstr "Velg bilde for bruk til banner"
 
-#: faugus/launcher.py:5992
+#: faugus/launcher.py:5987
 msgid "Select an image for the banner"
 msgstr "Velg bilde for bruk til banner"
 
-#: faugus/launcher.py:5993
+#: faugus/launcher.py:5988
 #, fuzzy
 msgid "Select an image for the icon"
 msgstr "Velg bilde for bruk til banner"
 
-#: faugus/launcher.py:6023
+#: faugus/launcher.py:6018
 msgid "Enter the image URL"
 msgstr "Fyll ut bilde-URL"
 
-#: faugus/launcher.py:6564
+#: faugus/launcher.py:6559
 msgid "Windows Game"
 msgstr "Windows-spill"
 
-#: faugus/launcher.py:6565
+#: faugus/launcher.py:6560
 msgid "Linux Game"
 msgstr "Linux-spill"
 
-#: faugus/launcher.py:6566
+#: faugus/launcher.py:6561
 msgid "Steam Game"
 msgstr "Steam-spill"
 
-#: faugus/launcher.py:6806
+#: faugus/launcher.py:6801
 #, fuzzy
 msgid "Select the game executable"
 msgstr "Velg spillets .exe"
@@ -885,23 +881,7 @@ msgstr "Valgt fil er ikke et støttet bilde."
 msgid "Please choose another one."
 msgstr "Vennligst velg ny."
 
-#: faugus/utils.py:855
-#, fuzzy
-msgid ""
-"Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\n"
-"MangoHud not found"
-msgstr ""
-"Vis monitoreringsvindu for overvåkning av FPS, temperatur, CPU/GPU-"
-"ressursbruk med mer."
-
-#: faugus/utils.py:861
-#, fuzzy
-msgid ""
-"Tweaks your system to improve performance\n"
-"GameMode not found"
-msgstr "Konfigurer system for å forbedre prestasjon."
-
-#: faugus/utils.py:867
+#: faugus/utils.py:855 faugus/utils.py:869
 #, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
@@ -909,141 +889,165 @@ msgstr ""
 "Vis monitoreringsvindu for overvåkning av FPS, temperatur, CPU/GPU-"
 "ressursbruk med mer."
 
-#: faugus/utils.py:869
+#: faugus/utils.py:856
+#, fuzzy
+msgid "MangoHud not found"
+msgstr "%s ble ikke funnet."
+
+#: faugus/utils.py:863 faugus/utils.py:871
 #, fuzzy
 msgid "Tweaks your system to improve performance"
 msgstr "Konfigurer system for å forbedre prestasjon."
 
-#: faugus/utils.py:875
+#: faugus/utils.py:863
+#, fuzzy
+msgid "GameMode not found"
+msgstr "%s ble ikke funnet."
+
+#: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
 msgstr "Velg ikon for snarvei"
 
-#: faugus/utils.py:1208
+#: faugus/utils.py:1210
 msgid "Presets"
 msgstr ""
 
-#: faugus/utils.py:1271
+#: faugus/utils.py:1273
 msgid "Launch Arguments"
 msgstr "Kjøringsargumenter"
 
-#: faugus/utils.py:1327
+#: faugus/utils.py:1329
 #, fuzzy
 msgid "Select a command or script"
 msgstr "Velg ikon for snarvei"
 
-#: faugus/utils.py:1352
+#: faugus/utils.py:1354
 msgid "Pre-launch"
 msgstr ""
 
-#: faugus/utils.py:1353
+#: faugus/utils.py:1355
 msgid "Command or script to run before the game"
 msgstr ""
 
-#: faugus/utils.py:1355
+#: faugus/utils.py:1357
 msgid "Post-launch"
 msgstr ""
 
-#: faugus/utils.py:1356
+#: faugus/utils.py:1358
 msgid "Command or script to run after the game"
 msgstr ""
 
-#: faugus/utils.py:1423 faugus/utils.py:1608
+#: faugus/utils.py:1425 faugus/utils.py:1610
 msgid "Enable"
 msgstr "Aktiver"
 
-#: faugus/utils.py:1432
+#: faugus/utils.py:1434
 #, fuzzy
 msgid "Path to the application"
 msgstr "Kjør applikasjon først"
 
-#: faugus/utils.py:1444
+#: faugus/utils.py:1446
 msgid "Select an additional application"
 msgstr "Velg tilleggsapplikasjon"
 
-#: faugus/utils.py:1461
+#: faugus/utils.py:1463
 msgid "Delay (seconds)"
 msgstr "Forsinkelse (sekunder)"
 
-#: faugus/utils.py:1474
+#: faugus/utils.py:1476
 msgid "Run the application first"
 msgstr "Kjør applikasjon først"
 
-#: faugus/utils.py:1559
+#: faugus/utils.py:1561
 msgid "Lossless Scaling Location"
 msgstr "Lokasjon for tapsfri skalering"
 
-#: faugus/utils.py:1567
+#: faugus/utils.py:1569
 #, fuzzy
 msgid "Lossless.dll location"
 msgstr "Lokasjon for tapsfri skalering"
 
-#: faugus/utils.py:1579
+#: faugus/utils.py:1581
 msgid "Select the Lossless.dll file"
 msgstr "Velg Lossless.dll-fil"
 
-#: faugus/utils.py:1612
+#: faugus/utils.py:1614
 msgid "Multiplier"
 msgstr "Multiplikator"
 
-#: faugus/utils.py:1617
+#: faugus/utils.py:1619
 #, fuzzy
 msgid "Multiply the FPS"
 msgstr "Multipliser FPS."
 
-#: faugus/utils.py:1619
+#: faugus/utils.py:1621
 msgid "Flow Scale"
 msgstr "Flow Scale"
 
-#: faugus/utils.py:1626
+#: faugus/utils.py:1628
 #, fuzzy
 msgid "Lower the internal motion estimation resolution"
 msgstr "Senk estimat for intern bevegelsesoppløsning."
 
-#: faugus/utils.py:1628
+#: faugus/utils.py:1630
 msgid "Performance Mode"
 msgstr "Prestasjonsmodus"
 
-#: faugus/utils.py:1629
+#: faugus/utils.py:1631
 #, fuzzy
 msgid "Massively improve performance at the cost of quality"
 msgstr "Forbedre ytelse på bekostning av kvalitet."
 
-#: faugus/utils.py:1632
+#: faugus/utils.py:1634
 msgid "HDR Mode"
 msgstr "HDR-modus"
 
-#: faugus/utils.py:1633
+#: faugus/utils.py:1635
 #, fuzzy
 msgid "Enable special HDR-only behavior"
 msgstr "Aktiver spesiell oppførsel for HDR"
 
-#: faugus/utils.py:1636
+#: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
 msgstr "Presentasjonsmodus (Eksperimentell)"
 
-#: faugus/utils.py:1640
+#: faugus/utils.py:1642
 #, fuzzy
 msgid "Override the present mode"
 msgstr "Overstyr presentasjonsmodus."
 
-#: faugus/utils.py:1907
+#: faugus/utils.py:1909
 #, fuzzy
 msgid "Choose a cover"
 msgstr "Verktøyslinjeikon"
 
-#: faugus/utils.py:1908
+#: faugus/utils.py:1910
 #, fuzzy
 msgid "Choose a banner"
 msgstr "Verktøyslinjeikon"
 
-#: faugus/utils.py:1909
+#: faugus/utils.py:1911
 #, fuzzy
 msgid "Choose an icon"
 msgstr "Verktøyslinjeikon"
 
-#: faugus/utils.py:2007
+#: faugus/utils.py:2009
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~ msgid ""
+#~ "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\n"
+#~ "MangoHud not found"
+#~ msgstr ""
+#~ "Vis monitoreringsvindu for overvåkning av FPS, temperatur, CPU/GPU-"
+#~ "ressursbruk med mer."
+
+#, fuzzy
+#~ msgid ""
+#~ "Tweaks your system to improve performance\n"
+#~ "GameMode not found"
+#~ msgstr "Konfigurer system for å forbedre prestasjon."
 
 #~ msgid "-d3d11 -fullscreen"
 #~ msgstr "f.eks: -d3d11 -fullscreen"
