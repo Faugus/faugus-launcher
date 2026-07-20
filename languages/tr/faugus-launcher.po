@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 12:29+0000\n"
+"POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-03-23 18:30+0300\n"
 "Last-Translator: Gökay BALCI <g0kkai@duck.com>\n"
 "Language-Team: \n"
@@ -301,7 +301,7 @@ msgstr "%s yükleniyor..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:595
+#: faugus/runner.py:607
 msgid "Downloading"
 msgstr "İndiriliyor"
 
@@ -791,58 +791,58 @@ msgstr "İndiriliyor %s..."
 msgid "Error during download"
 msgstr "İndirme sırasında hata oluştu"
 
-#: faugus/runner.py:153
+#: faugus/runner.py:162
 msgid "Starting Steam game..."
 msgstr "Steam oyunu başlatılıyor..."
 
-#: faugus/runner.py:379
+#: faugus/runner.py:391
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Faugus Launcher'ı kullanmaktan memnun musunuz?"
 
-#: faugus/runner.py:383
+#: faugus/runner.py:395
 msgid "Please consider donating"
 msgstr "Lütfen bağış yapmayı düşünün"
 
-#: faugus/runner.py:389
+#: faugus/runner.py:401
 msgid "Never show this message again"
 msgstr "Bu mesajı bir daha gösterme"
 
-#: faugus/runner.py:399
+#: faugus/runner.py:411
 msgid "Continue"
 msgstr "Devam"
 
-#: faugus/runner.py:434
+#: faugus/runner.py:446
 #, fuzzy
 msgid "Internet connection error"
 msgstr "İnternet bağlantı problemi."
 
-#: faugus/runner.py:436
+#: faugus/runner.py:448
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s bulunamadı."
 
-#: faugus/runner.py:437
+#: faugus/runner.py:449
 msgid "Please install it or use another Proton version."
 msgstr "Lütfen bunu yükleyin veya başka bir Proton sürümü deneyin."
 
-#: faugus/runner.py:569
+#: faugus/runner.py:581
 msgid "Components are up to date"
 msgstr "Bileşenler güncel"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:605
 msgid "Updating"
 msgstr "Güncelleniyor"
 
-#: faugus/runner.py:597
+#: faugus/runner.py:609
 msgid "Extracting"
 msgstr "Ayıklanıyor"
 
-#: faugus/runner.py:603
+#: faugus/runner.py:615
 msgid "is up to date"
 msgstr "güncel"
 
-#: faugus/runner.py:669
+#: faugus/runner.py:681
 msgid "The keys and values were successfully added to the registry."
 msgstr "Anahtarlar ve değerler başarıyla kayıtlara eklendi."
 
@@ -1013,6 +1013,14 @@ msgstr "Sunum Modu (deneysel)"
 #, fuzzy
 msgid "Override the present mode"
 msgstr "Sunum modunu devre dışı bırak"
+
+#: faugus/utils.py:1895
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1896
+msgid "Add your API key in Settings first."
+msgstr ""
 
 #: faugus/utils.py:1909
 #, fuzzy

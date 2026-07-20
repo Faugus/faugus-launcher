@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 12:29+0000\n"
+"POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-07-20 11:23+0000\n"
 "Last-Translator: Hosted Weblate user 158752 <mistahl@users.noreply.hosted."
 "weblate.org>\n"
@@ -300,7 +300,7 @@ msgstr "Installiere %s..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:595
+#: faugus/runner.py:607
 msgid "Downloading"
 msgstr "Lädt herunter"
 
@@ -796,59 +796,59 @@ msgstr "%s wird heruntergeladen..."
 msgid "Error during download"
 msgstr "Fehler beim Herunterladen"
 
-#: faugus/runner.py:153
+#: faugus/runner.py:162
 msgid "Starting Steam game..."
 msgstr "Starte Steam-Spiel..."
 
-#: faugus/runner.py:379
+#: faugus/runner.py:391
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Gefällt dir der Faugus Launcher?"
 
-#: faugus/runner.py:383
+#: faugus/runner.py:395
 msgid "Please consider donating"
 msgstr "Bitte eine Spende erwägen"
 
-#: faugus/runner.py:389
+#: faugus/runner.py:401
 msgid "Never show this message again"
 msgstr "Diese Meldung nicht mehr anzeigen"
 
-#: faugus/runner.py:399
+#: faugus/runner.py:411
 msgid "Continue"
 msgstr "Weiter"
 
-#: faugus/runner.py:434
+#: faugus/runner.py:446
 #, fuzzy
 msgid "Internet connection error"
 msgstr "Fehler bei der Internetverbindung."
 
-#: faugus/runner.py:436
+#: faugus/runner.py:448
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s wurde nicht gefunden."
 
-#: faugus/runner.py:437
+#: faugus/runner.py:449
 msgid "Please install it or use another Proton version."
 msgstr ""
 "Bitte installieren Sie es oder verwenden Sie eine andere Proton-Version."
 
-#: faugus/runner.py:569
+#: faugus/runner.py:581
 msgid "Components are up to date"
 msgstr "Komponenten sind auf dem neuesten Stand"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:605
 msgid "Updating"
 msgstr "Aktualisiere"
 
-#: faugus/runner.py:597
+#: faugus/runner.py:609
 msgid "Extracting"
 msgstr "Extrahiere"
 
-#: faugus/runner.py:603
+#: faugus/runner.py:615
 msgid "is up to date"
 msgstr "ist auf dem neusten Stand"
 
-#: faugus/runner.py:669
+#: faugus/runner.py:681
 msgid "The keys and values were successfully added to the registry."
 msgstr ""
 "Die Schlüssel und Werte wurden erfolgreich zur Registrierung hinzugefügt."
@@ -1020,6 +1020,14 @@ msgstr "Present‑Modus (experimentell)"
 #, fuzzy
 msgid "Override the present mode"
 msgstr "Überschreibe den Present-Mudus."
+
+#: faugus/utils.py:1895
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1896
+msgid "Add your API key in Settings first."
+msgstr ""
 
 #: faugus/utils.py:1909
 #, fuzzy

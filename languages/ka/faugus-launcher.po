@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 12:29+0000\n"
+"POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-03-18 04:45+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
@@ -300,7 +300,7 @@ msgstr "მიმდინარეობს %s-ის დაყენება.
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:595
+#: faugus/runner.py:607
 msgid "Downloading"
 msgstr "გადმოწერა"
 
@@ -792,60 +792,60 @@ msgstr "%s-ის გადმოწერა..."
 msgid "Error during download"
 msgstr "შეცდომა გადმოწერისას"
 
-#: faugus/runner.py:153
+#: faugus/runner.py:162
 msgid "Starting Steam game..."
 msgstr "Steam-ის თამაშის გაშვება..."
 
-#: faugus/runner.py:379
+#: faugus/runner.py:391
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "მოგწონთ Faugus Launcher?"
 
-#: faugus/runner.py:383
+#: faugus/runner.py:395
 msgid "Please consider donating"
 msgstr "იფიქრეთ, შემოგვწიროთ"
 
-#: faugus/runner.py:389
+#: faugus/runner.py:401
 msgid "Never show this message again"
 msgstr "აღარ მაჩვენო ეს შეტყობინება"
 
-#: faugus/runner.py:399
+#: faugus/runner.py:411
 msgid "Continue"
 msgstr "გაგრძელება"
 
-#: faugus/runner.py:434
+#: faugus/runner.py:446
 #, fuzzy
 msgid "Internet connection error"
 msgstr "ინტერნეტთან დაკავშირების შეცდომა."
 
-#: faugus/runner.py:436
+#: faugus/runner.py:448
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s აღმოჩენილი არაა."
 
-#: faugus/runner.py:437
+#: faugus/runner.py:449
 msgid "Please install it or use another Proton version."
 msgstr "დააყენეთ ის, ან გამოიყენეთ Proton-ის სხვა ვერსია."
 
-#: faugus/runner.py:569
+#: faugus/runner.py:581
 msgid "Components are up to date"
 msgstr "კომპონენტები განახლებულია"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:605
 msgid "Updating"
 msgstr ""
 
-#: faugus/runner.py:597
+#: faugus/runner.py:609
 #, fuzzy
 msgid "Extracting"
 msgstr "გაშლა..."
 
-#: faugus/runner.py:603
+#: faugus/runner.py:615
 #, fuzzy
 msgid "is up to date"
 msgstr "GE-Proton განახლებულია"
 
-#: faugus/runner.py:669
+#: faugus/runner.py:681
 msgid "The keys and values were successfully added to the registry."
 msgstr "გასაღებები და მნიშვნელობები წარმატებით დაემატა რეესტრს."
 
@@ -1014,6 +1014,14 @@ msgstr "პრეზენტაციის რეჟიმი (ექსპე
 #, fuzzy
 msgid "Override the present mode"
 msgstr "პრეზენტაციის რეჟიმის გადაფარვა."
+
+#: faugus/utils.py:1895
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1896
+msgid "Add your API key in Settings first."
+msgstr ""
 
 #: faugus/utils.py:1909
 #, fuzzy

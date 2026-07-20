@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 12:29+0000\n"
+"POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-02-23 23:11+0330\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -302,7 +302,7 @@ msgstr "در حال نصب کردن %s..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:595
+#: faugus/runner.py:607
 #, fuzzy
 msgid "Downloading"
 msgstr "در حال دانلود..."
@@ -797,60 +797,60 @@ msgstr "در حال دانلود %s..."
 msgid "Error during download"
 msgstr "در هنگام دانلود %s مشکلی پیش آمد"
 
-#: faugus/runner.py:153
+#: faugus/runner.py:162
 msgid "Starting Steam game..."
 msgstr "در حال باز کردن گیم استیم..."
 
-#: faugus/runner.py:379
+#: faugus/runner.py:391
 msgid "Are you enjoying Faugus?"
 msgstr ""
 
-#: faugus/runner.py:383
+#: faugus/runner.py:395
 #, fuzzy
 msgid "Please consider donating"
 msgstr "لطفا یک مورد دیگر انتخاب کنید."
 
-#: faugus/runner.py:389
+#: faugus/runner.py:401
 msgid "Never show this message again"
 msgstr ""
 
-#: faugus/runner.py:399
+#: faugus/runner.py:411
 msgid "Continue"
 msgstr ""
 
-#: faugus/runner.py:434
+#: faugus/runner.py:446
 #, fuzzy
 msgid "Internet connection error"
 msgstr "خطای در به اینترنت."
 
-#: faugus/runner.py:436
+#: faugus/runner.py:448
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s یافت نشد."
 
-#: faugus/runner.py:437
+#: faugus/runner.py:449
 msgid "Please install it or use another Proton version."
 msgstr "لطفاً آن را نصب کنید یا از نسخه پروتون دیگری استفاده کنید."
 
-#: faugus/runner.py:569
+#: faugus/runner.py:581
 msgid "Components are up to date"
 msgstr "همه پیش نیاز ها بروز هستند"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:605
 msgid "Updating"
 msgstr ""
 
-#: faugus/runner.py:597
+#: faugus/runner.py:609
 #, fuzzy
 msgid "Extracting"
 msgstr "در حال استخراج..."
 
-#: faugus/runner.py:603
+#: faugus/runner.py:615
 #, fuzzy
 msgid "is up to date"
 msgstr "GE-Proton به روز است"
 
-#: faugus/runner.py:669
+#: faugus/runner.py:681
 msgid "The keys and values were successfully added to the registry."
 msgstr "کلیدها و مقادیر با موفقیت به رجیستری اضافه شدند."
 
@@ -1019,6 +1019,14 @@ msgstr ""
 
 #: faugus/utils.py:1642
 msgid "Override the present mode"
+msgstr ""
+
+#: faugus/utils.py:1895
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1896
+msgid "Add your API key in Settings first."
 msgstr ""
 
 #: faugus/utils.py:1909

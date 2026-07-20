@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 12:29+0000\n"
+"POT-Creation-Date: 2026-07-20 13:14+0000\n"
 "PO-Revision-Date: 2026-07-06 22:55+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -297,7 +297,7 @@ msgstr "Установка %s..."
 
 #: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
 #: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
-#: faugus/runner.py:595
+#: faugus/runner.py:607
 msgid "Downloading"
 msgstr "Загрузка"
 
@@ -792,58 +792,58 @@ msgstr "Загрузка %s..."
 msgid "Error during download"
 msgstr "Ошибка во время загрузки"
 
-#: faugus/runner.py:153
+#: faugus/runner.py:162
 msgid "Starting Steam game..."
 msgstr "Запуск игры Steam..."
 
-#: faugus/runner.py:379
+#: faugus/runner.py:391
 #, fuzzy
 msgid "Are you enjoying Faugus?"
 msgstr "Вам нравится Faugus Launcher?"
 
-#: faugus/runner.py:383
+#: faugus/runner.py:395
 msgid "Please consider donating"
 msgstr "Пожалуйста, поддержите донатом"
 
-#: faugus/runner.py:389
+#: faugus/runner.py:401
 msgid "Never show this message again"
 msgstr "Не показывать снова"
 
-#: faugus/runner.py:399
+#: faugus/runner.py:411
 msgid "Continue"
 msgstr "Продолжить"
 
-#: faugus/runner.py:434
+#: faugus/runner.py:446
 #, fuzzy
 msgid "Internet connection error"
 msgstr "Ошибка интернет соединения."
 
-#: faugus/runner.py:436
+#: faugus/runner.py:448
 #, fuzzy, python-format
 msgid "%s was not found"
 msgstr "%s не найден."
 
-#: faugus/runner.py:437
+#: faugus/runner.py:449
 msgid "Please install it or use another Proton version."
 msgstr "Пожалуйста, установите его или используйте другую версию Proton."
 
-#: faugus/runner.py:569
+#: faugus/runner.py:581
 msgid "Components are up to date"
 msgstr "Компоненты не нуждается в обновлении"
 
-#: faugus/runner.py:593
+#: faugus/runner.py:605
 msgid "Updating"
 msgstr "Обновление"
 
-#: faugus/runner.py:597
+#: faugus/runner.py:609
 msgid "Extracting"
 msgstr "Распаковка"
 
-#: faugus/runner.py:603
+#: faugus/runner.py:615
 msgid "is up to date"
 msgstr "не нуждается в обновлении"
 
-#: faugus/runner.py:669
+#: faugus/runner.py:681
 msgid "The keys and values were successfully added to the registry."
 msgstr "Ключи и значения были успешно добавлены в реестр."
 
@@ -1013,6 +1013,14 @@ msgstr "Режим перезентации (Эксперементально)"
 #, fuzzy
 msgid "Override the present mode"
 msgstr "Игнорировать режим презентации."
+
+#: faugus/utils.py:1895
+msgid "No SteamGridDB API key configured."
+msgstr ""
+
+#: faugus/utils.py:1896
+msgid "Add your API key in Settings first."
+msgstr ""
 
 #: faugus/utils.py:1909
 #, fuzzy
