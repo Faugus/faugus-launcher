@@ -852,13 +852,15 @@ def disable_mangohud_gamemode_if_missing(obj):
         obj.checkbox_mangohud.set_sensitive(False)
         obj.checkbox_mangohud.set_active(False)
         obj.checkbox_mangohud.set_tooltip_text(
-            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\nMangoHud not found"))
+            _("Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more")
+            + "\n" + _("MangoHud not found"))
 
     obj.gamemode_enabled = os.path.exists(GAMEMODERUN) or os.path.exists("/usr/games/gamemoderun")
     if not obj.gamemode_enabled:
         obj.checkbox_gamemode.set_sensitive(False)
         obj.checkbox_gamemode.set_active(False)
-        obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance\nGameMode not found"))
+        obj.checkbox_gamemode.set_tooltip_text(
+            _("Tweaks your system to improve performance") + "\n" + _("GameMode not found"))
 
 
 def create_mangohud_gamemode_checkboxes(obj):
