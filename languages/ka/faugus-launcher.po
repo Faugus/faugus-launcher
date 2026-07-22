@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 13:14+0000\n"
+"POT-Creation-Date: 2026-07-22 13:21+0000\n"
 "PO-Revision-Date: 2026-07-20 13:27+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -90,14 +90,14 @@ msgstr ""
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "პრეფიქსებისა და გამშვებების მარქაფი არ მოხდება!"
 
-#: faugus/backup.py:269 faugus/launcher.py:4140 faugus/launcher.py:5057
-#: faugus/launcher.py:5478 faugus/launcher.py:6029 faugus/shortcut.py:86
+#: faugus/backup.py:269 faugus/launcher.py:4212 faugus/launcher.py:5129
+#: faugus/launcher.py:5550 faugus/launcher.py:6101 faugus/shortcut.py:86
 #: faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "გაუქმება"
 
-#: faugus/backup.py:273 faugus/launcher.py:4144 faugus/launcher.py:4834
-#: faugus/launcher.py:5061 faugus/launcher.py:5482 faugus/launcher.py:6025
+#: faugus/backup.py:273 faugus/launcher.py:4216 faugus/launcher.py:4906
+#: faugus/launcher.py:5133 faugus/launcher.py:5554 faugus/launcher.py:6097
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "დიახ"
@@ -111,7 +111,7 @@ msgstr "აღსადგენად აირჩიეთ მარქაფ�
 msgid "Play"
 msgstr "დაკვრა"
 
-#: faugus/launcher.py:267 faugus/launcher.py:1446
+#: faugus/launcher.py:267 faugus/launcher.py:1453
 msgid "Edit"
 msgstr "ჩასწორება"
 
@@ -123,7 +123,7 @@ msgstr "წაშლა"
 msgid "Duplicate"
 msgstr "დუბლირება"
 
-#: faugus/launcher.py:276 faugus/launcher.py:1742
+#: faugus/launcher.py:276 faugus/launcher.py:1749
 msgid "Hide"
 msgstr "დამალვა"
 
@@ -152,622 +152,622 @@ msgstr "ჟურნალის ჩვენება"
 msgid "Stop"
 msgstr "გაჩერება"
 
-#: faugus/launcher.py:780 faugus/launcher.py:906 faugus/launcher.py:1183
-#: faugus/launcher.py:1347 faugus/launcher.py:1481 faugus/launcher.py:1538
-#: faugus/launcher.py:1582
+#: faugus/launcher.py:780 faugus/launcher.py:926 faugus/launcher.py:1190
+#: faugus/launcher.py:1354 faugus/launcher.py:1488 faugus/launcher.py:1545
+#: faugus/launcher.py:1589
 msgid "All"
 msgstr ""
 
-#: faugus/launcher.py:782 faugus/launcher.py:908 faugus/launcher.py:1193
-#: faugus/launcher.py:1347 faugus/launcher.py:1481 faugus/launcher.py:1538
+#: faugus/launcher.py:782 faugus/launcher.py:928 faugus/launcher.py:1200
+#: faugus/launcher.py:1354 faugus/launcher.py:1488 faugus/launcher.py:1545
 msgid "Uncategorized"
 msgstr ""
 
-#: faugus/launcher.py:877
+#: faugus/launcher.py:897
 #, fuzzy
 msgid "Kill all running games"
 msgstr "ყველა გაშვებული თამაშის ნაძალადევი დახურვა"
 
-#: faugus/launcher.py:881
+#: faugus/launcher.py:901
 msgid "Search..."
 msgstr "ძებნა..."
 
-#: faugus/launcher.py:886
+#: faugus/launcher.py:906
 msgid "Alphabetical"
 msgstr ""
 
-#: faugus/launcher.py:887
+#: faugus/launcher.py:907
 #, fuzzy
 msgid "Playtime"
 msgstr "დაკვრა"
 
-#: faugus/launcher.py:888
+#: faugus/launcher.py:908
 msgid "Last played"
 msgstr ""
 
-#: faugus/launcher.py:889 faugus/launcher.py:4015
+#: faugus/launcher.py:909 faugus/launcher.py:4087
 msgid "Custom"
 msgstr ""
 
-#: faugus/launcher.py:1194 faugus/launcher.py:1197 faugus/launcher.py:1481
-#: faugus/launcher.py:1538 faugus/launcher.py:1581 faugus/launcher.py:1755
-#: faugus/launcher.py:1766 faugus/launcher.py:1921
+#: faugus/launcher.py:1201 faugus/launcher.py:1204 faugus/launcher.py:1488
+#: faugus/launcher.py:1545 faugus/launcher.py:1588 faugus/launcher.py:1762
+#: faugus/launcher.py:1773 faugus/launcher.py:1928
 msgid "None"
 msgstr ""
 
-#: faugus/launcher.py:1368
+#: faugus/launcher.py:1375
 msgid "Manage categories..."
 msgstr ""
 
-#: faugus/launcher.py:1400
+#: faugus/launcher.py:1407
 msgid "Manage Categories"
 msgstr ""
 
-#: faugus/launcher.py:1445
+#: faugus/launcher.py:1452
 msgid "Add"
 msgstr ""
 
-#: faugus/launcher.py:1447 faugus/proton_manager.py:222
+#: faugus/launcher.py:1454 faugus/proton_manager.py:222
 #: faugus/proton_manager.py:337
 msgid "Remove"
 msgstr "წაშლა"
 
-#: faugus/launcher.py:1674
+#: faugus/launcher.py:1681
 msgid "Shut down"
 msgstr "გამორთვა"
 
-#: faugus/launcher.py:1677
+#: faugus/launcher.py:1684
 msgid "Reboot"
 msgstr "გადატვირთვა"
 
-#: faugus/launcher.py:1680
+#: faugus/launcher.py:1687
 msgid "Close"
 msgstr "დახურვა"
 
-#: faugus/launcher.py:1740
+#: faugus/launcher.py:1747
 msgid "Remove from hidden"
 msgstr "წაშლა დამალულიდან"
 
-#: faugus/launcher.py:1841
+#: faugus/launcher.py:1848
 msgid "hour"
 msgstr "საათი"
 
-#: faugus/launcher.py:1842
+#: faugus/launcher.py:1849
 msgid "hours"
 msgstr "საათი"
 
-#: faugus/launcher.py:1843
+#: faugus/launcher.py:1850
 msgid "minute"
 msgstr "წუთი"
 
-#: faugus/launcher.py:1844
+#: faugus/launcher.py:1851
 msgid "minutes"
 msgstr "წუთი"
 
-#: faugus/launcher.py:1980 faugus/launcher.py:4701 faugus/launcher.py:6589
+#: faugus/launcher.py:1987 faugus/launcher.py:4773 faugus/launcher.py:6661
 #, fuzzy
 msgid "Select a file to run in the prefix"
 msgstr "აირჩიეთ ფაილი პრეფისში გასაშვებად"
 
-#: faugus/launcher.py:2026
+#: faugus/launcher.py:2033
 #, python-format
 msgid "%s Logs"
 msgstr "%s-ის ჟურნალი"
 
-#: faugus/launcher.py:2065
+#: faugus/launcher.py:2072
 msgid "Copy to clipboard"
 msgstr "ბუფერში კოპირება"
 
-#: faugus/launcher.py:2069
+#: faugus/launcher.py:2076
 msgid "Open file location"
 msgstr "ფაილის მდებარეობის გახსნა"
 
-#: faugus/launcher.py:2148 faugus/launcher.py:3096
+#: faugus/launcher.py:2155 faugus/launcher.py:3168
 #, fuzzy, python-format
 msgid "%s already exists"
 msgstr "%s უკვე არსებობს."
 
-#: faugus/launcher.py:2266 faugus/launcher.py:2933
+#: faugus/launcher.py:2273 faugus/launcher.py:3005
 #, fuzzy, python-format
 msgid "%s is running"
 msgstr "%s უკვე გაშვებულია."
 
-#: faugus/launcher.py:2597
+#: faugus/launcher.py:2669
 msgid "Proton may generate huge log files."
 msgstr "Proton-მა, შეიძლება, უზარმაზარი ჟურნალის ფაილები შექმნას."
 
-#: faugus/launcher.py:2598
+#: faugus/launcher.py:2670
 msgid "Enable logging only when debugging a problem."
 msgstr "ჩართეთ ჟურნალი, მხოლოდ, პრობლემის გამართვის დროს."
 
-#: faugus/launcher.py:2857
+#: faugus/launcher.py:2929
 #, python-format
 msgid "Edit %s"
 msgstr "%s-ის ჩასწორება"
 
-#: faugus/launcher.py:2995
+#: faugus/launcher.py:3067
 #, fuzzy
 msgid "Failed to remove prefix"
 msgstr "პრეფიქსის წაშლა ჩავარდა."
 
-#: faugus/launcher.py:3230
+#: faugus/launcher.py:3302
 #, fuzzy
 msgid "No internet connection"
 msgstr "ინტერნეტკავშირის გარეშე."
 
-#: faugus/launcher.py:3306 faugus/launcher.py:3458
+#: faugus/launcher.py:3378 faugus/launcher.py:3530
 #, python-format
 msgid "Installing %s..."
 msgstr "მიმდინარეობს %s-ის დაყენება..."
 
-#: faugus/launcher.py:3318 faugus/launcher.py:3322 faugus/launcher.py:3326
-#: faugus/launcher.py:3330 faugus/launcher.py:3334 faugus/launcher.py:3338
+#: faugus/launcher.py:3390 faugus/launcher.py:3394 faugus/launcher.py:3398
+#: faugus/launcher.py:3402 faugus/launcher.py:3406 faugus/launcher.py:3410
 #: faugus/runner.py:607
 msgid "Downloading"
 msgstr "გადმოწერა"
 
-#: faugus/launcher.py:3410
+#: faugus/launcher.py:3482
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s დაყენებული არაა!"
 
-#: faugus/launcher.py:3452
+#: faugus/launcher.py:3524
 msgid "Download complete"
 msgstr "გადმოწერა დასრულებულია"
 
-#: faugus/launcher.py:3455
+#: faugus/launcher.py:3527
 #, python-format
 msgid "Error during download: %s"
 msgstr "შეცდომა გადმოწერისას: %s"
 
-#: faugus/launcher.py:3460 faugus/launcher.py:3463 faugus/launcher.py:3473
+#: faugus/launcher.py:3532 faugus/launcher.py:3535 faugus/launcher.py:3545
 msgid "Please close the login window and wait."
 msgstr "დახურეთ შესვლის ფანჯარა და მოიცადეთ."
 
-#: faugus/launcher.py:3472
+#: faugus/launcher.py:3544
 msgid "Please don't change the installation path."
 msgstr "ნუ შეცვლით დაყენების ბილიკს."
 
-#: faugus/launcher.py:3476
+#: faugus/launcher.py:3548
 msgid "Please close Wargaming to finish the installation."
 msgstr "დაყენების დასასრულებლად დახურეთ Wargaming."
 
-#: faugus/launcher.py:3855
+#: faugus/launcher.py:3927
 msgid "Settings"
 msgstr "მორგება"
 
-#: faugus/launcher.py:3977
+#: faugus/launcher.py:4049
 msgid "Language"
 msgstr "ენა"
 
-#: faugus/launcher.py:3981
+#: faugus/launcher.py:4053
 #, fuzzy
 msgid "Mode"
 msgstr "HDR რეჟიმი"
 
-#: faugus/launcher.py:3985
+#: faugus/launcher.py:4057
 msgid "List"
 msgstr "ჩამონათვალი"
 
-#: faugus/launcher.py:3986
+#: faugus/launcher.py:4058
 msgid "Grid"
 msgstr ""
 
-#: faugus/launcher.py:3987
+#: faugus/launcher.py:4059
 msgid "Covers"
 msgstr ""
 
-#: faugus/launcher.py:3990
+#: faugus/launcher.py:4062
 #, fuzzy
 msgid "Background"
 msgstr "მარქაფი"
 
-#: faugus/launcher.py:3993 faugus/launcher.py:4006 faugus/launcher.py:4014
+#: faugus/launcher.py:4065 faugus/launcher.py:4078 faugus/launcher.py:4086
 #, fuzzy
 msgid "Default"
 msgstr "ნაგულისხმევი Proton"
 
-#: faugus/launcher.py:3994
+#: faugus/launcher.py:4066
 msgid "Accent color"
 msgstr ""
 
-#: faugus/launcher.py:3995
+#: faugus/launcher.py:4067
 msgid "Dominant color"
 msgstr ""
 
-#: faugus/launcher.py:3998
+#: faugus/launcher.py:4070
 #, fuzzy
 msgid "Banner"
 msgstr "ბანერები"
 
-#: faugus/launcher.py:4000
+#: faugus/launcher.py:4072
 msgid "UI Customization"
 msgstr ""
 
-#: faugus/launcher.py:4003
+#: faugus/launcher.py:4075
 msgid "Theme"
 msgstr ""
 
-#: faugus/launcher.py:4007
+#: faugus/launcher.py:4079
 msgid "Light"
 msgstr ""
 
-#: faugus/launcher.py:4008
+#: faugus/launcher.py:4080
 msgid "Dark"
 msgstr ""
 
-#: faugus/launcher.py:4011
+#: faugus/launcher.py:4083
 msgid "Accent Color"
 msgstr ""
 
-#: faugus/launcher.py:4026
+#: faugus/launcher.py:4098
 msgid "Startup Window Size"
 msgstr ""
 
-#: faugus/launcher.py:4030
+#: faugus/launcher.py:4102
 #, fuzzy
 msgid "Default size"
 msgstr "ნაგულისხმევი Proton"
 
-#: faugus/launcher.py:4031
+#: faugus/launcher.py:4103
 msgid "Remember size"
-msgstr ""
-
-#: faugus/launcher.py:4032
-#, fuzzy
-msgid "Maximized"
-msgstr "გაშლილად გაშვება"
-
-#: faugus/launcher.py:4033
-#, fuzzy
-msgid "Fullscreen"
-msgstr "მაგ: -d3d11 -fullscreen"
-
-#: faugus/launcher.py:4034
-msgid "Alt+Enter toggles fullscreen"
-msgstr "Alt+Enter გადართავს სრულეკრანიან რეჟიმს"
-
-#: faugus/launcher.py:4036
-msgid "Labels"
-msgstr ""
-
-#: faugus/launcher.py:4048
-msgid "Default Prefixes Location"
-msgstr "ნაგულისხმევი პრეფიქსების მდებარეობა"
-
-#: faugus/launcher.py:4052
-msgid "The location where prefixes are created"
-msgstr ""
-
-#: faugus/launcher.py:4062
-msgid "Default Prefix Tools"
-msgstr "ნაგულისხმევი პრეფიქსის ხელსაწყოები"
-
-#: faugus/launcher.py:4068
-msgid "Default Proton"
-msgstr "ნაგულისხმევი Proton"
-
-#: faugus/launcher.py:4072
-msgid "Proton Manager"
-msgstr "Proton-ის მმართველი"
-
-#: faugus/launcher.py:4075
-msgid "Miscellaneous"
-msgstr "სხვადასხვა"
-
-#: faugus/launcher.py:4078
-#, fuzzy
-msgid "Discrete GPU"
-msgstr "დისკრეტული GPU-ის გამოყენება"
-
-#: faugus/launcher.py:4080
-msgid "Auto-close on launch"
-msgstr ""
-
-#: faugus/launcher.py:4082
-msgid "Autostart"
-msgstr ""
-
-#: faugus/launcher.py:4084
-msgid "System tray icon"
-msgstr "სისტემური პანელის ხატულა"
-
-#: faugus/launcher.py:4087
-msgid "Minimized startup"
-msgstr ""
-
-#: faugus/launcher.py:4090
-msgid "Monochrome icon"
-msgstr "მონოქრომული ხატულა"
-
-#: faugus/launcher.py:4093
-#, fuzzy
-msgid "Splash window"
-msgstr "გაშვების ეკრანის გამორთვა"
-
-#: faugus/launcher.py:4096
-#, fuzzy
-msgid "Automatic updates"
-msgstr "ავტომატური განახლებების გათიშვა"
-
-#: faugus/launcher.py:4099
-msgid "Logging"
-msgstr ""
-
-#: faugus/launcher.py:4102
-msgid "Categories and sort"
 msgstr ""
 
 #: faugus/launcher.py:4104
 #, fuzzy
+msgid "Maximized"
+msgstr "გაშლილად გაშვება"
+
+#: faugus/launcher.py:4105
+#, fuzzy
+msgid "Fullscreen"
+msgstr "მაგ: -d3d11 -fullscreen"
+
+#: faugus/launcher.py:4106
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt+Enter გადართავს სრულეკრანიან რეჟიმს"
+
+#: faugus/launcher.py:4108
+msgid "Labels"
+msgstr ""
+
+#: faugus/launcher.py:4120
+msgid "Default Prefixes Location"
+msgstr "ნაგულისხმევი პრეფიქსების მდებარეობა"
+
+#: faugus/launcher.py:4124
+msgid "The location where prefixes are created"
+msgstr ""
+
+#: faugus/launcher.py:4134
+msgid "Default Prefix Tools"
+msgstr "ნაგულისხმევი პრეფიქსის ხელსაწყოები"
+
+#: faugus/launcher.py:4140
+msgid "Default Proton"
+msgstr "ნაგულისხმევი Proton"
+
+#: faugus/launcher.py:4144
+msgid "Proton Manager"
+msgstr "Proton-ის მმართველი"
+
+#: faugus/launcher.py:4147
+msgid "Miscellaneous"
+msgstr "სხვადასხვა"
+
+#: faugus/launcher.py:4150
+#, fuzzy
+msgid "Discrete GPU"
+msgstr "დისკრეტული GPU-ის გამოყენება"
+
+#: faugus/launcher.py:4152
+msgid "Auto-close on launch"
+msgstr ""
+
+#: faugus/launcher.py:4154
+msgid "Autostart"
+msgstr ""
+
+#: faugus/launcher.py:4156
+msgid "System tray icon"
+msgstr "სისტემური პანელის ხატულა"
+
+#: faugus/launcher.py:4159
+msgid "Minimized startup"
+msgstr ""
+
+#: faugus/launcher.py:4162
+msgid "Monochrome icon"
+msgstr "მონოქრომული ხატულა"
+
+#: faugus/launcher.py:4165
+#, fuzzy
+msgid "Splash window"
+msgstr "გაშვების ეკრანის გამორთვა"
+
+#: faugus/launcher.py:4168
+#, fuzzy
+msgid "Automatic updates"
+msgstr "ავტომატური განახლებების გათიშვა"
+
+#: faugus/launcher.py:4171
+msgid "Logging"
+msgstr ""
+
+#: faugus/launcher.py:4174
+msgid "Categories and sort"
+msgstr ""
+
+#: faugus/launcher.py:4176
+#, fuzzy
 msgid "Hidden games"
 msgstr "დამალული თამაშების ჩვენება"
 
-#: faugus/launcher.py:4105
+#: faugus/launcher.py:4177
 #, fuzzy
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H თამაშების საჩვენებლად/დასამალად."
 
-#: faugus/launcher.py:4107
+#: faugus/launcher.py:4179
 msgid "Gamepad navigation"
 msgstr ""
 
-#: faugus/launcher.py:4110
+#: faugus/launcher.py:4182
 #, fuzzy
 msgid "Wayland driver (experimental)"
 msgstr "Wayland-ის დრაივერის გამოყენება (ექსპერიმენტული)"
 
-#: faugus/launcher.py:4113
+#: faugus/launcher.py:4185
 #, fuzzy
 msgid "WOW64 (experimental)"
 msgstr "WOW64-ის ჩართვა (ექსპერიმენტული)"
 
-#: faugus/launcher.py:4123 faugus/launcher.py:5435
+#: faugus/launcher.py:4195 faugus/launcher.py:5507
 msgid "Run"
 msgstr "გაშვება"
 
-#: faugus/launcher.py:4126 faugus/launcher.py:5438
+#: faugus/launcher.py:4198 faugus/launcher.py:5510
 #, fuzzy
 msgid "Run a file in the prefix"
 msgstr "ფაილის გაშვება პრეფიქსში"
 
-#: faugus/launcher.py:4130 faugus/launcher.py:5423 faugus/shortcut.py:82
+#: faugus/launcher.py:4202 faugus/launcher.py:5495 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr ""
 
-#: faugus/launcher.py:4131 faugus/launcher.py:5424 faugus/shortcut.py:83
+#: faugus/launcher.py:4203 faugus/launcher.py:5496 faugus/shortcut.py:83
 msgid "No Sleep"
 msgstr ""
 
-#: faugus/launcher.py:4132 faugus/launcher.py:5425 faugus/shortcut.py:84
+#: faugus/launcher.py:4204 faugus/launcher.py:5497 faugus/shortcut.py:84
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
 
-#: faugus/launcher.py:4134
+#: faugus/launcher.py:4206
 msgid "Support the Project"
 msgstr "დაუჭირეთ მხარი ამ პროექტს"
 
-#: faugus/launcher.py:4148
+#: faugus/launcher.py:4220
 msgid "Backup/Restore Settings"
 msgstr "პარამეტრების მარქაფი/აღდგენა"
 
-#: faugus/launcher.py:4152
+#: faugus/launcher.py:4224
 msgid "Backup"
 msgstr "მარქაფი"
 
-#: faugus/launcher.py:4155
+#: faugus/launcher.py:4227
 msgid "Restore"
 msgstr "აღდგენა"
 
-#: faugus/launcher.py:4162
+#: faugus/launcher.py:4234
 msgid "Global Environment Variables"
 msgstr "გლობალური გარემოს ცვლადები"
 
-#: faugus/launcher.py:4415
+#: faugus/launcher.py:4487
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "ჟურნალის გასუფთავება (%s)"
 
-#: faugus/launcher.py:4418
+#: faugus/launcher.py:4490
 msgid "Clear Logs"
 msgstr "ჟურნალის გასუფთავება"
 
-#: faugus/launcher.py:4645
+#: faugus/launcher.py:4717
 msgid "Do you want to save the changes?"
 msgstr "გნებავთ ცვლილებების შენახვა?"
 
-#: faugus/launcher.py:4755
+#: faugus/launcher.py:4827
 msgid "Select a backup file to restore"
 msgstr "აღსადგენად აირჩიეთ მარქაფის ფაილი"
 
-#: faugus/launcher.py:4761
+#: faugus/launcher.py:4833
 msgid "ZIP files"
 msgstr "Zip ფაილები"
 
-#: faugus/launcher.py:4776 faugus/launcher.py:4786
+#: faugus/launcher.py:4848 faugus/launcher.py:4858
 #, fuzzy
 msgid "This is not a valid Faugus backup file."
 msgstr "ეს ფაილი სწორი Faugus Launcher-ის მარქაფის ფაილი არაა."
 
-#: faugus/launcher.py:4825
+#: faugus/launcher.py:4897
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "მართლა გნებავთ, თავზე გადააწეროთ პარამეტრები?"
 
-#: faugus/launcher.py:4834 faugus/launcher.py:5125
+#: faugus/launcher.py:4906 faugus/launcher.py:5197
 msgid "Yes"
 msgstr "დიახ"
 
-#: faugus/launcher.py:4835 faugus/launcher.py:5121
+#: faugus/launcher.py:4907 faugus/launcher.py:5193
 msgid "No"
 msgstr "არა"
 
-#: faugus/launcher.py:4842 faugus/launcher.py:6832
+#: faugus/launcher.py:4914 faugus/launcher.py:6904
 msgid "Select a prefix location"
 msgstr "პრეფიქსის მდებარეობის არჩევა"
 
-#: faugus/launcher.py:5046
+#: faugus/launcher.py:5118
 #, python-format
 msgid "Duplicate %s"
 msgstr "%s-ის დუბლირება"
 
-#: faugus/launcher.py:5051 faugus/launcher.py:5302 faugus/launcher.py:5315
+#: faugus/launcher.py:5123 faugus/launcher.py:5374 faugus/launcher.py:5387
 #: faugus/shortcut.py:43
 msgid "Title"
 msgstr "სათაური"
 
-#: faugus/launcher.py:5097
+#: faugus/launcher.py:5169
 #, python-format
 msgid "Delete %s"
 msgstr "%s: წაშლა"
 
-#: faugus/launcher.py:5104
+#: faugus/launcher.py:5176
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "მართლა გნებავთ, წაშალოთ %s?"
 
-#: faugus/launcher.py:5113
+#: faugus/launcher.py:5185
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr ""
 
-#: faugus/launcher.py:5115
+#: faugus/launcher.py:5187
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr ""
 
-#: faugus/launcher.py:5129
+#: faugus/launcher.py:5201
 msgid "Also remove the prefix:"
 msgstr "ასევე წაიშალოს პრეფიქსი:"
 
-#: faugus/launcher.py:5176
+#: faugus/launcher.py:5248
 msgid "New Game/App"
 msgstr "ახალი თამაში/აპი"
 
-#: faugus/launcher.py:5285
+#: faugus/launcher.py:5357
 #, fuzzy
 msgid "Steam User"
 msgstr "Steam-ის თამაში"
 
-#: faugus/launcher.py:5299 faugus/launcher.py:5823 faugus/launcher.py:5825
+#: faugus/launcher.py:5371 faugus/launcher.py:5895 faugus/launcher.py:5897
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:5367 faugus/utils.py:1429
+#: faugus/launcher.py:5439 faugus/utils.py:1429
 msgid "Path"
 msgstr "ბილიკი"
 
-#: faugus/launcher.py:5371
+#: faugus/launcher.py:5443
 msgid "Path to the game executable"
 msgstr ""
 
-#: faugus/launcher.py:5379
+#: faugus/launcher.py:5451
 msgid "Prefix"
 msgstr "პრეფიქსი"
 
-#: faugus/launcher.py:5383
+#: faugus/launcher.py:5455
 #, fuzzy
 msgid "Path to the prefix"
 msgstr "/ბილიკი/პრეფიქსამდე"
 
-#: faugus/launcher.py:5391
+#: faugus/launcher.py:5463
 msgid "Proton"
 msgstr "პროტონი"
 
-#: faugus/launcher.py:5405 faugus/shortcut.py:60
+#: faugus/launcher.py:5477 faugus/shortcut.py:60
 msgid "Game Arguments"
 msgstr "თამაშის არგუმენტები"
 
-#: faugus/launcher.py:5410 faugus/shortcut.py:65 faugus/utils.py:1152
+#: faugus/launcher.py:5482 faugus/shortcut.py:65 faugus/utils.py:1152
 #, fuzzy
 msgid "Launch Settings"
 msgstr "მორგება"
 
-#: faugus/launcher.py:5413 faugus/shortcut.py:68 faugus/utils.py:1401
+#: faugus/launcher.py:5485 faugus/shortcut.py:68 faugus/utils.py:1401
 msgid "Additional Application"
 msgstr "დამატებითი აპლიკაცია"
 
-#: faugus/launcher.py:5416 faugus/shortcut.py:71
+#: faugus/launcher.py:5488 faugus/shortcut.py:71
 #, fuzzy
 msgid "Additional application to run with the game"
 msgstr ""
 "დამატებითი აპლიკაციები თამაშთან ერთად გასაშვებად. მაგ: ჩიტები, ტრეინერები, "
 "მოდები..."
 
-#: faugus/launcher.py:5418 faugus/shortcut.py:73 faugus/utils.py:1527
+#: faugus/launcher.py:5490 faugus/shortcut.py:73 faugus/utils.py:1527
 msgid "Lossless Scaling Frame Generation"
 msgstr "უდანაკარგო მასშტაბის კადრის გენერაცია"
 
-#: faugus/launcher.py:5440
+#: faugus/launcher.py:5512
 msgid "Shortcut"
 msgstr "მალსახმობი"
 
-#: faugus/launcher.py:5445
+#: faugus/launcher.py:5517
 msgid "Desktop"
 msgstr "სამუშაო მაგიდა"
 
-#: faugus/launcher.py:5446
+#: faugus/launcher.py:5518
 msgid "App Menu"
 msgstr "აპის მენიუ"
 
-#: faugus/launcher.py:5447
+#: faugus/launcher.py:5519
 msgid "Steam"
 msgstr "ნაკადი"
 
-#: faugus/launcher.py:5648
+#: faugus/launcher.py:5720
 msgid "Refresh"
 msgstr "განახლება"
 
-#: faugus/launcher.py:5651
+#: faugus/launcher.py:5723
 msgid "Load from file"
 msgstr "ფაილიდან ჩატვირთვა"
 
-#: faugus/launcher.py:5654
+#: faugus/launcher.py:5726
 msgid "Load from URL"
 msgstr "ჩატვირთვა URL-დან"
 
-#: faugus/launcher.py:5659
+#: faugus/launcher.py:5731
 msgid "Game/App"
 msgstr "თამაში/აპლიკაცია"
 
-#: faugus/launcher.py:5676
+#: faugus/launcher.py:5748
 msgid "Tools"
 msgstr "ხელსაწყოები"
 
-#: faugus/launcher.py:5831 faugus/shortcut.py:190
+#: faugus/launcher.py:5903 faugus/shortcut.py:190
 #, fuzzy
 msgid "Vulkan Layer not found"
 msgstr "%s აღმოჩენილი არაა."
 
-#: faugus/launcher.py:5986
+#: faugus/launcher.py:6058
 #, fuzzy
 msgid "Select an image for the cover"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:5987
+#: faugus/launcher.py:6059
 msgid "Select an image for the banner"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:5988
+#: faugus/launcher.py:6060
 #, fuzzy
 msgid "Select an image for the icon"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:6018
+#: faugus/launcher.py:6090
 msgid "Enter the image URL"
 msgstr "შეიყვანეთ გამოსახულების URL"
 
-#: faugus/launcher.py:6559
+#: faugus/launcher.py:6631
 msgid "Windows Game"
 msgstr "Windows-ის თამაში"
 
-#: faugus/launcher.py:6560
+#: faugus/launcher.py:6632
 msgid "Linux Game"
 msgstr "Linux-ის თამაში"
 
-#: faugus/launcher.py:6561
+#: faugus/launcher.py:6633
 msgid "Steam Game"
 msgstr "Steam-ის თამაში"
 
-#: faugus/launcher.py:6801
+#: faugus/launcher.py:6873
 #, fuzzy
 msgid "Select the game executable"
 msgstr "აირჩიეთ თამაშის .exe"
