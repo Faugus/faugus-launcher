@@ -45,7 +45,6 @@ jobs:
           echo "skip=true" >> "$GITHUB_OUTPUT"
 
       - name: Install gettext
-        if: steps.check.outputs.skip != 'true'
         run: sudo apt-get update && sudo apt-get install -y gettext
 
       - name: Regenerate languages/faugus-launcher.pot
@@ -56,25 +55,16 @@ jobs:
             --output=languages/faugus-launcher.pot \
             faugus/*.py
 
-      - name: Update translation files (msgmerge)
-        if: steps.check.outputs.skip != 'true'
-        run: |
-          for po in languages/*/faugus-launcher.po; do
-            msgmerge --update --backup=off --quiet "$po" languages/faugus-launcher.pot
-          done
-
-      - name: Compile translation files (msgfmt)
-        if: steps.check.outputs.skip != 'true'
+      - name: Compile translation files (msgfmt, no msgmerge)
         run: |
           for po in languages/*/faugus-launcher.po; do
             msgfmt "$po" -o "$(dirname "$po")/faugus-launcher.mo"
           done
 
-      - name: Commit if translatable strings actually changed
-        if: steps.check.outputs.skip != 'true'
+      - name: Commit if .pot or .mo actually changed
         run: |
           changed=false
-          for f in languages/faugus-launcher.pot languages/*/faugus-launcher.po; do
+          for f in languages/faugus-launcher.pot languages/*/faugus-launcher.mo; do
             if ! diff --ignore-matching-lines='^#:' \
                        --ignore-matching-lines='^"POT-Creation-Date:' \
                        <(git show "HEAD:$f" 2>/dev/null) "$f" > /dev/null 2>&1; then
@@ -83,12 +73,12 @@ jobs:
             fi
           done
           if [ "$changed" = false ]; then
-            echo "No translatable string changes, nothing to commit."
+            echo "No .pot/.mo changes, nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add languages/
+          git add languages/faugus-launcher.pot languages/*/faugus-launcher.mo
           git commit -m "Update translation template (faugus-launcher.pot)"
           git fetch origin main
           git rebase origin/main
