@@ -3,7 +3,6 @@
 import shutil
 import subprocess
 import sys
-import tarfile
 import threading
 import warnings
 import gi
@@ -3548,7 +3547,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} msiexec /i '{file_path}' /passive"
                 elif launcher == "gog":
                     self.label_download2.set_text("")
-
+                    import tarfile
                     with tarfile.open(file_path, "r:gz") as tar:
                         tar.extractall(path=FAUGUS_TEMP, filter="fully_trusted")
 
@@ -6624,7 +6623,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 path = "drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
 
             elif active_id == "gog":
-                self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files/GOG Galaxy/GalaxyClient.exe"
 
             elif active_id == "rockstar":
