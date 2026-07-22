@@ -1,0 +1,304 @@
+name: Build and publish release packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (e.g. 2.0.1)"
+        required: true
+      publish:
+        description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ github.event.release.tag_name || inputs.tag }}
+  RELEASE_ID: ${{ github.event.release.id }}
+  DO_PUBLISH: ${{ github.event_name == 'release' || inputs.publish == true }}
+
+jobs:
+  appimage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build python3-pip curl
+
+      - name: Build AppImage
+        run: |
+          chmod +x packaging/appimage/build.sh
+          packaging/appimage/build.sh "$TAG" 1
+
+      - name: Upload to release
+        if: env.RELEASE_ID != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE=$(ls packaging/appimage/Faugus-*.AppImage)
+          curl -sS -f -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @"$FILE" \
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+
+  arch-aur:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          pacman -Syu --noconfirm --needed git openssh curl \
+            python-gobject python-requests python-pillow python-vdf python-psutil python-dbus \
+            icoextract gtk4 libadwaita libmanette meson
+
+      - name: Prepare PKGBUILD
+        run: |
+          mkdir -p /build
+          cp packaging/arch/PKGBUILD /build/PKGBUILD
+          sed -i "s/^pkgver=.*/pkgver=${TAG}/" /build/PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" /build/PKGBUILD
+
+      - name: Build package as non-root
+        run: |
+          useradd -m builder
+          chown -R builder:builder /build
+          su builder -c "cd /build && makepkg -s --noconfirm"
+          su builder -c "cd /build && makepkg --printsrcinfo > .SRCINFO"
+
+      - name: Push to AUR
+        if: env.AUR_SSH_PRIVATE_KEY != '' && env.DO_PUBLISH == 'true'
+        env:
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur -o IdentitiesOnly=yes"
+          git config --global user.name "Faugus"
+          git config --global user.email "felix.ribeiro@live.com"
+          git clone ssh://aur@aur.archlinux.org/faugus-launcher.git /tmp/aur-repo
+          cp /build/PKGBUILD /build/.SRCINFO /tmp/aur-repo/
+          cd /tmp/aur-repo
+          git add PKGBUILD .SRCINFO
+          git diff --cached --quiet && echo "No changes for AUR" && exit 0
+          git commit -m "Update to ${TAG}"
+          git push
+
+      - name: Upload package asset
+        if: env.RELEASE_ID != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE=$(ls /build/*.pkg.tar.* | head -1)
+          curl -sS -f -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @"$FILE" \
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+
+  debian:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build python3 wget dpkg-dev lintian \
+            devscripts debhelper dh-python gnupg dput
+
+      - name: Build raw .deb
+        run: |
+          set -e
+          PACKAGE_NAME="faugus-launcher"
+          DEB_VERSION="${TAG}-1"
+          DEB_NAME="${PACKAGE_NAME}_${DEB_VERSION}_all.deb"
+          BUILD_DIR=$(mktemp -d)
+          INSTALL_DIR=$(mktemp -d)
+
+          wget -q -O "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz" \
+            "https://github.com/Faugus/${PACKAGE_NAME}/archive/refs/tags/${TAG}.tar.gz"
+          tar -xzf "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz" -C "${BUILD_DIR}"
+          cd "${BUILD_DIR}/${PACKAGE_NAME}-${TAG}"
+
+          export USE_LICENSE_FILES=0
+          meson setup build --prefix=/usr --buildtype=plain
+          meson install -C build --destdir="${INSTALL_DIR}"
+
+          mkdir -p "${INSTALL_DIR}/DEBIAN"
+          cat > "${INSTALL_DIR}/DEBIAN/control" <<EOF
+          Package: ${PACKAGE_NAME}
+          Version: ${DEB_VERSION}
+          Section: games
+          Priority: optional
+          Architecture: all
+          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, python3-icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
+          Maintainer: Faugus <felix.ribeiro@live.com>
+          Description: A simple and lightweight app for running Windows games using UMU-Launcher
+          Homepage: https://github.com/Faugus/${PACKAGE_NAME}
+          EOF
+
+          dpkg-deb --build "${INSTALL_DIR}" "${DEB_NAME}"
+          mv "${DEB_NAME}" "$GITHUB_WORKSPACE/"
+          lintian "$GITHUB_WORKSPACE/${DEB_NAME}" || true
+
+      - name: Upload .deb to release
+        if: env.RELEASE_ID != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILE=$(ls faugus-launcher_*_all.deb)
+          curl -sS -f -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @"$FILE" \
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+
+      - name: Import PPA signing key
+        if: env.PPA_GPG_PRIVATE_KEY != '' && env.DO_PUBLISH == 'true'
+        env:
+          PPA_GPG_PRIVATE_KEY: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          PPA_GPG_PASSPHRASE: ${{ secrets.PPA_GPG_PASSPHRASE }}
+        run: |
+          echo "$PPA_GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          gpgconf --reload gpg-agent
+          echo "PPA_GPG_KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec/{print $5; exit}')" >> "$GITHUB_ENV"
+
+      - name: Build and upload PPA source packages
+        if: env.PPA_GPG_PRIVATE_KEY != '' && env.DO_PUBLISH == 'true'
+        env:
+          PPA_GPG_PRIVATE_KEY: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          PPA_GPG_PASSPHRASE: ${{ secrets.PPA_GPG_PASSPHRASE }}
+        run: |
+          set -e
+          PACKAGE="faugus-launcher"
+          PPA="ppa:faugus/faugus-launcher"
+          DISTROS=("noble" "resolute")
+          WORK_DIR=$(mktemp -d)
+          cd "$WORK_DIR"
+
+          wget -q -O "${PACKAGE}_${TAG}.orig.tar.gz" \
+            "https://github.com/Faugus/${PACKAGE}/archive/refs/tags/${TAG}.tar.gz"
+          tar -xzf "${PACKAGE}_${TAG}.orig.tar.gz"
+
+          export DEBSIGN_KEYID="$PPA_GPG_KEY_ID"
+          export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-k$PPA_GPG_KEY_ID"
+
+          for DISTRO in "${DISTROS[@]}"; do
+            echo "Building for $DISTRO..."
+            cp -r "${PACKAGE}-${TAG}" "${PACKAGE}-${TAG}-${DISTRO}"
+            cd "${PACKAGE}-${TAG}-${DISTRO}"
+
+            rm -rf debian
+            mkdir -p debian/source
+            echo "3.0 (quilt)" > debian/source/format
+
+            cat > debian/control <<EOF
+          Source: $PACKAGE
+          Section: games
+          Priority: optional
+          Maintainer: Faugus <felix.ribeiro@live.com>
+          Build-Depends: debhelper-compat (= 13), dh-python, python3-all, meson, ninja-build, libgtk-3-bin
+          Standards-Version: 4.6.0
+          Homepage: https://github.com/Faugus/$PACKAGE
+
+          Package: $PACKAGE
+          Architecture: all
+          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, python3-icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
+          Description: A simple and lightweight app for running Windows games using UMU-Launcher
+          EOF
+
+            cat > debian/changelog <<EOF
+          $PACKAGE ($TAG-1~${DISTRO}1) $DISTRO; urgency=medium
+
+            * Release $TAG for $DISTRO
+
+           -- Faugus <felix.ribeiro@live.com>  $(date -R)
+          EOF
+
+            cat > debian/rules <<'RULES'
+          #!/usr/bin/make -f
+
+          %:
+          	dh $@ --buildsystem=meson --with python3
+
+          override_dh_auto_install:
+          	dh_auto_install
+          RULES
+            chmod +x debian/rules
+
+            debuild -S -sa -k"$PPA_GPG_KEY_ID" -p"gpg --pinentry-mode loopback --passphrase $PPA_GPG_PASSPHRASE"
+            cd ..
+
+            CHANGES_FILE=$(find . -maxdepth 1 -name "${PACKAGE}_*${DISTRO}1_source.changes" -print -quit)
+            if [ -z "$CHANGES_FILE" ]; then
+              echo "Could not find .changes file for $DISTRO" >&2
+              exit 1
+            fi
+            dput "$PPA" "$CHANGES_FILE"
+
+            rm -rf "${PACKAGE}-${TAG}-${DISTRO}"
+          done
+
+  fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: dnf install -y rpmdevtools rpm-build curl
+
+      - name: Build RPM
+        run: |
+          rpmdev-setuptree
+          cp packaging/fedora/faugus-launcher.spec ~/rpmbuild/SPECS/
+          sed -i "s/^Version:.*/Version:        ${TAG}/" ~/rpmbuild/SPECS/faugus-launcher.spec
+          cd ~/rpmbuild/SPECS
+          spectool -g -C ../SOURCES faugus-launcher.spec
+          rpmbuild -ba faugus-launcher.spec
+
+      - name: Upload packages to release
+        if: env.RELEASE_ID != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for FILE in ~/rpmbuild/RPMS/noarch/*.rpm ~/rpmbuild/SRPMS/*.rpm; do
+            curl -sS -f -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary @"$FILE" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+          done
+
+      - name: Submit to COPR
+        if: env.COPR_API_TOKEN != '' && env.DO_PUBLISH == 'true'
+        env:
+          COPR_API_LOGIN: ${{ secrets.COPR_API_LOGIN }}
+          COPR_API_TOKEN: ${{ secrets.COPR_API_TOKEN }}
+          COPR_API_USERNAME: ${{ secrets.COPR_API_USERNAME }}
+        run: |
+          dnf install -y copr-cli
+          mkdir -p ~/.config
+          cat > ~/.config/copr <<EOF
+          [copr-cli]
+          login = $COPR_API_LOGIN
+          username = $COPR_API_USERNAME
+          token = $COPR_API_TOKEN
+          copr_url = https://copr.fedorainfracloud.org
+          EOF
+          SRPM=$(ls ~/rpmbuild/SRPMS/*.rpm | head -1)
+          copr-cli build faugus/faugus-launcher "$SRPM"
