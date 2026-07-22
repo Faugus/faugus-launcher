@@ -30,7 +30,7 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y meson ninja-build python3-pip curl
+          sudo apt-get install -y meson ninja-build python3-pip curl libgtk-3-bin
 
       - name: Build AppImage
         run: |
@@ -260,7 +260,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install build dependencies
-        run: dnf install -y rpmdevtools rpm-build curl
+        run: dnf install -y rpmdevtools rpm-build curl meson gtk-update-icon-cache python3-devel gtk4-devel
 
       - name: Build RPM
         run: |
