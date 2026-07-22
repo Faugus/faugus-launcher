@@ -34,7 +34,3 @@ A simple and lightweight app for running Windows games using UMU-Launcher/UMU-Pr
 %{_datadir}/faugus-launcher/*
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 %{_datadir}/metainfo/io.github.Faugus.faugus-launcher.metainfo.xml
-
-%changelog
-* Mon Jul 20 2026 Faugus - 2.0.1-1
-- Release 2.0.1.
