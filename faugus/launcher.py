@@ -8,8 +8,11 @@ import warnings
 import gi
 import vdf
 import signal
+import os
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
