@@ -40,7 +40,7 @@ jobs:
           packaging/appimage/build.sh "$TAG" 1
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: appimage
           path: packaging/appimage/Faugus-*.AppImage
@@ -84,7 +84,7 @@ jobs:
           su builder -c "cd /build && makepkg --printsrcinfo > .SRCINFO"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: arch-package
           path: /build/*.pkg.tar.*
@@ -168,7 +168,7 @@ jobs:
           lintian "$GITHUB_WORKSPACE/${DEB_NAME}" || true
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debian-package
           path: faugus-launcher_*_all.deb
@@ -295,7 +295,7 @@ jobs:
           cp ~/rpmbuild/RPMS/noarch/*.rpm ~/rpmbuild/SRPMS/*.rpm "$GITHUB_WORKSPACE/dist/"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: fedora-packages
           path: dist/*.rpm
