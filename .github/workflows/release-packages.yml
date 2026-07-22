@@ -1,4 +1,5 @@
 name: Build and publish release packages
+run-name: Faugus ${{ github.event.release.tag_name || inputs.tag }}
 
 on:
   release:
@@ -56,7 +57,7 @@ jobs:
             --data-binary @"$FILE" \
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
 
-  arch-aur:
+  arch:
     runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
@@ -290,13 +291,14 @@ jobs:
           spectool -g -C ../SOURCES faugus-launcher.spec
           rpmbuild -ba faugus-launcher.spec
 
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp ~/rpmbuild/RPMS/noarch/*.rpm ~/rpmbuild/SRPMS/*.rpm "$GITHUB_WORKSPACE/dist/"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: fedora-packages
-          path: |
-            /root/rpmbuild/RPMS/noarch/*.rpm
-            /root/rpmbuild/SRPMS/*.rpm
+          path: dist/*.rpm
 
       - name: Upload packages to release
         if: env.RELEASE_ID != ''
