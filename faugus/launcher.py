@@ -3,6 +3,7 @@
 import shutil
 import subprocess
 import sys
+import tarfile
 import threading
 import warnings
 import gi
@@ -3194,10 +3195,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
             if launcher_id == "epic":
                 path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
-            if launcher_id == "ubisoft":
-                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+            if launcher_id == "gog":
+                path = f"{prefix}/drive_c/Program Files/GOG Galaxy/GalaxyClient.exe"
             if launcher_id == "rockstar":
                 path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+            if launcher_id == "ubisoft":
+                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
             if launcher_id == "wargaming":
                 path = f"{prefix}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
 
@@ -3302,7 +3305,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.show_warning_dialog_main(add_game_dialog, _("No internet connection"), "")
                     return True
 
-                if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
+                if launcher_id in ("battle", "ea", "epic", "gog", "rockstar", "ubisoft", "wargaming"):
                     destroy_add_game_dialog()
                     dialog_destroyed = True
                     self.launcher_screen(
@@ -3398,13 +3401,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.label_download.set_text(_("Downloading") + " Epic Games...")
             self.download_launcher("epic", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
-        elif launcher == "ubisoft":
-            self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
-            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
+        elif launcher == "gog":
+            self.label_download.set_text(_("Downloading") + " GOG Galaxy...")
+            self.download_launcher("gog", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "rockstar":
             self.label_download.set_text(_("Downloading") + " Rockstar Launcher...")
             self.download_launcher("rockstar", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
+
+        elif launcher == "ubisoft":
+            self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
+            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "wargaming":
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
@@ -3492,16 +3499,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
-            urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
+            urls = {"battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+                "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
-                "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
-                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
+                "gog": "https://github.com/Faugus/components/releases/download/v1.0.1/gog.tar.gz",
                 "rockstar": "https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe",
+                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
                 "wargaming": "https://redirect.wargaming.net/WGC/Wargaming_Game_Center_Install_NA.exe"}
 
-            file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
-                "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe",
-                "rockstar": "Rockstar-Games-Launcher.exe", "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
+            file_name = {"battle": "Battle.net-Setup.exe", "ea": "EAappInstaller.exe",
+                "epic": "EpicGamesLauncherInstaller.msi", "gog": "gog.tar.gz",
+                "rockstar": "Rockstar-Games-Launcher.exe", "ubisoft": "UbisoftConnectInstaller.exe",
+                "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
 
             if launcher not in urls:
                 return None
@@ -3537,13 +3546,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 elif launcher == "epic":
                     self.label_download2.set_text("")
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} msiexec /i '{file_path}' /passive"
-                elif launcher == "ubisoft":
+                elif launcher == "gog":
                     self.label_download2.set_text("")
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /S"
+
+                    with tarfile.open(file_path, "r:gz") as tar:
+                        tar.extractall(path=FAUGUS_TEMP, filter="fully_trusted")
+
+                    installer_path = os.path.join(FAUGUS_TEMP, "gog", "GalaxySetup.exe")
+                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{installer_path}' /VERYSILENT /NORESTART /SUPPRESSMSGBOXES"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait."))
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}'"
+                elif launcher == "ubisoft":
+                    self.label_download2.set_text("")
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /S"
                 elif launcher == "wargaming":
                     self.label_download2.set_text(_("Please close Wargaming to finish the installation."))
                     command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /SILENT"
@@ -6606,13 +6623,17 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
 
-            elif active_id == "ubisoft":
+            elif active_id == "gog":
                 self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
-                path = "drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+                path = "drive_c/Program Files/GOG Galaxy/GalaxyClient.exe"
 
             elif active_id == "rockstar":
                 self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+
+            elif active_id == "ubisoft":
+                self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
+                path = "drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
 
             elif active_id == "wargaming":
                 path = "drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
@@ -6634,6 +6655,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("battle", "Battle.net")
         self.combobox_launcher.append("ea", "EA App")
         self.combobox_launcher.append("epic", "Epic Games")
+        self.combobox_launcher.append("gog", "GOG Galaxy")
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
