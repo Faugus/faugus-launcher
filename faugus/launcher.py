@@ -3493,7 +3493,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
             urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-                "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.msi",
+                "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
                 "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
                 "rockstar": "https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe",
@@ -6633,7 +6633,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("steam", _("Steam Game"))
         self.combobox_launcher.append("battle", "Battle.net")
         self.combobox_launcher.append("ea", "EA App")
-
+        self.combobox_launcher.append("epic", "Epic Games")
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
