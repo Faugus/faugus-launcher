@@ -821,14 +821,34 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if visible_children:
             self._focus_flowbox_child_at(0)
 
+    def select_first_child_when_ready(self):
+        attempts = {"n": 0}
+
+        def try_select():
+            attempts["n"] += 1
+
+            visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
+            if visible_children:
+                self._focus_flowbox_child_at(0)
+                return False
+
+            return attempts["n"] < 100
+
+        GLib.timeout_add(50, try_select)
+
     def select_game_by_title(self, title):
+        attempts = {"n": 0}
+
         def do_select():
+            attempts["n"] += 1
+
             visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
             for index, child in enumerate(visible_children):
                 if hasattr(child, 'game') and child.game and child.game.title == title:
                     self._focus_flowbox_child_at(index)
-                    break
-            return False
+                    return False
+
+            return attempts["n"] < 100
 
         GLib.timeout_add(50, do_select)
 
@@ -999,20 +1019,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._last_zoom = zoom_pct
             self.cover_size = zoom_pct
 
-            if hasattr(self, 'flowbox'):
-                for child in widget_children(self.flowbox):
-                    if not hasattr(child, 'game') or not child.game:
-                        continue
-                    game = child.game
-
-                    if self.interface_mode in ("Covers", "SteamGridDB") and hasattr(child, 'cover'):
-                        zoom_width = int(230 * (zoom_pct / 100.0))
-                        zoom_height = int(zoom_width * 1.5)
-                        if os.path.isfile(game.cover):
-                            surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
-                        else:
-                            surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
-                        child.cover.set_paintable(surface)
+            self.schedule_zoom_apply(zoom_pct)
 
         self.scale_zoom.connect("value-changed", on_zoom_changed)
 
@@ -1900,7 +1907,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         self.update_list()
-        self.select_first_child()
+        self.select_first_child_when_ready()
 
     def on_context_menu_category(self, menu_item, category_name, selected_gameid):
         self.submenu_category.popdown()
@@ -2215,7 +2222,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.load_config()
                 self.update_list()
-                self.select_first_child()
+                self.select_first_child_when_ready()
                 return True
             except Exception:
                 return False
@@ -2312,8 +2319,73 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             w = w.get_parent()
 
         self.flowbox.remove_all()
-        for game in self.games:
-            self.add_item_list(game)
+        self.populate_flowbox_incremental()
+
+    def populate_flowbox_incremental(self, batch_size=8):
+        games_iter = iter(self.games)
+
+        generation = object()
+        self._flowbox_populate_generation = generation
+
+        def step():
+            if getattr(self, '_flowbox_populate_generation', None) is not generation:
+                return False
+
+            for _ in range(batch_size):
+                game = next(games_iter, None)
+                if game is None:
+                    return False
+                self.add_item_list(game)
+
+            return True
+
+        GLib.idle_add(step)
+
+    def schedule_zoom_apply(self, zoom_pct):
+        if getattr(self, '_zoom_apply_source', None):
+            GLib.source_remove(self._zoom_apply_source)
+
+        def fire():
+            self._zoom_apply_source = None
+            self.apply_zoom_incremental(zoom_pct)
+            return False
+
+        self._zoom_apply_source = GLib.timeout_add(150, fire)
+
+    def apply_zoom_incremental(self, zoom_pct, batch_size=15):
+        if not hasattr(self, 'flowbox') or self.interface_mode not in ("Covers", "SteamGridDB"):
+            return
+
+        children_iter = iter(widget_children(self.flowbox))
+
+        generation = object()
+        self._zoom_apply_generation = generation
+
+        zoom_width = int(230 * (zoom_pct / 100.0))
+        zoom_height = int(zoom_width * 1.5)
+
+        def step():
+            if getattr(self, '_zoom_apply_generation', None) is not generation:
+                return False
+
+            for _ in range(batch_size):
+                child = next(children_iter, None)
+                if child is None:
+                    return False
+
+                if not hasattr(child, 'game') or not child.game or not hasattr(child, 'cover'):
+                    continue
+
+                game = child.game
+                if os.path.isfile(game.cover):
+                    surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
+                else:
+                    surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
+                child.cover.set_paintable(surface)
+
+            return True
+
+        GLib.idle_add(step)
 
     def add_item_list(self, game):
         zoom_pct = self.cover_size
@@ -3011,7 +3083,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_list()
 
             self.remove_latest_and_order(gameid)
-            self.select_first_child()
+            self.select_first_child_when_ready()
 
     def reload_playtimes(self):
         games_data = load_json_file(GAMES_JSON, [])
