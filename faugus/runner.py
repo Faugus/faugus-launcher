@@ -9,8 +9,11 @@ import time
 import shlex
 import signal
 import warnings
+import os
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
 gi.require_version("Gtk", "4.0")
 
@@ -46,9 +49,10 @@ def set_child_env(key, value):
 
 
 def child_env():
-    return {**os.environ, **_child_only_env}
-
-
+    env = {**os.environ, **_child_only_env}
+    env.pop("VK_LOADER_LAYERS_DISABLE", None)
+    return env
+ 
 def warm_up_gpu():
     import ctypes
 
