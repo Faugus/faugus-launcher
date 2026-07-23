@@ -9,7 +9,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
-"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: Hosted Weblate user 158752 "
+"<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -340,7 +341,7 @@ msgstr "Liste"
 
 #: faugus/launcher.py:4074
 msgid "Grid"
-msgstr ""
+msgstr "Kacheln"
 
 #: faugus/launcher.py:4075
 msgid "Covers"
@@ -456,7 +457,7 @@ msgstr "Taskleistensymbol"
 
 #: faugus/launcher.py:4175
 msgid "Minimized startup"
-msgstr ""
+msgstr "Minimiert starten"
 
 #: faugus/launcher.py:4178
 msgid "Monochrome icon"
