@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
-"PO-Revision-Date: 2026-07-20 13:26+0000\n"
+"PO-Revision-Date: 2026-07-23 01:08+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -21,16 +21,15 @@ msgstr ""
 
 #: faugus/backup.py:153
 msgid "Backup Settings"
-msgstr "Configuración de copia de seguridad"
+msgstr "Ajustes de copia de seguridad"
 
 #: faugus/backup.py:181
 msgid "Backup Destination"
 msgstr "Destino de la copia de seguridad"
 
 #: faugus/backup.py:194
-#, fuzzy
 msgid "Backup destination path"
-msgstr "Destino de la copia de seguridad"
+msgstr "Ruta de destino de la copia de seguridad"
 
 #: faugus/backup.py:205
 msgid "Backup now"
@@ -86,7 +85,7 @@ msgstr "Aún no hay copia de seguridad"
 
 #: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
-msgstr "¡Los prefijos y Proton no se incluirán en la copia de seguridad!"
+msgstr "¡Los prefixes y Proton no se incluirán en la copia de seguridad!"
 
 #: faugus/backup.py:269 faugus/launcher.py:4228 faugus/launcher.py:5226
 #: faugus/launcher.py:5647 faugus/launcher.py:6198 faugus/shortcut.py:86
@@ -134,12 +133,11 @@ msgstr "Abrir ubicación del juego"
 
 #: faugus/launcher.py:299
 msgid "Open prefix location"
-msgstr "Abrir ubicación del prefijo"
+msgstr "Abrir ubicación del prefix"
 
 #: faugus/launcher.py:302
-#, fuzzy
 msgid "Run file in the prefix"
-msgstr "Ejecutar un archivo dentro del prefijo"
+msgstr "Ejecutar un archivo dentro del prefix"
 
 #: faugus/launcher.py:305
 msgid "Show logs"
@@ -161,7 +159,6 @@ msgid "Uncategorized"
 msgstr "Sin categoría"
 
 #: faugus/launcher.py:897
-#, fuzzy
 msgid "Kill all running games"
 msgstr "Forzar cierre de todos los juegos en ejecución"
 
@@ -241,9 +238,8 @@ msgid "minutes"
 msgstr "minutos"
 
 #: faugus/launcher.py:1987 faugus/launcher.py:4870 faugus/launcher.py:6762
-#, fuzzy
 msgid "Select a file to run in the prefix"
-msgstr "Seleccionar un archivo para ejecutar dentro del prefijo"
+msgstr "Seleccionar un archivo para ejecutar dentro del prefix"
 
 #: faugus/launcher.py:2033
 #, python-format
@@ -274,7 +270,7 @@ msgstr "Proton puede generar archivos de registro muy grandes."
 
 #: faugus/launcher.py:2670
 msgid "Enable logging only when debugging a problem."
-msgstr "Activa el registro solo al depurar un problema."
+msgstr "Activa el logging solo al depurar un problema."
 
 #: faugus/launcher.py:2929
 #, python-format
@@ -283,7 +279,7 @@ msgstr "Editar %s"
 
 #: faugus/launcher.py:3067
 msgid "Failed to remove prefix"
-msgstr "Error al eliminar el prefijo"
+msgstr "Error al eliminar el prefix"
 
 #: faugus/launcher.py:3304
 msgid "No internet connection"
@@ -348,7 +344,7 @@ msgstr "Grilla"
 
 #: faugus/launcher.py:4075
 msgid "Covers"
-msgstr "Carátulas"
+msgstr "Portadas"
 
 #: faugus/launcher.py:4078
 msgid "Background"
@@ -360,7 +356,7 @@ msgstr "Predeterminado"
 
 #: faugus/launcher.py:4082
 msgid "Accent color"
-msgstr "Color de resaltado"
+msgstr "Color de selección"
 
 #: faugus/launcher.py:4083
 msgid "Dominant color"
@@ -372,7 +368,7 @@ msgstr "Banner"
 
 #: faugus/launcher.py:4088
 msgid "UI Customization"
-msgstr "Personalización de UI"
+msgstr "Personalización de interfaz"
 
 #: faugus/launcher.py:4091
 msgid "Theme"
@@ -388,11 +384,11 @@ msgstr "Oscuro"
 
 #: faugus/launcher.py:4099
 msgid "Accent Color"
-msgstr "Color de resaltado"
+msgstr "Color de selección"
 
 #: faugus/launcher.py:4114
 msgid "Startup Window Size"
-msgstr "Tamaño de ventana de inicio"
+msgstr "Tamaño de ventana al iniciar"
 
 #: faugus/launcher.py:4118
 msgid "Default size"
@@ -420,15 +416,15 @@ msgstr "Etiquetas"
 
 #: faugus/launcher.py:4136
 msgid "Default Prefixes Location"
-msgstr "Ubicación predeterminada de los prefijos"
+msgstr "Ubicación predeterminada de los prefixes"
 
 #: faugus/launcher.py:4140
 msgid "The location where prefixes are created"
-msgstr "La ubicación donde se crean los prefijos"
+msgstr "La ubicación donde se crean los prefixes"
 
 #: faugus/launcher.py:4150
 msgid "Default Prefix Tools"
-msgstr "Herramientas del prefijo predeterminado"
+msgstr "Herramientas de prefix predeterminadas"
 
 #: faugus/launcher.py:4156
 msgid "Default Proton"
@@ -476,11 +472,11 @@ msgstr "Actualizaciones automáticas"
 
 #: faugus/launcher.py:4187
 msgid "Logging"
-msgstr "Registro"
+msgstr "Activar logging"
 
 #: faugus/launcher.py:4190
 msgid "Categories and sort"
-msgstr "Categorías y orden"
+msgstr "Mostrar categorías y modo de orden"
 
 #: faugus/launcher.py:4192
 msgid "Hidden games"
@@ -495,12 +491,10 @@ msgid "Gamepad navigation"
 msgstr "Navegación con gamepad"
 
 #: faugus/launcher.py:4198
-#, fuzzy
 msgid "Wayland driver (experimental)"
 msgstr "Usar controlador Wayland (experimental)"
 
 #: faugus/launcher.py:4201
-#, fuzzy
 msgid "WOW64 (experimental)"
 msgstr "Activar WOW64 (experimental)"
 
@@ -509,9 +503,8 @@ msgid "Run"
 msgstr "Ejecutar"
 
 #: faugus/launcher.py:4214 faugus/launcher.py:5607
-#, fuzzy
 msgid "Run a file in the prefix"
-msgstr "Ejecutar un archivo dentro del prefijo"
+msgstr "Ejecutar un archivo dentro del prefix"
 
 #: faugus/launcher.py:4218 faugus/launcher.py:5592 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
@@ -594,7 +587,7 @@ msgstr "No"
 
 #: faugus/launcher.py:5011 faugus/launcher.py:7005
 msgid "Select a prefix location"
-msgstr "Seleccionar una ubicación para el prefijo"
+msgstr "Seleccionar una ubicación para el prefix"
 
 #: faugus/launcher.py:5215
 #, python-format
@@ -619,15 +612,15 @@ msgstr "¿Estás seguro de que deseas eliminar %s?"
 #: faugus/launcher.py:5282
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
-msgstr "ADVERTENCIA: Este prefijo es utilizado por %d otros juegos."
+msgstr "ADVERTENCIA: Este prefix es utilizado por %d otros juegos."
 
 #: faugus/launcher.py:5284
 msgid "WARNING: This prefix is used by 1 other game."
-msgstr "ADVERTENCIA: Este prefijo es utilizado por 1 otro juego."
+msgstr "ADVERTENCIA: Este prefix es utilizado por 1 otro juego."
 
 #: faugus/launcher.py:5298
 msgid "Also remove the prefix:"
-msgstr "También eliminar el prefijo:"
+msgstr "También eliminar el prefix:"
 
 #: faugus/launcher.py:5345
 msgid "New Game/App"
@@ -651,11 +644,11 @@ msgstr "Ruta al ejecutable del juego"
 
 #: faugus/launcher.py:5548
 msgid "Prefix"
-msgstr "Prefijo"
+msgstr "Prefix"
 
 #: faugus/launcher.py:5552
 msgid "Path to the prefix"
-msgstr "Ruta al prefijo"
+msgstr "Ruta al prefix"
 
 #: faugus/launcher.py:5560
 msgid "Proton"
@@ -861,27 +854,22 @@ msgid "Please choose another one."
 msgstr "Por favor, elige otro."
 
 #: faugus/utils.py:855 faugus/utils.py:869
-#, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
 msgstr ""
-"Muestra una superposición para monitorear FPS, temperaturas, carga de CPU/"
-"GPU y más."
+"Muestra un overlay para monitorear FPS, temperaturas, carga de CPU/GPU y más"
 
 #: faugus/utils.py:856
-#, fuzzy
 msgid "MangoHud not found"
-msgstr "%s no fue encontrado"
+msgstr "MangoHud no encontrado"
 
 #: faugus/utils.py:863 faugus/utils.py:871
-#, fuzzy
 msgid "Tweaks your system to improve performance"
-msgstr "Optimiza tu sistema para mejorar el rendimiento."
+msgstr "Optimiza tu sistema para mejorar el rendimiento"
 
 #: faugus/utils.py:863
-#, fuzzy
 msgid "GameMode not found"
-msgstr "%s no fue encontrado"
+msgstr "GameMode no encontrado"
 
 #: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
@@ -896,9 +884,8 @@ msgid "Launch Arguments"
 msgstr "Argumentos de lanzamiento"
 
 #: faugus/utils.py:1329
-#, fuzzy
 msgid "Select a command or script"
-msgstr "Seleccionar un icono para el acceso directo"
+msgstr "Selecciona un comando o script"
 
 #: faugus/utils.py:1354
 msgid "Pre-launch"
@@ -921,9 +908,8 @@ msgid "Enable"
 msgstr "Activar"
 
 #: faugus/utils.py:1434
-#, fuzzy
 msgid "Path to the application"
-msgstr "Ejecutar la aplicación primero"
+msgstr "Ruta a la aplicación"
 
 #: faugus/utils.py:1446
 msgid "Select an additional application"
@@ -942,9 +928,8 @@ msgid "Lossless Scaling Location"
 msgstr "Ubicación de Lossless Scaling"
 
 #: faugus/utils.py:1569
-#, fuzzy
 msgid "Lossless.dll location"
-msgstr "Ubicación de Lossless Scaling"
+msgstr "Ubicación de Lossless.dll"
 
 #: faugus/utils.py:1581
 msgid "Select the Lossless.dll file"
@@ -955,68 +940,60 @@ msgid "Multiplier"
 msgstr "Multiplicador"
 
 #: faugus/utils.py:1619
-#, fuzzy
 msgid "Multiply the FPS"
-msgstr "Multiplica los FPS."
+msgstr "Multiplica los FPS"
 
 #: faugus/utils.py:1621
 msgid "Flow Scale"
 msgstr "Escala de flujo"
 
 #: faugus/utils.py:1628
-#, fuzzy
 msgid "Lower the internal motion estimation resolution"
-msgstr "Reduce la resolución interna de estimación de movimiento."
+msgstr "Reduce la resolución interna de estimación de movimiento"
 
 #: faugus/utils.py:1630
 msgid "Performance Mode"
 msgstr "Modo de rendimiento"
 
 #: faugus/utils.py:1631
-#, fuzzy
 msgid "Massively improve performance at the cost of quality"
-msgstr "Mejora enormemente el rendimiento a costa de la calidad."
+msgstr "Mejora enormemente el rendimiento en detrimento de la calidad"
 
 #: faugus/utils.py:1634
 msgid "HDR Mode"
 msgstr "Modo HDR"
 
 #: faugus/utils.py:1635
-#, fuzzy
 msgid "Enable special HDR-only behavior"
-msgstr "Activa el comportamiento especial exclusivo de HDR."
+msgstr "Activa el comportamiento especial exclusivo de HDR"
 
 #: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
 msgstr "Modo de presentación (experimental)"
 
 #: faugus/utils.py:1642
-#, fuzzy
 msgid "Override the present mode"
-msgstr "Anula el modo de presentación."
+msgstr "Sustituye el modo actual"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "No hay una API key de SteamGridDB configurada."
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "Primero añade tu API key en la configuración."
 
 #: faugus/utils.py:1909
-#, fuzzy
 msgid "Choose a cover"
-msgstr "Icono en la bandeja del sistema"
+msgstr "Elije una portada"
 
 #: faugus/utils.py:1910
-#, fuzzy
 msgid "Choose a banner"
-msgstr "Icono en la bandeja del sistema"
+msgstr "Elije un banner"
 
 #: faugus/utils.py:1911
-#, fuzzy
 msgid "Choose an icon"
-msgstr "Icono en la bandeja del sistema"
+msgstr "Elije un ícono"
 
 #: faugus/utils.py:2009
 msgid "No results found"

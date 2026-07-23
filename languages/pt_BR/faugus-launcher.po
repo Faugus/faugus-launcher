@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
-"PO-Revision-Date: 2026-07-20 14:26+0000\n"
+"PO-Revision-Date: 2026-07-23 01:15+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -540,12 +540,11 @@ msgstr "Variáveis de Ambiente Globais"
 
 #: faugus/launcher.py:4471 faugus/launcher.py:4484
 msgid "Environment"
-msgstr ""
+msgstr "Ambiente"
 
 #: faugus/launcher.py:4472 faugus/launcher.py:4485
-#, fuzzy
 msgid "Interface"
-msgstr "Modo de Interface"
+msgstr "Interface"
 
 #: faugus/launcher.py:4584
 #, python-format
