@@ -74,7 +74,7 @@ def list_steam_account_ids():
         return []
     try:
         return [f for f in os.listdir(USERDATA)
-                if os.path.isdir(os.path.join(USERDATA, f)) and f.isdigit()]
+                if os.path.isdir(os.path.join(USERDATA, f)) and f.isdigit() and f != "0"]
     except (FileNotFoundError, PermissionError):
         return []
 

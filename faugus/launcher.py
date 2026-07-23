@@ -22,7 +22,7 @@ from faugus.ea_fix import *
 from faugus.tray_sni import TrayIcon
 from faugus.migration import fix_legacy_shortcut_icons
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'
@@ -821,14 +821,34 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if visible_children:
             self._focus_flowbox_child_at(0)
 
+    def select_first_child_when_ready(self):
+        attempts = {"n": 0}
+
+        def try_select():
+            attempts["n"] += 1
+
+            visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
+            if visible_children:
+                self._focus_flowbox_child_at(0)
+                return False
+
+            return attempts["n"] < 100
+
+        GLib.timeout_add(50, try_select)
+
     def select_game_by_title(self, title):
+        attempts = {"n": 0}
+
         def do_select():
+            attempts["n"] += 1
+
             visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
             for index, child in enumerate(visible_children):
                 if hasattr(child, 'game') and child.game and child.game.title == title:
                     self._focus_flowbox_child_at(index)
-                    break
-            return False
+                    return False
+
+            return attempts["n"] < 100
 
         GLib.timeout_add(50, do_select)
 
@@ -999,20 +1019,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._last_zoom = zoom_pct
             self.cover_size = zoom_pct
 
-            if hasattr(self, 'flowbox'):
-                for child in widget_children(self.flowbox):
-                    if not hasattr(child, 'game') or not child.game:
-                        continue
-                    game = child.game
-
-                    if self.interface_mode in ("Covers", "SteamGridDB") and hasattr(child, 'cover'):
-                        zoom_width = int(230 * (zoom_pct / 100.0))
-                        zoom_height = int(zoom_width * 1.5)
-                        if os.path.isfile(game.cover):
-                            surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
-                        else:
-                            surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
-                        child.cover.set_paintable(surface)
+            self.schedule_zoom_apply(zoom_pct)
 
         self.scale_zoom.connect("value-changed", on_zoom_changed)
 
@@ -1900,7 +1907,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         self.update_list()
-        self.select_first_child()
+        self.select_first_child_when_ready()
 
     def on_context_menu_category(self, menu_item, category_name, selected_gameid):
         self.submenu_category.popdown()
@@ -2215,7 +2222,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.load_config()
                 self.update_list()
-                self.select_first_child()
+                self.select_first_child_when_ready()
                 return True
             except Exception:
                 return False
@@ -2312,8 +2319,73 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             w = w.get_parent()
 
         self.flowbox.remove_all()
-        for game in self.games:
-            self.add_item_list(game)
+        self.populate_flowbox_incremental()
+
+    def populate_flowbox_incremental(self, batch_size=8):
+        games_iter = iter(self.games)
+
+        generation = object()
+        self._flowbox_populate_generation = generation
+
+        def step():
+            if getattr(self, '_flowbox_populate_generation', None) is not generation:
+                return False
+
+            for _ in range(batch_size):
+                game = next(games_iter, None)
+                if game is None:
+                    return False
+                self.add_item_list(game)
+
+            return True
+
+        GLib.idle_add(step)
+
+    def schedule_zoom_apply(self, zoom_pct):
+        if getattr(self, '_zoom_apply_source', None):
+            GLib.source_remove(self._zoom_apply_source)
+
+        def fire():
+            self._zoom_apply_source = None
+            self.apply_zoom_incremental(zoom_pct)
+            return False
+
+        self._zoom_apply_source = GLib.timeout_add(150, fire)
+
+    def apply_zoom_incremental(self, zoom_pct, batch_size=15):
+        if not hasattr(self, 'flowbox') or self.interface_mode not in ("Covers", "SteamGridDB"):
+            return
+
+        children_iter = iter(widget_children(self.flowbox))
+
+        generation = object()
+        self._zoom_apply_generation = generation
+
+        zoom_width = int(230 * (zoom_pct / 100.0))
+        zoom_height = int(zoom_width * 1.5)
+
+        def step():
+            if getattr(self, '_zoom_apply_generation', None) is not generation:
+                return False
+
+            for _ in range(batch_size):
+                child = next(children_iter, None)
+                if child is None:
+                    return False
+
+                if not hasattr(child, 'game') or not child.game or not hasattr(child, 'cover'):
+                    continue
+
+                game = child.game
+                if os.path.isfile(game.cover):
+                    surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
+                else:
+                    surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
+                child.cover.set_paintable(surface)
+
+            return True
+
+        GLib.idle_add(step)
 
     def add_item_list(self, game):
         zoom_pct = self.cover_size
@@ -3011,7 +3083,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_list()
 
             self.remove_latest_and_order(gameid)
-            self.select_first_child()
+            self.select_first_child_when_ready()
 
     def reload_playtimes(self):
         games_data = load_json_file(GAMES_JSON, [])
@@ -3122,10 +3194,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 path = f"{prefix}/drive_c/Program Files/Electronic Arts/EA Desktop/EA Desktop/EALauncher.exe"
             if launcher_id == "epic":
                 path = f"{prefix}/drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
-            if launcher_id == "ubisoft":
-                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+            if launcher_id == "gog":
+                path = f"{prefix}/drive_c/Program Files/GOG Galaxy/GalaxyClient.exe"
             if launcher_id == "rockstar":
                 path = f"{prefix}/drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+            if launcher_id == "ubisoft":
+                path = f"{prefix}/drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
             if launcher_id == "wargaming":
                 path = f"{prefix}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
 
@@ -3230,7 +3304,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.show_warning_dialog_main(add_game_dialog, _("No internet connection"), "")
                     return True
 
-                if launcher_id in ("battle", "ea", "epic", "ubisoft", "rockstar", "wargaming"):
+                if launcher_id in ("battle", "ea", "epic", "gog", "rockstar", "ubisoft", "wargaming"):
                     destroy_add_game_dialog()
                     dialog_destroyed = True
                     self.launcher_screen(
@@ -3326,13 +3400,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.label_download.set_text(_("Downloading") + " Epic Games...")
             self.download_launcher("epic", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
-        elif launcher == "ubisoft":
-            self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
-            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
+        elif launcher == "gog":
+            self.label_download.set_text(_("Downloading") + " GOG Galaxy...")
+            self.download_launcher("gog", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "rockstar":
             self.label_download.set_text(_("Downloading") + " Rockstar Launcher...")
             self.download_launcher("rockstar", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
+
+        elif launcher == "ubisoft":
+            self.label_download.set_text(_("Downloading") + " Ubisoft Connect...")
+            self.download_launcher("ubisoft", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
         elif launcher == "wargaming":
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
@@ -3420,16 +3498,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
-            urls = {"ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
-                "epic": "https://github.com/Faugus/components/releases/download/v1.0.0/epic.msi",
-                "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
-                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
+            urls = {"battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+                "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
+                "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
+                "gog": "https://github.com/Faugus/components/releases/download/v1.0.1/gog.tar.gz",
                 "rockstar": "https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe",
+                "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
                 "wargaming": "https://redirect.wargaming.net/WGC/Wargaming_Game_Center_Install_NA.exe"}
 
-            file_name = {"ea": "EAappInstaller.exe", "epic": "EpicGamesLauncherInstaller.msi",
-                "battle": "Battle.net-Setup.exe", "ubisoft": "UbisoftConnectInstaller.exe",
-                "rockstar": "Rockstar-Games-Launcher.exe", "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
+            file_name = {"battle": "Battle.net-Setup.exe", "ea": "EAappInstaller.exe",
+                "epic": "EpicGamesLauncherInstaller.msi", "gog": "gog.tar.gz",
+                "rockstar": "Rockstar-Games-Launcher.exe", "ubisoft": "UbisoftConnectInstaller.exe",
+                "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
 
             if launcher not in urls:
                 return None
@@ -3465,13 +3545,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 elif launcher == "epic":
                     self.label_download2.set_text("")
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} msiexec /i '{file_path}' /passive"
-                elif launcher == "ubisoft":
+                elif launcher == "gog":
                     self.label_download2.set_text("")
-                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /S"
+                    import tarfile
+                    with tarfile.open(file_path, "r:gz") as tar:
+                        tar.extractall(path=FAUGUS_TEMP, filter="fully_trusted")
+
+                    installer_path = os.path.join(FAUGUS_TEMP, "gog", "GalaxySetup.exe")
+                    command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{installer_path}' /VERYSILENT /NORESTART /SUPPRESSMSGBOXES"
                 elif launcher == "rockstar":
                     self.label_download.set_text(_("Please don't change the installation path."))
                     self.label_download2.set_text(_("Please close the login window and wait."))
                     command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}'"
+                elif launcher == "ubisoft":
+                    self.label_download2.set_text("")
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /S"
                 elif launcher == "wargaming":
                     self.label_download2.set_text(_("Please close Wargaming to finish the installation."))
                     command = f"LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' /SILENT"
@@ -4186,6 +4274,7 @@ class Settings(Gtk.Dialog):
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrolled_window.set_min_content_height(130)
+        scrolled_window.set_vexpand(True)
         scrolled_window.set_child(treeview)
 
         self.box = self.get_content_area()
@@ -4205,13 +4294,6 @@ class Settings(Gtk.Dialog):
         frame.set_margin_end(10)
         frame.set_margin_bottom(10)
 
-        box_main = Gtk.Grid()
-        box_main.set_column_homogeneous(True)
-        box_main.set_column_spacing(10)
-        box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_mid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-
         box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_buttons.set_valign(Gtk.Align.CENTER)
 
@@ -4229,11 +4311,14 @@ class Settings(Gtk.Dialog):
 
         grid_miscellaneous = build_grid()
 
+        grid_misc_col2 = build_grid()
+
         grid_envar = build_grid()
+        grid_envar.set_vexpand(True)
 
         grid_theme_accent = build_grid()
 
-        grid_theme_rest = build_grid(margin_top=False)
+        grid_theme_rest = build_grid()
 
         grid_support = build_grid(column_homogeneous=True)
         grid_support.set_vexpand(True)
@@ -4272,27 +4357,25 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.checkbox_sdl, 0, 3, 1, 1)
         grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
+        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 0, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_splash_window, 0, 1, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 2, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 3, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wow64, 0, 5, 1, 1)
+
+        grid_misc_col2.attach(self.checkbox_auto_close_on_launch, 0, 0, 1, 1)
+        grid_misc_col2.attach(self.checkbox_autostart, 0, 1, 1, 1)
+        grid_misc_col2.attach(self.checkbox_system_tray, 0, 2, 1, 1)
+        grid_misc_col2.attach(self.checkbox_minimized_startup, 0, 3, 1, 1)
+        grid_misc_col2.attach(self.checkbox_mono_icon, 0, 4, 1, 1)
+
         grid_logs.attach(self.checkbox_logging, 0, 0, 1, 1)
         grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
         self.button_clearlogs.set_hexpand(True)
 
-        grid_miscellaneous.attach(self.label_miscellaneous, 0, 0, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 1, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_splash_window, 0, 2, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_autostart, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wow64, 0, 11, 1, 1)
-
-        grid_theme_accent.attach(self.label_ui_customization, 0, 0, 1, 1)
-
-        grid_theme_accent.attach(self.label_interface, 0, 1, 1, 1)
-        grid_theme_accent.attach(self.combobox_interface, 0, 2, 1, 1)
+        grid_theme_accent.attach(self.label_interface, 0, 0, 1, 1)
+        grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
         grid_theme_rest.attach(self.label_theme, 0, 0, 1, 1)
@@ -4322,7 +4405,7 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.label_startup_window_size, 0, 2, 2, 1)
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
         self.grid_big_interface.attach(self.checkbox_labels, 0, 4, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_banner, 1, 4, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_banner, 0, 5, 1, 1)
         self.combobox_startup_window_size.set_hexpand(True)
         self.entry_steamgriddb_key.set_hexpand(True)
 
@@ -4330,28 +4413,113 @@ class Settings(Gtk.Dialog):
         grid_support.attach(button_kofi, 0, 1, 1, 1)
         grid_support.attach(button_paypal, 1, 1, 1, 1)
 
-        box_left.append(grid_prefix)
-        box_left.append(grid_runner)
-        box_left.append(self.label_default_prefix_tools)
-        box_left.append(grid_tools)
-        box_left.append(grid_envar)
-        box_left.append(grid_language)
+        box_left_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_left_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_mid_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_mid_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_right_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_right_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        box_mid.append(grid_miscellaneous)
-        box_mid.append(grid_logs)
-        box_mid.append(grid_backup)
+        box_left_col1.append(grid_runner)
+        box_left_col1.append(self.label_default_prefix_tools)
+        box_left_col1.append(grid_tools)
 
-        box_right.append(grid_theme_accent)
-        box_right.append(self.grid_big_interface)
-        box_right.append(grid_theme_rest)
-        box_right.append(grid_support)
+        box_left_col2.append(grid_prefix)
+        box_left_col2.append(grid_envar)
 
-        box_main.attach(box_left, 0, 0, 1, 1)
-        box_main.attach(box_right, 1, 0, 1, 1)
-        box_main.attach(box_mid, 2, 0, 1, 1)
+        box_left_col1.set_hexpand(True)
+        box_left_col2.set_hexpand(True)
+
+        box_left = Gtk.Grid()
+        box_left.set_column_homogeneous(True)
+        box_left.set_column_spacing(10)
+        box_left.attach(box_left_col1, 0, 0, 1, 1)
+        box_left.attach(box_left_col2, 1, 0, 1, 1)
+
+        box_mid_col1.append(grid_miscellaneous)
+        box_mid_col1.append(grid_logs)
+        box_mid_col2.append(grid_misc_col2)
+
+        box_mid_col1.set_hexpand(True)
+        box_mid_col2.set_hexpand(True)
+
+        box_mid = Gtk.Grid()
+        box_mid.set_column_homogeneous(True)
+        box_mid.set_column_spacing(10)
+        box_mid.attach(box_mid_col1, 0, 0, 1, 1)
+        box_mid.attach(box_mid_col2, 1, 0, 1, 1)
+
+        box_right_col1.append(grid_theme_accent)
+        box_right_col1.append(self.grid_big_interface)
+
+        box_right_col2.append(grid_theme_rest)
+
+        box_right_col1.set_hexpand(True)
+        box_right_col2.set_hexpand(True)
+
+        box_right = Gtk.Grid()
+        box_right.set_column_homogeneous(True)
+        box_right.set_column_spacing(10)
+        box_right.attach(box_right_col2, 0, 0, 1, 1)
+        box_right.attach(box_right_col1, 1, 0, 1, 1)
+
         box_left.set_hexpand(True)
         box_mid.set_hexpand(True)
-        frame.set_child(box_main)
+        box_right.set_hexpand(True)
+
+        view_stack = Gtk.Stack()
+        view_stack.add_titled(box_left, "environment", _("Environment"))
+        view_stack.add_titled(box_right, "interface", _("Interface"))
+        view_stack.add_titled(box_mid, "miscellaneous", _("Miscellaneous"))
+
+        view_switcher = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        view_switcher.add_css_class("linked")
+        view_switcher.set_homogeneous(True)
+        view_switcher.set_hexpand(True)
+        view_switcher.set_margin_top(10)
+        view_switcher.set_margin_start(10)
+        view_switcher.set_margin_end(10)
+
+        tab_buttons = [
+            ("environment", _("Environment")),
+            ("interface", _("Interface")),
+            ("miscellaneous", _("Miscellaneous")),
+        ]
+        first_button = None
+        tab_button_widgets = []
+        for name, label in tab_buttons:
+            button = Gtk.ToggleButton(label=label)
+            button.set_focusable(False)
+            if first_button is None:
+                first_button = button
+                button.set_active(True)
+            else:
+                button.set_group(first_button)
+            button.connect("toggled", lambda btn, n=name: view_stack.set_visible_child_name(n) if btn.get_active() else None)
+            view_switcher.append(button)
+            tab_button_widgets.append(button)
+
+        self.view_stack = view_stack
+        self.tab_names = [n for n, _ in tab_buttons]
+        self.tab_button_widgets = tab_button_widgets
+
+        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_tabs.append(view_switcher)
+        box_tabs.append(view_stack)
+
+        frame.set_child(box_tabs)
+
+        frame_footer = Gtk.Frame()
+        frame_footer.set_margin_start(10)
+        frame_footer.set_margin_end(10)
+        frame_footer.set_margin_bottom(10)
+
+        box_footer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_footer.set_homogeneous(True)
+        box_footer.append(grid_language)
+        box_footer.append(grid_support)
+        box_footer.append(grid_backup)
+        frame_footer.set_child(box_footer)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_bottom.set_homogeneous(True)
@@ -4365,6 +4533,7 @@ class Settings(Gtk.Dialog):
         box_bottom.append(self.button_ok)
 
         self.box.append(frame)
+        self.box.append(frame_footer)
         self.box.append(box_bottom)
 
         self.populate_combobox_with_runners()
@@ -6534,13 +6703,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files/Epic Games/Launcher/Portal/Binaries/Win64/EpicGamesLauncher.exe"
 
-            elif active_id == "ubisoft":
-                self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
-                path = "drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
+            elif active_id == "gog":
+                path = "drive_c/Program Files/GOG Galaxy/GalaxyClient.exe"
 
             elif active_id == "rockstar":
                 self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files/Rockstar Games/Launcher/Launcher.exe"
+
+            elif active_id == "ubisoft":
+                self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
+                path = "drive_c/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/UbisoftConnect.exe"
 
             elif active_id == "wargaming":
                 path = "drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
@@ -6561,7 +6733,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("steam", _("Steam Game"))
         self.combobox_launcher.append("battle", "Battle.net")
         self.combobox_launcher.append("ea", "EA App")
-
+        self.combobox_launcher.append("epic", "Epic Games")
+        self.combobox_launcher.append("gog", "GOG Galaxy")
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")

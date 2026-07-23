@@ -33,11 +33,20 @@ fix_legacy_shortcut_icons()
 _ = setup_gettext('faugus-launcher')
 
 _env_set = set()
+_child_only_env = {}
 
 
 def set_env(key, value):
     os.environ[key] = value
     _env_set.add(key)
+
+
+def set_child_env(key, value):
+    _child_only_env[key] = value
+
+
+def child_env():
+    return {**os.environ, **_child_only_env}
 
 
 def warm_up_gpu():
@@ -126,8 +135,12 @@ class FaugusRun(HiDpiMixin):
         set_env("PROTON_BATTLEYE_RUNTIME", BE_DIR)
 
         if self.discrete_gpu:
-            set_env("DRI_PRIME", "1")
-            warm_up_gpu()
+            set_child_env("DRI_PRIME", "1")
+
+            def do_warm_up_gpu():
+                warm_up_gpu()
+                return False
+            GLib.idle_add(do_warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.wow64_enabled:
@@ -142,7 +155,7 @@ class FaugusRun(HiDpiMixin):
             GLib.idle_add(self.show_log_window)
 
         if os.environ.get("PROTONPATH") == "Steam":
-            subprocess.Popen(self.message, shell=True)
+            subprocess.Popen(self.message, shell=True, env=child_env())
 
             def update_ui():
                 if self.splash_window:
@@ -184,9 +197,6 @@ class FaugusRun(HiDpiMixin):
             if not os.environ.get("PROTONPATH") == "umu-sniper":
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
-
-        if not os.environ.get("GAMEID"):
-            set_env("PROTONFIXES_DISABLE", "1")
 
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "DW-Proton Latest" and protonpath != "umu-sniper":
@@ -233,6 +243,8 @@ class FaugusRun(HiDpiMixin):
         print("\n=== ENVIRONMENT VARIABLES ===")
         for key in sorted(_env_set):
             print(f"{key}={os.environ.get(key)}")
+        for key in sorted(_child_only_env):
+            print(f"{key}={_child_only_env[key]}")
 
         print("\n=== UMU-LAUNCHER COMMAND ===")
         print(f"{self.message}\n")
@@ -250,7 +262,8 @@ class FaugusRun(HiDpiMixin):
 
             process = subprocess.Popen(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                bufsize=8192, text=True, start_new_session=is_game
+                bufsize=8192, text=True, start_new_session=is_game,
+                env=child_env()
             )
 
             def watch_stream(stream, lf=None):
@@ -319,7 +332,7 @@ class FaugusRun(HiDpiMixin):
 
         if self.pre_launch:
             try:
-                subprocess.Popen(self.pre_launch, shell=True)
+                subprocess.Popen(self.pre_launch, shell=True, env=child_env())
             except Exception as e:
                 print(f"Error running pre-launch command: {e}")
 
@@ -697,7 +710,7 @@ class FaugusRun(HiDpiMixin):
 
         if self.post_launch:
             try:
-                subprocess.Popen(self.post_launch, shell=True)
+                subprocess.Popen(self.post_launch, shell=True, env=child_env())
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
