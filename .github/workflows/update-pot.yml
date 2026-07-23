@@ -12,6 +12,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: update-pot-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   update-pot:
     runs-on: ubuntu-latest
