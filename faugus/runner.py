@@ -198,9 +198,6 @@ class FaugusRun(HiDpiMixin):
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
 
-        if not os.environ.get("GAMEID"):
-            set_env("PROTONFIXES_DISABLE", "1")
-
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "DW-Proton Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
