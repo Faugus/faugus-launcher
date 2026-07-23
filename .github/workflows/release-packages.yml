@@ -97,8 +97,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
-          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts 2>/dev/null
-          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur -o IdentitiesOnly=yes"
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           git config --global user.name "Faugus"
           git config --global user.email "felix.ribeiro@live.com"
           git clone ssh://aur@aur.archlinux.org/faugus-launcher.git /tmp/aur-repo
@@ -110,7 +109,7 @@ jobs:
           git push
 
       - name: Upload package asset
-        if: env.RELEASE_ID != ''
+        if: always() && env.RELEASE_ID != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -130,7 +129,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y meson ninja-build python3 wget dpkg-dev lintian \
-            devscripts debhelper dh-python gnupg dput
+            devscripts debhelper dh-python gnupg dput \
+            build-essential python3-all libgtk-3-bin
 
       - name: Build raw .deb
         run: |
