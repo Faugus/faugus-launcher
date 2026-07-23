@@ -90,11 +90,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.1-1" date="2026-07-20">
+    <release version="2.0.2-1" date="2026-07-22">
       <description>
         <ul>
-          <li>Fixed games not launching in some system when Discrete GPU option is enabled</li>
-          <li>Fixed app stuck in the migration screen</li>
+          <li>Re-added Epic Games launcher</li>
+          <li>Added GOG Galaxy launcher support</li>
+          <li>Added tabs to Settings screen</li>
+          <li>Now loads images incrementally</li>
+          <li>Now allows automatic Protonfixes</li>
+          <li>Now ignores Steam user 0</li>
+          <li>Updated translations</li>
         </ul>
       </description>
     </release>
