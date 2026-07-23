@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Linus Virtanen <linus.virtanen@protonmail.com>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fi/>\n"
 "Language: fi\n"
@@ -21,67 +21,67 @@ msgstr ""
 
 #: faugus/backup.py:153
 msgid "Backup Settings"
-msgstr ""
+msgstr "Varmuuskopioi asetukset"
 
 #: faugus/backup.py:181
 msgid "Backup Destination"
-msgstr ""
+msgstr "Varmuuskopion kohde"
 
 #: faugus/backup.py:194
 msgid "Backup destination path"
-msgstr ""
+msgstr "Varmuuskopion tiedostopolku"
 
 #: faugus/backup.py:205
 msgid "Backup now"
-msgstr ""
+msgstr "Varmuuskopioi nyt"
 
 #: faugus/backup.py:211
 msgid "Automatic Backup"
-msgstr ""
+msgstr "Automaattinen varmuuskopiointi"
 
 #: faugus/backup.py:220
 msgid "Daily"
-msgstr ""
+msgstr "Päivittäin"
 
 #: faugus/backup.py:221
 msgid "Weekly"
-msgstr ""
+msgstr "Viikoittain"
 
 #: faugus/backup.py:223
 msgid "Monthly"
-msgstr ""
+msgstr "Kuukausittain"
 
 #: faugus/backup.py:235
 msgid "Monday"
-msgstr ""
+msgstr "Maanantai"
 
 #: faugus/backup.py:236
 msgid "Tuesday"
-msgstr ""
+msgstr "Tiistai"
 
 #: faugus/backup.py:237
 msgid "Wednesday"
-msgstr ""
+msgstr "Keskiviikko"
 
 #: faugus/backup.py:238
 msgid "Thursday"
-msgstr ""
+msgstr "Torstai"
 
 #: faugus/backup.py:239
 msgid "Friday"
-msgstr ""
+msgstr "Perjantai"
 
 #: faugus/backup.py:240
 msgid "Saturday"
-msgstr ""
+msgstr "Lauantai"
 
 #: faugus/backup.py:241
 msgid "Sunday"
-msgstr ""
+msgstr "Sunnuntai"
 
 #: faugus/backup.py:260
 msgid "No backup yet"
-msgstr ""
+msgstr "Varmuuskopiota ei vielä ole"
 
 #: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
