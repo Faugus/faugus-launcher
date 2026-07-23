@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ka/>\n"
 "Language: ka\n"
@@ -43,7 +43,7 @@ msgstr ""
 
 #: faugus/backup.py:220
 msgid "Daily"
-msgstr ""
+msgstr "დღიური"
 
 #: faugus/backup.py:221
 msgid "Weekly"
@@ -263,14 +263,14 @@ msgid "Open file location"
 msgstr "ფაილის მდებარეობის გახსნა"
 
 #: faugus/launcher.py:2155 faugus/launcher.py:3168
-#, fuzzy, python-format
+#, python-format
 msgid "%s already exists"
-msgstr "%s უკვე არსებობს."
+msgstr "%s უკვე არსებობს"
 
 #: faugus/launcher.py:2273 faugus/launcher.py:3005
-#, fuzzy, python-format
+#, python-format
 msgid "%s is running"
-msgstr "%s უკვე გაშვებულია."
+msgstr "%s გაშვებულია"
 
 #: faugus/launcher.py:2669
 msgid "Proton may generate huge log files."
@@ -286,14 +286,12 @@ msgid "Edit %s"
 msgstr "%s-ის ჩასწორება"
 
 #: faugus/launcher.py:3067
-#, fuzzy
 msgid "Failed to remove prefix"
-msgstr "პრეფიქსის წაშლა ჩავარდა."
+msgstr "პრეფიქსის წაშლა ჩავარდა"
 
 #: faugus/launcher.py:3304
-#, fuzzy
 msgid "No internet connection"
-msgstr "ინტერნეტკავშირის გარეშე."
+msgstr "ინტერნეტკავშირის გარეშე"
 
 #: faugus/launcher.py:3380 faugus/launcher.py:3538
 #, python-format
@@ -341,9 +339,8 @@ msgid "Language"
 msgstr "ენა"
 
 #: faugus/launcher.py:4069
-#, fuzzy
 msgid "Mode"
-msgstr "HDR რეჟიმი"
+msgstr "რეჟიმი"
 
 #: faugus/launcher.py:4073
 msgid "List"
@@ -504,9 +501,8 @@ msgid "Hidden games"
 msgstr "დამალული თამაშების ჩვენება"
 
 #: faugus/launcher.py:4193
-#, fuzzy
 msgid "Ctrl+H toggles hidden games"
-msgstr "Ctrl+H თამაშების საჩვენებლად/დასამალად."
+msgstr "Ctrl+H გადართავს დამალულ თამაშებს"
 
 #: faugus/launcher.py:4195
 msgid "Gamepad navigation"
@@ -695,11 +691,8 @@ msgid "Additional Application"
 msgstr "დამატებითი აპლიკაცია"
 
 #: faugus/launcher.py:5585 faugus/shortcut.py:71
-#, fuzzy
 msgid "Additional application to run with the game"
-msgstr ""
-"დამატებითი აპლიკაციები თამაშთან ერთად გასაშვებად. მაგ: ჩიტები, ტრეინერები, "
-"მოდები..."
+msgstr "დამატებითი აპლიკაციები თამაშთან ერთად გასაშვებად"
 
 #: faugus/launcher.py:5587 faugus/shortcut.py:73 faugus/utils.py:1527
 msgid "Lossless Scaling Frame Generation"
@@ -742,9 +735,8 @@ msgid "Tools"
 msgstr "ხელსაწყოები"
 
 #: faugus/launcher.py:6000 faugus/shortcut.py:190
-#, fuzzy
 msgid "Vulkan Layer not found"
-msgstr "%s აღმოჩენილი არაა."
+msgstr "Vulkan-ის ფენა აღმოჩენილი არაა"
 
 #: faugus/launcher.py:6155
 #, fuzzy
@@ -825,14 +817,13 @@ msgid "Continue"
 msgstr "გაგრძელება"
 
 #: faugus/runner.py:443
-#, fuzzy
 msgid "Internet connection error"
-msgstr "ინტერნეტთან დაკავშირების შეცდომა."
+msgstr "ინტერნეტთან დაკავშირების შეცდომა"
 
 #: faugus/runner.py:445
-#, fuzzy, python-format
+#, python-format
 msgid "%s was not found"
-msgstr "%s აღმოჩენილი არაა."
+msgstr "%s აღმოჩენილი არაა"
 
 #: faugus/runner.py:446
 msgid "Please install it or use another Proton version."
@@ -847,14 +838,12 @@ msgid "Updating"
 msgstr ""
 
 #: faugus/runner.py:606
-#, fuzzy
 msgid "Extracting"
-msgstr "გაშლა..."
+msgstr "ამღება"
 
 #: faugus/runner.py:612
-#, fuzzy
 msgid "is up to date"
-msgstr "GE-Proton განახლებულია"
+msgstr "განახლებულია"
 
 #: faugus/runner.py:678
 msgid "The keys and values were successfully added to the registry."
@@ -894,25 +883,21 @@ msgid "Please choose another one."
 msgstr "აირჩიეთ სხვა."
 
 #: faugus/utils.py:855 faugus/utils.py:869
-#, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
-msgstr "აჩვენებს ზემოდან FPS-ს, ტემპერატურას, CPU/GPU-ის დატვირთვას და ა.შ."
+msgstr "აჩვენებს ზემოდან FPS-ს, ტემპერატურას, CPU/GPU-ის დატვირთვას და ა.შ"
 
 #: faugus/utils.py:856
-#, fuzzy
 msgid "MangoHud not found"
-msgstr "%s აღმოჩენილი არაა."
+msgstr "MangoHud აღმოჩენილი არაა"
 
 #: faugus/utils.py:863 faugus/utils.py:871
-#, fuzzy
 msgid "Tweaks your system to improve performance"
-msgstr "ცვლის თქვენს სისტემას წარმადობის გასაზრდელად."
+msgstr "ცვლის თქვენს სისტემას წარმადობის გასაზრდელად"
 
 #: faugus/utils.py:863
-#, fuzzy
 msgid "GameMode not found"
-msgstr "%s აღმოჩენილი არაა."
+msgstr "GameMode აღმოჩენილი არაა"
 
 #: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
@@ -986,45 +971,40 @@ msgid "Multiplier"
 msgstr "მამრავლი"
 
 #: faugus/utils.py:1619
-#, fuzzy
 msgid "Multiply the FPS"
-msgstr "FPS-ის მამრავლი."
+msgstr "FPS-ის მამრავლი"
 
 #: faugus/utils.py:1621
 msgid "Flow Scale"
 msgstr "დინების მასშტაბი"
 
 #: faugus/utils.py:1628
-#, fuzzy
 msgid "Lower the internal motion estimation resolution"
-msgstr "შიდა მოძრაობის დადგენის გარჩევადობის დაწევა."
+msgstr "შიდა მოძრაობის დადგენის გარჩევადობის დაწევა"
 
 #: faugus/utils.py:1630
 msgid "Performance Mode"
 msgstr "წარმადობის რეჟიმი"
 
 #: faugus/utils.py:1631
-#, fuzzy
 msgid "Massively improve performance at the cost of quality"
-msgstr "წარმადობის საგრძნობი გაზრდა ხარისხის ხარჯზე."
+msgstr "წარმადობის საგრძნობი გაზრდა ხარისხის ხარჯზე"
 
 #: faugus/utils.py:1634
 msgid "HDR Mode"
 msgstr "HDR რეჟიმი"
 
 #: faugus/utils.py:1635
-#, fuzzy
 msgid "Enable special HDR-only behavior"
-msgstr "სპეციალური, მხოლოდ-HDR ქცევის ჩართვა."
+msgstr "სპეციალური, მხოლოდ-HDR ქცევის ჩართვა"
 
 #: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
 msgstr "პრეზენტაციის რეჟიმი (ექსპერიმენტული)"
 
 #: faugus/utils.py:1642
-#, fuzzy
 msgid "Override the present mode"
-msgstr "პრეზენტაციის რეჟიმის გადაფარვა."
+msgstr "პრეზენტაციის რეჟიმის გადაფარვა"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
