@@ -282,7 +282,19 @@ jobs:
               echo "Could not find .changes file for $DISTRO" >&2
               exit 1
             fi
-            dput "$PPA" "$CHANGES_FILE"
+            UPLOAD_OK=0
+            for attempt in 1 2 3; do
+              if dput "$PPA" "$CHANGES_FILE"; then
+                UPLOAD_OK=1
+                break
+              fi
+              echo "dput attempt $attempt failed, retrying in 15s..."
+              sleep 15
+            done
+            if [ "$UPLOAD_OK" != "1" ]; then
+              echo "dput failed after 3 attempts for $DISTRO" >&2
+              exit 1
+            fi
 
             rm -rf "${PACKAGE}-${TAG}-${DISTRO}"
           done
