@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
 "PO-Revision-Date: 2026-07-24 10:01+0000\n"
-"Last-Translator: nixxo <nixxo@protonmail.com>\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -541,17 +541,16 @@ msgstr "Variabili d'Ambiente Globali"
 
 #: faugus/launcher.py:4471 faugus/launcher.py:4484
 msgid "Environment"
-msgstr ""
+msgstr "Ambiente"
 
 #: faugus/launcher.py:4472 faugus/launcher.py:4485
-#, fuzzy
 msgid "Interface"
-msgstr "Modalità Interfaccia"
+msgstr "Interfaccia"
 
 #: faugus/launcher.py:4584
 #, python-format
 msgid "Clear Logs (%s)"
-msgstr "Pulisci i Registri (%s)"
+msgstr "Svuota Registri (%s)"
 
 #: faugus/launcher.py:4587
 msgid "Clear Logs"
@@ -748,7 +747,7 @@ msgstr "Seleziona l'eseguibile del gioco"
 
 #: faugus/proton_manager.py:88
 msgid "Faugus Proton Manager"
-msgstr "Gestore Installazioni di Proton"
+msgstr "Gestore Proton di Faugus"
 
 #: faugus/proton_manager.py:222 faugus/proton_manager.py:343
 #: faugus/proton_manager.py:357
@@ -980,11 +979,11 @@ msgstr "Sovrascrivi la modalità presentazione"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr "Chiave API di SteamGridDB non configurata."
+msgstr "Nessuna chiave API di SteamGridDB configurata."
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr "Aggiungi la tua chiave API nelle Impostazioni."
+msgstr "Aggiungi la tua chiave API nelle Impostazioni prima."
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
