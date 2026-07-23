@@ -348,6 +348,12 @@ def _handle_button_down(self, button, win):
         elif role == "rb":
             win.notebook.set_current_page(1)
 
+    elif isinstance(getattr(win, "view_stack", None), Gtk.Stack):
+        if role == "lb":
+            _switch_stack_tab(win, -1)
+        elif role == "rb":
+            _switch_stack_tab(win, 1)
+
     elif isinstance(win, VirtualKeyboard):
         if role == "square":
             win.on_backspace(None)
@@ -355,6 +361,21 @@ def _handle_button_down(self, button, win):
             win.on_toggle_mode(win.get_focus(), "Shift")
         elif role == "start":
             win.on_enter(None)
+
+
+def _switch_stack_tab(win, delta):
+    stack = getattr(win, "view_stack", None)
+    names = getattr(win, "tab_names", None)
+    buttons = getattr(win, "tab_button_widgets", None)
+    if not stack or not names or not buttons:
+        return
+
+    current = stack.get_visible_child_name()
+    if current not in names:
+        return
+
+    index = (names.index(current) + delta) % len(names)
+    buttons[index].set_active(True)
 
 
 def _handle_treeview_confirm(treeview):

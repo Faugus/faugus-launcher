@@ -4468,9 +4468,9 @@ class Settings(Gtk.Dialog):
         box_right.set_hexpand(True)
 
         view_stack = Gtk.Stack()
-        view_stack.add_titled(box_left, "prefixes", _("Prefixes & Tools"))
+        view_stack.add_titled(box_left, "environment", _("Environment"))
         view_stack.add_titled(box_right, "interface", _("Interface"))
-        view_stack.add_titled(box_mid, "behavior", _("Behavior"))
+        view_stack.add_titled(box_mid, "miscellaneous", _("Miscellaneous"))
 
         view_switcher = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         view_switcher.add_css_class("linked")
@@ -4481,13 +4481,15 @@ class Settings(Gtk.Dialog):
         view_switcher.set_margin_end(10)
 
         tab_buttons = [
-            ("prefixes", _("Prefixes & Tools")),
+            ("environment", _("Environment")),
             ("interface", _("Interface")),
-            ("behavior", _("Behavior")),
+            ("miscellaneous", _("Miscellaneous")),
         ]
         first_button = None
+        tab_button_widgets = []
         for name, label in tab_buttons:
             button = Gtk.ToggleButton(label=label)
+            button.set_focusable(False)
             if first_button is None:
                 first_button = button
                 button.set_active(True)
@@ -4495,6 +4497,11 @@ class Settings(Gtk.Dialog):
                 button.set_group(first_button)
             button.connect("toggled", lambda btn, n=name: view_stack.set_visible_child_name(n) if btn.get_active() else None)
             view_switcher.append(button)
+            tab_button_widgets.append(button)
+
+        self.view_stack = view_stack
+        self.tab_names = [n for n, _ in tab_buttons]
+        self.tab_button_widgets = tab_button_widgets
 
         box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_tabs.append(view_switcher)
