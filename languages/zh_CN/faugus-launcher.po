@@ -3,19 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
-"PO-Revision-Date: 2026-07-20 16:20+0800\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"PO-Revision-Date: 2026-07-21 09:17+0800\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
+"projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.9\n"
 
 #: faugus/backup.py:153
@@ -857,18 +858,16 @@ msgid ""
 msgstr "显示覆盖层，以监控帧数、温度、CPU/GPU 负载等"
 
 #: faugus/utils.py:856
-#, fuzzy
 msgid "MangoHud not found"
-msgstr "未找到 %s"
+msgstr "未找到 MangoHud"
 
 #: faugus/utils.py:863 faugus/utils.py:871
 msgid "Tweaks your system to improve performance"
 msgstr "调整您的系统以提高性能"
 
 #: faugus/utils.py:863
-#, fuzzy
 msgid "GameMode not found"
-msgstr "未找到 %s"
+msgstr "未找到 GameMode"
 
 #: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
@@ -976,11 +975,11 @@ msgstr "覆盖呈现模式"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "SteamGridDB API 密钥未配置"
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "请先在设置中添加 API 密钥"
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
