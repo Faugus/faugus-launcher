@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
-"PO-Revision-Date: 2026-07-23 01:08+0000\n"
+"PO-Revision-Date: 2026-07-24 10:01+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -540,12 +540,11 @@ msgstr "Variables de entorno globales"
 
 #: faugus/launcher.py:4471 faugus/launcher.py:4484
 msgid "Environment"
-msgstr ""
+msgstr "Entorno"
 
 #: faugus/launcher.py:4472 faugus/launcher.py:4485
-#, fuzzy
 msgid "Interface"
-msgstr "Modo de interfaz"
+msgstr "Interfaz"
 
 #: faugus/launcher.py:4584
 #, python-format
