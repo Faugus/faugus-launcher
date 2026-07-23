@@ -224,6 +224,7 @@ jobs:
           export DEBSIGN_KEYID="$PPA_GPG_KEY_ID"
           export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-k$PPA_GPG_KEY_ID"
 
+          FIRST_DISTRO=1
           for DISTRO in "${DISTROS[@]}"; do
             echo "Building for $DISTRO..."
             cp -r "${PACKAGE}-${TAG}" "${PACKAGE}-${TAG}-${DISTRO}"
@@ -267,7 +268,13 @@ jobs:
           RULES
             chmod +x debian/rules
 
-            debuild -S -sa -k"$PPA_GPG_KEY_ID" -p"gpg --pinentry-mode loopback --passphrase $PPA_GPG_PASSPHRASE"
+            if [ "$FIRST_DISTRO" = "1" ]; then
+              SOURCE_FLAG="-sa"
+              FIRST_DISTRO=0
+            else
+              SOURCE_FLAG="-sd"
+            fi
+            debuild -S "$SOURCE_FLAG" -k"$PPA_GPG_KEY_ID" -p"gpg --pinentry-mode loopback --passphrase $PPA_GPG_PASSPHRASE"
             cd ..
 
             CHANGES_FILE=$(find . -maxdepth 1 -name "${PACKAGE}_*${DISTRO}1_source.changes" -print -quit)
