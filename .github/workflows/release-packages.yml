@@ -13,6 +13,10 @@ on:
         description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"
         type: boolean
         default: false
+      jobs:
+        description: "Which jobs to run: 'all' or a comma-separated list (appimage,arch,debian,fedora)"
+        type: string
+        default: "all"
 
 permissions:
   contents: write
@@ -24,6 +28,7 @@ env:
 
 jobs:
   appimage:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'appimage')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -58,6 +63,7 @@ jobs:
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
 
   arch:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'arch')
     runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
@@ -121,6 +127,7 @@ jobs:
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
 
   debian:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'debian')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -274,6 +281,7 @@ jobs:
           done
 
   fedora:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'fedora')
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
