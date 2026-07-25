@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-23 01:02+0000\n"
-"PO-Revision-Date: 2026-07-23 01:09+0000\n"
+"PO-Revision-Date: 2026-07-25 11:01+0000\n"
 "Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
@@ -541,12 +541,11 @@ msgstr "Глобальные переменные окружения"
 
 #: faugus/launcher.py:4471 faugus/launcher.py:4484
 msgid "Environment"
-msgstr ""
+msgstr "Окружение"
 
 #: faugus/launcher.py:4472 faugus/launcher.py:4485
-#, fuzzy
 msgid "Interface"
-msgstr "Режим интерфейса"
+msgstr "Интерфейс"
 
 #: faugus/launcher.py:4584
 #, python-format
