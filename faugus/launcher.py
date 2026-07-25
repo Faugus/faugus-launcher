@@ -231,79 +231,47 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         """, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         load_frame_css()
 
-        self.context_menu = Gtk.Popover()
-        self.context_menu.set_has_arrow(False)
-        self.context_menu.set_autohide(True)
-        context_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        context_box.set_margin_start(6)
-        context_box.set_margin_end(6)
-        context_box.set_margin_top(6)
-        context_box.set_margin_bottom(6)
-        self.context_menu.set_child(context_box)
+        self.context_menu = None
 
-        self.label_menu_title = Gtk.Label(label="")
-        self.label_menu_title.set_halign(Gtk.Align.START)
-        self.label_menu_title.add_css_class("heading")
-        self.label_menu_title.set_margin_bottom(4)
-        context_box.append(self.label_menu_title)
+        self.action_context_play = Gio.SimpleAction.new("context-play", None)
+        self.action_context_play.connect("activate", self.on_context_menu_play)
+        self.add_action(self.action_context_play)
 
-        self.label_menu_playtime = Gtk.Label(label="")
-        self.label_menu_playtime.set_halign(Gtk.Align.START)
-        self.label_menu_playtime.set_margin_bottom(4)
-        context_box.append(self.label_menu_playtime)
+        self.action_context_edit = Gio.SimpleAction.new("context-edit", None)
+        self.action_context_edit.connect("activate", self.on_context_menu_edit)
+        self.add_action(self.action_context_edit)
 
-        context_box.append(Gtk.Separator())
+        self.action_context_delete = Gio.SimpleAction.new("context-delete", None)
+        self.action_context_delete.connect("activate", self.on_context_menu_delete)
+        self.add_action(self.action_context_delete)
 
-        def context_menu_button(label):
-            btn = Gtk.Button(label=label)
-            btn.set_has_frame(False)
-            btn.get_child().set_halign(Gtk.Align.START)
-            context_box.append(btn)
-            return btn
+        self.action_context_duplicate = Gio.SimpleAction.new("context-duplicate", None)
+        self.action_context_duplicate.connect("activate", self.on_context_menu_duplicate)
+        self.add_action(self.action_context_duplicate)
 
-        self.menu_play = context_menu_button(_("Play"))
-        self.menu_play.connect("clicked", self.on_context_menu_play)
+        self.action_context_hide = Gio.SimpleAction.new("context-hide", None)
+        self.action_context_hide.connect("activate", self.on_context_menu_hide)
+        self.add_action(self.action_context_hide)
 
-        self.menu_edit = context_menu_button(_("Edit"))
-        self.menu_edit.connect("clicked", self.on_context_menu_edit)
+        self.action_context_category = Gio.SimpleAction.new("context-category", GLib.VariantType.new("s"))
+        self.action_context_category.connect("activate", self.on_context_menu_category)
+        self.add_action(self.action_context_category)
 
-        self.menu_delete = context_menu_button(_("Delete"))
-        self.menu_delete.connect("clicked", self.on_context_menu_delete)
+        self.action_context_game_location = Gio.SimpleAction.new("context-game-location", None)
+        self.action_context_game_location.connect("activate", self.on_context_menu_game_location)
+        self.add_action(self.action_context_game_location)
 
-        self.menu_duplicate = context_menu_button(_("Duplicate"))
-        self.menu_duplicate.connect("clicked", self.on_context_menu_duplicate)
+        self.action_context_prefix_location = Gio.SimpleAction.new("context-prefix-location", None)
+        self.action_context_prefix_location.connect("activate", self.on_context_menu_prefix_location)
+        self.add_action(self.action_context_prefix_location)
 
-        self.menu_hide = context_menu_button(_("Hide"))
-        self.menu_hide.connect("clicked", self.on_context_menu_hide)
+        self.action_context_run = Gio.SimpleAction.new("context-run", None)
+        self.action_context_run.connect("activate", self.on_context_menu_run)
+        self.add_action(self.action_context_run)
 
-        self.menu_category = context_menu_button(_("Category"))
-        self.submenu_category = Gtk.Popover()
-        self.submenu_category.set_parent(self.menu_category)
-        self.submenu_category_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        self.submenu_category_box.set_margin_start(6)
-        self.submenu_category_box.set_margin_end(6)
-        self.submenu_category_box.set_margin_top(6)
-        self.submenu_category_box.set_margin_bottom(6)
-        self.submenu_category.set_child(self.submenu_category_box)
-
-        def on_category_button_clicked(widget):
-            if self.gamepad_navigation:
-                self.active_popover = self.submenu_category
-            self.submenu_category.popup()
-
-        self.menu_category.connect("clicked", on_category_button_clicked)
-
-        self.menu_game_location = context_menu_button(_("Open game location"))
-        self.menu_game_location.connect("clicked", self.on_context_menu_game_location)
-
-        self.menu_prefix_location = context_menu_button(_("Open prefix location"))
-        self.menu_prefix_location.connect("clicked", self.on_context_menu_prefix_location)
-
-        self.menu_run = context_menu_button(_("Run file in the prefix"))
-        self.menu_run.connect("clicked", self.on_context_menu_run)
-
-        self.menu_show_logs = context_menu_button(_("Show logs"))
-        self.menu_show_logs.connect("clicked", self.on_context_show_logs)
+        self.action_context_show_logs = Gio.SimpleAction.new("context-show-logs", None)
+        self.action_context_show_logs.connect("activate", self.on_context_show_logs)
+        self.add_action(self.action_context_show_logs)
 
         self.load_config()
 
@@ -349,10 +317,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         is_running = gameid in self.running if gameid else False
         icon = "faugus-stop-symbolic" if is_running else "faugus-play-symbolic"
-        text = _("Stop") if is_running else _("Play")
 
         self.button_play.set_child(new_icon_image(f"{icon}.svg"))
-        self.menu_play.get_child().set_text(text)
 
     def selected(self):
         selected_items = self.flowbox.get_selected_children()
@@ -1705,21 +1671,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_close_fullscreen(self, widget):
         self.get_application().quit()
 
-    def on_item_right_click(self, item=None, x=None, y=None):
-        if item is None:
-            selected = self.flowbox.get_selected_children()
-            item = selected[0] if selected else None
-
-        if not item:
-            return
-
-        self.flowbox.emit('child-activated', item)
-        self.flowbox.select_child(item)
-
-        game = self.selected()
+    def build_context_menu(self, game):
         title = game.title
 
-        self.label_menu_title.set_text(title)
+        label_menu_title = Gtk.Label(label=title)
+        label_menu_title.set_halign(Gtk.Align.START)
+        label_menu_title.add_css_class("heading")
+        label_menu_title.set_margin_bottom(4)
 
         data = load_json_file(GAMES_JSON, [])
 
@@ -1730,29 +1688,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 formatted = self.format_playtime(game.playtime)
                 break
 
-        self.label_menu_playtime.set_visible(bool(formatted))
-        if formatted:
-            self.label_menu_playtime.set_text(formatted)
+        label_menu_playtime = Gtk.Label(label=formatted or "")
+        label_menu_playtime.set_halign(Gtk.Align.START)
+        label_menu_playtime.set_margin_bottom(4)
+        label_menu_playtime.set_visible(bool(formatted))
+
+        header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        header_box.set_margin_start(6)
+        header_box.set_margin_end(6)
+        header_box.set_margin_top(6)
+        header_box.append(label_menu_title)
+        header_box.append(label_menu_playtime)
 
         self.proton_log = f"{LOGS_DIR}/{game.gameid}/proton.log"
         self.umu_log = f"{LOGS_DIR}/{game.gameid}/umu.log"
 
         if os.path.exists(self.proton_log):
-            self.menu_show_logs.set_sensitive(True)
+            self.action_context_show_logs.set_enabled(True)
             self.current_title = title
         else:
-            self.menu_show_logs.set_sensitive(False)
+            self.action_context_show_logs.set_enabled(False)
 
-        if game.hidden:
-            self.menu_hide.set_label(_("Remove from hidden"))
-        else:
-            self.menu_hide.set_label(_("Hide"))
-
-        child = self.submenu_category_box.get_first_child()
-        while child:
-            next_child = child.get_next_sibling()
-            self.submenu_category_box.remove(child)
-            child = next_child
+        hide_label = _("Remove from hidden") if game.hidden else _("Hide")
+        play_label = _("Stop") if game.gameid in self.running else _("Play")
 
         categories = sorted(
             [cat.strip() for cat in load_json_file(CATEGORIES_FILE, default=[]) if cat.strip()],
@@ -1772,54 +1730,92 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not current_cats:
             current_cats = [_("None")]
 
+        category_menu = Gio.Menu()
         for cat in categories:
             label_text = f"✓ {cat}" if cat in current_cats else f"   {cat}"
+            cat_item = Gio.MenuItem.new(label_text, None)
+            cat_item.set_action_and_target_value("win.context-category", GLib.Variant.new_string(cat))
+            category_menu.append_item(cat_item)
 
-            cat_btn = Gtk.Button(label=label_text)
-            cat_btn.set_has_frame(False)
-            cat_btn.get_child().set_halign(Gtk.Align.START)
-            cat_btn.connect("clicked", self.on_context_menu_category, cat, game.gameid)
-            self.submenu_category_box.append(cat_btn)
-
-        self.menu_show_logs.set_visible(self.logging_enabled)
-
-        if game.runner == "Steam":
-            self.menu_duplicate.set_visible(False)
-            self.menu_game_location.set_visible(False)
-            self.menu_prefix_location.set_visible(False)
-            self.menu_run.set_visible(False)
-            self.menu_show_logs.set_visible(False)
-        elif game.runner == "Linux-Native":
-            self.menu_duplicate.set_visible(True)
-            self.menu_game_location.set_visible(True)
-            self.menu_prefix_location.set_visible(False)
-            self.menu_run.set_visible(False)
-            self.menu_show_logs.set_visible(False)
-        else:
-            self.menu_duplicate.set_visible(True)
-            self.menu_game_location.set_visible(True)
-            self.menu_prefix_location.set_visible(True)
-            self.menu_run.set_visible(True)
+        show_duplicate = game.runner != "Steam"
+        show_game_location = game.runner != "Steam"
+        show_prefix_location = game.runner not in ("Steam", "Linux-Native")
+        show_run = game.runner not in ("Steam", "Linux-Native")
+        show_logs_item = self.logging_enabled and game.runner not in ("Steam", "Linux-Native")
 
         game_path = expand_path(game.path)
         game_prefix = expand_path(game.prefix)
 
         if os.path.dirname(game_path):
-            self.menu_game_location.set_sensitive(True)
+            self.action_context_game_location.set_enabled(True)
             self.current_game = os.path.dirname(game_path)
         else:
-            self.menu_game_location.set_sensitive(False)
+            self.action_context_game_location.set_enabled(False)
             self.current_game = None
 
         if os.path.isdir(game_prefix):
-            self.menu_prefix_location.set_sensitive(True)
+            self.action_context_prefix_location.set_enabled(True)
             self.current_prefix = game_prefix
         else:
-            self.menu_prefix_location.set_sensitive(False)
+            self.action_context_prefix_location.set_enabled(False)
             self.current_prefix = None
 
-        if self.context_menu.get_parent():
+        root = Gio.Menu()
+
+        header_section = Gio.Menu()
+        header_item = Gio.MenuItem.new()
+        header_item.set_attribute_value("custom", GLib.Variant.new_string("header"))
+        header_section.append_item(header_item)
+        root.append_section(None, header_section)
+
+        actions_section = Gio.Menu()
+        actions_section.append(play_label, "win.context-play")
+        actions_section.append(_("Edit"), "win.context-edit")
+        actions_section.append(_("Delete"), "win.context-delete")
+
+        if show_duplicate:
+            actions_section.append(_("Duplicate"), "win.context-duplicate")
+
+        actions_section.append(hide_label, "win.context-hide")
+        actions_section.append_submenu(_("Category"), category_menu)
+
+        if show_game_location:
+            actions_section.append(_("Open game location"), "win.context-game-location")
+
+        if show_prefix_location:
+            actions_section.append(_("Open prefix location"), "win.context-prefix-location")
+
+        if show_run:
+            actions_section.append(_("Run file in the prefix"), "win.context-run")
+
+        if show_logs_item:
+            actions_section.append(_("Show logs"), "win.context-show-logs")
+
+        root.append_section(None, actions_section)
+
+        popover = Gtk.PopoverMenu.new_from_model_full(root, Gtk.PopoverMenuFlags.NESTED)
+        popover.set_has_arrow(False)
+        popover.add_child(header_box, "header")
+        return popover
+
+    def on_item_right_click(self, item=None, x=None, y=None):
+        if item is None:
+            selected = self.flowbox.get_selected_children()
+            item = selected[0] if selected else None
+
+        if not item:
+            return
+
+        self.flowbox.emit('child-activated', item)
+        self.flowbox.select_child(item)
+
+        game = self.selected()
+
+        if self.context_menu is not None and self.context_menu.get_parent():
+            self.context_menu.popdown()
             self.context_menu.unparent()
+
+        self.context_menu = self.build_context_menu(game)
         self.context_menu.set_parent(item)
         if x is not None and y is not None:
             translated = self.flowbox.translate_coordinates(item, x, y)
@@ -1862,31 +1858,31 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return " ".join(parts)
 
-    def on_context_menu_play(self, menu_item):
+    def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if game:
             self.on_button_play_clicked(None, game)
 
-    def on_context_menu_edit(self, menu_item):
+    def on_context_menu_edit(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if game:
             self.on_button_edit_clicked(game)
 
-    def on_context_menu_delete(self, menu_item):
+    def on_context_menu_delete(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if game:
             self.on_button_delete_clicked(game)
 
-    def on_context_menu_duplicate(self, menu_item):
+    def on_context_menu_duplicate(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if game:
             self.on_duplicate_clicked()
 
-    def on_context_menu_hide(self, menu_item):
+    def on_context_menu_hide(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if not game:
@@ -1909,9 +1905,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.update_list()
         self.select_first_child_when_ready()
 
-    def on_context_menu_category(self, menu_item, category_name, selected_gameid):
-        self.submenu_category.popdown()
+    def on_context_menu_category(self, action, param):
+        category_name = param.get_string()
+        game = self.selected()
+        selected_gameid = game.gameid if game else None
         self.context_menu.popdown()
+        if not selected_gameid:
+            return
         try:
             data = load_json_file(GAMES_JSON, [])
 
@@ -1969,15 +1969,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.select_child(child_to_select)
             self.flowbox.set_focus_child(child_to_select)
 
-    def on_context_menu_game_location(self, menu_item):
+    def on_context_menu_game_location(self, action, param):
         self.context_menu.popdown()
         subprocess.Popen(["xdg-open", self.current_game])
 
-    def on_context_menu_prefix_location(self, menu_item):
+    def on_context_menu_prefix_location(self, action, param):
         self.context_menu.popdown()
         subprocess.Popen(["xdg-open", self.current_prefix])
 
-    def on_context_menu_run(self, menu_item):
+    def on_context_menu_run(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if not game:
@@ -2023,7 +2023,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         filechooser.connect("response", on_response)
         filechooser.present()
 
-    def on_context_show_logs(self, menu_item):
+    def on_context_show_logs(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
         if game:
@@ -2294,8 +2294,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.sort = cfg.config.get('sort', '')
         self.category = cfg.config.get('category', '')
         self.steam_user = cfg.config.get('steam-user', 'all')
-
-        self.menu_show_logs.set_visible(self.logging_enabled)
 
     def load_games(self):
         games_data = load_json_file(GAMES_JSON, [])

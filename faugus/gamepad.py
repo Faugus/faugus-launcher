@@ -438,15 +438,8 @@ def _open_context_menu(self):
         return
 
     self.active_popover = active_menu
-
-    items = [w for w in widget_children(active_menu.get_child()) if isinstance(w, Gtk.Button) and w.get_visible()]
-    if not items:
-        return
-
-    menu_play = getattr(self, "menu_play", None)
-    target = menu_play if menu_play in items else next((i for i in items if i.get_sensitive()), items[0])
     self.set_focus_visible(True)
-    target.grab_focus()
+    active_menu.child_focus(Gtk.DirectionType.TAB_FORWARD)
 
 
 def adjust_widget_value(widget, direction):
@@ -590,6 +583,17 @@ def _handle_menu_button(self, button):
         GLib.idle_add(lambda: activate_focused_widget(self))
 
     elif role == "back":
+        root = popover.get_root()
+        focused = root.get_focus() if root else None
+        nested = _find_parent_popover(focused) if focused else None
+        if nested and nested is not popover:
+            anchor = nested.get_parent()
+            nested.popdown()
+            popover.popup()
+            if anchor:
+                anchor.grab_focus()
+            return
+
         anchor = popover.get_parent()
         parent_popover = _find_parent_popover(anchor)
 
@@ -897,6 +901,9 @@ def activate_focused_widget(self):
             fetch_suggestions=fetch_suggestions, on_suggestion_selected=on_suggestion_selected
         )
         dialog.present()
+
+    elif type(focused).__name__ == "GtkModelButton":
+        focused.emit("clicked")
 
     elif isinstance(focused, Gtk.Button):
         label = focused.get_label() if hasattr(focused, "get_label") else None
