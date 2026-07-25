@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-25 17:19+0000\n"
-"PO-Revision-Date: 2026-07-23 01:15+0000\n"
+"PO-Revision-Date: 2026-07-25 18:53+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -223,7 +223,7 @@ msgstr "Executar arquivo no prefixo"
 
 #: faugus/launcher.py:1810 faugus/launcher.py:1832
 msgid "Recent"
-msgstr ""
+msgstr "Recente"
 
 #: faugus/launcher.py:1912
 msgid "hour"
