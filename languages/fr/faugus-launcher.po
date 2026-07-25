@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-25 17:19+0000\n"
-"PO-Revision-Date: 2026-07-25 11:02+0000\n"
+"PO-Revision-Date: 2026-07-26 14:46+0000\n"
 "Last-Translator: Loïc <weblate.plethora939@passmail.net>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
@@ -223,7 +223,7 @@ msgstr "Lancer un fichier dans le préfixe"
 
 #: faugus/launcher.py:1810 faugus/launcher.py:1832
 msgid "Recent"
-msgstr ""
+msgstr "Récent"
 
 #: faugus/launcher.py:1912
 msgid "hour"
@@ -574,7 +574,7 @@ msgstr "Fichiers ZIP"
 
 #: faugus/launcher.py:5032 faugus/launcher.py:5042
 msgid "This is not a valid Faugus backup file."
-msgstr "Ceci n'est pas un fichier de sauvegarde de FAUGUS valide."
+msgstr "Ceci n'est pas un fichier de sauvegarde de Faugus valide."
 
 #: faugus/launcher.py:5081
 msgid "Are you sure you want to overwrite the settings?"
@@ -590,413 +590,415 @@ msgstr "Non"
 
 #: faugus/launcher.py:5098 faugus/launcher.py:7092
 msgid "Select a prefix location"
-msgstr ""
+msgstr "Sélectionnez un emplacement pour le préfixe"
 
 #: faugus/launcher.py:5302
 #, python-format
 msgid "Duplicate %s"
-msgstr ""
+msgstr "Doublon %s"
 
 #: faugus/launcher.py:5307 faugus/launcher.py:5558 faugus/launcher.py:5571
 #: faugus/shortcut.py:43
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 #: faugus/launcher.py:5353
 #, python-format
 msgid "Delete %s"
-msgstr ""
+msgstr "Supprimer %s"
 
 #: faugus/launcher.py:5360
 #, python-format
 msgid "Are you sure you want to delete %s?"
-msgstr ""
+msgstr "Etes-vous sûr de vouloirs supprimer %s ?"
 
 #: faugus/launcher.py:5369
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
-msgstr ""
+msgstr "ATTENTION : ce préfixe est utilisé par %d autres jeux."
 
 #: faugus/launcher.py:5371
 msgid "WARNING: This prefix is used by 1 other game."
-msgstr ""
+msgstr "ATTENTION : ce préfixe est utilisé par 1 autre jeu."
 
 #: faugus/launcher.py:5385
 msgid "Also remove the prefix:"
-msgstr ""
+msgstr "Egalement supprimer le préfixe :"
 
 #: faugus/launcher.py:5432
 msgid "New Game/App"
-msgstr ""
+msgstr "Nouveau jeu / application"
 
 #: faugus/launcher.py:5541
 msgid "Steam User"
-msgstr ""
+msgstr "Utilisateur Steam"
 
 #: faugus/launcher.py:5555 faugus/launcher.py:6079 faugus/launcher.py:6081
 msgid "No Steam users found"
-msgstr ""
+msgstr "Aucun utilisateur Steam trouvé"
 
 #: faugus/launcher.py:5623 faugus/utils.py:1429
 msgid "Path"
-msgstr ""
+msgstr "Chemin"
 
 #: faugus/launcher.py:5627
 msgid "Path to the game executable"
-msgstr ""
+msgstr "Chemin vers l'exécutable du jeu"
 
 #: faugus/launcher.py:5635
 msgid "Prefix"
-msgstr ""
+msgstr "Préfixe"
 
 #: faugus/launcher.py:5639
 msgid "Path to the prefix"
-msgstr ""
+msgstr "Chemin vers le préfixe"
 
 #: faugus/launcher.py:5647
 msgid "Proton"
-msgstr ""
+msgstr "Proton"
 
 #: faugus/launcher.py:5661 faugus/shortcut.py:60
 msgid "Game Arguments"
-msgstr ""
+msgstr "Arguments du jeu"
 
 #: faugus/launcher.py:5666 faugus/shortcut.py:65 faugus/utils.py:1152
 msgid "Launch Settings"
-msgstr ""
+msgstr "Paramètres de lancement"
 
 #: faugus/launcher.py:5669 faugus/shortcut.py:68 faugus/utils.py:1401
 msgid "Additional Application"
-msgstr ""
+msgstr "Application additionnelle"
 
 #: faugus/launcher.py:5672 faugus/shortcut.py:71
 msgid "Additional application to run with the game"
-msgstr ""
+msgstr "Application additionnelle à lance avec le jeu"
 
 #: faugus/launcher.py:5674 faugus/shortcut.py:73 faugus/utils.py:1527
 msgid "Lossless Scaling Frame Generation"
-msgstr ""
+msgstr "Lossless Scaling Frame Generation"
 
 #: faugus/launcher.py:5696
 msgid "Shortcut"
-msgstr ""
+msgstr "Raccourci"
 
 #: faugus/launcher.py:5701
 msgid "Desktop"
-msgstr ""
+msgstr "Bureau"
 
 #: faugus/launcher.py:5702
 msgid "App Menu"
-msgstr ""
+msgstr "Menu des applications"
 
 #: faugus/launcher.py:5703
 msgid "Steam"
-msgstr ""
+msgstr "Steam"
 
 #: faugus/launcher.py:5904
 msgid "Refresh"
-msgstr ""
+msgstr "Rafraîchir"
 
 #: faugus/launcher.py:5907
 msgid "Load from file"
-msgstr ""
+msgstr "Charger depuis un fichier"
 
 #: faugus/launcher.py:5910
 msgid "Load from URL"
-msgstr ""
+msgstr "Charger depuis une URL"
 
 #: faugus/launcher.py:5915
 msgid "Game/App"
-msgstr ""
+msgstr "Jeu / Application"
 
 #: faugus/launcher.py:5932
 msgid "Tools"
-msgstr ""
+msgstr "Outils"
 
 #: faugus/launcher.py:6087 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
-msgstr ""
+msgstr "Vulkan Layer introuvable"
 
 #: faugus/launcher.py:6242
 msgid "Select an image for the cover"
-msgstr ""
+msgstr "Sélectionner une image pour l'affiche"
 
 #: faugus/launcher.py:6243
 msgid "Select an image for the banner"
-msgstr ""
+msgstr "Sélectionner une image pour la bannière"
 
 #: faugus/launcher.py:6244
 msgid "Select an image for the icon"
-msgstr ""
+msgstr "Sélectionner une image pour l'icône"
 
 #: faugus/launcher.py:6274
 msgid "Enter the image URL"
-msgstr ""
+msgstr "Entrer l'URL de l'image"
 
 #: faugus/launcher.py:6818
 msgid "Windows Game"
-msgstr ""
+msgstr "Jeu Windows"
 
 #: faugus/launcher.py:6819
 msgid "Linux Game"
-msgstr ""
+msgstr "Jeu Linux"
 
 #: faugus/launcher.py:6820
 msgid "Steam Game"
-msgstr ""
+msgstr "Jeu Steam"
 
 #: faugus/launcher.py:7061
 msgid "Select the game executable"
-msgstr ""
+msgstr "Sélectionner l'exécutable du jeu"
 
 #: faugus/proton_manager.py:88
 msgid "Faugus Proton Manager"
-msgstr ""
+msgstr "Gestionnaire de Proton Faugus"
 
 #: faugus/proton_manager.py:222 faugus/proton_manager.py:343
 #: faugus/proton_manager.py:357
 msgid "Download"
-msgstr ""
+msgstr "Télécharger"
 
 #: faugus/proton_manager.py:299
 msgid "Downloading..."
-msgstr ""
+msgstr "Téléchargement..."
 
 #: faugus/proton_manager.py:301
 #, python-format
 msgid "Downloading %s..."
-msgstr ""
+msgstr "Téléchargement de %s..."
 
 #: faugus/proton_manager.py:344
 msgid "Error during download"
-msgstr ""
+msgstr "Erreur lors du téléchargement"
 
 #: faugus/runner.py:162
 msgid "Starting Steam game..."
-msgstr ""
+msgstr "Démarrage du jeu Steam..."
 
 #: faugus/runner.py:388
 msgid "Are you enjoying Faugus?"
-msgstr ""
+msgstr "Appréciez-vous Faugus ?"
 
 #: faugus/runner.py:392
 msgid "Please consider donating"
-msgstr ""
+msgstr "Veuillez considérer une donation"
 
 #: faugus/runner.py:398
 msgid "Never show this message again"
-msgstr ""
+msgstr "Ne plus afficher ce message"
 
 #: faugus/runner.py:408
 msgid "Continue"
-msgstr ""
+msgstr "Continuer"
 
 #: faugus/runner.py:443
 msgid "Internet connection error"
-msgstr ""
+msgstr "Erreur de connexion à internet"
 
 #: faugus/runner.py:445
 #, python-format
 msgid "%s was not found"
-msgstr ""
+msgstr "%s introuvable"
 
 #: faugus/runner.py:446
 msgid "Please install it or use another Proton version."
-msgstr ""
+msgstr "Veuillez installer ou utiliser une autre version de Proton."
 
 #: faugus/runner.py:578
 msgid "Components are up to date"
-msgstr ""
+msgstr "Les composants sont à jour"
 
 #: faugus/runner.py:602
 msgid "Updating"
-msgstr ""
+msgstr "Mise à jour"
 
 #: faugus/runner.py:606
 msgid "Extracting"
-msgstr ""
+msgstr "Extraction"
 
 #: faugus/runner.py:612
 msgid "is up to date"
-msgstr ""
+msgstr "est à jour"
 
 #: faugus/runner.py:678
 msgid "The keys and values were successfully added to the registry."
-msgstr ""
+msgstr "Les clés et valeurs ont été ajoutées au registre avec succès."
 
 #: faugus/tray_sni.py:262
 msgid "Open Faugus"
-msgstr ""
+msgstr "Ouvrir Faugus"
 
 #: faugus/tray_sni.py:264
 msgid "Quit"
-msgstr ""
+msgstr "Quitter"
 
 #: faugus/utils.py:622
 msgid "Open"
-msgstr ""
+msgstr "Ouvrir"
 
 #: faugus/utils.py:655
 msgid "Windows files"
-msgstr ""
+msgstr "Fichiers Windows"
 
 #: faugus/utils.py:663
 msgid "All files"
-msgstr ""
+msgstr "Tous les fichiers"
 
 #: faugus/utils.py:673
 msgid "Image files"
-msgstr ""
+msgstr "Fichiers d'images"
 
 #: faugus/utils.py:822
 msgid "The selected file is not a valid image."
-msgstr ""
+msgstr "Le fichier sélectionné n'est pas un fichier d'image valide."
 
 #: faugus/utils.py:823
 msgid "Please choose another one."
-msgstr ""
+msgstr "Veuillez en choisir un autre."
 
 #: faugus/utils.py:855 faugus/utils.py:869
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
 msgstr ""
+"Afficher un overlay afin de surveiller les FPS, températures, la charge CPU/"
+"GPU et autres"
 
 #: faugus/utils.py:856
 msgid "MangoHud not found"
-msgstr ""
+msgstr "MangoHud introuvable"
 
 #: faugus/utils.py:863 faugus/utils.py:871
 msgid "Tweaks your system to improve performance"
-msgstr ""
+msgstr "Modifie votre système pour améliorer les performances"
 
 #: faugus/utils.py:863
 msgid "GameMode not found"
-msgstr ""
+msgstr "GameMode introuvable"
 
 #: faugus/utils.py:877
 msgid "Select an icon for the shortcut"
-msgstr ""
+msgstr "Sélectionner une icône pour le raccourci"
 
 #: faugus/utils.py:1210
 msgid "Presets"
-msgstr ""
+msgstr "Presets"
 
 #: faugus/utils.py:1273
 msgid "Launch Arguments"
-msgstr ""
+msgstr "Arguments de lancement"
 
 #: faugus/utils.py:1329
 msgid "Select a command or script"
-msgstr ""
+msgstr "Sélectionner une commande ou un script"
 
 #: faugus/utils.py:1354
 msgid "Pre-launch"
-msgstr ""
+msgstr "Pré-lancement"
 
 #: faugus/utils.py:1355
 msgid "Command or script to run before the game"
-msgstr ""
+msgstr "Commande ou script à lancer avant le jeu"
 
 #: faugus/utils.py:1357
 msgid "Post-launch"
-msgstr ""
+msgstr "Post-lancement"
 
 #: faugus/utils.py:1358
 msgid "Command or script to run after the game"
-msgstr ""
+msgstr "Commande ou script à lancer après le jeu"
 
 #: faugus/utils.py:1425 faugus/utils.py:1610
 msgid "Enable"
-msgstr ""
+msgstr "Activer"
 
 #: faugus/utils.py:1434
 msgid "Path to the application"
-msgstr ""
+msgstr "Chemin vers l'application"
 
 #: faugus/utils.py:1446
 msgid "Select an additional application"
-msgstr ""
+msgstr "Sélectionner une application additionnelle"
 
 #: faugus/utils.py:1463
 msgid "Delay (seconds)"
-msgstr ""
+msgstr "Délai (secondes)"
 
 #: faugus/utils.py:1476
 msgid "Run the application first"
-msgstr ""
+msgstr "Lancer l'application d'abord"
 
 #: faugus/utils.py:1561
 msgid "Lossless Scaling Location"
-msgstr ""
+msgstr "Emplacement de Lossless Scaling"
 
 #: faugus/utils.py:1569
 msgid "Lossless.dll location"
-msgstr ""
+msgstr "Emplacement de Lossless.dll"
 
 #: faugus/utils.py:1581
 msgid "Select the Lossless.dll file"
-msgstr ""
+msgstr "Sélectionner le fichier Lossless.dll"
 
 #: faugus/utils.py:1614
 msgid "Multiplier"
-msgstr ""
+msgstr "Multiplicateur"
 
 #: faugus/utils.py:1619
 msgid "Multiply the FPS"
-msgstr ""
+msgstr "Multiplie les FPS"
 
 #: faugus/utils.py:1621
 msgid "Flow Scale"
-msgstr ""
+msgstr "Flow Scale"
 
 #: faugus/utils.py:1628
 msgid "Lower the internal motion estimation resolution"
-msgstr ""
+msgstr "Baisse la résolution de l'estimation interne du mouvement"
 
 #: faugus/utils.py:1630
 msgid "Performance Mode"
-msgstr ""
+msgstr "Mode performance"
 
 #: faugus/utils.py:1631
 msgid "Massively improve performance at the cost of quality"
-msgstr ""
+msgstr "Améliore massivement les performances aux dépens de la qualité"
 
 #: faugus/utils.py:1634
 msgid "HDR Mode"
-msgstr ""
+msgstr "Mode HDR"
 
 #: faugus/utils.py:1635
 msgid "Enable special HDR-only behavior"
-msgstr ""
+msgstr "Active un comportement unique au HDR"
 
 #: faugus/utils.py:1638
 msgid "Present Mode (Experimental)"
-msgstr ""
+msgstr "Mode présent (expérimental)"
 
 #: faugus/utils.py:1642
 msgid "Override the present mode"
-msgstr ""
+msgstr "Outrepasse le mode présent"
 
 #: faugus/utils.py:1895
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "Aucune clé d'API SteamGridDB configurée."
 
 #: faugus/utils.py:1896
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "Ajoutez d'abord votre clé API dans les paramètres."
 
 #: faugus/utils.py:1909
 msgid "Choose a cover"
-msgstr ""
+msgstr "Choisissez une affiche"
 
 #: faugus/utils.py:1910
 msgid "Choose a banner"
-msgstr ""
+msgstr "Choisissez une bannière"
 
 #: faugus/utils.py:1911
 msgid "Choose an icon"
-msgstr ""
+msgstr "Choisissez une icône"
 
 #: faugus/utils.py:2009
 msgid "No results found"
-msgstr ""
+msgstr "Aucun résultat"
