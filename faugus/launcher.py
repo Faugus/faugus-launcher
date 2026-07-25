@@ -269,6 +269,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.action_context_run.connect("activate", self.on_context_menu_run)
         self.add_action(self.action_context_run)
 
+        self.action_context_recent_run = Gio.SimpleAction.new("context-recent-run", GLib.VariantType.new("s"))
+        self.action_context_recent_run.connect("activate", self.on_context_menu_recent_run)
+        self.add_action(self.action_context_recent_run)
+
         self.action_context_show_logs = Gio.SimpleAction.new("context-show-logs", None)
         self.action_context_show_logs.connect("activate", self.on_context_show_logs)
         self.add_action(self.action_context_show_logs)
@@ -1785,17 +1789,81 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if show_prefix_location:
             actions_section.append(_("Open prefix location"), "win.context-prefix-location")
 
-        if show_run:
-            actions_section.append(_("Run file in the prefix"), "win.context-run")
-
         if show_logs_item:
             actions_section.append(_("Show logs"), "win.context-show-logs")
 
         root.append_section(None, actions_section)
 
+        run_section = Gio.Menu()
+
+        if show_run:
+            run_section.append(_("Run file in the prefix"), "win.context-run")
+
+            recent_files = load_json_file(RECENT_RUN_FILES, {}).get(game.gameid, [])
+            recent_files = [f for f in recent_files if os.path.isfile(f)]
+            if recent_files:
+                recent_menu = Gio.Menu()
+                for file_run in recent_files:
+                    file_item = Gio.MenuItem.new(os.path.basename(file_run), None)
+                    file_item.set_action_and_target_value("win.context-recent-run", GLib.Variant.new_string(file_run))
+                    recent_menu.append_item(file_item)
+                run_section.append_submenu(_("Recent"), recent_menu)
+
+        if run_section.get_n_items() > 0:
+            root.append_section(None, run_section)
+
         popover = Gtk.PopoverMenu.new_from_model_full(root, Gtk.PopoverMenuFlags.NESTED)
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
+
+        if show_run and recent_files:
+            def find_label_text(widget):
+                if type(widget).__name__ == "Label":
+                    return widget.get_text()
+                child = widget.get_first_child()
+                while child:
+                    text = find_label_text(child)
+                    if text is not None:
+                        return text
+                    child = child.get_next_sibling()
+                return None
+
+            def find_recent_row(widget):
+                if type(widget).__name__ == "GtkModelButton" and find_label_text(widget) == _("Recent"):
+                    return widget
+                child = widget.get_first_child()
+                while child:
+                    found = find_recent_row(child)
+                    if found:
+                        return found
+                    child = child.get_next_sibling()
+                return None
+
+            def find_nested_popover(button):
+                child = button.get_first_child()
+                while child:
+                    if type(child).__name__ == "PopoverMenu":
+                        return child
+                    child = child.get_next_sibling()
+                return None
+
+            def collect_model_buttons(widget, out):
+                if type(widget).__name__ == "GtkModelButton":
+                    out.append(widget)
+                    return
+                child = widget.get_first_child()
+                while child:
+                    collect_model_buttons(child, out)
+                    child = child.get_next_sibling()
+
+            recent_row = find_recent_row(popover)
+            recent_popover = find_nested_popover(recent_row) if recent_row else None
+            if recent_popover:
+                recent_buttons = []
+                collect_model_buttons(recent_popover, recent_buttons)
+                for button, file_run in zip(recent_buttons, recent_files):
+                    button.set_tooltip_text(file_run)
+
         return popover
 
     def on_item_right_click(self, item=None, x=None, y=None):
@@ -1977,6 +2045,40 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu.popdown()
         subprocess.Popen(["xdg-open", self.current_prefix])
 
+    def run_file_in_prefix(self, game, file_run):
+        prefix = expand_path(game.prefix)
+        runner = game.runner
+        title_formatted = format_title(game.title)
+        game_directory = os.path.dirname(expand_path(game.path))
+        cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
+        escaped_file_run = file_run.replace("'", "'\\''")
+        command_parts = []
+
+        command_parts.append(f"FAUGUS_DISABLE_UPDATES=1")
+        if title_formatted:
+            command_parts.append(f"LOG_DIR={title_formatted}")
+        if prefix:
+            command_parts.append(f"WINEPREFIX='{prefix}'")
+        if runner:
+            command_parts.append(f"PROTONPATH='{resolve_protonpath(runner)}'")
+        if escaped_file_run.endswith(".reg"):
+            command_parts.append(f"'{UMU_RUN}' regedit '{escaped_file_run}'")
+        else:
+            command_parts.append(f"'{UMU_RUN}' '{escaped_file_run}'")
+
+        command = ' '.join(command_parts)
+        cmd = (sys.executable, "-m", "faugus.runner", command)
+        subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
+
+        self.record_recent_run_file(game.gameid, file_run)
+
+    def record_recent_run_file(self, gameid, file_run):
+        data = load_json_file(RECENT_RUN_FILES, {})
+        files = [f for f in data.get(gameid, []) if f != file_run]
+        files.insert(0, file_run)
+        data[gameid] = files[:5]
+        save_json_file(data, RECENT_RUN_FILES)
+
     def on_context_menu_run(self, action, param):
         self.context_menu.popdown()
         game = self.selected()
@@ -1993,35 +2095,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def on_response(dialog_fc, response):
             if response == Gtk.ResponseType.ACCEPT:
-                prefix = expand_path(game.prefix)
-                runner = game.runner
-                title_formatted = format_title(game.title)
                 file_run = dialog_fc.get_file().get_path()
-                game_directory = os.path.dirname(expand_path(game.path))
-                cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
-                escaped_file_run = file_run.replace("'", "'\\''")
-                command_parts = []
-
-                command_parts.append(f"FAUGUS_DISABLE_UPDATES=1")
-                if title_formatted:
-                    command_parts.append(f"LOG_DIR={title_formatted}")
-                if prefix:
-                    command_parts.append(f"WINEPREFIX='{prefix}'")
-                if runner:
-                    command_parts.append(f"PROTONPATH='{resolve_protonpath(runner)}'")
-                if escaped_file_run.endswith(".reg"):
-                    command_parts.append(f"'{UMU_RUN}' regedit '{escaped_file_run}'")
-                else:
-                    command_parts.append(f"'{UMU_RUN}' '{escaped_file_run}'")
-
-                command = ' '.join(command_parts)
-                cmd = (sys.executable, "-m", "faugus.runner", command)
-                subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
+                self.run_file_in_prefix(game, file_run)
 
             destroy_and_release(dialog_fc)
 
         filechooser.connect("response", on_response)
         filechooser.present()
+
+    def on_context_menu_recent_run(self, action, param):
+        self.context_menu.popdown()
+        game = self.selected()
+        if not game:
+            return
+        file_run = param.get_string()
+        if os.path.isfile(file_run):
+            self.run_file_in_prefix(game, file_run)
 
     def on_context_show_logs(self, action, param):
         self.context_menu.popdown()
