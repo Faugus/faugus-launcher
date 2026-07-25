@@ -356,6 +356,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay = Gtk.Overlay()
 
         base_box = Gtk.Box()
+        base_box.add_css_class("background")
         base_box.set_hexpand(True)
         base_box.set_vexpand(True)
         if base_mode == "accent":
