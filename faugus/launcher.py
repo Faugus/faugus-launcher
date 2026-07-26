@@ -1911,6 +1911,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 rect = Gdk.Rectangle()
                 rect.x, rect.y, rect.width, rect.height = int(ix), int(iy), 1, 1
                 self.context_menu.set_pointing_to(rect)
+        else:
+            rect = Gdk.Rectangle()
+            rect.x, rect.y, rect.width, rect.height = 0, 0, item.get_width() or 1, 1
+            self.context_menu.set_pointing_to(rect)
         self.context_menu.popup()
 
     def format_playtime(self, seconds):
