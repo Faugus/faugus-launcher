@@ -4209,7 +4209,7 @@ class Settings(Gtk.Dialog):
         self.label_language.set_halign(Gtk.Align.START)
         self.combobox_language = IdComboBox()
 
-        self.label_interface = Gtk.Label(label=_("Mode"))
+        self.label_interface = Gtk.Label(label=_("Interface Mode"))
         self.label_interface.set_halign(Gtk.Align.START)
         self.combobox_interface = IdComboBox()
         self.combobox_interface.connect("changed", self.on_combobox_interface_changed)
@@ -4227,9 +4227,6 @@ class Settings(Gtk.Dialog):
         self.combobox_background.connect("changed", self.on_background_changed)
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
-
-        self.label_ui_customization = Gtk.Label(label=_("UI Customization"))
-        self.label_ui_customization.set_halign(Gtk.Align.START)
 
         self.label_theme = Gtk.Label(label=_("Theme"))
         self.label_theme.set_halign(Gtk.Align.START)
@@ -4520,10 +4517,8 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
         grid_miscellaneous.attach(self.checkbox_wow64, 0, 11, 1, 1)
 
-        grid_theme_accent.attach(self.label_ui_customization, 0, 0, 1, 1)
-
-        grid_theme_accent.attach(self.label_interface, 0, 1, 1, 1)
-        grid_theme_accent.attach(self.combobox_interface, 0, 2, 1, 1)
+        grid_theme_accent.attach(self.label_interface, 0, 0, 1, 1)
+        grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
         grid_theme_rest.attach(self.label_theme, 0, 0, 1, 1)
