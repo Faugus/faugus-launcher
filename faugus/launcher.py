@@ -5740,7 +5740,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.tab_names = [n for n, _ in tab_buttons]
         self.tab_button_widgets = tab_button_widgets
 
-        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box_tabs.append(self.tab_switcher)
         box_tabs.append(self.view_stack)
 
@@ -5992,7 +5992,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if interface_mode == "SteamGridDB":
             banner_row1_width = self.grid_page1.measure(Gtk.Orientation.HORIZONTAL, -1).natural
             banner_placeholder1.set_size_request(-1, int(banner_row1_width / (1920 / 620)))
-            self.grid_page1.attach(self.banner_preview1_overlay, 0, 0, 2, 1)
+            box_tabs.insert_child_after(self.banner_preview1_overlay, None)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
@@ -6032,11 +6032,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2.append(self.grid_addapp)
         page2.append(self.grid_lossless)
         page2.append(self.grid_tools)
-
-        if interface_mode == "SteamGridDB":
-            banner_row2_width = self.grid_page2.measure(Gtk.Orientation.HORIZONTAL, -1).natural
-            banner_placeholder2.set_size_request(-1, int(banner_row2_width / (1920 / 620)))
-            self.grid_page2.attach(self.banner_preview2_overlay, 0, 0, 2, 1)
 
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
@@ -6091,6 +6086,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
 
         self.present()
+
+        if interface_mode == "SteamGridDB":
+            self.combobox_launcher.grab_focus()
 
     def on_combobox_steam_changed(self, combobox):
         self.combobox_steam_title.remove_css_class("combobox")
