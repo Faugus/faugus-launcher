@@ -273,6 +273,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.action_context_recent_run.connect("activate", self.on_context_menu_recent_run)
         self.add_action(self.action_context_recent_run)
 
+        self.action_context_clear_recent = Gio.SimpleAction.new("context-clear-recent", None)
+        self.action_context_clear_recent.connect("activate", self.on_context_menu_clear_recent)
+        self.add_action(self.action_context_clear_recent)
+
         self.action_context_show_logs = Gio.SimpleAction.new("context-show-logs", None)
         self.action_context_show_logs.connect("activate", self.on_context_show_logs)
         self.add_action(self.action_context_show_logs)
@@ -1803,10 +1807,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             recent_files = [f for f in recent_files if os.path.isfile(f)]
             if recent_files:
                 recent_menu = Gio.Menu()
+                recent_files_section = Gio.Menu()
                 for file_run in recent_files:
                     file_item = Gio.MenuItem.new(os.path.basename(file_run), None)
                     file_item.set_action_and_target_value("win.context-recent-run", GLib.Variant.new_string(file_run))
-                    recent_menu.append_item(file_item)
+                    recent_files_section.append_item(file_item)
+                recent_menu.append_section(None, recent_files_section)
+
+                recent_clear_section = Gio.Menu()
+                recent_clear_section.append(_("Clear recent"), "win.context-clear-recent")
+                recent_menu.append_section(None, recent_clear_section)
+
                 run_section.append_submenu(_("Recent"), recent_menu)
 
         if run_section.get_n_items() > 0:
@@ -1816,53 +1827,85 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
 
+        def find_label_text(widget):
+            if type(widget).__name__ == "Label":
+                return widget.get_text()
+            child = widget.get_first_child()
+            while child:
+                text = find_label_text(child)
+                if text is not None:
+                    return text
+                child = child.get_next_sibling()
+            return None
+
+        def find_row_by_label(widget, target_label):
+            if type(widget).__name__ == "GtkModelButton" and find_label_text(widget) == target_label:
+                return widget
+            child = widget.get_first_child()
+            while child:
+                found = find_row_by_label(child, target_label)
+                if found:
+                    return found
+                child = child.get_next_sibling()
+            return None
+
+        def find_nested_popover(button):
+            child = button.get_first_child()
+            while child:
+                if type(child).__name__ == "PopoverMenu":
+                    return child
+                child = child.get_next_sibling()
+            return None
+
+        def collect_model_buttons(widget, out):
+            if type(widget).__name__ == "GtkModelButton":
+                out.append(widget)
+                return
+            child = widget.get_first_child()
+            while child:
+                collect_model_buttons(child, out)
+                child = child.get_next_sibling()
+
+        def collect_top_level_buttons(widget, out):
+            if type(widget).__name__ == "PopoverMenu" and widget is not popover:
+                return
+            if type(widget).__name__ == "GtkModelButton":
+                out.append(widget)
+            child = widget.get_first_child()
+            while child:
+                collect_top_level_buttons(child, out)
+                child = child.get_next_sibling()
+
+        category_row = find_row_by_label(popover, _("Category"))
+        recent_row = find_row_by_label(popover, _("Recent")) if show_run and recent_files else None
+
         if show_run and recent_files:
-            def find_label_text(widget):
-                if type(widget).__name__ == "Label":
-                    return widget.get_text()
-                child = widget.get_first_child()
-                while child:
-                    text = find_label_text(child)
-                    if text is not None:
-                        return text
-                    child = child.get_next_sibling()
-                return None
-
-            def find_recent_row(widget):
-                if type(widget).__name__ == "GtkModelButton" and find_label_text(widget) == _("Recent"):
-                    return widget
-                child = widget.get_first_child()
-                while child:
-                    found = find_recent_row(child)
-                    if found:
-                        return found
-                    child = child.get_next_sibling()
-                return None
-
-            def find_nested_popover(button):
-                child = button.get_first_child()
-                while child:
-                    if type(child).__name__ == "PopoverMenu":
-                        return child
-                    child = child.get_next_sibling()
-                return None
-
-            def collect_model_buttons(widget, out):
-                if type(widget).__name__ == "GtkModelButton":
-                    out.append(widget)
-                    return
-                child = widget.get_first_child()
-                while child:
-                    collect_model_buttons(child, out)
-                    child = child.get_next_sibling()
-
-            recent_row = find_recent_row(popover)
             recent_popover = find_nested_popover(recent_row) if recent_row else None
             if recent_popover:
                 recent_buttons = []
                 collect_model_buttons(recent_popover, recent_buttons)
                 for button, file_run in zip(recent_buttons, recent_files):
                     button.set_tooltip_text(file_run)
+
+        submenu_rows = [row for row in (category_row, recent_row) if row is not None]
+        if submenu_rows:
+            top_level_buttons = []
+            collect_top_level_buttons(popover, top_level_buttons)
+
+            def close_open_submenu(*_args):
+                for row in submenu_rows:
+                    nested = find_nested_popover(row)
+                    if nested and nested.get_visible():
+                        nested.popdown()
+                        popover.popup()
+                        break
+
+            for btn in top_level_buttons:
+                if btn in submenu_rows:
+                    continue
+                motion = Gtk.EventControllerMotion()
+                motion.connect("enter", close_open_submenu)
+                btn.add_controller(motion)
 
         return popover
 
@@ -2111,6 +2154,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         file_run = param.get_string()
         if os.path.isfile(file_run):
             self.run_file_in_prefix(game, file_run)
+
+    def on_context_menu_clear_recent(self, action, param):
+        self.context_menu.popdown()
+        game = self.selected()
+        if not game:
+            return
+        data = load_json_file(RECENT_RUN_FILES, {})
+        if game.gameid in data:
+            del data[game.gameid]
+            save_json_file(data, RECENT_RUN_FILES)
 
     def on_context_show_logs(self, action, param):
         self.context_menu.popdown()
