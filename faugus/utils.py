@@ -846,6 +846,18 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
     return True
 
 
+def on_treeview_query_tooltip(widget, x, y, keyboard_mode, tooltip, store):
+    result = widget.get_path_at_pos(x, y)
+    if result is not None:
+        path, column, cell_x, cell_y = result
+        tree_iter = store.get_iter(path)
+        value = store.get_value(tree_iter, 0)
+        if value.strip():
+            tooltip.set_text(value)
+            return True
+    return False
+
+
 def disable_mangohud_gamemode_if_missing(obj):
     obj.mangohud_enabled = os.path.exists(MANGOHUD_DIR)
     if not obj.mangohud_enabled:
@@ -1179,6 +1191,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     tree_presets.set_vexpand(True)
     renderer_presets = Gtk.CellRendererText()
     renderer_presets.set_property("editable", True)
+    renderer_presets.set_property("ellipsize", Pango.EllipsizeMode.END)
 
     def on_preset_edited(renderer, path, new_text):
         store_presets[path][0] = new_text
@@ -1202,9 +1215,15 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     key_controller_presets.connect("key-pressed", on_preset_key_press)
     tree_presets.add_controller(key_controller_presets)
     column_presets = Gtk.TreeViewColumn("", renderer_presets, text=0)
+    column_presets.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column_presets.set_expand(True)
     tree_presets.append_column(column_presets)
     tree_presets.set_headers_visible(False)
+    tree_presets.set_has_tooltip(True)
+    tree_presets.connect("query-tooltip", on_treeview_query_tooltip, store_presets)
+
     scroll_presets = Gtk.ScrolledWindow()
+    scroll_presets.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
     scroll_presets.set_child(tree_presets)
 
     label_presets_header = Gtk.Label(label=_("Presets"))
@@ -1242,6 +1261,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     tree_args.set_vexpand(True)
     renderer_args = Gtk.CellRendererText()
     renderer_args.set_property("editable", True)
+    renderer_args.set_property("ellipsize", Pango.EllipsizeMode.END)
 
     def on_arg_edited(renderer, path, new_text):
         store_args[path][0] = new_text
@@ -1265,9 +1285,15 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     key_controller_args.connect("key-pressed", on_arg_key_press)
     tree_args.add_controller(key_controller_args)
     column_args = Gtk.TreeViewColumn("", renderer_args, text=0)
+    column_args.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column_args.set_expand(True)
     tree_args.append_column(column_args)
     tree_args.set_headers_visible(False)
+    tree_args.set_has_tooltip(True)
+    tree_args.connect("query-tooltip", on_treeview_query_tooltip, store_args)
+
     scroll_args = Gtk.ScrolledWindow()
+    scroll_args.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
     scroll_args.set_child(tree_args)
 
     label_args_header = Gtk.Label(label=_("Launch Arguments"))

@@ -4372,7 +4372,7 @@ class Settings(Gtk.Dialog):
         treeview = Gtk.TreeView(model=self.liststore)
         treeview.add_css_class("envar-list")
         treeview.set_has_tooltip(True)
-        treeview.connect("query-tooltip", self.on_query_tooltip)
+        treeview.connect("query-tooltip", on_treeview_query_tooltip, self.liststore)
         envar_key_controller = Gtk.EventControllerKey()
         envar_key_controller.connect("key-pressed", self.on_envar_key_press)
         treeview.add_controller(envar_key_controller)
@@ -4707,17 +4707,6 @@ class Settings(Gtk.Dialog):
         if os.path.exists(LOGS_DIR):
             shutil.rmtree(LOGS_DIR)
         self.update_button_label()
-
-    def on_query_tooltip(self, widget, x, y, keyboard_mode, tooltip):
-        result = widget.get_path_at_pos(x, y)
-        if result is not None:
-            path, column, cell_x, cell_y = result
-            tree_iter = self.liststore.get_iter(path)
-            value = self.liststore.get_value(tree_iter, 0)
-            if value.strip():
-                tooltip.set_text(value)
-                return True
-        return False
 
     def on_cell_edited(self, widget, path, text, column_index):
         self.liststore[path][column_index] = text
