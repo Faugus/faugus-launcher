@@ -2497,10 +2497,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     continue
 
                 game = child.game
-                if os.path.isfile(game.cover):
-                    surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
-                else:
-                    surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
+                surface = self.get_cover_paintable(game, zoom_width, zoom_height)
                 child.cover.set_paintable(surface)
 
             return True
@@ -2615,10 +2612,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             zoom_width = int(230 * (zoom_pct / 100.0))
             zoom_height = int(zoom_width * 1.5)
 
-            if os.path.isfile(game.cover):
-                surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
-            else:
-                surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
+            surface = self.get_cover_paintable(game, zoom_width, zoom_height)
             image2.set_paintable(surface)
 
             hbox.append(image2)
@@ -2660,10 +2654,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             zoom_width = int(230 * (zoom_pct / 100.0))
             zoom_height = int(zoom_width * 1.5)
 
-            if os.path.isfile(game.cover):
-                surface = self.get_game_artwork(game.cover, game, zoom_width, zoom_height)
-            else:
-                surface = create_accent_placeholder_paintable(zoom_width, zoom_height)
+            surface = self.get_cover_paintable(game, zoom_width, zoom_height)
             flowbox_child.cover.set_paintable(surface)
 
     def get_game_artwork(self, path, game, width=None, height=None):
@@ -2680,6 +2671,38 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if width and height:
             return HiDpiPaintable(texture, width, height)
         return texture
+
+    def get_cover_texture(self, path, installed):
+        if not hasattr(self, '_cover_texture_cache'):
+            self._cover_texture_cache = {}
+
+        try:
+            mtime = os.path.getmtime(path)
+        except OSError:
+            mtime = None
+
+        cache_key = (path, mtime, installed)
+        texture = self._cover_texture_cache.get(cache_key)
+        if texture is not None:
+            return texture
+
+        for key in [k for k in self._cover_texture_cache if k[0] == path]:
+            del self._cover_texture_cache[key]
+
+        pixbuf = safe_load_pixbuf(path, None, None, False)
+        if not installed:
+            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+
+        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+        self._cover_texture_cache[cache_key] = texture
+        return texture
+
+    def get_cover_paintable(self, game, width, height):
+        if not os.path.isfile(game.cover):
+            return create_accent_placeholder_paintable(width, height)
+
+        texture = self.get_cover_texture(game.cover, self.is_game_installed(game))
+        return HiDpiPaintable(texture, width, height)
 
     def is_game_installed(self, game):
         if game.runner == "Steam":
