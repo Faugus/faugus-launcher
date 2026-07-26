@@ -90,6 +90,11 @@ def init_gamepad(self):
     self.can_move_x = True
     self.can_move_y = True
 
+    self.scroll_deadzone = 0.2
+    self.scroll_speed = 24
+    self.right_stick_x = 0.0
+    self.right_stick_y = 0.0
+
     self.held_direction = None
     self.hold_start_time = 0
     self.last_repeat_time = 0
@@ -99,7 +104,6 @@ def init_gamepad(self):
     self.active_popover = None
     self.gamepad_active_combo = None
     self.gamepad_combo_popover = None
-    self.gamepad_combo_listbox = None
 
     self.gamepad_monitor.connect("device-connected", lambda mon, device: _attach_device(self, device))
     self.gamepad_monitor.connect("device-disconnected", lambda mon, device: _detach_device(self, device))
@@ -173,6 +177,9 @@ def _tick_repeat(self):
             if now - self.last_repeat_time >= self.repeat_interval:
                 _dispatch_navigation(self, self.held_direction)
                 self.last_repeat_time = now
+
+    if usable:
+        _scroll_active_window(self)
 
     return True
 
@@ -259,6 +266,63 @@ def _on_absolute_axis(self, event):
             self.can_move_x = True
             if getattr(self, "held_direction", None) in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
                 _set_held_direction(self, None)
+
+    elif axis == 3:
+        self.right_stick_x = value if abs(value) > self.scroll_deadzone else 0.0
+
+    elif axis == 4:
+        self.right_stick_y = value if abs(value) > self.scroll_deadzone else 0.0
+
+
+def _scroll_active_window(self):
+    if not (self.right_stick_x or self.right_stick_y):
+        return
+
+    usable, win = _is_usable(self)
+    if not usable or not win:
+        return
+
+    focused = win.get_focus()
+    scrolled = _find_parent_scrolled_window(focused) if focused else None
+    if scrolled is None:
+        scrolled = _find_any_scrolled_window(win)
+    if scrolled is None:
+        return
+
+    if self.right_stick_y:
+        vadj = scrolled.get_vadjustment()
+        if vadj:
+            new_value = vadj.get_value() + self.right_stick_y * self.scroll_speed
+            new_value = max(vadj.get_lower(), min(new_value, vadj.get_upper() - vadj.get_page_size()))
+            vadj.set_value(new_value)
+
+    if self.right_stick_x:
+        hadj = scrolled.get_hadjustment()
+        if hadj:
+            new_value = hadj.get_value() + self.right_stick_x * self.scroll_speed
+            new_value = max(hadj.get_lower(), min(new_value, hadj.get_upper() - hadj.get_page_size()))
+            hadj.set_value(new_value)
+
+
+def _find_parent_scrolled_window(widget):
+    parent = widget.get_parent() if widget else None
+    while parent:
+        if isinstance(parent, Gtk.ScrolledWindow):
+            return parent
+        parent = parent.get_parent()
+    return None
+
+
+def _find_any_scrolled_window(widget):
+    if isinstance(widget, Gtk.ScrolledWindow):
+        return widget
+    child = widget.get_first_child()
+    while child:
+        found = _find_any_scrolled_window(child)
+        if found:
+            return found
+        child = child.get_next_sibling()
+    return None
 
 
 def _on_button_press(self, event):
@@ -508,7 +572,6 @@ def open_combobox(self, combo):
 
     self.gamepad_active_combo = combo
     self.gamepad_combo_popover = popover
-    self.gamepad_combo_listbox = list_box
 
     popover.connect("closed", lambda p: _on_combo_popover_closed(self, combo))
     popover.popup()
@@ -523,7 +586,6 @@ def _on_combo_popover_closed(self, combo):
         popover = self.gamepad_combo_popover
         self.gamepad_active_combo = None
         self.gamepad_combo_popover = None
-        self.gamepad_combo_listbox = None
         combo.grab_focus()
         if popover:
             popover.unparent()
