@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-26 18:51+0000\n"
-"PO-Revision-Date: 2026-07-26 15:27+0000\n"
+"PO-Revision-Date: 2026-07-26 20:07+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -339,10 +339,8 @@ msgid "Language"
 msgstr "Idioma"
 
 #: faugus/launcher.py:4212
-#, fuzzy
-#| msgid "Interface"
 msgid "Interface Mode"
-msgstr "Interface"
+msgstr "Modo de Interface"
 
 #: faugus/launcher.py:4216
 msgid "List"
