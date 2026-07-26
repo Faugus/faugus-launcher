@@ -5990,9 +5990,19 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.append(self.grid_shortcut)
 
         if interface_mode == "SteamGridDB":
-            banner_row1_width = self.grid_page1.measure(Gtk.Orientation.HORIZONTAL, -1).natural
-            banner_placeholder1.set_size_request(-1, int(banner_row1_width / (1920 / 620)))
             box_tabs.insert_child_after(self.banner_preview1_overlay, None)
+
+            banner_ratio = 1920 / 620
+            banner_size_state = {"width": -1}
+
+            def on_addgame_banner_tick(widget, frame_clock, box=self.banner_preview1_overlay, state=banner_size_state):
+                width = widget.get_width()
+                if width > 0 and width != state["width"]:
+                    state["width"] = width
+                    box.set_size_request(-1, int(width / banner_ratio))
+                return True
+
+            self.banner_preview1_overlay.add_tick_callback(on_addgame_banner_tick)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
