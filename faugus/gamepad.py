@@ -572,6 +572,42 @@ def _find_parent_popover(widget):
     return None
 
 
+def _find_stack(widget):
+    if type(widget).__name__ == "Stack":
+        return widget
+    child = widget.get_first_child()
+    while child:
+        found = _find_stack(child)
+        if found:
+            return found
+        child = child.get_next_sibling()
+    return None
+
+
+def _find_label_text(widget):
+    if type(widget).__name__ == "Label":
+        return widget.get_text()
+    child = widget.get_first_child()
+    while child:
+        text = _find_label_text(child)
+        if text is not None:
+            return text
+        child = child.get_next_sibling()
+    return None
+
+
+def _find_row_by_label(widget, target_label):
+    if type(widget).__name__ == "GtkModelButton" and _find_label_text(widget) == target_label:
+        return widget
+    child = widget.get_first_child()
+    while child:
+        found = _find_row_by_label(child, target_label)
+        if found:
+            return found
+        child = child.get_next_sibling()
+    return None
+
+
 def _handle_menu_button(self, button):
     popover = getattr(self, "active_popover", None)
     if not popover or not popover.get_visible():
@@ -583,15 +619,18 @@ def _handle_menu_button(self, button):
         GLib.idle_add(lambda: activate_focused_widget(self))
 
     elif role == "back":
-        root = popover.get_root()
-        focused = root.get_focus() if root else None
-        nested = _find_parent_popover(focused) if focused else None
-        if nested and nested is not popover:
-            anchor = nested.get_parent()
-            nested.popdown()
-            popover.popup()
-            if anchor:
-                anchor.grab_focus()
+        stack = _find_stack(popover)
+        if stack and stack.get_visible_child_name() not in (None, "main"):
+            page_name = stack.get_visible_child_name()
+            stack.set_visible_child_name("main")
+            root = popover.get_root()
+            if root:
+                root.set_focus_visible(True)
+            origin_row = _find_row_by_label(stack.get_visible_child(), page_name)
+            if origin_row:
+                origin_row.grab_focus()
+            else:
+                popover.child_focus(Gtk.DirectionType.TAB_FORWARD)
             return
 
         anchor = popover.get_parent()

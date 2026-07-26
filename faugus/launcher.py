@@ -1824,7 +1824,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if run_section.get_n_items() > 0:
             root.append_section(None, run_section)
 
-        popover = Gtk.PopoverMenu.new_from_model_full(root, Gtk.PopoverMenuFlags.NESTED)
+        popover = Gtk.PopoverMenu.new_from_model(root)
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
 
@@ -1839,74 +1839,49 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 child = child.get_next_sibling()
             return None
 
-        def find_row_by_label(widget, target_label):
-            if type(widget).__name__ == "GtkModelButton" and find_label_text(widget) == target_label:
+        def find_stack(widget):
+            if type(widget).__name__ == "Stack":
                 return widget
             child = widget.get_first_child()
             while child:
-                found = find_row_by_label(child, target_label)
+                found = find_stack(child)
                 if found:
                     return found
                 child = child.get_next_sibling()
             return None
 
-        def find_nested_popover(button):
-            child = button.get_first_child()
-            while child:
-                if type(child).__name__ == "PopoverMenu":
-                    return child
-                child = child.get_next_sibling()
+        def find_submenu_page(stack, target_label):
+            if not stack:
+                return None
+            page = stack.get_first_child()
+            while page:
+                header = page.get_first_child()
+                while header:
+                    if type(header).__name__ == "GtkModelButton" and "title" in header.get_css_classes():
+                        if find_label_text(header) == target_label:
+                            return page
+                        break
+                    header = header.get_next_sibling()
+                page = page.get_next_sibling()
             return None
 
         def collect_model_buttons(widget, out):
             if type(widget).__name__ == "GtkModelButton":
-                out.append(widget)
+                if "title" not in widget.get_css_classes():
+                    out.append(widget)
                 return
             child = widget.get_first_child()
             while child:
                 collect_model_buttons(child, out)
                 child = child.get_next_sibling()
 
-        def collect_top_level_buttons(widget, out):
-            if type(widget).__name__ == "PopoverMenu" and widget is not popover:
-                return
-            if type(widget).__name__ == "GtkModelButton":
-                out.append(widget)
-            child = widget.get_first_child()
-            while child:
-                collect_top_level_buttons(child, out)
-                child = child.get_next_sibling()
-
-        category_row = find_row_by_label(popover, _("Category"))
-        recent_row = find_row_by_label(popover, _("Recent")) if show_run and recent_files else None
-
         if show_run and recent_files:
-            recent_popover = find_nested_popover(recent_row) if recent_row else None
-            if recent_popover:
+            recent_page = find_submenu_page(find_stack(popover), _("Recent"))
+            if recent_page:
                 recent_buttons = []
-                collect_model_buttons(recent_popover, recent_buttons)
+                collect_model_buttons(recent_page, recent_buttons)
                 for button, file_run in zip(recent_buttons, recent_files):
                     button.set_tooltip_text(file_run)
-
-        submenu_rows = [row for row in (category_row, recent_row) if row is not None]
-        if submenu_rows:
-            top_level_buttons = []
-            collect_top_level_buttons(popover, top_level_buttons)
-
-            def close_open_submenu(*_args):
-                for row in submenu_rows:
-                    nested = find_nested_popover(row)
-                    if nested and nested.get_visible():
-                        nested.popdown()
-                        popover.popup()
-                        break
-
-            for btn in top_level_buttons:
-                if btn in submenu_rows:
-                    continue
-                motion = Gtk.EventControllerMotion()
-                motion.connect("enter", close_open_submenu)
-                btn.add_controller(motion)
 
         return popover
 
