@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-26 18:51+0000\n"
-"PO-Revision-Date: 2026-07-25 11:01+0000\n"
+"PO-Revision-Date: 2026-07-26 20:07+0000\n"
 "Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ja/>\n"
@@ -224,11 +224,11 @@ msgstr "ファイルをPrefix内で実行する"
 
 #: faugus/launcher.py:1819
 msgid "Clear recent"
-msgstr ""
+msgstr "最近のを消去する"
 
 #: faugus/launcher.py:1822 faugus/launcher.py:1879
 msgid "Recent"
-msgstr ""
+msgstr "最近の"
 
 #: faugus/launcher.py:1935
 msgid "hour"
@@ -340,10 +340,8 @@ msgid "Language"
 msgstr "言語"
 
 #: faugus/launcher.py:4212
-#, fuzzy
-#| msgid "Interface"
 msgid "Interface Mode"
-msgstr "インターフェース"
+msgstr "インターフェースモード"
 
 #: faugus/launcher.py:4216
 msgid "List"
@@ -435,7 +433,7 @@ msgstr "デフォルトのPrefix設定ツール"
 
 #: faugus/launcher.py:4296
 msgid "Default Proton"
-msgstr "デフォルトのProton（ゲーム互換レイヤー）"
+msgstr "デフォルトのProton（Windows互換レイヤー）"
 
 #: faugus/launcher.py:4300
 msgid "Proton Manager"
@@ -649,7 +647,7 @@ msgstr "Prefixへのパス（仮想環境フォルダ）"
 
 #: faugus/launcher.py:5613
 msgid "Proton"
-msgstr "Proton（ゲーム互換レイヤー）"
+msgstr "Proton（Windows互換レイヤー）"
 
 #: faugus/launcher.py:5627 faugus/shortcut.py:60
 msgid "Game Arguments"
@@ -885,7 +883,7 @@ msgstr "コマンドまたはスクリプトを選択してください"
 
 #: faugus/utils.py:1380
 msgid "Pre-launch"
-msgstr "起動前"
+msgstr "起動前のスクリプト"
 
 #: faugus/utils.py:1381
 msgid "Command or script to run before the game"
@@ -893,7 +891,7 @@ msgstr "ゲーム開始前に実行するコマンドまたはスクリプト"
 
 #: faugus/utils.py:1383
 msgid "Post-launch"
-msgstr "起動後"
+msgstr "起動後のスクリプト"
 
 #: faugus/utils.py:1384
 msgid "Command or script to run after the game"
