@@ -5761,13 +5761,49 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.entry_title.connect("changed", self.update_prefix_entry)
 
-        self.notebook = Gtk.Notebook()
-        self.notebook.set_margin_start(10)
-        self.notebook.set_margin_end(10)
-        self.notebook.set_margin_top(10)
-        self.notebook.set_margin_bottom(10)
+        self.view_stack = Gtk.Stack()
 
-        self.box.append(self.notebook)
+        self.tab_switcher = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.tab_switcher.add_css_class("linked")
+        self.tab_switcher.set_homogeneous(True)
+        self.tab_switcher.set_hexpand(True)
+        self.tab_switcher.set_margin_top(10)
+        self.tab_switcher.set_margin_start(10)
+        self.tab_switcher.set_margin_end(10)
+
+        tab_buttons = [
+            ("page1", _("Game/App")),
+            ("page2", _("Tools")),
+        ]
+        first_button = None
+        tab_button_widgets = []
+        for name, label in tab_buttons:
+            button = Gtk.ToggleButton(label=label)
+            button.set_focusable(False)
+            if first_button is None:
+                first_button = button
+                button.set_active(True)
+            else:
+                button.set_group(first_button)
+            button.connect("toggled", lambda btn, n=name: self.view_stack.set_visible_child_name(n) if btn.get_active() else None)
+            self.tab_switcher.append(button)
+            tab_button_widgets.append(button)
+
+        self.tab_names = [n for n, _ in tab_buttons]
+        self.tab_button_widgets = tab_button_widgets
+
+        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_tabs.append(self.tab_switcher)
+        box_tabs.append(self.view_stack)
+
+        frame = Gtk.Frame()
+        frame.set_margin_top(10)
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_bottom(10)
+        frame.set_child(box_tabs)
+
+        self.box.append(frame)
 
         self.image_cover = new_picture()
         self.image_cover.set_margin_top(10)
@@ -5929,13 +5965,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         load_url.connect("clicked", self.on_load_url)
 
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.tab_box1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label1 = Gtk.Label(label=_("Game/App"))
-        tab_label1.set_width_chars(8)
-        tab_label1.set_xalign(0.5)
-        tab_label1.set_hexpand(True)
-        self.tab_box1.append(tab_label1)
-        self.tab_box1.set_hexpand(True)
 
         self.grid_page1.attach(page1, 0, 1, 1, 1)
         if interface_mode in ("Covers", "SteamGridDB"):
@@ -5943,16 +5972,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.set_hexpand(True)
         self.image_cover.set_hexpand(True)
 
-        self.notebook.append_page(self.grid_page1, self.tab_box1)
+        self.view_stack.add_titled(self.grid_page1, "page1", _("Game/App"))
 
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.tab_box2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        tab_label2 = Gtk.Label(label=_("Tools"))
-        tab_label2.set_width_chars(8)
-        tab_label2.set_xalign(0.5)
-        tab_label2.set_hexpand(True)
-        self.tab_box2.append(tab_label2)
-        self.tab_box2.set_hexpand(True)
 
         self.grid_page2.attach(page2, 0, 1, 1, 1)
         if interface_mode in ("Covers", "SteamGridDB"):
@@ -5960,7 +5982,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2.set_hexpand(True)
         self.image_cover2.set_hexpand(True)
 
-        self.notebook.append_page(self.grid_page2, self.tab_box2)
+        self.view_stack.add_titled(self.grid_page2, "page2", _("Tools"))
 
         self.grid_launcher.attach(self.combobox_launcher, 1, 0, 1, 1)
         self.combobox_launcher.set_hexpand(True)
@@ -6748,8 +6770,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_steam.set_visible(True)
         self.combobox_steam_shortcut_user.set_visible(True)
         self.grid_page2.set_visible(True)
-        self.tab_box2.set_visible(True)
-        self.notebook.set_show_tabs(True)
+        self.tab_button_widgets[self.tab_names.index("page2")].set_visible(True)
+        self.tab_switcher.set_visible(True)
         self.button_shortcut_icon.set_visible(True)
 
         if active_id == "windows":
@@ -6776,8 +6798,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.checkbox_shortcut_steam.set_visible(False)
             self.combobox_steam_shortcut_user.set_visible(False)
             self.grid_page2.set_visible(False)
-            self.tab_box2.set_visible(False)
-            self.notebook.set_show_tabs(False)
+            self.tab_button_widgets[self.tab_names.index("page2")].set_visible(False)
+            self.tab_switcher.set_visible(False)
             self.button_shortcut_icon.set_visible(True)
 
         else:
@@ -7143,17 +7165,17 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if self.grid_steam_title.get_visible():
             if not combobox_steam:
                 self.combobox_steam_title.add_css_class("combobox")
-                self.notebook.set_current_page(0)
+                self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
         if entry == "prefix":
             if not title or not prefix:
                 if not title:
                     self.entry_title.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 if not prefix:
                     self.entry_prefix.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 return False
 
@@ -7161,11 +7183,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if not title or not path:
                 if not title:
                     self.entry_title.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 if not path:
                     self.entry_path.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 return False
 
@@ -7173,19 +7195,19 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if not title or not path or not prefix or not gameid:
                 if not title:
                     self.entry_title.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 if not path:
                     self.entry_path.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 if not prefix:
                     self.entry_prefix.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 if not gameid:
                     self.entry_title.add_css_class("entry")
-                    self.notebook.set_current_page(0)
+                    self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
 
                 return False
 

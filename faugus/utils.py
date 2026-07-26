@@ -1927,8 +1927,8 @@ def show_steamgriddb_picker(obj, category):
     if not game_name:
         load_red_entry_css()
         obj.entry_title.add_css_class("entry")
-        if hasattr(obj, "notebook"):
-            obj.notebook.set_current_page(0)
+        if hasattr(obj, "tab_button_widgets") and hasattr(obj, "tab_names"):
+            obj.tab_button_widgets[obj.tab_names.index("page1")].set_active(True)
         return
 
     titles = {
