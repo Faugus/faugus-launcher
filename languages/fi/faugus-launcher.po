@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 18:51+0000\n"
+"POT-Creation-Date: 2026-07-27 02:33+0000\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
 "Last-Translator: Linus Virtanen <linus.virtanen@protonmail.com>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -88,13 +88,13 @@ msgid "Prefixes and Protons will not be backed up!"
 msgstr ""
 
 #: faugus/backup.py:269 faugus/launcher.py:4368 faugus/launcher.py:5279
-#: faugus/launcher.py:5700 faugus/launcher.py:6279 faugus/shortcut.py:86
-#: faugus/utils.py:531 faugus/utils.py:621
+#: faugus/launcher.py:5700 faugus/launcher.py:6287 faugus/proton_manager.py:306
+#: faugus/shortcut.py:86 faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr ""
 
 #: faugus/backup.py:273 faugus/launcher.py:4372 faugus/launcher.py:5056
-#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6275
+#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6283
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr ""
@@ -161,7 +161,7 @@ msgid "Edit"
 msgstr ""
 
 #: faugus/launcher.py:1429 faugus/proton_manager.py:222
-#: faugus/proton_manager.py:337
+#: faugus/proton_manager.py:341
 msgid "Remove"
 msgstr ""
 
@@ -245,7 +245,7 @@ msgstr ""
 msgid "minutes"
 msgstr ""
 
-#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6843
+#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6851
 msgid "Select a file to run in the prefix"
 msgstr ""
 
@@ -434,7 +434,7 @@ msgstr ""
 msgid "Default Proton"
 msgstr ""
 
-#: faugus/launcher.py:4300
+#: faugus/launcher.py:4300 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr ""
 
@@ -579,7 +579,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: faugus/launcher.py:5064 faugus/launcher.py:7086
+#: faugus/launcher.py:5064 faugus/launcher.py:7094
 msgid "Select a prefix location"
 msgstr ""
 
@@ -624,7 +624,7 @@ msgstr ""
 msgid "Steam User"
 msgstr ""
 
-#: faugus/launcher.py:5521 faugus/launcher.py:6073 faugus/launcher.py:6075
+#: faugus/launcher.py:5521 faugus/launcher.py:6078 faugus/launcher.py:6080
 msgid "No Steam users found"
 msgstr ""
 
@@ -704,62 +704,45 @@ msgstr ""
 msgid "Load from URL"
 msgstr ""
 
-#: faugus/launcher.py:6081 faugus/shortcut.py:190
+#: faugus/launcher.py:6086 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
 msgstr ""
 
-#: faugus/launcher.py:6236
+#: faugus/launcher.py:6244
 msgid "Select an image for the cover"
 msgstr ""
 
-#: faugus/launcher.py:6237
+#: faugus/launcher.py:6245
 msgid "Select an image for the banner"
 msgstr ""
 
-#: faugus/launcher.py:6238
+#: faugus/launcher.py:6246
 msgid "Select an image for the icon"
 msgstr ""
 
-#: faugus/launcher.py:6268
+#: faugus/launcher.py:6276
 msgid "Enter the image URL"
 msgstr ""
 
-#: faugus/launcher.py:6812
+#: faugus/launcher.py:6820
 msgid "Windows Game"
 msgstr ""
 
-#: faugus/launcher.py:6813
+#: faugus/launcher.py:6821
 msgid "Linux Game"
 msgstr ""
 
-#: faugus/launcher.py:6814
+#: faugus/launcher.py:6822
 msgid "Steam Game"
 msgstr ""
 
-#: faugus/launcher.py:7055
+#: faugus/launcher.py:7063
 msgid "Select the game executable"
 msgstr ""
 
-#: faugus/proton_manager.py:88
-msgid "Faugus Proton Manager"
-msgstr ""
-
-#: faugus/proton_manager.py:222 faugus/proton_manager.py:343
-#: faugus/proton_manager.py:357
+#: faugus/proton_manager.py:222 faugus/proton_manager.py:347
+#: faugus/proton_manager.py:351 faugus/proton_manager.py:361
 msgid "Download"
-msgstr ""
-
-#: faugus/proton_manager.py:299
-msgid "Downloading..."
-msgstr ""
-
-#: faugus/proton_manager.py:301
-#, python-format
-msgid "Downloading %s..."
-msgstr ""
-
-#: faugus/proton_manager.py:344
-msgid "Error during download"
 msgstr ""
 
 #: faugus/runner.py:162

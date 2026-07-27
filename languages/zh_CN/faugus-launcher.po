@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 18:51+0000\n"
+"POT-Creation-Date: 2026-07-27 02:33+0000\n"
 "PO-Revision-Date: 2026-07-21 09:17+0800\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
@@ -88,13 +88,13 @@ msgid "Prefixes and Protons will not be backed up!"
 msgstr "将不会备份 Prefix 和 Proton!"
 
 #: faugus/backup.py:269 faugus/launcher.py:4368 faugus/launcher.py:5279
-#: faugus/launcher.py:5700 faugus/launcher.py:6279 faugus/shortcut.py:86
-#: faugus/utils.py:531 faugus/utils.py:621
+#: faugus/launcher.py:5700 faugus/launcher.py:6287 faugus/proton_manager.py:306
+#: faugus/shortcut.py:86 faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "取消"
 
 #: faugus/backup.py:273 faugus/launcher.py:4372 faugus/launcher.py:5056
-#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6275
+#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6283
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "好"
@@ -161,7 +161,7 @@ msgid "Edit"
 msgstr "编辑"
 
 #: faugus/launcher.py:1429 faugus/proton_manager.py:222
-#: faugus/proton_manager.py:337
+#: faugus/proton_manager.py:341
 msgid "Remove"
 msgstr "删除"
 
@@ -245,7 +245,7 @@ msgstr "分钟"
 msgid "minutes"
 msgstr "分钟"
 
-#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6843
+#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6851
 msgid "Select a file to run in the prefix"
 msgstr "选择要在 Prefix 中运行的文件"
 
@@ -435,7 +435,7 @@ msgstr "默认 Prefix 工具"
 msgid "Default Proton"
 msgstr "默认 Proton"
 
-#: faugus/launcher.py:4300
+#: faugus/launcher.py:4300 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr "Proton 管理器"
 
@@ -580,7 +580,7 @@ msgstr "是"
 msgid "No"
 msgstr "不"
 
-#: faugus/launcher.py:5064 faugus/launcher.py:7086
+#: faugus/launcher.py:5064 faugus/launcher.py:7094
 msgid "Select a prefix location"
 msgstr "选择一个 Prefix 位置"
 
@@ -625,7 +625,7 @@ msgstr "添加新游戏/程序"
 msgid "Steam User"
 msgstr "Steam 用户"
 
-#: faugus/launcher.py:5521 faugus/launcher.py:6073 faugus/launcher.py:6075
+#: faugus/launcher.py:5521 faugus/launcher.py:6078 faugus/launcher.py:6080
 msgid "No Steam users found"
 msgstr "未找到任何 Steam 用户"
 
@@ -705,63 +705,46 @@ msgstr "从文件读取"
 msgid "Load from URL"
 msgstr "从 URL 读取"
 
-#: faugus/launcher.py:6081 faugus/shortcut.py:190
+#: faugus/launcher.py:6086 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
 msgstr "未找到 Vulkan 层"
 
-#: faugus/launcher.py:6236
+#: faugus/launcher.py:6244
 msgid "Select an image for the cover"
 msgstr "为封面选择图像"
 
-#: faugus/launcher.py:6237
+#: faugus/launcher.py:6245
 msgid "Select an image for the banner"
 msgstr "为海报选择图像"
 
-#: faugus/launcher.py:6238
+#: faugus/launcher.py:6246
 msgid "Select an image for the icon"
 msgstr "为图标选择图像"
 
-#: faugus/launcher.py:6268
+#: faugus/launcher.py:6276
 msgid "Enter the image URL"
 msgstr "输入图像 URL"
 
-#: faugus/launcher.py:6812
+#: faugus/launcher.py:6820
 msgid "Windows Game"
 msgstr "Windows 游戏"
 
-#: faugus/launcher.py:6813
+#: faugus/launcher.py:6821
 msgid "Linux Game"
 msgstr "Linux 游戏"
 
-#: faugus/launcher.py:6814
+#: faugus/launcher.py:6822
 msgid "Steam Game"
 msgstr "Steam 游戏"
 
-#: faugus/launcher.py:7055
+#: faugus/launcher.py:7063
 msgid "Select the game executable"
 msgstr "选择游戏的可执行文件"
 
-#: faugus/proton_manager.py:88
-msgid "Faugus Proton Manager"
-msgstr "Faugus Proton 管理器"
-
-#: faugus/proton_manager.py:222 faugus/proton_manager.py:343
-#: faugus/proton_manager.py:357
+#: faugus/proton_manager.py:222 faugus/proton_manager.py:347
+#: faugus/proton_manager.py:351 faugus/proton_manager.py:361
 msgid "Download"
 msgstr "下载"
-
-#: faugus/proton_manager.py:299
-msgid "Downloading..."
-msgstr "正在下载……"
-
-#: faugus/proton_manager.py:301
-#, python-format
-msgid "Downloading %s..."
-msgstr "正在下载 %s……"
-
-#: faugus/proton_manager.py:344
-msgid "Error during download"
-msgstr "下载时出现错误"
 
 #: faugus/runner.py:162
 msgid "Starting Steam game..."
@@ -992,6 +975,19 @@ msgstr "选择一个图标"
 #: faugus/utils.py:2035
 msgid "No results found"
 msgstr "没有结果"
+
+#~ msgid "Faugus Proton Manager"
+#~ msgstr "Faugus Proton 管理器"
+
+#~ msgid "Downloading..."
+#~ msgstr "正在下载……"
+
+#, python-format
+#~ msgid "Downloading %s..."
+#~ msgstr "正在下载 %s……"
+
+#~ msgid "Error during download"
+#~ msgstr "下载时出现错误"
 
 #~ msgid "Mode"
 #~ msgstr "模式"

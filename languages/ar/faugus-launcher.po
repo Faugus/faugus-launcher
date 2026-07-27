@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 18:51+0000\n"
+"POT-Creation-Date: 2026-07-27 02:33+0000\n"
 "PO-Revision-Date: 2026-07-23 01:10+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Arabic <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -92,13 +92,13 @@ msgid "Prefixes and Protons will not be backed up!"
 msgstr "لن يتم عمل نسخة احتياطية prefix وrunners!"
 
 #: faugus/backup.py:269 faugus/launcher.py:4368 faugus/launcher.py:5279
-#: faugus/launcher.py:5700 faugus/launcher.py:6279 faugus/shortcut.py:86
-#: faugus/utils.py:531 faugus/utils.py:621
+#: faugus/launcher.py:5700 faugus/launcher.py:6287 faugus/proton_manager.py:306
+#: faugus/shortcut.py:86 faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "إلغاء"
 
 #: faugus/backup.py:273 faugus/launcher.py:4372 faugus/launcher.py:5056
-#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6275
+#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6283
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "موافق"
@@ -168,7 +168,7 @@ msgid "Edit"
 msgstr "تعديل"
 
 #: faugus/launcher.py:1429 faugus/proton_manager.py:222
-#: faugus/proton_manager.py:337
+#: faugus/proton_manager.py:341
 msgid "Remove"
 msgstr "إزالة"
 
@@ -254,7 +254,7 @@ msgstr ""
 msgid "minutes"
 msgstr ""
 
-#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6843
+#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6851
 #, fuzzy
 msgid "Select a file to run in the prefix"
 msgstr "حدد ملفًا لتشغيله داخل prefix"
@@ -456,7 +456,7 @@ msgstr "أدوات Prefix الافتراضية"
 msgid "Default Proton"
 msgstr "موقع prefixes الافتراضي"
 
-#: faugus/launcher.py:4300
+#: faugus/launcher.py:4300 faugus/proton_manager.py:84
 #, fuzzy
 msgid "Proton Manager"
 msgstr "مدير GE-Proton"
@@ -611,7 +611,7 @@ msgstr "نعم"
 msgid "No"
 msgstr "لا"
 
-#: faugus/launcher.py:5064 faugus/launcher.py:7086
+#: faugus/launcher.py:5064 faugus/launcher.py:7094
 msgid "Select a prefix location"
 msgstr "حدد موقع prefix"
 
@@ -657,7 +657,7 @@ msgstr "لعبة/تطبيق جديد"
 msgid "Steam User"
 msgstr ""
 
-#: faugus/launcher.py:5521 faugus/launcher.py:6073 faugus/launcher.py:6075
+#: faugus/launcher.py:5521 faugus/launcher.py:6078 faugus/launcher.py:6080
 msgid "No Steam users found"
 msgstr ""
 
@@ -742,69 +742,50 @@ msgstr "تحميل من ملف"
 msgid "Load from URL"
 msgstr "تحميل من ملف"
 
-#: faugus/launcher.py:6081 faugus/shortcut.py:190
+#: faugus/launcher.py:6086 faugus/shortcut.py:190
 #, fuzzy
 msgid "Vulkan Layer not found"
 msgstr "لم يتم العثور على {path}"
 
-#: faugus/launcher.py:6236
+#: faugus/launcher.py:6244
 #, fuzzy
 msgid "Select an image for the cover"
 msgstr "حدد صورة للافتة"
 
-#: faugus/launcher.py:6237
+#: faugus/launcher.py:6245
 msgid "Select an image for the banner"
 msgstr "حدد صورة للافتة"
 
-#: faugus/launcher.py:6238
+#: faugus/launcher.py:6246
 #, fuzzy
 msgid "Select an image for the icon"
 msgstr "حدد صورة للافتة"
 
-#: faugus/launcher.py:6268
+#: faugus/launcher.py:6276
 msgid "Enter the image URL"
 msgstr ""
 
-#: faugus/launcher.py:6812
+#: faugus/launcher.py:6820
 msgid "Windows Game"
 msgstr "لعبة Windows"
 
-#: faugus/launcher.py:6813
+#: faugus/launcher.py:6821
 msgid "Linux Game"
 msgstr "لعبة Linux"
 
-#: faugus/launcher.py:6814
+#: faugus/launcher.py:6822
 msgid "Steam Game"
 msgstr ""
 
-#: faugus/launcher.py:7055
+#: faugus/launcher.py:7063
 #, fuzzy
 msgid "Select the game executable"
 msgstr "حدد ملف .exe الخاص باللعبة"
 
-#: faugus/proton_manager.py:88
-#, fuzzy
-msgid "Faugus Proton Manager"
-msgstr "برنامج Faugus GE-Proton"
-
-#: faugus/proton_manager.py:222 faugus/proton_manager.py:343
-#: faugus/proton_manager.py:357
+#: faugus/proton_manager.py:222 faugus/proton_manager.py:347
+#: faugus/proton_manager.py:351 faugus/proton_manager.py:361
 msgid "Download"
 msgstr "تنزيل"
-
-#: faugus/proton_manager.py:299
-msgid "Downloading..."
-msgstr "جاري التنزيل..."
-
-#: faugus/proton_manager.py:301
-#, fuzzy, python-format
-msgid "Downloading %s..."
-msgstr "جاري التنزيل..."
-
-#: faugus/proton_manager.py:344
-#, fuzzy
-msgid "Error during download"
-msgstr "خطأ أثناء التنزيل: {error}"
 
 #: faugus/runner.py:162
 #, fuzzy
@@ -1055,6 +1036,21 @@ msgstr "أيقونة منطقة الإعلام"
 #: faugus/utils.py:2035
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Faugus Proton Manager"
+#~ msgstr "برنامج Faugus GE-Proton"
+
+#~ msgid "Downloading..."
+#~ msgstr "جاري التنزيل..."
+
+#, fuzzy, python-format
+#~ msgid "Downloading %s..."
+#~ msgstr "جاري التنزيل..."
+
+#, fuzzy
+#~ msgid "Error during download"
+#~ msgstr "خطأ أثناء التنزيل: {error}"
 
 #, fuzzy
 #~ msgid ""

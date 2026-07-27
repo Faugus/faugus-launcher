@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-26 18:51+0000\n"
+"POT-Creation-Date: 2026-07-27 02:33+0000\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -91,13 +91,13 @@ msgid "Prefixes and Protons will not be backed up!"
 msgstr "პრეფიქსებისა და გამშვებების მარქაფი არ მოხდება!"
 
 #: faugus/backup.py:269 faugus/launcher.py:4368 faugus/launcher.py:5279
-#: faugus/launcher.py:5700 faugus/launcher.py:6279 faugus/shortcut.py:86
-#: faugus/utils.py:531 faugus/utils.py:621
+#: faugus/launcher.py:5700 faugus/launcher.py:6287 faugus/proton_manager.py:306
+#: faugus/shortcut.py:86 faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "გაუქმება"
 
 #: faugus/backup.py:273 faugus/launcher.py:4372 faugus/launcher.py:5056
-#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6275
+#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6283
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "დიახ"
@@ -167,7 +167,7 @@ msgid "Edit"
 msgstr "ჩასწორება"
 
 #: faugus/launcher.py:1429 faugus/proton_manager.py:222
-#: faugus/proton_manager.py:337
+#: faugus/proton_manager.py:341
 msgid "Remove"
 msgstr "წაშლა"
 
@@ -252,7 +252,7 @@ msgstr "წუთი"
 msgid "minutes"
 msgstr "წუთი"
 
-#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6843
+#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6851
 #, fuzzy
 msgid "Select a file to run in the prefix"
 msgstr "აირჩიეთ ფაილი პრეფისში გასაშვებად"
@@ -449,7 +449,7 @@ msgstr "ნაგულისხმევი პრეფიქსის ხე�
 msgid "Default Proton"
 msgstr "ნაგულისხმევი Proton"
 
-#: faugus/launcher.py:4300
+#: faugus/launcher.py:4300 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr "Proton-ის მმართველი"
 
@@ -602,7 +602,7 @@ msgstr "დიახ"
 msgid "No"
 msgstr "არა"
 
-#: faugus/launcher.py:5064 faugus/launcher.py:7086
+#: faugus/launcher.py:5064 faugus/launcher.py:7094
 msgid "Select a prefix location"
 msgstr "პრეფიქსის მდებარეობის არჩევა"
 
@@ -648,7 +648,7 @@ msgstr "ახალი თამაში/აპი"
 msgid "Steam User"
 msgstr "Steam-ის თამაში"
 
-#: faugus/launcher.py:5521 faugus/launcher.py:6073 faugus/launcher.py:6075
+#: faugus/launcher.py:5521 faugus/launcher.py:6078 faugus/launcher.py:6080
 msgid "No Steam users found"
 msgstr ""
 
@@ -730,66 +730,49 @@ msgstr "ფაილიდან ჩატვირთვა"
 msgid "Load from URL"
 msgstr "ჩატვირთვა URL-დან"
 
-#: faugus/launcher.py:6081 faugus/shortcut.py:190
+#: faugus/launcher.py:6086 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
 msgstr "Vulkan-ის ფენა აღმოჩენილი არაა"
 
-#: faugus/launcher.py:6236
+#: faugus/launcher.py:6244
 #, fuzzy
 msgid "Select an image for the cover"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:6237
+#: faugus/launcher.py:6245
 msgid "Select an image for the banner"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:6238
+#: faugus/launcher.py:6246
 #, fuzzy
 msgid "Select an image for the icon"
 msgstr "აირჩიეთ გამოსახულება ბანერისთვის"
 
-#: faugus/launcher.py:6268
+#: faugus/launcher.py:6276
 msgid "Enter the image URL"
 msgstr "შეიყვანეთ გამოსახულების URL"
 
-#: faugus/launcher.py:6812
+#: faugus/launcher.py:6820
 msgid "Windows Game"
 msgstr "Windows-ის თამაში"
 
-#: faugus/launcher.py:6813
+#: faugus/launcher.py:6821
 msgid "Linux Game"
 msgstr "Linux-ის თამაში"
 
-#: faugus/launcher.py:6814
+#: faugus/launcher.py:6822
 msgid "Steam Game"
 msgstr "Steam-ის თამაში"
 
-#: faugus/launcher.py:7055
+#: faugus/launcher.py:7063
 #, fuzzy
 msgid "Select the game executable"
 msgstr "აირჩიეთ თამაშის .exe"
 
-#: faugus/proton_manager.py:88
-msgid "Faugus Proton Manager"
-msgstr "Faugus Proton Manager"
-
-#: faugus/proton_manager.py:222 faugus/proton_manager.py:343
-#: faugus/proton_manager.py:357
+#: faugus/proton_manager.py:222 faugus/proton_manager.py:347
+#: faugus/proton_manager.py:351 faugus/proton_manager.py:361
 msgid "Download"
 msgstr "გადმოწერა"
-
-#: faugus/proton_manager.py:299
-msgid "Downloading..."
-msgstr "გადმოწერა..."
-
-#: faugus/proton_manager.py:301
-#, python-format
-msgid "Downloading %s..."
-msgstr "%s-ის გადმოწერა..."
-
-#: faugus/proton_manager.py:344
-msgid "Error during download"
-msgstr "შეცდომა გადმოწერისას"
 
 #: faugus/runner.py:162
 msgid "Starting Steam game..."
@@ -1028,6 +1011,19 @@ msgstr "სისტემური პანელის ხატულა"
 #: faugus/utils.py:2035
 msgid "No results found"
 msgstr ""
+
+#~ msgid "Faugus Proton Manager"
+#~ msgstr "Faugus Proton Manager"
+
+#~ msgid "Downloading..."
+#~ msgstr "გადმოწერა..."
+
+#, python-format
+#~ msgid "Downloading %s..."
+#~ msgstr "%s-ის გადმოწერა..."
+
+#~ msgid "Error during download"
+#~ msgstr "შეცდომა გადმოწერისას"
 
 #~ msgid "Mode"
 #~ msgstr "რეჟიმი"
