@@ -406,12 +406,6 @@ def _handle_button_down(self, button, win):
         elif role == "start":
             GLib.idle_add(lambda: self.show_power_menu(None))
 
-    elif isinstance(getattr(win, "notebook", None), Gtk.Notebook):
-        if role == "lb":
-            win.notebook.set_current_page(0)
-        elif role == "rb":
-            win.notebook.set_current_page(1)
-
     elif isinstance(getattr(win, "view_stack", None), Gtk.Stack):
         if role == "lb":
             _switch_stack_tab(win, -1)

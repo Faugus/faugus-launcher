@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background
+from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -26,43 +26,39 @@ _ = setup_gettext('faugus-launcher')
 
 VARIANTS = {
     "cachyos": {
-        "name": "Proton-CachyOS",
         "tab_label": "Proton-CachyOS",
         "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
         "tag_prefix": "cachyos-",
         "archive_ext": ["x86_64.tar.xz"],
-        "latest_dir": "Proton-CachyOS Latest",
         "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
     },
     "ge": {
-        "name": "GE-Proton",
         "tab_label": "GE-Proton",
         "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
         "tag_prefix": "GE-Proton",
         "archive_ext": [".tar.gz", ".tar.xz"],
-        "latest_dir": "Proton-GE Latest",
         "min_version": (9, 1),
         "tag_to_display": lambda tag: tag,
     },
     "em": {
-        "name": "Proton-EM",
         "tab_label": "Proton-EM",
         "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
         "tag_prefix": "EM-",
         "archive_ext": [".tar.xz"],
-        "latest_dir": "Proton-EM Latest",
         "tag_to_display": lambda tag: f"proton-{tag}",
     },
     "dw": {
-        "name": "DW-Proton",
         "tab_label": "DW-Proton",
         "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
         "tag_prefix": "dwproton-",
         "archive_ext": ["x86_64.tar.xz"],
-        "latest_dir": "DW-Proton Latest",
         "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
 }
+
+
+class _DownloadCancelled(Exception):
+    pass
 
 
 class _StreamProgress:
@@ -85,7 +81,7 @@ class _StreamProgress:
 
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
-        super().__init__(title=_("Faugus Proton Manager"))
+        super().__init__(title=_("Proton Manager"))
         hide_dialog_action_area(self)
         self.set_resizable(False)
         self.set_modal(True)
@@ -98,56 +94,60 @@ class ProtonDownloader(Gtk.Dialog):
         self.content_area.set_vexpand(True)
         self.content_area.set_hexpand(True)
 
-        self.notebook = Gtk.Notebook()
-        self.notebook.set_halign(Gtk.Align.FILL)
-        self.notebook.set_valign(Gtk.Align.FILL)
-        self.notebook.set_vexpand(True)
-        self.notebook.set_hexpand(True)
-        self.notebook.set_margin_start(10)
-        self.notebook.set_margin_end(10)
-        self.notebook.set_margin_top(10)
-        self.notebook.set_margin_bottom(10)
-        self.content_area.append(self.notebook)
+        self.view_stack = Gtk.Stack()
+        self.view_stack.set_halign(Gtk.Align.FILL)
+        self.view_stack.set_valign(Gtk.Align.FILL)
+        self.view_stack.set_vexpand(True)
+        self.view_stack.set_hexpand(True)
 
-        self.label_progress = Gtk.Label(label="")
-        self.label_progress.set_margin_start(10)
-        self.label_progress.set_margin_end(10)
-        self.label_progress.set_margin_bottom(10)
-        self.content_area.append(self.label_progress)
+        self.tab_switcher = IdComboBox()
+        self.tab_switcher.set_hexpand(True)
+        self.tab_switcher.set_margin_top(10)
+        self.tab_switcher.set_margin_start(10)
+        self.tab_switcher.set_margin_end(10)
+        self.tab_switcher.connect(
+            "changed",
+            lambda combo: self.view_stack.set_visible_child_name(combo.get_active_id())
+        )
 
-        self.progress_bar = Gtk.ProgressBar()
-        self.progress_bar.set_margin_start(10)
-        self.progress_bar.set_margin_end(10)
-        self.progress_bar.set_margin_bottom(10)
-        self.content_area.append(self.progress_bar)
+        content_scroll = Gtk.ScrolledWindow()
+        content_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        content_scroll.set_size_request(-1, 500)
+        content_scroll.set_vexpand(True)
+        content_scroll.set_child(self.view_stack)
+
+        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_tabs.append(self.tab_switcher)
+        box_tabs.append(content_scroll)
+
+        frame = Gtk.Frame()
+        frame.set_margin_top(10)
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_bottom(10)
+        frame.set_child(box_tabs)
+
+        self.content_area.append(frame)
 
         self.grids = {}
         for key, variant in VARIANTS.items():
             grid = Gtk.Grid()
             grid.set_hexpand(True)
             grid.set_row_spacing(5)
-            grid.set_column_spacing(10)
-            scroll = Gtk.ScrolledWindow()
-            scroll.set_size_request(400, 400)
-            scroll.set_margin_top(10)
-            scroll.set_margin_bottom(10)
-            scroll.set_margin_start(10)
-            scroll.set_margin_end(10)
-            scroll.set_child(grid)
+            grid.set_column_spacing(20)
+            grid.set_margin_start(10)
+            grid.set_margin_end(10)
+            grid.set_margin_bottom(10)
 
-            tab_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            tab_label = Gtk.Label(label=variant["tab_label"])
-            tab_label.set_width_chars(15)
-            tab_label.set_xalign(0.5)
-            tab_label.set_hexpand(True)
-            tab_box.append(tab_label)
-            tab_box.set_hexpand(True)
-            self.notebook.append_page(scroll, tab_box)
+            self.view_stack.add_titled(grid, key, variant["tab_label"])
+
+            self.tab_switcher.append(key, variant["tab_label"])
+
             self.grids[key] = grid
 
+        self.tab_switcher.set_active(0)
+
         self.get_releases()
-        self.progress_bar.set_visible(False)
-        self.label_progress.set_visible(False)
 
     def get_releases(self):
         closed_event = self.closed_event
@@ -222,6 +222,8 @@ class ProtonDownloader(Gtk.Dialog):
         button = Gtk.Button(label=_("Remove") if is_installed else _("Download"))
         button.connect("clicked", self.on_button_clicked, release, variant)
         button.set_size_request(120, -1)
+        button.download_cancel_event = None
+        button.progress_css_provider = None
         grid.attach(button, 1, row_index, 1, 1)
 
     def get_installed_path(self, tag_name, variant):
@@ -250,32 +252,39 @@ class ProtonDownloader(Gtk.Dialog):
         button.set_label(new_label)
         button.set_sensitive(True)
 
+    def set_button_progress(self, button, fraction):
+        provider = button.progress_css_provider
+        if provider is None:
+            provider = Gtk.CssProvider()
+            button.progress_css_provider = provider
+            button.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        pct = max(0.0, min(1.0, fraction)) * 100
+        css = (
+            "button { background-image: linear-gradient(to right, "
+            f"alpha(@accent_bg_color, 0.5) {pct:.1f}%, transparent {pct:.1f}%); }}"
+        )
+        provider.load_from_string(css)
+
+    def clear_button_progress(self, button):
+        if button.progress_css_provider is not None:
+            button.get_style_context().remove_provider(button.progress_css_provider)
+            button.progress_css_provider = None
+
     def on_button_clicked(self, widget, release, variant):
+        if widget.download_cancel_event is not None:
+            widget.download_cancel_event.set()
+            return
+
         tag_name = release["tag_name"]
         version_path = self.get_installed_path(tag_name, variant)
 
         if version_path.exists():
             self.on_remove_clicked(widget, release, variant)
         else:
-            self.progress_bar.set_visible(True)
-            self.label_progress.set_visible(True)
             self.on_download_clicked(widget, release, variant)
 
-    def disable_all_buttons(self):
-        for grid in self.grids.values():
-            for child in widget_children(grid):
-                if isinstance(child, Gtk.Button):
-                    child.set_sensitive(False)
-
-    def enable_all_buttons(self):
-        for grid in self.grids.values():
-            for child in widget_children(grid):
-                if isinstance(child, Gtk.Button):
-                    child.set_sensitive(True)
-
     def on_download_clicked(self, widget, release, variant):
-        self.disable_all_buttons()
-
         selected_asset = select_asset(release["assets"], variant["archive_ext"])
 
         if selected_asset:
@@ -283,34 +292,28 @@ class ProtonDownloader(Gtk.Dialog):
                 selected_asset["browser_download_url"],
                 selected_asset["name"],
                 release["tag_name"],
-                widget
+                widget,
+                variant,
             )
         else:
             print(release['tag_name'])
-            self.enable_all_buttons()
 
-    def download_and_extract(self, url, filename, tag_name, button):
+    def download_and_extract(self, url, filename, tag_name, button, variant):
         closed_event = self.closed_event
-        progress_bar = self.progress_bar
-        label_progress = self.label_progress
-        update_button = self.update_button
-        enable_all_buttons = self.enable_all_buttons
+        cancel_event = threading.Event()
+        button.download_cancel_event = cancel_event
 
-        button.set_label(_("Downloading..."))
-        button.set_sensitive(False)
-        label_progress.set_text(_("Downloading %s...") % tag_name)
-        label_progress.set_visible(True)
-        progress_bar.set_visible(True)
-        progress_bar.set_fraction(0)
-        progress_bar.set_text("0%")
-
-        main_context = GLib.MainContext.default()
-        while main_context.pending():
-            main_context.iteration(False)
+        button.set_label(_("Cancel"))
+        self.set_button_progress(button, 0)
 
         def safe_idle_add(*args):
             if not closed_event.is_set():
                 GLib.idle_add(*args)
+
+        def finish(new_label):
+            self.clear_button_progress(button)
+            button.download_cancel_event = None
+            button.set_label(new_label)
 
         def worker():
             try:
@@ -323,28 +326,29 @@ class ProtonDownloader(Gtk.Dialog):
                 last_pct = [-1]
 
                 def _progress(frac):
+                    if cancel_event.is_set() or closed_event.is_set():
+                        raise _DownloadCancelled()
                     pct = int(frac * 1000)
                     if pct != last_pct[0]:
                         last_pct[0] = pct
-                        safe_idle_add(progress_bar.set_fraction, frac)
-                        safe_idle_add(progress_bar.set_text, f"{pct / 10:.1f}%")
+                        safe_idle_add(self.set_button_progress, button, frac)
 
                 stream = _StreamProgress(response.raw, total_size, _progress)
 
                 with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
                     tar.extractall(path=COMPATIBILITY_DIR, filter="fully_trusted")
 
-                safe_idle_add(update_button, button, _("Remove"))
-                safe_idle_add(progress_bar.set_visible, False)
-                safe_idle_add(label_progress.set_visible, False)
+                safe_idle_add(finish, _("Remove"))
+
+            except _DownloadCancelled:
+                version_path = self.get_installed_path(tag_name, variant)
+                if version_path and version_path.exists():
+                    shutil.rmtree(version_path, ignore_errors=True)
+                safe_idle_add(finish, _("Download"))
 
             except Exception as e:
                 print(f"Error during download/extraction: {e}")
-                safe_idle_add(update_button, button, _("Download"))
-                safe_idle_add(label_progress.set_text, _("Error during download"))
-            finally:
-                safe_idle_add(enable_all_buttons)
-                safe_idle_add(button.grab_focus)
+                safe_idle_add(finish, _("Download"))
 
         run_in_background(worker)
 
