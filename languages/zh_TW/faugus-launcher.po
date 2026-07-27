@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 02:33+0000\n"
+"POT-Creation-Date: 2026-07-27 14:56+0000\n"
 "PO-Revision-Date: 2026-07-23 01:10+0000\n"
 "Last-Translator: \"Jao, Yun-Jui\" <janumeke@gmail.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
@@ -87,14 +87,14 @@ msgstr "尚無備份"
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "前綴與 Protons 不會備份！"
 
-#: faugus/backup.py:269 faugus/launcher.py:4368 faugus/launcher.py:5279
-#: faugus/launcher.py:5700 faugus/launcher.py:6287 faugus/proton_manager.py:306
+#: faugus/backup.py:269 faugus/launcher.py:4412 faugus/launcher.py:5323
+#: faugus/launcher.py:5744 faugus/launcher.py:6331 faugus/proton_manager.py:306
 #: faugus/shortcut.py:86 faugus/utils.py:531 faugus/utils.py:621
 msgid "Cancel"
 msgstr "取消"
 
-#: faugus/backup.py:273 faugus/launcher.py:4372 faugus/launcher.py:5056
-#: faugus/launcher.py:5283 faugus/launcher.py:5704 faugus/launcher.py:6283
+#: faugus/backup.py:273 faugus/launcher.py:4416 faugus/launcher.py:5100
+#: faugus/launcher.py:5327 faugus/launcher.py:5748 faugus/launcher.py:6327
 #: faugus/shortcut.py:90 faugus/utils.py:535 faugus/utils.py:801
 msgid "Ok"
 msgstr "好"
@@ -103,641 +103,643 @@ msgstr "好"
 msgid "Select the backup destination"
 msgstr "選取備份目的地"
 
-#: faugus/launcher.py:755 faugus/launcher.py:901 faugus/launcher.py:1165
-#: faugus/launcher.py:1329 faugus/launcher.py:1463 faugus/launcher.py:1520
-#: faugus/launcher.py:1564
+#: faugus/launcher.py:760 faugus/launcher.py:906 faugus/launcher.py:1171
+#: faugus/launcher.py:1336 faugus/launcher.py:1471 faugus/launcher.py:1528
+#: faugus/launcher.py:1572 faugus/launcher.py:1591
 msgid "All"
 msgstr "全部"
 
-#: faugus/launcher.py:757 faugus/launcher.py:903 faugus/launcher.py:1175
-#: faugus/launcher.py:1329 faugus/launcher.py:1463 faugus/launcher.py:1520
+#: faugus/launcher.py:762 faugus/launcher.py:908 faugus/launcher.py:1181
+#: faugus/launcher.py:1336 faugus/launcher.py:1471 faugus/launcher.py:1528
+#: faugus/launcher.py:1605
 msgid "Uncategorized"
 msgstr "未分類"
 
-#: faugus/launcher.py:872
+#: faugus/launcher.py:877
 msgid "Kill all running games"
 msgstr "終止所有運行中的遊戲"
 
-#: faugus/launcher.py:876
+#: faugus/launcher.py:881
 msgid "Search..."
 msgstr "搜尋..."
 
-#: faugus/launcher.py:881
+#: faugus/launcher.py:886
 msgid "Alphabetical"
 msgstr "字母"
 
-#: faugus/launcher.py:882
+#: faugus/launcher.py:887
 msgid "Playtime"
 msgstr "遊玩時間"
 
-#: faugus/launcher.py:883
+#: faugus/launcher.py:888
 msgid "Last played"
 msgstr "最後遊玩"
 
-#: faugus/launcher.py:884 faugus/launcher.py:4243
+#: faugus/launcher.py:889 faugus/launcher.py:4287
 msgid "Custom"
 msgstr "自訂"
 
-#: faugus/launcher.py:1176 faugus/launcher.py:1179 faugus/launcher.py:1463
-#: faugus/launcher.py:1520 faugus/launcher.py:1563 faugus/launcher.py:1729
-#: faugus/launcher.py:1740 faugus/launcher.py:2019
+#: faugus/launcher.py:1182 faugus/launcher.py:1185 faugus/launcher.py:1471
+#: faugus/launcher.py:1528 faugus/launcher.py:1571 faugus/launcher.py:1606
+#: faugus/launcher.py:1609 faugus/launcher.py:1764 faugus/launcher.py:1775
+#: faugus/launcher.py:2055
 msgid "None"
 msgstr "無"
 
-#: faugus/launcher.py:1350
+#: faugus/launcher.py:1358
 msgid "Manage categories..."
 msgstr "管理分類..."
 
-#: faugus/launcher.py:1382
+#: faugus/launcher.py:1390
 msgid "Manage Categories"
 msgstr "管理分類"
 
-#: faugus/launcher.py:1427
+#: faugus/launcher.py:1435
 msgid "Add"
 msgstr "新增"
 
-#: faugus/launcher.py:1428 faugus/launcher.py:1782
+#: faugus/launcher.py:1436 faugus/launcher.py:1817
 msgid "Edit"
 msgstr "編輯"
 
-#: faugus/launcher.py:1429 faugus/proton_manager.py:222
+#: faugus/launcher.py:1437 faugus/proton_manager.py:222
 #: faugus/proton_manager.py:341
 msgid "Remove"
 msgstr "刪除"
 
-#: faugus/launcher.py:1656
+#: faugus/launcher.py:1691
 msgid "Shut down"
 msgstr "關機"
 
-#: faugus/launcher.py:1659
+#: faugus/launcher.py:1694
 msgid "Reboot"
 msgstr "重新開機"
 
-#: faugus/launcher.py:1662
+#: faugus/launcher.py:1697
 msgid "Close"
 msgstr "關閉"
 
-#: faugus/launcher.py:1721
+#: faugus/launcher.py:1756
 msgid "Remove from hidden"
 msgstr "從隱藏移除"
 
-#: faugus/launcher.py:1721
+#: faugus/launcher.py:1756
 msgid "Hide"
 msgstr "隱藏"
 
-#: faugus/launcher.py:1722
+#: faugus/launcher.py:1757
 msgid "Stop"
 msgstr "停止"
 
-#: faugus/launcher.py:1722
+#: faugus/launcher.py:1757
 msgid "Play"
 msgstr "遊玩"
 
-#: faugus/launcher.py:1783
+#: faugus/launcher.py:1818
 msgid "Delete"
 msgstr "刪除"
 
-#: faugus/launcher.py:1786
+#: faugus/launcher.py:1821
 msgid "Duplicate"
 msgstr "建立副本"
 
-#: faugus/launcher.py:1789
+#: faugus/launcher.py:1824
 msgid "Category"
 msgstr "分類"
 
-#: faugus/launcher.py:1792
+#: faugus/launcher.py:1827
 msgid "Open game location"
 msgstr "開啟遊戲位置"
 
-#: faugus/launcher.py:1795
+#: faugus/launcher.py:1830
 msgid "Open prefix location"
 msgstr "開啟前綴位置"
 
-#: faugus/launcher.py:1798
+#: faugus/launcher.py:1833
 msgid "Show logs"
 msgstr "顯示紀錄"
 
-#: faugus/launcher.py:1805
+#: faugus/launcher.py:1840
 msgid "Run file in the prefix"
 msgstr "在此前綴中運行檔案"
 
-#: faugus/launcher.py:1819
+#: faugus/launcher.py:1854
 msgid "Clear recent"
 msgstr ""
 
-#: faugus/launcher.py:1822 faugus/launcher.py:1879
+#: faugus/launcher.py:1857 faugus/launcher.py:1915
 msgid "Recent"
 msgstr ""
 
-#: faugus/launcher.py:1935
+#: faugus/launcher.py:1971
 msgid "hour"
 msgstr "小時"
 
-#: faugus/launcher.py:1936
+#: faugus/launcher.py:1972
 msgid "hours"
 msgstr "小時"
 
-#: faugus/launcher.py:1937
+#: faugus/launcher.py:1973
 msgid "minute"
 msgstr "分鐘"
 
-#: faugus/launcher.py:1938
+#: faugus/launcher.py:1974
 msgid "minutes"
 msgstr "分鐘"
 
-#: faugus/launcher.py:2112 faugus/launcher.py:4923 faugus/launcher.py:6851
+#: faugus/launcher.py:2148 faugus/launcher.py:4967 faugus/launcher.py:6895
 msgid "Select a file to run in the prefix"
 msgstr "選取一個要在此前綴中運行的檔案"
 
-#: faugus/launcher.py:2155
+#: faugus/launcher.py:2191
 #, python-format
 msgid "%s Logs"
 msgstr "%s 紀錄"
 
-#: faugus/launcher.py:2194
+#: faugus/launcher.py:2230
 msgid "Copy to clipboard"
 msgstr "複製至剪貼簿"
 
-#: faugus/launcher.py:2198
+#: faugus/launcher.py:2234
 msgid "Open file location"
 msgstr "開啟檔案位置"
 
-#: faugus/launcher.py:2277 faugus/launcher.py:3311
+#: faugus/launcher.py:2313 faugus/launcher.py:3355
 #, python-format
 msgid "%s already exists"
 msgstr "%s 已經存在"
 
-#: faugus/launcher.py:2395 faugus/launcher.py:3148
+#: faugus/launcher.py:2431 faugus/launcher.py:3192
 #, python-format
 msgid "%s is running"
 msgstr "%s 正在運行"
 
-#: faugus/launcher.py:2812
+#: faugus/launcher.py:2856
 msgid "Proton may generate huge log files."
 msgstr "Proton 可能會產生很大的紀錄檔案。"
 
-#: faugus/launcher.py:2813
+#: faugus/launcher.py:2857
 msgid "Enable logging only when debugging a problem."
 msgstr "只在問題除錯時啟用紀錄。"
 
-#: faugus/launcher.py:3072
+#: faugus/launcher.py:3116
 #, python-format
 msgid "Edit %s"
 msgstr "編輯 %s"
 
-#: faugus/launcher.py:3210
+#: faugus/launcher.py:3254
 msgid "Failed to remove prefix"
 msgstr "刪除前綴失敗"
 
-#: faugus/launcher.py:3447
+#: faugus/launcher.py:3491
 msgid "No internet connection"
 msgstr "沒有網路連線"
 
-#: faugus/launcher.py:3523 faugus/launcher.py:3681
+#: faugus/launcher.py:3567 faugus/launcher.py:3725
 #, python-format
 msgid "Installing %s..."
 msgstr "正在安裝 %s..."
 
-#: faugus/launcher.py:3535 faugus/launcher.py:3539 faugus/launcher.py:3543
-#: faugus/launcher.py:3547 faugus/launcher.py:3551 faugus/launcher.py:3555
-#: faugus/launcher.py:3559 faugus/runner.py:604
+#: faugus/launcher.py:3579 faugus/launcher.py:3583 faugus/launcher.py:3587
+#: faugus/launcher.py:3591 faugus/launcher.py:3595 faugus/launcher.py:3599
+#: faugus/launcher.py:3603 faugus/runner.py:604
 msgid "Downloading"
 msgstr "正在下載"
 
-#: faugus/launcher.py:3631
+#: faugus/launcher.py:3675
 #, python-format
 msgid "%s was not installed!"
 msgstr "沒有安裝 %s！"
 
-#: faugus/launcher.py:3675
+#: faugus/launcher.py:3719
 msgid "Download complete"
 msgstr "下載完成"
 
-#: faugus/launcher.py:3678
+#: faugus/launcher.py:3722
 #, python-format
 msgid "Error during download: %s"
 msgstr "下載時出錯：%s"
 
-#: faugus/launcher.py:3683 faugus/launcher.py:3686 faugus/launcher.py:3701
+#: faugus/launcher.py:3727 faugus/launcher.py:3730 faugus/launcher.py:3745
 msgid "Please close the login window and wait."
 msgstr "請關閉登入視窗並等待。"
 
-#: faugus/launcher.py:3700
+#: faugus/launcher.py:3744
 msgid "Please don't change the installation path."
 msgstr "請勿變更安裝路徑。"
 
-#: faugus/launcher.py:3707
+#: faugus/launcher.py:3751
 msgid "Please close Wargaming to finish the installation."
 msgstr "請關閉 Wargaming 來完成安裝。"
 
-#: faugus/launcher.py:4086
+#: faugus/launcher.py:4130
 msgid "Settings"
 msgstr "設定"
 
-#: faugus/launcher.py:4208
+#: faugus/launcher.py:4252
 msgid "Language"
 msgstr "語言"
 
-#: faugus/launcher.py:4212
+#: faugus/launcher.py:4256
 #, fuzzy
 msgid "Interface Mode"
 msgstr "介面模式"
 
-#: faugus/launcher.py:4216
+#: faugus/launcher.py:4260
 msgid "List"
 msgstr "列表"
 
-#: faugus/launcher.py:4217
+#: faugus/launcher.py:4261
 msgid "Grid"
 msgstr "網格"
 
-#: faugus/launcher.py:4218
+#: faugus/launcher.py:4262
 msgid "Covers"
 msgstr "封面"
 
-#: faugus/launcher.py:4221
+#: faugus/launcher.py:4265
 msgid "Background"
 msgstr "背景"
 
-#: faugus/launcher.py:4224 faugus/launcher.py:4234 faugus/launcher.py:4242
+#: faugus/launcher.py:4268 faugus/launcher.py:4278 faugus/launcher.py:4286
 msgid "Default"
 msgstr "預設"
 
-#: faugus/launcher.py:4225
+#: faugus/launcher.py:4269
 msgid "Accent color"
 msgstr "強調顏色"
 
-#: faugus/launcher.py:4226
+#: faugus/launcher.py:4270
 msgid "Dominant color"
 msgstr "主要顏色"
 
-#: faugus/launcher.py:4229
+#: faugus/launcher.py:4273
 msgid "Banner"
 msgstr "橫幅"
 
-#: faugus/launcher.py:4231
+#: faugus/launcher.py:4275
 msgid "Theme"
 msgstr "主題"
 
-#: faugus/launcher.py:4235
+#: faugus/launcher.py:4279
 msgid "Light"
 msgstr "淺色"
 
-#: faugus/launcher.py:4236
+#: faugus/launcher.py:4280
 msgid "Dark"
 msgstr "深色"
 
-#: faugus/launcher.py:4239
+#: faugus/launcher.py:4283
 msgid "Accent Color"
 msgstr "強調顏色"
 
-#: faugus/launcher.py:4254
+#: faugus/launcher.py:4298
 msgid "Startup Window Size"
 msgstr "啟動視窗大小"
 
-#: faugus/launcher.py:4258
+#: faugus/launcher.py:4302
 msgid "Default size"
 msgstr "預設大小"
 
-#: faugus/launcher.py:4259
+#: faugus/launcher.py:4303
 msgid "Remember size"
 msgstr "記住大小"
 
-#: faugus/launcher.py:4260
+#: faugus/launcher.py:4304
 msgid "Maximized"
 msgstr "最大化"
 
-#: faugus/launcher.py:4261
+#: faugus/launcher.py:4305
 msgid "Fullscreen"
 msgstr "全螢幕"
 
-#: faugus/launcher.py:4262
+#: faugus/launcher.py:4306
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter 會切換全螢幕"
 
-#: faugus/launcher.py:4264
+#: faugus/launcher.py:4308
 msgid "Labels"
 msgstr "標籤"
 
-#: faugus/launcher.py:4276
+#: faugus/launcher.py:4320
 msgid "Default Prefixes Location"
 msgstr "預設前綴位置"
 
-#: faugus/launcher.py:4280
+#: faugus/launcher.py:4324
 msgid "The location where prefixes are created"
 msgstr "前綴被建立的位置"
 
-#: faugus/launcher.py:4290
+#: faugus/launcher.py:4334
 msgid "Default Prefix Tools"
 msgstr "預設前綴工具"
 
-#: faugus/launcher.py:4296
+#: faugus/launcher.py:4340
 msgid "Default Proton"
 msgstr "預設 Proton"
 
-#: faugus/launcher.py:4300 faugus/proton_manager.py:84
+#: faugus/launcher.py:4344 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr "Proton 管理員"
 
-#: faugus/launcher.py:4303
+#: faugus/launcher.py:4347
 msgid "Miscellaneous"
 msgstr "雜項"
 
-#: faugus/launcher.py:4306
+#: faugus/launcher.py:4350
 msgid "Discrete GPU"
 msgstr "獨立顯示卡"
 
-#: faugus/launcher.py:4308
+#: faugus/launcher.py:4352
 msgid "Auto-close on launch"
 msgstr "啟動時自動關閉"
 
-#: faugus/launcher.py:4310
+#: faugus/launcher.py:4354
 msgid "Autostart"
 msgstr "自動啟動"
 
-#: faugus/launcher.py:4312
+#: faugus/launcher.py:4356
 msgid "System tray icon"
 msgstr "系統匣圖示"
 
-#: faugus/launcher.py:4315
+#: faugus/launcher.py:4359
 msgid "Minimized startup"
 msgstr "最小化啟動"
 
-#: faugus/launcher.py:4318
+#: faugus/launcher.py:4362
 msgid "Monochrome icon"
 msgstr "單色圖示"
 
-#: faugus/launcher.py:4321
+#: faugus/launcher.py:4365
 msgid "Splash window"
 msgstr "啟動視窗"
 
-#: faugus/launcher.py:4324
+#: faugus/launcher.py:4368
 msgid "Automatic updates"
 msgstr "自動更新"
 
-#: faugus/launcher.py:4327
+#: faugus/launcher.py:4371
 msgid "Logging"
 msgstr "記錄"
 
-#: faugus/launcher.py:4330
+#: faugus/launcher.py:4374
 msgid "Categories and sort"
 msgstr "分類與排序"
 
-#: faugus/launcher.py:4332
+#: faugus/launcher.py:4376
 msgid "Hidden games"
 msgstr "隱藏的遊戲"
 
-#: faugus/launcher.py:4333
+#: faugus/launcher.py:4377
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H 會切換隱藏的遊戲"
 
-#: faugus/launcher.py:4335
+#: faugus/launcher.py:4379
 msgid "Gamepad navigation"
 msgstr "遊戲手把導覽"
 
-#: faugus/launcher.py:4338
+#: faugus/launcher.py:4382
 msgid "Wayland driver (experimental)"
 msgstr "Wayland 驅動程式 (實驗性)"
 
-#: faugus/launcher.py:4341
+#: faugus/launcher.py:4385
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (實驗性)"
 
-#: faugus/launcher.py:4351 faugus/launcher.py:5657
+#: faugus/launcher.py:4395 faugus/launcher.py:5701
 msgid "Run"
 msgstr "運行"
 
-#: faugus/launcher.py:4354 faugus/launcher.py:5660
+#: faugus/launcher.py:4398 faugus/launcher.py:5704
 msgid "Run a file in the prefix"
 msgstr "在此前綴中運行檔案"
 
-#: faugus/launcher.py:4358 faugus/launcher.py:5645 faugus/shortcut.py:82
+#: faugus/launcher.py:4402 faugus/launcher.py:5689 faugus/shortcut.py:82
 msgid "May fix gamepad issues with some games"
 msgstr "可能修復一些遊戲的遊戲手把問題"
 
-#: faugus/launcher.py:4359 faugus/launcher.py:5646 faugus/shortcut.py:83
+#: faugus/launcher.py:4403 faugus/launcher.py:5690 faugus/shortcut.py:83
 msgid "No Sleep"
 msgstr "不睡眠"
 
-#: faugus/launcher.py:4360 faugus/launcher.py:5647 faugus/shortcut.py:84
+#: faugus/launcher.py:4404 faugus/launcher.py:5691 faugus/shortcut.py:84
 msgid "Prevents the system from suspending while gaming"
 msgstr "防止玩遊戲時系統暫停"
 
-#: faugus/launcher.py:4362
+#: faugus/launcher.py:4406
 msgid "Support the Project"
 msgstr "支持本專案"
 
-#: faugus/launcher.py:4376
+#: faugus/launcher.py:4420
 msgid "Backup/Restore Settings"
 msgstr "備份/回復設定"
 
-#: faugus/launcher.py:4380
+#: faugus/launcher.py:4424
 msgid "Backup"
 msgstr "備份"
 
-#: faugus/launcher.py:4383
+#: faugus/launcher.py:4427
 msgid "Restore"
 msgstr "回復"
 
-#: faugus/launcher.py:4390
+#: faugus/launcher.py:4434
 msgid "Global Environment Variables"
 msgstr "全域環境變數"
 
-#: faugus/launcher.py:4648
+#: faugus/launcher.py:4692
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "清除紀錄 (%s)"
 
-#: faugus/launcher.py:4651
+#: faugus/launcher.py:4695
 msgid "Clear Logs"
 msgstr "清除紀錄"
 
-#: faugus/launcher.py:4867
+#: faugus/launcher.py:4911
 msgid "Do you want to save the changes?"
 msgstr "你要儲存變動嗎？"
 
-#: faugus/launcher.py:4977
+#: faugus/launcher.py:5021
 msgid "Select a backup file to restore"
 msgstr "選取一個要回復的備份檔案"
 
-#: faugus/launcher.py:4983
+#: faugus/launcher.py:5027
 msgid "ZIP files"
 msgstr "ZIP 檔案"
 
-#: faugus/launcher.py:4998 faugus/launcher.py:5008
+#: faugus/launcher.py:5042 faugus/launcher.py:5052
 msgid "This is not a valid Faugus backup file."
 msgstr "這不是有效的 Faugus 備份檔案。"
 
-#: faugus/launcher.py:5047
+#: faugus/launcher.py:5091
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "你確定要覆寫設定？"
 
-#: faugus/launcher.py:5056 faugus/launcher.py:5347
+#: faugus/launcher.py:5100 faugus/launcher.py:5391
 msgid "Yes"
 msgstr "是"
 
-#: faugus/launcher.py:5057 faugus/launcher.py:5343
+#: faugus/launcher.py:5101 faugus/launcher.py:5387
 msgid "No"
 msgstr "否"
 
-#: faugus/launcher.py:5064 faugus/launcher.py:7094
+#: faugus/launcher.py:5108 faugus/launcher.py:7138
 msgid "Select a prefix location"
 msgstr "選取一個前綴位置"
 
-#: faugus/launcher.py:5268
+#: faugus/launcher.py:5312
 #, python-format
 msgid "Duplicate %s"
 msgstr "建立 %s 的副本"
 
-#: faugus/launcher.py:5273 faugus/launcher.py:5524 faugus/launcher.py:5537
+#: faugus/launcher.py:5317 faugus/launcher.py:5568 faugus/launcher.py:5581
 #: faugus/shortcut.py:43
 msgid "Title"
 msgstr "標題"
 
-#: faugus/launcher.py:5319
+#: faugus/launcher.py:5363
 #, python-format
 msgid "Delete %s"
 msgstr "刪除 %s"
 
-#: faugus/launcher.py:5326
+#: faugus/launcher.py:5370
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "你確定要刪除 %s？"
 
-#: faugus/launcher.py:5335
+#: faugus/launcher.py:5379
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "警告：此前綴被另外 %d 個遊戲使用。"
 
-#: faugus/launcher.py:5337
+#: faugus/launcher.py:5381
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "警告：此前綴被另外 1 個遊戲使用。"
 
-#: faugus/launcher.py:5351
+#: faugus/launcher.py:5395
 msgid "Also remove the prefix:"
 msgstr "也刪除此前綴："
 
-#: faugus/launcher.py:5398
+#: faugus/launcher.py:5442
 msgid "New Game/App"
 msgstr "新遊戲/程式"
 
-#: faugus/launcher.py:5507
+#: faugus/launcher.py:5551
 msgid "Steam User"
 msgstr "Steam 使用者"
 
-#: faugus/launcher.py:5521 faugus/launcher.py:6078 faugus/launcher.py:6080
+#: faugus/launcher.py:5565 faugus/launcher.py:6122 faugus/launcher.py:6124
 msgid "No Steam users found"
 msgstr "沒有找到 Steam 使用者"
 
-#: faugus/launcher.py:5589 faugus/utils.py:1455
+#: faugus/launcher.py:5633 faugus/utils.py:1455
 msgid "Path"
 msgstr "路徑"
 
-#: faugus/launcher.py:5593
+#: faugus/launcher.py:5637
 msgid "Path to the game executable"
 msgstr "遊戲執行檔的路徑"
 
-#: faugus/launcher.py:5601
+#: faugus/launcher.py:5645
 msgid "Prefix"
 msgstr "前綴"
 
-#: faugus/launcher.py:5605
+#: faugus/launcher.py:5649
 msgid "Path to the prefix"
 msgstr "前綴的路徑"
 
-#: faugus/launcher.py:5613
+#: faugus/launcher.py:5657
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/launcher.py:5627 faugus/shortcut.py:60
+#: faugus/launcher.py:5671 faugus/shortcut.py:60
 msgid "Game Arguments"
 msgstr "遊戲引數"
 
-#: faugus/launcher.py:5632 faugus/shortcut.py:65 faugus/utils.py:1164
+#: faugus/launcher.py:5676 faugus/shortcut.py:65 faugus/utils.py:1164
 msgid "Launch Settings"
 msgstr "啟動設定"
 
-#: faugus/launcher.py:5635 faugus/shortcut.py:68 faugus/utils.py:1427
+#: faugus/launcher.py:5679 faugus/shortcut.py:68 faugus/utils.py:1427
 msgid "Additional Application"
 msgstr "額外程式"
 
-#: faugus/launcher.py:5638 faugus/shortcut.py:71
+#: faugus/launcher.py:5682 faugus/shortcut.py:71
 msgid "Additional application to run with the game"
 msgstr "與遊戲一起運行的額外程式"
 
-#: faugus/launcher.py:5640 faugus/shortcut.py:73 faugus/utils.py:1553
+#: faugus/launcher.py:5684 faugus/shortcut.py:73 faugus/utils.py:1553
 msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling 影格生成"
 
-#: faugus/launcher.py:5662
+#: faugus/launcher.py:5706
 msgid "Shortcut"
 msgstr "捷徑"
 
-#: faugus/launcher.py:5667
+#: faugus/launcher.py:5711
 msgid "Desktop"
 msgstr "桌面"
 
-#: faugus/launcher.py:5668
+#: faugus/launcher.py:5712
 msgid "App Menu"
 msgstr "程式選單"
 
-#: faugus/launcher.py:5669
+#: faugus/launcher.py:5713
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:5723 faugus/launcher.py:5928
+#: faugus/launcher.py:5767 faugus/launcher.py:5972
 msgid "Game/App"
 msgstr "遊戲/程式"
 
-#: faugus/launcher.py:5724 faugus/launcher.py:5938
+#: faugus/launcher.py:5768 faugus/launcher.py:5982
 msgid "Tools"
 msgstr "工具"
 
-#: faugus/launcher.py:5911
+#: faugus/launcher.py:5955
 msgid "Refresh"
 msgstr "重新整理"
 
-#: faugus/launcher.py:5914
+#: faugus/launcher.py:5958
 msgid "Load from file"
 msgstr "從檔案載入"
 
-#: faugus/launcher.py:5917
+#: faugus/launcher.py:5961
 msgid "Load from URL"
 msgstr "從網址載入"
 
-#: faugus/launcher.py:6086 faugus/shortcut.py:190
+#: faugus/launcher.py:6130 faugus/shortcut.py:190
 msgid "Vulkan Layer not found"
 msgstr "沒有找到 Vulkan 層"
 
-#: faugus/launcher.py:6244
+#: faugus/launcher.py:6288
 msgid "Select an image for the cover"
 msgstr "為封面選取一個影像"
 
-#: faugus/launcher.py:6245
+#: faugus/launcher.py:6289
 msgid "Select an image for the banner"
 msgstr "為橫幅選取一個影像"
 
-#: faugus/launcher.py:6246
+#: faugus/launcher.py:6290
 msgid "Select an image for the icon"
 msgstr "為圖示選取一個影像"
 
-#: faugus/launcher.py:6276
+#: faugus/launcher.py:6320
 msgid "Enter the image URL"
 msgstr "輸入影像網址"
 
-#: faugus/launcher.py:6820
+#: faugus/launcher.py:6864
 msgid "Windows Game"
 msgstr "Windows 遊戲"
 
-#: faugus/launcher.py:6821
+#: faugus/launcher.py:6865
 msgid "Linux Game"
 msgstr "Linux 遊戲"
 
-#: faugus/launcher.py:6822
+#: faugus/launcher.py:6866
 msgid "Steam Game"
 msgstr "Steam 遊戲"
 
-#: faugus/launcher.py:7063
+#: faugus/launcher.py:7107
 msgid "Select the game executable"
 msgstr "選取遊戲執行檔"
 
