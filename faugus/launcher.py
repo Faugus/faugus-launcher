@@ -1331,7 +1331,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         focus_btn = None
 
         for cat_name in categories:
-            btn = Gtk.Button(label=cat_name)
+            count = self._count_games_in_category(cat_name)
+            btn = Gtk.Button(label=f"{cat_name} ({count})")
             if cat_name == current_label:
                 focus_btn = btn
             btn.set_has_frame(False)
@@ -1578,6 +1579,33 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def _get_current_categories(self):
         return [cat.strip() for cat in load_json_file(CATEGORIES_FILE, default=[]) if cat.strip()]
+
+    def _count_games_in_category(self, category_name):
+        if category_name == _("All"):
+            return len(self.games)
+
+        count = 0
+        for game in self.games:
+            raw_cat = game.category
+
+            if isinstance(raw_cat, str):
+                game_cats = [raw_cat]
+            elif isinstance(raw_cat, list):
+                game_cats = raw_cat
+            else:
+                game_cats = []
+
+            if category_name == _("Uncategorized"):
+                matches = not game_cats or game_cats == [_("None")]
+            else:
+                if not game_cats:
+                    game_cats = [_("None")]
+                matches = category_name in game_cats
+
+            if matches:
+                count += 1
+
+        return count
 
     def _update_games_category(self, old_cat, new_cat):
         try:
