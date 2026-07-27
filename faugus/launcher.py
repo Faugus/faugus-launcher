@@ -130,9 +130,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.running = {}
 
         add_css_once("main_window", """
-            .game {
-                background-color: @theme_base_color;
-                color: @theme_text_color;
+            .list-row-entry {
+                padding: 0;
+                min-height: 0;
             }
             flowboxchild:not(.cover-container) {
                 background: transparent;
@@ -155,6 +155,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
             }
+            flowboxchild:selected:focus:not(.cover-container) .game-label {
+                color: @theme_selected_fg_color;
+            }
             .category-list row:selected {
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
@@ -172,11 +175,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             flowboxchild.cover-container:selected {
                 transform: scale(1.05);
-                border-color: alpha(@theme_selected_bg_color, 0.5);
-                box-shadow: 0 0 25px 5px alpha(@theme_selected_bg_color, 0.3);
-            }
-            flowboxchild.cover-container:selected:focus {
                 border-color: @theme_selected_bg_color;
+                box-shadow: 0 0 25px 5px alpha(@theme_selected_bg_color, 0.3);
             }
             .cover-placeholder,
             .banner-placeholder {
@@ -2543,13 +2543,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode in ("Covers", "SteamGridDB"):
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
-        hbox.add_css_class("game")
-
         game_icon = game.icon
         if not os.path.isfile(game_icon):
             game_icon = FAUGUS_PNG
 
         game_label = Gtk.Label.new(game.title)
+        game_label.add_css_class("game-label")
 
         if self.interface_mode in ("Grid", "Covers", "SteamGridDB"):
             game_label.set_wrap(True)
@@ -2654,7 +2653,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             hbox.append(game_label)
 
         overlay = Gtk.Overlay()
-        overlay.set_child(hbox)
+        deco_entry = Gtk.Entry()
+        deco_entry.set_can_target(False)
+        deco_entry.set_focusable(False)
+        deco_entry.set_hexpand(True)
+        deco_entry.set_vexpand(True)
+        deco_entry.add_css_class("game")
+        deco_entry.add_css_class("list-row-entry")
+        overlay.set_child(deco_entry)
+        overlay.add_overlay(hbox)
+        overlay.set_measure_overlay(hbox, True)
         overlay.add_overlay(anim_box)
         anim_box.set_can_target(False)
         self.flowbox_child.set_child(overlay)
