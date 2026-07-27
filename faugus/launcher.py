@@ -214,6 +214,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             .accent-background {
                 background-color: alpha(@accent_bg_color, 0.2);
             }
+            popover.popover-accent-background contents,
+            popover.popover-accent-background arrow {
+                background-color: @window_bg_color;
+                background-image: linear-gradient(alpha(@accent_bg_color, 0.2), alpha(@accent_bg_color, 0.2));
+            }
             .steamgriddb-focus-tint {
                 background-color: transparent;
                 border-radius: 12px;
@@ -938,6 +943,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def on_sort_button_clicked(widget):
             popover = Gtk.Popover()
             popover.set_parent(widget)
+            if self.background_mode == "accent":
+                popover.add_css_class("popover-accent-background")
             vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
             vbox.set_margin_top(10)
             vbox.set_margin_bottom(10)
@@ -1320,6 +1327,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         popover = Gtk.Popover()
         popover.set_parent(button)
         popover.connect("closed", lambda p: p.unparent())
+        if self.background_mode == "accent":
+            popover.add_css_class("popover-accent-background")
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         vbox.set_margin_top(10)
         vbox.set_margin_bottom(10)
@@ -1855,6 +1864,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         popover = Gtk.PopoverMenu.new_from_model(root)
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
+        if self.background_mode == "accent":
+            popover.add_css_class("popover-accent-background")
 
         def find_label_text(widget):
             if type(widget).__name__ == "Label":
