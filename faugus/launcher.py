@@ -2666,6 +2666,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         deco_entry.set_focusable(False)
         deco_entry.set_hexpand(True)
         deco_entry.set_vexpand(True)
+        deco_entry.set_width_chars(0)
+        deco_entry.set_max_width_chars(0)
         deco_entry.add_css_class("game")
         deco_entry.add_css_class("list-row-entry")
         overlay.set_child(deco_entry)
