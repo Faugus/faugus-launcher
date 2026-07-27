@@ -53,53 +53,58 @@
   <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-grid.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-grid.png</image>
       <caption>Main window: Grid interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-covers.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-covers.png</image>
       <caption>Main window: Covers interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/main-steamgriddb.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-steamgriddb.png</image>
       <caption>Main window: SteamGridDB interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/add-tool.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/add-tool.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/launch-settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/launch-settings.png</image>
       <caption>Add/Edit Game: Launch Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1909bb3/screenshots/proton-manager.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/proton-manager.png</image>
       <caption>Proton Manager</caption>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.2-1" date="2026-07-22">
+    <release version="2.0.3-1" date="2026-07-27">
       <description>
         <ul>
-          <li>Re-added Epic Games launcher</li>
-          <li>Added GOG Galaxy launcher support</li>
-          <li>Added tabs to Settings screen</li>
-          <li>Now loads images incrementally</li>
-          <li>Now allows automatic Protonfixes</li>
-          <li>Now ignores Steam user 0</li>
-          <li>Updated translations</li>
+          <li>Now applies the accent color to games and menus in the main screen.</li>
+          <li>Changed the context menu visuals.</li>
+          <li>Added a “Recent” section for apps that were run in the prefix.</li>
+          <li>Now also lists Family Shared games when adding a Steam games.</li>
+          <li>Now shows the number of games in the categories menu.</li>
+          <li>Reverted the Settings window tabs. Now it has as scroll bar for small resolution screens.</li>
+          <li>Improved the Proton Manager.</li>
+          <li>Improved the zoom slider.</li>
+          <li>Other minor visual improvements.</li>
+          <li>Fixed row alignment when editing a large string in the Launch Arguments.</li>
+          <li>Fixed transparency background with some GTK themes.</li>
+          <li>Fixed AppImage not running in some systems.</li>
         </ul>
       </description>
     </release>
