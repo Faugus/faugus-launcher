@@ -86,8 +86,8 @@ cat > "$APPDIR/AppRun" <<'APPRUN'
 #!/bin/bash
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
-for site_packages in "$HERE"/usr/lib/python3*/site-packages; do
-    export PYTHONPATH="$site_packages${PYTHONPATH:+:$PYTHONPATH}"
+for site_packages in "$HERE"/usr/lib/python3*/site-packages "$HERE"/usr/lib/python3*/dist-packages; do
+    [ -d "$site_packages" ] && export PYTHONPATH="$site_packages${PYTHONPATH:+:$PYTHONPATH}"
 done
 
 export XDG_DATA_DIRS="$HERE/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
