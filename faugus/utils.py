@@ -1797,11 +1797,28 @@ def list_gtk4_themes():
     return sorted(names)
 
 
+_theme_engine_lock_handler = None
+
+
 def apply_theme_engine(theme_engine):
+    settings = Gtk.Settings.get_default()
+
+    global _theme_engine_lock_handler
+    if _theme_engine_lock_handler is not None:
+        settings.disconnect(_theme_engine_lock_handler)
+        _theme_engine_lock_handler = None
+
     if theme_engine == "adwaita":
         Adw.StyleManager.get_default()
+        settings.set_property("gtk-theme-name", "Adwaita-empty")
+
+        def _force_adwaita(obj, pspec):
+            if obj.get_property("gtk-theme-name") != "Adwaita-empty":
+                obj.set_property("gtk-theme-name", "Adwaita-empty")
+
+        _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
     elif theme_engine and theme_engine != "gtk4":
-        Gtk.Settings.get_default().set_property("gtk-theme-name", theme_engine)
+        settings.set_property("gtk-theme-name", theme_engine)
 
 
 def apply_interface_customization(interface_theme, accent_color, theme_engine="adwaita"):
