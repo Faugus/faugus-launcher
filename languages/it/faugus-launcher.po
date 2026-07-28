@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-27 14:56+0000\n"
-"PO-Revision-Date: 2026-07-26 14:46+0000\n"
+"PO-Revision-Date: 2026-07-28 13:40+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -225,7 +225,7 @@ msgstr "Esegui file all'interno del prefix"
 
 #: faugus/launcher.py:1854
 msgid "Clear recent"
-msgstr ""
+msgstr "Svuota recenti"
 
 #: faugus/launcher.py:1857 faugus/launcher.py:1915
 msgid "Recent"
@@ -341,10 +341,8 @@ msgid "Language"
 msgstr "Lingua"
 
 #: faugus/launcher.py:4256
-#, fuzzy
-#| msgid "Interface"
 msgid "Interface Mode"
-msgstr "Interfaccia"
+msgstr "Modalità Interfaccia"
 
 #: faugus/launcher.py:4260
 msgid "List"
