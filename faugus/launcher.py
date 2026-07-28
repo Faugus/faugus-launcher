@@ -348,6 +348,46 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return fallback
         return (int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255))
 
+    def apply_popover_background_mode(self, popover, game=None):
+        if self.background_mode == "accent":
+            popover.add_css_class("popover-accent-background")
+            return
+
+        if self.background_mode != "dominant_color":
+            return
+
+        game = game or self.selected()
+        if not game:
+            return
+
+        if self.interface_mode in ("Covers", "SteamGridDB"):
+            color_source = f"{COVERS_DIR}/{game.gameid}.png"
+        else:
+            color_source = f"{ICONS_DIR}/{game.gameid}.png"
+
+        if not os.path.isfile(color_source):
+            return
+
+        r, g, b = get_dominant_color(color_source)
+        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+        fade_r = int(window_r * 0.8 + r * 0.2)
+        fade_g = int(window_g * 0.8 + g * 0.2)
+        fade_b = int(window_b * 0.8 + b * 0.2)
+
+        if getattr(self, "_popover_dominant_provider", None) is None:
+            self._popover_dominant_provider = Gtk.CssProvider()
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(), self._popover_dominant_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
+            )
+
+        self._popover_dominant_provider.load_from_data(f"""
+        popover.popover-dominant-background contents,
+        popover.popover-dominant-background arrow {{
+            background-color: rgb({fade_r}, {fade_g}, {fade_b});
+        }}
+        """.encode("utf-8"))
+        popover.add_css_class("popover-dominant-background")
+
     def build_background_container(self, content_widget):
         base_mode = self.background_mode
         show_banner = self.banner_overlay_enabled()
@@ -943,7 +983,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def on_sort_button_clicked(widget):
             popover = Gtk.Popover()
             popover.set_parent(widget)
-            popover.add_css_class("popover-accent-background")
+            self.apply_popover_background_mode(popover)
             vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
             vbox.set_margin_top(10)
             vbox.set_margin_bottom(10)
@@ -1326,7 +1366,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         popover = Gtk.Popover()
         popover.set_parent(button)
         popover.connect("closed", lambda p: p.unparent())
-        popover.add_css_class("popover-accent-background")
+        self.apply_popover_background_mode(popover)
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         vbox.set_margin_top(10)
         vbox.set_margin_bottom(10)
@@ -1862,7 +1902,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         popover = Gtk.PopoverMenu.new_from_model(root)
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
-        popover.add_css_class("popover-accent-background")
+        self.apply_popover_background_mode(popover, game)
 
         def find_label_text(widget):
             if type(widget).__name__ == "Label":
