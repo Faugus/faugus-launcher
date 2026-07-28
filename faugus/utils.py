@@ -1849,10 +1849,6 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
             "dark": Adw.ColorScheme.FORCE_DARK,
         }
         style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
-    elif theme_engine == "system" and interface_theme in ("light", "dark"):
-        Gtk.Settings.get_default().set_property(
-            "gtk-application-prefer-dark-theme", interface_theme == "dark"
-        )
 
     display = Gdk.Display.get_default()
     global _accent_css_provider
