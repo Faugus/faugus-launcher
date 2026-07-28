@@ -1773,13 +1773,45 @@ _OVERRIDE_PRIORITY = Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
 _accent_css_provider = None
 
 
-def apply_interface_customization(interface_theme, accent_color):
-    style_manager = Adw.StyleManager.get_default()
-    scheme_map = {
-        "light": Adw.ColorScheme.FORCE_LIGHT,
-        "dark": Adw.ColorScheme.FORCE_DARK,
-    }
-    style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
+_EXCLUDED_THEME_NAMES = {"Adwaita", "Adwaita-dark", "Adwaita-empty", "Default", "Empty", "HighContrast", "HighContrastInverse"}
+
+
+def list_gtk4_themes():
+    search_dirs = [
+        os.path.expanduser("~/.themes"),
+        PathManager.user_data("themes"),
+    ]
+    for data_dir in os.getenv("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":"):
+        search_dirs.append(os.path.join(data_dir, "themes"))
+
+    names = set()
+    for themes_dir in search_dirs:
+        if not os.path.isdir(themes_dir):
+            continue
+        for entry in os.listdir(themes_dir):
+            if entry in _EXCLUDED_THEME_NAMES:
+                continue
+            if os.path.isdir(os.path.join(themes_dir, entry, "gtk-4.0")):
+                names.add(entry)
+
+    return sorted(names)
+
+
+def apply_theme_engine(theme_engine):
+    if theme_engine == "adwaita":
+        Adw.StyleManager.get_default()
+    elif theme_engine and theme_engine != "gtk4":
+        Gtk.Settings.get_default().set_property("gtk-theme-name", theme_engine)
+
+
+def apply_interface_customization(interface_theme, accent_color, theme_engine="adwaita"):
+    if theme_engine == "adwaita":
+        style_manager = Adw.StyleManager.get_default()
+        scheme_map = {
+            "light": Adw.ColorScheme.FORCE_LIGHT,
+            "dark": Adw.ColorScheme.FORCE_DARK,
+        }
+        style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
 
     display = Gdk.Display.get_default()
     global _accent_css_provider

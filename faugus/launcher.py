@@ -72,14 +72,14 @@ def convert_runner(runner):
     return runner
 
 
-class FaugusApp(Adw.Application):
+class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
         super().__init__(application_id="io.github.Faugus.faugus-launcher")
         self.window = None
         self.start_hidden = start_hidden
 
     def do_startup(self):
-        Adw.Application.do_startup(self)
+        Gtk.Application.do_startup(self)
 
         app_icon_dir = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "..", "assets"
@@ -89,9 +89,12 @@ class FaugusApp(Adw.Application):
             Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).add_search_path(app_icon_dir)
 
         cfg = ConfigManager()
+        theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+        apply_theme_engine(theme_engine)
         apply_interface_customization(
             cfg.config.get('interface-theme', 'system'),
             cfg.config.get('accent-color', 'system'),
+            theme_engine,
         )
 
     def do_activate(self):
@@ -2478,6 +2481,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.auto_close_on_launch = cfg.config.get('auto-close-on-launch', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
+        self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
@@ -2838,7 +2842,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 return
 
             def finish_settings():
-                apply_interface_customization(settings_dialog.interface_theme, settings_dialog.accent_color)
+                apply_interface_customization(
+                    settings_dialog.interface_theme,
+                    settings_dialog.accent_color,
+                    settings_dialog.combobox_theme_engine.get_active_id(),
+                )
 
                 self.save_interface_settings()
                 settings_dialog.update_config_file()
@@ -2863,6 +2871,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.background_mode != settings_dialog.combobox_background.get_active_id():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.theme_engine != settings_dialog.combobox_theme_engine.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.banner_enabled != settings_dialog.checkbox_banner.get_active():
@@ -2905,7 +2916,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             proceed()
 
         else:
-            apply_interface_customization(settings_dialog.original_interface_theme, settings_dialog.original_accent_color)
+            apply_interface_customization(
+                settings_dialog.original_interface_theme,
+                settings_dialog.original_accent_color,
+                settings_dialog.original_theme_engine,
+            )
             self.apply_background_mode_live(settings_dialog.original_background_mode)
             destroy_and_release(settings_dialog)
 
@@ -4314,6 +4329,14 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
+        self.label_theme_engine = Gtk.Label(label=_("GTK Theme"))
+        self.label_theme_engine.set_halign(Gtk.Align.START)
+        self.combobox_theme_engine = IdComboBox()
+        self.combobox_theme_engine.append("adwaita", _("Adwaita"))
+        self.combobox_theme_engine.append("gtk4", _("GTK4"))
+        for theme_name in list_gtk4_themes():
+            self.combobox_theme_engine.append(theme_name, theme_name)
+
         self.label_theme = Gtk.Label(label=_("Theme"))
         self.label_theme.set_halign(Gtk.Align.START)
         self.combobox_theme = IdComboBox()
@@ -4607,19 +4630,23 @@ class Settings(Gtk.Dialog):
         grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_theme, 0, 0, 1, 1)
-        grid_theme_rest.attach(self.combobox_theme, 0, 1, 1, 1)
+        grid_theme_rest.attach(self.label_theme_engine, 0, 0, 1, 1)
+        grid_theme_rest.attach(self.combobox_theme_engine, 0, 1, 1, 1)
+        self.combobox_theme_engine.set_hexpand(True)
+
+        grid_theme_rest.attach(self.label_theme, 0, 2, 1, 1)
+        grid_theme_rest.attach(self.combobox_theme, 0, 3, 1, 1)
         self.combobox_theme.set_hexpand(True)
-        grid_theme_rest.attach(self.label_accent, 0, 2, 1, 1)
-        grid_theme_rest.attach(self.box_accent, 0, 3, 1, 1)
+        grid_theme_rest.attach(self.label_accent, 0, 4, 1, 1)
+        grid_theme_rest.attach(self.box_accent, 0, 5, 1, 1)
         self.combobox_accent.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_background, 0, 4, 1, 1)
-        grid_theme_rest.attach(self.combobox_background, 0, 5, 1, 1)
+        grid_theme_rest.attach(self.label_background, 0, 6, 1, 1)
+        grid_theme_rest.attach(self.combobox_background, 0, 7, 1, 1)
         self.combobox_background.set_hexpand(True)
 
-        grid_theme_rest.attach(self.checkbox_categories_and_sort, 0, 6, 1, 1)
-        grid_theme_rest.attach(self.checkbox_hidden_games, 0, 7, 1, 1)
+        grid_theme_rest.attach(self.checkbox_categories_and_sort, 0, 8, 1, 1)
+        grid_theme_rest.attach(self.checkbox_hidden_games, 0, 9, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
@@ -4808,7 +4835,7 @@ class Settings(Gtk.Dialog):
         else:
             self.accent_color = "system"
 
-        apply_interface_customization(self.interface_theme, self.accent_color)
+        apply_interface_customization(self.interface_theme, self.accent_color, self.theme_engine)
 
         if hasattr(self.parent, 'schedule_background_update'):
             self.parent.schedule_background_update()
@@ -4867,6 +4894,7 @@ class Settings(Gtk.Dialog):
         config.set_value("startup-window-size", self.combobox_startup_window_size.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
         config.set_value("accent-color", self.accent_color)
+        config.set_value("theme-engine", self.combobox_theme_engine.get_active_id())
         config.save_config()
 
         self.set_sensitive(False)
@@ -4930,7 +4958,7 @@ class Settings(Gtk.Dialog):
                 if self.entry_default_prefix.get_text() == "":
                     self.entry_default_prefix.add_css_class("entry")
                     return
-                apply_interface_customization(self.interface_theme, self.accent_color)
+                apply_interface_customization(self.interface_theme, self.accent_color, self.combobox_theme_engine.get_active_id())
                 self.update_envar_file()
                 self.update_config_file()
                 self.parent.manage_autostart_file(self.checkbox_autostart.get_active(), self.checkbox_minimized_startup.get_active())
@@ -5198,9 +5226,11 @@ class Settings(Gtk.Dialog):
         startup_window_size = cfg.config.get('startup-window-size', '')
         self.interface_theme = cfg.config.get('interface-theme', 'system')
         self.accent_color = cfg.config.get('accent-color', 'system')
+        self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.original_interface_theme = self.interface_theme
         self.original_accent_color = self.accent_color
         self.original_background_mode = background_mode
+        self.original_theme_engine = self.theme_engine
 
         self.checkbox_auto_close_on_launch.set_active(auto_close_on_launch)
         self.entry_default_prefix.set_text(self.default_prefix)
@@ -5234,6 +5264,9 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.set_active_id(self.interface_mode)
         self.combobox_background.set_active_id(background_mode)
         self.checkbox_banner.set_active(banner_enabled)
+
+        if not self.combobox_theme_engine.set_active_id(self.theme_engine):
+            self.combobox_theme_engine.set_active_id("adwaita")
 
         loaded_theme = self.interface_theme
         loaded_accent = self.accent_color

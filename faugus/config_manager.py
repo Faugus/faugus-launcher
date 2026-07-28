@@ -41,6 +41,7 @@ class ConfigManager:
             'startup-window-size': 'None',
             'interface-theme': 'system',
             'accent-color': 'system',
+            'theme-engine': 'adwaita',
             'steamgriddb-api-key': '',
             'background-mode': 'default',
             'banner-enabled': 'True',
