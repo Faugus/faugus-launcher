@@ -214,9 +214,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 opacity: 0.5;
                 transition: background-color 0.05s ease-in, opacity 0.05s ease-in;
             }
-            .accent-background {
-                background-color: alpha(@accent_bg_color, 0.2);
-            }
             popover.popover-accent-background contents,
             popover.popover-accent-background arrow {
                 background-color: @window_bg_color;
@@ -381,6 +378,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self._accent_background_provider.load_from_data(css.encode("utf-8"))
 
     def apply_popover_background_mode(self, popover, game=None):
+        if self.theme_engine != "adwaita":
+            return
+
         if self.background_mode == "accent":
             popover.add_css_class("popover-accent-background")
             return
