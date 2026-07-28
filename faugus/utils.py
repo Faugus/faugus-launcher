@@ -1837,7 +1837,7 @@ def apply_theme_engine(theme_engine):
                 obj.set_property("gtk-theme-name", "Adwaita-empty")
 
         _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
-    elif theme_engine:
+    elif theme_engine and theme_engine != "system":
         settings.set_property("gtk-theme-name", theme_engine)
 
 

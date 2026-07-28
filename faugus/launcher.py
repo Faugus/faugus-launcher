@@ -4366,6 +4366,7 @@ class Settings(Gtk.Dialog):
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
         self.combobox_theme_engine.append("adwaita", f"Adwaita ({_('Default')})")
+        self.combobox_theme_engine.append("system", _("System Theme"))
         for theme_name in list_gtk4_themes():
             self.combobox_theme_engine.append(theme_name, theme_name)
         self.combobox_theme_engine.connect("changed", self.on_theme_engine_changed)
