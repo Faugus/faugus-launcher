@@ -1855,6 +1855,9 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
             --accent-bg-color: {accent_color};
             --accent-fg-color: {fg_color};
         }}
+        link {{
+            color: {accent_color};
+        }}
         """
         provider.load_from_data(css.encode("utf-8"))
         Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
