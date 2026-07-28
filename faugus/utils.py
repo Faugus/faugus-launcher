@@ -1797,6 +1797,26 @@ def list_gtk4_themes():
     return sorted(names)
 
 
+def get_system_accent_rgb():
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = bus.call_sync(
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Settings",
+            "Read",
+            GLib.Variant("(ss)", ("org.freedesktop.appearance", "accent-color")),
+            None,
+            Gio.DBusCallFlags.NONE,
+            500,
+            None,
+        )
+        r, g, b = result.unpack()[0]
+        return int(r * 255), int(g * 255), int(b * 255)
+    except GLib.Error:
+        return None
+
+
 _theme_engine_lock_handler = None
 
 
@@ -1817,7 +1837,7 @@ def apply_theme_engine(theme_engine):
                 obj.set_property("gtk-theme-name", "Adwaita-empty")
 
         _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
-    elif theme_engine and theme_engine != "gtk4":
+    elif theme_engine:
         settings.set_property("gtk-theme-name", theme_engine)
 
 
@@ -1836,9 +1856,11 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
         Gtk.StyleContext.remove_provider_for_display(display, _accent_css_provider)
         _accent_css_provider = None
 
-    effective_accent = accent_color
-    if not effective_accent or effective_accent == "system":
-        effective_accent = "rgb(53,132,228)" if theme_engine == "adwaita" else None
+    effective_accent = None
+    if theme_engine == "adwaita":
+        effective_accent = accent_color
+        if not effective_accent or effective_accent == "system":
+            effective_accent = "rgb(53,132,228)"
 
     if effective_accent:
         accent_color = effective_accent

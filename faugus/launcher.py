@@ -351,6 +351,35 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return fallback
         return (int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255))
 
+    def get_accent_rgb(self):
+        if self.theme_engine == "adwaita":
+            if self.accent_color and self.accent_color != "system":
+                match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', self.accent_color)
+                if match:
+                    return tuple(int(v) for v in match.groups())
+            return self.get_named_rgb("accent_bg_color")
+
+        system_accent = get_system_accent_rgb()
+        if system_accent:
+            return system_accent
+        return self.get_named_rgb("accent_bg_color")
+
+    def update_accent_background_css(self):
+        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
+        ar, ag, ab = self.get_accent_rgb()
+        fade_r = int(window_r * 0.8 + ar * 0.2)
+        fade_g = int(window_g * 0.8 + ag * 0.2)
+        fade_b = int(window_b * 0.8 + ab * 0.2)
+
+        if getattr(self, "_accent_background_provider", None) is None:
+            self._accent_background_provider = Gtk.CssProvider()
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(), self._accent_background_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
+            )
+
+        css = f".accent-background {{ background-color: rgb({fade_r}, {fade_g}, {fade_b}); }}"
+        self._accent_background_provider.load_from_data(css.encode("utf-8"))
+
     def apply_popover_background_mode(self, popover, game=None):
         if self.background_mode == "accent":
             popover.add_css_class("popover-accent-background")
@@ -372,7 +401,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         r, g, b = get_dominant_color(color_source)
-        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
         fade_r = int(window_r * 0.8 + r * 0.2)
         fade_g = int(window_g * 0.8 + g * 0.2)
         fade_b = int(window_b * 0.8 + b * 0.2)
@@ -402,6 +431,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not show_banner and base_mode != "dominant_color":
             if base_mode == "accent":
                 content_widget.add_css_class("accent-background")
+                self.update_accent_background_css()
             self._bg_no_overlay_widget = content_widget
             return content_widget
 
@@ -413,6 +443,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_box.set_vexpand(True)
         if base_mode == "accent":
             base_box.add_css_class("accent-background")
+            self.update_accent_background_css()
         overlay.set_child(base_box)
         self._bg_base_box = base_box
 
@@ -559,7 +590,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         banner_path = getattr(self, 'launcher_banner_path', None)
 
         base_mode = self.background_mode
-        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
 
         if base_mode == "dominant_color":
             dominant = getattr(self, 'launcher_banner_dominant_rgb', None)
@@ -577,7 +608,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 fade_r, fade_g, fade_b = window_r, window_g, window_b
         elif base_mode == "accent":
-            ar, ag, ab = self.get_named_rgb("accent_bg_color")
+            ar, ag, ab = self.get_accent_rgb()
             fade_r = int(window_r * 0.8 + ar * 0.2)
             fade_g = int(window_g * 0.8 + ag * 0.2)
             fade_b = int(window_b * 0.8 + ab * 0.2)
@@ -620,6 +651,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 widget.remove_css_class("accent-background")
             if new_mode == "accent":
                 widget.add_css_class("accent-background")
+                self.update_accent_background_css()
 
         self.update_launcher_banner_css()
 
@@ -704,13 +736,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if os.path.isfile(candidate):
                         banner_uri = Gio.File.new_for_path(candidate).get_uri()
 
-                        window_r, window_g, window_b = self.get_named_rgb("window_bg_color")
+                        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
                         if base_mode == "dominant_color" and color_css:
                             fade_r = int(window_r * 0.8 + r * 0.2)
                             fade_g = int(window_g * 0.8 + g * 0.2)
                             fade_b = int(window_b * 0.8 + b * 0.2)
                         elif base_mode == "accent":
-                            ar, ag, ab = self.get_named_rgb("accent_bg_color")
+                            ar, ag, ab = self.get_accent_rgb()
                             fade_r = int(window_r * 0.8 + ar * 0.2)
                             fade_g = int(window_g * 0.8 + ag * 0.2)
                             fade_b = int(window_b * 0.8 + ab * 0.2)
@@ -2482,6 +2514,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+        self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
@@ -4332,10 +4365,10 @@ class Settings(Gtk.Dialog):
         self.label_theme_engine = Gtk.Label(label=_("GTK Theme"))
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
-        self.combobox_theme_engine.append("adwaita", _("Adwaita"))
-        self.combobox_theme_engine.append("gtk4", _("GTK4"))
+        self.combobox_theme_engine.append("adwaita", f"Adwaita ({_('Default')})")
         for theme_name in list_gtk4_themes():
             self.combobox_theme_engine.append(theme_name, theme_name)
+        self.combobox_theme_engine.connect("changed", self.on_theme_engine_changed)
 
         self.label_theme = Gtk.Label(label=_("Theme"))
         self.label_theme.set_halign(Gtk.Align.START)
@@ -4845,6 +4878,13 @@ class Settings(Gtk.Dialog):
         if hasattr(self.parent, 'apply_background_mode_live'):
             self.parent.apply_background_mode_live(new_mode)
 
+    def on_theme_engine_changed(self, widget):
+        is_adwaita = self.combobox_theme_engine.get_active_id() == "adwaita"
+        self.label_theme.set_visible(is_adwaita)
+        self.combobox_theme.set_visible(is_adwaita)
+        self.label_accent.set_visible(is_adwaita)
+        self.box_accent.set_visible(is_adwaita)
+
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
             self.checkbox_minimized_startup.set_sensitive(False)
@@ -5267,6 +5307,7 @@ class Settings(Gtk.Dialog):
 
         if not self.combobox_theme_engine.set_active_id(self.theme_engine):
             self.combobox_theme_engine.set_active_id("adwaita")
+        self.on_theme_engine_changed(self.combobox_theme_engine)
 
         loaded_theme = self.interface_theme
         loaded_accent = self.accent_color
