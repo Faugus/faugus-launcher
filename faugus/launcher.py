@@ -4880,9 +4880,11 @@ class Settings(Gtk.Dialog):
             self.parent.apply_background_mode_live(new_mode)
 
     def on_theme_engine_changed(self, widget):
-        is_adwaita = self.combobox_theme_engine.get_active_id() == "adwaita"
-        self.label_theme.set_visible(is_adwaita)
-        self.combobox_theme.set_visible(is_adwaita)
+        engine = self.combobox_theme_engine.get_active_id()
+        is_adwaita = engine == "adwaita"
+        show_theme = is_adwaita or engine == "system"
+        self.label_theme.set_visible(show_theme)
+        self.combobox_theme.set_visible(show_theme)
         self.label_accent.set_visible(is_adwaita)
         self.box_accent.set_visible(is_adwaita)
 
