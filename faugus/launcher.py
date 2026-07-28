@@ -219,6 +219,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: @window_bg_color;
                 background-image: linear-gradient(alpha(@accent_bg_color, 0.2), alpha(@accent_bg_color, 0.2));
             }
+            popover.menu label.title,
+            modelbutton.title {
+                font-size: inherit;
+                font-weight: inherit;
+            }
             .steamgriddb-focus-tint {
                 background-color: transparent;
                 border-radius: 12px;
