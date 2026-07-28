@@ -1850,27 +1850,10 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
         @define-color accent_fg_color {fg_color};
         @define-color theme_selected_bg_color {accent_color};
         @define-color theme_selected_fg_color {fg_color};
-        checkbutton check:checked,
-        checkbutton check:indeterminate,
-        radiobutton radio:checked {{
-            background-color: {accent_color};
-            border-color: {accent_color};
-            color: {fg_color};
-        }}
-        entry:focus,
-        entry:focus-within,
-        spinbutton:focus-within {{
-            outline-color: {accent_color};
-            border-color: {accent_color};
-        }}
-        switch:checked {{
-            background-color: {accent_color};
-        }}
-        scale highlight {{
-            background-color: {accent_color};
-        }}
-        progressbar > trough > progress {{
-            background-color: {accent_color};
+        :root {{
+            --accent-color: {accent_color};
+            --accent-bg-color: {accent_color};
+            --accent-fg-color: {fg_color};
         }}
         """
         provider.load_from_data(css.encode("utf-8"))
