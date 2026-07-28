@@ -71,7 +71,18 @@ PY_TAG=$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.ver
 VENDOR_DIR="$APPDIR/usr/lib/$PY_TAG/site-packages"
 mkdir -p "$VENDOR_DIR"
 python3 -m pip install --target="$VENDOR_DIR" --no-compile \
+    --only-binary=Pillow,psutil \
     requests psutil vdf Pillow icoextract pefile dbus-python
+
+python3 -c "
+import sys
+sys.path.insert(0, '$VENDOR_DIR')
+from PIL import Image
+Image.new('RGB', (1, 1))
+" || {
+    echo "Pillow's native _imaging extension failed to import after install - aborting build" >&2
+    exit 1
+}
 
 DESKTOP_SRC="$APPDIR/usr/share/applications/$APP_ID.desktop"
 ICON_SVG_SRC="$APPDIR/usr/share/icons/hicolor/scalable/apps/$APP_ID.svg"
