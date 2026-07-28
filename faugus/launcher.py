@@ -4761,11 +4761,12 @@ class Settings(Gtk.Dialog):
         available_langs = [("English", "en_US")]
 
         if os.path.isdir(LOCALE_DIR):
-            for lang in os.listdir(LOCALE_DIR):
-                if find_mo_file(LOCALE_DIR, lang, "faugus-launcher"):
-                    lang_name = self.LANG_NAMES.get(lang, lang)
-                    if lang != "en_US":
-                        available_langs.append((lang_name, lang))
+            completions = get_translation_completions(LOCALE_DIR, "faugus-launcher")
+            for lang, completion in completions.items():
+                if lang == "en_US" or completion < MIN_TRANSLATION_PERCENT:
+                    continue
+                lang_name = self.LANG_NAMES.get(lang, lang)
+                available_langs.append((lang_name, lang))
 
         available_langs.sort(key=lambda x: x[0])
 
