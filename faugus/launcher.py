@@ -182,10 +182,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border-color: @theme_selected_bg_color;
                 box-shadow: 0 0 25px 5px alpha(@theme_selected_bg_color, 0.3);
             }
-            .cover-placeholder,
-            .banner-placeholder {
-                background-color: alpha(@accent_bg_color, 0.4);
-            }
             .cover-placeholder {
                 border-radius: 12px;
             }
@@ -294,6 +290,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.load_config()
 
+        placeholder_r, placeholder_g, placeholder_b = self.get_accent_rgb()
+        add_css_once(
+            "placeholder_accent",
+            f"""
+            .cover-placeholder,
+            .banner-placeholder {{
+                background-color: rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.4);
+            }}
+            """,
+        )
+
         if self.interface_mode == "List":
             self.setup_interface()
         if self.interface_mode in ("Grid", "Covers", "SteamGridDB"):
@@ -362,10 +369,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     return tuple(int(v) for v in match.groups())
             return self.get_named_rgb("accent_bg_color")
 
-        system_accent = get_system_accent_rgb()
-        if system_accent:
-            return system_accent
-        return self.get_named_rgb("accent_bg_color")
+        if self.theme_engine == "system":
+            system_accent = get_system_accent_rgb()
+            if system_accent:
+                return system_accent
+
+        return self.get_named_rgb("theme_selected_bg_color")
 
     def update_accent_background_css(self):
         window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")

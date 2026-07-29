@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox, apply_titlebar_preference
+from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -261,9 +261,10 @@ class ProtonDownloader(Gtk.Dialog):
             button.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         pct = max(0.0, min(1.0, fraction)) * 100
+        r, g, b = get_effective_accent_rgb()
         css = (
             "button { background-image: linear-gradient(to right, "
-            f"alpha(@accent_bg_color, 0.5) {pct:.1f}%, transparent {pct:.1f}%); }}"
+            f"rgba({r}, {g}, {b}, 0.5) {pct:.1f}%, transparent {pct:.1f}%); }}"
         )
         provider.load_from_string(css)
 

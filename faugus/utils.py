@@ -1828,6 +1828,33 @@ def get_system_accent_rgb():
         return None
 
 
+def get_effective_accent_rgb():
+    from faugus.config_manager import ConfigManager
+    cfg = ConfigManager()
+    theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+    accent_color = cfg.config.get('accent-color', 'system').strip('"')
+
+    if theme_engine == "adwaita":
+        if accent_color and accent_color != "system":
+            match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', accent_color)
+            if match:
+                return tuple(int(v) for v in match.groups())
+        found, rgba = Gtk.Box().get_style_context().lookup_color("accent_bg_color")
+        if found:
+            return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
+        return (30, 30, 34)
+
+    if theme_engine == "system":
+        system_accent = get_system_accent_rgb()
+        if system_accent:
+            return system_accent
+
+    found, rgba = Gtk.Box().get_style_context().lookup_color("theme_selected_bg_color")
+    if found:
+        return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
+    return (30, 30, 34)
+
+
 _theme_engine_lock_handler = None
 
 
