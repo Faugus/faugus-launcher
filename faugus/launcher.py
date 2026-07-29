@@ -4935,8 +4935,8 @@ class Settings(Gtk.Dialog):
 
     def on_theme_engine_changed(self, widget):
         is_adwaita = self.combobox_theme_engine.get_active_id() == "adwaita"
-        self.label_theme.set_visible(is_adwaita)
-        self.combobox_theme.set_visible(is_adwaita)
+        self.label_theme.set_visible(True)
+        self.combobox_theme.set_visible(True)
         self.label_accent.set_visible(is_adwaita)
         self.box_accent.set_visible(is_adwaita)
 
