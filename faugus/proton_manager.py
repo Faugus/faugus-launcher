@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox
+from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox, apply_titlebar_preference
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -82,6 +82,7 @@ class _StreamProgress:
 class ProtonDownloader(Gtk.Dialog):
     def __init__(self):
         super().__init__(title=_("Proton Manager"))
+        apply_titlebar_preference(self)
         hide_dialog_action_area(self)
         self.set_resizable(False)
         self.set_modal(True)

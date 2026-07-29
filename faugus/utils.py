@@ -489,6 +489,12 @@ class IdComboBox(Gtk.DropDown):
         return [self._store.get_string(i) for i in range(self._store.get_n_items())]
 
 
+def apply_titlebar_preference(window):
+    from faugus.config_manager import ConfigManager
+    if ConfigManager().config.get('system-title-bar', 'False') != 'True':
+        window.set_titlebar(Gtk.HeaderBar())
+
+
 def hide_dialog_action_area(dialog):
     outer = dialog.get_first_child()
     if not outer:
@@ -618,6 +624,7 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
         modal=True,
         action=action,
     )
+    apply_titlebar_preference(dialog)
     dialog.add_button(cancel_label or _("Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
     dialog.set_default_response(Gtk.ResponseType.ACCEPT)
@@ -760,6 +767,7 @@ def is_valid_image(file_path):
 
 def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel_label=None, callback=None, modal=True):
     dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(modal)
     dialog.set_resizable(False)
@@ -1162,6 +1170,7 @@ def init_addon_defaults(obj):
 
 def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
     dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
     dialog.set_modal(True)
@@ -1425,6 +1434,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
 def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first, callback):
     dialog = Gtk.Dialog(title=_("Additional Application"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
@@ -1551,6 +1561,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
 def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
                          lossless_performance, lossless_hdr, lossless_present, callback):
     dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
@@ -2024,6 +2035,7 @@ def show_steamgriddb_picker(obj, category):
     keys = {"cover": "grids", "banner": "heroes", "icon": "icons"}
 
     dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_default_size(720, 480)
