@@ -273,18 +273,11 @@ def add_focus_tint(overlay, size=None, square=False):
 
 
 def create_accent_placeholder_paintable(width, height, alpha=0.4):
-    dummy = Gtk.Box()
-    found, rgba = dummy.get_style_context().lookup_color("accent_bg_color")
-    if not found:
-        rgba = Gdk.RGBA()
-        rgba.red, rgba.green, rgba.blue, rgba.alpha = 0.5, 0.5, 0.5, 1.0
+    r, g, b = get_effective_accent_rgb()
 
     w = width * HIDPI_SCALE
     h = height * HIDPI_SCALE
     pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, w, h)
-    r = int(rgba.red * 255)
-    g = int(rgba.green * 255)
-    b = int(rgba.blue * 255)
     a = int(alpha * 255)
     pixbuf.fill((r << 24) | (g << 16) | (b << 8) | a)
     texture = Gdk.Texture.new_for_pixbuf(pixbuf)
