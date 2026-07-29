@@ -182,6 +182,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border-color: @theme_selected_bg_color;
                 box-shadow: 0 0 25px 5px alpha(@theme_selected_bg_color, 0.3);
             }
+            flowboxchild.cover-container:selected .game {
+                background-color: alpha(@theme_selected_bg_color, 0.5);
+            }
+            flowboxchild.cover-container:selected:focus .game {
+                background-color: @theme_selected_bg_color;
+                color: @theme_selected_fg_color;
+            }
+            flowboxchild.cover-container:selected:focus .game-label {
+                color: @theme_selected_fg_color;
+            }
             .cover-placeholder {
                 border-radius: 12px;
             }
