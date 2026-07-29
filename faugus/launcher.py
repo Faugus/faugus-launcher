@@ -231,6 +231,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 font-size: inherit;
                 font-weight: inherit;
             }
+            dropdown popover.menu listview,
+            dropdown popover.menu scrolledwindow {
+                background: none;
+                background-color: transparent;
+                background-image: none;
+            }
+            dropdown popover.menu row:not(:hover):not(:focus) {
+                background: none;
+                background-color: transparent;
+                background-image: none;
+                box-shadow: none;
+            }
             .steamgriddb-focus-tint {
                 background-color: transparent;
                 border-radius: 12px;
