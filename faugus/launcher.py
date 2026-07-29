@@ -243,6 +243,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-image: none;
                 box-shadow: none;
             }
+            dropdown button.toggle row:hover {
+                background: none;
+                background-color: transparent;
+                background-image: none;
+                box-shadow: none;
+            }
             .steamgriddb-focus-tint {
                 background-color: transparent;
                 border-radius: 12px;
