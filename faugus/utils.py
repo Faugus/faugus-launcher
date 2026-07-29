@@ -1773,13 +1773,82 @@ _OVERRIDE_PRIORITY = Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
 _accent_css_provider = None
 
 
-def apply_interface_customization(interface_theme, accent_color):
-    style_manager = Adw.StyleManager.get_default()
-    scheme_map = {
-        "light": Adw.ColorScheme.FORCE_LIGHT,
-        "dark": Adw.ColorScheme.FORCE_DARK,
-    }
-    style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
+_EXCLUDED_THEME_NAMES = {"Adwaita", "Adwaita-dark", "Adwaita-empty", "Default", "Empty", "HighContrast", "HighContrastInverse"}
+
+
+def list_gtk4_themes():
+    search_dirs = [
+        os.path.expanduser("~/.themes"),
+        PathManager.user_data("themes"),
+    ]
+    for data_dir in os.getenv("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":"):
+        search_dirs.append(os.path.join(data_dir, "themes"))
+
+    names = set()
+    for themes_dir in search_dirs:
+        if not os.path.isdir(themes_dir):
+            continue
+        for entry in os.listdir(themes_dir):
+            if entry in _EXCLUDED_THEME_NAMES:
+                continue
+            if os.path.isdir(os.path.join(themes_dir, entry, "gtk-4.0")):
+                names.add(entry)
+
+    return sorted(names)
+
+
+def get_system_accent_rgb():
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = bus.call_sync(
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Settings",
+            "Read",
+            GLib.Variant("(ss)", ("org.freedesktop.appearance", "accent-color")),
+            None,
+            Gio.DBusCallFlags.NONE,
+            500,
+            None,
+        )
+        r, g, b = result.unpack()[0]
+        return int(r * 255), int(g * 255), int(b * 255)
+    except GLib.Error:
+        return None
+
+
+_theme_engine_lock_handler = None
+
+
+def apply_theme_engine(theme_engine):
+    settings = Gtk.Settings.get_default()
+
+    global _theme_engine_lock_handler
+    if _theme_engine_lock_handler is not None:
+        settings.disconnect(_theme_engine_lock_handler)
+        _theme_engine_lock_handler = None
+
+    if theme_engine == "adwaita":
+        Adw.StyleManager.get_default()
+        settings.set_property("gtk-theme-name", "Adwaita-empty")
+
+        def _force_adwaita(obj, pspec):
+            if obj.get_property("gtk-theme-name") != "Adwaita-empty":
+                obj.set_property("gtk-theme-name", "Adwaita-empty")
+
+        _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
+    elif theme_engine and theme_engine != "system":
+        settings.set_property("gtk-theme-name", theme_engine)
+
+
+def apply_interface_customization(interface_theme, accent_color, theme_engine="adwaita"):
+    if theme_engine == "adwaita":
+        style_manager = Adw.StyleManager.get_default()
+        scheme_map = {
+            "light": Adw.ColorScheme.FORCE_LIGHT,
+            "dark": Adw.ColorScheme.FORCE_DARK,
+        }
+        style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
 
     display = Gdk.Display.get_default()
     global _accent_css_provider
@@ -1787,7 +1856,14 @@ def apply_interface_customization(interface_theme, accent_color):
         Gtk.StyleContext.remove_provider_for_display(display, _accent_css_provider)
         _accent_css_provider = None
 
-    if accent_color and accent_color != "system":
+    effective_accent = None
+    if theme_engine == "adwaita":
+        effective_accent = accent_color
+        if not effective_accent or effective_accent == "system":
+            effective_accent = "rgb(53,132,228)"
+
+    if effective_accent:
+        accent_color = effective_accent
         fg_color = _contrasting_fg_color(accent_color)
         provider = Gtk.CssProvider()
         css = f"""
@@ -1796,6 +1872,14 @@ def apply_interface_customization(interface_theme, accent_color):
         @define-color accent_fg_color {fg_color};
         @define-color theme_selected_bg_color {accent_color};
         @define-color theme_selected_fg_color {fg_color};
+        :root {{
+            --accent-color: {accent_color};
+            --accent-bg-color: {accent_color};
+            --accent-fg-color: {fg_color};
+        }}
+        link {{
+            color: {accent_color};
+        }}
         """
         provider.load_from_data(css.encode("utf-8"))
         Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
