@@ -412,9 +412,12 @@ def main():
     exec_path = sys.argv[1]
 
     cfg = ConfigManager()
+    theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+    apply_theme_engine(theme_engine)
     apply_interface_customization(
         cfg.config.get('interface-theme', 'system'),
         cfg.config.get('accent-color', 'system'),
+        theme_engine,
     )
 
     app = Gtk.Application(application_id="io.github.Faugus.faugus-launcher")
