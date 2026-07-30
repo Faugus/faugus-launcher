@@ -1821,6 +1821,30 @@ def get_system_accent_rgb():
         return None
 
 
+def get_system_prefers_dark():
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = bus.call_sync(
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Settings",
+            "Read",
+            GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
+            None,
+            Gio.DBusCallFlags.NONE,
+            500,
+            None,
+        )
+        value = result.unpack()[0]
+        if value == 1:
+            return True
+        if value == 2:
+            return False
+        return None
+    except GLib.Error:
+        return None
+
+
 def get_effective_accent_rgb():
     from faugus.config_manager import ConfigManager
     cfg = ConfigManager()
@@ -1868,7 +1892,11 @@ def apply_theme_engine(theme_engine):
                 obj.set_property("gtk-theme-name", "Adwaita-empty")
 
         _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
-    elif theme_engine and theme_engine != "system":
+    elif theme_engine == "system":
+        prefers_dark = get_system_prefers_dark()
+        if prefers_dark is not None:
+            settings.set_property("gtk-application-prefer-dark-theme", prefers_dark)
+    elif theme_engine:
         settings.set_property("gtk-theme-name", theme_engine)
 
 
