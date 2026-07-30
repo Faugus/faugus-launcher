@@ -81,7 +81,7 @@
       <caption>Add/Edit Game: Launch Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/5ba1f56/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
@@ -90,21 +90,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.3-1" date="2026-07-27">
+    <release version="2.0.4-1" date="2026-07-30">
       <description>
         <ul>
-          <li>Now applies the accent color to games and menus in the main screen.</li>
-          <li>Changed the context menu visuals.</li>
-          <li>Added a “Recent” section for apps that were run in the prefix.</li>
-          <li>Now also lists Family Shared games when adding a Steam games.</li>
-          <li>Now shows the number of games in the categories menu.</li>
-          <li>Reverted the Settings window tabs. Now it has as scroll bar for small resolution screens.</li>
-          <li>Improved the Proton Manager.</li>
-          <li>Improved the zoom slider.</li>
-          <li>Other minor visual improvements.</li>
-          <li>Fixed row alignment when editing a large string in the Launch Arguments.</li>
-          <li>Fixed transparency background with some GTK themes.</li>
-          <li>Fixed AppImage not running in some systems.</li>
+          <li>Added support for themes.</li>
+          <li>Now applies themes to the splash and shortcut windows.</li>
+          <li>Added an option to change the title bar.</li>
+          <li>Fixed AppImage not saving images due to recent changes.</li>
+          <li>Now only shows languages that are at least 90% translated.</li>
+          <li>Minor visual improvements.</li>
         </ul>
       </description>
     </release>
