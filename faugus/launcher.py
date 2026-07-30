@@ -926,19 +926,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.tray_icon = None
         self.get_application().quit()
 
-    def _focus_flowbox_child_at(self, index):
-        self.set_focus(None)
-        for _ in range(index + 1):
-            if not self.flowbox.child_focus(Gtk.DirectionType.TAB_FORWARD):
-                break
-        focused = self.flowbox.get_focus_child()
-        if focused is not None:
-            self.flowbox.select_child(focused)
+    def _focus_flowbox_child(self, child):
+        self.flowbox.grab_focus()
+        self.flowbox.select_child(child)
+        child.grab_focus()
 
     def select_first_child(self):
         visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
         if visible_children:
-            self._focus_flowbox_child_at(0)
+            self._focus_flowbox_child(visible_children[0])
 
     def select_first_child_when_ready(self):
         attempts = {"n": 0}
@@ -948,7 +944,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
             if visible_children:
-                self._focus_flowbox_child_at(0)
+                self._focus_flowbox_child(visible_children[0])
                 return False
 
             return attempts["n"] < 100
@@ -962,9 +958,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             attempts["n"] += 1
 
             visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
-            for index, child in enumerate(visible_children):
+            for child in visible_children:
                 if hasattr(child, 'game') and child.game and child.game.title == title:
-                    self._focus_flowbox_child_at(index)
+                    self._focus_flowbox_child(child)
                     return False
 
             return attempts["n"] < 100
