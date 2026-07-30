@@ -486,6 +486,15 @@ def apply_titlebar_preference(window):
     from faugus.config_manager import ConfigManager
     if ConfigManager().config.get('system-title-bar', 'False') != 'True':
         window.set_titlebar(Gtk.HeaderBar())
+        add_css_once(
+            "headerbar_title_size",
+            """
+            headerbar .title {
+                font-size: 1em;
+                font-weight: bold;
+            }
+            """,
+        )
 
 
 def hide_dialog_action_area(dialog):
@@ -620,6 +629,16 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
     dialog.add_button(cancel_label or _("Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
     dialog.set_default_response(Gtk.ResponseType.ACCEPT)
+    add_css_once(
+        "filechooser_grid_selection",
+        """
+        filechooser gridview > child:selected,
+        filechooser gridview > child:selected:hover {
+            background-color: @theme_selected_bg_color;
+            color: @theme_selected_fg_color;
+        }
+        """,
+    )
     return dialog
 
 

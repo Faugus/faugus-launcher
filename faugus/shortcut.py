@@ -25,6 +25,7 @@ _ = setup_gettext('faugus-launcher')
 class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
     def __init__(self, file_path):
         super().__init__(title="Faugus")
+        apply_titlebar_preference(self)
         self.file_path = expand_path(file_path)
         self.set_resizable(False)
 

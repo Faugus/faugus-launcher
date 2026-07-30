@@ -5566,6 +5566,7 @@ class DuplicateDialog(Gtk.Dialog):
         label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.set_has_tooltip(True)
+        self.entry_title.set_hexpand(True)
         self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
         button_cancel = Gtk.Button(label=_("Cancel"))
@@ -5577,12 +5578,13 @@ class DuplicateDialog(Gtk.Dialog):
         button_ok.set_hexpand(True)
 
         content_area = self.get_content_area()
-        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_halign(Gtk.Align.FILL)
         content_area.set_valign(Gtk.Align.CENTER)
         content_area.set_vexpand(True)
         content_area.set_hexpand(True)
 
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_hexpand(True)
         box_top.set_margin_start(10)
         box_top.set_margin_end(10)
         box_top.set_margin_top(10)
@@ -5590,6 +5592,7 @@ class DuplicateDialog(Gtk.Dialog):
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_bottom.set_homogeneous(True)
+        box_bottom.set_hexpand(True)
         box_bottom.set_margin_start(10)
         box_bottom.set_margin_end(10)
         box_bottom.set_margin_bottom(10)
@@ -5693,6 +5696,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
+        #self.set_size_request(300, -1)
 
         self.closed_event = threading.Event()
 
@@ -5728,7 +5732,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.box.set_margin_top(0)
         self.box.set_margin_bottom(0)
         self.content_area = self.get_content_area()
-        self.content_area.set_halign(Gtk.Align.CENTER)
+        self.content_area.set_halign(Gtk.Align.FILL)
         self.content_area.set_valign(Gtk.Align.CENTER)
         self.content_area.set_vexpand(True)
         self.content_area.set_hexpand(True)
