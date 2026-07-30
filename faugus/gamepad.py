@@ -557,6 +557,7 @@ def open_combobox(self, combo):
     popover = Gtk.Popover()
     popover.set_parent(combo)
     popover.set_autohide(True)
+    popover.set_has_arrow(False)
     popover.add_css_class("menu")
     popover.set_child(scrolled)
 
@@ -605,7 +606,17 @@ def _navigate_combo(self, direction):
     root = popover.get_root()
     if root:
         root.set_focus_visible(True)
-    popover.child_focus(direction)
+
+    candidates = []
+    _collect_focusable(popover, candidates)
+    current = next((w for w in candidates if w.has_focus()), None)
+
+    if current:
+        if not _focus_nearest_in_direction(current, direction, popover):
+            current.grab_focus()
+        return
+    if candidates:
+        candidates[0].grab_focus()
 
 
 def _navigate_popover(self, direction):
@@ -616,7 +627,17 @@ def _navigate_popover(self, direction):
     root = popover.get_root()
     if root:
         root.set_focus_visible(True)
-    popover.child_focus(direction)
+
+    candidates = []
+    _collect_focusable(popover, candidates)
+    current = next((w for w in candidates if w.has_focus()), None)
+
+    if current:
+        if not _focus_nearest_in_direction(current, direction, popover):
+            current.grab_focus()
+        return
+    if candidates:
+        candidates[0].grab_focus()
 
 
 def _find_parent_popover(widget):

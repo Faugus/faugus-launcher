@@ -329,6 +329,27 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             """,
         )
 
+        if self.theme_engine != "adwaita":
+            add_css_once(
+                "focus_ring_fallback",
+                f"""
+                button:focus-visible,
+                entry:focus-visible,
+                dropdown > button:focus-visible,
+                check:focus-visible,
+                radio:focus-visible,
+                scale:focus-visible {{
+                    outline: 2px solid rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.8);
+                    outline-offset: 1px;
+                }}
+                row:focus-visible {{
+                    outline: 2px solid rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.8);
+                    outline-offset: -2px;
+                }}
+                """,
+                Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+            )
+
         if self.interface_mode == "List":
             self.setup_interface()
         if self.interface_mode in ("Grid", "Covers", "SteamGridDB"):
