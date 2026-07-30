@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-29 13:41+0000\n"
-"PO-Revision-Date: 2026-07-26 20:07+0000\n"
+"PO-Revision-Date: 2026-07-30 12:25+0000\n"
 "Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ja/>\n"
@@ -383,11 +383,11 @@ msgstr "テーマ"
 
 #: faugus/launcher.py:4383
 msgid "System Theme"
-msgstr ""
+msgstr "システムテーマ"
 
 #: faugus/launcher.py:4388
 msgid "Color Scheme"
-msgstr ""
+msgstr "カラースキーム"
 
 #: faugus/launcher.py:4392
 msgid "Light"
@@ -495,7 +495,7 @@ msgstr "カテゴリと並べ替えボタン"
 
 #: faugus/launcher.py:4489
 msgid "System title bar"
-msgstr ""
+msgstr "システムタイトルバーを非表示にする"
 
 #: faugus/launcher.py:4491
 msgid "Hidden games"
