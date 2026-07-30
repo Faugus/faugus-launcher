@@ -4934,11 +4934,15 @@ class Settings(Gtk.Dialog):
             self.parent.apply_background_mode_live(new_mode)
 
     def on_theme_engine_changed(self, widget):
-        is_adwaita = self.combobox_theme_engine.get_active_id() == "adwaita"
-        self.label_theme.set_visible(True)
-        self.combobox_theme.set_visible(True)
+        self.theme_engine = self.combobox_theme_engine.get_active_id()
+        is_adwaita = self.theme_engine == "adwaita"
+        self.label_theme.set_visible(is_adwaita)
+        self.combobox_theme.set_visible(is_adwaita)
         self.label_accent.set_visible(is_adwaita)
         self.box_accent.set_visible(is_adwaita)
+        if not is_adwaita:
+            self.combobox_theme.set_active_id("system")
+            self.combobox_accent.set_active_id("system")
 
     def on_checkbox_system_tray_toggled(self, widget):
         if not widget.get_active():
