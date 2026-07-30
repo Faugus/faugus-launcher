@@ -617,7 +617,6 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
         modal=True,
         action=action,
     )
-    apply_titlebar_preference(dialog)
     dialog.add_button(cancel_label or _("Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
     dialog.set_default_response(Gtk.ResponseType.ACCEPT)
