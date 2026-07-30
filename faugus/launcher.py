@@ -967,6 +967,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         GLib.timeout_add(50, do_select)
 
+    def find_flowbox_child_for_game(self, game):
+        for child in widget_children(self.flowbox):
+            if getattr(child, 'game', None) is game:
+                return child
+        return None
+
     def on_flowbox_keynav_failed(self, flowbox, direction):
         flowbox.set_can_focus(False)
         result = self.child_focus(direction)
@@ -2166,8 +2172,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         except Exception:
             return
 
-        self.update_list()
-        self.select_first_child_when_ready()
+        if game.hidden and not self.show_hidden:
+            hidden_child = self.find_flowbox_child_for_game(game)
+            if hidden_child is not None:
+                self.flowbox.remove(hidden_child)
+            if game in self.games:
+                self.games.remove(game)
+
+            self.select_first_child_when_ready()
 
     def on_context_menu_category(self, action, param):
         category_name = param.get_string()
@@ -2464,17 +2476,25 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         new_cover = f"{COVERS_DIR}/{title_formatted}.png"
         if os.path.exists(cover):
             shutil.copyfile(cover, new_cover)
+        else:
+            new_cover = ""
 
         new_addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
         if os.path.exists(expand_path(game.addapp_bat)):
             shutil.copyfile(expand_path(game.addapp_bat), new_addapp_bat)
 
-        game.title = new_title
-        game.cover = new_cover
-        game.addapp_bat = new_addapp_bat
+        game_dict = game_to_dict(game)
+        if isinstance(game_dict["category"], list):
+            game_dict["category"] = list(game_dict["category"])
+        game_dict["gameid"] = title_formatted
+        game_dict["title"] = new_title
+        game_dict["icon"] = new_icon
+        game_dict["cover"] = new_cover
+        game_dict["addapp_bat"] = new_addapp_bat
 
-        game_info = game_to_dict(game)
-        game_info["gameid"] = title_formatted
+        new_game = Game(**game_dict)
+
+        game_info = game_to_dict(new_game)
 
         games = load_json_file(GAMES_JSON, [])
 
@@ -2482,9 +2502,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         save_json_file(games, GAMES_JSON)
 
-        self.games.append(game)
-        self.add_item_list(game)
-        self.update_list()
+        self.games.append(new_game)
+        self.add_item_list(new_game)
+        self.flowbox.invalidate_sort()
+        self.entry_search.set_text("")
         self.select_game_by_title(new_title)
 
         destroy_and_release(dialog)
@@ -2517,7 +2538,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 config.save_config()
 
                 self.load_config()
-                self.update_list()
+                self.apply_show_hidden_change()
                 self.select_first_child_when_ready()
                 return True
             except Exception:
@@ -2995,7 +3016,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 if self.show_hidden != settings_dialog.checkbox_hidden_games.get_active():
                     self.load_config()
-                    self.update_list()
+                    self.apply_show_hidden_change()
 
                 self.load_config()
 
@@ -3424,7 +3445,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self._deleted_gameid = gameid
             self.save_games()
-            self.update_list()
+
+            deleted_child = self.find_flowbox_child_for_game(game)
+            if deleted_child is not None:
+                self.flowbox.remove(deleted_child)
+            if game in self.games:
+                self.games.remove(game)
 
             self.remove_latest_and_order(gameid)
             self.select_first_child_when_ready()
@@ -3678,7 +3704,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     write_addapp_bat(addapp_bat, path, addapp, addapp_delay, addapp_first, game_arguments)
 
                 self.add_item_list(game)
-                self.update_list()
+                self.flowbox.invalidate_sort()
+                self.entry_search.set_text("")
 
                 self.select_game_by_title(title)
 
@@ -3817,7 +3844,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.add_shortcut(game, appmenu_shortcut_state, "appmenu", icon_temp, icon_final)
                 self.add_steam_shortcut(game, steam_shortcut_state, icon_temp, icon_final, steam_user)
                 self.add_item_list(game)
-                self.update_list()
+                self.flowbox.invalidate_sort()
+                self.entry_search.set_text("")
                 self.select_game_by_title(title)
             else:
                 if os.path.exists(expand_path(game.prefix)):
@@ -3825,9 +3853,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.remove_shortcut(game, "both")
                 self.remove_steam_shortcut(title)
                 self.remove_cover_icon(game)
+
+                removed_child = self.find_flowbox_child_for_game(game)
+                if removed_child is not None:
+                    self.flowbox.remove(removed_child)
                 self.games.remove(game)
+
                 self.save_games()
-                self.update_list()
                 self.remove_latest_and_order(game.gameid)
                 self.show_warning_dialog_main(self, _("%s was not installed!") % title, "")
 
@@ -3997,7 +4029,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 write_addapp_bat(game.addapp_bat, game.path, game.addapp, game.addapp_delay, game.addapp_first, game.game_arguments)
 
             self.save_games()
-            self.update_list()
+
+            edited_child = self.find_flowbox_child_for_game(game)
+            if edited_child is not None:
+                edited_child.label.set_text(game.title)
+                self.update_game_visual(edited_child)
 
             self.select_game_by_title(game.title)
         else:
@@ -4225,9 +4261,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(desktop_shortcut_path):
                 os.remove(desktop_shortcut_path)
 
-    def update_list(self):
-        self.load_games()
-        self.entry_search.set_text("")
+    def apply_show_hidden_change(self):
+        if self.show_hidden:
+            existing_ids = {g.gameid for g in self.games}
+            games_data = load_json_file(GAMES_JSON, [])
+
+            for game_data in games_data:
+                if game_data.get("hidden") and game_data.get("gameid") not in existing_ids:
+                    game = Game(**prepare_game_kwargs(game_data))
+                    self.games.append(game)
+                    self.add_item_list(game)
+
+            self.flowbox.invalidate_sort()
+        else:
+            for game in [g for g in self.games if g.hidden]:
+                child = self.find_flowbox_child_for_game(game)
+                if child is not None:
+                    self.flowbox.remove(child)
+                self.games.remove(game)
 
     def save_games(self):
         all_games_data = load_json_file(GAMES_JSON, [])
