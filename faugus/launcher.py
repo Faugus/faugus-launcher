@@ -235,20 +235,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-image: none;
                 box-shadow: none;
             }
-            .steamgriddb-focus-tint {
-                background-color: transparent;
-                border-radius: 12px;
-                transition: background-color 150ms ease;
-            }
-            .steamgriddb-focus-tint.steamgriddb-focus-tint-square {
-                border-radius: 0;
-            }
-            flowboxchild.steamgriddb-candidate:focus .steamgriddb-focus-tint {
-                background-color: alpha(@accent_bg_color, 0.2);
-            }
-            .steamgriddb-artwork-picker-overlay:focus-within .steamgriddb-focus-tint {
-                background-color: alpha(@accent_bg_color, 0.2);
-            }
         """, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         load_frame_css()
 
@@ -328,7 +314,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     outline: 2px solid rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.8);
                     outline-offset: 1px;
                 }}
-                row:focus-visible {{
+                row:focus-visible,
+                modelbutton:focus-visible {{
                     outline: 2px solid rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.8);
                     outline-offset: -2px;
                 }}

@@ -252,26 +252,6 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
-def add_focus_tint(overlay, size=None, square=False):
-    tint = Gtk.Box()
-    tint.add_css_class("steamgriddb-focus-tint")
-    if square:
-        tint.add_css_class("steamgriddb-focus-tint-square")
-    tint.set_can_target(False)
-    if size:
-        width, height = size
-        tint.set_size_request(width, height)
-        tint.set_halign(Gtk.Align.CENTER)
-        tint.set_valign(Gtk.Align.CENTER)
-    else:
-        tint.set_hexpand(True)
-        tint.set_vexpand(True)
-    overlay.add_overlay(tint)
-    overlay.set_measure_overlay(tint, False)
-    overlay.add_css_class("steamgriddb-artwork-picker-overlay")
-    return tint
-
-
 def create_accent_placeholder_paintable(width, height, alpha=0.4):
     r, g, b = get_effective_accent_rgb()
 
@@ -2087,10 +2067,11 @@ def show_steamgriddb_picker(obj, category):
     spinner_box.set_hexpand(True)
     spinner_box.append(spinner)
 
+    accent_r, accent_g, accent_b = get_effective_accent_rgb()
     add_css_once(
         "steamgriddb_picker_candidate",
-        """
-        .steamgriddb-candidate {
+        f"""
+        .steamgriddb-candidate {{
             border: none;
             background: none;
             background-color: transparent;
@@ -2100,8 +2081,13 @@ def show_steamgriddb_picker(obj, category):
             padding: 0px;
             min-width: 0;
             min-height: 0;
-        }
+        }}
+        .steamgriddb-candidate:focus-visible {{
+            outline: 2px solid rgba({accent_r}, {accent_g}, {accent_b}, 0.8);
+            outline-offset: -2px;
+        }}
         """,
+        Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
     )
 
     is_list = category == "banner"
