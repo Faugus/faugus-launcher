@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-30 17:15+0000\n"
-"PO-Revision-Date: 2026-07-27 17:07+0000\n"
+"PO-Revision-Date: 2026-07-31 15:06+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -382,11 +382,11 @@ msgstr "Tema"
 
 #: faugus/launcher.py:4437
 msgid "System Theme"
-msgstr ""
+msgstr "Tema del sistema"
 
 #: faugus/launcher.py:4442
 msgid "Color Scheme"
-msgstr ""
+msgstr "Esquema de colores"
 
 #: faugus/launcher.py:4446
 msgid "Light"
@@ -494,7 +494,7 @@ msgstr "Mostrar categorías y modo de orden"
 
 #: faugus/launcher.py:4543
 msgid "System title bar"
-msgstr ""
+msgstr "Barra de título del sistema"
 
 #: faugus/launcher.py:4545
 msgid "Hidden games"
