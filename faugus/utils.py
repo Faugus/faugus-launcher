@@ -2089,6 +2089,23 @@ def show_steamgriddb_picker(obj, category):
     spinner_box.set_hexpand(True)
     spinner_box.append(spinner)
 
+    add_css_once(
+        "steamgriddb_picker_candidate",
+        """
+        .steamgriddb-candidate {
+            border: none;
+            background: none;
+            background-color: transparent;
+            background-image: none;
+            outline: none;
+            box-shadow: none;
+            padding: 0px;
+            min-width: 0;
+            min-height: 0;
+        }
+        """,
+    )
+
     is_list = category == "banner"
 
     items_container = Gtk.FlowBox()
@@ -2171,27 +2188,17 @@ def show_steamgriddb_picker(obj, category):
             picture = new_picture(paintable)
             picture.set_cursor(Gdk.Cursor.new_from_name("pointer"))
 
-            picture_overlay = Gtk.Overlay()
-            picture_overlay.set_child(picture)
-            tint = Gtk.Box()
-            tint.add_css_class("steamgriddb-focus-tint")
-            tint.set_can_target(False)
-            tint.set_hexpand(True)
-            tint.set_vexpand(True)
-            picture_overlay.add_overlay(tint)
-            picture_overlay.set_measure_overlay(tint, False)
-
             child = Gtk.FlowBoxChild()
             if is_list:
-                child.set_size_request(thumb_w, -1)
-                child.set_halign(Gtk.Align.FILL)
+                child.set_size_request(thumb_w, thumb_h)
+                child.set_halign(Gtk.Align.CENTER)
                 child.set_valign(Gtk.Align.START)
             else:
-                child.set_hexpand(True)
-                child.set_vexpand(True)
-                child.set_halign(Gtk.Align.FILL)
-                child.set_valign(Gtk.Align.FILL)
-            child.set_child(picture_overlay)
+                child.set_size_request(thumb_w, thumb_h)
+                child.set_halign(Gtk.Align.CENTER)
+                child.set_valign(Gtk.Align.CENTER)
+            child.set_overflow(Gtk.Overflow.HIDDEN)
+            child.set_child(picture)
             child.add_css_class("steamgriddb-candidate")
             child.gamepad_activate = lambda u=item["url"]: apply_selection(u)
 
