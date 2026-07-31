@@ -497,7 +497,12 @@ def _open_context_menu(self):
 
     self.active_popover = active_menu
     self.set_focus_visible(True)
-    active_menu.child_focus(Gtk.DirectionType.TAB_FORWARD)
+    candidates = []
+    _collect_focusable(active_menu, candidates)
+    if candidates:
+        candidates[0].grab_focus()
+    else:
+        active_menu.child_focus(Gtk.DirectionType.TAB_FORWARD)
 
 
 def adjust_widget_value(widget, direction):
@@ -771,7 +776,7 @@ def _find_descendant_by_typename(widget, type_name):
 def _collect_focusable(widget, out):
     if not widget.get_mapped():
         return
-    if widget.get_sensitive() and widget.get_focusable() and not isinstance(widget, Gtk.Label):
+    if widget.get_sensitive() and widget.get_focusable() and not isinstance(widget, (Gtk.Label, Gtk.ScrolledWindow)):
         out.append(widget)
     child = widget.get_first_child()
     while child:
