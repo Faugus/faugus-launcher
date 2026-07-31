@@ -3237,7 +3237,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.present()
-        GLib.idle_add(add_game_dialog.combobox_launcher.grab_focus)
 
     def on_button_edit_clicked(self, widget):
         game = self.selected()
@@ -6391,9 +6390,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
 
         self.present()
-
-        if interface_mode == "SteamGridDB":
-            GLib.idle_add(self.combobox_launcher.grab_focus)
 
     def on_combobox_steam_changed(self, combobox):
         self.combobox_steam_title.remove_css_class("combobox")
