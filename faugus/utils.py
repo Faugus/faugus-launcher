@@ -1902,10 +1902,8 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
         _accent_css_provider = None
 
     effective_accent = None
-    if theme_engine == "adwaita":
+    if theme_engine == "adwaita" and accent_color and accent_color != "system":
         effective_accent = accent_color
-        if not effective_accent or effective_accent == "system":
-            effective_accent = "rgb(53,132,228)"
 
     if effective_accent:
         accent_color = effective_accent
