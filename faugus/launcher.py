@@ -2609,7 +2609,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         self.categories_and_sort_enabled = cfg.config.get('categories-and-sort-enabled', 'False') == 'True'
-        self.system_title_bar = cfg.config.get('system-title-bar', 'False') == 'True'
+        self.header_bar = cfg.config.get('header-bar', 'False') == 'True'
         self.startup_window_size = cfg.config.get('startup-window-size', '')
         self.window_width = int(cfg.config.get('width', 1280))
         self.window_height = int(cfg.config.get('height', 720))
@@ -3014,7 +3014,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.categories_and_sort_enabled != settings_dialog.checkbox_categories_and_sort.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-                if self.system_title_bar != settings_dialog.checkbox_system_title_bar.get_active():
+                if self.header_bar != settings_dialog.checkbox_header_bar.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 settings_dialog.update_envar_file()
@@ -4597,7 +4597,7 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_categories_and_sort = Gtk.CheckButton(label=_("Categories and sort"))
 
-        self.checkbox_system_title_bar = Gtk.CheckButton(label=_("System title bar"))
+        self.checkbox_header_bar = Gtk.CheckButton(label=_("Header bar"))
 
         self.checkbox_hidden_games = Gtk.CheckButton(label=_("Hidden games"))
         self.checkbox_hidden_games.set_tooltip_text(_("Ctrl+H toggles hidden games"))
@@ -4807,7 +4807,7 @@ class Settings(Gtk.Dialog):
         self.combobox_background.set_hexpand(True)
 
         grid_theme_rest.attach(self.checkbox_categories_and_sort, 0, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_system_title_bar, 0, 9, 1, 1)
+        grid_theme_rest.attach(self.checkbox_header_bar, 0, 9, 1, 1)
         grid_theme_rest.attach(self.checkbox_hidden_games, 0, 10, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
@@ -5064,7 +5064,7 @@ class Settings(Gtk.Dialog):
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("minimized-startup-enabled", self.checkbox_minimized_startup.get_active())
         config.set_value("categories-and-sort-enabled", self.checkbox_categories_and_sort.get_active())
-        config.set_value("system-title-bar", self.checkbox_system_title_bar.get_active())
+        config.set_value("header-bar", self.checkbox_header_bar.get_active())
         config.set_value("startup-window-size", self.combobox_startup_window_size.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
         config.set_value("accent-color", self.accent_color)
@@ -5397,7 +5397,7 @@ class Settings(Gtk.Dialog):
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
         minimized_startup_enabled = cfg.config.get('minimized-startup-enabled', 'False') == 'True'
         categories_and_sort_enabled = cfg.config.get('categories-and-sort-enabled', 'False') == 'True'
-        system_title_bar = cfg.config.get('system-title-bar', 'False') == 'True'
+        header_bar = cfg.config.get('header-bar', 'False') == 'True'
         startup_window_size = cfg.config.get('startup-window-size', '')
         self.interface_theme = cfg.config.get('interface-theme', 'system')
         self.accent_color = cfg.config.get('accent-color', 'system')
@@ -5461,7 +5461,7 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_minimized_startup.set_active(minimized_startup_enabled)
         self.checkbox_categories_and_sort.set_active(categories_and_sort_enabled)
-        self.checkbox_system_title_bar.set_active(system_title_bar)
+        self.checkbox_header_bar.set_active(header_bar)
         self.combobox_startup_window_size.set_active_id(startup_window_size)
 
         index_language = 0

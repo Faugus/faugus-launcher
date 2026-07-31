@@ -432,7 +432,7 @@ class IdComboBox(Gtk.DropDown):
 
 def apply_titlebar_preference(window):
     from faugus.config_manager import ConfigManager
-    if ConfigManager().config.get('system-title-bar', 'False') != 'True':
+    if ConfigManager().config.get('header-bar', 'False') == 'True':
         window.set_titlebar(Gtk.HeaderBar())
         add_css_once(
             "headerbar_title_size",
