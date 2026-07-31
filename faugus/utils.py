@@ -284,38 +284,6 @@ def create_accent_placeholder_paintable(width, height, alpha=0.4):
     return HiDpiPaintable(texture, width, height)
 
 
-def wrap_with_replaceable_placeholder(picture, width, height):
-    margin_top = picture.get_margin_top()
-    margin_bottom = picture.get_margin_bottom()
-    margin_start = picture.get_margin_start()
-    margin_end = picture.get_margin_end()
-    picture.set_margin_top(0)
-    picture.set_margin_bottom(0)
-    picture.set_margin_start(0)
-    picture.set_margin_end(0)
-
-    placeholder = Gtk.Box()
-    placeholder.add_css_class("cover-placeholder")
-    placeholder.set_size_request(width, height)
-
-    stack = Gtk.Stack()
-    stack.set_hhomogeneous(False)
-    stack.set_vhomogeneous(False)
-    stack.set_transition_type(Gtk.StackTransitionType.NONE)
-    stack.set_hexpand(picture.get_hexpand())
-    stack.set_vexpand(picture.get_vexpand())
-    stack.set_halign(picture.get_halign())
-    stack.set_valign(picture.get_valign())
-    stack.set_margin_top(margin_top)
-    stack.set_margin_bottom(margin_bottom)
-    stack.set_margin_start(margin_start)
-    stack.set_margin_end(margin_end)
-    stack.add_named(placeholder, "placeholder")
-    stack.add_named(picture, "picture")
-    stack.set_visible_child_name("placeholder")
-    return stack
-
-
 def set_spinner_loading(spinners, loading):
     for spinner in spinners:
         spinner.set_visible(loading)

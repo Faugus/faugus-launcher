@@ -138,30 +138,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 padding: 0;
                 min-height: 0;
             }
-            flowboxchild:not(.cover-container) {
-                background: transparent;
-                border: none;
-                outline: none;
-                box-shadow: none;
-            }
-            flowboxchild:not(.cover-container):focus,
-            flowboxchild:not(.cover-container):selected,
-            flowboxchild:not(.cover-container):focus-within {
-                background: transparent;
-                border: none;
-                outline: none;
-                box-shadow: none;
-            }
-            flowboxchild:selected:not(.cover-container) .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
-            }
-            flowboxchild:selected:focus:not(.cover-container) .game {
-                background-color: @theme_selected_bg_color;
-                color: @theme_selected_fg_color;
-            }
-            flowboxchild:selected:focus:not(.cover-container) .game-label {
-                color: @theme_selected_fg_color;
-            }
             .category-list row:selected {
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
@@ -170,36 +146,46 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
             }
-            flowboxchild.cover-container {
-                border: 4px solid transparent;
-                border-radius: 12px;
+            entry.flowbox-entry {
+                border: none;
+                background: none;
+                background-color: transparent;
+                background-image: none;
+                outline: none;
+                box-shadow: none;
                 padding: 0px;
-                transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                            border-color 200ms ease;
             }
-            flowboxchild.cover-container:selected {
-                transform: scale(1.05);
-                border-color: @theme_selected_bg_color;
-                box-shadow: 0 0 25px 5px alpha(@theme_selected_bg_color, 0.3);
-            }
-            flowboxchild.cover-container:selected .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
-            }
-            flowboxchild.cover-container:selected:focus .game {
+            entry.flowbox-entry:selected:not(.cover-container) .game {
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
             }
-            flowboxchild.cover-container:selected:focus .game-label {
+            entry.flowbox-entry:selected:backdrop:not(.cover-container) .game {
+                background-color: alpha(@theme_selected_bg_color, 0.5);
+            }
+            entry.flowbox-entry.cover-container {
+                box-shadow: none;
+                transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+            entry.flowbox-entry.cover-container .game {
+                border: none;
+            }
+            entry.flowbox-entry.cover-container:selected {
+                transform: scale(1.05);
+                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 1),
+                            0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
+            }
+            entry.flowbox-entry.cover-container:selected .game {
+                background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
             }
-            .cover-placeholder {
-                border-radius: 12px;
+            entry.flowbox-entry.cover-container:selected:backdrop {
+                box-shadow: none;
+            }
+            entry.flowbox-entry.cover-container:selected:backdrop .game {
+                background-color: alpha(@theme_selected_bg_color, 0.5);
             }
             .spinner-dim-overlay {
                 background-color: alpha(black, 0.3);
-            }
-            .spinner-dim-overlay-cover {
-                border-radius: 12px;
             }
             .spinner-dim-overlay-icon {
                 border-radius: 8px;
@@ -1275,6 +1261,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.set_min_children_per_line(1)
             self.flowbox.set_max_children_per_line(1)
 
+        if self.interface_mode == "List":
+            self.flowbox.set_row_spacing(5)
+        elif self.interface_mode == "Grid":
+            self.flowbox.set_row_spacing(5)
+            self.flowbox.set_column_spacing(5)
+
         def sort_games(child1, child2, user_data):
             g1 = getattr(child1, 'game', None) or getattr(child1.get_child(), 'game', None)
             g2 = getattr(child2, 'game', None) or getattr(child2.get_child(), 'game', None)
@@ -1424,6 +1416,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.list_hbox.append(self.build_background_container(list_container))
 
         update_sort_data()
+
+        warmup_child = Gtk.FlowBoxChild()
+        warmup_child.set_css_name("entry")
+        del warmup_child
+
         self.load_games()
 
         self.set_child(self.box_main)
@@ -2731,6 +2728,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox_child.game = game
         self.flowbox_child.label = game_label
         self.flowbox_child.hbox = hbox
+        self.flowbox_child.add_css_class("flowbox-entry")
+        self.flowbox_child.set_css_name("entry")
 
         anim_box = Gtk.Box()
         anim_box.add_css_class("launch-overlay")
@@ -2788,6 +2787,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
         if self.interface_mode in ("Covers", "SteamGridDB"):
+            self.flowbox_child.add_css_class("cover-container")
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
 
@@ -2814,7 +2814,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             hbox.append(image2)
 
-            self.flowbox_child.add_css_class("cover-container")
             self.flowbox_child.set_overflow(Gtk.Overflow.HIDDEN)
 
             game_label.set_visible(self.labels_enabled)
@@ -3238,7 +3237,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.present()
-        add_game_dialog.combobox_launcher.grab_focus()
+        GLib.idle_add(add_game_dialog.combobox_launcher.grab_focus)
 
     def on_button_edit_clicked(self, widget):
         game = self.selected()
@@ -5696,7 +5695,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
-        #self.set_size_request(300, -1)
 
         self.closed_event = threading.Event()
 
@@ -5778,6 +5776,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_tools = build_grid()
 
+        cover_placeholder_r, cover_placeholder_g, cover_placeholder_b = self.parent_window.get_accent_rgb()
+        add_css_once(
+            "addgame_cover_empty",
+            f"""
+            .cover-empty {{
+                background-color: rgba({cover_placeholder_r}, {cover_placeholder_g}, {cover_placeholder_b}, 0.4);
+            }}
+            """,
+        )
+
         add_css_once("addgame_dialog", """
         .entry {
             border: 1px solid red;
@@ -5785,8 +5793,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         .combobox {
             border: 1px solid red;
         }
-        .add-game-cover {
-            border-radius: 12px;
+        .add-game-media-button {
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+        .add-game-banner-button {
+            border-radius: 0;
         }
         .suggestion-popover list,
         .suggestion-popover row {
@@ -6057,138 +6070,124 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.box.append(frame_scroll)
 
         self.image_cover = new_picture()
-        self.image_cover.set_margin_top(10)
-        self.image_cover.set_margin_bottom(10)
-        self.image_cover.set_margin_start(10)
-        self.image_cover.set_margin_end(10)
+        self.image_cover.set_can_shrink(True)
+        self.image_cover.set_content_fit(Gtk.ContentFit.COVER)
+        self.image_cover.set_hexpand(True)
         self.image_cover.set_vexpand(True)
-        self.image_cover.set_valign(Gtk.Align.CENTER)
-        self.image_cover.add_css_class("add-game-cover")
-        self.image_cover.set_overflow(Gtk.Overflow.HIDDEN)
+        self.image_cover.set_halign(Gtk.Align.FILL)
+        self.image_cover.set_valign(Gtk.Align.FILL)
+        cover_content1, self.spinner_cover1 = wrap_with_spinner(self.image_cover, dim_shape="cover")
+        self.button_cover = Gtk.Button()
+        self.button_cover.set_size_request(260, 390)
+        self.button_cover.set_margin_top(10)
+        self.button_cover.set_margin_bottom(10)
+        self.button_cover.set_margin_start(10)
+        self.button_cover.set_margin_end(10)
+        self.button_cover.set_vexpand(True)
+        self.button_cover.set_valign(Gtk.Align.CENTER)
+        self.button_cover.set_halign(Gtk.Align.CENTER)
+        self.button_cover.set_overflow(Gtk.Overflow.HIDDEN)
+        self.button_cover.set_child(cover_content1)
+        self.button_cover.add_css_class("add-game-media-button")
+        self.button_cover.add_css_class("cover-empty")
 
         self.image_cover2 = new_picture()
-        self.image_cover2.set_margin_top(10)
-        self.image_cover2.set_margin_bottom(10)
-        self.image_cover2.set_margin_start(10)
-        self.image_cover2.set_margin_end(10)
+        self.image_cover2.set_can_shrink(True)
+        self.image_cover2.set_content_fit(Gtk.ContentFit.COVER)
+        self.image_cover2.set_hexpand(True)
         self.image_cover2.set_vexpand(True)
-        self.image_cover2.set_valign(Gtk.Align.CENTER)
-        self.image_cover2.add_css_class("add-game-cover")
-        self.image_cover2.set_overflow(Gtk.Overflow.HIDDEN)
+        self.image_cover2.set_halign(Gtk.Align.FILL)
+        self.image_cover2.set_valign(Gtk.Align.FILL)
+        cover_content2, self.spinner_cover2 = wrap_with_spinner(self.image_cover2, dim_shape="cover")
+        self.button_cover2 = Gtk.Button()
+        self.button_cover2.set_size_request(260, 390)
+        self.button_cover2.set_margin_top(10)
+        self.button_cover2.set_margin_bottom(10)
+        self.button_cover2.set_margin_start(10)
+        self.button_cover2.set_margin_end(10)
+        self.button_cover2.set_vexpand(True)
+        self.button_cover2.set_valign(Gtk.Align.CENTER)
+        self.button_cover2.set_halign(Gtk.Align.CENTER)
+        self.button_cover2.set_overflow(Gtk.Overflow.HIDDEN)
+        self.button_cover2.set_child(cover_content2)
+        self.button_cover2.add_css_class("add-game-media-button")
+        self.button_cover2.add_css_class("cover-empty")
 
-        self.picture_banner1 = Gtk.Picture()
+        self.picture_banner1 = new_picture()
         self.picture_banner1.set_can_shrink(True)
         self.picture_banner1.set_content_fit(Gtk.ContentFit.COVER)
         self.picture_banner1.set_hexpand(True)
         self.picture_banner1.set_vexpand(True)
-
-        banner_placeholder1 = Gtk.Box()
-        banner_placeholder1.add_css_class("banner-placeholder")
-        banner_placeholder1.set_hexpand(True)
-        banner_placeholder1.set_vexpand(True)
-
-        self.stack_banner_preview1 = Gtk.Stack()
-        self.stack_banner_preview1.set_hhomogeneous(False)
-        self.stack_banner_preview1.set_vhomogeneous(False)
-        self.stack_banner_preview1.set_transition_type(Gtk.StackTransitionType.NONE)
-        self.stack_banner_preview1.set_hexpand(True)
-        self.stack_banner_preview1.set_vexpand(True)
-        self.stack_banner_preview1.add_named(banner_placeholder1, "placeholder")
-        self.stack_banner_preview1.add_named(self.picture_banner1, "picture")
-        self.stack_banner_preview1.set_visible_child_name("placeholder")
+        self.picture_banner1.set_halign(Gtk.Align.FILL)
+        self.picture_banner1.set_valign(Gtk.Align.FILL)
+        self.button_banner1 = Gtk.Button()
+        self.button_banner1.set_hexpand(True)
+        self.button_banner1.set_vexpand(True)
+        self.button_banner1.set_overflow(Gtk.Overflow.HIDDEN)
+        self.button_banner1.set_child(self.picture_banner1)
+        self.button_banner1.add_css_class("add-game-media-button")
+        self.button_banner1.add_css_class("add-game-banner-button")
+        self.button_banner1.add_css_class("banner-placeholder")
 
         self.banner_preview1 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
-        self.banner_preview1.set_child(self.stack_banner_preview1)
+        self.banner_preview1.set_child(self.button_banner1)
         self.banner_preview1.set_hexpand(True)
-        self.banner_preview1.set_focusable(True)
 
-        self.picture_banner2 = Gtk.Picture()
+        self.picture_banner2 = new_picture()
         self.picture_banner2.set_can_shrink(True)
         self.picture_banner2.set_content_fit(Gtk.ContentFit.COVER)
         self.picture_banner2.set_hexpand(True)
         self.picture_banner2.set_vexpand(True)
-
-        banner_placeholder2 = Gtk.Box()
-        banner_placeholder2.add_css_class("banner-placeholder")
-        banner_placeholder2.set_hexpand(True)
-        banner_placeholder2.set_vexpand(True)
-
-        self.stack_banner_preview2 = Gtk.Stack()
-        self.stack_banner_preview2.set_hhomogeneous(False)
-        self.stack_banner_preview2.set_vhomogeneous(False)
-        self.stack_banner_preview2.set_transition_type(Gtk.StackTransitionType.NONE)
-        self.stack_banner_preview2.set_hexpand(True)
-        self.stack_banner_preview2.set_vexpand(True)
-        self.stack_banner_preview2.add_named(banner_placeholder2, "placeholder")
-        self.stack_banner_preview2.add_named(self.picture_banner2, "picture")
-        self.stack_banner_preview2.set_visible_child_name("placeholder")
+        self.picture_banner2.set_halign(Gtk.Align.FILL)
+        self.picture_banner2.set_valign(Gtk.Align.FILL)
+        self.button_banner2 = Gtk.Button()
+        self.button_banner2.set_hexpand(True)
+        self.button_banner2.set_vexpand(True)
+        self.button_banner2.set_overflow(Gtk.Overflow.HIDDEN)
+        self.button_banner2.set_child(self.picture_banner2)
+        self.button_banner2.add_css_class("add-game-media-button")
+        self.button_banner2.add_css_class("add-game-banner-button")
+        self.button_banner2.add_css_class("banner-placeholder")
 
         self.banner_preview2 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
-        self.banner_preview2.set_child(self.stack_banner_preview2)
+        self.banner_preview2.set_child(self.button_banner2)
         self.banner_preview2.set_hexpand(True)
-        self.banner_preview2.set_focusable(True)
 
-        self.image_cover.set_hexpand(True)
-        self.image_cover_stack = wrap_with_replaceable_placeholder(self.image_cover, 260, 390)
-        self.image_cover_stack.set_focusable(True)
-
-        self.image_cover2.set_hexpand(True)
-        self.image_cover2_stack = wrap_with_replaceable_placeholder(self.image_cover2, 260, 390)
-        self.image_cover2_stack.set_focusable(True)
-
-        image_click1 = Gtk.GestureClick()
-        image_click1.set_button(Gdk.BUTTON_SECONDARY)
-        image_click1.connect("pressed", self.on_image_clicked)
-        self.image_cover_stack.add_controller(image_click1)
-
-        image_click2 = Gtk.GestureClick()
-        image_click2.set_button(Gdk.BUTTON_SECONDARY)
-        image_click2.connect("pressed", self.on_image_clicked)
-        self.image_cover2_stack.add_controller(image_click2)
-
-        def on_cover_primary_click(gesture, n_press, x, y):
+        def on_cover_primary_click(button):
             if self.interface_mode == "SteamGridDB":
                 show_steamgriddb_picker(self, "cover")
 
-        image_click1_primary = Gtk.GestureClick()
-        image_click1_primary.set_button(Gdk.BUTTON_PRIMARY)
-        image_click1_primary.connect("pressed", on_cover_primary_click)
-        self.image_cover_stack.add_controller(image_click1_primary)
+        self.button_cover.connect("clicked", on_cover_primary_click)
+        self.button_cover2.connect("clicked", on_cover_primary_click)
 
-        image_click2_primary = Gtk.GestureClick()
-        image_click2_primary.set_button(Gdk.BUTTON_PRIMARY)
-        image_click2_primary.connect("pressed", on_cover_primary_click)
-        self.image_cover2_stack.add_controller(image_click2_primary)
+        cover_click_secondary1 = Gtk.GestureClick()
+        cover_click_secondary1.set_button(Gdk.BUTTON_SECONDARY)
+        cover_click_secondary1.connect("pressed", self.on_image_clicked)
+        self.button_cover.add_controller(cover_click_secondary1)
 
-        self.image_cover_overlay, self.spinner_cover1 = wrap_with_spinner(self.image_cover_stack, dim_shape="cover")
-        self.image_cover2_overlay, self.spinner_cover2 = wrap_with_spinner(self.image_cover2_stack, dim_shape="cover")
-        add_focus_tint(self.image_cover_overlay, size=(260, 390))
-        add_focus_tint(self.image_cover2_overlay, size=(260, 390))
+        cover_click_secondary2 = Gtk.GestureClick()
+        cover_click_secondary2.set_button(Gdk.BUTTON_SECONDARY)
+        cover_click_secondary2.connect("pressed", self.on_image_clicked)
+        self.button_cover2.add_controller(cover_click_secondary2)
 
-        self.banner_preview1_overlay, self.spinner_banner1 = wrap_with_spinner(self.banner_preview1)
-        self.banner_preview2_overlay, self.spinner_banner2 = wrap_with_spinner(self.banner_preview2)
-        add_focus_tint(self.banner_preview1_overlay, square=True)
-        add_focus_tint(self.banner_preview2_overlay, square=True)
+        self.image_cover_overlay = self.button_cover
+        self.image_cover2_overlay = self.button_cover2
 
-        banner_click1 = Gtk.GestureClick()
-        banner_click1.set_button(Gdk.BUTTON_PRIMARY)
-        banner_click1.connect("pressed", lambda g, n, x, y: show_steamgriddb_picker(self, "banner"))
-        self.banner_preview1.add_controller(banner_click1)
-
-        banner_click2 = Gtk.GestureClick()
-        banner_click2.set_button(Gdk.BUTTON_PRIMARY)
-        banner_click2.connect("pressed", lambda g, n, x, y: show_steamgriddb_picker(self, "banner"))
-        self.banner_preview2.add_controller(banner_click2)
+        self.button_banner1.connect("clicked", lambda w: show_steamgriddb_picker(self, "banner"))
+        self.button_banner2.connect("clicked", lambda w: show_steamgriddb_picker(self, "banner"))
 
         banner_click_secondary1 = Gtk.GestureClick()
         banner_click_secondary1.set_button(Gdk.BUTTON_SECONDARY)
         banner_click_secondary1.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "banner"))
-        self.banner_preview1.add_controller(banner_click_secondary1)
+        self.button_banner1.add_controller(banner_click_secondary1)
 
         banner_click_secondary2 = Gtk.GestureClick()
         banner_click_secondary2.set_button(Gdk.BUTTON_SECONDARY)
         banner_click_secondary2.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "banner"))
-        self.banner_preview2.add_controller(banner_click_secondary2)
+        self.button_banner2.add_controller(banner_click_secondary2)
+
+        self.banner_preview1_overlay, self.spinner_banner1 = wrap_with_spinner(self.banner_preview1)
+        self.banner_preview2_overlay, self.spinner_banner2 = wrap_with_spinner(self.banner_preview2)
 
         self.menu = Gtk.Popover()
         self.menu.set_has_arrow(False)
@@ -6221,7 +6220,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if interface_mode in ("Covers", "SteamGridDB"):
             self.grid_page1.attach(self.image_cover_overlay, 1, 1, 1, 1)
         page1.set_hexpand(True)
-        self.image_cover.set_hexpand(True)
 
         self.view_stack.add_titled(self.grid_page1, "page1", _("Game/App"))
 
@@ -6231,7 +6229,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if interface_mode in ("Covers", "SteamGridDB"):
             self.grid_page2.attach(self.image_cover2_overlay, 1, 1, 1, 1)
         page2.set_hexpand(True)
-        self.image_cover2.set_hexpand(True)
 
         self.view_stack.add_titled(self.grid_page2, "page2", _("Tools"))
 
@@ -6389,14 +6386,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_steam_user.set_visible(False)
         self.update_image_cover()
         if interface_mode not in ("Covers", "SteamGridDB"):
-            self.image_cover.set_visible(False)
-            self.image_cover2.set_visible(False)
+            self.button_cover.set_visible(False)
+            self.button_cover2.set_visible(False)
 
 
         self.present()
 
         if interface_mode == "SteamGridDB":
-            self.combobox_launcher.grab_focus()
+            GLib.idle_add(self.combobox_launcher.grab_focus)
 
     def on_combobox_steam_changed(self, combobox):
         self.combobox_steam_title.remove_css_class("combobox")
@@ -6690,14 +6687,18 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def update_banner_preview(self, banner_path):
         if banner_path and os.path.isfile(banner_path):
-            surface = self.new_texture_from_image(banner_path, 480, 155, True)
+            pixbuf = safe_load_pixbuf(banner_path, None, None, False)
+            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+            surface = HiDpiPaintable(texture, 480, 155)
             self.picture_banner1.set_paintable(surface)
             self.picture_banner2.set_paintable(surface)
-            self.stack_banner_preview1.set_visible_child_name("picture")
-            self.stack_banner_preview2.set_visible_child_name("picture")
+            self.button_banner1.remove_css_class("banner-placeholder")
+            self.button_banner2.remove_css_class("banner-placeholder")
         else:
-            self.stack_banner_preview1.set_visible_child_name("placeholder")
-            self.stack_banner_preview2.set_visible_child_name("placeholder")
+            self.picture_banner1.set_paintable(None)
+            self.picture_banner2.set_paintable(None)
+            self.button_banner1.add_css_class("banner-placeholder")
+            self.button_banner2.add_css_class("banner-placeholder")
 
     def get_artwork(self):
         import requests
@@ -6812,14 +6813,18 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def update_image_cover(self):
         if os.path.isfile(self.cover_path_temp):
-            surface = self.new_texture_from_image(self.cover_path_temp, 260, 390, True)
+            pixbuf = safe_load_pixbuf(self.cover_path_temp, None, None, False)
+            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+            surface = HiDpiPaintable(texture, 260, 390)
             self.image_cover.set_paintable(surface)
             self.image_cover2.set_paintable(surface)
-            self.image_cover_stack.set_visible_child_name("picture")
-            self.image_cover2_stack.set_visible_child_name("picture")
+            self.button_cover.remove_css_class("cover-empty")
+            self.button_cover2.remove_css_class("cover-empty")
         else:
-            self.image_cover_stack.set_visible_child_name("placeholder")
-            self.image_cover2_stack.set_visible_child_name("placeholder")
+            self.image_cover.set_paintable(None)
+            self.image_cover2.set_paintable(None)
+            self.button_cover.add_css_class("cover-empty")
+            self.button_cover2.add_css_class("cover-empty")
 
     def on_entry_focus_out(self):
         if self._steamgriddb_suggestion_id is not None:
