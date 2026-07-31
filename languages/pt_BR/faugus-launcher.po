@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 22:05+0000\n"
-"PO-Revision-Date: 2026-07-30 12:25+0000\n"
+"PO-Revision-Date: 2026-08-01 01:05+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -494,7 +494,7 @@ msgstr "Categorias e ordem"
 
 #: faugus/launcher.py:4600
 msgid "Header bar"
-msgstr ""
+msgstr "Barra de cabeçalho"
 
 #: faugus/launcher.py:4602
 msgid "Hidden games"
