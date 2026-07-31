@@ -159,6 +159,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: @theme_selected_bg_color;
                 color: @theme_selected_fg_color;
             }
+            entry.flowbox-entry:selected:not(.cover-container) .game-label {
+                color: @theme_selected_fg_color;
+            }
             entry.flowbox-entry:selected:backdrop:not(.cover-container) .game {
                 background-color: alpha(@theme_selected_bg_color, 0.5);
             }
@@ -176,6 +179,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected .game {
                 background-color: @theme_selected_bg_color;
+                color: @theme_selected_fg_color;
+            }
+            entry.flowbox-entry.cover-container:selected .game-label {
                 color: @theme_selected_fg_color;
             }
             entry.flowbox-entry.cover-container:selected:backdrop {
