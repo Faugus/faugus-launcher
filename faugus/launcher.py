@@ -659,8 +659,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         """
         base_provider.load_from_data(base_css.encode("utf-8"))
 
-        if banner_image_box is not None and provider is not None and banner_path is not None:
-            banner_uri = Gio.File.new_for_path(banner_path).get_uri()
+        if banner_image_box is not None and provider is not None and banner_path is not None and os.path.isfile(banner_path):
+            cache_path = banner_path
+            if os.path.getsize(banner_path) > 0:
+                self._banner_css_cache_counter = getattr(self, '_banner_css_cache_counter', 0) + 1
+                candidate_path = f"{banner_path}.cache{self._banner_css_cache_counter}"
+                try:
+                    shutil.copyfile(banner_path, candidate_path)
+                    cache_path = candidate_path
+                except OSError:
+                    cache_path = banner_path
+
+            old_cache_path = getattr(self, '_banner_css_cache_path', None)
+            self._banner_css_cache_path = cache_path if cache_path != banner_path else None
+
+            banner_uri = Gio.File.new_for_path(cache_path).get_uri()
             banner_css = f"""
             .launcher-screen-banner-image {{
                 background-image: linear-gradient(to bottom, rgba({fade_r}, {fade_g}, {fade_b}, 0) 0%, rgba({fade_r}, {fade_g}, {fade_b}, 1) 100%), url("{banner_uri}");
@@ -670,6 +683,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }}
             """
             provider.load_from_data(banner_css.encode("utf-8"))
+
+            if old_cache_path and old_cache_path != cache_path and os.path.isfile(old_cache_path):
+                try:
+                    os.remove(old_cache_path)
+                except OSError:
+                    pass
 
     def apply_background_mode_live(self, new_mode):
         show_banner = self.banner_overlay_enabled()
@@ -4021,6 +4040,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.update_game_visual(edited_child)
 
             self.select_game_by_title(game.title)
+            self.launcher_banner_dominant_rgb = None
+            self.schedule_background_update()
         else:
             if os.path.isfile(edit_game_dialog.icon_temp):
                 os.remove(edit_game_dialog.icon_temp)
