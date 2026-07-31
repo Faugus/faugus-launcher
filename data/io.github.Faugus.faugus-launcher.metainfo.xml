@@ -53,27 +53,27 @@
   <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-grid.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-grid.png</image>
       <caption>Main window: Grid interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-covers.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-covers.png</image>
       <caption>Main window: Covers interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/main-steamgriddb.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-steamgriddb.png</image>
       <caption>Main window: SteamGridDB interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/add-tool.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/add-tool.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
@@ -81,7 +81,7 @@
       <caption>Add/Edit Game: Launch Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/5ba1f56/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
