@@ -22,7 +22,7 @@ from faugus.ea_fix import *
 from faugus.tray_sni import TrayIcon
 from faugus.migration import fix_legacy_shortcut_icons
 
-VERSION = "2.0.4"
+VERSION = "2.0.5"
 
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'

@@ -90,15 +90,17 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.4-1" date="2026-07-30">
+    <release version="2.0.5-1" date="2026-07-31">
       <description>
         <ul>
-          <li>Added support for themes.</li>
-          <li>Now applies themes to the splash and shortcut windows.</li>
-          <li>Added an option to change the title bar.</li>
-          <li>Fixed AppImage not saving images due to recent changes.</li>
-          <li>Now only shows languages that are at least 90% translated.</li>
-          <li>Minor visual improvements.</li>
+          <li>Now the game card should match the theme.</li>
+          <li>Replaced the System title bar option with Header bar.</li>
+          <li>Gamepad navigation improvements.</li>
+          <li>Some fine tuning for non Adwaita themes.</li>
+          <li>Fixed the accent color not being applied on Adwaita.</li>
+          <li>Fixed an issue where, when editing a game, the previous one would be selected.</li>
+          <li>Fixed gamepad not navigating through files/folders when set as Icon view.</li>
+          <li>Updated translations.</li>
         </ul>
       </description>
     </release>
