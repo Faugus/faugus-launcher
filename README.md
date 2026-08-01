@@ -17,13 +17,6 @@ sudo dnf -y copr enable faugus/faugus-launcher
 sudo dnf -y install faugus-launcher
 ```
 
-## Bazzite (Copr)
-```
-sudo dnf5 -y copr enable faugus/faugus-launcher
-sudo rpm-ostree -y install faugus-launcher
-```
-Restart your system.
-
 ## Debian-based distributions
 ### PPA (Ubuntu, Mint, KDE Neon...)
 ```
