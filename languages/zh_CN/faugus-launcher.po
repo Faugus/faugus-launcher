@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:31-0300\n"
+"POT-Creation-Date: 2026-08-02 01:51-0300\n"
 "PO-Revision-Date: 2026-07-21 09:17+0800\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
@@ -871,6 +871,11 @@ msgstr "未找到 GameMode"
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
 msgstr "为快捷方式选择图标"
+
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
 
 #: faugus/utils.py:1072
 msgid "System"

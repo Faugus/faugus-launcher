@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:31-0300\n"
+"POT-Creation-Date: 2026-08-02 01:51-0300\n"
 "PO-Revision-Date: 2026-07-30 12:25+0000\n"
 "Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -871,6 +871,11 @@ msgstr "GameModeが見つかりません"
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
 msgstr "ショートカットのアイコンを選択してください"
+
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
 
 #: faugus/utils.py:1072
 #, fuzzy
