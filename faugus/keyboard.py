@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gdk, GLib
-from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release, run_in_background
+from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release, run_in_background, apply_titlebar_preference
 
 LAYOUT_LOWER = [
     [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
@@ -31,6 +31,7 @@ LAYOUT_SYMBOLS = [
 class VirtualKeyboard(Gtk.Dialog):
     def __init__(self, parent, entry, on_close=None, fetch_suggestions=None, on_suggestion_selected=None):
         super().__init__(title="Faugus", transient_for=parent, modal=True)
+        apply_titlebar_preference(self)
         hide_dialog_action_area(self)
 
         self.entry = entry
@@ -91,18 +92,12 @@ class VirtualKeyboard(Gtk.Dialog):
             min-width: 40px;
             padding: 0;
             margin: 0;
-            border: none;
-            border-radius: 8px;
         }
         .tv-keyboard button:focus {
             background-color: alpha(@theme_selected_bg_color, 1);
         }
         .tv-keyboard entry {
             min-height: 40px;
-            border-radius: 8px;
-        }
-        .tv-keyboard-suggestions row {
-            border-radius: 8px;
         }
         .tv-keyboard-suggestions row:focus {
             background-color: alpha(@theme_selected_bg_color, 1);
