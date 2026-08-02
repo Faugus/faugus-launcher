@@ -509,6 +509,11 @@ def _release_combo_boxes(widget):
 
 
 def destroy_and_release(widget):
+    if isinstance(widget, Gtk.NativeDialog):
+        widget.destroy()
+        widget.__dict__.clear()
+        return
+
     if isinstance(widget, Gtk.Window):
         widget.set_focus(None)
 
@@ -568,6 +573,21 @@ def format_title(title):
 
 
 def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None):
+    from faugus.config_manager import ConfigManager
+    gamepad_navigation = ConfigManager().config.get('gamepad-navigation', 'False') == 'True'
+
+    if not gamepad_navigation:
+        dialog = Gtk.FileChooserNative(
+            title=title,
+            transient_for=parent,
+            modal=True,
+            action=action,
+            accept_label=accept_label or _("Open"),
+            cancel_label=cancel_label or _("Cancel"),
+        )
+        dialog.present = dialog.show
+        return dialog
+
     dialog = Gtk.FileChooserDialog(
         title=title,
         transient_for=parent,
