@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-02 01:51-0300\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
 "Language: pt_BR\n"
@@ -875,7 +875,7 @@ msgstr "Selecione um ícone para o atalho"
 #: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
 #: faugus/utils.py:1068 faugus/utils.py:1069
 msgid "Latest"
-msgstr ""
+msgstr "Último"
 
 #: faugus/utils.py:1072
 msgid "System"
