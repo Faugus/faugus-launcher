@@ -429,6 +429,9 @@ class IdComboBox(Gtk.DropDown):
     def get_texts(self):
         return [self._store.get_string(i) for i in range(self._store.get_n_items())]
 
+    def get_ids(self):
+        return list(self._ids)
+
 
 def apply_titlebar_preference(window):
     from faugus.config_manager import ConfigManager
@@ -1059,14 +1062,14 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append_text("Proton-CachyOS Latest (default)")
-    combobox.append_text("GE-Proton Latest")
-    combobox.append_text("Proton-EM Latest")
-    combobox.append_text("DW-Proton Latest")
-    combobox.append_text("UMU-Proton Latest")
+    combobox.append("Proton-CachyOS Latest", f"Proton-CachyOS Latest ({_('Default')})")
+    combobox.append("Proton-GE Latest", "GE-Proton Latest")
+    combobox.append("Proton-EM Latest", "Proton-EM Latest")
+    combobox.append("DW-Proton Latest", "DW-Proton Latest")
+    combobox.append("", "UMU-Proton Latest")
 
     if os.path.exists(PROTON_CACHYOS):
-        combobox.append_text("Proton-CachyOS (System)")
+        combobox.append("Proton-CachyOS (System)", f"Proton-CachyOS ({_('System')})")
 
     try:
         if os.path.exists(COMPATIBILITY_DIR):
@@ -1086,7 +1089,7 @@ def populate_combobox_with_runners(combobox):
             versions.sort(key=version_key, reverse=True)
 
             for version in versions:
-                combobox.append_text(version)
+                combobox.append(version, version)
     except Exception as e:
         print(f"Error accessing the directory: {e}")
 
@@ -1564,8 +1567,6 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     flow = val if (val := lossless_flow) != "" else 100
     performance = val if (val := lossless_performance) != "" else False
     hdr = val if (val := lossless_hdr) != "" else False
-    present = val if (val := lossless_present) != "" else "VSync/FIFO (default)"
-
     from faugus.config_manager import ConfigManager
     from faugus.steam_setup import LOSSLESS_DLL
 
@@ -1657,23 +1658,12 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode"))
 
-    options = [
-        "VSync/FIFO (default)",
-        "Mailbox",
-        "Immediate",
-    ]
+    combobox_present.append("fifo", f"VSync/FIFO ({_('Default')})")
+    combobox_present.append("mailbox", "Mailbox")
+    combobox_present.append("immediate", "Immediate")
 
-    for opt in options:
-        combobox_present.append_text(opt)
-
-    mapping = {
-        "fifo": "VSync/FIFO (default)",
-        "mailbox": "Mailbox",
-        "immediate": "Immediate",
-    }
-
-    ui_value = mapping.get(present, "VSync/FIFO (default)")
-    combobox_present.set_active(options.index(ui_value))
+    if not combobox_present.set_active_id(lossless_present):
+        combobox_present.set_active(0)
 
     def on_enable_toggled(cb):
         active = cb.get_active()
@@ -1720,19 +1710,13 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                 entry_location.add_css_class("entry")
                 return
 
-            present_text = combobox_present.get_active_text()
-            present_mapping = {
-                "VSync/FIFO (default)": "fifo",
-                "Mailbox": "mailbox",
-                "Immediate": "immediate",
-            }
             result = (
                 checkbox_enable.get_active(),
                 spin_multiplier.get_value_as_int(),
                 scale_flow.get_value(),
                 checkbox_performance.get_active(),
                 checkbox_hdr.get_active(),
-                present_mapping.get(present_text, "fifo"),
+                combobox_present.get_active_id(),
             )
             cfg.set_value("lossless-location", entry_location.get_text())
             cfg.save_config()

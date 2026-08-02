@@ -50,28 +50,6 @@ if fix_legacy_shortcut_icons():
 _ = setup_gettext('faugus-launcher')
 
 
-def convert_runner(runner):
-    if runner == "Proton-CachyOS Latest":
-        return "Proton-CachyOS Latest (default)"
-
-    if runner == "Proton-CachyOS Latest (default)":
-        return "Proton-CachyOS Latest"
-
-    if runner == "Proton-GE Latest":
-        return "GE-Proton Latest"
-
-    if runner == "GE-Proton Latest":
-        return "Proton-GE Latest"
-
-    if runner == "UMU-Proton Latest":
-        return ""
-
-    if runner == "":
-        return "UMU-Proton Latest"
-
-    return runner
-
-
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False):
         super().__init__(application_id="io.github.Faugus.faugus-launcher")
@@ -2994,8 +2972,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if tray_needs_reload:
                     self.load_tray_icon()
 
-                combobox_language = settings_dialog.combobox_language.get_active_text()
-
                 if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
@@ -3011,7 +2987,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.labels_enabled != settings_dialog.checkbox_labels.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-                if self.language != settings_dialog.lang_codes.get(combobox_language, "en_US"):
+                if self.language != settings_dialog.combobox_language.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
@@ -3259,7 +3235,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             edit_game_dialog = AddGame(self, self.interface_mode)
             edit_game_dialog.connect("response", self.on_edit_dialog_response, edit_game_dialog, game)
 
-            game_runner = convert_runner(game.runner)
+            game_runner = game.runner
 
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("linux")
@@ -3275,21 +3251,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.combobox_steam_user.set_active_id_silent(game.steam_user)
                 edit_game_dialog.populate_steam_title_combobox(game.steam_user)
 
-            for i, text in enumerate(edit_game_dialog.combobox_steam_title.get_texts()):
-                if text == title:
-                    edit_game_dialog.combobox_steam_title.set_active_silent(i)
-                    break
+            if game_runner == "Steam" and game.path:
+                edit_game_dialog.combobox_steam_title.set_active_id_silent(game.path)
 
-            index_runner = 0
-
-            for i, text in enumerate(edit_game_dialog.combobox_runner.get_texts()):
-                if text == game_runner:
-                    index_runner = i
-                    break
-            if not game_runner:
-                index_runner = 1
-
-            edit_game_dialog.combobox_runner.set_active(index_runner)
+            if not edit_game_dialog.combobox_runner.set_active_id(game_runner):
+                edit_game_dialog.combobox_runner.set_active(0)
             edit_game_dialog._suggestion_programmatic = True
             edit_game_dialog.entry_title.set_text(game.title)
             edit_game_dialog._suggestion_programmatic = False
@@ -3554,7 +3520,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             launch_arguments = add_game_dialog.launch_arguments
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
-            runner = add_game_dialog.combobox_runner.get_active_text()
+            runner = add_game_dialog.combobox_runner.get_active_id()
             addapp = add_game_dialog.addapp
             addapp_delay = add_game_dialog.addapp_delay
             addapp_first = add_game_dialog.addapp_first
@@ -3612,7 +3578,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             icon_final = f'{add_game_dialog.icons_path}/{title_formatted}.png'
             icon = icon_final
 
-            runner = convert_runner(runner)
             if launcher_id == "linux":
                 runner = "Linux-Native"
             if launcher_id == "steam":
@@ -3977,7 +3942,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.sdl_enabled = edit_game_dialog.checkbox_sdl.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
-            game.runner = edit_game_dialog.combobox_runner.get_active_text()
+            game.runner = edit_game_dialog.combobox_runner.get_active_id()
             game.addapp_enabled = edit_game_dialog.addapp_enabled
             game.addapp = edit_game_dialog.addapp
             game.addapp_delay = edit_game_dialog.addapp_delay
@@ -4020,7 +3985,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.png'
             game.icon = icon_final
 
-            game.runner = convert_runner(game.runner)
             if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
             if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
@@ -4467,8 +4431,6 @@ class Settings(Gtk.Dialog):
             "zh_TW": "Chinese (Traditional)",
             "zu": "Zulu",
         }
-
-        self.lang_codes = {}
 
         self.label_language = Gtk.Label(label=_("Language"))
         self.label_language.set_halign(Gtk.Align.START)
@@ -4966,8 +4928,7 @@ class Settings(Gtk.Dialog):
         available_langs.sort(key=lambda x: x[0])
 
         for lang_name, lang_code in available_langs:
-            self.combobox_language.append_text(lang_name)
-            self.lang_codes[lang_name] = lang_code
+            self.combobox_language.append(lang_code, lang_name)
 
         self.combobox_language.set_active(0)
 
@@ -5036,10 +4997,9 @@ class Settings(Gtk.Dialog):
         populate_combobox_with_runners(self.combobox_runner)
 
     def update_config_file(self):
-        combobox_language = self.combobox_language.get_active_text()
         entry_default_prefix = self.entry_default_prefix.get_text()
         combobox_default_runner = self.get_default_runner()
-        language = self.lang_codes.get(combobox_language, "en_US")
+        language = self.combobox_language.get_active_id()
         logging_warning = self.logging_warning
 
         config = ConfigManager()
@@ -5080,9 +5040,7 @@ class Settings(Gtk.Dialog):
         self.set_sensitive(False)
 
     def get_default_runner(self):
-        default_runner = self.combobox_runner.get_active_text()
-        default_runner = convert_runner(default_runner)
-        return default_runner
+        return self.combobox_runner.get_active_id()
 
     def update_envar_file(self):
         if hasattr(self, "liststore"):
@@ -5090,7 +5048,7 @@ class Settings(Gtk.Dialog):
             save_json_file(values, ENVAR_DIR)
 
     def on_button_proton_manager_clicked(self, widget):
-        current_runner = self.combobox_runner.get_active_text()
+        current_runner = self.combobox_runner.get_active_id()
 
         from faugus.proton_manager import ProtonDownloader
         dialog = ProtonDownloader()
@@ -5104,10 +5062,7 @@ class Settings(Gtk.Dialog):
             self.populate_combobox_with_runners()
 
             if current_runner:
-                for i, text in enumerate(self.combobox_runner.get_texts()):
-                    if text == current_runner:
-                        self.combobox_runner.set_active(i)
-                        break
+                self.combobox_runner.set_active_id(current_runner)
 
         dialog.connect("response", on_response)
         dialog.present()
@@ -5421,14 +5376,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_sdl.set_active(sdl_enabled)
         self.checkbox_no_sleep.set_active(no_sleep)
 
-        self.default_runner = convert_runner(self.default_runner)
-        index_runner = 0
-        for i, text in enumerate(self.combobox_runner.get_texts()):
-            if text == self.default_runner:
-                index_runner = i
-                break
-
-        self.combobox_runner.set_active(index_runner)
+        if not self.combobox_runner.set_active_id(self.default_runner):
+            self.combobox_runner.set_active(0)
         self.checkbox_discrete_gpu.set_active(discrete_gpu)
         self.checkbox_splash_window.set_active(splash_window_enabled)
         self.checkbox_automatic_updates.set_active(automatic_updates)
@@ -5472,17 +5421,14 @@ class Settings(Gtk.Dialog):
 
         index_language = 0
 
-        if self.language == "":
-            self.combobox_language.set_active(index_language)
-        else:
+        if self.language != "":
             language_primary = self.language.split("_")[0].split("-")[0].lower()
-            for i, lang_name in enumerate(self.combobox_language.get_texts()):
-                lang_code = self.lang_codes.get(lang_name, "")
-                if lang_code == self.language or lang_code.lower() == language_primary:
+            for i, lang_code in enumerate(self.combobox_language.get_ids()):
+                if lang_code == self.language or (lang_code or "").lower() == language_primary:
                     index_language = i
                     break
 
-            self.combobox_language.set_active(index_language)
+        self.combobox_language.set_active(index_language)
         self.load_liststore_from_file(ENVAR_DIR)
 
     def load_liststore_from_file(self, filename=ENVAR_DIR):
@@ -6364,15 +6310,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.populate_combobox_with_runners()
 
-        index_to_activate = 0
-
-        self.default_runner = convert_runner(self.default_runner)
-
-        for i, text in enumerate(self.combobox_runner.get_texts()):
-            if text == self.default_runner:
-                index_to_activate = i
-                break
-        self.combobox_runner.set_active(index_to_activate)
+        if not self.combobox_runner.set_active_id(self.default_runner):
+            self.combobox_runner.set_active(0)
 
         self.checkbox_mangohud.set_active(self.default_mangohud)
         self.checkbox_gamemode.set_active(self.default_gamemode)
@@ -7175,11 +7114,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 title = self.entry_title.get_text()
                 prefix = expand_path(self.entry_prefix.get_text())
                 title_formatted = format_title(title)
-                runner = self.combobox_runner.get_active_text()
+                runner = self.combobox_runner.get_active_id()
                 game_directory = os.path.dirname(file_run)
                 cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
                 escaped_file_run = file_run.replace("'", "'\\''")
-                runner = convert_runner(runner)
                 command_parts = []
 
                 if title_formatted:
@@ -7301,9 +7239,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         title = self.entry_title.get_text()
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
-        runner = self.combobox_runner.get_active_text()
-
-        runner = convert_runner(runner)
+        runner = self.combobox_runner.get_active_id()
 
         command_parts = []
 
@@ -7339,9 +7275,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         title = self.entry_title.get_text()
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
-        runner = self.combobox_runner.get_active_text()
-
-        runner = convert_runner(runner)
+        runner = self.combobox_runner.get_active_id()
 
         command_parts = []
 
