@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:51-0300\n"
+"POT-Creation-Date: 2026-08-02 04:52+0000\n"
 "PO-Revision-Date: 2026-08-02 04:56+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -84,11 +84,7 @@ msgstr "Dimanche"
 msgid "No backup yet"
 msgstr "Pas encore de sauvegarde"
 
-#: faugus/backup.py:261 faugus/backup.py:353
-msgid "Last backup:"
-msgstr ""
-
-#: faugus/backup.py:265 faugus/backup.py:266
+#: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Les préfixes et protons ne seront pas sauvegardés !"
 
@@ -368,8 +364,7 @@ msgstr "Affiches"
 msgid "Background"
 msgstr "Arrière-plan"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
-#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
+#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
 msgid "Default"
 msgstr "Défaut"
 
@@ -876,15 +871,6 @@ msgstr "GameMode introuvable"
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
 msgstr "Sélectionner une icône pour le raccourci"
-
-#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
-#: faugus/utils.py:1068 faugus/utils.py:1069
-msgid "Latest"
-msgstr ""
-
-#: faugus/utils.py:1072
-msgid "System"
-msgstr ""
 
 #: faugus/utils.py:1220
 msgid "Presets"

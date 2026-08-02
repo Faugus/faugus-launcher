@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:51-0300\n"
+"POT-Creation-Date: 2026-08-02 04:52+0000\n"
 "PO-Revision-Date: 2026-08-02 04:56+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Persian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -85,11 +85,7 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:261 faugus/backup.py:353
-msgid "Last backup:"
-msgstr ""
-
-#: faugus/backup.py:265 faugus/backup.py:266
+#: faugus/backup.py:265
 #, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix ها و باز کننده ها پشتیبان گیری نخواهند شد!"
@@ -381,8 +377,7 @@ msgstr ""
 msgid "Background"
 msgstr "پشتیبان گیری"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
-#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
+#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
 #, fuzzy
 msgid "Default"
 msgstr "Proton پیشفرض"
@@ -920,15 +915,6 @@ msgstr "%s یافت نشد."
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
 msgstr "یک آیکون برای میانبر انتخاب کنید"
-
-#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
-#: faugus/utils.py:1068 faugus/utils.py:1069
-msgid "Latest"
-msgstr ""
-
-#: faugus/utils.py:1072
-msgid "System"
-msgstr ""
 
 #: faugus/utils.py:1220
 msgid "Presets"

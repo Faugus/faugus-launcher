@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:51-0300\n"
+"POT-Creation-Date: 2026-08-02 04:52+0000\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -84,11 +84,7 @@ msgstr "Domenica"
 msgid "No backup yet"
 msgstr "Ancora nessun backup"
 
-#: faugus/backup.py:261 faugus/backup.py:353
-msgid "Last backup:"
-msgstr "Ultimo backup:"
-
-#: faugus/backup.py:265 faugus/backup.py:266
+#: faugus/backup.py:265
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix e Proton non saranno oggetto di backup!"
 
@@ -366,8 +362,7 @@ msgstr "Copertine"
 msgid "Background"
 msgstr "Sfondo"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
-#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
+#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
 msgid "Default"
 msgstr "Predefinito"
 
@@ -875,17 +870,6 @@ msgstr "GameMode non trovato"
 msgid "Select an icon for the shortcut"
 msgstr "Seleziona un'icona per la scorciatoia"
 
-#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
-#: faugus/utils.py:1068 faugus/utils.py:1069
-msgid "Latest"
-msgstr ""
-
-#: faugus/utils.py:1072
-#, fuzzy
-#| msgid "System Theme"
-msgid "System"
-msgstr "Tema del Sistema"
-
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr "Preimpostati"
@@ -1011,6 +995,14 @@ msgstr "Scegliere una icona"
 #: faugus/utils.py:2170
 msgid "No results found"
 msgstr "Nessun risultato trovato"
+
+#~ msgid "Last backup:"
+#~ msgstr "Ultimo backup:"
+
+#, fuzzy
+#~| msgid "System Theme"
+#~ msgid "System"
+#~ msgstr "Tema del Sistema"
 
 #~ msgid "System title bar"
 #~ msgstr "Barra del titolo di sistema"
