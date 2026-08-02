@@ -90,7 +90,7 @@ meson ninja pygobject requests pillow vdf psutil dbus-python icoextract gtk4 lib
 ```
 
 ### Themes location
-Native and Flatpak
+Native and Flatpak.
 ```
 ~/.themes
 ```
@@ -102,7 +102,7 @@ Native. Flatpak needs permission.
 sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=xdg-data/themes:ro
 ```
 
-Native only
+Native only.
 ```
 /usr/share/themes
 ```
