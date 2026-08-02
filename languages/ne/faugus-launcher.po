@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 01:31-0300\n"
+"POT-Creation-Date: 2026-08-02 01:51-0300\n"
 "PO-Revision-Date: 2026-07-23 01:09+0000\n"
 "Last-Translator: Winter Snow <git.xerox732@passinbox.com>\n"
 "Language-Team: Nepali <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -869,6 +869,11 @@ msgstr ""
 
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
+msgstr ""
+
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
 msgstr ""
 
 #: faugus/utils.py:1072
