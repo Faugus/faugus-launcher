@@ -8,9 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-02 05:44+0000\n"
-"PO-Revision-Date: 2026-08-02 04:55+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
+"PO-Revision-Date: 2026-08-02 23:52+0000\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -436,9 +435,8 @@ msgid "Labels"
 msgstr "Etichette"
 
 #: faugus/launcher.py:4505
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "Chiave API SteamGridDB"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -506,7 +504,7 @@ msgstr "Categorie e ordinamento"
 
 #: faugus/launcher.py:4568
 msgid "Header bar"
-msgstr ""
+msgstr "Barra del titolo"
 
 #: faugus/launcher.py:4570
 msgid "Hidden games"
@@ -883,13 +881,11 @@ msgstr "Seleziona un'icona per la scorciatoia"
 #: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
 #: faugus/utils.py:1068 faugus/utils.py:1069
 msgid "Latest"
-msgstr ""
+msgstr "Recente"
 
 #: faugus/utils.py:1072
-#, fuzzy
-#| msgid "System Theme"
 msgid "System"
-msgstr "Tema del Sistema"
+msgstr "Sistema"
 
 #: faugus/utils.py:1220
 msgid "Presets"
