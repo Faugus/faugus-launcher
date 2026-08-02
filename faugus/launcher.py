@@ -4502,7 +4502,7 @@ class Settings(Gtk.Dialog):
 
         self.label_steamgriddb_key = Gtk.Label()
         self.label_steamgriddb_key.set_markup(
-            '<a href="https://www.steamgriddb.com/profile/preferences/api">SteamGridDB API Key</a>'
+            f'<a href="https://www.steamgriddb.com/profile/preferences/api">{_("SteamGridDB API Key")}</a>'
         )
         self.label_steamgriddb_key.set_use_markup(True)
         self.label_steamgriddb_key.set_halign(Gtk.Align.START)
