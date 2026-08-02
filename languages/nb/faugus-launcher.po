@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 04:52+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/faugus-"
@@ -85,7 +85,11 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr ""
+
+#: faugus/backup.py:266
 #, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix og kjører vil ikke bli sikkerhetskopiert!"
@@ -373,7 +377,8 @@ msgstr ""
 msgid "Background"
 msgstr "Sikkerhetskopier"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 #, fuzzy
 msgid "Default"
 msgstr "Standard Proton"
@@ -445,6 +450,11 @@ msgstr "Alt+Enter aktiverer fullskjerm-modus"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr ""
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "Steam"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -911,6 +921,15 @@ msgstr "%s ble ikke funnet."
 msgid "Select an icon for the shortcut"
 msgstr "Velg ikon for snarvei"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr ""
@@ -1089,10 +1108,6 @@ msgstr ""
 
 #~ msgid "Blocks"
 #~ msgstr "Blokker"
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "Steam"
 
 #, fuzzy
 #~ msgid "Show hero"

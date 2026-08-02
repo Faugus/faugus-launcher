@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 04:52+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:56+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
@@ -84,7 +84,11 @@ msgstr "Sonntag"
 msgid "No backup yet"
 msgstr "Noch keine Sicherung"
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr "Letzte Sicherung:"
+
+#: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Präfixe und Proton-Versionen werden nicht gesichert!"
 
@@ -363,7 +367,8 @@ msgstr "Cover"
 msgid "Background"
 msgstr "Hintergrund"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 msgid "Default"
 msgstr "Standard"
 
@@ -430,6 +435,11 @@ msgstr "Alt+Enter schaltet den Vollbildmodus um"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr "Beschriftungen"
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "Steam"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -875,6 +885,15 @@ msgstr "GameMode nicht gefunden"
 msgid "Select an icon for the shortcut"
 msgstr "Wählen Sie ein Symbol für die Verknüpfung aus"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr "Voreinstellungen"
@@ -999,9 +1018,6 @@ msgstr "Wähle ein Symbol"
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
-#~ msgid "Last backup:"
-#~ msgstr "Letzte Sicherung:"
-
 #~ msgid "Faugus Proton Manager"
 #~ msgstr "Faugus Proton-Verwaltung"
 
@@ -1047,10 +1063,6 @@ msgstr "Keine Ergebnisse gefunden"
 
 #~ msgid "Blocks"
 #~ msgstr "Blockansicht"
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "Steam"
 
 #, fuzzy
 #~ msgid "Show hero"
