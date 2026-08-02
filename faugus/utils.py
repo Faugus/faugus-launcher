@@ -1062,11 +1062,11 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append("Proton-CachyOS Latest", f"Proton-CachyOS Latest ({_('Default')})")
-    combobox.append("Proton-GE Latest", "GE-Proton Latest")
-    combobox.append("Proton-EM Latest", "Proton-EM Latest")
-    combobox.append("DW-Proton Latest", "DW-Proton Latest")
-    combobox.append("", "UMU-Proton Latest")
+    combobox.append("Proton-CachyOS Latest", f"Proton-CachyOS {_('Latest')} ({_('Default')})")
+    combobox.append("Proton-GE Latest", f"GE-Proton {_('Latest')}")
+    combobox.append("Proton-EM Latest", f"Proton-EM {_('Latest')}")
+    combobox.append("DW-Proton Latest", f"DW-Proton {_('Latest')}")
+    combobox.append("", f"UMU-Proton {_('Latest')}")
 
     if os.path.exists(PROTON_CACHYOS):
         combobox.append("Proton-CachyOS (System)", f"Proton-CachyOS ({_('System')})")
