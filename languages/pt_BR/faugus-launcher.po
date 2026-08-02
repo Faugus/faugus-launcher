@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-02 01:31-0300\n"
-"PO-Revision-Date: 2026-08-01 01:05+0000\n"
+"PO-Revision-Date: 2026-08-02 04:47+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -873,10 +873,8 @@ msgid "Select an icon for the shortcut"
 msgstr "Selecione um ícone para o atalho"
 
 #: faugus/utils.py:1072
-#, fuzzy
-#| msgid "System Theme"
 msgid "System"
-msgstr "Tema do Sistema"
+msgstr "Sistema"
 
 #: faugus/utils.py:1220
 msgid "Presets"
