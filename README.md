@@ -75,11 +75,6 @@ sudo ninja install
 meson ninja pygobject requests pillow vdf psutil dbus-python icoextract gtk4 libadwaita libmanette
 ```
 
-## Translations
-[![Translation status](https://hosted.weblate.org/widget/faugus-launcher/faugus-launcher/svg-badge.svg)](https://hosted.weblate.org/engage/faugus-launcher/)
-
-Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus-launcher/faugus-launcher/) — Sign in, pick your language, and translate directly in the browser.
-
 # Usage
 [![YouTube](http://i.ytimg.com/vi/Ay6C2f55Pc8/hqdefault.jpg)](https://www.youtube.com/watch?v=Ay6C2f55Pc8)
 
@@ -94,6 +89,24 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 ~/.local/share/Steam/compatibilitytools.d/
 ```
 
+### Themes location
+Native and Flatpak
+```
+~/.themes
+```
+Native. Flatpak needs permission.
+```
+~/.local/share/themes
+```
+```
+sudo flatpak override io.github.Faugus.faugus-launcher --filesystem=xdg-data/themes:ro
+```
+
+Native only
+```
+/usr/share/themes
+```
+
 ### Gamepad mapping
 | Action        | Playstation | Xbox     |
 |---------------|-------------|----------|
@@ -104,6 +117,11 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 | Add game/app  | L1          | LB       |
 | Settings      | R1          | RB       |
 | Power options | Options     | Menu     |
+
+# Translations
+[![Translation status](https://hosted.weblate.org/widget/faugus-launcher/faugus-launcher/svg-badge.svg)](https://hosted.weblate.org/engage/faugus-launcher/)
+
+Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus-launcher/faugus-launcher/) — Sign in, pick your language, and translate directly in the browser.
 
 # Screenshots
 
