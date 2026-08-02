@@ -258,12 +258,12 @@ class BackupWindow(Gtk.Dialog):
         last_date = self.config.get('backup-last-date')
         if not last_date or not last_date.strip():
             last_date = _("No backup yet")
-        self.label_last_backup = Gtk.Label(label=f"{_('Last backup:')} {last_date}")
+        self.label_last_backup = Gtk.Label(label="{} {}".format(_("Last backup:"), last_date))
         self.label_last_backup.set_margin_top(10)
         self.main_box.append(self.label_last_backup)
 
-        self.label_warning = Gtk.Label(label=_("Prefixes and Protons will not be backed up!"))
-        self.label_warning.set_markup(f'<span color="red">{_("Prefixes and Protons will not be backed up!")}</span>')
+        self.label_warning = Gtk.Label()
+        self.label_warning.set_markup('<span color="red">{}</span>'.format(_("Prefixes and Protons will not be backed up!")))
         self.main_box.append(self.label_warning)
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
@@ -350,7 +350,7 @@ class BackupWindow(Gtk.Dialog):
             new_date = perform_backup(dest_path)
             self.config['backup-last-date'] = new_date
             save_config(self.config)
-            self.label_last_backup.set_text(f"{_('Last backup:')} {new_date}")
+            self.label_last_backup.set_text("{} {}".format(_("Last backup:"), new_date))
         except Exception:
             pass
 

@@ -1062,14 +1062,14 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append("Proton-CachyOS Latest", f"Proton-CachyOS {_('Latest')} ({_('Default')})")
-    combobox.append("Proton-GE Latest", f"GE-Proton {_('Latest')}")
-    combobox.append("Proton-EM Latest", f"Proton-EM {_('Latest')}")
-    combobox.append("DW-Proton Latest", f"DW-Proton {_('Latest')}")
-    combobox.append("", f"UMU-Proton {_('Latest')}")
+    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")))
+    combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
+    combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
+    combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
+    combobox.append("", "UMU-Proton {}".format(_("Latest")))
 
     if os.path.exists(PROTON_CACHYOS):
-        combobox.append("Proton-CachyOS (System)", f"Proton-CachyOS ({_('System')})")
+        combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
 
     try:
         if os.path.exists(COMPATIBILITY_DIR):
@@ -1658,7 +1658,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode"))
 
-    combobox_present.append("fifo", f"VSync/FIFO ({_('Default')})")
+    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")))
     combobox_present.append("mailbox", "Mailbox")
     combobox_present.append("immediate", "Immediate")
 

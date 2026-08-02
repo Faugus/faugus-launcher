@@ -4458,7 +4458,7 @@ class Settings(Gtk.Dialog):
         self.label_theme_engine = Gtk.Label(label=_("Theme"))
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
-        self.combobox_theme_engine.append("adwaita", f"Adwaita ({_('Default')})")
+        self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")))
         self.combobox_theme_engine.append("system", _("System Theme"))
         for theme_name in list_gtk4_themes():
             self.combobox_theme_engine.append(theme_name, theme_name)
@@ -4502,7 +4502,7 @@ class Settings(Gtk.Dialog):
 
         self.label_steamgriddb_key = Gtk.Label()
         self.label_steamgriddb_key.set_markup(
-            f'<a href="https://www.steamgriddb.com/profile/preferences/api">{_("SteamGridDB API Key")}</a>'
+            '<a href="https://www.steamgriddb.com/profile/preferences/api">{}</a>'.format(_("SteamGridDB API Key"))
         )
         self.label_steamgriddb_key.set_use_markup(True)
         self.label_steamgriddb_key.set_halign(Gtk.Align.START)
