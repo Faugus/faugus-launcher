@@ -312,7 +312,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 "focus_ring_fallback",
                 f"""
                 button:focus-visible,
-                entry:focus-visible,
+                entry:focus-visible:not(.flowbox-entry),
                 dropdown > button:focus-visible,
                 check:focus-visible,
                 radio:focus-visible,
