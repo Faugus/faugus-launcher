@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:54+0000\n"
 "Last-Translator: Łukasz Zając <sec@rbtv.pl>\n"
 "Language-Team: Polish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -84,7 +84,11 @@ msgstr "W niedzielę"
 msgid "No backup yet"
 msgstr "Brak kopii zapasowej"
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr ""
+
+#: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefiksy i protony nie będą w kopii zapasowej!"
 
@@ -363,7 +367,8 @@ msgstr "Okładki"
 msgid "Background"
 msgstr "Tło"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 msgid "Default"
 msgstr "Domyślny"
 
@@ -430,6 +435,11 @@ msgstr "Alt+Enter przełącza pełny ekran"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr "Nazwy"
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "Steam"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -870,6 +880,15 @@ msgstr "Nie znaleziono programu GameMode"
 msgid "Select an icon for the shortcut"
 msgstr "Wskaż ikonę, która zostanie dodana do skrótu"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr "Szablony"
@@ -1039,10 +1058,6 @@ msgstr "Nie znaleziono"
 
 #~ msgid "Blocks"
 #~ msgstr "Klocki"
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "Steam"
 
 #, fuzzy
 #~ msgid "Show hero"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -84,7 +84,11 @@ msgstr "Domingo"
 msgid "No backup yet"
 msgstr "Aún no hay copia de seguridad"
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr "Última copia de seguridad:"
+
+#: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "¡Los prefixes y Proton no se incluirán en la copia de seguridad!"
 
@@ -362,7 +366,8 @@ msgstr "Portadas"
 msgid "Background"
 msgstr "Fondo"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 msgid "Default"
 msgstr "Predeterminado"
 
@@ -429,6 +434,11 @@ msgstr "Alt+Enter alterna la pantalla completa"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr "Etiquetas"
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "Steam"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -869,6 +879,17 @@ msgstr "GameMode no encontrado"
 msgid "Select an icon for the shortcut"
 msgstr "Seleccionar un icono para el acceso directo"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+#, fuzzy
+#| msgid "System Theme"
+msgid "System"
+msgstr "Tema del sistema"
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr "Preajustes"
@@ -993,14 +1014,6 @@ msgstr "Elije un ícono"
 msgid "No results found"
 msgstr "No se encontraron resultados"
 
-#~ msgid "Last backup:"
-#~ msgstr "Última copia de seguridad:"
-
-#, fuzzy
-#~| msgid "System Theme"
-#~ msgid "System"
-#~ msgstr "Tema del sistema"
-
 #~ msgid "System title bar"
 #~ msgstr "Barra de título del sistema"
 
@@ -1052,10 +1065,6 @@ msgstr "No se encontraron resultados"
 
 #~ msgid "Blocks"
 #~ msgstr "Bloques"
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "Steam"
 
 #, fuzzy
 #~ msgid "Show hero"

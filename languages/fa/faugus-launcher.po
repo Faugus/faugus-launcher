@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:56+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Persian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -85,7 +85,11 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr ""
+
+#: faugus/backup.py:266
 #, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix ها و باز کننده ها پشتیبان گیری نخواهند شد!"
@@ -377,7 +381,8 @@ msgstr ""
 msgid "Background"
 msgstr "پشتیبان گیری"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 #, fuzzy
 msgid "Default"
 msgstr "Proton پیشفرض"
@@ -448,6 +453,11 @@ msgstr "Alt+Enter حالت تمام صفحه را روشن می کند"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr ""
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "استیم"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -916,6 +926,15 @@ msgstr "%s یافت نشد."
 msgid "Select an icon for the shortcut"
 msgstr "یک آیکون برای میانبر انتخاب کنید"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr ""
@@ -1089,10 +1108,6 @@ msgstr ""
 #, python-format
 #~ msgid "%s is already running."
 #~ msgstr "%s از قبل باز است."
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "استیم"
 
 #, fuzzy
 #~ msgid "Show hero"

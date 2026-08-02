@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:56+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Arabic <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -86,7 +86,11 @@ msgstr ""
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr ""
+
+#: faugus/backup.py:266
 #, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "لن يتم عمل نسخة احتياطية prefix وrunners!"
@@ -376,7 +380,8 @@ msgstr ""
 msgid "Background"
 msgstr "نسخ احتياطي"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 #, fuzzy
 msgid "Default"
 msgstr "المشغل الافتراضي"
@@ -448,6 +453,10 @@ msgstr "Alt+Enter لتبديل وضع ملء الشاشة"
 
 #: faugus/launcher.py:4500
 msgid "Labels"
+msgstr ""
+
+#: faugus/launcher.py:4505
+msgid "SteamGridDB API Key"
 msgstr ""
 
 #: faugus/launcher.py:4512
@@ -919,6 +928,15 @@ msgstr "لم يتم العثور على {path}"
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
 msgstr "حدد أيقونة للاختصار"
+
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
 
 #: faugus/utils.py:1220
 msgid "Presets"

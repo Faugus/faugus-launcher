@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
 "Last-Translator: \"Jao, Yun-Jui\" <janumeke@gmail.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
@@ -83,7 +83,11 @@ msgstr "星期日"
 msgid "No backup yet"
 msgstr "尚無備份"
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr "最後備份："
+
+#: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "前綴與 Protons 不會備份！"
 
@@ -362,7 +366,8 @@ msgstr "封面"
 msgid "Background"
 msgstr "背景"
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 msgid "Default"
 msgstr "預設"
 
@@ -429,6 +434,11 @@ msgstr "Alt+Enter 會切換全螢幕"
 #: faugus/launcher.py:4500
 msgid "Labels"
 msgstr "標籤"
+
+#: faugus/launcher.py:4505
+#, fuzzy
+msgid "SteamGridDB API Key"
+msgstr "Steam"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -867,6 +877,15 @@ msgstr "沒有找到 GameMode"
 msgid "Select an icon for the shortcut"
 msgstr "為捷徑選取一個圖示"
 
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
+msgstr ""
+
 #: faugus/utils.py:1220
 msgid "Presets"
 msgstr "預設集"
@@ -991,9 +1010,6 @@ msgstr "選擇一個圖示"
 msgid "No results found"
 msgstr "沒有找到結果"
 
-#~ msgid "Last backup:"
-#~ msgstr "最後備份："
-
 #~ msgid "Faugus Proton Manager"
 #~ msgstr "Faugus Proton 管理員"
 
@@ -1037,10 +1053,6 @@ msgstr "沒有找到結果"
 
 #~ msgid "Blocks"
 #~ msgstr "方塊"
-
-#, fuzzy
-#~ msgid "SteamGridDB"
-#~ msgstr "Steam"
 
 #, fuzzy
 #~ msgid "Show hero"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:02+0000\n"
+"POT-Creation-Date: 2026-08-02 05:13+0000\n"
 "PO-Revision-Date: 2026-08-02 04:55+0000\n"
 "Last-Translator: Linus Virtanen <linus.virtanen@protonmail.com>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -83,7 +83,11 @@ msgstr "Sunnuntai"
 msgid "No backup yet"
 msgstr "Varmuuskopiota ei vielä ole"
 
-#: faugus/backup.py:265
+#: faugus/backup.py:261 faugus/backup.py:353
+msgid "Last backup:"
+msgstr ""
+
+#: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
 msgstr ""
 
@@ -361,7 +365,8 @@ msgstr ""
 msgid "Background"
 msgstr ""
 
-#: faugus/launcher.py:4451 faugus/launcher.py:4470 faugus/launcher.py:4478
+#: faugus/launcher.py:4451 faugus/launcher.py:4461 faugus/launcher.py:4470
+#: faugus/launcher.py:4478 faugus/utils.py:1065 faugus/utils.py:1661
 msgid "Default"
 msgstr ""
 
@@ -427,6 +432,10 @@ msgstr ""
 
 #: faugus/launcher.py:4500
 msgid "Labels"
+msgstr ""
+
+#: faugus/launcher.py:4505
+msgid "SteamGridDB API Key"
 msgstr ""
 
 #: faugus/launcher.py:4512
@@ -864,6 +873,15 @@ msgstr ""
 
 #: faugus/utils.py:879
 msgid "Select an icon for the shortcut"
+msgstr ""
+
+#: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
+#: faugus/utils.py:1068 faugus/utils.py:1069
+msgid "Latest"
+msgstr ""
+
+#: faugus/utils.py:1072
+msgid "System"
 msgstr ""
 
 #: faugus/utils.py:1220
