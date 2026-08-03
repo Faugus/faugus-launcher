@@ -51,10 +51,11 @@ _ = setup_gettext('faugus-launcher')
 
 
 class FaugusApp(Gtk.Application):
-    def __init__(self, start_hidden=False):
+    def __init__(self, start_hidden=False, console_mode=False):
         super().__init__(application_id="io.github.Faugus.faugus-launcher")
         self.window = None
         self.start_hidden = start_hidden
+        self.console_mode = console_mode
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -273,6 +274,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.add_action(self.action_context_show_logs)
 
         self.load_config()
+
+        if getattr(app, 'console_mode', False):
+            self.interface_mode = "SteamGridDB"
+            self.gamepad_navigation = True
+            self.startup_window_size = "Fullscreen"
 
         placeholder_r, placeholder_g, placeholder_b = self.get_accent_rgb()
         add_css_once(
@@ -7468,13 +7474,14 @@ def main():
     suppress_adwaita_theme_warning()
 
     start_hidden = "--hide" in sys.argv
-    sys.argv = [arg for arg in sys.argv if arg != "--hide"]
+    console_mode = "--console" in sys.argv
+    sys.argv = [arg for arg in sys.argv if arg not in ("--hide", "--console")]
 
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
         sys.exit(0)
 
-    app = FaugusApp(start_hidden)
+    app = FaugusApp(start_hidden, console_mode)
     app.run(sys.argv)
 
 
