@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 from threading import Thread, Event
 from faugus.config_manager import *
 from faugus.utils import *
@@ -49,37 +49,23 @@ def child_env():
     return {**os.environ, **_child_only_env}
 
 
-VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU = 2
-
-
-def detect_discrete_gpu_name():
+def warm_up_gpu():
     import ctypes
-
-    class VkInstanceCreateInfo(ctypes.Structure):
-        _fields_ = [
-            ("sType", ctypes.c_int),
-            ("pNext", ctypes.c_void_p),
-            ("flags", ctypes.c_uint32),
-            ("pApplicationInfo", ctypes.c_void_p),
-            ("enabledLayerCount", ctypes.c_uint32),
-            ("ppEnabledLayerNames", ctypes.c_void_p),
-            ("enabledExtensionCount", ctypes.c_uint32),
-            ("ppEnabledExtensionNames", ctypes.c_void_p),
-        ]
-
-    class VkPhysicalDeviceProperties(ctypes.Structure):
-        _fields_ = [
-            ("apiVersion", ctypes.c_uint32),
-            ("driverVersion", ctypes.c_uint32),
-            ("vendorID", ctypes.c_uint32),
-            ("deviceID", ctypes.c_uint32),
-            ("deviceType", ctypes.c_uint32),
-            ("deviceName", ctypes.c_char * 256),
-            ("_rest", ctypes.c_uint8 * 768),
-        ]
 
     try:
         vulkan = ctypes.CDLL("libvulkan.so.1")
+
+        class VkInstanceCreateInfo(ctypes.Structure):
+            _fields_ = [
+                ("sType", ctypes.c_int),
+                ("pNext", ctypes.c_void_p),
+                ("flags", ctypes.c_uint32),
+                ("pApplicationInfo", ctypes.c_void_p),
+                ("enabledLayerCount", ctypes.c_uint32),
+                ("ppEnabledLayerNames", ctypes.c_void_p),
+                ("enabledExtensionCount", ctypes.c_uint32),
+                ("ppEnabledExtensionNames", ctypes.c_void_p),
+            ]
 
         create_info = VkInstanceCreateInfo(
             sType=1, pNext=None, flags=0, pApplicationInfo=None,
@@ -89,27 +75,13 @@ def detect_discrete_gpu_name():
 
         instance = ctypes.c_void_p()
         if vulkan.vkCreateInstance(ctypes.byref(create_info), None, ctypes.byref(instance)) != 0:
-            return None
+            return
 
-        try:
-            count = ctypes.c_uint32(0)
-            vulkan.vkEnumeratePhysicalDevices(instance, ctypes.byref(count), None)
-            if count.value == 0:
-                return None
-
-            devices = (ctypes.c_void_p * count.value)()
-            vulkan.vkEnumeratePhysicalDevices(instance, ctypes.byref(count), devices)
-
-            for i in range(count.value):
-                props = VkPhysicalDeviceProperties()
-                vulkan.vkGetPhysicalDeviceProperties(ctypes.c_void_p(devices[i]), ctypes.byref(props))
-                if props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-                    return props.deviceName.decode("utf-8", "ignore")
-            return None
-        finally:
-            vulkan.vkDestroyInstance(instance, None)
+        count = ctypes.c_uint32(0)
+        vulkan.vkEnumeratePhysicalDevices(instance, ctypes.byref(count), None)
+        vulkan.vkDestroyInstance(instance, None)
     except OSError:
-        return None
+        pass
 
 
 class FaugusRun(HiDpiMixin):
@@ -164,11 +136,11 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_child_env("DRI_PRIME", "1")
-            discrete_gpu_name = detect_discrete_gpu_name()
-            if discrete_gpu_name and "nvidia" in discrete_gpu_name.lower():
-                set_child_env("__NV_PRIME_RENDER_OFFLOAD", "1")
-                set_child_env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
-                set_child_env("__VK_LAYER_NV_optimus", "NVIDIA_only")
+
+            def do_warm_up_gpu():
+                warm_up_gpu()
+                return False
+            GLib.idle_add(do_warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.wow64_enabled:
