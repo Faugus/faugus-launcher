@@ -959,10 +959,26 @@ def extract_ico(exe_path, output_path, best_frame=False):
             print(f"Error extracting icon: {result.stderr}")
             return "error"
 
-        from PIL import Image
+        from PIL import Image, ImageFile
+
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
 
         with Image.open(temp_ico) as icon:
-            frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+            sizes = sorted(set(icon.info.get("sizes", [icon.size])), reverse=True)
+
+            frame = None
+            for size in sizes:
+                try:
+                    icon.size = size
+                    frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+                    break
+                except Exception:
+                    continue
+
+            if frame is None:
+                print("An error occurred: no usable icon frame found.")
+                return "error"
+
             frame.save(output_path, "PNG")
 
         return "ok"
