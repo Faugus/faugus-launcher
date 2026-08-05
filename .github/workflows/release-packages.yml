@@ -292,8 +292,10 @@ jobs:
           RULES
             chmod +x debian/rules
 
+            UPLOADED_ORIG=0
             if [ "$FIRST_DISTRO" = "1" ]; then
               SOURCE_FLAG="-sa"
+              UPLOADED_ORIG=1
               FIRST_DISTRO=0
             else
               SOURCE_FLAG="-sd"
@@ -312,12 +314,17 @@ jobs:
                 UPLOAD_OK=1
                 break
               fi
-              echo "dput attempt $attempt failed, retrying in 15s..."
-              sleep 15
+              echo "dput attempt $attempt failed, retrying in 30s..."
+              sleep 30
             done
             if [ "$UPLOAD_OK" != "1" ]; then
               echo "dput failed after 3 attempts for $DISTRO" >&2
               exit 1
+            fi
+
+            if [ "$UPLOADED_ORIG" = "1" ]; then
+              echo "Waiting for Launchpad to process the orig tarball before uploading dependent series..."
+              sleep 60
             fi
 
             rm -rf "${PACKAGE}-${TAG}-${DISTRO}"
