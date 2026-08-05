@@ -56,11 +56,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           FILE=$(ls packaging/appimage/Faugus-*.AppImage)
+          NAME=$(basename "$FILE")
+          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+          if [ -n "$ASSET_ID" ]; then
+            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+          fi
           curl -sS -f -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
 
   arch:
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'arch')
@@ -120,11 +128,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           FILE=$(ls /build/*.pkg.tar.* | head -1)
+          NAME=$(basename "$FILE")
+          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+          if [ -n "$ASSET_ID" ]; then
+            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+          fi
           curl -sS -f -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
 
   debian:
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'debian')
@@ -186,11 +202,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           FILE=$(ls faugus-launcher_*_all.deb)
+          NAME=$(basename "$FILE")
+          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+          if [ -n "$ASSET_ID" ]; then
+            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+          fi
           curl -sS -f -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
 
       - name: Import PPA signing key
         if: env.PPA_GPG_PRIVATE_KEY != '' && env.DO_PUBLISH == 'true'
@@ -333,11 +357,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for FILE in ~/rpmbuild/RPMS/noarch/*.rpm ~/rpmbuild/SRPMS/*.rpm; do
+            NAME=$(basename "$FILE")
+            ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+              | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+            if [ -n "$ASSET_ID" ]; then
+              curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+            fi
             curl -sS -f -X POST \
               -H "Authorization: token $GITHUB_TOKEN" \
               -H "Content-Type: application/octet-stream" \
               --data-binary @"$FILE" \
-              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
           done
 
       - name: Submit to COPR
