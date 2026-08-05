@@ -90,16 +90,17 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.5-1" date="2026-07-31">
+    <release version="2.0.6-1" date="2026-08-05">
       <description>
         <ul>
-          <li>Now the game card should match the theme.</li>
-          <li>Replaced the System title bar option with Header bar.</li>
-          <li>Gamepad navigation improvements.</li>
-          <li>Some fine tuning for non Adwaita themes.</li>
-          <li>Fixed the accent color not being applied on Adwaita.</li>
-          <li>Fixed an issue where, when editing a game, the previous one would be selected.</li>
-          <li>Fixed gamepad not navigating through files/folders when set as Icon view.</li>
+          <li>The Flatpak version now shows all the devices in the filechooser.</li>
+          <li>Fixed icon extraction from some .exe files.</li>
+          <li>Now only shows the GTK filechooser when Gamepad Navigation is enabled, as the gamepad can't navigate throught the native filechooser.</li>
+          <li>Now also applies themes to the virtual keyboard.</li>
+          <li>Fixed LSFG-VK 2.0.</li>
+          <li>Minor visual improvements.</li>
+          <li>Fixed some missing translation tokens.</li>
+          <li>Added the version label back in the Settings screen.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
