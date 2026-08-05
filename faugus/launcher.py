@@ -4677,6 +4677,16 @@ class Settings(Gtk.Dialog):
         frame.set_margin_start(10)
         frame.set_margin_end(10)
 
+        label_version = Gtk.Label()
+        label_version.set_markup(
+            '<a href="https://github.com/Faugus/faugus-launcher/releases/tag/{0}">{0}</a>'.format(VERSION)
+        )
+        label_version.set_use_markup(True)
+        label_version.set_halign(Gtk.Align.END)
+        label_version.set_valign(Gtk.Align.START)
+        label_version.set_margin_end(10)
+        label_version.set_margin_top(10)
+
         box_main = Gtk.Grid()
         box_main.set_column_homogeneous(True)
         box_main.set_column_spacing(10)
@@ -4826,7 +4836,12 @@ class Settings(Gtk.Dialog):
         box_main.attach(box_mid, 2, 0, 1, 1)
         box_left.set_hexpand(True)
         box_mid.set_hexpand(True)
-        frame.set_child(box_main)
+
+        box_main_overlay = Gtk.Overlay()
+        box_main_overlay.set_child(box_main)
+        box_main_overlay.add_overlay(label_version)
+
+        frame.set_child(box_main_overlay)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_bottom.set_homogeneous(True)
