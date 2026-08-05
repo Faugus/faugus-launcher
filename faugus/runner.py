@@ -9,7 +9,6 @@ import time
 import shlex
 import signal
 import warnings
-import os
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
