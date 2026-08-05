@@ -7,10 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:13+0000\n"
-"PO-Revision-Date: 2026-08-02 04:56+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
+"POT-Creation-Date: 2026-08-02 05:44+0000\n"
+"PO-Revision-Date: 2026-08-02 23:52+0000\n"
+"Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
 "Language: ru\n"
@@ -232,11 +231,11 @@ msgstr "Запустить файл внутри префикса"
 
 #: faugus/launcher.py:1984
 msgid "Clear recent"
-msgstr ""
+msgstr "Очистить недавние"
 
 #: faugus/launcher.py:1987 faugus/launcher.py:2045
 msgid "Recent"
-msgstr ""
+msgstr "Недавние"
 
 #: faugus/launcher.py:2101
 msgid "hour"
@@ -348,10 +347,8 @@ msgid "Language"
 msgstr "Язык"
 
 #: faugus/launcher.py:4439
-#, fuzzy
-#| msgid "Interface"
 msgid "Interface Mode"
-msgstr "Интерфейс"
+msgstr "Режим интерфейса"
 
 #: faugus/launcher.py:4443
 msgid "List"
@@ -392,11 +389,11 @@ msgstr "Тема"
 
 #: faugus/launcher.py:4462
 msgid "System Theme"
-msgstr ""
+msgstr "Системная тема"
 
 #: faugus/launcher.py:4467
 msgid "Color Scheme"
-msgstr ""
+msgstr "Цветовая схема"
 
 #: faugus/launcher.py:4471
 msgid "Light"
@@ -439,9 +436,8 @@ msgid "Labels"
 msgstr "Названия"
 
 #: faugus/launcher.py:4505
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "API-ключ SteamGridDB"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -509,7 +505,7 @@ msgstr "Категории и сортировка"
 
 #: faugus/launcher.py:4568
 msgid "Header bar"
-msgstr ""
+msgstr "Панель заголовка"
 
 #: faugus/launcher.py:4570
 msgid "Hidden games"
@@ -884,11 +880,11 @@ msgstr "Выберите иконку для ярлыка"
 #: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
 #: faugus/utils.py:1068 faugus/utils.py:1069
 msgid "Latest"
-msgstr ""
+msgstr "Последний"
 
 #: faugus/utils.py:1072
 msgid "System"
-msgstr ""
+msgstr "Система"
 
 #: faugus/utils.py:1220
 msgid "Presets"

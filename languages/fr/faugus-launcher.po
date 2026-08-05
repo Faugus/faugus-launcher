@@ -7,10 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:13+0000\n"
-"PO-Revision-Date: 2026-08-02 04:56+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
+"POT-Creation-Date: 2026-08-02 05:44+0000\n"
+"PO-Revision-Date: 2026-08-04 02:47+0000\n"
+"Last-Translator: Loïc <weblate.plethora939@passmail.net>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -18,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.8.dev0\n"
+"X-Generator: Weblate 2026.8.1.dev0\n"
 
 #: faugus/backup.py:153
 msgid "Backup Settings"
@@ -391,7 +390,7 @@ msgstr "Thème"
 
 #: faugus/launcher.py:4462
 msgid "System Theme"
-msgstr ""
+msgstr "Thème du système"
 
 #: faugus/launcher.py:4467
 msgid "Color Scheme"
@@ -453,7 +452,7 @@ msgstr "L'emplacement où les préfixes sont créés"
 
 #: faugus/launcher.py:4526
 msgid "Default Prefix Tools"
-msgstr "Outil par défaut des préfixes"
+msgstr "Outils par défaut des préfixes"
 
 #: faugus/launcher.py:4532
 msgid "Default Proton"

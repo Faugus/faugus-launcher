@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:13+0000\n"
-"PO-Revision-Date: 2026-08-02 04:55+0000\n"
+"POT-Creation-Date: 2026-08-02 05:44+0000\n"
+"PO-Revision-Date: 2026-08-02 23:52+0000\n"
 "Last-Translator: \"Jao, Yun-Jui\" <janumeke@gmail.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hant/>\n"
@@ -230,11 +230,11 @@ msgstr "在此前綴中運行檔案"
 
 #: faugus/launcher.py:1984
 msgid "Clear recent"
-msgstr ""
+msgstr "清除最近"
 
 #: faugus/launcher.py:1987 faugus/launcher.py:2045
 msgid "Recent"
-msgstr ""
+msgstr "最近"
 
 #: faugus/launcher.py:2101
 msgid "hour"
@@ -285,7 +285,7 @@ msgstr "Proton 可能會產生很大的紀錄檔案。"
 
 #: faugus/launcher.py:3018
 msgid "Enable logging only when debugging a problem."
-msgstr "只在問題除錯時啟用紀錄。"
+msgstr "只在問題除錯時啟用記錄。"
 
 #: faugus/launcher.py:3270
 #, python-format
@@ -346,7 +346,6 @@ msgid "Language"
 msgstr "語言"
 
 #: faugus/launcher.py:4439
-#, fuzzy
 msgid "Interface Mode"
 msgstr "介面模式"
 
@@ -389,11 +388,11 @@ msgstr "主題"
 
 #: faugus/launcher.py:4462
 msgid "System Theme"
-msgstr ""
+msgstr "系統主題"
 
 #: faugus/launcher.py:4467
 msgid "Color Scheme"
-msgstr ""
+msgstr "顏色方案"
 
 #: faugus/launcher.py:4471
 msgid "Light"
@@ -436,9 +435,8 @@ msgid "Labels"
 msgstr "標籤"
 
 #: faugus/launcher.py:4505
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "SteamGridDB API 金鑰"
 
 #: faugus/launcher.py:4512
 msgid "Default Prefixes Location"
@@ -506,7 +504,7 @@ msgstr "分類與排序"
 
 #: faugus/launcher.py:4568
 msgid "Header bar"
-msgstr ""
+msgstr "標頭列"
 
 #: faugus/launcher.py:4570
 msgid "Hidden games"
@@ -579,7 +577,7 @@ msgstr "清除紀錄"
 
 #: faugus/launcher.py:5117
 msgid "Do you want to save the changes?"
-msgstr "你要儲存變動嗎？"
+msgstr "你要儲存變更嗎？"
 
 #: faugus/launcher.py:5227
 msgid "Select a backup file to restore"
@@ -867,7 +865,7 @@ msgstr "沒有找到 MangoHud"
 
 #: faugus/utils.py:865 faugus/utils.py:873
 msgid "Tweaks your system to improve performance"
-msgstr "微調系統以增進效能"
+msgstr "微調你的系統以增進效能"
 
 #: faugus/utils.py:865
 msgid "GameMode not found"
@@ -880,11 +878,11 @@ msgstr "為捷徑選取一個圖示"
 #: faugus/utils.py:1065 faugus/utils.py:1066 faugus/utils.py:1067
 #: faugus/utils.py:1068 faugus/utils.py:1069
 msgid "Latest"
-msgstr ""
+msgstr "最新"
 
 #: faugus/utils.py:1072
 msgid "System"
-msgstr ""
+msgstr "系統"
 
 #: faugus/utils.py:1220
 msgid "Presets"
