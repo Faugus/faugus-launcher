@@ -11,6 +11,7 @@ gi.require_version('Adw', '1')
 from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
+os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
 def _log_writer_filter(log_level, fields, n_fields, user_data):
     import ctypes

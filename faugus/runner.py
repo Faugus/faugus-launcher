@@ -13,8 +13,6 @@ import os
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
-
 gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, Gdk, GLib
