@@ -153,6 +153,7 @@ ENVAR_DIR = PathManager.user_config('faugus-launcher/envar.json')
 GAMES_JSON = PathManager.user_data('faugus-launcher/games.json')
 PRESETS_FILE = PathManager.user_data('faugus-launcher/presets.json')
 LATEST_GAMES = PathManager.user_state('faugus-launcher/latest-games.json')
+RECENT_RUN_FILES = PathManager.user_state('faugus-launcher/recent-run-files.json')
 CATEGORIES_FILE = PathManager.user_data('faugus-launcher/categories.json')
 CUSTOM_ORDER = PathManager.user_data('faugus-launcher/custom-order.json')
 FAUGUS_LAUNCHER_SHARE_DIR = PathManager.user_data('faugus-launcher')
@@ -188,6 +189,7 @@ BACKUP_ITEMS = {
     "envar.json": ENVAR_DIR,
     "games.json": GAMES_JSON,
     "latest-games.json": LATEST_GAMES,
+    "recent-run-files.json": RECENT_RUN_FILES,
     "categories.json": CATEGORIES_FILE,
     "custom-order.json": CUSTOM_ORDER,
     "presets.json": PRESETS_FILE,

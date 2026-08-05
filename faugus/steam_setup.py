@@ -126,12 +126,30 @@ def read_library_folders():
     return libraries
 
 
+def _read_family_group_members(account_id):
+    if not steam_folder:
+        return set()
+    path = steam_folder / "userdata" / account_id / "config/localconfig.vdf"
+    if not path.exists():
+        return set()
+    try:
+        with open(path, "r", errors="ignore") as f:
+            data = vdf.load(f)
+        family_group = data.get("UserLocalConfigStore", {}).get("FamilyGroup", {})
+        members = family_group.get("members", {})
+        return {m.get("accountid") for m in members.values() if m.get("accountid")}
+    except Exception:
+        return set()
+
+
 def read_installed_games(account_id=None):
     if not steam_folder:
         return []
 
     games = []
     libraries = read_library_folders()
+
+    family_members = _read_family_group_members(account_id) if account_id and account_id != "all" else None
 
     for lib in libraries:
         steamapps_dir = lib / "steamapps"
@@ -152,14 +170,14 @@ def read_installed_games(account_id=None):
                     if '"LastOwner"' in line:
                         last_owner = line.split('"')[-2]
 
-            if account_id and account_id != "all":
+            if family_members is not None:
                 owner_account_id = None
                 if last_owner:
                     try:
                         owner_account_id = str(int(last_owner) - 76561197960265728)
                     except ValueError:
                         owner_account_id = None
-                if owner_account_id != account_id:
+                if owner_account_id != account_id and owner_account_id not in family_members:
                     continue
 
             if name:

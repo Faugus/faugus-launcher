@@ -13,6 +13,10 @@ on:
         description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"
         type: boolean
         default: false
+      jobs:
+        description: "Which jobs to run: 'all' or a comma-separated list (appimage,arch,debian,fedora)"
+        type: string
+        default: "all"
 
 permissions:
   contents: write
@@ -24,6 +28,7 @@ env:
 
 jobs:
   appimage:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'appimage')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -58,6 +63,7 @@ jobs:
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
 
   arch:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'arch')
     runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
@@ -97,8 +103,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$AUR_SSH_PRIVATE_KEY" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
-          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts 2>/dev/null
-          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur -o IdentitiesOnly=yes"
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/aur -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           git config --global user.name "Faugus"
           git config --global user.email "felix.ribeiro@live.com"
           git clone ssh://aur@aur.archlinux.org/faugus-launcher.git /tmp/aur-repo
@@ -110,7 +115,7 @@ jobs:
           git push
 
       - name: Upload package asset
-        if: env.RELEASE_ID != ''
+        if: always() && env.RELEASE_ID != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -122,6 +127,7 @@ jobs:
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")"
 
   debian:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'debian')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -130,7 +136,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y meson ninja-build python3 wget dpkg-dev lintian \
-            devscripts debhelper dh-python gnupg dput
+            devscripts debhelper dh-python gnupg dput \
+            build-essential python3-all libgtk-3-bin
 
       - name: Build raw .deb
         run: |
@@ -217,6 +224,7 @@ jobs:
           export DEBSIGN_KEYID="$PPA_GPG_KEY_ID"
           export DEBUILD_DPKG_BUILDPACKAGE_OPTS="-k$PPA_GPG_KEY_ID"
 
+          FIRST_DISTRO=1
           for DISTRO in "${DISTROS[@]}"; do
             echo "Building for $DISTRO..."
             cp -r "${PACKAGE}-${TAG}" "${PACKAGE}-${TAG}-${DISTRO}"
@@ -260,7 +268,13 @@ jobs:
           RULES
             chmod +x debian/rules
 
-            debuild -S -sa -k"$PPA_GPG_KEY_ID" -p"gpg --pinentry-mode loopback --passphrase $PPA_GPG_PASSPHRASE"
+            if [ "$FIRST_DISTRO" = "1" ]; then
+              SOURCE_FLAG="-sa"
+              FIRST_DISTRO=0
+            else
+              SOURCE_FLAG="-sd"
+            fi
+            debuild -S "$SOURCE_FLAG" -k"$PPA_GPG_KEY_ID" -p"gpg --pinentry-mode loopback --passphrase $PPA_GPG_PASSPHRASE"
             cd ..
 
             CHANGES_FILE=$(find . -maxdepth 1 -name "${PACKAGE}_*${DISTRO}1_source.changes" -print -quit)
@@ -268,12 +282,25 @@ jobs:
               echo "Could not find .changes file for $DISTRO" >&2
               exit 1
             fi
-            dput "$PPA" "$CHANGES_FILE"
+            UPLOAD_OK=0
+            for attempt in 1 2 3; do
+              if dput "$PPA" "$CHANGES_FILE"; then
+                UPLOAD_OK=1
+                break
+              fi
+              echo "dput attempt $attempt failed, retrying in 15s..."
+              sleep 15
+            done
+            if [ "$UPLOAD_OK" != "1" ]; then
+              echo "dput failed after 3 attempts for $DISTRO" >&2
+              exit 1
+            fi
 
             rm -rf "${PACKAGE}-${TAG}-${DISTRO}"
           done
 
   fedora:
+    if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'fedora')
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:

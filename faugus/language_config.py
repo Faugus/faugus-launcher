@@ -4,6 +4,8 @@ import gettext
 
 from faugus.path_manager import *
 
+MIN_TRANSLATION_PERCENT = 90
+
 
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')
@@ -50,7 +52,28 @@ def find_mo_file(locale_dir, lang_code, domain):
     ):
         if os.path.isfile(candidate):
             return candidate
-    return None
+
+
+def count_mo_entries(mo_path):
+    try:
+        with open(mo_path, 'rb') as f:
+            translation = gettext.GNUTranslations(f)
+    except OSError:
+        return None
+    return len([k for k in translation._catalog if k != ''])
+
+
+def get_translation_completions(locale_dir, domain):
+    counts = {}
+    for lang_code in os.listdir(locale_dir):
+        mo_path = find_mo_file(locale_dir, lang_code, domain)
+        if mo_path:
+            counts[lang_code] = count_mo_entries(mo_path)
+
+    total = max(counts.values(), default=0)
+    if not total:
+        return {}
+    return {lang_code: count / total * 100.0 for lang_code, count in counts.items()}
 
 
 def setup_gettext(domain):

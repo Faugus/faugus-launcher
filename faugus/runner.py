@@ -202,9 +202,6 @@ class FaugusRun(HiDpiMixin):
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
 
-        if not os.environ.get("GAMEID"):
-            set_env("PROTONFIXES_DISABLE", "1")
-
         protonpath = os.environ.get("PROTONPATH")
         if protonpath and protonpath != "Proton-GE Latest" and protonpath != "Proton-EM Latest" and protonpath != "Proton-CachyOS Latest" and protonpath != "DW-Proton Latest" and protonpath != "umu-sniper":
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
@@ -507,6 +504,14 @@ class FaugusRun(HiDpiMixin):
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.automatic_updates = self.cfg.config.get('automatic-updates', 'True') == 'True'
+
+        theme_engine = self.cfg.config.get('theme-engine', 'adwaita').strip('"')
+        apply_theme_engine(theme_engine)
+        apply_interface_customization(
+            self.cfg.config.get('interface-theme', 'system'),
+            self.cfg.config.get('accent-color', 'system'),
+            theme_engine,
+        )
 
     def show_splash(self):
         self.splash_window = Gtk.Window(title="Faugus")
@@ -880,12 +885,6 @@ def is_apple_silicon():
 
 def main():
     suppress_adwaita_theme_warning()
-
-    cfg = ConfigManager()
-    apply_interface_customization(
-        cfg.config.get('interface-theme', 'system'),
-        cfg.config.get('accent-color', 'system'),
-    )
 
     if is_apple_silicon() and 'FAUGUS_MUVM' not in os.environ:
         import shutil

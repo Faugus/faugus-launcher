@@ -1,0 +1,77 @@
+name: Update metainfo screenshot commits
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "screenshots/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-metainfo-screenshots-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update-metainfo-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update screenshot commit refs for changed files
+        id: update
+        run: |
+          METAINFO="data/io.github.Faugus.faugus-launcher.metainfo.xml"
+          SHORT_SHA=$(git rev-parse --short HEAD)
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BEFORE="${{ github.event.before }}"
+            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              CHANGED=$(git diff --name-only "$(git hash-object -t tree /dev/null)" HEAD -- 'screenshots/**')
+            else
+              CHANGED=$(git diff --name-only "$BEFORE" HEAD -- 'screenshots/**')
+            fi
+          else
+            CHANGED=$(git ls-files 'screenshots/**')
+          fi
+
+          if [ -z "$CHANGED" ]; then
+            echo "No screenshot changes found."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          updated=false
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            filename=$(basename "$f")
+            if grep -q "/screenshots/$filename<" "$METAINFO"; then
+              sed -i -E "s#(raw\.githubusercontent\.com/Faugus/faugus-launcher/)[^/]+(/screenshots/$filename)#\1${SHORT_SHA}\2#" "$METAINFO"
+              echo "Updated $filename -> $SHORT_SHA"
+              updated=true
+            else
+              echo "Skipping $filename (not referenced in metainfo.xml)"
+            fi
+          done <<< "$CHANGED"
+
+          echo "changed=$updated" >> "$GITHUB_OUTPUT"
+
+      - name: Commit if metainfo.xml actually changed
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          METAINFO="data/io.github.Faugus.faugus-launcher.metainfo.xml"
+          if git diff --quiet -- "$METAINFO"; then
+            echo "No metainfo.xml changes, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$METAINFO"
+          git commit -m "Update metainfo screenshot commit refs"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main

@@ -252,75 +252,16 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
-def add_focus_tint(overlay, size=None, square=False):
-    tint = Gtk.Box()
-    tint.add_css_class("steamgriddb-focus-tint")
-    if square:
-        tint.add_css_class("steamgriddb-focus-tint-square")
-    tint.set_can_target(False)
-    if size:
-        width, height = size
-        tint.set_size_request(width, height)
-        tint.set_halign(Gtk.Align.CENTER)
-        tint.set_valign(Gtk.Align.CENTER)
-    else:
-        tint.set_hexpand(True)
-        tint.set_vexpand(True)
-    overlay.add_overlay(tint)
-    overlay.set_measure_overlay(tint, False)
-    overlay.add_css_class("steamgriddb-artwork-picker-overlay")
-    return tint
-
-
 def create_accent_placeholder_paintable(width, height, alpha=0.4):
-    dummy = Gtk.Box()
-    found, rgba = dummy.get_style_context().lookup_color("accent_bg_color")
-    if not found:
-        rgba = Gdk.RGBA()
-        rgba.red, rgba.green, rgba.blue, rgba.alpha = 0.5, 0.5, 0.5, 1.0
+    r, g, b = get_effective_accent_rgb()
 
     w = width * HIDPI_SCALE
     h = height * HIDPI_SCALE
     pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, w, h)
-    r = int(rgba.red * 255)
-    g = int(rgba.green * 255)
-    b = int(rgba.blue * 255)
     a = int(alpha * 255)
     pixbuf.fill((r << 24) | (g << 16) | (b << 8) | a)
     texture = Gdk.Texture.new_for_pixbuf(pixbuf)
     return HiDpiPaintable(texture, width, height)
-
-
-def wrap_with_replaceable_placeholder(picture, width, height):
-    margin_top = picture.get_margin_top()
-    margin_bottom = picture.get_margin_bottom()
-    margin_start = picture.get_margin_start()
-    margin_end = picture.get_margin_end()
-    picture.set_margin_top(0)
-    picture.set_margin_bottom(0)
-    picture.set_margin_start(0)
-    picture.set_margin_end(0)
-
-    placeholder = Gtk.Box()
-    placeholder.add_css_class("cover-placeholder")
-    placeholder.set_size_request(width, height)
-
-    stack = Gtk.Stack()
-    stack.set_hhomogeneous(False)
-    stack.set_vhomogeneous(False)
-    stack.set_transition_type(Gtk.StackTransitionType.NONE)
-    stack.set_hexpand(picture.get_hexpand())
-    stack.set_vexpand(picture.get_vexpand())
-    stack.set_halign(picture.get_halign())
-    stack.set_valign(picture.get_valign())
-    stack.set_margin_top(margin_top)
-    stack.set_margin_bottom(margin_bottom)
-    stack.set_margin_start(margin_start)
-    stack.set_margin_end(margin_end)
-    stack.add_named(placeholder, "placeholder")
-    stack.add_named(picture, "picture")
-    stack.set_visible_child_name("placeholder")
-    return stack
 
 
 def set_spinner_loading(spinners, loading):
@@ -488,6 +429,24 @@ class IdComboBox(Gtk.DropDown):
     def get_texts(self):
         return [self._store.get_string(i) for i in range(self._store.get_n_items())]
 
+    def get_ids(self):
+        return list(self._ids)
+
+
+def apply_titlebar_preference(window):
+    from faugus.config_manager import ConfigManager
+    if ConfigManager().config.get('header-bar', 'False') == 'True':
+        window.set_titlebar(Gtk.HeaderBar())
+        add_css_once(
+            "headerbar_title_size",
+            """
+            headerbar .title {
+                font-size: 1em;
+                font-weight: bold;
+            }
+            """,
+        )
+
 
 def hide_dialog_action_area(dialog):
     outer = dialog.get_first_child()
@@ -553,6 +512,11 @@ def _release_combo_boxes(widget):
 
 
 def destroy_and_release(widget):
+    if isinstance(widget, Gtk.NativeDialog):
+        widget.destroy()
+        widget.__dict__.clear()
+        return
+
     if isinstance(widget, Gtk.Window):
         widget.set_focus(None)
 
@@ -612,6 +576,21 @@ def format_title(title):
 
 
 def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None):
+    from faugus.config_manager import ConfigManager
+    gamepad_navigation = ConfigManager().config.get('gamepad-navigation', 'False') == 'True'
+
+    if not gamepad_navigation:
+        dialog = Gtk.FileChooserNative(
+            title=title,
+            transient_for=parent,
+            modal=True,
+            action=action,
+            accept_label=accept_label or _("Open"),
+            cancel_label=cancel_label or _("Cancel"),
+        )
+        dialog.present = dialog.show
+        return dialog
+
     dialog = Gtk.FileChooserDialog(
         title=title,
         transient_for=parent,
@@ -621,6 +600,16 @@ def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None
     dialog.add_button(cancel_label or _("Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(accept_label or _("Open"), Gtk.ResponseType.ACCEPT)
     dialog.set_default_response(Gtk.ResponseType.ACCEPT)
+    add_css_once(
+        "filechooser_grid_selection",
+        """
+        filechooser gridview > child:selected,
+        filechooser gridview > child:selected:hover {
+            background-color: @theme_selected_bg_color;
+            color: @theme_selected_fg_color;
+        }
+        """,
+    )
     return dialog
 
 
@@ -760,6 +749,7 @@ def is_valid_image(file_path):
 
 def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel_label=None, callback=None, modal=True):
     dialog = Gtk.Dialog(title="Faugus", transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(modal)
     dialog.set_resizable(False)
@@ -844,6 +834,18 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
         return False
     tooltip.set_text(static_tooltip)
     return True
+
+
+def on_treeview_query_tooltip(widget, x, y, keyboard_mode, tooltip, store):
+    result = widget.get_path_at_pos(x, y)
+    if result is not None:
+        path, column, cell_x, cell_y = result
+        tree_iter = store.get_iter(path)
+        value = store.get_value(tree_iter, 0)
+        if value.strip():
+            tooltip.set_text(value)
+            return True
+    return False
 
 
 def disable_mangohud_gamemode_if_missing(obj):
@@ -957,10 +959,26 @@ def extract_ico(exe_path, output_path, best_frame=False):
             print(f"Error extracting icon: {result.stderr}")
             return "error"
 
-        from PIL import Image
+        from PIL import Image, ImageFile
+
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
 
         with Image.open(temp_ico) as icon:
-            frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+            sizes = sorted(set(icon.info.get("sizes", [icon.size])), reverse=True)
+
+            frame = None
+            for size in sizes:
+                try:
+                    icon.size = size
+                    frame = icon.convert("RGBA").resize((256, 256), Image.LANCZOS)
+                    break
+                except Exception:
+                    continue
+
+            if frame is None:
+                print("An error occurred: no usable icon frame found.")
+                return "error"
+
             frame.save(output_path, "PNG")
 
         return "ok"
@@ -1060,14 +1078,14 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append_text("Proton-CachyOS Latest (default)")
-    combobox.append_text("GE-Proton Latest")
-    combobox.append_text("Proton-EM Latest")
-    combobox.append_text("DW-Proton Latest")
-    combobox.append_text("UMU-Proton Latest")
+    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")))
+    combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
+    combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
+    combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
+    combobox.append("", "UMU-Proton {}".format(_("Latest")))
 
     if os.path.exists(PROTON_CACHYOS):
-        combobox.append_text("Proton-CachyOS (System)")
+        combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
 
     try:
         if os.path.exists(COMPATIBILITY_DIR):
@@ -1087,7 +1105,7 @@ def populate_combobox_with_runners(combobox):
             versions.sort(key=version_key, reverse=True)
 
             for version in versions:
-                combobox.append_text(version)
+                combobox.append(version, version)
     except Exception as e:
         print(f"Error accessing the directory: {e}")
 
@@ -1150,6 +1168,7 @@ def init_addon_defaults(obj):
 
 def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
     dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
     dialog.set_modal(True)
@@ -1179,6 +1198,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     tree_presets.set_vexpand(True)
     renderer_presets = Gtk.CellRendererText()
     renderer_presets.set_property("editable", True)
+    renderer_presets.set_property("ellipsize", Pango.EllipsizeMode.END)
 
     def on_preset_edited(renderer, path, new_text):
         store_presets[path][0] = new_text
@@ -1202,9 +1222,15 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     key_controller_presets.connect("key-pressed", on_preset_key_press)
     tree_presets.add_controller(key_controller_presets)
     column_presets = Gtk.TreeViewColumn("", renderer_presets, text=0)
+    column_presets.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column_presets.set_expand(True)
     tree_presets.append_column(column_presets)
     tree_presets.set_headers_visible(False)
+    tree_presets.set_has_tooltip(True)
+    tree_presets.connect("query-tooltip", on_treeview_query_tooltip, store_presets)
+
     scroll_presets = Gtk.ScrolledWindow()
+    scroll_presets.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
     scroll_presets.set_child(tree_presets)
 
     label_presets_header = Gtk.Label(label=_("Presets"))
@@ -1242,6 +1268,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     tree_args.set_vexpand(True)
     renderer_args = Gtk.CellRendererText()
     renderer_args.set_property("editable", True)
+    renderer_args.set_property("ellipsize", Pango.EllipsizeMode.END)
 
     def on_arg_edited(renderer, path, new_text):
         store_args[path][0] = new_text
@@ -1265,9 +1292,15 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     key_controller_args.connect("key-pressed", on_arg_key_press)
     tree_args.add_controller(key_controller_args)
     column_args = Gtk.TreeViewColumn("", renderer_args, text=0)
+    column_args.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column_args.set_expand(True)
     tree_args.append_column(column_args)
     tree_args.set_headers_visible(False)
+    tree_args.set_has_tooltip(True)
+    tree_args.connect("query-tooltip", on_treeview_query_tooltip, store_args)
+
     scroll_args = Gtk.ScrolledWindow()
+    scroll_args.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
     scroll_args.set_child(tree_args)
 
     label_args_header = Gtk.Label(label=_("Launch Arguments"))
@@ -1399,6 +1432,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
 def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first, callback):
     dialog = Gtk.Dialog(title=_("Additional Application"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
@@ -1525,6 +1559,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
 def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
                          lossless_performance, lossless_hdr, lossless_present, callback):
     dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), transient_for=parent)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_resizable(False)
@@ -1548,8 +1583,6 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     flow = val if (val := lossless_flow) != "" else 100
     performance = val if (val := lossless_performance) != "" else False
     hdr = val if (val := lossless_hdr) != "" else False
-    present = val if (val := lossless_present) != "" else "VSync/FIFO (default)"
-
     from faugus.config_manager import ConfigManager
     from faugus.steam_setup import LOSSLESS_DLL
 
@@ -1641,23 +1674,12 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode"))
 
-    options = [
-        "VSync/FIFO (default)",
-        "Mailbox",
-        "Immediate",
-    ]
+    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")))
+    combobox_present.append("mailbox", "Mailbox")
+    combobox_present.append("immediate", "Immediate")
 
-    for opt in options:
-        combobox_present.append_text(opt)
-
-    mapping = {
-        "fifo": "VSync/FIFO (default)",
-        "mailbox": "Mailbox",
-        "immediate": "Immediate",
-    }
-
-    ui_value = mapping.get(present, "VSync/FIFO (default)")
-    combobox_present.set_active(options.index(ui_value))
+    if not combobox_present.set_active_id(lossless_present):
+        combobox_present.set_active(0)
 
     def on_enable_toggled(cb):
         active = cb.get_active()
@@ -1704,19 +1726,13 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                 entry_location.add_css_class("entry")
                 return
 
-            present_text = combobox_present.get_active_text()
-            present_mapping = {
-                "VSync/FIFO (default)": "fifo",
-                "Mailbox": "mailbox",
-                "Immediate": "immediate",
-            }
             result = (
                 checkbox_enable.get_active(),
                 spin_multiplier.get_value_as_int(),
                 scale_flow.get_value(),
                 checkbox_performance.get_active(),
                 checkbox_hdr.get_active(),
-                present_mapping.get(present_text, "fifo"),
+                combobox_present.get_active_id(),
             )
             cfg.set_value("lossless-location", entry_location.get_text())
             cfg.save_config()
@@ -1747,13 +1763,137 @@ _OVERRIDE_PRIORITY = Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
 _accent_css_provider = None
 
 
-def apply_interface_customization(interface_theme, accent_color):
-    style_manager = Adw.StyleManager.get_default()
-    scheme_map = {
-        "light": Adw.ColorScheme.FORCE_LIGHT,
-        "dark": Adw.ColorScheme.FORCE_DARK,
-    }
-    style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
+_EXCLUDED_THEME_NAMES = {"Adwaita", "Adwaita-dark", "Adwaita-empty", "Default", "Empty", "HighContrast", "HighContrastInverse"}
+
+
+def list_gtk4_themes():
+    search_dirs = [
+        os.path.expanduser("~/.themes"),
+        PathManager.user_data("themes"),
+    ]
+    for data_dir in os.getenv("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":"):
+        search_dirs.append(os.path.join(data_dir, "themes"))
+
+    names = set()
+    for themes_dir in search_dirs:
+        if not os.path.isdir(themes_dir):
+            continue
+        for entry in os.listdir(themes_dir):
+            if entry in _EXCLUDED_THEME_NAMES:
+                continue
+            if os.path.isdir(os.path.join(themes_dir, entry, "gtk-4.0")):
+                names.add(entry)
+
+    return sorted(names)
+
+
+def get_system_accent_rgb():
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = bus.call_sync(
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Settings",
+            "Read",
+            GLib.Variant("(ss)", ("org.freedesktop.appearance", "accent-color")),
+            None,
+            Gio.DBusCallFlags.NONE,
+            500,
+            None,
+        )
+        r, g, b = result.unpack()[0]
+        return int(r * 255), int(g * 255), int(b * 255)
+    except GLib.Error:
+        return None
+
+
+def get_system_prefers_dark():
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = bus.call_sync(
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Settings",
+            "Read",
+            GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
+            None,
+            Gio.DBusCallFlags.NONE,
+            500,
+            None,
+        )
+        value = result.unpack()[0]
+        if value == 1:
+            return True
+        if value == 2:
+            return False
+        return None
+    except GLib.Error:
+        return None
+
+
+def get_effective_accent_rgb():
+    from faugus.config_manager import ConfigManager
+    cfg = ConfigManager()
+    theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+    accent_color = cfg.config.get('accent-color', 'system').strip('"')
+
+    if theme_engine == "adwaita":
+        if accent_color and accent_color != "system":
+            match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', accent_color)
+            if match:
+                return tuple(int(v) for v in match.groups())
+        found, rgba = Gtk.Box().get_style_context().lookup_color("accent_bg_color")
+        if found:
+            return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
+        return (30, 30, 34)
+
+    if theme_engine == "system":
+        system_accent = get_system_accent_rgb()
+        if system_accent:
+            return system_accent
+
+    found, rgba = Gtk.Box().get_style_context().lookup_color("theme_selected_bg_color")
+    if found:
+        return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
+    return (30, 30, 34)
+
+
+_theme_engine_lock_handler = None
+
+
+def apply_theme_engine(theme_engine):
+    settings = Gtk.Settings.get_default()
+
+    global _theme_engine_lock_handler
+    if _theme_engine_lock_handler is not None:
+        settings.disconnect(_theme_engine_lock_handler)
+        _theme_engine_lock_handler = None
+
+    if theme_engine == "adwaita":
+        Adw.StyleManager.get_default()
+        settings.set_property("gtk-theme-name", "Adwaita-empty")
+
+        def _force_adwaita(obj, pspec):
+            if obj.get_property("gtk-theme-name") != "Adwaita-empty":
+                obj.set_property("gtk-theme-name", "Adwaita-empty")
+
+        _theme_engine_lock_handler = settings.connect("notify::gtk-theme-name", _force_adwaita)
+    elif theme_engine == "system":
+        prefers_dark = get_system_prefers_dark()
+        if prefers_dark is not None:
+            settings.set_property("gtk-application-prefer-dark-theme", prefers_dark)
+    elif theme_engine:
+        settings.set_property("gtk-theme-name", theme_engine)
+
+
+def apply_interface_customization(interface_theme, accent_color, theme_engine="adwaita"):
+    if theme_engine == "adwaita":
+        style_manager = Adw.StyleManager.get_default()
+        scheme_map = {
+            "light": Adw.ColorScheme.FORCE_LIGHT,
+            "dark": Adw.ColorScheme.FORCE_DARK,
+        }
+        style_manager.set_color_scheme(scheme_map.get(interface_theme, Adw.ColorScheme.DEFAULT))
 
     display = Gdk.Display.get_default()
     global _accent_css_provider
@@ -1761,7 +1901,12 @@ def apply_interface_customization(interface_theme, accent_color):
         Gtk.StyleContext.remove_provider_for_display(display, _accent_css_provider)
         _accent_css_provider = None
 
-    if accent_color and accent_color != "system":
+    effective_accent = None
+    if theme_engine == "adwaita" and accent_color and accent_color != "system":
+        effective_accent = accent_color
+
+    if effective_accent:
+        accent_color = effective_accent
         fg_color = _contrasting_fg_color(accent_color)
         provider = Gtk.CssProvider()
         css = f"""
@@ -1770,6 +1915,14 @@ def apply_interface_customization(interface_theme, accent_color):
         @define-color accent_fg_color {fg_color};
         @define-color theme_selected_bg_color {accent_color};
         @define-color theme_selected_fg_color {fg_color};
+        :root {{
+            --accent-color: {accent_color};
+            --accent-bg-color: {accent_color};
+            --accent-fg-color: {fg_color};
+        }}
+        link {{
+            color: {accent_color};
+        }}
         """
         provider.load_from_data(css.encode("utf-8"))
         Gtk.StyleContext.add_provider_for_display(display, provider, _OVERRIDE_PRIORITY)
@@ -1901,8 +2054,8 @@ def show_steamgriddb_picker(obj, category):
     if not game_name:
         load_red_entry_css()
         obj.entry_title.add_css_class("entry")
-        if hasattr(obj, "notebook"):
-            obj.notebook.set_current_page(0)
+        if hasattr(obj, "tab_button_widgets") and hasattr(obj, "tab_names"):
+            obj.tab_button_widgets[obj.tab_names.index("page1")].set_active(True)
         return
 
     titles = {
@@ -1914,6 +2067,7 @@ def show_steamgriddb_picker(obj, category):
     keys = {"cover": "grids", "banner": "heroes", "icon": "icons"}
 
     dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
+    apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
     dialog.set_modal(True)
     dialog.set_default_size(720, 480)
@@ -1932,6 +2086,29 @@ def show_steamgriddb_picker(obj, category):
     spinner_box.set_vexpand(True)
     spinner_box.set_hexpand(True)
     spinner_box.append(spinner)
+
+    accent_r, accent_g, accent_b = get_effective_accent_rgb()
+    add_css_once(
+        "steamgriddb_picker_candidate",
+        f"""
+        .steamgriddb-candidate {{
+            border: none;
+            background: none;
+            background-color: transparent;
+            background-image: none;
+            outline: none;
+            box-shadow: none;
+            padding: 0px;
+            min-width: 0;
+            min-height: 0;
+        }}
+        .steamgriddb-candidate:focus-visible {{
+            outline: 2px solid rgba({accent_r}, {accent_g}, {accent_b}, 0.8);
+            outline-offset: -2px;
+        }}
+        """,
+        Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+    )
 
     is_list = category == "banner"
 
@@ -2015,27 +2192,17 @@ def show_steamgriddb_picker(obj, category):
             picture = new_picture(paintable)
             picture.set_cursor(Gdk.Cursor.new_from_name("pointer"))
 
-            picture_overlay = Gtk.Overlay()
-            picture_overlay.set_child(picture)
-            tint = Gtk.Box()
-            tint.add_css_class("steamgriddb-focus-tint")
-            tint.set_can_target(False)
-            tint.set_hexpand(True)
-            tint.set_vexpand(True)
-            picture_overlay.add_overlay(tint)
-            picture_overlay.set_measure_overlay(tint, False)
-
             child = Gtk.FlowBoxChild()
             if is_list:
-                child.set_size_request(thumb_w, -1)
-                child.set_halign(Gtk.Align.FILL)
+                child.set_size_request(thumb_w, thumb_h)
+                child.set_halign(Gtk.Align.CENTER)
                 child.set_valign(Gtk.Align.START)
             else:
-                child.set_hexpand(True)
-                child.set_vexpand(True)
-                child.set_halign(Gtk.Align.FILL)
-                child.set_valign(Gtk.Align.FILL)
-            child.set_child(picture_overlay)
+                child.set_size_request(thumb_w, thumb_h)
+                child.set_halign(Gtk.Align.CENTER)
+                child.set_valign(Gtk.Align.CENTER)
+            child.set_overflow(Gtk.Overflow.HIDDEN)
+            child.set_child(picture)
             child.add_css_class("steamgriddb-candidate")
             child.gamepad_activate = lambda u=item["url"]: apply_selection(u)
 

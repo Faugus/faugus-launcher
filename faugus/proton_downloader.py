@@ -68,9 +68,13 @@ def get_tar_mode(name):
     return 'r|'
 
 
+USER_AGENT = "faugus-launcher"
+
+
 def get_latest_tag_and_url(api, archive_ext):
     try:
-        with urllib.request.urlopen(api, timeout=5) as r:
+        req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT})
+        with urllib.request.urlopen(req, timeout=5) as r:
             data = json.loads(r.read())
     except Exception:
         return None, None, None
@@ -136,14 +140,16 @@ def install_proton_latest(proton_dir, url, asset_name, label):
     try:
         print(f"Downloading & extracting {label}...", flush=True)
         tmp.mkdir(parents=True, exist_ok=True)
-        response = urllib.request.urlopen(url, timeout=30)
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        response = urllib.request.urlopen(req, timeout=30)
 
         with tarfile.open(fileobj=response, mode=get_tar_mode(asset_name)) as tar:
             tar.extractall(tmp, filter="data")
-    except Exception:
+    except Exception as e:
+        print(f"Error downloading/extracting {label}: {e}", flush=True)
         if tmp.exists():
             shutil.rmtree(tmp)
-        return
+        return False
 
     extracted = next(tmp.iterdir())
 
@@ -152,6 +158,7 @@ def install_proton_latest(proton_dir, url, asset_name, label):
 
     extracted.rename(proton_dir)
     shutil.rmtree(tmp)
+    return True
 
 
 def ensure_latest(kind):
@@ -162,6 +169,7 @@ def ensure_latest(kind):
 
     latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
     if not url:
+        print(f"Could not determine the latest {cfg['label']} release.", flush=True)
         return
 
     installed = get_installed_version(proton_dir)
@@ -170,8 +178,8 @@ def ensure_latest(kind):
         print(f"{cfg['label']} is up to date.", flush=True)
         return
 
-    install_proton_latest(proton_dir, url, asset_name, cfg["label"])
-    rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
+    if install_proton_latest(proton_dir, url, asset_name, cfg["label"]):
+        rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
 
 def main():
