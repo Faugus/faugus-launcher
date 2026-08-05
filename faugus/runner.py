@@ -46,9 +46,10 @@ def set_child_env(key, value):
 
 
 def child_env():
-    return {**os.environ, **_child_only_env}
-
-
+    env = {**os.environ, **_child_only_env}
+    env.pop("VK_LOADER_LAYERS_DISABLE", None)
+    return env
+ 
 def warm_up_gpu():
     import ctypes
 
