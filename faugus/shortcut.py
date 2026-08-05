@@ -95,7 +95,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         load_red_entry_css()
         load_frame_css()
 
-        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box.set_margin_start(0)
         self.box.set_margin_end(0)
         self.box.set_margin_top(0)
@@ -141,31 +141,15 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.grid_lossless.attach(self.button_lossless, 0, 0, 1, 1)
         self.button_lossless.set_hexpand(True)
 
-        self.grid_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.grid_tools.set_margin_start(10)
-        self.grid_tools.set_margin_end(10)
-        self.grid_tools.set_margin_top(10)
-        self.grid_tools.set_margin_bottom(10)
-
-        self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.grid_shortcut_icon.set_margin_start(10)
-        self.grid_shortcut_icon.set_margin_end(10)
-        self.grid_shortcut_icon.set_margin_top(10)
-        self.grid_shortcut_icon.set_margin_bottom(10)
-
-        self.grid_tools.append(self.checkbox_mangohud)
-        self.grid_tools.append(self.checkbox_gamemode)
-        self.grid_tools.append(self.checkbox_no_sleep)
-        self.grid_tools.append(self.checkbox_sdl)
-
-        self.grid_shortcut_icon.append(self.button_shortcut_icon)
-        self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
-        self.grid_shortcut_icon.set_halign(Gtk.Align.END)
-        self.grid_shortcut_icon.set_hexpand(True)
-
-        self.box_tools = Gtk.Box()
-        self.box_tools.append(self.grid_tools)
-        self.box_tools.append(self.grid_shortcut_icon)
+        self.grid_tools = build_grid(column_homogeneous=True)
+        self.grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
+        self.checkbox_mangohud.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
+        self.grid_tools.attach(self.checkbox_no_sleep, 0, 2, 1, 1)
+        self.grid_tools.attach(self.checkbox_sdl, 0, 3, 1, 1)
+        self.grid_tools.attach(self.button_shortcut_icon, 1, 0, 1, 4)
+        self.button_shortcut_icon.set_hexpand(True)
+        self.button_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
         self.button_cancel.set_hexpand(True)
         self.button_ok.set_hexpand(True)
@@ -178,7 +162,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.box_main.append(self.grid_launch_settings)
         self.box_main.append(self.grid_addapp)
         self.box_main.append(self.grid_lossless)
-        self.box_main.append(self.box_tools)
+        self.box_main.append(self.grid_tools)
 
         self.load_config()
 

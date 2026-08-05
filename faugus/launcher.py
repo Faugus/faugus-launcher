@@ -5724,7 +5724,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_runner = build_grid(margin_bottom=False)
 
-        self.grid_shortcut = build_grid()
+        self.grid_shortcut = build_grid(column_homogeneous=True)
 
         self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
@@ -6234,10 +6234,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_appmenu.set_hexpand(True)
         self.grid_shortcut.attach(self.checkbox_shortcut_steam, 0, 2, 1, 1)
         self.checkbox_shortcut_steam.set_hexpand(True)
-        self.grid_shortcut.attach(self.combobox_steam_shortcut_user, 2, 2, 1, 1)
+        self.grid_shortcut.attach(self.combobox_steam_shortcut_user, 1, 2, 1, 1)
         self.combobox_steam_shortcut_user.set_hexpand(True)
         self.grid_shortcut_icon.append(self.button_shortcut_icon_overlay)
-        self.grid_shortcut.attach(self.grid_shortcut_icon, 2, 0, 1, 2)
+        self.grid_shortcut.attach(self.grid_shortcut_icon, 1, 0, 1, 2)
 
         page1.append(self.grid_launcher)
         page1.append(self.grid_steam_user)
