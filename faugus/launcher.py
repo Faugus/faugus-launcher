@@ -3540,6 +3540,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             hidden = False
             category = False
 
+            if launcher_id == "amazon":
+                path = f"{prefix}/drive_c/users/steamuser/AppData/Local/Amazon Games/App/Amazon Games.exe"
             if launcher_id == "battle":
                 path = f"{prefix}/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
             if launcher_id == "ea":
@@ -3655,7 +3657,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.show_warning_dialog_main(add_game_dialog, _("No internet connection"), "")
                     return True
 
-                if launcher_id in ("battle", "ea", "epic", "gog", "rockstar", "ubisoft", "wargaming"):
+                if launcher_id in ("amazon", "battle", "ea", "epic", "gog", "rockstar", "ubisoft", "wargaming"):
                     destroy_add_game_dialog()
                     dialog_destroyed = True
                     self.launcher_screen(
@@ -3740,7 +3742,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_download2.set_visible(False)
         self.label_download2.set_size_request(256, -1)
 
-        if launcher == "battle":
+        if launcher == "amazon":
+            self.label_download.set_text(_("Downloading") + " Amazon Games...")
+            self.download_launcher("amazon", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
+
+        elif launcher == "battle":
             self.label_download.set_text(_("Downloading") + " Battle.net...")
             self.download_launcher("battle", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
@@ -3855,7 +3861,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
-            urls = {"battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
+            urls = {"amazon": "https://download.amazongames.com/AmazonGamesSetup.exe",
+                "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
                 "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
                 "epic": "https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi",
                 "gog": "https://github.com/Faugus/components/releases/download/v1.0.1/gog.tar.gz",
@@ -3863,7 +3870,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 "ubisoft": "https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe",
                 "wargaming": "https://redirect.wargaming.net/WGC/Wargaming_Game_Center_Install_NA.exe"}
 
-            file_name = {"battle": "Battle.net-Setup.exe", "ea": "EAappInstaller.exe",
+            file_name = {"amazon": "AmazonGamesSetup.exe", "battle": "Battle.net-Setup.exe", "ea": "EAappInstaller.exe",
                 "epic": "EpicGamesLauncherInstaller.msi", "gog": "gog.tar.gz",
                 "rockstar": "Rockstar-Games-Launcher.exe", "ubisoft": "UbisoftConnectInstaller.exe",
                 "wargaming": "wargaming_game_center_install_na_dgp3m1ci2u7l.exe"}
@@ -3893,7 +3900,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             def on_download_complete():
                 self.label_download.set_text(_("Installing %s...") % title)
-                if launcher == "battle":
+                if launcher == "amazon":
+                    self.label_download2.set_text(_("Please close the login window and wait."))
+                    command = f"PROTON_ENABLE_WAYLAND=0 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}'"
+                elif launcher == "battle":
                     self.label_download2.set_text(_("Please close the login window and wait."))
                     command = f"PROTON_ENABLE_WAYLAND=0 WINE_SIMULATE_WRITECOPY=1 LOG_DIR='{title_formatted}' WINEPREFIX='{prefix}' {UMU_RUN} '{file_path}' --installpath='C:\\Program Files (x86)\\Battle.net' --lang=enUS"
                 elif launcher == "ea":
@@ -7054,7 +7064,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if getattr(self, 'popover_suggestion', None) is not None:
                 self.popover_suggestion.popdown()
 
-            if active_id == "battle":
+            if active_id == "amazon":
+                self.launch_arguments = "PROTON_ENABLE_WAYLAND=0"
+                path = "drive_c/users/steamuser/AppData/Local/Amazon Games/App/Amazon Games.exe"
+
+            elif active_id == "battle":
                 self.launch_arguments = "WINE_SIMULATE_WRITECOPY=1\nPROTON_ENABLE_WAYLAND=0"
                 path = "drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
 
@@ -7094,6 +7108,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("windows", _("Windows Game"))
         self.combobox_launcher.append("linux", _("Linux Game"))
         self.combobox_launcher.append("steam", _("Steam Game"))
+        self.combobox_launcher.append("amazon", "Amazon Games")
         self.combobox_launcher.append("battle", "Battle.net")
         self.combobox_launcher.append("ea", "EA App")
         self.combobox_launcher.append("epic", "Epic Games")
