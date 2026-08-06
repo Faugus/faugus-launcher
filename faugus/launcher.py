@@ -3465,6 +3465,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         for app_id in to_remove:
                             del shortcuts["shortcuts"][app_id]
 
+                        renumber_shortcuts(shortcuts)
+
                         with open(path, 'wb') as f:
                             vdf.binary_dump(shortcuts, f)
                 except SyntaxError:
@@ -4191,6 +4193,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                             if to_remove:
                                 for app_id in to_remove:
                                     del shortcuts["shortcuts"][app_id]
+                                renumber_shortcuts(shortcuts)
                                 save_shortcuts(shortcuts, path)
                     except SyntaxError:
                         pass

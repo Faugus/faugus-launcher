@@ -69,6 +69,15 @@ def to_signed_int32(value):
     return value
 
 
+def renumber_shortcuts(shortcuts):
+    entries = shortcuts.get("shortcuts")
+    if not entries:
+        return
+
+    ordered = sorted(entries.items(), key=lambda item: int(item[0]) if item[0].isdigit() else 0)
+    shortcuts["shortcuts"] = {str(i): game_info for i, (_, game_info) in enumerate(ordered)}
+
+
 def list_steam_account_ids():
     if not USERDATA:
         return []
