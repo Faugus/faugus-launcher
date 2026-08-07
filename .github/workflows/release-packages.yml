@@ -363,7 +363,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for FILE in ~/rpmbuild/RPMS/noarch/*.rpm ~/rpmbuild/SRPMS/*.rpm; do
+          for FILE in ~/rpmbuild/RPMS/noarch/*.rpm; do
             NAME=$(basename "$FILE")
             ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
               "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
