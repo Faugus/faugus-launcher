@@ -34,15 +34,17 @@ for cmd in meson ninja python3 curl tar; do
 done
 
 if ! python3 -m pip --version >/dev/null 2>&1; then
-    echo "pip for python3 is required to bundle dependencies (requests, psutil, vdf, Pillow, icoextract, pefile, dbus-python)." >&2
+    echo "pip for python3 is required to bundle dependencies (requests, vdf, icoextract, pefile)." >&2
     echo "Install it first, e.g. on Arch: sudo pacman -S python-pip" >&2
     exit 1
 fi
 
-echo "This AppImage bundles Faugus's own Python code and its pip-only"
-echo "dependencies. It relies on the host system for Python 3, GTK4,"
-echo "libadwaita, libmanette and PyGObject, since fully bundling those"
-echo "is impractical for a GTK4 app. Target systems need those installed."
+echo "This AppImage bundles Faugus's own Python code and its pure-Python"
+echo "pip dependencies. It relies on the host system for Python 3, GTK4,"
+echo "libadwaita, libmanette, PyGObject, Pillow, psutil and dbus-python,"
+echo "since anything with a compiled extension is tied to the host's"
+echo "Python ABI and can't be safely bundled without shipping Python"
+echo "itself. Target systems need those installed."
 echo
 
 rm -rf "$BUILD_ROOT"
@@ -71,18 +73,7 @@ PY_TAG=$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.ver
 VENDOR_DIR="$APPDIR/usr/lib/$PY_TAG/site-packages"
 mkdir -p "$VENDOR_DIR"
 python3 -m pip install --target="$VENDOR_DIR" --no-compile \
-    --only-binary=Pillow,psutil \
-    requests psutil vdf Pillow icoextract pefile dbus-python
-
-python3 -c "
-import sys
-sys.path.insert(0, '$VENDOR_DIR')
-from PIL import Image
-Image.new('RGB', (1, 1))
-" || {
-    echo "Pillow's native _imaging extension failed to import after install - aborting build" >&2
-    exit 1
-}
+    requests vdf icoextract pefile
 
 DESKTOP_SRC="$APPDIR/usr/share/applications/$APP_ID.desktop"
 ICON_SVG_SRC="$APPDIR/usr/share/icons/hicolor/scalable/apps/$APP_ID.svg"
