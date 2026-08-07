@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-05 14:36+0000\n"
-"PO-Revision-Date: 2026-08-02 04:56+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-08-07 13:45+0000\n"
+"Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 2026.8.dev0\n"
+"X-Generator: Weblate 2026.8.1.dev0\n"
 
 #: faugus/backup.py:153
 msgid "Backup Settings"
@@ -230,11 +230,11 @@ msgstr "在 Prefix 中运行文件"
 
 #: faugus/launcher.py:1990
 msgid "Clear recent"
-msgstr ""
+msgstr "清除最近"
 
 #: faugus/launcher.py:1993 faugus/launcher.py:2051
 msgid "Recent"
-msgstr ""
+msgstr "最近"
 
 #: faugus/launcher.py:2107
 msgid "hour"
@@ -346,7 +346,6 @@ msgid "Language"
 msgstr "语言"
 
 #: faugus/launcher.py:4445
-#, fuzzy
 msgid "Interface Mode"
 msgstr "界面样式"
 
@@ -389,11 +388,11 @@ msgstr "主题"
 
 #: faugus/launcher.py:4468
 msgid "System Theme"
-msgstr ""
+msgstr "系统主题"
 
 #: faugus/launcher.py:4473
 msgid "Color Scheme"
-msgstr ""
+msgstr "配色方案"
 
 #: faugus/launcher.py:4477
 msgid "Light"
@@ -436,9 +435,8 @@ msgid "Labels"
 msgstr "标签"
 
 #: faugus/launcher.py:4511
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "SteamGridDB API 密钥"
 
 #: faugus/launcher.py:4518
 msgid "Default Prefixes Location"
@@ -506,7 +504,7 @@ msgstr "分类菜单和排序选项"
 
 #: faugus/launcher.py:4574
 msgid "Header bar"
-msgstr ""
+msgstr "标题栏"
 
 #: faugus/launcher.py:4576
 msgid "Hidden games"
@@ -880,11 +878,11 @@ msgstr "为快捷方式选择图标"
 #: faugus/utils.py:1082 faugus/utils.py:1083 faugus/utils.py:1084
 #: faugus/utils.py:1085 faugus/utils.py:1086
 msgid "Latest"
-msgstr ""
+msgstr "最新"
 
 #: faugus/utils.py:1089
 msgid "System"
-msgstr ""
+msgstr "系统"
 
 #: faugus/utils.py:1237
 msgid "Presets"
