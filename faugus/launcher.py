@@ -3204,8 +3204,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         save_json_file(games, LATEST_GAMES)
 
-        if self.system_tray:
-            self.load_tray_icon()
+        if self.tray_icon:
+            self.tray_icon.notify_menu_changed()
 
     def on_button_kill_clicked(self, widget):
         for gameid, pid in list(self.running.items()):
@@ -3481,8 +3481,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 save_json_file(recent_games, LATEST_GAMES)
 
-                if self.system_tray:
-                    self.load_tray_icon()
+                if self.tray_icon:
+                    self.tray_icon.notify_menu_changed()
 
         except FileNotFoundError:
             pass

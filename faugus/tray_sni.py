@@ -1,4 +1,3 @@
-import os
 import json
 
 import gi
@@ -137,6 +136,11 @@ def resolve_icon_path(mono_icon):
 
 
 class TrayIcon:
+    RECENT_SLOT_IDS = (1, 2, 3, 4, 5)
+    SEPARATOR_ID = 6
+    OPEN_ID = 7
+    QUIT_ID = 8
+
     def __init__(self, mono_icon, on_present, on_quit, on_launch):
         self.on_present = on_present
         self.on_quit = on_quit
@@ -242,29 +246,39 @@ class TrayIcon:
             if gameid:
                 games_by_id[gameid] = entry.get("title", gameid)
 
-        items = []
-        item_id = 1
-
+        recent = []
         for gameid in load_json_file(LATEST_GAMES, default=[]):
             gameid = gameid.strip()
-            if len(items) >= 5:
+            if len(recent) >= len(self.RECENT_SLOT_IDS):
                 break
             title = games_by_id.get(gameid)
             if not title:
                 continue
-            items.append({"id": item_id, "label": title, "action": lambda gid=gameid: self.on_launch(gid)})
-            item_id += 1
+            recent.append((gameid, title))
+
+        items = []
+        for slot_id, (gameid, title) in zip(self.RECENT_SLOT_IDS, recent):
+            items.append({"id": slot_id, "label": title, "action": lambda gid=gameid: self.on_launch(gid)})
 
         if items:
-            items.append({"id": item_id, "separator": True})
-            item_id += 1
+            items.append({"id": self.SEPARATOR_ID, "separator": True})
 
-        items.append({"id": item_id, "label": _("Open Faugus"), "action": self.on_present})
-        item_id += 1
-        items.append({"id": item_id, "label": _("Quit"), "action": self.on_quit})
+        items.append({"id": self.OPEN_ID, "label": _("Open Faugus"), "action": self.on_present})
+        items.append({"id": self.QUIT_ID, "label": _("Quit"), "action": self.on_quit})
 
         self.menu_items = items
         self.menu_revision += 1
+
+    def notify_menu_changed(self):
+        self.rebuild_menu()
+        if self.connection:
+            self.connection.emit_signal(
+                None,
+                MENU_PATH,
+                "com.canonical.dbusmenu",
+                "LayoutUpdated",
+                GLib.Variant("(ui)", (self.menu_revision, 0)),
+            )
 
     def on_menu_get_property(self, connection, sender, path, interface, prop_name):
         if prop_name == "Version":
