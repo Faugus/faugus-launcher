@@ -7,6 +7,10 @@ from pathlib import Path
 
 IS_FLATPAK = 'FLATPAK_ID' in os.environ or os.path.exists('/.flatpak-info')
 APPIMAGE_PATH = os.environ.get('APPIMAGE')
+APP_ID = 'io.github.Faugus.faugus-launcher'
+TRAY_BUS_NAME = f'{APP_ID}.Tray'
+TRAY_OBJECT_PATH = '/io/github/Faugus/faugus_launcher/Tray'
+TRAY_INTERFACE = 'io.github.Faugus.Tray'
 
 FAUGUS_SOURCE_ROOT = str(Path(__file__).resolve().parent.parent)
 
@@ -16,6 +20,8 @@ def subprocess_env():
     existing = env.get('PYTHONPATH', '')
     env['PYTHONPATH'] = FAUGUS_SOURCE_ROOT + (os.pathsep + existing if existing else '')
     return env
+
+
 
 
 class PathManager:

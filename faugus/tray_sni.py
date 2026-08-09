@@ -1,10 +1,7 @@
 import json
 
-import gi
-gi.require_version('GdkPixbuf', '2.0')
-
-from gi.repository import GdkPixbuf, Gio, GLib
-from faugus.path_manager import FAUGUS_MONO_ICON, FAUGUS_PNG, GAMES_JSON, LATEST_GAMES
+from gi.repository import Gio, GLib
+from faugus.path_manager import APP_ID, FAUGUS_MONO_ICON, FAUGUS_PNG, GAMES_JSON, LATEST_GAMES
 from faugus.language_config import setup_gettext
 
 _ = setup_gettext('faugus-launcher')
@@ -111,6 +108,10 @@ def load_json_file(filepath, default=None):
 
 
 def load_icon_pixmap(svg_path, size=64):
+    import gi
+    gi.require_version('GdkPixbuf', '2.0')
+    from gi.repository import GdkPixbuf
+
     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(svg_path, size, size, True)
     if not pixbuf.get_has_alpha():
         pixbuf = pixbuf.add_alpha(False, 0, 0, 0)
@@ -131,10 +132,6 @@ def load_icon_pixmap(svg_path, size=64):
     return width, height, bytes(argb)
 
 
-def resolve_icon_path(mono_icon):
-    return FAUGUS_MONO_ICON if mono_icon else FAUGUS_PNG
-
-
 class TrayIcon:
     RECENT_SLOT_IDS = (1, 2, 3, 4, 5)
     SEPARATOR_ID = 6
@@ -146,7 +143,8 @@ class TrayIcon:
         self.on_quit = on_quit
         self.on_launch = on_launch
 
-        self.icon_pixmap = load_icon_pixmap(resolve_icon_path(mono_icon))
+        self.icon_name = APP_ID if not mono_icon else ""
+        self.icon_pixmap = load_icon_pixmap(FAUGUS_MONO_ICON if mono_icon else FAUGUS_PNG)
 
         self.item_info = Gio.DBusNodeInfo.new_for_xml(ITEM_XML).interfaces[0]
         self.menu_info = Gio.DBusNodeInfo.new_for_xml(MENU_XML).interfaces[0]
@@ -158,6 +156,7 @@ class TrayIcon:
         self.watch_id = None
         self.item_reg_id = None
         self.menu_reg_id = None
+        self.registered = False
 
     def start(self):
         address = Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, None)
@@ -181,7 +180,7 @@ class TrayIcon:
             "org.kde.StatusNotifierWatcher",
             Gio.BusNameWatcherFlags.NONE,
             self.on_watcher_appeared,
-            None,
+            self.on_watcher_vanished,
         )
 
     def stop(self):
@@ -197,6 +196,9 @@ class TrayIcon:
         self.watch_id = None
 
     def on_watcher_appeared(self, connection, name, owner):
+        if self.registered:
+            return
+        self.registered = True
         connection.call(
             "org.kde.StatusNotifierWatcher",
             "/StatusNotifierWatcher",
@@ -210,6 +212,9 @@ class TrayIcon:
             None,
         )
 
+    def on_watcher_vanished(self, connection, name):
+        self.registered = False
+
     def on_item_get_property(self, connection, sender, path, interface, prop_name):
         if prop_name == "Category":
             return GLib.Variant("s", "ApplicationStatus")
@@ -222,7 +227,7 @@ class TrayIcon:
         if prop_name == "WindowId":
             return GLib.Variant("i", 0)
         if prop_name == "IconName":
-            return GLib.Variant("s", "")
+            return GLib.Variant("s", self.icon_name)
         if prop_name == "IconPixmap":
             w, h, data = self.icon_pixmap
             return GLib.Variant("a(iiay)", [(w, h, data)])

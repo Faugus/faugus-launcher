@@ -14,6 +14,7 @@ py.install_sources(
   'runner.py',
   'shortcut.py',
   'steam_setup.py',
+  'tray_only.py',
   'tray_sni.py',
   'utils.py',
   subdir: 'faugus',

@@ -19,7 +19,6 @@ from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
-from faugus.tray_sni import TrayIcon
 from faugus.migration import fix_legacy_shortcut_icons
 
 VERSION = "2.0.6"
@@ -52,10 +51,20 @@ _ = setup_gettext('faugus-launcher')
 
 class FaugusApp(Gtk.Application):
     def __init__(self, start_hidden=False, console_mode=False):
-        super().__init__(application_id="io.github.Faugus.faugus-launcher")
+        super().__init__(application_id=APP_ID)
         self.window = None
         self.start_hidden = start_hidden
         self.console_mode = console_mode
+
+        quit_action = Gio.SimpleAction.new("quit", None)
+        quit_action.connect("activate", self.on_quit_action)
+        self.add_action(quit_action)
+
+    def on_quit_action(self, action, param):
+        if self.window:
+            self.window.on_quit()
+        else:
+            self.quit()
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -97,7 +106,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.fullscreen_activated = False
         self.system_tray = False
-        self.tray_icon = None
         self.mono_icon = False
 
         self.current_prefix = None
@@ -341,7 +349,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.flowbox.connect("selected-children-changed", on_selected_children_changed)
 
-        GLib.idle_add(self.load_tray_icon)
+        GLib.idle_add(self.ensure_tray_daemon)
 
         if self.gamepad_navigation:
             import faugus.gamepad as gamepad
@@ -838,30 +846,73 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def save_running(self):
         save_json_file(self.running, RUNNING_GAMES)
 
-    def load_tray_icon(self):
-        if self.tray_icon:
-            self.tray_icon.stop()
-            self.tray_icon = None
+    def tray_daemon_running(self):
+        connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        result = connection.call_sync(
+            "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus",
+            "NameHasOwner", GLib.Variant("(s)", (TRAY_BUS_NAME,)),
+            GLib.VariantType.new("(b)"), Gio.DBusCallFlags.NONE, -1, None,
+        )
+        return connection, result.unpack()[0]
 
+    def restart_tray_daemon(self, connection, launch_ui=False):
+        try:
+            connection.call_sync(
+                TRAY_BUS_NAME, TRAY_OBJECT_PATH, TRAY_INTERFACE, "Restart",
+                GLib.Variant("(b)", (launch_ui,)), None, Gio.DBusCallFlags.NONE, -1, None,
+            )
+        except GLib.Error:
+            pass
+
+    def shutdown_tray_daemon(self, connection):
+        try:
+            connection.call_sync(
+                TRAY_BUS_NAME, TRAY_OBJECT_PATH, TRAY_INTERFACE, "Shutdown",
+                None, None, Gio.DBusCallFlags.NONE, -1, None,
+            )
+        except GLib.Error:
+            pass
+
+    def notify_tray_menu_changed(self):
         if not self.system_tray:
             return
+        try:
+            connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+            connection.call_sync(
+                TRAY_BUS_NAME, TRAY_OBJECT_PATH, TRAY_INTERFACE, "RefreshMenu",
+                None, None, Gio.DBusCallFlags.NONE, -1, None,
+            )
+        except GLib.Error:
+            pass
 
-        self.tray_icon = TrayIcon(
-            mono_icon=self.mono_icon,
-            on_present=self.restore_window,
-            on_quit=self.on_quit,
-            on_launch=self.on_tray_launch,
+    def start_tray_daemon(self):
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "faugus.tray_only", "--hide"],
+            env=subprocess_env(),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
         )
-        self.tray_icon.start()
+        GLib.child_watch_add(proc.pid, lambda pid, status: None)
 
-    def on_tray_launch(self, gameid):
-        game = next((g for g in self.games if g.gameid == gameid), None)
-        if not game:
-            return
-        if game.gameid in self.running:
-            self.running_dialog(game.title)
-        else:
-            self.on_button_play_clicked(None, game)
+    def ensure_tray_daemon(self, force_restart=False):
+        connection, running = self.tray_daemon_running()
+
+        if not self.system_tray:
+            if running:
+                self.shutdown_tray_daemon(connection)
+                self.on_quit()
+                return True
+            return False
+
+        if running and force_restart:
+            self.restart_tray_daemon(connection, launch_ui=True)
+            self.on_quit()
+            return True
+
+        if not running:
+            self.start_tray_daemon()
 
     def save_interface_settings(self):
         config = ConfigManager()
@@ -893,20 +944,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.system_tray:
             self.set_visible(False)
+            self.on_quit()
             return True
 
         self.on_quit()
         return False
 
-    def restore_window(self, *_):
-        self.set_visible(True)
-        self.present()
-
     def on_quit(self, *_):
-        if self.tray_icon:
-            self.tray_icon.stop()
-            self.tray_icon = None
-        self.get_application().quit()
+        app = self.get_application()
+        if app:
+            app.quit()
+        timer = threading.Timer(2.0, lambda: os._exit(0))
+        timer.daemon = True
+        timer.start()
 
     def _focus_flowbox_child(self, child):
         self.flowbox.grab_focus()
@@ -2972,11 +3022,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.mono_icon != new_mono_icon
                 )
 
+                if tray_needs_reload and new_system_tray and not self.tray_daemon_running()[1]:
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.tray_only'])
+
                 self.system_tray = new_system_tray
                 self.mono_icon = new_mono_icon
 
                 if tray_needs_reload:
-                    self.load_tray_icon()
+                    if self.ensure_tray_daemon(force_restart=True):
+                        return
 
                 if self.interface_mode != settings_dialog.combobox_interface.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
@@ -3203,9 +3257,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         games.insert(0, gameid)
 
         save_json_file(games, LATEST_GAMES)
-
-        if self.tray_icon:
-            self.tray_icon.notify_menu_changed()
+        self.notify_tray_menu_changed()
 
     def on_button_kill_clicked(self, widget):
         for gameid, pid in list(self.running.items()):
@@ -3480,9 +3532,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 recent_games.remove(gameid)
 
                 save_json_file(recent_games, LATEST_GAMES)
-
-                if self.tray_icon:
-                    self.tray_icon.notify_menu_changed()
+                self.notify_tray_menu_changed()
 
         except FileNotFoundError:
             pass
@@ -5137,10 +5187,15 @@ class Settings(Gtk.Dialog):
                     self.parent.system_tray != new_system_tray or
                     self.parent.mono_icon != new_mono_icon
                 )
+
+                if tray_needs_reload and new_system_tray and not self.parent.tray_daemon_running()[1]:
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.tray_only'])
+
                 self.parent.system_tray = new_system_tray
                 self.parent.mono_icon = new_mono_icon
                 if tray_needs_reload:
-                    self.parent.load_tray_icon()
+                    if self.parent.ensure_tray_daemon(force_restart=True):
+                        return
             else:
                 self.load_config()
 
@@ -7508,7 +7563,7 @@ def main():
 
     start_hidden = "--hide" in sys.argv
     console_mode = "--console" in sys.argv
-    sys.argv = [arg for arg in sys.argv if arg not in ("--hide", "--console")]
+    sys.argv = [arg for arg in sys.argv if arg not in ("--hide", "--console", "--ui-child")]
 
     if len(sys.argv) == 2:
         run_file(sys.argv[1])
