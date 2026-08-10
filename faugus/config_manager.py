@@ -20,6 +20,7 @@ class ConfigManager:
             'mono-icon': 'False',
             'interface-mode': 'List',
             'labels-enabled': 'False',
+            'zoom-enabled': 'True',
             'logging-enabled': 'False',
             'wayland-driver': 'False',
             'wow64-enabled': 'False',

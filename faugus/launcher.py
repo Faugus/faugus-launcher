@@ -1377,7 +1377,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.main_hbox.append(self.build_background_container(right_vbox))
 
-            self.scale_zoom.set_visible(self.interface_mode in ("Covers", "SteamGridDB"))
+            self.scale_zoom.set_visible(self.interface_mode in ("Covers", "SteamGridDB") and self.zoom_enabled)
 
             bottom_bar = Gtk.CenterBox(orientation=Gtk.Orientation.HORIZONTAL)
             bottom_bar.set_margin_top(5)
@@ -2644,6 +2644,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
+        self.zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
         self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.language = cfg.config.get('language', '')
@@ -3045,6 +3046,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.labels_enabled != settings_dialog.checkbox_labels.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.zoom_enabled != settings_dialog.checkbox_zoom.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.language != settings_dialog.combobox_language.get_active_id():
@@ -4569,6 +4573,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_labels = Gtk.CheckButton(label=_("Labels"))
         self.checkbox_labels.set_active(False)
 
+        self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
+        self.checkbox_zoom.set_active(True)
+
         self.label_steamgriddb_key = Gtk.Label()
         self.label_steamgriddb_key.set_markup(
             '<a href="https://www.steamgriddb.com/profile/preferences/api">{}</a>'.format(_("SteamGridDB API Key"))
@@ -4871,6 +4878,7 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
         self.grid_big_interface.attach(self.checkbox_labels, 0, 4, 1, 1)
         self.grid_big_interface.attach(self.checkbox_banner, 1, 4, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_zoom, 0, 5, 1, 1)
         self.combobox_startup_window_size.set_hexpand(True)
         self.entry_steamgriddb_key.set_hexpand(True)
 
@@ -5023,18 +5031,21 @@ class Settings(Gtk.Dialog):
         if active_id == "Grid":
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(False)
+            self.checkbox_zoom.set_visible(False)
             self.label_steamgriddb_key.set_visible(False)
             self.entry_steamgriddb_key.set_visible(False)
             self.checkbox_banner.set_visible(False)
         if active_id == "Covers":
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(True)
+            self.checkbox_zoom.set_visible(True)
             self.label_steamgriddb_key.set_visible(False)
             self.entry_steamgriddb_key.set_visible(False)
             self.checkbox_banner.set_visible(False)
         if active_id == "SteamGridDB":
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(True)
+            self.checkbox_zoom.set_visible(True)
             self.label_steamgriddb_key.set_visible(True)
             self.entry_steamgriddb_key.set_visible(True)
             self.checkbox_banner.set_visible(True)
@@ -5109,6 +5120,7 @@ class Settings(Gtk.Dialog):
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("labels-enabled", self.checkbox_labels.get_active())
+        config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
         config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
@@ -5437,6 +5449,7 @@ class Settings(Gtk.Dialog):
         background_mode = cfg.config.get('background-mode', 'default').strip('"')
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
+        zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -5474,6 +5487,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_autostart.set_active(self.autostart_enabled)
         self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_labels.set_active(labels_enabled)
+        self.checkbox_zoom.set_active(zoom_enabled)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_logging.set_active(logging_enabled)
         self.checkbox_hidden_games.set_active(show_hidden)
