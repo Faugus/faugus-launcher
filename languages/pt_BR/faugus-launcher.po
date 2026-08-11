@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-10 13:19+0000\n"
-"PO-Revision-Date: 2026-08-07 21:10+0000\n"
+"PO-Revision-Date: 2026-08-11 16:24+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -437,7 +437,7 @@ msgstr "Rótulos"
 
 #: faugus/launcher.py:4576
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
 
 #: faugus/launcher.py:4581
 msgid "SteamGridDB API Key"
