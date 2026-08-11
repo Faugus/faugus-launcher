@@ -209,25 +209,25 @@ class FaugusRun(HiDpiMixin):
             elif protonpath == "Steam":
                 pass
             else:
-                protonpath_path = COMPATIBILITY_DIR / protonpath
-                if not protonpath_path.is_dir():
+                protonpath_path = find_compatibilitytool(protonpath)
+                if protonpath_path is None:
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
         if protonpath == "Proton-EM Latest":
             self.proton_latest = "--em"
-            self.proton_exists = (COMPATIBILITY_DIR / "Proton-EM Latest").is_dir()
+            self.proton_exists = find_compatibilitytool("Proton-EM Latest") is not None
 
         if protonpath == "Proton-GE Latest":
             self.proton_latest = "--ge"
-            self.proton_exists = (COMPATIBILITY_DIR / "Proton-GE Latest").is_dir()
+            self.proton_exists = find_compatibilitytool("Proton-GE Latest") is not None
 
         if protonpath == "Proton-CachyOS Latest":
             self.proton_latest = "--cachyos"
-            self.proton_exists = (COMPATIBILITY_DIR / "Proton-CachyOS Latest").is_dir()
+            self.proton_exists = find_compatibilitytool("Proton-CachyOS Latest") is not None
 
         if protonpath == "DW-Proton Latest":
             self.proton_latest = "--dw"
-            self.proton_exists = (COMPATIBILITY_DIR / "DW-Proton Latest").is_dir()
+            self.proton_exists = find_compatibilitytool("DW-Proton Latest") is not None
 
         self.components_exists = (
             os.path.exists(EAC_DIR) and

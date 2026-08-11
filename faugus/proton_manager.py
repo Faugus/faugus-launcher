@@ -230,15 +230,18 @@ class ProtonDownloader(Gtk.Dialog):
     def get_installed_path(self, tag_name, variant):
         display_name = variant["tag_to_display"](tag_name)
 
-        for name in (tag_name, display_name):
-            p = COMPATIBILITY_DIR / name
-            if p.exists():
-                return p
+        for compat_dir in COMPATIBILITY_DIRS:
+            for name in (tag_name, display_name):
+                p = compat_dir / name
+                if p.exists():
+                    return p
 
-        if COMPATIBILITY_DIR.exists():
-            tag_lower = tag_name.lower()
-            display_lower = display_name.lower()
-            for folder in COMPATIBILITY_DIR.iterdir():
+        tag_lower = tag_name.lower()
+        display_lower = display_name.lower()
+        for compat_dir in COMPATIBILITY_DIRS:
+            if not compat_dir.exists():
+                continue
+            for folder in compat_dir.iterdir():
                 if not folder.is_dir():
                     continue
                 fn_lower = folder.name.lower()

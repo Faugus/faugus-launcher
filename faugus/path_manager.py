@@ -101,6 +101,19 @@ class PathManager:
         return str(native_steam / 'compatibilitytools.d')
 
     @staticmethod
+    def get_compatibilitytools_dirs():
+        base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
+        native_steam = base_dir / 'Steam' / 'compatibilitytools.d'
+        flatpak_steam = Path(
+            PathManager.user_home('.var/app/com.valvesoftware.Steam/data/Steam')
+        ) / 'compatibilitytools.d'
+
+        dirs = [native_steam]
+        if flatpak_steam != native_steam:
+            dirs.append(flatpak_steam)
+        return [str(d) for d in dirs]
+
+    @staticmethod
     def get_applications():
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
         compatibilitytools_folder = base_dir / 'applications'
@@ -178,6 +191,15 @@ ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
 PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
 UMU_RUN = PathManager.user_data('faugus-launcher/umu-run')
 COMPATIBILITY_DIR = Path(PathManager.get_compatibilitytools())
+COMPATIBILITY_DIRS = [Path(p) for p in PathManager.get_compatibilitytools_dirs()]
+
+
+def find_compatibilitytool(name):
+    for compat_dir in COMPATIBILITY_DIRS:
+        candidate = compat_dir / name
+        if candidate.is_dir():
+            return candidate
+    return None
 MANGOHUD_DIR = PathManager.find_binary('mangohud')
 GAMEMODERUN = PathManager.find_binary('gamemoderun')
 if APPIMAGE_PATH:

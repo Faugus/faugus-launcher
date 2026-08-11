@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -1089,10 +1089,12 @@ def populate_combobox_with_runners(combobox):
         combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
 
     try:
-        if os.path.exists(COMPATIBILITY_DIR):
-            versions = []
-            for entry in os.listdir(COMPATIBILITY_DIR):
-                entry_path = os.path.join(COMPATIBILITY_DIR, entry)
+        versions = set()
+        for compat_dir in COMPATIBILITY_DIRS:
+            if not os.path.exists(compat_dir):
+                continue
+            for entry in os.listdir(compat_dir):
+                entry_path = os.path.join(compat_dir, entry)
                 if (
                     os.path.isdir(entry_path)
                     and entry not in ("UMU-Latest", "LegacyRuntime")
@@ -1101,12 +1103,10 @@ def populate_combobox_with_runners(combobox):
                     and not entry.startswith("DW-Proton Latest")
                     and not entry.startswith("Proton-CachyOS Latest")
                 ):
-                    versions.append(entry)
+                    versions.add(entry)
 
-            versions.sort(key=version_key, reverse=True)
-
-            for version in versions:
-                combobox.append(version, version)
+        for version in sorted(versions, key=version_key, reverse=True):
+            combobox.append(version, version)
     except Exception as e:
         print(f"Error accessing the directory: {e}")
 
