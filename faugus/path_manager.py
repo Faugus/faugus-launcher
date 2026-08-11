@@ -90,8 +90,15 @@ class PathManager:
     @staticmethod
     def get_compatibilitytools():
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
-        compatibilitytools_folder = base_dir / 'Steam' / 'compatibilitytools.d'
-        return str(compatibilitytools_folder)
+        native_steam = base_dir / 'Steam'
+        if native_steam.is_dir():
+            return str(native_steam / 'compatibilitytools.d')
+
+        flatpak_steam = Path(PathManager.user_home('.var/app/com.valvesoftware.Steam/data/Steam'))
+        if flatpak_steam.is_dir():
+            return str(flatpak_steam / 'compatibilitytools.d')
+
+        return str(native_steam / 'compatibilitytools.d')
 
     @staticmethod
     def get_applications():
