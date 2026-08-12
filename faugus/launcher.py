@@ -2202,7 +2202,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         try:
-            data = load_json_file(GAMES_JSON, [])
+            data = load_json_file_or_none(GAMES_JSON)
+            if data is None:
+                return
 
             for item in data:
                 if item.get("gameid") == game.gameid:
@@ -2232,7 +2234,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not selected_gameid:
             return
         try:
-            data = load_json_file(GAMES_JSON, [])
+            data = load_json_file_or_none(GAMES_JSON)
+            if data is None:
+                return
 
             for item in data:
                 if item.get("gameid") == selected_gameid:
@@ -2537,15 +2541,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         new_game = Game(**game_dict)
 
-        game_info = game_to_dict(new_game)
-
-        games = load_json_file(GAMES_JSON, [])
-
-        games.append(game_info)
-
-        save_json_file(games, GAMES_JSON)
-
         self.games.append(new_game)
+        self.save_games()
+
         self.add_item_list(new_game)
         self.flowbox.invalidate_sort()
         self.entry_search.set_text("")
@@ -3728,17 +3726,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         steam_shortcut_state, icon_temp, icon_final, steam_shortcut_user_selected
                     )
 
-            game_info = game_to_dict(game)
-
-            games = load_json_file(GAMES_JSON, [])
-
-            games.append(game_info)
-
-            self.backup_games()
-
-            save_json_file(games, GAMES_JSON)
-
             self.games.append(game)
+            self.save_games()
 
             if launcher_id in ("windows", "linux", "steam"):
                 self.add_shortcut(game, desktop_shortcut_state, "desktop", icon_temp, icon_final)
@@ -4339,26 +4328,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.games.remove(game)
 
     def save_games(self):
-        all_games_data = load_json_file(GAMES_JSON, [])
+        all_games_data = load_json_file_or_none(GAMES_JSON)
+        if all_games_data is None:
+            return
 
-        visible_games_map = {game.gameid: game for game in self.games}
         deleted_id = getattr(self, "_deleted_gameid", None)
-        new_games_data = []
+        visible_ids = {game.gameid for game in self.games}
 
-        for game_data in all_games_data:
-            gameid = game_data.get("gameid")
-            hidden = game_data.get("hidden", False)
+        hidden_games_data = [
+            game_data for game_data in all_games_data
+            if game_data.get("hidden", False)
+            and game_data.get("gameid") not in visible_ids
+            and game_data.get("gameid") != deleted_id
+        ]
 
-            if deleted_id and gameid == deleted_id:
-                continue
-            if not hidden and gameid not in visible_games_map:
-                continue
-
-            if gameid in visible_games_map:
-                game = visible_games_map.pop(gameid)
-                game_data = game_to_save_dict(game, hidden=hidden)
-
-            new_games_data.append(game_data)
+        new_games_data = [
+            game_to_save_dict(game) for game in self.games
+            if game.gameid != deleted_id
+        ] + hidden_games_data
 
         if hasattr(self, "_deleted_gameid"):
             del self._deleted_gameid

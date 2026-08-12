@@ -565,6 +565,17 @@ def load_json_file(filepath, default=None):
         return default if default is not None else []
 
 
+def load_json_file_or_none(filepath):
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Faugus Launcher: refusing to touch {filepath}, failed to read it ({e})")
+        return None
+
+
 def save_json_file(data, filepath, indent=4):
     atomic_write(filepath, lambda f: json.dump(data, f, indent=indent, ensure_ascii=False))
 
