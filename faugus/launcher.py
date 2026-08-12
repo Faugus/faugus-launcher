@@ -3302,6 +3302,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("linux")
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
+                edit_game_dialog.checkbox_disable_umu.set_active(game.disable_umu == True)
             if game_runner == "Steam":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("steam")
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
@@ -3660,6 +3661,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 addapp_enabled = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
                 no_sleep = True if add_game_dialog.checkbox_no_sleep.get_active() else ""
 
+            disable_umu = True if (
+                launcher_id == "linux" and add_game_dialog.checkbox_disable_umu.get_active()
+            ) else ""
+
             game = Game(
                 title_formatted,
                 title,
@@ -3693,6 +3698,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 pre_launch=add_game_dialog.pre_launch,
                 post_launch=add_game_dialog.post_launch,
                 steam_user=add_game_dialog.combobox_steam_user.get_active_id() if launcher_id == "steam" else "",
+                disable_umu=disable_umu,
             )
 
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -4059,6 +4065,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
+                game.disable_umu = True if edit_game_dialog.checkbox_disable_umu.get_active() else ""
+            else:
+                game.disable_umu = ""
             if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
                 game.runner = "Steam"
                 game.steam_user = edit_game_dialog.combobox_steam_user.get_active_id()
@@ -5580,6 +5589,7 @@ class Game:
         pre_launch="",
         post_launch="",
         steam_user="",
+        disable_umu="",
     ):
         self.gameid = gameid
         self.title = title
@@ -5613,6 +5623,7 @@ class Game:
         self.pre_launch = pre_launch
         self.post_launch = post_launch
         self.steam_user = steam_user
+        self.disable_umu = disable_umu
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -6014,6 +6025,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
+        self.checkbox_disable_umu = Gtk.CheckButton(label=_("Disable UMU"))
+        self.checkbox_disable_umu.set_tooltip_text(
+            _("Runs the game directly, without the UMU-Launcher wrapper"))
+        self.checkbox_disable_umu.set_visible(False)
         self.checkbox_sdl = Gtk.CheckButton(label="SDL")
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
@@ -6314,6 +6329,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_path.attach(self.entry_path, 0, 1, 3, 1)
         self.entry_path.set_hexpand(True)
         self.grid_path.attach(self.button_search, 3, 1, 1, 1)
+        self.grid_path.attach(self.checkbox_disable_umu, 0, 2, 4, 1)
+        self.checkbox_disable_umu.set_hexpand(True)
 
         self.grid_prefix.attach(self.label_prefix, 0, 0, 1, 1)
         self.grid_prefix.attach(self.entry_prefix, 0, 1, 3, 1)
@@ -7049,6 +7066,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_gamemode.set_active(self.default_gamemode)
         self.checkbox_sdl.set_active(self.default_sdl_enabled)
         self.checkbox_no_sleep.set_active(self.default_no_sleep)
+        self.checkbox_disable_umu.set_active(False)
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
         if os.path.isfile(self.cover_path_temp):
             os.remove(self.cover_path_temp)
@@ -7084,6 +7102,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_protonfix.set_visible(False)
         self.grid_addapp.set_visible(False)
         self.checkbox_sdl.set_visible(False)
+        self.checkbox_disable_umu.set_visible(False)
         self.checkbox_no_sleep.set_visible(True)
         self.checkbox_shortcut_steam.set_visible(True)
         self.combobox_steam_shortcut_user.set_visible(True)
@@ -7109,6 +7128,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.grid_title.set_visible(True)
             self.grid_path.set_visible(True)
             self.button_shortcut_icon.set_visible(True)
+            self.checkbox_disable_umu.set_visible(True)
 
         elif active_id == "steam":
             self.grid_steam_title.set_visible(True)

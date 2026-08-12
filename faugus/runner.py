@@ -787,6 +787,7 @@ def build_launch_command(game):
     lossless_hdr = game.get("lossless_hdr", "")
     lossless_present = game.get("lossless_present", "")
     icon = game.get("icon", "")
+    disable_umu = bool(game.get("disable_umu", "")) and runner == "Linux-Native"
 
     if gameid == "ea-app":
         path = update_ea_path(prefix)
@@ -806,7 +807,8 @@ def build_launch_command(game):
         command_parts.append(f"GAMEID={protonfix}")
     if runner:
         if runner == "Linux-Native":
-            command_parts.append('PROTONPATH=umu-sniper')
+            if not disable_umu:
+                command_parts.append('PROTONPATH=umu-sniper')
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={PROTON_CACHYOS}")
@@ -823,7 +825,7 @@ def build_launch_command(game):
     if mangohud and os.path.exists(MANGOHUD_DIR):
         command_parts.append("mangohud")
 
-    if runner != "Steam":
+    if runner != "Steam" and not disable_umu:
         command_parts.append(f"'{UMU_RUN}'")
 
     if addapp_enabled == "addapp_enabled":
