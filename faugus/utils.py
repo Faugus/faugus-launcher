@@ -1060,7 +1060,9 @@ def update_games_json():
             ico_path = os.path.join(ICONS_DIR, f"{game_id}.ico")
             png_path = os.path.join(ICONS_DIR, f"{game_id}.png")
 
-            if os.path.exists(ico_path):
+            if os.path.exists(png_path):
+                new_icon_path = png_path
+            elif os.path.exists(ico_path):
                 new_icon_path = ico_path
             else:
                 new_icon_path = png_path

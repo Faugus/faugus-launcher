@@ -4052,6 +4052,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.png'
             game.icon = icon_final
 
+            legacy_icon = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
+            if os.path.isfile(legacy_icon):
+                os.remove(legacy_icon)
+
             if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
                 game.disable_umu = True if edit_game_dialog.checkbox_disable_umu.get_active() else ""
