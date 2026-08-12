@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-12 16:20+0000\n"
-"PO-Revision-Date: 2026-08-12 16:20+0000\n"
+"PO-Revision-Date: 2026-08-12 22:44+0000\n"
 "Last-Translator: nixxo <nixxo@protonmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -699,14 +699,12 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "Generazione Frame con Lossless Scaling"
 
 #: faugus/launcher.py:6028
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Disabilita Hidraw"
+msgstr "Disabilita UMU"
 
 #: faugus/launcher.py:6030
 msgid "Runs the game directly, without the UMU-Launcher wrapper"
-msgstr ""
+msgstr "Avvia il gioco direttamente, senza usare UMU-Launcher"
 
 #: faugus/launcher.py:6050
 msgid "Shortcut"
