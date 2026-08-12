@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -577,8 +577,8 @@ def format_title(title):
 
 
 def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None):
-    from faugus.config_manager import ConfigManager
-    gamepad_navigation = ConfigManager().config.get('gamepad-navigation', 'False') == 'True'
+    config = load_json_file(CONFIG_FILE_DIR, default={})
+    gamepad_navigation = config.get('gamepad-navigation', 'False') == 'True'
 
     if not gamepad_navigation:
         dialog = Gtk.FileChooserNative(
