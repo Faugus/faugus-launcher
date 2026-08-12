@@ -1336,7 +1336,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if idx1 != idx2:
                         return (idx1 > idx2) - (idx1 < idx2)
 
-            return (g1.title > g2.title) - (g1.title < g2.title) if g1 and g2 else 0
+            if not (g1 and g2):
+                return 0
+
+            t1, t2 = g1.title.lower(), g2.title.lower()
+            return (t1 > t2) - (t1 < t2)
 
         def filter_games(child, user_data):
             game = getattr(child, 'game', None) or getattr(child.get_child(), 'game', None)
