@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 17:39+0000\n"
 "PO-Revision-Date: 2026-08-13 21:51+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: howoz <howoz@proton.me>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/tr/>\n"
 "Language: tr\n"
@@ -702,10 +702,8 @@ msgid "Disable UMU"
 msgstr "UMU'yu devre dışı bırak"
 
 #: faugus/launcher.py:6025
-#, fuzzy
-#| msgid "Runs the game directly, without the UMU-Launcher wrapper"
 msgid "Runs the game without the Steam Runtime"
-msgstr "Oyunu UMU-Launcher sarmalayıcısı olmadan çalıştır"
+msgstr "Oyunu Steam çalışma ortamı olmadan yürüt"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
