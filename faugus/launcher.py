@@ -21,7 +21,7 @@ from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
 
-VERSION = "2.0.6"
+VERSION = "2.1.0"
 
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'

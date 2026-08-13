@@ -90,17 +90,19 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.6-1" date="2026-08-05">
+    <release version="2.1.0-1" date="2026-08-13">
       <description>
         <ul>
-          <li>The Flatpak version now shows all the devices in the filechooser.</li>
-          <li>Fixed icon extraction from some .exe files.</li>
-          <li>Now only shows the GTK filechooser when Gamepad Navigation is enabled, as the gamepad can't navigate throught the native filechooser.</li>
-          <li>Now also applies themes to the virtual keyboard.</li>
-          <li>Fixed LSFG-VK 2.0.</li>
-          <li>Minor visual improvements.</li>
-          <li>Fixed some missing translation tokens.</li>
-          <li>Added the version label back in the Settings screen.</li>
+          <li>Added Amazon Games.</li>
+          <li>Added an option to toggle the zoom slider.</li>
+          <li>Added an option to disable UMU for Linux games as some of them don't run with the Steam Runtime.</li>
+          <li>The system tray icon now runs in a separate process, independent of the main window, using less RAM.</li>
+          <li>Now it also reads Protons installed in Steam's Flatpak data folder.</li>
+          <li>Reinforced games file handling to prevent data loss.</li>
+          <li>Fixed older icons not being updated.</li>
+          <li>Fixed Steam shortcut order when removing it.</li>
+          <li>Fixed AppImage not extracting icons from exe file.</li>
+          <li>Fixed the filechooser not opening in the migration process.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
