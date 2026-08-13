@@ -23,13 +23,39 @@ permissions:
 
 env:
   TAG: ${{ github.event.release.tag_name || inputs.tag }}
-  RELEASE_ID: ${{ github.event.release.id }}
-  DO_PUBLISH: ${{ github.event_name == 'release' || inputs.publish == true }}
+  DO_PUBLISH: ${{ github.run_attempt == '1' && (github.event_name == 'release' || inputs.publish == true) }}
 
 jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.resolve.outputs.release_id }}
+    steps:
+      - name: Resolve release id
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.release.id }}" ]; then
+            echo "release_id=${{ github.event.release.id }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            echo "release_id=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          RELEASE_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG" \
+            | jq -r '.id // empty')
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+
   appimage:
+    needs: resolve
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'appimage')
     runs-on: ubuntu-latest
+    env:
+      RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
     steps:
       - uses: actions/checkout@v7
 
@@ -57,23 +83,32 @@ jobs:
         run: |
           FILE=$(ls packaging/appimage/Faugus-*.AppImage)
           NAME=$(basename "$FILE")
-          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
-            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
-          if [ -n "$ASSET_ID" ]; then
-            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
-          fi
-          curl -sS -f -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
+          for attempt in 1 2 3; do
+            ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+              | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+            if [ -n "$ASSET_ID" ]; then
+              curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+            fi
+            if curl -sS -f -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary @"$FILE" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"; then
+              break
+            fi
+            echo "Upload attempt $attempt failed, retrying..."
+            sleep $((attempt * 10))
+          done
 
   arch:
+    needs: resolve
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'arch')
     runs-on: ubuntu-latest
     container: archlinux:base-devel
+    env:
+      RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
     steps:
       - uses: actions/checkout@v7
 
@@ -129,22 +164,31 @@ jobs:
         run: |
           FILE=$(ls /build/*.pkg.tar.* | head -1)
           NAME=$(basename "$FILE")
-          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
-            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
-          if [ -n "$ASSET_ID" ]; then
-            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
-          fi
-          curl -sS -f -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
+          for attempt in 1 2 3; do
+            ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+              | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+            if [ -n "$ASSET_ID" ]; then
+              curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+            fi
+            if curl -sS -f -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary @"$FILE" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"; then
+              break
+            fi
+            echo "Upload attempt $attempt failed, retrying..."
+            sleep $((attempt * 10))
+          done
 
   debian:
+    needs: resolve
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'debian')
     runs-on: ubuntu-latest
+    env:
+      RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
     steps:
       - uses: actions/checkout@v7
 
@@ -203,18 +247,24 @@ jobs:
         run: |
           FILE=$(ls faugus-launcher_*_all.deb)
           NAME=$(basename "$FILE")
-          ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
-            | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
-          if [ -n "$ASSET_ID" ]; then
-            curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
-          fi
-          curl -sS -f -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @"$FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
+          for attempt in 1 2 3; do
+            ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+              | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+            if [ -n "$ASSET_ID" ]; then
+              curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+            fi
+            if curl -sS -f -X POST \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary @"$FILE" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"; then
+              break
+            fi
+            echo "Upload attempt $attempt failed, retrying..."
+            sleep $((attempt * 10))
+          done
 
       - name: Import PPA signing key
         if: env.PPA_GPG_PRIVATE_KEY != '' && env.DO_PUBLISH == 'true'
@@ -331,9 +381,12 @@ jobs:
           done
 
   fedora:
+    needs: resolve
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'fedora')
     runs-on: ubuntu-latest
     container: fedora:latest
+    env:
+      RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
     steps:
       - uses: actions/checkout@v7
 
@@ -365,18 +418,24 @@ jobs:
         run: |
           for FILE in ~/rpmbuild/RPMS/noarch/*.rpm; do
             NAME=$(basename "$FILE")
-            ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
-              | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
-            if [ -n "$ASSET_ID" ]; then
-              curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-                "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
-            fi
-            curl -sS -f -X POST \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary @"$FILE" \
-              "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"
+            for attempt in 1 2 3; do
+              ASSET_ID=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" \
+                | jq -r --arg NAME "$NAME" '.[] | select(.name==$NAME) | .id')
+              if [ -n "$ASSET_ID" ]; then
+                curl -sS -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+                  "https://api.github.com/repos/${{ github.repository }}/releases/assets/$ASSET_ID"
+              fi
+              if curl -sS -f -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @"$FILE" \
+                "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=$NAME"; then
+                break
+              fi
+              echo "Upload attempt $attempt for $NAME failed, retrying..."
+              sleep $((attempt * 10))
+            done
           done
 
       - name: Submit to COPR
