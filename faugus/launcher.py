@@ -6022,7 +6022,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         create_mangohud_gamemode_checkboxes(self)
         self.checkbox_disable_umu = Gtk.CheckButton(label=_("Disable UMU"))
         self.checkbox_disable_umu.set_tooltip_text(
-            _("Runs the game directly, without the UMU-Launcher wrapper"))
+            _("Runs the game without the Steam Runtime"))
         self.checkbox_disable_umu.set_visible(False)
         self.checkbox_sdl = Gtk.CheckButton(label="SDL")
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
