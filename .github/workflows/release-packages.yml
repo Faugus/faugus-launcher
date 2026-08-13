@@ -79,7 +79,7 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          pacman -Syu --noconfirm --needed git openssh curl \
+          pacman -Syu --noconfirm --needed git openssh curl jq \
             python-gobject python-requests python-pillow python-vdf python-psutil python-dbus \
             icoextract gtk4 libadwaita libmanette meson
 
@@ -338,7 +338,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install build dependencies
-        run: dnf install -y rpmdevtools rpm-build curl meson gtk-update-icon-cache python3-devel gtk4-devel
+        run: dnf install -y rpmdevtools rpm-build curl jq meson gtk-update-icon-cache python3-devel gtk4-devel
 
       - name: Build RPM
         run: |
