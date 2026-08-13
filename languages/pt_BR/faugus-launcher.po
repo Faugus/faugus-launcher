@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-12 16:20+0000\n"
-"PO-Revision-Date: 2026-08-11 16:24+0000\n"
+"PO-Revision-Date: 2026-08-13 17:38+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -698,10 +698,8 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling Gerador de Quadros"
 
 #: faugus/launcher.py:6028
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Desativar Hidraw"
+msgstr "Desativar UMU"
 
 #: faugus/launcher.py:6030
 msgid "Runs the game directly, without the UMU-Launcher wrapper"
