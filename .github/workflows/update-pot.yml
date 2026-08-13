@@ -80,10 +80,45 @@ jobs:
             echo "No .pot/.mo changes, nothing to commit."
             exit 0
           fi
+
+          stash_dir="$(mktemp -d)"
+          cp languages/faugus-launcher.pot "$stash_dir/"
+          for mo in languages/*/faugus-launcher.mo; do
+            dest="$stash_dir/$(dirname "$mo")"
+            mkdir -p "$dest"
+            cp "$mo" "$dest/"
+          done
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add languages/faugus-launcher.pot languages/*/faugus-launcher.mo
-          git commit -m "Update translation template (faugus-launcher.pot)"
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            cp "$stash_dir/faugus-launcher.pot" languages/faugus-launcher.pot
+            for mo in "$stash_dir"/languages/*/faugus-launcher.mo; do
+              lang_dir="languages/$(basename "$(dirname "$mo")")"
+              mkdir -p "$lang_dir"
+              cp "$mo" "$lang_dir/faugus-launcher.mo"
+            done
+
+            git add languages/faugus-launcher.pot languages/*/faugus-launcher.mo
+            if git diff --cached --quiet; then
+              echo "Upstream already has this update, nothing to push."
+              exit 0
+            fi
+
+            git commit -m "Update translation template (faugus-launcher.pot)"
+
+            if git push origin HEAD:main; then
+              echo "Pushed successfully on attempt $attempt."
+              exit 0
+            fi
+
+            echo "Push attempt $attempt failed (likely a concurrent update), retrying..."
+            sleep $((attempt * 10))
+          done
+
+          echo "Failed to push translation template update after multiple attempts." >&2
+          exit 1
