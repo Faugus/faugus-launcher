@@ -7,10 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-13 17:39+0000\n"
-"PO-Revision-Date: 2026-08-12 04:31+0000\n"
-"Last-Translator: Hosted Weblate user 158752 "
-"<mistahl@users.noreply.hosted.weblate.org>\n"
+"POT-Creation-Date: 2026-08-13 21:35+0000\n"
+"PO-Revision-Date: 2026-08-13 21:49+0000\n"
+"Last-Translator: Hamza-108 <Hamzabehrem2005@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -395,7 +394,7 @@ msgstr ""
 
 #: faugus/launcher.py:4544
 msgid "Color Scheme"
-msgstr ""
+msgstr "Farbschema"
 
 #: faugus/launcher.py:4548
 msgid "Light"
@@ -439,12 +438,11 @@ msgstr "Beschriftungen"
 
 #: faugus/launcher.py:4580
 msgid "Zoom"
-msgstr ""
+msgstr "Vergrößern"
 
 #: faugus/launcher.py:4585
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "SteamGridDB API Key"
 
 #: faugus/launcher.py:4592
 msgid "Default Prefixes Location"

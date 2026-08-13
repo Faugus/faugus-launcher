@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-13 17:39+0000\n"
-"PO-Revision-Date: 2026-08-13 17:38+0000\n"
+"POT-Creation-Date: 2026-08-13 21:35+0000\n"
+"PO-Revision-Date: 2026-08-13 21:50+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -703,7 +703,7 @@ msgstr "Desativar UMU"
 
 #: faugus/launcher.py:6025
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "Executa o jogo sem o Steam Runtime"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
