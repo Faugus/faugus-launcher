@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 17:39+0000\n"
 "PO-Revision-Date: 2026-08-13 21:49+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -695,8 +695,7 @@ msgstr "Zusätzliche Anwendung"
 
 #: faugus/launcher.py:6017 faugus/shortcut.py:72
 msgid "Additional application to run with the game"
-msgstr ""
-"Zusätzliche Anwendung, die zusammen mit dem Spiel gestartet werden soll"
+msgstr "Zusätzliche Anwendung, die zusammen mit dem Spiel gestartet werden soll"
 
 #: faugus/launcher.py:6019 faugus/shortcut.py:74 faugus/utils.py:1576
 msgid "Lossless Scaling Frame Generation"
