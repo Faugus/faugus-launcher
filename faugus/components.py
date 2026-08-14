@@ -5,7 +5,7 @@ import requests
 import tarfile
 import shutil
 
-from faugus.path_manager import FAUGUS_LAUNCHER_SHARE_DIR, DOWNLOAD_DIR, UMU_RUN
+from faugus.path_manager import FAUGUS_LAUNCHER_SHARE_DIR, DOWNLOAD_DIR, UMU_RUN, PathManager
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
@@ -53,6 +53,9 @@ def download_umu_run(version):
 
 
 def update_umu():
+    if PathManager.find_binary("umu-run") != "":
+        return
+
     latest = get_latest_umu_version()
     current = get_installed_umu_version()
 
