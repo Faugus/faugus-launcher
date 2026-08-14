@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
 "PO-Revision-Date: 2026-08-14 04:57+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
 "Language: zh_CN\n"
@@ -437,7 +437,7 @@ msgstr "标签"
 
 #: faugus/launcher.py:4580
 msgid "Zoom"
-msgstr ""
+msgstr "缩放"
 
 #: faugus/launcher.py:4585
 msgid "SteamGridDB API Key"
@@ -698,14 +698,12 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "小黄鸭帧生成"
 
 #: faugus/launcher.py:6023
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "禁用 Hidraw"
+msgstr "禁用 UMU"
 
 #: faugus/launcher.py:6025
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "不使用 Steam 运行时运行游戏"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
