@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
-"PO-Revision-Date: 2026-08-14 05:15+0000\n"
+"PO-Revision-Date: 2026-08-15 14:51+0000\n"
 "Last-Translator: Hamza-108 <Hamzabehrem2005@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
@@ -390,7 +390,7 @@ msgstr "Thema"
 
 #: faugus/launcher.py:4539
 msgid "System Theme"
-msgstr ""
+msgstr "Systemdesign"
 
 #: faugus/launcher.py:4544
 msgid "Color Scheme"
@@ -510,7 +510,7 @@ msgstr "Zeige Kategorie- und Sortierschaltflächen"
 
 #: faugus/launcher.py:4648
 msgid "Header bar"
-msgstr ""
+msgstr "Kopfleiste"
 
 #: faugus/launcher.py:4650
 msgid "Hidden games"
@@ -701,14 +701,12 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling Frame Generation"
 
 #: faugus/launcher.py:6023
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Hidraw deaktivieren"
+msgstr "Deaktiviere UMU"
 
 #: faugus/launcher.py:6025
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "Startet das Spiel ohne die Steam-Laufzeit"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
@@ -904,7 +902,7 @@ msgstr "Jüngste"
 
 #: faugus/utils.py:1102
 msgid "System"
-msgstr ""
+msgstr "System"
 
 #: faugus/utils.py:1251
 msgid "Presets"
