@@ -59,35 +59,18 @@ jobs:
             --output=languages/faugus-launcher.pot \
             faugus/*.py
 
-      - name: Compile translation files (msgfmt, no msgmerge)
+      - name: Commit if .pot actually changed
         run: |
-          for po in languages/*/faugus-launcher.po; do
-            msgfmt "$po" -o "$(dirname "$po")/faugus-launcher.mo"
-          done
-
-      - name: Commit if .pot or .mo actually changed
-        run: |
-          changed=false
-          for f in languages/faugus-launcher.pot languages/*/faugus-launcher.mo; do
-            if ! diff --ignore-matching-lines='^#:' \
-                       --ignore-matching-lines='^"POT-Creation-Date:' \
-                       <(git show "HEAD:$f" 2>/dev/null) "$f" > /dev/null 2>&1; then
-              changed=true
-              break
-            fi
-          done
-          if [ "$changed" = false ]; then
-            echo "No .pot/.mo changes, nothing to commit."
+          if diff --ignore-matching-lines='^#:' \
+                   --ignore-matching-lines='^"POT-Creation-Date:' \
+                   <(git show "HEAD:languages/faugus-launcher.pot" 2>/dev/null) \
+                   languages/faugus-launcher.pot > /dev/null 2>&1; then
+            echo "No .pot changes, nothing to commit."
             exit 0
           fi
 
           stash_dir="$(mktemp -d)"
           cp languages/faugus-launcher.pot "$stash_dir/"
-          for mo in languages/*/faugus-launcher.mo; do
-            dest="$stash_dir/$(dirname "$mo")"
-            mkdir -p "$dest"
-            cp "$mo" "$dest/"
-          done
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -97,13 +80,8 @@ jobs:
             git reset --hard origin/main
 
             cp "$stash_dir/faugus-launcher.pot" languages/faugus-launcher.pot
-            for mo in "$stash_dir"/languages/*/faugus-launcher.mo; do
-              lang_dir="languages/$(basename "$(dirname "$mo")")"
-              mkdir -p "$lang_dir"
-              cp "$mo" "$lang_dir/faugus-launcher.mo"
-            done
 
-            git add languages/faugus-launcher.pot languages/*/faugus-launcher.mo
+            git add languages/faugus-launcher.pot
             if git diff --cached --quiet; then
               echo "Upstream already has this update, nothing to push."
               exit 0

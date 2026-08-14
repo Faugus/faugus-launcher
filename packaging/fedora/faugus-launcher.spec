@@ -8,7 +8,7 @@ URL:            https://github.com/Faugus/faugus-launcher
 Source0:        https://github.com/Faugus/faugus-launcher/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  meson gtk-update-icon-cache python3-devel
+BuildRequires:  meson gtk-update-icon-cache python3-devel gettext
 Requires:       python3-gobject python3-requests python3-pillow python3-vdf python3-psutil python3-dbus gtk4 libadwaita libmanette python3-icoextract
 
 %description

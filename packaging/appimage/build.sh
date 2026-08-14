@@ -26,7 +26,7 @@ TOOLS_DIR="$SCRIPT_DIR/.appimage-tools"
 APPIMAGETOOL="$TOOLS_DIR/appimagetool-$ARCH.AppImage"
 OUTPUT="$SCRIPT_DIR/Faugus-$VERSION-$ARCH.AppImage"
 
-for cmd in meson ninja python3 curl tar; do
+for cmd in meson ninja python3 curl tar msgfmt; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "Missing required tool: $cmd" >&2
         exit 1
