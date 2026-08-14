@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
-"PO-Revision-Date: 2026-08-13 21:49+0000\n"
+"PO-Revision-Date: 2026-08-14 05:13+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -90,8 +90,7 @@ msgstr "前回のバックアップ："
 
 #: faugus/backup.py:266
 msgid "Prefixes and Protons will not be backed up!"
-msgstr ""
-"プレフィックス (Prefixes) と プロトン (Protons) はバックアップされません！"
+msgstr "プレフィックス (Prefixes) と プロトン (Protons) はバックアップされません！"
 
 #: faugus/backup.py:269 faugus/launcher.py:4686 faugus/launcher.py:5639
 #: faugus/launcher.py:6083 faugus/launcher.py:6647 faugus/proton_manager.py:311
