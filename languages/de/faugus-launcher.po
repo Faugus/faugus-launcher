@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
 "PO-Revision-Date: 2026-08-19 02:17+0000\n"
-"Last-Translator: Hamza-108 <Hamzabehrem2005@gmail.com>\n"
+"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -230,7 +230,7 @@ msgstr "Datei im Präfix ausführen"
 
 #: faugus/launcher.py:2044
 msgid "Clear recent"
-msgstr "Zuletzt verwendet löschen"
+msgstr "Zuletzt verwendet leeren"
 
 #: faugus/launcher.py:2047 faugus/launcher.py:2105
 msgid "Recent"
@@ -510,7 +510,7 @@ msgstr "Zeige Kategorie- und Sortierschaltflächen"
 
 #: faugus/launcher.py:4648
 msgid "Header bar"
-msgstr "Kopfleiste"
+msgstr "Titelleiste"
 
 #: faugus/launcher.py:4650
 msgid "Hidden games"
@@ -898,7 +898,7 @@ msgstr "Wählen Sie ein Symbol für die Verknüpfung aus"
 #: faugus/utils.py:1095 faugus/utils.py:1096 faugus/utils.py:1097
 #: faugus/utils.py:1098 faugus/utils.py:1099
 msgid "Latest"
-msgstr "Jüngste"
+msgstr "Neuste"
 
 #: faugus/utils.py:1102
 msgid "System"
