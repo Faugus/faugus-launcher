@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
-"PO-Revision-Date: 2026-08-15 14:51+0000\n"
+"PO-Revision-Date: 2026-08-19 02:17+0000\n"
 "Last-Translator: Hamza-108 <Hamzabehrem2005@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
@@ -230,7 +230,7 @@ msgstr "Datei im Präfix ausführen"
 
 #: faugus/launcher.py:2044
 msgid "Clear recent"
-msgstr ""
+msgstr "Zuletzt verwendet löschen"
 
 #: faugus/launcher.py:2047 faugus/launcher.py:2105
 msgid "Recent"
