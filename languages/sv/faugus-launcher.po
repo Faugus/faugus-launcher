@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
-"PO-Revision-Date: 2026-08-14 05:14+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-08-21 05:33+0000\n"
+"Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
 "Language: sv\n"
@@ -102,7 +102,7 @@ msgstr "Avbryt"
 #: faugus/launcher.py:5643 faugus/launcher.py:6087 faugus/launcher.py:6643
 #: faugus/shortcut.py:91 faugus/utils.py:495 faugus/utils.py:803
 msgid "Ok"
-msgstr "OK"
+msgstr "Ok"
 
 #: faugus/backup.py:323
 msgid "Select the backup destination"
@@ -437,7 +437,7 @@ msgstr "Etiketter"
 
 #: faugus/launcher.py:4580
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
 
 #: faugus/launcher.py:4585
 msgid "SteamGridDB API Key"
@@ -699,11 +699,11 @@ msgstr "Bildrutegenerering med Lossless Scaling"
 
 #: faugus/launcher.py:6023
 msgid "Disable UMU"
-msgstr ""
+msgstr "Inaktivera UMU"
 
 #: faugus/launcher.py:6025
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "Kör spelet utan Steam körtid"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
