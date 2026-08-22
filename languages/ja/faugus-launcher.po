@@ -8,9 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-13 21:35+0000\n"
-"PO-Revision-Date: 2026-08-14 05:13+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
+"PO-Revision-Date: 2026-08-23 03:51+0000\n"
+"Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ja/>\n"
 "Language: ja\n"
@@ -438,12 +437,11 @@ msgstr "ラベル"
 
 #: faugus/launcher.py:4580
 msgid "Zoom"
-msgstr ""
+msgstr "ズームバー"
 
 #: faugus/launcher.py:4585
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr "SteamGridDB APIキー"
 
 #: faugus/launcher.py:4592
 msgid "Default Prefixes Location"
@@ -511,7 +509,7 @@ msgstr "カテゴリと並べ替えボタン"
 
 #: faugus/launcher.py:4648
 msgid "Header bar"
-msgstr ""
+msgstr "ヘッダーバー"
 
 #: faugus/launcher.py:4650
 msgid "Hidden games"
@@ -700,14 +698,12 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scalingフレーム生成"
 
 #: faugus/launcher.py:6023
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Hidrawを無効にする"
+msgstr "UMU-Launcherを無効にする"
 
 #: faugus/launcher.py:6025
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "Steam Runtimeを使用せずにゲームを実行します"
 
 #: faugus/launcher.py:6045
 msgid "Shortcut"
@@ -895,13 +891,11 @@ msgstr "ショートカットのアイコンを選択してください"
 #: faugus/utils.py:1095 faugus/utils.py:1096 faugus/utils.py:1097
 #: faugus/utils.py:1098 faugus/utils.py:1099
 msgid "Latest"
-msgstr ""
+msgstr "最新版"
 
 #: faugus/utils.py:1102
-#, fuzzy
-#| msgid "System Theme"
 msgid "System"
-msgstr "システムテーマ"
+msgstr "システム"
 
 #: faugus/utils.py:1251
 msgid "Presets"
