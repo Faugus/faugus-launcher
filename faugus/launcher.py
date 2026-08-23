@@ -5615,9 +5615,13 @@ class Settings(Gtk.Dialog):
         is_steamgriddb = active_id == "SteamGridDB"
         not_list = active_id != "List"
 
-        covers_steamgriddb_tip = _("Covers and SteamGridDB modes")
-        steamgriddb_tip = _("SteamGridDB mode")
-        not_list_tip = _("Grid, Covers and SteamGridDB modes")
+        grid_label = _("Grid")
+        covers_label = _("Covers")
+        steamgriddb_label = "SteamGridDB"
+
+        covers_steamgriddb_tip = _("{} and {} modes").format(covers_label, steamgriddb_label)
+        steamgriddb_tip = _("{} mode").format(steamgriddb_label)
+        not_list_tip = _("{}, {} and {} modes").format(grid_label, covers_label, steamgriddb_label)
 
         for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_carrousel):
             checkbox.set_sensitive(covers_or_steamgriddb)
