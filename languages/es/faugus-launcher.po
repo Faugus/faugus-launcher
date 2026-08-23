@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 15:20+0000\n"
-"PO-Revision-Date: 2026-08-20 07:35+0000\n"
+"PO-Revision-Date: 2026-08-23 18:04+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -441,7 +441,7 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5148
 msgid "Carrousel"
-msgstr ""
+msgstr "Carrusel"
 
 #: faugus/launcher.py:5153
 msgid "SteamGridDB API Key"
