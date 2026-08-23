@@ -20,6 +20,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
+from faugus.main_screen_nav import adjust_widget_value, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 
 VERSION = "2.1.0"
 
@@ -143,14 +144,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 padding: 0px;
             }
             entry.flowbox-entry:selected:not(.cover-container) .game {
-                background-color: @theme_selected_bg_color;
+                background-color: alpha(@theme_selected_bg_color, 0.5);
                 color: @theme_selected_fg_color;
             }
             entry.flowbox-entry:selected:not(.cover-container) .game-label {
                 color: @theme_selected_fg_color;
             }
+            entry.flowbox-entry:selected:focus:not(.cover-container) .game {
+                background-color: @theme_selected_bg_color;
+            }
             entry.flowbox-entry:selected:backdrop:not(.cover-container) .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
+                background-color: alpha(@theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container {
                 box-shadow: none;
@@ -160,22 +164,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border: none;
             }
             entry.flowbox-entry.cover-container:selected {
-                transform: scale(1.05);
-                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 1),
-                            0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
+                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
+                            0 0 30px 10px alpha(@theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container:selected .game {
-                background-color: @theme_selected_bg_color;
+                background-color: alpha(@theme_selected_bg_color, 0.5);
                 color: @theme_selected_fg_color;
             }
             entry.flowbox-entry.cover-container:selected .game-label {
                 color: @theme_selected_fg_color;
             }
+            entry.flowbox-entry.cover-container:selected:focus {
+                transform: scale(1.05);
+                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 1),
+                            0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
+            }
+            entry.flowbox-entry.cover-container:selected:focus .game {
+                background-color: @theme_selected_bg_color;
+            }
             entry.flowbox-entry.cover-container:selected:backdrop {
                 box-shadow: none;
             }
             entry.flowbox-entry.cover-container:selected:backdrop .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
+                background-color: alpha(@theme_selected_bg_color, 0.25);
             }
             .spinner-dim-overlay {
                 background-color: alpha(black, 0.3);
@@ -367,6 +378,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_play.set_child(new_icon_image(f"{icon}.svg"))
 
     def selected(self):
+        if self.carrousel_active():
+            games = self.carrousel_visible_games()
+            if not games:
+                return None
+            return games[self.carrousel_index % len(games)]
+
         selected_items = self.flowbox.get_selected_children()
         if not selected_items:
             return None
@@ -374,6 +391,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def banner_overlay_enabled(self):
         return self.interface_mode == "SteamGridDB" and self.banner_enabled
+
+    def carrousel_active(self):
+        return self.interface_mode in ("Covers", "SteamGridDB") and self.carrousel_enabled
 
     def get_named_rgb(self, name, fallback=(30, 30, 34)):
         found, rgba = Gtk.Box().get_style_context().lookup_color(name)
@@ -959,16 +979,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         timer.start()
 
     def _focus_flowbox_child(self, child):
-        self.flowbox.grab_focus()
-        self.flowbox.select_child(child)
-        child.grab_focus()
+        focus_flowbox_child(self.flowbox, child)
 
     def select_first_child(self):
+        if self.carrousel_active():
+            self.carrousel_index = 0
+            self.render_carrousel()
+            if hasattr(self, 'carrousel_fixed'):
+                self.carrousel_fixed.grab_focus()
+            return
+
         visible_children = [c for c in widget_children(self.flowbox) if c.get_child_visible()]
         if visible_children:
             self._focus_flowbox_child(visible_children[0])
 
     def select_first_child_when_ready(self):
+        if self.carrousel_active():
+            self.carrousel_index = 0
+            self.render_carrousel()
+            return
+
         attempts = {"n": 0}
 
         def try_select():
@@ -984,6 +1014,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         GLib.timeout_add(50, try_select)
 
     def select_game_by_title(self, title):
+        if self.carrousel_active():
+            games = self.carrousel_visible_games()
+            for i, g in enumerate(games):
+                if g.title == title:
+                    self.carrousel_index = i
+                    self.render_carrousel()
+                    return
+            return
+
         attempts = {"n": 0}
 
         def do_select():
@@ -1005,11 +1044,32 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 return child
         return None
 
+    def on_flowbox_key(self, controller, keyval, keycode, state):
+        direction = {
+            Gdk.KEY_Right: Gtk.DirectionType.RIGHT,
+            Gdk.KEY_Left: Gtk.DirectionType.LEFT,
+            Gdk.KEY_Down: Gtk.DirectionType.DOWN,
+            Gdk.KEY_Up: Gtk.DirectionType.UP,
+        }.get(keyval)
+        if direction is None:
+            return False
+        return navigate_focus(direction)
+
+    def on_flowbox_keyval_tracker(self, controller, keyval, keycode, state):
+        self._last_flowbox_keyval = keyval
+        if self.interface_mode == "List" and keyval in (Gdk.KEY_Left, Gdk.KEY_Right):
+            return True
+        return False
+
     def on_flowbox_keynav_failed(self, flowbox, direction):
-        flowbox.set_can_focus(False)
-        result = self.child_focus(direction)
-        flowbox.set_can_focus(True)
-        return bool(result)
+        if self._last_flowbox_keyval == Gdk.KEY_Up:
+            focus_top_bar(self)
+            return True
+        if self._last_flowbox_keyval != Gdk.KEY_Down:
+            return True
+        selected = flowbox.get_selected_children()
+        focus_bottom_bar_by_column(self, selected[0] if selected else None)
+        return True
 
     def setup_interface(self, is_big=False):
         if is_big:
@@ -1055,6 +1115,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_search.connect("changed", self.on_search_changed)
         self.entry_search.connect("activate", self.on_search_activate)
         self.entry_search.set_size_request(170, 50)
+
+        search_key_controller = Gtk.EventControllerKey()
+        search_key_controller.connect("key-pressed", self.on_search_entry_key)
+        self.entry_search.get_delegate().add_controller(search_key_controller)
 
         self.opt_alpha = _("Alphabetical")
         self.opt_playtime = _("Playtime")
@@ -1134,7 +1198,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.current_sort = target_label
                     self.button_sort.set_label(target_label)
                     update_sort_data()
-                    self.flowbox.invalidate_sort()
+                    if self.carrousel_active():
+                        self.render_carrousel()
+                    else:
+                        self.flowbox.invalidate_sort()
                     popover.popdown()
 
                 btn.connect("clicked", set_sort)
@@ -1177,6 +1244,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.scale_zoom.connect("value-changed", on_zoom_changed)
 
+        zoom_key_controller = Gtk.EventControllerKey()
+        zoom_key_controller.connect("key-pressed", self.on_zoom_scale_key)
+        self.scale_zoom.add_controller(zoom_key_controller)
+
         scroll_box = Gtk.ScrolledWindow()
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll_box.set_margin_top(10)
@@ -1188,6 +1259,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.connect("keynav-failed", self.on_flowbox_keynav_failed)
+        self._last_flowbox_keyval = None
+        flowbox_keyval_tracker = Gtk.EventControllerKey()
+        flowbox_keyval_tracker.connect("key-pressed", self.on_flowbox_keyval_tracker)
+        self.flowbox.add_controller(flowbox_keyval_tracker)
         click_release = Gtk.GestureClick()
         click_release.set_button(Gdk.BUTTON_PRIMARY)
         click_release.connect("released", self.on_item_release_event)
@@ -1384,10 +1459,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.scale_zoom.set_visible(self.interface_mode in ("Covers", "SteamGridDB") and self.zoom_enabled)
 
             bottom_bar = Gtk.CenterBox(orientation=Gtk.Orientation.HORIZONTAL)
+            self.bottom_bar = bottom_bar
             bottom_bar.set_margin_top(5)
             bottom_bar.set_margin_bottom(10)
             bottom_bar.set_margin_start(10)
             bottom_bar.set_margin_end(10)
+
+            bottom_bar_key_controller = Gtk.EventControllerKey()
+            bottom_bar_key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+            bottom_bar_key_controller.connect("key-pressed", self.on_bottom_bar_key)
+            bottom_bar.add_controller(bottom_bar_key_controller)
 
             bottom_bar.set_start_widget(self.scale_zoom)
 
@@ -1418,16 +1499,27 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.scale_zoom.set_valign(Gtk.Align.CENTER)
             self.scale_zoom.set_vexpand(False)
 
-            right_vbox.append(scroll_box)
+            if self.carrousel_active():
+                self.carrousel_box = self.build_carrousel_widget()
+                self.carrousel_box.set_vexpand(True)
+                right_vbox.append(self.carrousel_box)
+            else:
+                right_vbox.append(scroll_box)
+                scroll_box.set_vexpand(True)
             right_vbox.append(bottom_bar)
-            scroll_box.set_vexpand(True)
 
         else:
             self.box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.box_bottom = Gtk.Box()
 
+            bottom_bar_key_controller = Gtk.EventControllerKey()
+            bottom_bar_key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+            bottom_bar_key_controller.connect("key-pressed", self.on_bottom_bar_key)
+            self.box_bottom.add_controller(bottom_bar_key_controller)
+
             if getattr(self, 'categories_and_sort_enabled', True):
                 top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                self.top_bar = top_bar
                 top_bar.set_margin_top(10)
                 top_bar.set_margin_start(10)
                 top_bar.set_margin_end(10)
@@ -1489,6 +1581,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 self.select_first_child()
 
+                if self.carrousel_active():
+                    return False
+
                 target = None
                 for child in widget_children(self.flowbox):
                     if child.get_child_visible():
@@ -1509,6 +1604,415 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         key_controller = Gtk.EventControllerKey()
         key_controller.connect("key-pressed", self.on_key_press_event)
         self.add_controller(key_controller)
+
+    def carrousel_visible_games(self):
+        search_text = self.entry_search.get_text().lower() if hasattr(self, 'entry_search') else ''
+
+        def sort_key(g):
+            if self.current_sort_id == "playtime":
+                return -self.playtime_data.get(g.gameid, 0)
+            if self.current_sort_id == "lastplayed":
+                return self.latest_games_order.get(g.gameid, float('inf'))
+            if self.current_sort_id == "custom":
+                return self.custom_order_data.get(g.gameid, 999999)
+            return g.title.lower()
+
+        def matches(g):
+            if search_text and search_text not in g.title.lower():
+                return False
+
+            if getattr(self, 'categories_and_sort_enabled', True) and self.current_category and self.current_category != _("All"):
+                raw_cat = g.category
+                if isinstance(raw_cat, str):
+                    cats = [raw_cat]
+                elif isinstance(raw_cat, list):
+                    cats = raw_cat
+                else:
+                    cats = []
+
+                if self.current_category == _("Uncategorized"):
+                    return not cats or cats == [_("None")]
+
+                if not cats:
+                    cats = [_("None")]
+                return self.current_category in cats
+
+            return True
+
+        ordered = sorted(self.games, key=sort_key)
+        return [g for g in ordered if matches(g)]
+
+    def build_carrousel_slot(self, offset):
+        picture = new_picture()
+        picture.set_can_shrink(True)
+
+        label = Gtk.Label()
+        label.add_css_class("game-label")
+        label.set_wrap(True)
+        label.set_lines(2)
+        label.set_ellipsize(Pango.EllipsizeMode.END)
+        label.set_max_width_chars(1)
+        label.set_justify(Gtk.Justification.CENTER)
+        label.set_size_request(-1, 50)
+        label.set_margin_start(10)
+        label.set_margin_end(10)
+        label.set_vexpand(True)
+        label.set_valign(Gtk.Align.CENTER)
+
+        hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        hbox.append(picture)
+        hbox.append(label)
+
+        deco_entry = Gtk.Entry()
+        deco_entry.set_can_target(False)
+        deco_entry.set_focusable(False)
+        deco_entry.get_delegate().set_focusable(False)
+        deco_entry.set_hexpand(True)
+        deco_entry.set_vexpand(True)
+        deco_entry.set_width_chars(0)
+        deco_entry.set_max_width_chars(0)
+        deco_entry.set_size_request(1, 1)
+        deco_entry.add_css_class("game")
+        deco_entry.add_css_class("list-row-entry")
+
+        card_overlay = Gtk.Overlay()
+        card_overlay.set_child(deco_entry)
+        card_overlay.add_overlay(hbox)
+        card_overlay.set_measure_overlay(hbox, True)
+
+        card = GObject.new(Gtk.Box, css_name="entry")
+        card.append(card_overlay)
+        card.add_css_class("flowbox-entry")
+        card.add_css_class("cover-container")
+        card.add_css_class("carrousel-cover-box")
+        card.set_overflow(Gtk.Overflow.HIDDEN)
+
+        style_provider = Gtk.CssProvider()
+        card.get_style_context().add_provider(style_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+
+        slot = {
+            "box": card,
+            "card": card,
+            "picture": picture,
+            "label": label,
+            "style_provider": style_provider,
+            "offset": offset,
+            "gameid": None,
+        }
+
+        click = Gtk.GestureClick()
+        click.set_button(Gdk.BUTTON_PRIMARY)
+        click.connect("released", lambda g, n, x, y, slot=slot: self.on_carrousel_slot_click(slot, n))
+        card.add_controller(click)
+
+        right_click = Gtk.GestureClick()
+        right_click.set_button(Gdk.BUTTON_SECONDARY)
+        right_click.connect("pressed", lambda g, n, x, y, slot=slot: self.on_carrousel_slot_right_click(slot, x, y))
+        card.add_controller(right_click)
+
+        return slot
+
+    def carrousel_slot_size(self):
+        zoom_pct = getattr(self, 'cover_size', 100)
+        max_width = max(1, int(230 * (zoom_pct / 100.0)))
+        max_height = int(max_width * 1.5)
+        return max_width, max_height
+
+    def carrousel_scale_opacity(self, offset):
+        anchors = (
+            (0.0, 1.05, 1.0),
+            (1.0, 0.82, 0.75),
+            (2.0, 0.62, 0.5),
+            (3.0, 0.46, 0.25),
+            (4.0, 0.3, 0.0),
+        )
+        d = abs(offset)
+        if d <= anchors[0][0]:
+            return anchors[0][1], anchors[0][2]
+        for (d0, s0, o0), (d1, s1, o1) in zip(anchors, anchors[1:]):
+            if d <= d1:
+                t = (d - d0) / (d1 - d0)
+                return s0 + (s1 - s0) * t, o0 + (o1 - o0) * t
+        return anchors[-1][1], anchors[-1][2]
+
+    def carrousel_glow_alpha(self, offset):
+        d = abs(offset)
+        if d >= 1.0:
+            return 0.0
+        return 1.0 - d
+
+    def set_carrousel_slot_content(self, slot, game):
+        max_width, max_height = self.carrousel_slot_size()
+        surface = self.get_cover_paintable(game, max_width, max_height)
+        slot["picture"].set_paintable(surface)
+        slot["picture"].set_size_request(max_width, max_height)
+        slot["gameid"] = game.gameid
+        slot["box"].game = game
+        slot["label"].set_text(game.title)
+        slot["label"].set_visible(getattr(self, 'labels_enabled', False))
+
+    def carrousel_radius_for_count(self, n):
+        if n < 3:
+            return 0
+        if n < 5:
+            return 1
+        if n < 7:
+            return 2
+        return 3
+
+    def on_carrousel_focus_changed(self, widget, pspec):
+        for slot in getattr(self, 'carrousel_slots', []):
+            self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
+
+    def layout_carrousel_slot(self, slot, offset):
+        scale, opacity = self.carrousel_scale_opacity(offset)
+        radius = getattr(self, 'carrousel_radius', 3)
+        d = abs(offset)
+        if d > radius:
+            opacity *= max(0.0, radius + 1 - d)
+        translate_x = offset * self.carrousel_step
+        slot["box"].set_opacity(opacity)
+
+        can_target = abs(offset) <= radius + 0.5
+        if slot.get("_can_target") != can_target:
+            slot["box"].set_can_target(can_target)
+            slot["_can_target"] = can_target
+
+        carrousel_fixed = getattr(self, 'carrousel_fixed', None)
+        is_focused = carrousel_fixed is not None and carrousel_fixed.is_focus()
+        if not is_focused and d < 0.5:
+            scale = 1.0
+
+        glow_t = self.carrousel_glow_alpha(offset)
+        if not is_focused:
+            glow_t *= 0.5
+        box_shadow = "none"
+        if glow_t > 0.0:
+            box_shadow = (
+                f"0 0 8px 2px alpha(@theme_selected_bg_color, {glow_t:.3f}), "
+                f"0 0 30px 10px alpha(@theme_selected_bg_color, {glow_t * 0.5:.3f})"
+            )
+        sliding = self._carrousel_anim_id is not None
+        transition = "none" if sliding else "transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+        css = (
+            f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
+            f"transition: {transition}; "
+            f"transform: translate({translate_x:.2f}px, 0) scale({scale:.4f}); "
+            f"box-shadow: {box_shadow}; }}"
+        )
+        slot["style_provider"].load_from_data(css.encode("utf-8"))
+
+        slot["visual_offset"] = offset
+
+    def build_carrousel_widget(self):
+        outer = Gtk.Fixed()
+        outer.set_can_focus(True)
+        outer.set_focusable(True)
+        outer.set_halign(Gtk.Align.CENTER)
+        outer.set_valign(Gtk.Align.CENTER)
+        outer.set_hexpand(True)
+        outer.set_overflow(Gtk.Overflow.HIDDEN)
+
+        carrousel_key = Gtk.EventControllerKey()
+        carrousel_key.connect("key-pressed", self.on_carrousel_key)
+        outer.add_controller(carrousel_key)
+        outer.connect("notify::has-focus", self.on_carrousel_focus_changed)
+
+        self.carrousel_index = 0
+        self.carrousel_fixed = outer
+        self.carrousel_min_offset = -4
+        self.carrousel_max_offset = 4
+        self.carrousel_radius = 3
+        self._carrousel_anim_id = None
+        self.carrousel_step = 0
+        self.carrousel_center_x = 0
+        self.carrousel_center_y = 0
+        self.carrousel_slots = [
+            self.build_carrousel_slot(offset)
+            for offset in range(self.carrousel_min_offset, self.carrousel_max_offset + 1)
+        ]
+        for slot in self.carrousel_slots:
+            outer.put(slot["box"], 0, 0)
+
+        return outer
+
+    def render_carrousel(self):
+        if not hasattr(self, 'carrousel_slots'):
+            return
+
+        if self._carrousel_anim_id is not None:
+            self.carrousel_fixed.remove_tick_callback(self._carrousel_anim_id)
+            self._carrousel_anim_id = None
+
+        max_width, max_height = self.carrousel_slot_size()
+        self.carrousel_step = max_width + 20
+        glow_margin = 40
+        total_height = max_height + 50 + glow_margin * 2
+        self.carrousel_fixed.set_size_request(self.carrousel_step * 7, total_height)
+        self.carrousel_center_x = self.carrousel_step * 7 / 2
+        self.carrousel_center_y = total_height / 2
+
+        games = self.carrousel_visible_games()
+        n = len(games)
+        self.carrousel_radius = self.carrousel_radius_for_count(n)
+
+        def place_base(slot):
+            _, natural_w, _, _ = slot["box"].measure(Gtk.Orientation.HORIZONTAL, -1)
+            _, natural_h, _, _ = slot["box"].measure(Gtk.Orientation.VERTICAL, natural_w)
+            base_x = self.carrousel_center_x - natural_w / 2
+            base_y = self.carrousel_center_y - natural_h / 2
+            self.carrousel_fixed.move(slot["box"], base_x, base_y)
+
+        if n == 0:
+            for slot in self.carrousel_slots:
+                slot["picture"].set_paintable(None)
+                slot["gameid"] = None
+                slot["label"].set_text("")
+                slot["box"].game = None
+                place_base(slot)
+                self.layout_carrousel_slot(slot, slot["offset"])
+            return
+
+        self.carrousel_index %= n
+        for slot in self.carrousel_slots:
+            idx = (self.carrousel_index + slot["offset"]) % n
+            self.set_carrousel_slot_content(slot, games[idx])
+            place_base(slot)
+            self.layout_carrousel_slot(slot, slot["offset"])
+
+        self.schedule_background_update()
+        self.update_icon()
+
+    def carrousel_move(self, delta):
+        games = self.carrousel_visible_games()
+        n = len(games)
+        if not games:
+            return
+
+        self.carrousel_radius = self.carrousel_radius_for_count(n)
+        self.carrousel_index = (self.carrousel_index + delta) % n
+
+        for slot in self.carrousel_slots:
+            old_offset = slot["offset"]
+            new_offset = old_offset - delta
+            if new_offset < self.carrousel_min_offset:
+                new_offset = self.carrousel_max_offset
+            elif new_offset > self.carrousel_max_offset:
+                new_offset = self.carrousel_min_offset
+
+            if abs(new_offset - old_offset) > 1:
+                idx = (self.carrousel_index + new_offset) % n
+                self.set_carrousel_slot_content(slot, games[idx])
+                slot["anim_from"] = new_offset
+            else:
+                slot["anim_from"] = slot.get("visual_offset", old_offset)
+
+            slot["anim_to"] = new_offset
+            slot["offset"] = new_offset
+
+        self.carrousel_start_animation()
+        self.schedule_background_update()
+        self.update_icon()
+
+    def carrousel_start_animation(self):
+        if self._carrousel_anim_id is not None:
+            self.carrousel_fixed.remove_tick_callback(self._carrousel_anim_id)
+
+        start = GLib.get_monotonic_time()
+        duration = 260000
+
+        def step(widget, frame_clock):
+            elapsed = GLib.get_monotonic_time() - start
+            t = min(1.0, elapsed / duration)
+            eased = t * t * (3.0 - 2.0 * t)
+            for slot in self.carrousel_slots:
+                current = slot["anim_from"] + (slot["anim_to"] - slot["anim_from"]) * eased
+                self.layout_carrousel_slot(slot, current)
+            if t >= 1.0:
+                self._carrousel_anim_id = None
+                return False
+            return True
+
+        self._carrousel_anim_id = self.carrousel_fixed.add_tick_callback(step)
+
+    def get_carrousel_center_slot(self):
+        for slot in self.carrousel_slots:
+            if abs(slot["offset"]) < 0.5:
+                return slot
+        return None
+
+    def on_bottom_bar_key(self, controller, keyval, keycode, state):
+        if keyval != Gdk.KEY_Up:
+            return False
+        return navigate_focus(Gtk.DirectionType.UP)
+
+    def on_zoom_scale_key(self, controller, keyval, keycode, state):
+        if keyval not in (Gdk.KEY_Left, Gdk.KEY_Right):
+            return False
+        direction = Gtk.DirectionType.LEFT if keyval == Gdk.KEY_Left else Gtk.DirectionType.RIGHT
+        if adjust_widget_value(self.scale_zoom, "left" if direction == Gtk.DirectionType.LEFT else "right"):
+            return True
+        return navigate_focus(direction)
+
+    def on_search_entry_key(self, controller, keyval, keycode, state):
+        if keyval not in (Gdk.KEY_Left, Gdk.KEY_Right):
+            return False
+
+        pos = self.entry_search.get_position()
+        if keyval == Gdk.KEY_Left and pos != 0:
+            return False
+        if keyval == Gdk.KEY_Right and pos != len(self.entry_search.get_text()):
+            return False
+
+        direction = Gtk.DirectionType.LEFT if keyval == Gdk.KEY_Left else Gtk.DirectionType.RIGHT
+        return navigate_focus(direction)
+
+    def on_carrousel_key(self, controller, keyval, keycode, state):
+        if not self.carrousel_active():
+            return False
+        direction = {
+            Gdk.KEY_Right: Gtk.DirectionType.RIGHT,
+            Gdk.KEY_Left: Gtk.DirectionType.LEFT,
+            Gdk.KEY_Down: Gtk.DirectionType.DOWN,
+            Gdk.KEY_Up: Gtk.DirectionType.UP,
+        }.get(keyval)
+        if direction is None:
+            return False
+        return navigate_focus(direction)
+
+    def on_carrousel_slot_click(self, slot, n_press):
+        offset = round(slot["offset"])
+        if offset != 0:
+            self.carrousel_move(offset)
+            return
+        if n_press == 2:
+            game = self.selected()
+            if not game:
+                return
+            if game.gameid in self.running:
+                self.running_dialog(game.title)
+            else:
+                self.on_button_play_clicked()
+
+    def on_carrousel_slot_right_click(self, slot, x, y):
+        offset = round(slot["offset"])
+        if offset != 0:
+            self.carrousel_move(offset)
+
+        game = self.selected()
+        if not game:
+            return
+
+        if self.context_menu is not None and self.context_menu.get_parent():
+            self.context_menu.popdown()
+            self.context_menu.unparent()
+
+        self.context_menu = self.build_context_menu(game)
+        self.context_menu.set_parent(slot["box"])
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        self.context_menu.set_pointing_to(rect)
+        self.context_menu.popup()
 
     def on_category_button_clicked(self, button):
         popover = Gtk.Popover()
@@ -1564,6 +2068,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_category_menu_item_selected(self, menu_item, category_name):
         self.button_category.set_label(category_name)
         self.current_category = category_name
+
+        if self.carrousel_active():
+            self.carrousel_index = 0
+            self.render_carrousel()
+            return
 
         if hasattr(self, 'flowbox'):
             self.flowbox.invalidate_filter()
@@ -2293,8 +2802,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         child_to_select = target_child if target_child is not None else first_visible
         if child_to_select is not None:
-            self.flowbox.select_child(child_to_select)
-            self.flowbox.set_focus_child(child_to_select)
+            self._focus_flowbox_child(child_to_select)
 
     def on_context_menu_game_location(self, action, param):
         self.context_menu.popdown()
@@ -2603,6 +3111,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.show_power_menu(self)
             return True
 
+        if self.carrousel_active():
+            game = self.selected()
+            if not game:
+                return False
+
+            if keyval == Gdk.KEY_Return:
+                if game.gameid in self.running:
+                    self.running_dialog(game.title)
+                else:
+                    self.on_button_play_clicked()
+
+            if keyval == Gdk.KEY_Delete:
+                self.on_button_delete_clicked()
+
+            return False
+
         game = self.selected()
         if not game:
             return False
@@ -2645,6 +3169,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
+        self.carrousel_enabled = cfg.config.get('carrousel-enabled', 'False') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
         self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
@@ -2674,6 +3199,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.games.append(game)
 
         self.games = sorted(self.games, key=lambda x: x.title.lower())
+
+        if self.carrousel_active():
+            self.render_carrousel()
+            return
 
         w = self.get_focus()
         while w is not None:
@@ -2717,6 +3246,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self._zoom_apply_source = GLib.timeout_add(150, fire)
 
     def apply_zoom_incremental(self, zoom_pct, batch_size=15):
+        if self.carrousel_active():
+            self.render_carrousel()
+            return
+
         if not hasattr(self, 'flowbox') or self.interface_mode not in ("Covers", "SteamGridDB"):
             return
 
@@ -2874,6 +3407,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         deco_entry = Gtk.Entry()
         deco_entry.set_can_target(False)
         deco_entry.set_focusable(False)
+        deco_entry.get_delegate().set_focusable(False)
         deco_entry.set_hexpand(True)
         deco_entry.set_vexpand(True)
         deco_entry.set_width_chars(0)
@@ -2962,7 +3496,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def is_game_installed(self, game):
         if game.runner == "Steam":
-            for appid, name in read_installed_games(getattr(game, 'steam_user', '') or None):
+            steam_user = getattr(game, 'steam_user', '') or None
+            cache = getattr(self, '_installed_games_cache', None)
+            if cache is None:
+                cache = {}
+                self._installed_games_cache = cache
+
+            now = GLib.get_monotonic_time()
+            entry = cache.get(steam_user)
+            if entry is None or (now - entry[0]) > 3_000_000:
+                entry = (now, read_installed_games(steam_user))
+                cache[steam_user] = entry
+
+            for appid, name in entry[1]:
                 if hasattr(game, "appid") and str(game.appid) == str(appid):
                     return True
                 if game.title.lower() == name.lower():
@@ -2972,6 +3518,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return os.path.exists(expand_path(game.path))
 
     def on_search_changed(self, entry):
+        if self.carrousel_active():
+            self.carrousel_index = 0
+            self.render_carrousel()
+            return
+
         self.flowbox.invalidate_filter()
 
         self.flowbox.unselect_all()
@@ -3051,6 +3602,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.zoom_enabled != settings_dialog.checkbox_zoom.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.carrousel_enabled != settings_dialog.checkbox_carrousel.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.language != settings_dialog.combobox_language.get_active_id():
@@ -3164,18 +3718,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not game:
             return
 
-        selected = self.flowbox.get_selected_children()
-        if selected:
-            child = selected[0]
-            self.update_game_visual(child)
-
-            if hasattr(child, 'anim_box') and child.anim_box:
-                child.anim_box.add_css_class("playing")
+        if self.carrousel_active():
+            center_slot = self.get_carrousel_center_slot() if hasattr(self, 'carrousel_slots') else None
+            anim_box = center_slot.get("anim_box") if center_slot else None
+            if anim_box:
+                anim_box.add_css_class("playing")
 
                 def remove_anim():
-                    child.anim_box.remove_css_class("playing")
+                    anim_box.remove_css_class("playing")
                     return False
                 GLib.timeout_add(150, remove_anim)
+        else:
+            selected = self.flowbox.get_selected_children()
+            if selected:
+                child = selected[0]
+                self.update_game_visual(child)
+
+                if hasattr(child, 'anim_box') and child.anim_box:
+                    child.anim_box.add_css_class("playing")
+
+                    def remove_anim():
+                        child.anim_box.remove_css_class("playing")
+                        return False
+                    GLib.timeout_add(150, remove_anim)
 
         gameid = game.gameid
         game_directory = os.path.dirname(expand_path(game.path))
@@ -4580,6 +5145,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
         self.checkbox_zoom.set_active(True)
 
+        self.checkbox_carrousel = Gtk.CheckButton(label=_("Carrousel"))
+        self.checkbox_carrousel.set_active(False)
+
         self.label_steamgriddb_key = Gtk.Label()
         self.label_steamgriddb_key.set_markup(
             '<a href="https://www.steamgriddb.com/profile/preferences/api">{}</a>'.format(_("SteamGridDB API Key"))
@@ -4883,6 +5451,7 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.checkbox_labels, 0, 4, 1, 1)
         self.grid_big_interface.attach(self.checkbox_banner, 1, 4, 1, 1)
         self.grid_big_interface.attach(self.checkbox_zoom, 0, 5, 1, 1)
+        self.grid_big_interface.attach(self.checkbox_carrousel, 1, 5, 1, 1)
         self.combobox_startup_window_size.set_hexpand(True)
         self.entry_steamgriddb_key.set_hexpand(True)
 
@@ -5036,6 +5605,7 @@ class Settings(Gtk.Dialog):
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(False)
             self.checkbox_zoom.set_visible(False)
+            self.checkbox_carrousel.set_visible(False)
             self.label_steamgriddb_key.set_visible(False)
             self.entry_steamgriddb_key.set_visible(False)
             self.checkbox_banner.set_visible(False)
@@ -5043,6 +5613,7 @@ class Settings(Gtk.Dialog):
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(True)
             self.checkbox_zoom.set_visible(True)
+            self.checkbox_carrousel.set_visible(True)
             self.label_steamgriddb_key.set_visible(False)
             self.entry_steamgriddb_key.set_visible(False)
             self.checkbox_banner.set_visible(False)
@@ -5050,6 +5621,7 @@ class Settings(Gtk.Dialog):
             self.grid_big_interface.set_visible(True)
             self.checkbox_labels.set_visible(True)
             self.checkbox_zoom.set_visible(True)
+            self.checkbox_carrousel.set_visible(True)
             self.label_steamgriddb_key.set_visible(True)
             self.entry_steamgriddb_key.set_visible(True)
             self.checkbox_banner.set_visible(True)
@@ -5125,6 +5697,7 @@ class Settings(Gtk.Dialog):
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("labels-enabled", self.checkbox_labels.get_active())
         config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
+        config.set_value("carrousel-enabled", self.checkbox_carrousel.get_active())
         config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
@@ -5454,6 +6027,7 @@ class Settings(Gtk.Dialog):
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
+        carrousel_enabled = cfg.config.get('carrousel-enabled', 'False') == 'True'
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -5492,6 +6066,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_labels.set_active(labels_enabled)
         self.checkbox_zoom.set_active(zoom_enabled)
+        self.checkbox_carrousel.set_active(carrousel_enabled)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_logging.set_active(logging_enabled)
         self.checkbox_hidden_games.set_active(show_hidden)

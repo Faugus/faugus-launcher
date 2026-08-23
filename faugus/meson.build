@@ -7,6 +7,7 @@ py.install_sources(
   'keyboard.py',
   'language_config.py',
   'launcher.py',
+  'main_screen_nav.py',
   'migration.py',
   'path_manager.py',
   'proton_downloader.py',

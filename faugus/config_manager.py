@@ -47,6 +47,7 @@ class ConfigManager:
             'steamgriddb-api-key': '',
             'background-mode': 'default',
             'banner-enabled': 'True',
+            'carrousel-enabled': 'False',
             'width': '1280',
             'height': '720',
             'cover-size': '100',
