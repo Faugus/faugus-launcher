@@ -192,6 +192,12 @@ def _migrate_config_json_values():
             config[new_key] = config.pop(old_key)
             changed = True
 
+    if "categories-and-sort-enabled" in config:
+        value = config.pop("categories-and-sort-enabled")
+        config.setdefault("categories-enabled", value)
+        config.setdefault("sort-enabled", value)
+        changed = True
+
     inverted_key_renames = {"splash-disable": "splash-window-enabled", "disable-updates": "automatic-updates"}
     for old_key, new_key in inverted_key_renames.items():
         if old_key in config:
