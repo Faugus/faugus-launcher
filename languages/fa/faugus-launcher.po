@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-23 18:14+0000\n"
+"POT-Creation-Date: 2026-08-23 18:20+0000\n"
 "PO-Revision-Date: 2026-08-14 05:15+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -95,15 +95,15 @@ msgstr ""
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix ها و باز کننده ها پشتیبان گیری نخواهند شد!"
 
-#: faugus/backup.py:269 faugus/launcher.py:5264 faugus/launcher.py:6231
-#: faugus/launcher.py:6675 faugus/launcher.py:7239 faugus/proton_manager.py:311
+#: faugus/backup.py:269 faugus/launcher.py:5264 faugus/launcher.py:6234
+#: faugus/launcher.py:6678 faugus/launcher.py:7242 faugus/proton_manager.py:311
 #: faugus/shortcut.py:87 faugus/utils.py:491 faugus/utils.py:601
 #: faugus/utils.py:612
 msgid "Cancel"
 msgstr "انصراف"
 
-#: faugus/backup.py:273 faugus/launcher.py:5268 faugus/launcher.py:5999
-#: faugus/launcher.py:6235 faugus/launcher.py:6679 faugus/launcher.py:7235
+#: faugus/backup.py:273 faugus/launcher.py:5268 faugus/launcher.py:6002
+#: faugus/launcher.py:6238 faugus/launcher.py:6682 faugus/launcher.py:7238
 #: faugus/shortcut.py:91 faugus/utils.py:495 faugus/utils.py:803
 msgid "Ok"
 msgstr "باشه"
@@ -261,7 +261,7 @@ msgstr "دقیقه"
 msgid "minutes"
 msgstr "دقیقه"
 
-#: faugus/launcher.py:2860 faugus/launcher.py:5866 faugus/launcher.py:7819
+#: faugus/launcher.py:2860 faugus/launcher.py:5869 faugus/launcher.py:7822
 #, fuzzy
 msgid "Select a file to run in the prefix"
 msgstr "یک فایل برای باز کردن درون prefix انتخاب کنید"
@@ -448,7 +448,7 @@ msgstr "باز شدن در حالت maximize"
 msgid "Fullscreen"
 msgstr "مثال: -d3d11 -fullscreen"
 
-#: faugus/launcher.py:5148 faugus/launcher.py:5640
+#: faugus/launcher.py:5148 faugus/launcher.py:5643
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter حالت تمام صفحه را روشن می کند"
 
@@ -567,24 +567,24 @@ msgstr "استفاده از درایور Wayland (آزمایشی)"
 msgid "WOW64 (experimental)"
 msgstr "فعال کردن WOW64 (آزمایشی)"
 
-#: faugus/launcher.py:5247 faugus/launcher.py:6632
+#: faugus/launcher.py:5247 faugus/launcher.py:6635
 msgid "Run"
 msgstr "اجرا"
 
-#: faugus/launcher.py:5250 faugus/launcher.py:6635
+#: faugus/launcher.py:5250 faugus/launcher.py:6638
 #, fuzzy
 msgid "Run a file in the prefix"
 msgstr "اجرا کردن یک فایل در prefix"
 
-#: faugus/launcher.py:5254 faugus/launcher.py:6620 faugus/shortcut.py:83
+#: faugus/launcher.py:5254 faugus/launcher.py:6623 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
 msgstr ""
 
-#: faugus/launcher.py:5255 faugus/launcher.py:6621 faugus/shortcut.py:84
+#: faugus/launcher.py:5255 faugus/launcher.py:6624 faugus/shortcut.py:84
 msgid "No Sleep"
 msgstr ""
 
-#: faugus/launcher.py:5256 faugus/launcher.py:6622 faugus/shortcut.py:85
+#: faugus/launcher.py:5256 faugus/launcher.py:6625 faugus/shortcut.py:85
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
 
@@ -617,225 +617,225 @@ msgstr "پاک کردن لاگ‌ها (%s)"
 msgid "Clear Logs"
 msgstr "پاک کردن لاگ‌ها"
 
+#: faugus/launcher.py:5621
+msgid "and"
+msgstr ""
+
 #: faugus/launcher.py:5622
-msgid "{} and {} modes"
+msgid "mode"
 msgstr ""
 
 #: faugus/launcher.py:5623
-msgid "{} mode"
+msgid "modes"
 msgstr ""
 
-#: faugus/launcher.py:5624
-msgid "{}, {} and {} modes"
-msgstr ""
-
-#: faugus/launcher.py:5810
+#: faugus/launcher.py:5813
 msgid "Do you want to save the changes?"
 msgstr "آیا می‌خواهید تغییرات را ذخیره کنید؟"
 
-#: faugus/launcher.py:5920
+#: faugus/launcher.py:5923
 msgid "Select a backup file to restore"
 msgstr "یک فایل پشتیبان گیری برای برگرداندن انتخاب کنید"
 
-#: faugus/launcher.py:5926
+#: faugus/launcher.py:5929
 msgid "ZIP files"
 msgstr "فایل های فشرده"
 
-#: faugus/launcher.py:5941 faugus/launcher.py:5951
+#: faugus/launcher.py:5944 faugus/launcher.py:5954
 #, fuzzy
 msgid "This is not a valid Faugus backup file."
 msgstr "فایل انتخاب شده یک فایل پشتیبان گیری سالم Faugus Launcher نیست."
 
-#: faugus/launcher.py:5990
+#: faugus/launcher.py:5993
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "آیا اطمینان دارید می خواهید تنظیمات را جایگزین کنید؟"
 
-#: faugus/launcher.py:5999 faugus/launcher.py:6302
+#: faugus/launcher.py:6002 faugus/launcher.py:6305
 msgid "Yes"
 msgstr "بله"
 
-#: faugus/launcher.py:6000 faugus/launcher.py:6298
+#: faugus/launcher.py:6003 faugus/launcher.py:6301
 msgid "No"
 msgstr "خیر"
 
-#: faugus/launcher.py:6007 faugus/launcher.py:8057
+#: faugus/launcher.py:6010 faugus/launcher.py:8060
 msgid "Select a prefix location"
 msgstr "یک مسیر prefix انتخاب کنید"
 
-#: faugus/launcher.py:6218
+#: faugus/launcher.py:6221
 #, python-format
 msgid "Duplicate %s"
 msgstr "تکثیر %s"
 
-#: faugus/launcher.py:6224 faugus/launcher.py:6495 faugus/launcher.py:6508
+#: faugus/launcher.py:6227 faugus/launcher.py:6498 faugus/launcher.py:6511
 #: faugus/shortcut.py:44
 msgid "Title"
 msgstr "عنوان"
 
-#: faugus/launcher.py:6273
+#: faugus/launcher.py:6276
 #, python-format
 msgid "Delete %s"
 msgstr "پاک کردن %s"
 
-#: faugus/launcher.py:6281
+#: faugus/launcher.py:6284
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "آیا اطمینان دارید می خواهید %s را پاک کنید؟"
 
-#: faugus/launcher.py:6290
+#: faugus/launcher.py:6293
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr ""
 
-#: faugus/launcher.py:6292
+#: faugus/launcher.py:6295
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr ""
 
-#: faugus/launcher.py:6306
+#: faugus/launcher.py:6309
 #, fuzzy
 msgid "Also remove the prefix:"
 msgstr "prefix را هم پاک کن."
 
-#: faugus/launcher.py:6353
+#: faugus/launcher.py:6356
 msgid "New Game/App"
 msgstr "بازی/برنامه جدید"
 
-#: faugus/launcher.py:6478
+#: faugus/launcher.py:6481
 #, fuzzy
 msgid "Steam User"
 msgstr "بازی استیم"
 
-#: faugus/launcher.py:6492 faugus/launcher.py:7032 faugus/launcher.py:7034
+#: faugus/launcher.py:6495 faugus/launcher.py:7035 faugus/launcher.py:7037
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:6560 faugus/utils.py:1478
+#: faugus/launcher.py:6563 faugus/utils.py:1478
 msgid "Path"
 msgstr "مسیر"
 
-#: faugus/launcher.py:6564
+#: faugus/launcher.py:6567
 msgid "Path to the game executable"
 msgstr ""
 
-#: faugus/launcher.py:6572
+#: faugus/launcher.py:6575
 msgid "Prefix"
 msgstr ""
 
-#: faugus/launcher.py:6576
+#: faugus/launcher.py:6579
 #, fuzzy
 msgid "Path to the prefix"
 msgstr "prefix را هم پاک کن."
 
-#: faugus/launcher.py:6584
+#: faugus/launcher.py:6587
 msgid "Proton"
 msgstr ""
 
-#: faugus/launcher.py:6598 faugus/shortcut.py:61
+#: faugus/launcher.py:6601 faugus/shortcut.py:61
 msgid "Game Arguments"
 msgstr "Argument های بازی"
 
-#: faugus/launcher.py:6603 faugus/shortcut.py:66 faugus/utils.py:1185
+#: faugus/launcher.py:6606 faugus/shortcut.py:66 faugus/utils.py:1185
 #, fuzzy
 msgid "Launch Settings"
 msgstr "تنظیمات"
 
-#: faugus/launcher.py:6606 faugus/shortcut.py:69 faugus/utils.py:1449
+#: faugus/launcher.py:6609 faugus/shortcut.py:69 faugus/utils.py:1449
 msgid "Additional Application"
 msgstr "برنامه اضافه"
 
-#: faugus/launcher.py:6609 faugus/shortcut.py:72
+#: faugus/launcher.py:6612 faugus/shortcut.py:72
 #, fuzzy
 msgid "Additional application to run with the game"
 msgstr ""
 "یک برنامه اضافه که به همراه بازی اجرا شود. مانند Cheat Engine, ترینر ها, ماد "
 "ها و..."
 
-#: faugus/launcher.py:6611 faugus/shortcut.py:74 faugus/utils.py:1576
+#: faugus/launcher.py:6614 faugus/shortcut.py:74 faugus/utils.py:1576
 msgid "Lossless Scaling Frame Generation"
 msgstr ""
 
-#: faugus/launcher.py:6615
+#: faugus/launcher.py:6618
 #, fuzzy
 #| msgid "Disable Hidraw"
 msgid "Disable UMU"
 msgstr "غیر فعال کردن Hidraw"
 
-#: faugus/launcher.py:6617
+#: faugus/launcher.py:6620
 msgid "Runs the game without the Steam Runtime"
 msgstr ""
 
-#: faugus/launcher.py:6637
+#: faugus/launcher.py:6640
 msgid "Shortcut"
 msgstr "میانبر"
 
-#: faugus/launcher.py:6642
+#: faugus/launcher.py:6645
 msgid "Desktop"
 msgstr "دسکتاب"
 
-#: faugus/launcher.py:6643
+#: faugus/launcher.py:6646
 msgid "App Menu"
 msgstr "منو برنامه"
 
-#: faugus/launcher.py:6644
+#: faugus/launcher.py:6647
 msgid "Steam"
 msgstr "استیم"
 
-#: faugus/launcher.py:6698 faugus/launcher.py:6888
+#: faugus/launcher.py:6701 faugus/launcher.py:6891
 msgid "Game/App"
 msgstr "بازی/برنامه"
 
-#: faugus/launcher.py:6699 faugus/launcher.py:6897
+#: faugus/launcher.py:6702 faugus/launcher.py:6900
 msgid "Tools"
 msgstr "ابزار ها"
 
-#: faugus/launcher.py:6872
+#: faugus/launcher.py:6875
 msgid "Refresh"
 msgstr "تازه کردن"
 
-#: faugus/launcher.py:6875
+#: faugus/launcher.py:6878
 msgid "Load from file"
 msgstr "بارگذاری از فایل"
 
-#: faugus/launcher.py:6878
+#: faugus/launcher.py:6881
 msgid "Load from URL"
 msgstr "بارگذاری از آدرس"
 
-#: faugus/launcher.py:7040 faugus/shortcut.py:175
+#: faugus/launcher.py:7043 faugus/shortcut.py:175
 #, fuzzy
 msgid "Vulkan Layer not found"
 msgstr "%s یافت نشد."
 
-#: faugus/launcher.py:7195
+#: faugus/launcher.py:7198
 #, fuzzy
 msgid "Select an image for the cover"
 msgstr "یک تصویر برای بنر انتخاب کنید"
 
-#: faugus/launcher.py:7196
+#: faugus/launcher.py:7199
 msgid "Select an image for the banner"
 msgstr "یک تصویر برای بنر انتخاب کنید"
 
-#: faugus/launcher.py:7197
+#: faugus/launcher.py:7200
 #, fuzzy
 msgid "Select an image for the icon"
 msgstr "یک تصویر برای بنر انتخاب کنید"
 
-#: faugus/launcher.py:7227
+#: faugus/launcher.py:7230
 msgid "Enter the image URL"
 msgstr "آدرس تصویر را وارد کنید"
 
-#: faugus/launcher.py:7787
+#: faugus/launcher.py:7790
 msgid "Windows Game"
 msgstr "بازی ویندوز"
 
-#: faugus/launcher.py:7788
+#: faugus/launcher.py:7791
 msgid "Linux Game"
 msgstr "بازی لینوکس"
 
-#: faugus/launcher.py:7789
+#: faugus/launcher.py:7792
 msgid "Steam Game"
 msgstr "بازی استیم"
 
-#: faugus/launcher.py:8026
+#: faugus/launcher.py:8029
 #, fuzzy
 msgid "Select the game executable"
 msgstr "فایل .exe بازی را انتخاب کنید"
