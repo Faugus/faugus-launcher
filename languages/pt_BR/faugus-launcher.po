@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:20+0000\n"
-"PO-Revision-Date: 2026-08-23 18:14+0000\n"
+"PO-Revision-Date: 2026-08-23 18:23+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -508,10 +508,8 @@ msgid "Logging"
 msgstr "Logs"
 
 #: faugus/launcher.py:5222
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Categoria"
+msgstr "Categorias"
 
 #: faugus/launcher.py:5224
 msgid "Sort"
@@ -592,11 +590,11 @@ msgstr "Limpar Logs"
 
 #: faugus/launcher.py:5621
 msgid "and"
-msgstr ""
+msgstr "e"
 
 #: faugus/launcher.py:5622
 msgid "mode"
-msgstr ""
+msgstr "modo"
 
 #: faugus/launcher.py:5623
 msgid "modes"
