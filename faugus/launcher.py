@@ -5618,10 +5618,13 @@ class Settings(Gtk.Dialog):
         grid_label = _("Grid")
         covers_label = _("Covers")
         steamgriddb_label = "SteamGridDB"
+        and_word = _("and")
+        mode_word = _("mode")
+        modes_word = _("modes")
 
-        covers_steamgriddb_tip = _("{} and {} modes").format(covers_label, steamgriddb_label)
-        steamgriddb_tip = _("{} mode").format(steamgriddb_label)
-        not_list_tip = _("{}, {} and {} modes").format(grid_label, covers_label, steamgriddb_label)
+        covers_steamgriddb_tip = f"{covers_label} {and_word} {steamgriddb_label} {modes_word}"
+        steamgriddb_tip = f"{steamgriddb_label} {mode_word}"
+        not_list_tip = f"{grid_label}, {covers_label} {and_word} {steamgriddb_label} {modes_word}"
 
         for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_carrousel):
             checkbox.set_sensitive(covers_or_steamgriddb)
