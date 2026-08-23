@@ -1985,6 +1985,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return navigate_focus(direction)
 
     def on_carrousel_slot_click(self, slot, n_press):
+        self.carrousel_fixed.grab_focus()
+        self.on_carrousel_focus_changed(self.carrousel_fixed, None)
+
         offset = round(slot["offset"])
         if offset != 0:
             self.carrousel_move(offset)
