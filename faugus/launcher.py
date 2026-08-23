@@ -1426,7 +1426,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             matches_search = search_text in game.title.lower() if search_text else True
             matches_category = True
 
-            if getattr(self, 'categories_and_sort_enabled', True) and self.current_category and self.current_category != _("All"):
+            if getattr(self, 'categories_enabled', True) and self.current_category and self.current_category != _("All"):
                 raw_cat = game.category
 
                 if isinstance(raw_cat, str):
@@ -1472,13 +1472,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             bottom_bar.set_start_widget(self.scale_zoom)
 
-            if getattr(self, 'categories_and_sort_enabled', True):
+            if getattr(self, 'sort_enabled', True) or getattr(self, 'categories_enabled', True):
                 box_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
                 box_actions.set_margin_start(10)
-                self.button_sort.set_size_request(50, 50)
-                self.button_category.set_size_request(50, 50)
-                box_actions.append(self.button_sort)
-                box_actions.append(self.button_category)
+                if getattr(self, 'sort_enabled', True):
+                    self.button_sort.set_size_request(50, 50)
+                    box_actions.append(self.button_sort)
+                if getattr(self, 'categories_enabled', True):
+                    self.button_category.set_size_request(50, 50)
+                    box_actions.append(self.button_category)
                 box_actions.set_halign(Gtk.Align.END)
                 box_actions.set_valign(Gtk.Align.CENTER)
                 box_actions.set_hexpand(True)
@@ -1517,18 +1519,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             bottom_bar_key_controller.connect("key-pressed", self.on_bottom_bar_key)
             self.box_bottom.add_controller(bottom_bar_key_controller)
 
-            if getattr(self, 'categories_and_sort_enabled', True):
+            if getattr(self, 'sort_enabled', True) or getattr(self, 'categories_enabled', True):
                 top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
                 self.top_bar = top_bar
                 top_bar.set_margin_top(10)
                 top_bar.set_margin_start(10)
                 top_bar.set_margin_end(10)
-                self.button_sort.set_size_request(110, -1)
-                self.button_category.set_size_request(110, -1)
-                self.button_sort.set_hexpand(True)
-                self.button_category.set_hexpand(True)
-                top_bar.append(self.button_sort)
-                top_bar.append(self.button_category)
+                if getattr(self, 'sort_enabled', True):
+                    self.button_sort.set_size_request(110, -1)
+                    self.button_sort.set_hexpand(True)
+                    top_bar.append(self.button_sort)
+                if getattr(self, 'categories_enabled', True):
+                    self.button_category.set_size_request(110, -1)
+                    self.button_category.set_hexpand(True)
+                    top_bar.append(self.button_category)
                 self.box_top.append(top_bar)
 
             self.box_top.append(scroll_box)
@@ -1621,7 +1625,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if search_text and search_text not in g.title.lower():
                 return False
 
-            if getattr(self, 'categories_and_sort_enabled', True) and self.current_category and self.current_category != _("All"):
+            if getattr(self, 'categories_enabled', True) and self.current_category and self.current_category != _("All"):
                 raw_cat = g.category
                 if isinstance(raw_cat, str):
                     cats = [raw_cat]
@@ -3176,7 +3180,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
-        self.categories_and_sort_enabled = cfg.config.get('categories-and-sort-enabled', 'False') == 'True'
+        self.categories_enabled = cfg.config.get('categories-enabled', 'False') == 'True'
+        self.sort_enabled = cfg.config.get('sort-enabled', 'False') == 'True'
         self.header_bar = cfg.config.get('header-bar', 'False') == 'True'
         self.startup_window_size = cfg.config.get('startup-window-size', '')
         self.window_width = int(cfg.config.get('width', 1280))
@@ -3613,7 +3618,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-                if self.categories_and_sort_enabled != settings_dialog.checkbox_categories_and_sort.get_active():
+                if self.categories_enabled != settings_dialog.checkbox_categories.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.sort_enabled != settings_dialog.checkbox_sort.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.header_bar != settings_dialog.checkbox_header_bar.get_active():
@@ -5211,7 +5219,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_logging = Gtk.CheckButton(label=_("Logging"))
         self.checkbox_logging.set_active(False)
 
-        self.checkbox_categories_and_sort = Gtk.CheckButton(label=_("Categories and sort"))
+        self.checkbox_categories = Gtk.CheckButton(label=_("Categories"))
+
+        self.checkbox_sort = Gtk.CheckButton(label=_("Sort"))
 
         self.checkbox_header_bar = Gtk.CheckButton(label=_("Header bar"))
 
@@ -5417,24 +5427,29 @@ class Settings(Gtk.Dialog):
         grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_theme_engine, 0, 0, 1, 1)
-        grid_theme_rest.attach(self.combobox_theme_engine, 0, 1, 1, 1)
+        grid_theme_rest.attach(self.label_theme_engine, 0, 0, 2, 1)
+        grid_theme_rest.attach(self.combobox_theme_engine, 0, 1, 2, 1)
         self.combobox_theme_engine.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_theme, 0, 2, 1, 1)
-        grid_theme_rest.attach(self.combobox_theme, 0, 3, 1, 1)
+        grid_theme_rest.attach(self.label_theme, 0, 2, 2, 1)
+        grid_theme_rest.attach(self.combobox_theme, 0, 3, 2, 1)
         self.combobox_theme.set_hexpand(True)
-        grid_theme_rest.attach(self.label_accent, 0, 4, 1, 1)
-        grid_theme_rest.attach(self.box_accent, 0, 5, 1, 1)
+        grid_theme_rest.attach(self.label_accent, 0, 4, 2, 1)
+        grid_theme_rest.attach(self.box_accent, 0, 5, 2, 1)
         self.combobox_accent.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_background, 0, 6, 1, 1)
-        grid_theme_rest.attach(self.combobox_background, 0, 7, 1, 1)
+        grid_theme_rest.attach(self.label_background, 0, 6, 2, 1)
+        grid_theme_rest.attach(self.combobox_background, 0, 7, 2, 1)
         self.combobox_background.set_hexpand(True)
 
-        grid_theme_rest.attach(self.checkbox_categories_and_sort, 0, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_header_bar, 0, 9, 1, 1)
-        grid_theme_rest.attach(self.checkbox_hidden_games, 0, 10, 1, 1)
+        grid_theme_rest.attach(self.checkbox_labels, 0, 8, 1, 1)
+        grid_theme_rest.attach(self.checkbox_banner, 1, 8, 1, 1)
+        grid_theme_rest.attach(self.checkbox_zoom, 0, 9, 1, 1)
+        grid_theme_rest.attach(self.checkbox_carrousel, 1, 9, 1, 1)
+        grid_theme_rest.attach(self.checkbox_sort, 0, 10, 1, 1)
+        grid_theme_rest.attach(self.checkbox_categories, 1, 10, 1, 1)
+        grid_theme_rest.attach(self.checkbox_hidden_games, 0, 11, 1, 1)
+        grid_theme_rest.attach(self.checkbox_header_bar, 1, 11, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
@@ -5448,10 +5463,6 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.entry_steamgriddb_key, 0, 1, 2, 1)
         self.grid_big_interface.attach(self.label_startup_window_size, 0, 2, 2, 1)
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
-        self.grid_big_interface.attach(self.checkbox_labels, 0, 4, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_banner, 1, 4, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_zoom, 0, 5, 1, 1)
-        self.grid_big_interface.attach(self.checkbox_carrousel, 1, 5, 1, 1)
         self.combobox_startup_window_size.set_hexpand(True)
         self.entry_steamgriddb_key.set_hexpand(True)
 
@@ -5599,32 +5610,31 @@ class Settings(Gtk.Dialog):
 
     def on_combobox_interface_changed(self, combobox):
         active_id = combobox.get_active_id()
-        if active_id == "List":
-            self.grid_big_interface.set_visible(False)
-        if active_id == "Grid":
-            self.grid_big_interface.set_visible(True)
-            self.checkbox_labels.set_visible(False)
-            self.checkbox_zoom.set_visible(False)
-            self.checkbox_carrousel.set_visible(False)
-            self.label_steamgriddb_key.set_visible(False)
-            self.entry_steamgriddb_key.set_visible(False)
-            self.checkbox_banner.set_visible(False)
-        if active_id == "Covers":
-            self.grid_big_interface.set_visible(True)
-            self.checkbox_labels.set_visible(True)
-            self.checkbox_zoom.set_visible(True)
-            self.checkbox_carrousel.set_visible(True)
-            self.label_steamgriddb_key.set_visible(False)
-            self.entry_steamgriddb_key.set_visible(False)
-            self.checkbox_banner.set_visible(False)
-        if active_id == "SteamGridDB":
-            self.grid_big_interface.set_visible(True)
-            self.checkbox_labels.set_visible(True)
-            self.checkbox_zoom.set_visible(True)
-            self.checkbox_carrousel.set_visible(True)
-            self.label_steamgriddb_key.set_visible(True)
-            self.entry_steamgriddb_key.set_visible(True)
-            self.checkbox_banner.set_visible(True)
+
+        covers_or_steamgriddb = active_id in ("Covers", "SteamGridDB")
+        is_steamgriddb = active_id == "SteamGridDB"
+        not_list = active_id != "List"
+
+        covers_steamgriddb_tip = _("Covers and SteamGridDB modes")
+        steamgriddb_tip = _("SteamGridDB mode")
+        not_list_tip = _("Grid, Covers and SteamGridDB modes")
+
+        for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_carrousel):
+            checkbox.set_sensitive(covers_or_steamgriddb)
+            checkbox.set_tooltip_text(None if covers_or_steamgriddb else covers_steamgriddb_tip)
+
+        self.checkbox_banner.set_sensitive(is_steamgriddb)
+        self.checkbox_banner.set_tooltip_text(None if is_steamgriddb else steamgriddb_tip)
+
+        self.label_steamgriddb_key.set_sensitive(is_steamgriddb)
+        self.entry_steamgriddb_key.set_sensitive(is_steamgriddb)
+        self.entry_steamgriddb_key.set_tooltip_text(None if is_steamgriddb else steamgriddb_tip)
+
+        self.label_startup_window_size.set_sensitive(not_list)
+        self.combobox_startup_window_size.set_sensitive(not_list)
+        self.combobox_startup_window_size.set_tooltip_text(
+            _("Alt+Enter toggles fullscreen") if not_list else not_list_tip
+        )
 
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
@@ -5702,7 +5712,8 @@ class Settings(Gtk.Dialog):
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("minimized-startup-enabled", self.checkbox_minimized_startup.get_active())
-        config.set_value("categories-and-sort-enabled", self.checkbox_categories_and_sort.get_active())
+        config.set_value("categories-enabled", self.checkbox_categories.get_active())
+        config.set_value("sort-enabled", self.checkbox_sort.get_active())
         config.set_value("header-bar", self.checkbox_header_bar.get_active())
         config.set_value("startup-window-size", self.combobox_startup_window_size.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
@@ -6037,7 +6048,8 @@ class Settings(Gtk.Dialog):
         self.language = cfg.config.get('language', '')
         self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
         minimized_startup_enabled = cfg.config.get('minimized-startup-enabled', 'False') == 'True'
-        categories_and_sort_enabled = cfg.config.get('categories-and-sort-enabled', 'False') == 'True'
+        categories_enabled = cfg.config.get('categories-enabled', 'False') == 'True'
+        sort_enabled = cfg.config.get('sort-enabled', 'False') == 'True'
         header_bar = cfg.config.get('header-bar', 'False') == 'True'
         startup_window_size = cfg.config.get('startup-window-size', '')
         self.interface_theme = cfg.config.get('interface-theme', 'system')
@@ -6097,7 +6109,8 @@ class Settings(Gtk.Dialog):
         self.accent_color = loaded_accent
 
         self.checkbox_minimized_startup.set_active(minimized_startup_enabled)
-        self.checkbox_categories_and_sort.set_active(categories_and_sort_enabled)
+        self.checkbox_categories.set_active(categories_enabled)
+        self.checkbox_sort.set_active(sort_enabled)
         self.checkbox_header_bar.set_active(header_bar)
         self.combobox_startup_window_size.set_active_id(startup_window_size)
 
