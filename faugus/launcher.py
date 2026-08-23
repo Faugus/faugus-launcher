@@ -1783,7 +1783,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             slot["_can_target"] = can_target
 
         carrousel_fixed = getattr(self, 'carrousel_fixed', None)
-        is_focused = carrousel_fixed is not None and carrousel_fixed.is_focus()
+        is_focused = (carrousel_fixed is not None and carrousel_fixed.is_focus()) or getattr(self, '_carrousel_menu_open', False)
         if not is_focused and d < 0.5:
             scale = 1.0
 
@@ -1828,6 +1828,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.carrousel_max_offset = 4
         self.carrousel_radius = 3
         self._carrousel_anim_id = None
+        self._carrousel_menu_open = False
         self.carrousel_step = 0
         self.carrousel_center_x = 0
         self.carrousel_center_y = 0
@@ -2001,7 +2002,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 self.on_button_play_clicked()
 
-    def on_carrousel_slot_right_click(self, slot, x, y):
+    def on_carrousel_slot_right_click(self, slot, x=None, y=None):
         offset = round(slot["offset"])
         if offset != 0:
             self.carrousel_move(offset)
@@ -2017,8 +2018,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu = self.build_context_menu(game)
         self.context_menu.set_parent(slot["box"])
         rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        if x is not None and y is not None:
+            rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        else:
+            rect.x, rect.y, rect.width, rect.height = 0, 0, slot["box"].get_width() or 1, 1
         self.context_menu.set_pointing_to(rect)
+
+        self._carrousel_menu_open = True
+        self.on_carrousel_focus_changed(self.carrousel_fixed, None)
+
+        def on_menu_closed(popover):
+            self._carrousel_menu_open = False
+            self.carrousel_fixed.grab_focus()
+            self.on_carrousel_focus_changed(self.carrousel_fixed, None)
+
+        self.context_menu.connect("closed", on_menu_closed)
         self.context_menu.popup()
 
     def on_category_button_clicked(self, button):
