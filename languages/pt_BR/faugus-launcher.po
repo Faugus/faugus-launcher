@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-23 18:23+0000\n"
+"PO-Revision-Date: 2026-08-23 18:42+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -589,22 +589,16 @@ msgid "Clear Logs"
 msgstr "Limpar Logs"
 
 #: faugus/launcher.py:5618
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers and SteamGridDB modes"
-msgstr "Chave do SteamGridDB API"
+msgstr "Modos Capas e SteamGridDB"
 
 #: faugus/launcher.py:5619
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB mode"
-msgstr "Chave do SteamGridDB API"
+msgstr "Modo SteamGridDB"
 
 #: faugus/launcher.py:5620
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Grid, Covers and SteamGridDB modes"
-msgstr "Chave do SteamGridDB API"
+msgstr "Modos Grade, Capas e SteamGridDB"
 
 #: faugus/launcher.py:5806
 msgid "Do you want to save the changes?"
