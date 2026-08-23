@@ -490,6 +490,12 @@ def _open_context_menu(self):
         self.on_item_right_click(focused, None)
         active_menu = getattr(self, "context_menu", None)
 
+    elif focused is getattr(self, "carrousel_fixed", None):
+        slot = self.get_carrousel_center_slot()
+        if slot:
+            self.on_carrousel_slot_right_click(slot)
+            active_menu = getattr(self, "context_menu", None)
+
     elif isinstance(focused, Gtk.ListBoxRow):
         listbox = focused.get_parent()
         listbox.select_row(focused)

@@ -2001,7 +2001,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 self.on_button_play_clicked()
 
-    def on_carrousel_slot_right_click(self, slot, x, y):
+    def on_carrousel_slot_right_click(self, slot, x=None, y=None):
         offset = round(slot["offset"])
         if offset != 0:
             self.carrousel_move(offset)
@@ -2017,8 +2017,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu = self.build_context_menu(game)
         self.context_menu.set_parent(slot["box"])
         rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        if x is not None and y is not None:
+            rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        else:
+            rect.x, rect.y, rect.width, rect.height = 0, 0, slot["box"].get_width() or 1, 1
         self.context_menu.set_pointing_to(rect)
+
+        def on_menu_closed(popover):
+            self.carrousel_fixed.grab_focus()
+            self.on_carrousel_focus_changed(self.carrousel_fixed, None)
+
+        self.context_menu.connect("closed", on_menu_closed)
         self.context_menu.popup()
 
     def on_category_button_clicked(self, button):
