@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-23 21:18+0000\n"
-"Last-Translator: nixxo <nixxo@protonmail.com>\n"
+"PO-Revision-Date: 2026-08-25 06:51+0000\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -373,7 +373,7 @@ msgstr "Predefinito"
 
 #: faugus/launcher.py:5102
 msgid "Accent color"
-msgstr "Colore Accento"
+msgstr "Colore d'accento"
 
 #: faugus/launcher.py:5103
 msgid "Dominant color"
@@ -405,7 +405,7 @@ msgstr "Scuro"
 
 #: faugus/launcher.py:5125
 msgid "Accent Color"
-msgstr "Colore accento"
+msgstr "Colore d'accento"
 
 #: faugus/launcher.py:5140
 msgid "Startup Window Size"
