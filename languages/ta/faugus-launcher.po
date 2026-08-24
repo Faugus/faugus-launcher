@@ -1,29 +1,25 @@
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the faugus-launcher package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-# SPDX-FileCopyrightText: 2026 Sergiu Bivol <sergiu@cip.md>
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-14 05:15+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
-"Language-Team: Romanian <https://hosted.weblate.org/projects/faugus-launcher/"
-"faugus-launcher/ro/>\n"
-"Language: ro\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
-"20)) ? 1 : 2;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:153
-#, fuzzy
 msgid "Backup Settings"
-msgstr "Copiază/restabilește configurările"
+msgstr ""
 
 #: faugus/backup.py:181
 msgid "Backup Destination"
@@ -34,9 +30,8 @@ msgid "Backup destination path"
 msgstr ""
 
 #: faugus/backup.py:205
-#, fuzzy
 msgid "Backup now"
-msgstr "Creează copie de rezervă"
+msgstr ""
 
 #: faugus/backup.py:211
 msgid "Automatic Backup"
@@ -91,27 +86,25 @@ msgid "Last backup:"
 msgstr ""
 
 #: faugus/backup.py:266
-#, fuzzy
 msgid "Prefixes and Protons will not be backed up!"
-msgstr "Prefixele și executorii nu vor fi copiați!"
+msgstr ""
 
 #: faugus/backup.py:269 faugus/launcher.py:5264 faugus/launcher.py:6227
 #: faugus/launcher.py:6671 faugus/launcher.py:7235 faugus/proton_manager.py:311
 #: faugus/shortcut.py:87 faugus/utils.py:491 faugus/utils.py:601
 #: faugus/utils.py:612
 msgid "Cancel"
-msgstr "Renunță"
+msgstr ""
 
 #: faugus/backup.py:273 faugus/launcher.py:5268 faugus/launcher.py:5995
 #: faugus/launcher.py:6231 faugus/launcher.py:6675 faugus/launcher.py:7231
 #: faugus/shortcut.py:91 faugus/utils.py:495 faugus/utils.py:803
 msgid "Ok"
-msgstr "Bine"
+msgstr ""
 
 #: faugus/backup.py:323
-#, fuzzy
 msgid "Select the backup destination"
-msgstr "Alegeți un fișier cu copia de rezervă de restabilit"
+msgstr ""
 
 #: faugus/launcher.py:952 faugus/launcher.py:1143 faugus/launcher.py:1429
 #: faugus/launcher.py:1628 faugus/launcher.py:2032 faugus/launcher.py:2173
@@ -126,22 +119,20 @@ msgid "Uncategorized"
 msgstr ""
 
 #: faugus/launcher.py:1110
-#, fuzzy
 msgid "Kill all running games"
-msgstr "Închide forțat toate jocurile ce rulează"
+msgstr ""
 
 #: faugus/launcher.py:1114
 msgid "Search..."
-msgstr "Caută…"
+msgstr ""
 
 #: faugus/launcher.py:1123
 msgid "Alphabetical"
 msgstr ""
 
 #: faugus/launcher.py:1124
-#, fuzzy
 msgid "Playtime"
-msgstr "Joacă"
+msgstr ""
 
 #: faugus/launcher.py:1125
 msgid "Last played"
@@ -172,48 +163,48 @@ msgstr ""
 
 #: faugus/launcher.py:2138 faugus/launcher.py:2520
 msgid "Edit"
-msgstr "Modifică"
+msgstr ""
 
 #: faugus/launcher.py:2139 faugus/proton_manager.py:223
 #: faugus/proton_manager.py:346
 msgid "Remove"
-msgstr "Elimină"
+msgstr ""
 
 #: faugus/launcher.py:2394
 msgid "Shut down"
-msgstr "Stinge"
+msgstr ""
 
 #: faugus/launcher.py:2397
 msgid "Reboot"
-msgstr "Repornește"
+msgstr ""
 
 #: faugus/launcher.py:2400
 msgid "Close"
-msgstr "Închide"
+msgstr ""
 
 #: faugus/launcher.py:2459
 msgid "Remove from hidden"
-msgstr "Elimină din ascunse"
+msgstr ""
 
 #: faugus/launcher.py:2459
 msgid "Hide"
-msgstr "Ascunde"
+msgstr ""
 
 #: faugus/launcher.py:2460
 msgid "Stop"
-msgstr "Oprește"
+msgstr ""
 
 #: faugus/launcher.py:2460
 msgid "Play"
-msgstr "Joacă"
+msgstr ""
 
 #: faugus/launcher.py:2521
 msgid "Delete"
-msgstr "Șterge"
+msgstr ""
 
 #: faugus/launcher.py:2524
 msgid "Duplicate"
-msgstr "Duplică"
+msgstr ""
 
 #: faugus/launcher.py:2527
 msgid "Category"
@@ -221,20 +212,19 @@ msgstr ""
 
 #: faugus/launcher.py:2530
 msgid "Open game location"
-msgstr "Deschide amplasarea jocului"
+msgstr ""
 
 #: faugus/launcher.py:2533
 msgid "Open prefix location"
-msgstr "Deschide amplasarea prefixului"
+msgstr ""
 
 #: faugus/launcher.py:2536
 msgid "Show logs"
-msgstr "Arată jurnale"
+msgstr ""
 
 #: faugus/launcher.py:2543
-#, fuzzy
 msgid "Run file in the prefix"
-msgstr "Rulează un fișier în cadrul prefixului"
+msgstr ""
 
 #: faugus/launcher.py:2557
 msgid "Clear recent"
@@ -246,121 +236,117 @@ msgstr ""
 
 #: faugus/launcher.py:2674
 msgid "hour"
-msgstr "oră"
+msgstr ""
 
 #: faugus/launcher.py:2675
 msgid "hours"
-msgstr "ore"
+msgstr ""
 
 #: faugus/launcher.py:2676
 msgid "minute"
-msgstr "minut"
+msgstr ""
 
 #: faugus/launcher.py:2677
 msgid "minutes"
-msgstr "minute"
+msgstr ""
 
 #: faugus/launcher.py:2860 faugus/launcher.py:5862 faugus/launcher.py:7815
-#, fuzzy
 msgid "Select a file to run in the prefix"
-msgstr "Alegeți fișierul de rulat în cadrul prefixului"
+msgstr ""
 
 #: faugus/launcher.py:2903
 #, python-format
 msgid "%s Logs"
-msgstr "Jurnale %s"
+msgstr ""
 
 #: faugus/launcher.py:2943
 msgid "Copy to clipboard"
-msgstr "Copiază în clipboard"
+msgstr ""
 
 #: faugus/launcher.py:2947
 msgid "Open file location"
-msgstr "Deschide amplasarea fișierului"
+msgstr ""
 
 #: faugus/launcher.py:3026 faugus/launcher.py:4152
-#, fuzzy, python-format
+#, python-format
 msgid "%s already exists"
-msgstr "%s există deja."
+msgstr ""
 
 #: faugus/launcher.py:3163 faugus/launcher.py:3984
-#, fuzzy, python-format
+#, python-format
 msgid "%s is running"
-msgstr "%s rulează deja."
+msgstr ""
 
 #: faugus/launcher.py:3645
 msgid "Proton may generate huge log files."
-msgstr "Proton poate genera fișiere cu jurnal uriașe."
+msgstr ""
 
 #: faugus/launcher.py:3646
 msgid "Enable logging only when debugging a problem."
-msgstr "Activați jurnalizarea doar când depanați o problemă."
+msgstr ""
 
 #: faugus/launcher.py:3908
 #, python-format
 msgid "Edit %s"
-msgstr "Modifică %s"
+msgstr ""
 
 #: faugus/launcher.py:4046
-#, fuzzy
 msgid "Failed to remove prefix"
-msgstr "Eliminarea prefixului a eșuat."
+msgstr ""
 
 #: faugus/launcher.py:4294
-#, fuzzy
 msgid "No internet connection"
-msgstr "Fără conexiune la Internet."
+msgstr ""
 
 #: faugus/launcher.py:4362 faugus/launcher.py:4530
 #, python-format
 msgid "Installing %s..."
-msgstr "Se instalează %s…"
+msgstr ""
 
 #: faugus/launcher.py:4374 faugus/launcher.py:4378 faugus/launcher.py:4382
 #: faugus/launcher.py:4386 faugus/launcher.py:4390 faugus/launcher.py:4394
 #: faugus/launcher.py:4398 faugus/launcher.py:4402 faugus/runner.py:613
 msgid "Downloading"
-msgstr "Se descarcă"
+msgstr ""
 
 #: faugus/launcher.py:4479
 #, python-format
 msgid "%s was not installed!"
-msgstr "%s nu a fost instalat!"
+msgstr ""
 
 #: faugus/launcher.py:4524
 msgid "Download complete"
-msgstr "Descărcare încheiată"
+msgstr ""
 
 #: faugus/launcher.py:4527
 #, python-format
 msgid "Error during download: %s"
-msgstr "Eroare la descărcare: %s"
+msgstr ""
 
 #: faugus/launcher.py:4532 faugus/launcher.py:4535 faugus/launcher.py:4538
 #: faugus/launcher.py:4553
 msgid "Please close the login window and wait."
-msgstr "Închideți fereastra de autentificare și așteptați."
+msgstr ""
 
 #: faugus/launcher.py:4552
 msgid "Please don't change the installation path."
-msgstr "Nu modificați calea de instalare."
+msgstr ""
 
 #: faugus/launcher.py:4559
 msgid "Please close Wargaming to finish the installation."
-msgstr "Închideți Wargaming pentru a finaliza instalarea."
+msgstr ""
 
 #: faugus/launcher.py:4964
 msgid "Settings"
-msgstr "Configurări"
+msgstr ""
 
 #: faugus/launcher.py:5085
 msgid "Language"
-msgstr "Limbă"
+msgstr ""
 
 #: faugus/launcher.py:5089
-#, fuzzy
 msgid "Interface Mode"
-msgstr "Regimul interfeței"
+msgstr ""
 
 #: faugus/launcher.py:5093
 msgid "List"
@@ -375,15 +361,13 @@ msgid "Covers"
 msgstr ""
 
 #: faugus/launcher.py:5098
-#, fuzzy
 msgid "Background"
-msgstr "Creează copie de rezervă"
+msgstr ""
 
 #: faugus/launcher.py:5101 faugus/launcher.py:5111 faugus/launcher.py:5120
 #: faugus/launcher.py:5128 faugus/utils.py:1095 faugus/utils.py:1692
-#, fuzzy
 msgid "Default"
-msgstr "Proton implicit"
+msgstr ""
 
 #: faugus/launcher.py:5102
 msgid "Accent color"
@@ -426,27 +410,24 @@ msgid "Startup Window Size"
 msgstr ""
 
 #: faugus/launcher.py:5144
-#, fuzzy
 msgid "Default size"
-msgstr "Proton implicit"
+msgstr ""
 
 #: faugus/launcher.py:5145
 msgid "Remember size"
 msgstr ""
 
 #: faugus/launcher.py:5146
-#, fuzzy
 msgid "Maximized"
-msgstr "Pornește maximizat"
+msgstr ""
 
 #: faugus/launcher.py:5147
-#, fuzzy
 msgid "Fullscreen"
-msgstr "exemplu: -d3d11 -fullscreen"
+msgstr ""
 
 #: faugus/launcher.py:5148 faugus/launcher.py:5636
 msgid "Alt+Enter toggles fullscreen"
-msgstr "Alt+Enter comută ecranul complet"
+msgstr ""
 
 #: faugus/launcher.py:5150
 msgid "Labels"
@@ -461,13 +442,12 @@ msgid "Carrousel"
 msgstr ""
 
 #: faugus/launcher.py:5161
-#, fuzzy
 msgid "SteamGridDB API Key"
-msgstr "Steam"
+msgstr ""
 
 #: faugus/launcher.py:5168
 msgid "Default Prefixes Location"
-msgstr "Amplasare implicită pentru prefixe"
+msgstr ""
 
 #: faugus/launcher.py:5172
 msgid "The location where prefixes are created"
@@ -475,24 +455,23 @@ msgstr ""
 
 #: faugus/launcher.py:5182
 msgid "Default Prefix Tools"
-msgstr "Unelte implicite pentru prefix"
+msgstr ""
 
 #: faugus/launcher.py:5188
 msgid "Default Proton"
-msgstr "Proton implicit"
+msgstr ""
 
 #: faugus/launcher.py:5192 faugus/proton_manager.py:84
 msgid "Proton Manager"
-msgstr "Gestionarul de Proton"
+msgstr ""
 
 #: faugus/launcher.py:5195
 msgid "Miscellaneous"
-msgstr "Diverse"
+msgstr ""
 
 #: faugus/launcher.py:5198
-#, fuzzy
 msgid "Discrete GPU"
-msgstr "Folosește placa grafică discretă"
+msgstr ""
 
 #: faugus/launcher.py:5200
 msgid "Auto-close on launch"
@@ -504,7 +483,7 @@ msgstr ""
 
 #: faugus/launcher.py:5204
 msgid "System tray icon"
-msgstr "Pictogramă în tava de sistem"
+msgstr ""
 
 #: faugus/launcher.py:5207
 msgid "Minimized startup"
@@ -512,17 +491,15 @@ msgstr ""
 
 #: faugus/launcher.py:5210
 msgid "Monochrome icon"
-msgstr "Pictogramă monocromă"
+msgstr ""
 
 #: faugus/launcher.py:5213
-#, fuzzy
 msgid "Splash window"
-msgstr "Dezactivează fereastra de întâmpinare"
+msgstr ""
 
 #: faugus/launcher.py:5216
-#, fuzzy
 msgid "Automatic updates"
-msgstr "Dezactivează actualizările automate"
+msgstr ""
 
 #: faugus/launcher.py:5219
 msgid "Logging"
@@ -541,37 +518,32 @@ msgid "Header bar"
 msgstr ""
 
 #: faugus/launcher.py:5228
-#, fuzzy
 msgid "Hidden games"
-msgstr "Arată jocurile ascunse"
+msgstr ""
 
 #: faugus/launcher.py:5229
-#, fuzzy
 msgid "Ctrl+H toggles hidden games"
-msgstr "Apăsați Ctrl+H pentru a ascunde/arăta jocuri."
+msgstr ""
 
 #: faugus/launcher.py:5231
 msgid "Gamepad navigation"
 msgstr ""
 
 #: faugus/launcher.py:5234
-#, fuzzy
 msgid "Wayland driver (experimental)"
-msgstr "Folosește driver Wayland (experimental)"
+msgstr ""
 
 #: faugus/launcher.py:5237
-#, fuzzy
 msgid "WOW64 (experimental)"
-msgstr "Activează WOW64 (experimental)"
+msgstr ""
 
 #: faugus/launcher.py:5247 faugus/launcher.py:6628
 msgid "Run"
-msgstr "Rulează"
+msgstr ""
 
 #: faugus/launcher.py:5250 faugus/launcher.py:6631
-#, fuzzy
 msgid "Run a file in the prefix"
-msgstr "Rulează un fișier în cadrul prefixului"
+msgstr ""
 
 #: faugus/launcher.py:5254 faugus/launcher.py:6616 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
@@ -587,101 +559,96 @@ msgstr ""
 
 #: faugus/launcher.py:5258
 msgid "Support the Project"
-msgstr "Susțineți proiectul"
+msgstr ""
 
 #: faugus/launcher.py:5272
 msgid "Backup/Restore Settings"
-msgstr "Copiază/restabilește configurările"
+msgstr ""
 
 #: faugus/launcher.py:5276
 msgid "Backup"
-msgstr "Creează copie de rezervă"
+msgstr ""
 
 #: faugus/launcher.py:5279
 msgid "Restore"
-msgstr "Restabilește"
+msgstr ""
 
 #: faugus/launcher.py:5286
 msgid "Global Environment Variables"
-msgstr "Variabile de mediu globale"
+msgstr ""
 
 #: faugus/launcher.py:5567
 #, python-format
 msgid "Clear Logs (%s)"
-msgstr "Curăță jurnalele (%s)"
+msgstr ""
 
 #: faugus/launcher.py:5570
 msgid "Clear Logs"
-msgstr "Curăță jurnalele"
+msgstr ""
 
 #: faugus/launcher.py:5618
-#, fuzzy
 msgid "Covers and SteamGridDB modes"
-msgstr "Steam"
+msgstr ""
 
 #: faugus/launcher.py:5619
-#, fuzzy
 msgid "SteamGridDB mode"
-msgstr "Steam"
+msgstr ""
 
 #: faugus/launcher.py:5620
-#, fuzzy
 msgid "Grid, Covers and SteamGridDB modes"
-msgstr "Steam"
+msgstr ""
 
 #: faugus/launcher.py:5806
 msgid "Do you want to save the changes?"
-msgstr "Doriți să salvați modificările?"
+msgstr ""
 
 #: faugus/launcher.py:5916
 msgid "Select a backup file to restore"
-msgstr "Alegeți un fișier cu copia de rezervă de restabilit"
+msgstr ""
 
 #: faugus/launcher.py:5922
 msgid "ZIP files"
-msgstr "Fișiere ZIP"
+msgstr ""
 
 #: faugus/launcher.py:5937 faugus/launcher.py:5947
-#, fuzzy
 msgid "This is not a valid Faugus backup file."
 msgstr ""
-"Acest fișier nu conține o copie de rezervă validă pentru Lansatorul Faugus."
 
 #: faugus/launcher.py:5986
 msgid "Are you sure you want to overwrite the settings?"
-msgstr "Sigur doriți să suprascrieți configurările?"
+msgstr ""
 
 #: faugus/launcher.py:5995 faugus/launcher.py:6298
 msgid "Yes"
-msgstr "Da"
+msgstr ""
 
 #: faugus/launcher.py:5996 faugus/launcher.py:6294
 msgid "No"
-msgstr "Nu"
+msgstr ""
 
 #: faugus/launcher.py:6003 faugus/launcher.py:8053
 msgid "Select a prefix location"
-msgstr "Alegeți amplasarea prefixului"
+msgstr ""
 
 #: faugus/launcher.py:6214
 #, python-format
 msgid "Duplicate %s"
-msgstr "Duplică %s"
+msgstr ""
 
 #: faugus/launcher.py:6220 faugus/launcher.py:6491 faugus/launcher.py:6504
 #: faugus/shortcut.py:44
 msgid "Title"
-msgstr "Titlu"
+msgstr ""
 
 #: faugus/launcher.py:6269
 #, python-format
 msgid "Delete %s"
-msgstr "Șterge %s"
+msgstr ""
 
 #: faugus/launcher.py:6277
 #, python-format
 msgid "Are you sure you want to delete %s?"
-msgstr "Sigur doriți să ștergeți %s?"
+msgstr ""
 
 #: faugus/launcher.py:6286
 #, python-format
@@ -693,18 +660,16 @@ msgid "WARNING: This prefix is used by 1 other game."
 msgstr ""
 
 #: faugus/launcher.py:6302
-#, fuzzy
 msgid "Also remove the prefix:"
-msgstr "Elimină și prefixul"
+msgstr ""
 
 #: faugus/launcher.py:6349
 msgid "New Game/App"
-msgstr "Joc/aplicație nouă"
+msgstr ""
 
 #: faugus/launcher.py:6474
-#, fuzzy
 msgid "Steam User"
-msgstr "Joc Steam"
+msgstr ""
 
 #: faugus/launcher.py:6488 faugus/launcher.py:7028 faugus/launcher.py:7030
 msgid "No Steam users found"
@@ -712,7 +677,7 @@ msgstr ""
 
 #: faugus/launcher.py:6556 faugus/utils.py:1478
 msgid "Path"
-msgstr "Cale"
+msgstr ""
 
 #: faugus/launcher.py:6560
 msgid "Path to the game executable"
@@ -720,46 +685,39 @@ msgstr ""
 
 #: faugus/launcher.py:6568
 msgid "Prefix"
-msgstr "Prefix"
+msgstr ""
 
 #: faugus/launcher.py:6572
-#, fuzzy
 msgid "Path to the prefix"
-msgstr "/calea/către/prefix"
+msgstr ""
 
 #: faugus/launcher.py:6580
 msgid "Proton"
-msgstr "Proton"
+msgstr ""
 
 #: faugus/launcher.py:6594 faugus/shortcut.py:61
 msgid "Game Arguments"
-msgstr "Argumente pentru joc"
+msgstr ""
 
 #: faugus/launcher.py:6599 faugus/shortcut.py:66 faugus/utils.py:1185
-#, fuzzy
 msgid "Launch Settings"
-msgstr "Configurări"
+msgstr ""
 
 #: faugus/launcher.py:6602 faugus/shortcut.py:69 faugus/utils.py:1449
 msgid "Additional Application"
-msgstr "Aplicație suplimentară"
+msgstr ""
 
 #: faugus/launcher.py:6605 faugus/shortcut.py:72
-#, fuzzy
 msgid "Additional application to run with the game"
 msgstr ""
-"Aplicație suplimentară de rulat împreună cu jocul, ca Cheat Engine, "
-"antrenori, modificări…"
 
 #: faugus/launcher.py:6607 faugus/shortcut.py:74 faugus/utils.py:1576
 msgid "Lossless Scaling Frame Generation"
-msgstr "Generarea cadrelor Lossless Scaling"
+msgstr ""
 
 #: faugus/launcher.py:6611
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Dezactivează Hidraw"
+msgstr ""
 
 #: faugus/launcher.py:6613
 msgid "Runs the game without the Steam Runtime"
@@ -767,201 +725,186 @@ msgstr ""
 
 #: faugus/launcher.py:6633
 msgid "Shortcut"
-msgstr "Scurtătură"
+msgstr ""
 
 #: faugus/launcher.py:6638
 msgid "Desktop"
-msgstr "Birou"
+msgstr ""
 
 #: faugus/launcher.py:6639
 msgid "App Menu"
-msgstr "Meniu de aplicații"
+msgstr ""
 
 #: faugus/launcher.py:6640
 msgid "Steam"
-msgstr "Steam"
+msgstr ""
 
 #: faugus/launcher.py:6694 faugus/launcher.py:6884
 msgid "Game/App"
-msgstr "Joc/aplicație"
+msgstr ""
 
 #: faugus/launcher.py:6695 faugus/launcher.py:6893
 msgid "Tools"
-msgstr "Unelte"
+msgstr ""
 
 #: faugus/launcher.py:6868
 msgid "Refresh"
-msgstr "Împrospătează"
+msgstr ""
 
 #: faugus/launcher.py:6871
 msgid "Load from file"
-msgstr "Încarcă din fișier"
+msgstr ""
 
 #: faugus/launcher.py:6874
 msgid "Load from URL"
-msgstr "Încarcă din URL"
+msgstr ""
 
 #: faugus/launcher.py:7036 faugus/shortcut.py:175
-#, fuzzy
 msgid "Vulkan Layer not found"
-msgstr "%s nu a fost găsit."
+msgstr ""
 
 #: faugus/launcher.py:7191
-#, fuzzy
 msgid "Select an image for the cover"
-msgstr "Alegeți o imagine pentru bandieră"
+msgstr ""
 
 #: faugus/launcher.py:7192
 msgid "Select an image for the banner"
-msgstr "Alegeți o imagine pentru bandieră"
+msgstr ""
 
 #: faugus/launcher.py:7193
-#, fuzzy
 msgid "Select an image for the icon"
-msgstr "Alegeți o imagine pentru bandieră"
+msgstr ""
 
 #: faugus/launcher.py:7223
 msgid "Enter the image URL"
-msgstr "Introduceți URL-ul imaginii"
+msgstr ""
 
 #: faugus/launcher.py:7783
 msgid "Windows Game"
-msgstr "Joc Windows"
+msgstr ""
 
 #: faugus/launcher.py:7784
 msgid "Linux Game"
-msgstr "Joc Linux"
+msgstr ""
 
 #: faugus/launcher.py:7785
 msgid "Steam Game"
-msgstr "Joc Steam"
+msgstr ""
 
 #: faugus/launcher.py:8022
-#, fuzzy
 msgid "Select the game executable"
-msgstr "Alegeți .exe-ul jocului"
+msgstr ""
 
 #: faugus/proton_manager.py:223 faugus/proton_manager.py:352
 #: faugus/proton_manager.py:356 faugus/proton_manager.py:366
 msgid "Download"
-msgstr "Descarcă"
+msgstr ""
 
 #: faugus/runner.py:163
 msgid "Starting Steam game..."
-msgstr "Se pornește un joc Steam…"
+msgstr ""
 
 #: faugus/runner.py:389
-#, fuzzy
 msgid "Are you enjoying Faugus?"
-msgstr "Vă place Lansatorul Faugus?"
+msgstr ""
 
 #: faugus/runner.py:393
 msgid "Please consider donating"
-msgstr "Vă rugăm să donați"
+msgstr ""
 
 #: faugus/runner.py:399
 msgid "Never show this message again"
-msgstr "Nu mai arăta acest mesaj niciodată"
+msgstr ""
 
 #: faugus/runner.py:409
 msgid "Continue"
-msgstr "Continuă"
+msgstr ""
 
 #: faugus/runner.py:444
-#, fuzzy
 msgid "Internet connection error"
-msgstr "Eroare de conexiune la Internet."
+msgstr ""
 
 #: faugus/runner.py:446
-#, fuzzy, python-format
+#, python-format
 msgid "%s was not found"
-msgstr "%s nu a fost găsit."
+msgstr ""
 
 #: faugus/runner.py:447
 msgid "Please install it or use another Proton version."
-msgstr "Instalați-l sau folosiți altă versiune de Proton."
+msgstr ""
 
 #: faugus/runner.py:587
 msgid "Components are up to date"
-msgstr "Componentele sunt la zi"
+msgstr ""
 
 #: faugus/runner.py:611
 msgid "Updating"
 msgstr ""
 
 #: faugus/runner.py:615
-#, fuzzy
 msgid "Extracting"
-msgstr "Se extrage…"
+msgstr ""
 
 #: faugus/runner.py:621
-#, fuzzy
 msgid "is up to date"
-msgstr "GE-Proton este la zi"
+msgstr ""
 
 #: faugus/runner.py:687
 msgid "The keys and values were successfully added to the registry."
-msgstr "Cheile și valorile au fost adăugate cu succes la registru."
+msgstr ""
 
 #: faugus/tray_sni.py:271
-#, fuzzy
 msgid "Open Faugus"
-msgstr "Deschide Lansatorul Faugus"
+msgstr ""
 
 #: faugus/tray_sni.py:272
 msgid "Quit"
-msgstr "Termină"
+msgstr ""
 
 #: faugus/utils.py:600 faugus/utils.py:613
 msgid "Open"
-msgstr "Deschide"
+msgstr ""
 
 #: faugus/utils.py:656
 msgid "Windows files"
-msgstr "Fișiere Windows"
+msgstr ""
 
 #: faugus/utils.py:664
 msgid "All files"
-msgstr "Toate fișierele"
+msgstr ""
 
 #: faugus/utils.py:674
 msgid "Image files"
-msgstr "Fișiere cu imagine"
+msgstr ""
 
 #: faugus/utils.py:824
 msgid "The selected file is not a valid image."
-msgstr "Fișierul ales nu este o imagine validă."
+msgstr ""
 
 #: faugus/utils.py:825
 msgid "Please choose another one."
-msgstr "Alegeți altul."
+msgstr ""
 
 #: faugus/utils.py:869 faugus/utils.py:883
-#, fuzzy
 msgid ""
 "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more"
 msgstr ""
-"Arată o suprapunere pentru monitorizarea ratei de cadre, temperaturii, "
-"încărcării procesorului și plăcii grafice, și altele."
 
 #: faugus/utils.py:870
-#, fuzzy
 msgid "MangoHud not found"
-msgstr "%s nu a fost găsit."
+msgstr ""
 
 #: faugus/utils.py:877 faugus/utils.py:885
-#, fuzzy
 msgid "Tweaks your system to improve performance"
-msgstr "Vă ajustează sistemul pentru a-i îmbunătăți performanța."
+msgstr ""
 
 #: faugus/utils.py:877
-#, fuzzy
 msgid "GameMode not found"
-msgstr "%s nu a fost găsit."
+msgstr ""
 
 #: faugus/utils.py:891
 msgid "Select an icon for the shortcut"
-msgstr "Alegeți o pictogramă pentru scurtătură"
+msgstr ""
 
 #: faugus/utils.py:1095 faugus/utils.py:1096 faugus/utils.py:1097
 #: faugus/utils.py:1098 faugus/utils.py:1099
@@ -978,12 +921,11 @@ msgstr ""
 
 #: faugus/utils.py:1321
 msgid "Launch Arguments"
-msgstr "Argumente pentru lansare"
+msgstr ""
 
 #: faugus/utils.py:1377
-#, fuzzy
 msgid "Select a command or script"
-msgstr "Alegeți o pictogramă pentru scurtătură"
+msgstr ""
 
 #: faugus/utils.py:1402
 msgid "Pre-launch"
@@ -1003,82 +945,75 @@ msgstr ""
 
 #: faugus/utils.py:1474 faugus/utils.py:1658
 msgid "Enable"
-msgstr "Activează"
+msgstr ""
 
 #: faugus/utils.py:1483
-#, fuzzy
 msgid "Path to the application"
-msgstr "Rulează mai întâi aplicația"
+msgstr ""
 
 #: faugus/utils.py:1495
 msgid "Select an additional application"
-msgstr "Alegeți o aplicație suplimentară"
+msgstr ""
 
 #: faugus/utils.py:1512
 msgid "Delay (seconds)"
-msgstr "Întârziere (secunde)"
+msgstr ""
 
 #: faugus/utils.py:1525
 msgid "Run the application first"
-msgstr "Rulează mai întâi aplicația"
+msgstr ""
 
 #: faugus/utils.py:1609
 msgid "Lossless Scaling Location"
-msgstr "Amplasarea „Lossless Scaling”"
+msgstr ""
 
 #: faugus/utils.py:1617
-#, fuzzy
 msgid "Lossless.dll location"
-msgstr "Amplasarea „Lossless Scaling”"
+msgstr ""
 
 #: faugus/utils.py:1629
 msgid "Select the Lossless.dll file"
-msgstr "Alegeți fișierul Lossless.dll"
+msgstr ""
 
 #: faugus/utils.py:1662
 msgid "Multiplier"
-msgstr "Multiplicator"
+msgstr ""
 
 #: faugus/utils.py:1667
-#, fuzzy
 msgid "Multiply the FPS"
-msgstr "Multiplică rata de cadre."
+msgstr ""
 
 #: faugus/utils.py:1669
 msgid "Flow Scale"
-msgstr "Scara debitului"
+msgstr ""
 
 #: faugus/utils.py:1676
-#, fuzzy
 msgid "Lower the internal motion estimation resolution"
-msgstr "Scade rezoluția internă a estimării mișcării."
+msgstr ""
 
 #: faugus/utils.py:1678
 msgid "Performance Mode"
-msgstr "Regim de performanță"
+msgstr ""
 
 #: faugus/utils.py:1679
-#, fuzzy
 msgid "Massively improve performance at the cost of quality"
-msgstr "Crește masiv performanța în detrimentul calității."
+msgstr ""
 
 #: faugus/utils.py:1682
 msgid "HDR Mode"
-msgstr "Regim HDR"
+msgstr ""
 
 #: faugus/utils.py:1683
-#, fuzzy
 msgid "Enable special HDR-only behavior"
-msgstr "Activează comportamentul special pentru HDR exclusiv."
+msgstr ""
 
 #: faugus/utils.py:1686
 msgid "Present Mode (Experimental)"
-msgstr "Regim de prezentare (experimental)"
+msgstr ""
 
 #: faugus/utils.py:1690
-#, fuzzy
 msgid "Override the present mode"
-msgstr "Supradefinește regimul de prezentare."
+msgstr ""
 
 #: faugus/utils.py:2063
 msgid "No SteamGridDB API key configured."
@@ -1089,237 +1024,17 @@ msgid "Add your API key in Settings first."
 msgstr ""
 
 #: faugus/utils.py:2077
-#, fuzzy
 msgid "Choose a cover"
-msgstr "Pictogramă în tava de sistem"
+msgstr ""
 
 #: faugus/utils.py:2078
-#, fuzzy
 msgid "Choose a banner"
-msgstr "Pictogramă în tava de sistem"
+msgstr ""
 
 #: faugus/utils.py:2079
-#, fuzzy
 msgid "Choose an icon"
-msgstr "Pictogramă în tava de sistem"
+msgstr ""
 
 #: faugus/utils.py:2201
 msgid "No results found"
 msgstr ""
-
-#~ msgid "Faugus Proton Manager"
-#~ msgstr "Gestionarul de Proton Faugus"
-
-#~ msgid "Downloading..."
-#~ msgstr "Se descarcă…"
-
-#, python-format
-#~ msgid "Downloading %s..."
-#~ msgstr "Se descarcă %s…"
-
-#~ msgid "Error during download"
-#~ msgstr "Eroare la descărcare"
-
-#, fuzzy
-#~ msgid "Mode"
-#~ msgstr "Regim HDR"
-
-#, fuzzy
-#~ msgid ""
-#~ "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more\n"
-#~ "MangoHud not found"
-#~ msgstr ""
-#~ "Arată o suprapunere pentru monitorizarea ratei de cadre, temperaturii, "
-#~ "încărcării procesorului și plăcii grafice, și altele."
-
-#, fuzzy
-#~ msgid ""
-#~ "Tweaks your system to improve performance\n"
-#~ "GameMode not found"
-#~ msgstr "Vă ajustează sistemul pentru a-i îmbunătăți performanța."
-
-#~ msgid "-d3d11 -fullscreen"
-#~ msgstr "exemplu: -d3d11 -fullscreen"
-
-#~ msgid "Run file inside the prefix"
-#~ msgstr "Rulează fișier în cadrul prefixului"
-
-#, python-format
-#~ msgid "%s is already running."
-#~ msgstr "%s rulează deja."
-
-#, fuzzy
-#~ msgid "Show hero"
-#~ msgstr "Arată jurnale"
-
-#~ msgid "Start in fullscreen"
-#~ msgstr "Pornește în ecran complet"
-
-#~ msgid "Show labels"
-#~ msgstr "Arată etichetele"
-
-#~ msgid "Close when running a game/app"
-#~ msgstr "Închide când rulează joc/aplicație"
-
-#~ msgid "Start on boot"
-#~ msgstr "Pornește la demarare"
-
-#, fuzzy
-#~ msgid "Start minimized to tray"
-#~ msgstr "Pornește maximizat"
-
-#~ msgid "Enable logging"
-#~ msgstr "Activează jurnalizarea"
-
-#~ msgid "Prevent Sleep"
-#~ msgstr "Previne adormirea"
-
-#, fuzzy
-#~ msgid "Lossless.dll not found"
-#~ msgstr "%s nu a fost găsit."
-
-#, fuzzy
-#~ msgid ""
-#~ "Lossless.dll NOT FOUND. If it's installed, go to Faugus's settings and "
-#~ "set the location."
-#~ msgstr ""
-#~ "Lossless.dll NU A FOST GĂSIT. Dacă acesta e instalat, mergeți în "
-#~ "configurările Lansatorului Faugus și stabiliți amplasarea."
-
-#~ msgid "Lossless Scaling Vulkan Layer NOT INSTALLED."
-#~ msgstr "Stratul Vulkan pentru Lossless Scaling NU E INSTALAT."
-
-#~ msgid ""
-#~ "Shows an overlay for monitoring FPS, temperatures, CPU/GPU load and more. "
-#~ "NOT INSTALLED."
-#~ msgstr ""
-#~ "Arată o suprapunere pentru monitorizarea ratei de cadre, temperaturii, "
-#~ "încărcării procesorului și plăcii grafice, și altele. NU ESTE INSTALAT."
-
-#~ msgid "Tweaks your system to improve performance. NOT INSTALLED."
-#~ msgstr ""
-#~ "Vă ajustează sistemul pentru a-i îmbunătăți performanța. NU ESTE INSTALAT."
-
-#~ msgid "Add to favorites"
-#~ msgstr "Adaugă la favorite"
-
-#~ msgid "Remove from favorites"
-#~ msgstr "Elimină din favorite"
-
-#~ msgid ""
-#~ "Add or remove a shortcut from Steam. Steam needs to be restarted. NO "
-#~ "STEAM USERS FOUND."
-#~ msgstr ""
-#~ "Adaugă sau elimină o scurtătură din Steam. Steam trebuie repornit. NU AU "
-#~ "FOST GĂSIȚI UTILIZATORI STEAM."
-
-#, python-format
-#~ msgid "%s is running. Please close it first."
-#~ msgstr "%s rulează. Închideți-l mai întâi."
-
-#~ msgid "Finish installation"
-#~ msgstr "Finalizează instalarea"
-
-#~ msgid "Smaller banners"
-#~ msgstr "Bandiere mai mici"
-
-#~ msgid "/path/to/Lossless.dll"
-#~ msgstr "/calea/către/Lossless.dll"
-
-#~ msgid "Only works with GE-Proton10 or Proton-EM-10."
-#~ msgstr "Funcționează doar cu GE-Proton10 sau Proton-EM-10."
-
-#~ msgid "Enable HDR (experimental)"
-#~ msgstr "Activează HDR (experimental)"
-
-#~ msgid ""
-#~ "Only works with GE-Proton10-9 or superior and Proton-EM-10-24 or superior."
-#~ msgstr ""
-#~ "Funcționează doar cu GE-Proton10-9 sau ulterior și Proton-EM-10-24 sau "
-#~ "ulterior."
-
-#~ msgid ""
-#~ "May fix controller issues with some games. Only works with GE-Proton10 or "
-#~ "Proton-EM-10."
-#~ msgstr ""
-#~ "Poate rezolva problemele cu controlori în unele jocuri. Funcționează doar "
-#~ "cu GE-Proton10 sau Proton-EM-10."
-
-#~ msgid "Save the backup file as..."
-#~ msgstr "Salvează copia de rezervă ca…"
-
-#~ msgid "Save"
-#~ msgstr "Salvează"
-
-#~ msgid "Game Title"
-#~ msgstr "Titlul jocului"
-
-#~ msgid "/path/to/the/exe"
-#~ msgstr "/calea/către/exe"
-
-#~ msgid "e.g.: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
-#~ msgstr "exemplu: PROTON_USE_WINED3D=1 gamescope -W 2560 -H 1440"
-
-#~ msgid "Add or remove a shortcut from the Desktop."
-#~ msgstr "Adaugă sau elimină o scurtătură de pe birou."
-
-#~ msgid "Add or remove a shortcut from the Application Menu."
-#~ msgstr "Adaugă sau elimină o scurtătură din meniul de aplicații."
-
-#~ msgid "Add or remove a shortcut from Steam. Steam needs to be restarted."
-#~ msgstr "Adaugă sau elimină o scurtătură din Steam. Steam trebuie repornit."
-
-#~ msgid "/path/to/the/app"
-#~ msgstr "/calea/către/aplicație"
-
-#, python-format
-#~ msgid "Extracting %s..."
-#~ msgstr "Se extrage %s…"
-
-#~ msgid "Error during extraction"
-#~ msgstr "Eroare la extragere"
-
-#~ msgid "Updating UMU-Launcher..."
-#~ msgstr "Se actualizează UMU-Launcher…"
-
-#~ msgid "UMU-Launcher is up to date"
-#~ msgstr "UMU-Launcher este la zi"
-
-#~ msgid "Updating BattlEye..."
-#~ msgstr "Se actualizează BattlEye…"
-
-#~ msgid "Updating Easy Anti-Cheat..."
-#~ msgstr "Se actualizează Easy Anti-Cheat…"
-
-#~ msgid "Downloading UMU-Proton..."
-#~ msgstr "Se descarcă UMU-Proton…"
-
-#~ msgid "Downloading Steam Runtime..."
-#~ msgstr "Se descarcă Steam Runtime…"
-
-#~ msgid "Extracting Steam Runtime..."
-#~ msgstr "Se extrage Steam Runtime…"
-
-#~ msgid "Extracting UMU-Proton..."
-#~ msgstr "Se extrage UMU-Proton…"
-
-#~ msgid "UMU-Proton is up to date"
-#~ msgstr "UMU-Proton este la zi"
-
-#~ msgid "Steam Runtime is up to date"
-#~ msgstr "Steam Runtime este la zi"
-
-#~ msgid "Downloading GE-Proton..."
-#~ msgstr "Se descarcă GE-Proton…"
-
-#~ msgid "Extracting GE-Proton..."
-#~ msgstr "Se extrage GE-Proton…"
-
-#~ msgid "Downloading Proton-EM..."
-#~ msgstr "Se descarcă Proton-EM…"
-
-#~ msgid "Extracting Proton-EM..."
-#~ msgstr "Se extrage Proton-EM…"
-
-#~ msgid "Proton-EM is up to date"
-#~ msgstr "Proton-EM este la zi"
