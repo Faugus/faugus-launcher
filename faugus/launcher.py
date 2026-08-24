@@ -20,7 +20,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
-from faugus.main_screen_nav import adjust_widget_value, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
+from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 
 VERSION = "2.1.0"
 
@@ -1883,6 +1883,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         outer.add_controller(carrousel_key)
         outer.connect("notify::has-focus", self.on_carrousel_focus_changed)
 
+        carrousel_scroll = Gtk.EventControllerScroll()
+        carrousel_scroll.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES)
+        carrousel_scroll.connect("scroll", self.on_carrousel_scroll)
+        outer.add_controller(carrousel_scroll)
+
         self.carrousel_index = 0
         self.carrousel_fixed = outer
         self.carrousel_min_offset = -4
@@ -2108,6 +2113,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if direction is None:
             return False
         return navigate_focus(direction)
+
+    def on_carrousel_scroll(self, controller, dx, dy):
+        if not self.carrousel_active():
+            return False
+
+        delta = dy if dy != 0 else dx
+        if delta == 0:
+            return False
+
+        self.carrousel_fixed.grab_focus()
+        self.on_carrousel_focus_changed(self.carrousel_fixed, None)
+        carrousel_move_coalesced(self, 1 if delta > 0 else -1)
+        return True
 
     def on_carrousel_slot_click(self, slot, n_press):
         self.carrousel_fixed.grab_focus()
