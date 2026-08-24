@@ -2399,7 +2399,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         self.current_category = new_cat
                         self.button_category.set_label(new_cat)
 
-                    self.flowbox.invalidate_filter()
+                    if self.carrousel_active():
+                        self.render_carrousel()
+                    else:
+                        self.flowbox.invalidate_filter()
 
                 populate_dialog_list()
                 return False
@@ -2429,7 +2432,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.button_category.set_label(_("All"))
 
                 populate_dialog_list()
-                self.flowbox.invalidate_filter()
+                if self.carrousel_active():
+                    self.render_carrousel()
+                else:
+                    self.flowbox.invalidate_filter()
 
         btn_add.connect("clicked", on_add)
         btn_edit.connect("clicked", on_edit)
@@ -2488,14 +2494,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if changed:
                 save_json_file(data, GAMES_JSON)
-                for flowbox_child in widget_children(self.flowbox):
-                    if hasattr(flowbox_child, "game"):
-                        child_cat = getattr(flowbox_child.game, "category", [])
-                        if isinstance(child_cat, str) and child_cat == old_cat:
-                            flowbox_child.game.category = [new_cat]
-                        elif isinstance(child_cat, list) and old_cat in child_cat:
-                            child_cat = [new_cat if c == old_cat else c for c in child_cat]
-                            flowbox_child.game.category = list(dict.fromkeys(child_cat))
+                for g in self.games:
+                    child_cat = getattr(g, "category", [])
+                    if isinstance(child_cat, str) and child_cat == old_cat:
+                        g.category = [new_cat]
+                    elif isinstance(child_cat, list) and old_cat in child_cat:
+                        child_cat = [new_cat if c == old_cat else c for c in child_cat]
+                        g.category = list(dict.fromkeys(child_cat))
         except Exception:
             pass
 
@@ -2519,14 +2524,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if changed:
                 save_json_file(data, GAMES_JSON)
-                for child in widget_children(self.flowbox):
-                    if hasattr(child, "game"):
-                        child_cat = getattr(child.game, "category", [])
-                        if isinstance(child_cat, str) and child_cat == cat_to_remove:
-                            child.game.category = []
-                        elif isinstance(child_cat, list) and cat_to_remove in child_cat:
-                            child_cat.remove(cat_to_remove)
-                            child.game.category = child_cat
+                for g in self.games:
+                    child_cat = getattr(g, "category", [])
+                    if isinstance(child_cat, str) and child_cat == cat_to_remove:
+                        g.category = []
+                    elif isinstance(child_cat, list) and cat_to_remove in child_cat:
+                        child_cat.remove(cat_to_remove)
+                        g.category = child_cat
         except Exception:
             pass
 
@@ -2933,15 +2937,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     else:
                         item["category"] = current_cats
 
-                    for child in widget_children(self.flowbox):
-                        if hasattr(child, "game") and child.game.gameid == selected_gameid:
-                            child.game.category = current_cats if current_cats else None
+                    for g in self.games:
+                        if g.gameid == selected_gameid:
+                            g.category = current_cats if current_cats else None
                             break
                     break
 
             save_json_file(data, GAMES_JSON)
 
         except Exception:
+            return
+
+        if self.carrousel_active():
+            games = self.carrousel_visible_games()
+            for idx, g in enumerate(games):
+                if g.gameid == selected_gameid:
+                    self.carrousel_index = idx
+                    break
+            self.render_carrousel()
             return
 
         self.flowbox.invalidate_filter()
