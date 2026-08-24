@@ -1714,6 +1714,67 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         right_click.connect("pressed", lambda g, n, x, y, slot=slot: self.on_carrousel_slot_right_click(slot, x, y))
         card.add_controller(right_click)
 
+        def on_prepare(source, x, y, slot=slot):
+            g = getattr(slot["box"], "game", None)
+            if not g:
+                return None
+            self._drag_source_id = g.gameid
+            return Gdk.ContentProvider.new_for_value(g.gameid)
+
+        def on_drag_begin(source, drag, slot=slot):
+            g = getattr(slot["box"], "game", None)
+            try:
+                if g and hasattr(g, 'icon') and g.icon:
+                    if os.path.isfile(g.icon):
+                        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(g.icon, 48, 48, True)
+                        source.set_icon(Gdk.Texture.new_for_pixbuf(pixbuf), 24, 24)
+                    else:
+                        theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+                        icon_paintable = theme.lookup_icon(
+                            g.icon, None, 48, slot["box"].get_scale_factor(),
+                            Gtk.TextDirection.NONE, 0)
+                        source.set_icon(icon_paintable, 24, 24)
+            except Exception:
+                pass
+
+        def on_drag_end(source, drag, delete_data):
+            self._drag_source_id = None
+            if self._carrousel_dnd_timeout_id is not None:
+                GLib.source_remove(self._carrousel_dnd_timeout_id)
+                self._carrousel_dnd_timeout_id = None
+                self.apply_pending_carrousel_reorder()
+            if self.current_sort_id == "custom":
+                save_json_file(self.custom_order_data, CUSTOM_ORDER)
+
+        drag_source = Gtk.DragSource()
+        drag_source.set_actions(Gdk.DragAction.MOVE)
+        drag_source.connect("prepare", on_prepare)
+        drag_source.connect("drag-begin", on_drag_begin)
+        drag_source.connect("drag-end", on_drag_end)
+        card.add_controller(drag_source)
+
+        def on_drop_motion(target, x, y, slot=slot):
+            if self.current_sort_id != "custom" or not getattr(self, '_drag_source_id', None):
+                return 0
+
+            target_g = getattr(slot["box"], "game", None)
+            if not target_g:
+                return 0
+
+            source_id = self._drag_source_id
+            target_id = target_g.gameid
+            if source_id != target_id:
+                self._carrousel_dnd_pending = (source_id, target_id)
+                if self._carrousel_dnd_timeout_id is None:
+                    self._carrousel_dnd_timeout_id = GLib.timeout_add(500, self.apply_pending_carrousel_reorder)
+
+            return Gdk.DragAction.MOVE
+
+        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.MOVE)
+        drop_target.connect("motion", on_drop_motion)
+        drop_target.connect("drop", lambda target, value, x, y: True)
+        card.add_controller(drop_target)
+
         return slot
 
     def carrousel_slot_size(self):
@@ -1828,6 +1889,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.carrousel_max_offset = 4
         self.carrousel_radius = 3
         self._carrousel_anim_id = None
+        self._carrousel_dnd_pending = None
+        self._carrousel_dnd_timeout_id = None
         self.carrousel_step = 0
         self.carrousel_center_x = 0
         self.carrousel_center_y = 0
@@ -1915,6 +1978,53 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             slot["offset"] = new_offset
 
         self.carrousel_start_animation()
+        self.schedule_background_update()
+        self.update_icon()
+
+    def apply_pending_carrousel_reorder(self):
+        self._carrousel_dnd_timeout_id = None
+        pending = self._carrousel_dnd_pending
+        self._carrousel_dnd_pending = None
+        if not pending:
+            return False
+
+        source_id, target_id = pending
+        ordered = [g.gameid for g in self.carrousel_visible_games()]
+
+        try:
+            src = ordered.index(source_id)
+            dst = ordered.index(target_id)
+        except ValueError:
+            return False
+
+        if src != dst:
+            ordered.pop(src)
+            ordered.insert(dst, source_id)
+
+            for idx, gid in enumerate(ordered):
+                self.custom_order_data[gid] = idx
+
+            self.carrousel_resync_after_reorder(source_id)
+
+        return False
+
+    def carrousel_resync_after_reorder(self, anchor_gameid):
+        games = self.carrousel_visible_games()
+        n = len(games)
+        if n == 0:
+            return
+
+        for idx, g in enumerate(games):
+            if g.gameid == anchor_gameid:
+                self.carrousel_index = idx
+                break
+
+        for slot in self.carrousel_slots:
+            idx = (self.carrousel_index + round(slot["offset"])) % n
+            game = games[idx]
+            if slot.get("gameid") != game.gameid:
+                self.set_carrousel_slot_content(slot, game)
+
         self.schedule_background_update()
         self.update_icon()
 
