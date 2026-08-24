@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-21 05:33+0000\n"
+"PO-Revision-Date: 2026-08-25 06:51+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -442,7 +442,7 @@ msgstr "Мащабиране"
 
 #: faugus/launcher.py:5156
 msgid "Carrousel"
-msgstr ""
+msgstr "Въртележка"
 
 #: faugus/launcher.py:5161
 msgid "SteamGridDB API Key"
@@ -509,14 +509,12 @@ msgid "Logging"
 msgstr "Включване на журналите"
 
 #: faugus/launcher.py:5222
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Категория"
+msgstr "Категории"
 
 #: faugus/launcher.py:5224
 msgid "Sort"
-msgstr ""
+msgstr "Подредба"
 
 #: faugus/launcher.py:5226
 msgid "Header bar"
@@ -592,22 +590,16 @@ msgid "Clear Logs"
 msgstr "Изчистване на журналите"
 
 #: faugus/launcher.py:5618
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers and SteamGridDB modes"
-msgstr "Ключ за SteamGridDB API"
+msgstr "Обложки и режими за SteamGridDB"
 
 #: faugus/launcher.py:5619
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB mode"
-msgstr "Ключ за SteamGridDB API"
+msgstr "Режим на SteamGridDB"
 
 #: faugus/launcher.py:5620
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Grid, Covers and SteamGridDB modes"
-msgstr "Ключ за SteamGridDB API"
+msgstr "Решетка, обложки и режими за SteamGridDB"
 
 #: faugus/launcher.py:5806
 msgid "Do you want to save the changes?"
