@@ -1110,11 +1110,11 @@ def populate_combobox_with_runners(combobox):
                 entry_path = os.path.join(compat_dir, entry)
                 if (
                     os.path.isdir(entry_path)
-                    and entry not in ("UMU-Latest", "LegacyRuntime")
-                    and not entry.startswith("Proton-GE Latest")
-                    and not entry.startswith("Proton-EM Latest")
-                    and not entry.startswith("DW-Proton Latest")
-                    and not entry.startswith("Proton-CachyOS Latest")
+                    and entry not in (
+                        "UMU-Latest", "LegacyRuntime",
+                        "Proton-GE Latest", "Proton-EM Latest",
+                        "DW-Proton Latest", "Proton-CachyOS Latest",
+                    )
                 ):
                     versions.add(entry)
 
