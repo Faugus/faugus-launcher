@@ -352,15 +352,36 @@ def _focus_games_area(window):
     return True
 
 
+def carrousel_move_coalesced(window, delta):
+    if getattr(window, "_carrousel_anim_id", None) is None:
+        window.carrousel_move(delta)
+        return
+
+    window._carrousel_pending_delta = getattr(window, "_carrousel_pending_delta", 0) + delta
+
+    if getattr(window, "_carrousel_pending_timeout_id", None) is not None:
+        return
+
+    def flush():
+        window._carrousel_pending_timeout_id = None
+        pending = window._carrousel_pending_delta
+        window._carrousel_pending_delta = 0
+        if pending != 0:
+            window.carrousel_move(pending)
+        return False
+
+    window._carrousel_pending_timeout_id = GLib.timeout_add(70, flush)
+
+
 def navigate_main_screen(window, focused, direction):
     carrousel_fixed = getattr(window, "carrousel_fixed", None)
     if carrousel_fixed is not None and getattr(window, "carrousel_active", lambda: False)() \
             and (focused is carrousel_fixed or _is_descendant_of(focused, carrousel_fixed)):
         if direction == Gtk.DirectionType.LEFT:
-            window.carrousel_move(-1)
+            carrousel_move_coalesced(window, -1)
             return True
         if direction == Gtk.DirectionType.RIGHT:
-            window.carrousel_move(1)
+            carrousel_move_coalesced(window, 1)
             return True
         if direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
             result = escape_focus(window, carrousel_fixed, direction)

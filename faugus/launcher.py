@@ -1956,6 +1956,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not games:
             return
 
+        if self._carrousel_anim_id is not None:
+            self.carrousel_fixed.remove_tick_callback(self._carrousel_anim_id)
+            self._carrousel_anim_id = None
+            for slot in self.carrousel_slots:
+                slot.pop("_settle_offset", None)
+                self.layout_carrousel_slot(slot, slot["offset"])
+
         self.carrousel_radius = self.carrousel_radius_for_count(n)
         self.carrousel_index = (self.carrousel_index + delta) % n
 
