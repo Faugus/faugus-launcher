@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-21 05:33+0000\n"
+"PO-Revision-Date: 2026-08-25 06:51+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -441,7 +441,7 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5156
 msgid "Carrousel"
-msgstr ""
+msgstr "Karusell"
 
 #: faugus/launcher.py:5161
 msgid "SteamGridDB API Key"
@@ -508,14 +508,12 @@ msgid "Logging"
 msgstr "Loggning"
 
 #: faugus/launcher.py:5222
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Kategori"
+msgstr "Kategorier"
 
 #: faugus/launcher.py:5224
 msgid "Sort"
-msgstr ""
+msgstr "Sortering"
 
 #: faugus/launcher.py:5226
 msgid "Header bar"
@@ -591,22 +589,16 @@ msgid "Clear Logs"
 msgstr "Rensa loggar"
 
 #: faugus/launcher.py:5618
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers and SteamGridDB modes"
-msgstr "API-nyckel för SteamGridDB"
+msgstr "Omslag och SteamGridDB-lägen"
 
 #: faugus/launcher.py:5619
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB mode"
-msgstr "API-nyckel för SteamGridDB"
+msgstr "SteamGridDB läge"
 
 #: faugus/launcher.py:5620
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Grid, Covers and SteamGridDB modes"
-msgstr "API-nyckel för SteamGridDB"
+msgstr "Rutnät, Omslag och SteamGridDB-lägen"
 
 #: faugus/launcher.py:5806
 msgid "Do you want to save the changes?"
