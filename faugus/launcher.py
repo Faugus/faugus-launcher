@@ -1959,22 +1959,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.carrousel_radius = self.carrousel_radius_for_count(n)
         self.carrousel_index = (self.carrousel_index + delta) % n
 
+        span = self.carrousel_max_offset - self.carrousel_min_offset + 1
+
         for slot in self.carrousel_slots:
             old_offset = slot["offset"]
-            new_offset = old_offset - delta
-            if new_offset < self.carrousel_min_offset:
-                new_offset = self.carrousel_max_offset
-            elif new_offset > self.carrousel_max_offset:
-                new_offset = self.carrousel_min_offset
+            raw_offset = old_offset - delta
 
-            if abs(new_offset - old_offset) > 1:
+            if raw_offset < self.carrousel_min_offset or raw_offset > self.carrousel_max_offset:
+                new_offset = self.carrousel_min_offset + (raw_offset - self.carrousel_min_offset) % span
+                edge = self.carrousel_max_offset if raw_offset > self.carrousel_max_offset else self.carrousel_min_offset
                 idx = (self.carrousel_index + new_offset) % n
                 self.set_carrousel_slot_content(slot, games[idx])
-                slot["anim_from"] = new_offset
+                slot["anim_from"] = edge
+                slot["anim_to"] = edge
+                slot["_settle_offset"] = new_offset
             else:
+                new_offset = raw_offset
                 slot["anim_from"] = slot.get("visual_offset", old_offset)
+                slot["anim_to"] = new_offset
+                slot["_settle_offset"] = None
 
-            slot["anim_to"] = new_offset
             slot["offset"] = new_offset
 
         self.carrousel_start_animation()
@@ -2043,6 +2047,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 current = slot["anim_from"] + (slot["anim_to"] - slot["anim_from"]) * eased
                 self.layout_carrousel_slot(slot, current)
             if t >= 1.0:
+                for slot in self.carrousel_slots:
+                    settle_offset = slot.pop("_settle_offset", None)
+                    if settle_offset is not None:
+                        self.layout_carrousel_slot(slot, settle_offset)
                 self._carrousel_anim_id = None
                 return False
             return True
