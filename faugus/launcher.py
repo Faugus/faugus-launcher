@@ -1942,7 +1942,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot["label"].set_text("")
                 slot["box"].game = None
                 place_base(slot)
-                self.layout_carrousel_slot(slot, slot["offset"])
+                slot["box"].set_opacity(0.0)
+                slot["box"].set_can_target(False)
+                slot["_can_target"] = False
+                slot["style_provider"].load_from_data(
+                    b"entry.flowbox-entry.cover-container.carrousel-cover-box { transition: none; box-shadow: none; }"
+                )
             return
 
         self.carrousel_index %= n
