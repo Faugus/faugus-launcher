@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-23 18:23+0000\n"
-"PO-Revision-Date: 2026-08-23 18:04+0000\n"
+"PO-Revision-Date: 2026-08-25 06:51+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -508,14 +508,12 @@ msgid "Logging"
 msgstr "Activar logging"
 
 #: faugus/launcher.py:5222
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Categoría"
+msgstr "Categorías"
 
 #: faugus/launcher.py:5224
 msgid "Sort"
-msgstr ""
+msgstr "Ordenar"
 
 #: faugus/launcher.py:5226
 msgid "Header bar"
@@ -591,22 +589,16 @@ msgid "Clear Logs"
 msgstr "Borrar registros"
 
 #: faugus/launcher.py:5618
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers and SteamGridDB modes"
-msgstr "SteamGridDB API Key"
+msgstr "Portadas y modos SteamGridDB"
 
 #: faugus/launcher.py:5619
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB mode"
-msgstr "SteamGridDB API Key"
+msgstr "Modo SteamGridDB"
 
 #: faugus/launcher.py:5620
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Grid, Covers and SteamGridDB modes"
-msgstr "SteamGridDB API Key"
+msgstr "Grilla, Portadas y modos SteamGridDB"
 
 #: faugus/launcher.py:5806
 msgid "Do you want to save the changes?"
