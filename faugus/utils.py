@@ -1398,17 +1398,17 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
     btn_move_up.connect("clicked", lambda b: on_move_clicked(b, -1))
     btn_move_down.connect("clicked", lambda b: on_move_clicked(b, 1))
-    buttons_separator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-    buttons_separator.set_margin_top(10)
-    buttons_separator.set_margin_bottom(10)
+    sep_buttons = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+    sep_buttons.set_margin_top(10)
+    sep_buttons.set_margin_bottom(10)
 
-    button_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-    button_box.set_vexpand(True)
-    button_box.set_valign(Gtk.Align.CENTER)
-    button_box.append(btn_copy)
-    button_box.append(buttons_separator)
-    button_box.append(btn_move_up)
-    button_box.append(btn_move_down)
+    box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    box_buttons.set_vexpand(True)
+    box_buttons.set_valign(Gtk.Align.CENTER)
+    box_buttons.append(btn_copy)
+    box_buttons.append(sep_buttons)
+    box_buttons.append(btn_move_up)
+    box_buttons.append(btn_move_down)
 
     def on_copy_clicked(btn):
         selection = tree_presets.get_selection()
@@ -1425,7 +1425,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     size_group.add_widget(box_presets)
 
     hbox.append(box_args)
-    hbox.append(button_box)
+    hbox.append(box_buttons)
     hbox.append(box_presets)
 
     def build_hook_command_box(title, current_value, key, tooltip):
