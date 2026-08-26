@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-26 20:21+0000\n"
+"POT-Creation-Date: 2026-08-26 21:03+0000\n"
 "PO-Revision-Date: 2026-08-14 05:14+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -92,15 +92,15 @@ msgstr "最後備份："
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "前綴與 Protons 不會備份！"
 
-#: faugus/backup.py:269 faugus/launcher.py:5434 faugus/launcher.py:6406
-#: faugus/launcher.py:6856 faugus/launcher.py:7420 faugus/proton_manager.py:311
+#: faugus/backup.py:269 faugus/launcher.py:5434 faugus/launcher.py:6410
+#: faugus/launcher.py:6860 faugus/launcher.py:7424 faugus/proton_manager.py:311
 #: faugus/shortcut.py:87 faugus/utils.py:491 faugus/utils.py:601
 #: faugus/utils.py:612
 msgid "Cancel"
 msgstr "取消"
 
-#: faugus/backup.py:273 faugus/launcher.py:5438 faugus/launcher.py:6173
-#: faugus/launcher.py:6410 faugus/launcher.py:6860 faugus/launcher.py:7416
+#: faugus/backup.py:273 faugus/launcher.py:5438 faugus/launcher.py:6177
+#: faugus/launcher.py:6414 faugus/launcher.py:6864 faugus/launcher.py:7420
 #: faugus/shortcut.py:91 faugus/utils.py:495 faugus/utils.py:803
 msgid "Ok"
 msgstr "好"
@@ -253,7 +253,7 @@ msgstr "分鐘"
 msgid "minutes"
 msgstr "分鐘"
 
-#: faugus/launcher.py:3033 faugus/launcher.py:6040 faugus/launcher.py:8004
+#: faugus/launcher.py:3033 faugus/launcher.py:6044 faugus/launcher.py:8008
 msgid "Select a file to run in the prefix"
 msgstr "選取一個要在此前綴中運行的檔案"
 
@@ -372,7 +372,7 @@ msgid "Background"
 msgstr "背景"
 
 #: faugus/launcher.py:5271 faugus/launcher.py:5281 faugus/launcher.py:5290
-#: faugus/launcher.py:5298 faugus/utils.py:1095 faugus/utils.py:1692
+#: faugus/launcher.py:5298 faugus/utils.py:1095 faugus/utils.py:1761
 msgid "Default"
 msgstr "預設"
 
@@ -548,23 +548,23 @@ msgstr "Wayland 驅動程式 (實驗性)"
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (實驗性)"
 
-#: faugus/launcher.py:5417 faugus/launcher.py:6813
+#: faugus/launcher.py:5417 faugus/launcher.py:6817
 msgid "Run"
 msgstr "運行"
 
-#: faugus/launcher.py:5420 faugus/launcher.py:6816
+#: faugus/launcher.py:5420 faugus/launcher.py:6820
 msgid "Run a file in the prefix"
 msgstr "在此前綴中運行檔案"
 
-#: faugus/launcher.py:5424 faugus/launcher.py:6801 faugus/shortcut.py:83
+#: faugus/launcher.py:5424 faugus/launcher.py:6805 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
 msgstr "可能修復一些遊戲的遊戲手把問題"
 
-#: faugus/launcher.py:5425 faugus/launcher.py:6802 faugus/shortcut.py:84
+#: faugus/launcher.py:5425 faugus/launcher.py:6806 faugus/shortcut.py:84
 msgid "No Sleep"
 msgstr "不睡眠"
 
-#: faugus/launcher.py:5426 faugus/launcher.py:6803 faugus/shortcut.py:85
+#: faugus/launcher.py:5426 faugus/launcher.py:6807 faugus/shortcut.py:85
 msgid "Prevents the system from suspending while gaming"
 msgstr "防止玩遊戲時系統暫停"
 
@@ -597,218 +597,224 @@ msgstr "清除紀錄 (%s)"
 msgid "Clear Logs"
 msgstr "清除紀錄"
 
-#: faugus/launcher.py:5787 faugus/launcher.py:5812
+#: faugus/launcher.py:5787
 #, fuzzy
 #| msgid "SteamGridDB API Key"
-msgid "Covers and Carrousel modes"
+msgid "Covers or Carrousel mode"
 msgstr "SteamGridDB API 金鑰"
 
 #: faugus/launcher.py:5788
 #, fuzzy
 #| msgid "SteamGridDB API Key"
-msgid "Grid, Covers and Carrousel modes"
+msgid "Grid, Covers or Carrousel mode"
 msgstr "SteamGridDB API 金鑰"
 
-#: faugus/launcher.py:5836
+#: faugus/launcher.py:5815
+#, fuzzy
+#| msgid "SteamGridDB API Key"
+msgid "Covers or Carrousel mode with SteamGridDB"
+msgstr "SteamGridDB API 金鑰"
+
+#: faugus/launcher.py:5840
 msgid "Adwaita theme"
 msgstr ""
 
-#: faugus/launcher.py:5984
+#: faugus/launcher.py:5988
 msgid "Do you want to save the changes?"
 msgstr "你要儲存變更嗎？"
 
-#: faugus/launcher.py:6094
+#: faugus/launcher.py:6098
 msgid "Select a backup file to restore"
 msgstr "選取一個要回復的備份檔案"
 
-#: faugus/launcher.py:6100
+#: faugus/launcher.py:6104
 msgid "ZIP files"
 msgstr "ZIP 檔案"
 
-#: faugus/launcher.py:6115 faugus/launcher.py:6125
+#: faugus/launcher.py:6119 faugus/launcher.py:6129
 msgid "This is not a valid Faugus backup file."
 msgstr "這不是有效的 Faugus 備份檔案。"
 
-#: faugus/launcher.py:6164
+#: faugus/launcher.py:6168
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "你確定要覆寫設定？"
 
-#: faugus/launcher.py:6173 faugus/launcher.py:6477
+#: faugus/launcher.py:6177 faugus/launcher.py:6481
 msgid "Yes"
 msgstr "是"
 
-#: faugus/launcher.py:6174 faugus/launcher.py:6473
+#: faugus/launcher.py:6178 faugus/launcher.py:6477
 msgid "No"
 msgstr "否"
 
-#: faugus/launcher.py:6181 faugus/launcher.py:8242
+#: faugus/launcher.py:6185 faugus/launcher.py:8246
 msgid "Select a prefix location"
 msgstr "選取一個前綴位置"
 
-#: faugus/launcher.py:6393
+#: faugus/launcher.py:6397
 #, python-format
 msgid "Duplicate %s"
 msgstr "建立 %s 的副本"
 
-#: faugus/launcher.py:6399 faugus/launcher.py:6676 faugus/launcher.py:6689
+#: faugus/launcher.py:6403 faugus/launcher.py:6680 faugus/launcher.py:6693
 #: faugus/shortcut.py:44
 msgid "Title"
 msgstr "標題"
 
-#: faugus/launcher.py:6448
+#: faugus/launcher.py:6452
 #, python-format
 msgid "Delete %s"
 msgstr "刪除 %s"
 
-#: faugus/launcher.py:6456
+#: faugus/launcher.py:6460
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "你確定要刪除 %s？"
 
-#: faugus/launcher.py:6465
+#: faugus/launcher.py:6469
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "警告：此前綴被另外 %d 個遊戲使用。"
 
-#: faugus/launcher.py:6467
+#: faugus/launcher.py:6471
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "警告：此前綴被另外 1 個遊戲使用。"
 
-#: faugus/launcher.py:6481
+#: faugus/launcher.py:6485
 msgid "Also remove the prefix:"
 msgstr "也刪除此前綴："
 
-#: faugus/launcher.py:6528
+#: faugus/launcher.py:6532
 msgid "New Game/App"
 msgstr "新遊戲/程式"
 
-#: faugus/launcher.py:6659
+#: faugus/launcher.py:6663
 msgid "Steam User"
 msgstr "Steam 使用者"
 
-#: faugus/launcher.py:6673 faugus/launcher.py:7213 faugus/launcher.py:7215
+#: faugus/launcher.py:6677 faugus/launcher.py:7217 faugus/launcher.py:7219
 msgid "No Steam users found"
 msgstr "沒有找到 Steam 使用者"
 
-#: faugus/launcher.py:6741 faugus/utils.py:1478
+#: faugus/launcher.py:6745 faugus/utils.py:1547
 msgid "Path"
 msgstr "路徑"
 
-#: faugus/launcher.py:6745
+#: faugus/launcher.py:6749
 msgid "Path to the game executable"
 msgstr "遊戲執行檔的路徑"
 
-#: faugus/launcher.py:6753
+#: faugus/launcher.py:6757
 msgid "Prefix"
 msgstr "前綴"
 
-#: faugus/launcher.py:6757
+#: faugus/launcher.py:6761
 msgid "Path to the prefix"
 msgstr "前綴的路徑"
 
-#: faugus/launcher.py:6765
+#: faugus/launcher.py:6769
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/launcher.py:6779 faugus/shortcut.py:61
+#: faugus/launcher.py:6783 faugus/shortcut.py:61
 msgid "Game Arguments"
 msgstr "遊戲引數"
 
-#: faugus/launcher.py:6784 faugus/shortcut.py:66 faugus/utils.py:1185
+#: faugus/launcher.py:6788 faugus/shortcut.py:66 faugus/utils.py:1185
 msgid "Launch Settings"
 msgstr "啟動設定"
 
-#: faugus/launcher.py:6787 faugus/shortcut.py:69 faugus/utils.py:1449
+#: faugus/launcher.py:6791 faugus/shortcut.py:69 faugus/utils.py:1518
 msgid "Additional Application"
 msgstr "額外程式"
 
-#: faugus/launcher.py:6790 faugus/shortcut.py:72
+#: faugus/launcher.py:6794 faugus/shortcut.py:72
 msgid "Additional application to run with the game"
 msgstr "與遊戲一起運行的額外程式"
 
-#: faugus/launcher.py:6792 faugus/shortcut.py:74 faugus/utils.py:1576
+#: faugus/launcher.py:6796 faugus/shortcut.py:74 faugus/utils.py:1645
 msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling 影格生成"
 
-#: faugus/launcher.py:6796
+#: faugus/launcher.py:6800
 #, fuzzy
 #| msgid "Disable Hidraw"
 msgid "Disable UMU"
 msgstr "停用 Hidraw"
 
-#: faugus/launcher.py:6798
+#: faugus/launcher.py:6802
 msgid "Runs the game without the Steam Runtime"
 msgstr ""
 
-#: faugus/launcher.py:6818
+#: faugus/launcher.py:6822
 msgid "Shortcut"
 msgstr "捷徑"
 
-#: faugus/launcher.py:6823
+#: faugus/launcher.py:6827
 msgid "Desktop"
 msgstr "桌面"
 
-#: faugus/launcher.py:6824
+#: faugus/launcher.py:6828
 msgid "App Menu"
 msgstr "程式選單"
 
-#: faugus/launcher.py:6825
+#: faugus/launcher.py:6829
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:6879 faugus/launcher.py:7069
+#: faugus/launcher.py:6883 faugus/launcher.py:7073
 msgid "Game/App"
 msgstr "遊戲/程式"
 
-#: faugus/launcher.py:6880 faugus/launcher.py:7078
+#: faugus/launcher.py:6884 faugus/launcher.py:7082
 msgid "Tools"
 msgstr "工具"
 
-#: faugus/launcher.py:7053
+#: faugus/launcher.py:7057
 msgid "Refresh"
 msgstr "重新整理"
 
-#: faugus/launcher.py:7056
+#: faugus/launcher.py:7060
 msgid "Load from file"
 msgstr "從檔案載入"
 
-#: faugus/launcher.py:7059
+#: faugus/launcher.py:7063
 msgid "Load from URL"
 msgstr "從網址載入"
 
-#: faugus/launcher.py:7221 faugus/shortcut.py:175
+#: faugus/launcher.py:7225 faugus/shortcut.py:175
 msgid "Vulkan Layer not found"
 msgstr "沒有找到 Vulkan 層"
 
-#: faugus/launcher.py:7376
+#: faugus/launcher.py:7380
 msgid "Select an image for the cover"
 msgstr "為封面選取一個影像"
 
-#: faugus/launcher.py:7377
+#: faugus/launcher.py:7381
 msgid "Select an image for the banner"
 msgstr "為橫幅選取一個影像"
 
-#: faugus/launcher.py:7378
+#: faugus/launcher.py:7382
 msgid "Select an image for the icon"
 msgstr "為圖示選取一個影像"
 
-#: faugus/launcher.py:7408
+#: faugus/launcher.py:7412
 msgid "Enter the image URL"
 msgstr "輸入影像網址"
 
-#: faugus/launcher.py:7972
+#: faugus/launcher.py:7976
 msgid "Windows Game"
 msgstr "Windows 遊戲"
 
-#: faugus/launcher.py:7973
+#: faugus/launcher.py:7977
 msgid "Linux Game"
 msgstr "Linux 遊戲"
 
-#: faugus/launcher.py:7974
+#: faugus/launcher.py:7978
 msgid "Steam Game"
 msgstr "Steam 遊戲"
 
-#: faugus/launcher.py:8211
+#: faugus/launcher.py:8215
 msgid "Select the game executable"
 msgstr "選取遊戲執行檔"
 
@@ -936,123 +942,123 @@ msgstr "系統"
 msgid "Presets"
 msgstr "預設集"
 
-#: faugus/utils.py:1321
+#: faugus/utils.py:1337
 msgid "Launch Arguments"
 msgstr "啟動引數"
 
-#: faugus/utils.py:1377
+#: faugus/utils.py:1446
 msgid "Select a command or script"
 msgstr "選取一個指令或腳本"
 
-#: faugus/utils.py:1402
+#: faugus/utils.py:1471
 msgid "Pre-launch"
 msgstr "啟動前"
 
-#: faugus/utils.py:1403
+#: faugus/utils.py:1472
 msgid "Command or script to run before the game"
 msgstr "遊戲前要運行的指令或腳本"
 
-#: faugus/utils.py:1405
+#: faugus/utils.py:1474
 msgid "Post-launch"
 msgstr "啟動後"
 
-#: faugus/utils.py:1406
+#: faugus/utils.py:1475
 msgid "Command or script to run after the game"
 msgstr "遊戲後要運行的指令或腳本"
 
-#: faugus/utils.py:1474 faugus/utils.py:1658
+#: faugus/utils.py:1543 faugus/utils.py:1727
 msgid "Enable"
 msgstr "啟用"
 
-#: faugus/utils.py:1483
+#: faugus/utils.py:1552
 msgid "Path to the application"
 msgstr "程式的路徑"
 
-#: faugus/utils.py:1495
+#: faugus/utils.py:1564
 msgid "Select an additional application"
 msgstr "選取一個額外程式"
 
-#: faugus/utils.py:1512
+#: faugus/utils.py:1581
 msgid "Delay (seconds)"
 msgstr "延遲 (秒)"
 
-#: faugus/utils.py:1525
+#: faugus/utils.py:1594
 msgid "Run the application first"
 msgstr "先運行此程式"
 
-#: faugus/utils.py:1609
+#: faugus/utils.py:1678
 msgid "Lossless Scaling Location"
 msgstr "Lossless Scaling 位置"
 
-#: faugus/utils.py:1617
+#: faugus/utils.py:1686
 msgid "Lossless.dll location"
 msgstr "Lossless.dll 位置"
 
-#: faugus/utils.py:1629
+#: faugus/utils.py:1698
 msgid "Select the Lossless.dll file"
 msgstr "選取 Lossless.dll 檔案"
 
-#: faugus/utils.py:1662
+#: faugus/utils.py:1731
 msgid "Multiplier"
 msgstr "倍率"
 
-#: faugus/utils.py:1667
+#: faugus/utils.py:1736
 msgid "Multiply the FPS"
 msgstr "將 FPS 倍增"
 
-#: faugus/utils.py:1669
+#: faugus/utils.py:1738
 msgid "Flow Scale"
 msgstr "流比例"
 
-#: faugus/utils.py:1676
+#: faugus/utils.py:1745
 msgid "Lower the internal motion estimation resolution"
 msgstr "降低內部動態推算的解析度"
 
-#: faugus/utils.py:1678
+#: faugus/utils.py:1747
 msgid "Performance Mode"
 msgstr "效能模式"
 
-#: faugus/utils.py:1679
+#: faugus/utils.py:1748
 msgid "Massively improve performance at the cost of quality"
 msgstr "以品質為代價大幅增進效能"
 
-#: faugus/utils.py:1682
+#: faugus/utils.py:1751
 msgid "HDR Mode"
 msgstr "HDR 模式"
 
-#: faugus/utils.py:1683
+#: faugus/utils.py:1752
 msgid "Enable special HDR-only behavior"
 msgstr "啟用特別的 HDR 限定行為"
 
-#: faugus/utils.py:1686
+#: faugus/utils.py:1755
 msgid "Present Mode (Experimental)"
 msgstr "呈現模式 (實驗性)"
 
-#: faugus/utils.py:1690
+#: faugus/utils.py:1759
 msgid "Override the present mode"
 msgstr "覆寫呈現模式"
 
-#: faugus/utils.py:2063
+#: faugus/utils.py:2132
 msgid "No SteamGridDB API key configured."
 msgstr "沒有配置 SteamGridDB API 金鑰。"
 
-#: faugus/utils.py:2064
+#: faugus/utils.py:2133
 msgid "Add your API key in Settings first."
 msgstr "先在設定中加入你的 API 金鑰。"
 
-#: faugus/utils.py:2077
+#: faugus/utils.py:2146
 msgid "Choose a cover"
 msgstr "選擇一個封面"
 
-#: faugus/utils.py:2078
+#: faugus/utils.py:2147
 msgid "Choose a banner"
 msgstr "選擇一個橫幅"
 
-#: faugus/utils.py:2079
+#: faugus/utils.py:2148
 msgid "Choose an icon"
 msgstr "選擇一個圖示"
 
-#: faugus/utils.py:2201
+#: faugus/utils.py:2270
 msgid "No results found"
 msgstr "沒有找到結果"
 
