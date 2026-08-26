@@ -5784,8 +5784,8 @@ class Settings(Gtk.Dialog):
         covers_or_carrousel = active_id in ("Covers", "Carrousel")
         not_list = active_id != "List"
 
-        covers_carrousel_tip = _("Covers and Carrousel modes")
-        not_list_tip = _("Grid, Covers and Carrousel modes")
+        covers_carrousel_tip = _("Covers or Carrousel mode")
+        not_list_tip = _("Grid, Covers or Carrousel mode")
 
         for checkbox in (self.checkbox_labels, self.checkbox_zoom):
             checkbox.set_sensitive(covers_or_carrousel)
@@ -5801,15 +5801,19 @@ class Settings(Gtk.Dialog):
 
     def on_checkbox_steamgriddb_toggled(self, checkbox):
         self.entry_steamgriddb_key.set_sensitive(checkbox.get_active())
+        self._refresh_banner_checkbox_sensitivity()
 
     def on_button_steamgriddb_key_clicked(self, widget):
         import webbrowser
         webbrowser.open("https://www.steamgriddb.com/profile/preferences/api")
 
     def _refresh_banner_checkbox_sensitivity(self):
-        enabled = self.combobox_interface.get_active_id() in ("Covers", "Carrousel")
+        covers_or_carrousel = self.combobox_interface.get_active_id() in ("Covers", "Carrousel")
+        enabled = covers_or_carrousel and self.checkbox_steamgriddb.get_active()
         self.checkbox_banner.set_sensitive(enabled)
-        self.checkbox_banner.set_tooltip_text(None if enabled else _("Covers and Carrousel modes"))
+        self.checkbox_banner.set_tooltip_text(
+            None if enabled else _("Covers or Carrousel mode with SteamGridDB")
+        )
 
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
