@@ -761,7 +761,7 @@ def activate_focused_widget(self):
         is_title_suggestion_field = (
             entry_title is not None
             and (focused is entry_title or _is_descendant_of(focused, entry_title))
-            and getattr(parent, "interface_mode", None) == "SteamGridDB"
+            and getattr(parent, "steamgriddb_enabled", False)
         )
         if is_title_suggestion_field:
             fetch_suggestions = parent.fetch_title_suggestions_for_keyboard
@@ -832,14 +832,18 @@ def activate_focused_widget(self):
             else:
                 self.button_play.emit("clicked")
 
-    elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
-        getattr(active_window, "banner_preview1", None), getattr(active_window, "banner_preview2", None)
-    ):
+    elif (getattr(active_window, "interface_mode", None) in ("Covers", "Carrousel")
+          and getattr(active_window, "steamgriddb_enabled", False)
+          and focused in (
+              getattr(active_window, "banner_preview1", None), getattr(active_window, "banner_preview2", None)
+          )):
         show_steamgriddb_picker(active_window, "banner")
 
-    elif getattr(active_window, "interface_mode", None) == "SteamGridDB" and focused in (
-        getattr(active_window, "image_cover_stack", None), getattr(active_window, "image_cover2_stack", None)
-    ):
+    elif (getattr(active_window, "interface_mode", None) in ("Covers", "Carrousel")
+          and getattr(active_window, "steamgriddb_enabled", False)
+          and focused in (
+              getattr(active_window, "image_cover_stack", None), getattr(active_window, "image_cover2_stack", None)
+          )):
         show_steamgriddb_picker(active_window, "cover")
 
     elif type(focused).__name__ == "GtkColorSwatch":

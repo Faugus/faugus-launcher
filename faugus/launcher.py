@@ -295,7 +295,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.load_config()
 
         if getattr(app, 'console_mode', False):
-            self.interface_mode = "SteamGridDB"
+            self.interface_mode = "Carrousel"
             self.gamepad_navigation = True
             self.startup_window_size = "Fullscreen"
 
@@ -334,7 +334,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode == "List":
             self.setup_interface()
-        if self.interface_mode in ("Grid", "Covers", "SteamGridDB"):
+        if self.interface_mode in ("Grid", "Covers", "Carrousel"):
             if self.startup_window_size == "Maximized":
                 self.maximize()
             if self.startup_window_size == "Fullscreen":
@@ -390,10 +390,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return getattr(selected_items[0], 'game', None)
 
     def banner_overlay_enabled(self):
-        return self.interface_mode == "SteamGridDB" and self.banner_enabled
+        return self.interface_mode in ("Covers", "Carrousel") and self.banner_enabled
 
     def carrousel_active(self):
-        return self.interface_mode in ("Covers", "SteamGridDB") and self.carrousel_enabled
+        return self.interface_mode == "Carrousel"
 
     def get_named_rgb(self, name, fallback=(30, 30, 34)):
         found, rgba = Gtk.Box().get_style_context().lookup_color(name)
@@ -447,7 +447,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not game:
             return
 
-        if self.interface_mode in ("Covers", "SteamGridDB"):
+        if self.interface_mode in ("Covers", "Carrousel"):
             color_source = f"{COVERS_DIR}/{game.gameid}.png"
         else:
             color_source = f"{ICONS_DIR}/{game.gameid}.png"
@@ -649,7 +649,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if base_mode == "dominant_color":
             dominant = getattr(self, 'launcher_banner_dominant_rgb', None)
-            if dominant is None and self.interface_mode in ("Covers", "SteamGridDB"):
+            if dominant is None and self.interface_mode in ("Covers", "Carrousel"):
                 color_source = f"{COVERS_DIR}/cover_temp.png"
                 if os.path.isfile(color_source):
                     dominant = get_dominant_color(color_source)
@@ -797,7 +797,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if game:
                 if base_mode == "dominant_color":
-                    if self.interface_mode in ("Covers", "SteamGridDB"):
+                    if self.interface_mode in ("Covers", "Carrousel"):
                         color_source = f"{COVERS_DIR}/{game.gameid}.png"
                     else:
                         color_source = f"{ICONS_DIR}/{game.gameid}.png"
@@ -1456,7 +1456,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.main_hbox.append(self.build_background_container(right_vbox))
 
-            self.scale_zoom.set_visible(self.interface_mode in ("Covers", "SteamGridDB") and self.zoom_enabled)
+            self.scale_zoom.set_visible(self.interface_mode in ("Covers", "Carrousel") and self.zoom_enabled)
 
             bottom_bar = Gtk.CenterBox(orientation=Gtk.Orientation.HORIZONTAL)
             self.bottom_bar = bottom_bar
@@ -3346,7 +3346,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
-        self.carrousel_enabled = cfg.config.get('carrousel-enabled', 'False') == 'True'
+        self.steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
         self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
@@ -3428,7 +3428,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.render_carrousel()
             return
 
-        if not hasattr(self, 'flowbox') or self.interface_mode not in ("Covers", "SteamGridDB"):
+        if not hasattr(self, 'flowbox') or self.interface_mode not in ("Covers", "Carrousel"):
             return
 
         children_iter = iter(widget_children(self.flowbox))
@@ -3467,7 +3467,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode == "Grid":
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             hbox.set_size_request(200, -1)
-        if self.interface_mode in ("Covers", "SteamGridDB"):
+        if self.interface_mode in ("Covers", "Carrousel"):
             hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         game_icon = game.icon
@@ -3477,7 +3477,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_label = Gtk.Label.new(game.title)
         game_label.add_css_class("game-label")
 
-        if self.interface_mode in ("Grid", "Covers", "SteamGridDB"):
+        if self.interface_mode in ("Grid", "Covers", "Carrousel"):
             game_label.set_wrap(True)
             game_label.set_lines(2)
             game_label.set_ellipsize(Pango.EllipsizeMode.END)
@@ -3546,7 +3546,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox_child.set_valign(Gtk.Align.FILL)
             self.flowbox_child.set_halign(Gtk.Align.FILL)
 
-        if self.interface_mode in ("Covers", "SteamGridDB"):
+        if self.interface_mode in ("Covers", "Carrousel"):
             self.flowbox_child.add_css_class("cover-container")
             self.flowbox_child.set_hexpand(True)
             self.flowbox_child.set_vexpand(True)
@@ -3782,9 +3782,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.zoom_enabled != settings_dialog.checkbox_zoom.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-                if self.carrousel_enabled != settings_dialog.checkbox_carrousel.get_active():
-                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
-
                 if self.language != settings_dialog.combobox_language.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
@@ -3843,7 +3840,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             settings_dialog.entry_default_prefix.add_css_class("entry")
             valid = False
 
-        if (settings_dialog.combobox_interface.get_active_id() == "SteamGridDB"
+        if (settings_dialog.checkbox_steamgriddb.get_active()
                 and not settings_dialog.entry_steamgriddb_key.get_text().strip()):
             settings_dialog.entry_steamgriddb_key.add_css_class("entry")
             valid = False
@@ -4366,7 +4363,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             addapp_bat = f"{os.path.dirname(expand_path(path))}/faugus-{title_formatted}.bat"
 
-            if self.interface_mode in ("Covers", "SteamGridDB"):
+            if self.interface_mode in ("Covers", "Carrousel"):
                 temp_cover_path = add_game_dialog.cover_path_temp
                 if os.path.isfile(temp_cover_path):
                     cover = os.path.join(COVERS_DIR, f"{title_formatted}.png")
@@ -4575,7 +4572,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.label_download.set_text(_("Downloading") + " Wargaming Game Center...")
             self.download_launcher("wargaming", title, title_formatted, runner, prefix, UMU_RUN, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
 
-        if self.interface_mode == "SteamGridDB" and os.path.isfile(icon_temp):
+        if self.steamgriddb_enabled and os.path.isfile(icon_temp):
             icon_surface = self.new_texture_from_image(icon_temp, 256, 256)
             icon_picture = new_picture(icon_surface)
             icon_picture.set_margin_bottom(20)
@@ -4621,7 +4618,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 game.path = update_ea_path(game.prefix)
 
             if os.path.exists(expand_path(game.path)):
-                if self.interface_mode != "SteamGridDB":
+                if not self.steamgriddb_enabled:
                     extracted_icon = self.extract_best_icon(expand_path(game.path), game.gameid)
 
                     if extracted_icon:
@@ -4778,7 +4775,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.gameid = title_formatted
             game.addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
 
-            if self.interface_mode in ("Covers", "SteamGridDB"):
+            if self.interface_mode in ("Covers", "Carrousel"):
                 temp_cover_path = edit_game_dialog.cover_path_temp
                 if os.path.isfile(temp_cover_path):
                     cover = os.path.join(COVERS_DIR, f"{title_formatted}.png")
@@ -5266,7 +5263,7 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.append("List", _("List"))
         self.combobox_interface.append("Grid", _("Grid"))
         self.combobox_interface.append("Covers", _("Covers"))
-        self.combobox_interface.append("SteamGridDB", "SteamGridDB")
+        self.combobox_interface.append("Carrousel", _("Carrousel"))
 
         self.label_background = Gtk.Label(label=_("Background"))
         self.label_background.set_halign(Gtk.Align.START)
@@ -5326,17 +5323,17 @@ class Settings(Gtk.Dialog):
         self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
         self.checkbox_zoom.set_active(True)
 
-        self.checkbox_carrousel = Gtk.CheckButton(label=_("Carrousel"))
-        self.checkbox_carrousel.set_active(False)
-
-        self.label_steamgriddb_key = Gtk.Label()
-        self.label_steamgriddb_key.set_markup(
-            '<a href="https://www.steamgriddb.com/profile/preferences/api">{}</a>'.format(_("SteamGridDB API Key"))
-        )
-        self.label_steamgriddb_key.set_use_markup(True)
-        self.label_steamgriddb_key.set_halign(Gtk.Align.START)
+        self.checkbox_steamgriddb = Gtk.CheckButton(label=_("SteamGridDB"))
+        self.checkbox_steamgriddb.set_active(False)
+        self.checkbox_steamgriddb.connect("toggled", self.on_checkbox_steamgriddb_toggled)
 
         self.entry_steamgriddb_key = Gtk.Entry()
+        self.entry_steamgriddb_key.set_placeholder_text(_("API Key"))
+
+        self.button_steamgriddb_key = Gtk.Button()
+        self.button_steamgriddb_key.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_steamgriddb_key.connect("clicked", self.on_button_steamgriddb_key_clicked)
+        self.button_steamgriddb_key.set_size_request(50, -1)
 
         self.label_default_prefix = Gtk.Label(label=_("Default Prefixes Location"))
         self.label_default_prefix.set_halign(Gtk.Align.START)
@@ -5588,13 +5585,14 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_splash_window, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_autostart, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wow64, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_hidden_games, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_autostart, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wow64, 0, 12, 1, 1)
 
         grid_theme_accent.attach(self.label_interface, 0, 0, 1, 1)
         grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -5616,13 +5614,11 @@ class Settings(Gtk.Dialog):
         self.combobox_background.set_hexpand(True)
 
         grid_theme_rest.attach(self.checkbox_labels, 0, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_banner, 1, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_zoom, 0, 9, 1, 1)
-        grid_theme_rest.attach(self.checkbox_carrousel, 1, 9, 1, 1)
-        grid_theme_rest.attach(self.checkbox_sort, 0, 10, 1, 1)
-        grid_theme_rest.attach(self.checkbox_categories, 1, 10, 1, 1)
-        grid_theme_rest.attach(self.checkbox_hidden_games, 0, 11, 1, 1)
-        grid_theme_rest.attach(self.checkbox_header_bar, 1, 11, 1, 1)
+        grid_theme_rest.attach(self.checkbox_zoom, 1, 8, 1, 1)
+        grid_theme_rest.attach(self.checkbox_sort, 0, 9, 1, 1)
+        grid_theme_rest.attach(self.checkbox_categories, 1, 9, 1, 1)
+        grid_theme_rest.attach(self.checkbox_banner, 0, 10, 1, 1)
+        grid_theme_rest.attach(self.checkbox_header_bar, 1, 10, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
@@ -5632,8 +5628,9 @@ class Settings(Gtk.Dialog):
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
 
-        self.grid_big_interface.attach(self.label_steamgriddb_key, 0, 0, 2, 1)
-        self.grid_big_interface.attach(self.entry_steamgriddb_key, 0, 1, 2, 1)
+        self.grid_big_interface.attach(self.checkbox_steamgriddb, 0, 0, 2, 1)
+        self.grid_big_interface.attach(self.entry_steamgriddb_key, 0, 1, 1, 1)
+        self.grid_big_interface.attach(self.button_steamgriddb_key, 1, 1, 1, 1)
         self.grid_big_interface.attach(self.label_startup_window_size, 0, 2, 2, 1)
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
         self.combobox_startup_window_size.set_hexpand(True)
@@ -5784,30 +5781,35 @@ class Settings(Gtk.Dialog):
     def on_combobox_interface_changed(self, combobox):
         active_id = combobox.get_active_id()
 
-        covers_or_steamgriddb = active_id in ("Covers", "SteamGridDB")
-        is_steamgriddb = active_id == "SteamGridDB"
+        covers_or_carrousel = active_id in ("Covers", "Carrousel")
         not_list = active_id != "List"
 
-        covers_steamgriddb_tip = _("Covers and SteamGridDB modes")
-        steamgriddb_tip = _("SteamGridDB mode")
-        not_list_tip = _("Grid, Covers and SteamGridDB modes")
+        covers_carrousel_tip = _("Covers and Carrousel modes")
+        not_list_tip = _("Grid, Covers and Carrousel modes")
 
-        for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_carrousel):
-            checkbox.set_sensitive(covers_or_steamgriddb)
-            checkbox.set_tooltip_text(None if covers_or_steamgriddb else covers_steamgriddb_tip)
+        for checkbox in (self.checkbox_labels, self.checkbox_zoom):
+            checkbox.set_sensitive(covers_or_carrousel)
+            checkbox.set_tooltip_text(None if covers_or_carrousel else covers_carrousel_tip)
 
-        self.checkbox_banner.set_sensitive(is_steamgriddb)
-        self.checkbox_banner.set_tooltip_text(None if is_steamgriddb else steamgriddb_tip)
-
-        self.label_steamgriddb_key.set_sensitive(is_steamgriddb)
-        self.entry_steamgriddb_key.set_sensitive(is_steamgriddb)
-        self.entry_steamgriddb_key.set_tooltip_text(None if is_steamgriddb else steamgriddb_tip)
+        self._refresh_banner_checkbox_sensitivity()
 
         self.label_startup_window_size.set_sensitive(not_list)
         self.combobox_startup_window_size.set_sensitive(not_list)
         self.combobox_startup_window_size.set_tooltip_text(
             _("Alt+Enter toggles fullscreen") if not_list else not_list_tip
         )
+
+    def on_checkbox_steamgriddb_toggled(self, checkbox):
+        self.entry_steamgriddb_key.set_sensitive(checkbox.get_active())
+
+    def on_button_steamgriddb_key_clicked(self, widget):
+        import webbrowser
+        webbrowser.open("https://www.steamgriddb.com/profile/preferences/api")
+
+    def _refresh_banner_checkbox_sensitivity(self):
+        enabled = self.combobox_interface.get_active_id() in ("Covers", "Carrousel")
+        self.checkbox_banner.set_sensitive(enabled)
+        self.checkbox_banner.set_tooltip_text(None if enabled else _("Covers and Carrousel modes"))
 
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
@@ -5831,10 +5833,13 @@ class Settings(Gtk.Dialog):
     def on_theme_engine_changed(self, widget):
         self.theme_engine = self.combobox_theme_engine.get_active_id()
         is_adwaita = self.theme_engine == "adwaita"
-        self.label_theme.set_visible(is_adwaita)
-        self.combobox_theme.set_visible(is_adwaita)
-        self.label_accent.set_visible(is_adwaita)
-        self.box_accent.set_visible(is_adwaita)
+        adwaita_tip = None if is_adwaita else _("Adwaita theme")
+        self.label_theme.set_sensitive(is_adwaita)
+        self.combobox_theme.set_sensitive(is_adwaita)
+        self.combobox_theme.set_tooltip_text(adwaita_tip)
+        self.label_accent.set_sensitive(is_adwaita)
+        self.box_accent.set_sensitive(is_adwaita)
+        self.box_accent.set_tooltip_text(adwaita_tip)
         if not is_adwaita:
             self.combobox_theme.set_active_id("system")
             self.combobox_accent.set_active_id("system")
@@ -5880,7 +5885,7 @@ class Settings(Gtk.Dialog):
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("labels-enabled", self.checkbox_labels.get_active())
         config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
-        config.set_value("carrousel-enabled", self.checkbox_carrousel.get_active())
+        config.set_value("steamgriddb-enabled", self.checkbox_steamgriddb.get_active())
         config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
         config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
@@ -6211,7 +6216,7 @@ class Settings(Gtk.Dialog):
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
-        carrousel_enabled = cfg.config.get('carrousel-enabled', 'False') == 'True'
+        steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -6251,7 +6256,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_mono_icon.set_active(self.mono_icon)
         self.checkbox_labels.set_active(labels_enabled)
         self.checkbox_zoom.set_active(zoom_enabled)
-        self.checkbox_carrousel.set_active(carrousel_enabled)
+        self.checkbox_steamgriddb.set_active(steamgriddb_enabled)
+        self.on_checkbox_steamgriddb_toggled(self.checkbox_steamgriddb)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_logging.set_active(logging_enabled)
         self.checkbox_hidden_games.set_active(show_hidden)
@@ -6530,6 +6536,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.parent_window = parent
         self.interface_mode = interface_mode
 
+        cfg = ConfigManager()
+        self.steamgriddb_enabled = (
+            cfg.config.get('steamgriddb-enabled', 'False') == 'True'
+            and bool(cfg.config.get('steamgriddb-api-key', '').strip('"'))
+        )
+
         init_addon_defaults(self)
 
         if not os.path.exists(COVERS_DIR):
@@ -6678,7 +6690,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.label_title.set_halign(Gtk.Align.START)
         self.entry_title = Gtk.Entry()
         self.entry_title.connect("changed", on_entry_changed)
-        if interface_mode in ("Covers", "SteamGridDB"):
+        if interface_mode in ("Covers", "Carrousel") or self.steamgriddb_enabled:
             title_focus_controller = Gtk.EventControllerFocus()
             title_focus_controller.connect("leave", lambda c: self.on_entry_focus_out())
             self.entry_title.add_controller(title_focus_controller)
@@ -6691,7 +6703,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self._suggestion_programmatic = False
         self._virtual_keyboard_active_for_title = False
 
-        if interface_mode == "SteamGridDB":
+        if self.steamgriddb_enabled:
             self.popover_suggestion = Gtk.Popover()
             self.popover_suggestion.set_has_arrow(False)
             self.popover_suggestion.set_autohide(False)
@@ -6828,14 +6840,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_shortcut_icon.connect(
             "clicked",
             lambda w: self.on_button_shortcut_icon_clicked(w)
-            if self.interface_mode != "SteamGridDB"
+            if not self.steamgriddb_enabled
             else show_steamgriddb_picker(self, "icon")
         )
         self.button_shortcut_icon_overlay, self.spinner_icon = wrap_with_spinner(self.button_shortcut_icon, dim_shape="icon")
 
         icon_click_secondary = Gtk.GestureClick()
         icon_click_secondary.set_button(Gdk.BUTTON_SECONDARY)
-        if interface_mode == "SteamGridDB":
+        if self.steamgriddb_enabled:
             icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "icon"))
         else:
             icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_button_shortcut_icon_clicked(self.button_shortcut_icon))
@@ -6987,7 +6999,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.banner_preview2.set_hexpand(True)
 
         def on_cover_primary_click(button):
-            if self.interface_mode == "SteamGridDB":
+            if self.interface_mode in ("Covers", "Carrousel") and self.steamgriddb_enabled:
                 show_steamgriddb_picker(self, "cover")
 
         self.button_cover.connect("clicked", on_cover_primary_click)
@@ -7050,7 +7062,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         self.grid_page1.attach(page1, 0, 1, 1, 1)
-        if interface_mode in ("Covers", "SteamGridDB"):
+        if interface_mode in ("Covers", "Carrousel"):
             self.grid_page1.attach(self.image_cover_overlay, 1, 1, 1, 1)
         page1.set_hexpand(True)
 
@@ -7059,7 +7071,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         self.grid_page2.attach(page2, 0, 1, 1, 1)
-        if interface_mode in ("Covers", "SteamGridDB"):
+        if interface_mode in ("Covers", "Carrousel"):
             self.grid_page2.attach(self.image_cover2_overlay, 1, 1, 1, 1)
         page2.set_hexpand(True)
 
@@ -7119,7 +7131,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.append(self.label_shortcut)
         page1.append(self.grid_shortcut)
 
-        if interface_mode == "SteamGridDB":
+        if interface_mode in ("Covers", "Carrousel") and self.steamgriddb_enabled:
             box_tabs.insert_child_after(self.banner_preview1_overlay, None)
 
             banner_ratio = 1920 / 620
@@ -7213,7 +7225,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_steam_title.set_visible(False)
         self.grid_steam_user.set_visible(False)
         self.update_image_cover()
-        if interface_mode not in ("Covers", "SteamGridDB"):
+        if interface_mode not in ("Covers", "Carrousel"):
             self.button_cover.set_visible(False)
             self.button_cover2.set_visible(False)
 
@@ -7304,7 +7316,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             refresh()
             return
 
-        if self.interface_mode == "SteamGridDB":
+        if self.steamgriddb_enabled:
             self.refresh_single_artwork(category)
         else:
             self.get_artwork()
@@ -7532,6 +7544,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         cover_path_temp = self.cover_path_temp
         banner_path_temp = self.banner_path_temp
         interface_mode = self.interface_mode
+        steamgriddb_enabled = self.steamgriddb_enabled
 
         game_name = self.entry_title.get_text().strip()
         if not game_name:
@@ -7543,9 +7556,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         cfg = ConfigManager()
         api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
 
-        fetch_icon = bool(api_key) and interface_mode == "SteamGridDB"
-        fetch_cover = interface_mode in ("Covers", "SteamGridDB")
-        fetch_banner_art = interface_mode == "SteamGridDB" and bool(api_key)
+        fetch_icon = steamgriddb_enabled
+        fetch_cover = interface_mode in ("Covers", "Carrousel")
+        fetch_banner_art = interface_mode in ("Covers", "Carrousel") and steamgriddb_enabled
 
         if fetch_icon:
             self.set_icon_loading(True)
@@ -7556,8 +7569,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         def fetch_artwork():
             try:
-                fetch_sgdb_icon = bool(api_key) and interface_mode == "SteamGridDB"
-                fetch_sgdb_cover_banner = interface_mode == "SteamGridDB" and bool(api_key)
+                fetch_sgdb_icon = steamgriddb_enabled
+                fetch_sgdb_cover_banner = interface_mode in ("Covers", "Carrousel") and steamgriddb_enabled
 
                 icon_url = cover_url = banner_url = None
                 if fetch_sgdb_icon or fetch_sgdb_cover_banner:
@@ -7610,7 +7623,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                             GLib.idle_add(self.refresh_banner_preview)
                     return
 
-                if interface_mode not in ("Covers", "SteamGridDB"):
+                if interface_mode not in ("Covers", "Carrousel"):
                     return
 
                 api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
@@ -7841,7 +7854,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         active_id = combobox.get_active_id()
 
         cfg = ConfigManager()
-        steamgriddb_enabled = bool(cfg.config.get('steamgriddb-api-key', '').strip('"'))
+        steamgriddb_enabled = (
+            cfg.config.get('steamgriddb-enabled', 'False') == 'True'
+            and bool(cfg.config.get('steamgriddb-api-key', '').strip('"'))
+        )
 
         if not skip_cleanup:
             self.cleanup_fields()
@@ -7904,7 +7920,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_run.set_visible(True)
             self.grid_protonfix.set_visible(True)
             self.checkbox_sdl.set_visible(True)
-            self.button_shortcut_icon.set_visible(steamgriddb_enabled and self.interface_mode == "SteamGridDB")
+            self.button_shortcut_icon.set_visible(steamgriddb_enabled)
 
             self._suggestion_programmatic = True
             self.entry_title.set_text(self.combobox_launcher.get_active_text())
@@ -7948,7 +7964,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if path:
                 self.entry_path.set_text(f"{self.entry_prefix.get_text()}/{path}")
 
-        if self.interface_mode in ("Covers", "SteamGridDB"):
+        if self.interface_mode in ("Covers", "Carrousel"):
             if self.entry_title.get_text():
                 self.get_artwork()
 
@@ -8204,7 +8220,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if response == Gtk.ResponseType.ACCEPT:
                 path = dialog_fc.get_file().get_path()
 
-                if self.interface_mode != "SteamGridDB":
+                if not self.steamgriddb_enabled:
                     os.makedirs(self.icon_directory, exist_ok=True)
                     status = extract_ico(path, self.icon_temp, best_frame=True)
                     if status == "ok":

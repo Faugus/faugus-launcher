@@ -173,6 +173,19 @@ def _migrate_config_json_values():
         config['interface-mode'] = mode_renames[mode]
         changed = True
 
+    mode = config.get('interface-mode')
+    carrousel_was_enabled = config.get('carrousel-enabled') == 'True'
+    if mode == 'SteamGridDB':
+        config['interface-mode'] = 'Carrousel' if carrousel_was_enabled else 'Covers'
+        config['steamgriddb-enabled'] = 'True'
+        changed = True
+    elif mode == 'Covers' and carrousel_was_enabled:
+        config['interface-mode'] = 'Carrousel'
+        changed = True
+    if 'carrousel-enabled' in config:
+        config.pop('carrousel-enabled')
+        changed = True
+
     key_renames = {
         "hero-enabled": "banner-enabled",
         "banner-size": "cover-size",
