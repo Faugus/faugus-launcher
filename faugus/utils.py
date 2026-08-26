@@ -1187,7 +1187,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     hide_dialog_action_area(dialog)
     dialog.set_resizable(False)
     dialog.set_modal(True)
-    dialog.set_default_size(650, 400)
+    dialog.set_default_size(950, 500)
 
     frame = Gtk.Frame()
     frame.set_margin_start(10)
@@ -1260,15 +1260,31 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     btn_copy = Gtk.Button()
     btn_copy.set_size_request(50, 50)
     btn_copy.set_valign(Gtk.Align.CENTER)
-
     img = new_icon_image("faugus-play-symbolic.svg")
     img.add_css_class("flip-x")
+    btn_copy.set_child(img)
+
+    btn_move_up = Gtk.Button()
+    btn_move_up.set_size_request(50, 50)
+    btn_move_up.set_valign(Gtk.Align.CENTER)
+    img_move_up = new_icon_image("faugus-play-symbolic.svg")
+    img_move_up.add_css_class("move_up")
+    btn_move_up.set_child(img_move_up)
+
+    btn_move_down = Gtk.Button()
+    btn_move_down.set_size_request(50, 50)
+    btn_move_down.set_valign(Gtk.Align.CENTER)
+    img_move_down = new_icon_image("faugus-play-symbolic.svg")
+    img_move_down.add_css_class("move_down")
+    btn_move_down.set_child(img_move_down)
+
     add_css_once(
         "launch_arguments_flip",
         ".flip-x { transform: scaleX(-1); }"
+        ".move_up { transform: rotate(270deg); }"
+        ".move_down { transform: rotate(90deg); }"
         ".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
     )
-    btn_copy.set_child(img)
 
     store_args = Gtk.ListStore(str)
     current_args = current_launch_arguments.split("\n")
@@ -1341,6 +1357,59 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     sel_presets.connect("changed", on_presets_selection_changed)
     sel_args.connect("changed", on_args_selection_changed)
 
+    def on_move_clicked(btn, direction):
+        # direction = -1 or 1 for up or down
+        # check both treeviews; use the one that has a selection
+        for tv in (tree_args, tree_presets):
+            sel = tv.get_selection()
+            model, treeiter = sel.get_selected()
+            if treeiter is not None:
+                selected_treeview = tv
+                break
+        else:
+            return
+
+        path = model.get_path(treeiter)
+        if path is None:
+            return
+
+        index = path[0]
+
+        if index == len(model) - 1: # the last element is always empty so, no move necessary
+            return
+
+        if direction == -1:  # move up
+            if index == 0:
+                return
+            other_iter = model.get_iter((index - 1,))
+            model.move_before(treeiter, other_iter)
+        elif direction == 1:  # move down
+            if index == len(model) - 2: # -2 because the last element in the list is empty
+                return
+            other_iter = model.get_iter((index + 1,))
+            model.move_after(treeiter, other_iter)
+        else:
+            return
+
+        # move selection in the new position
+        new_path = model.get_path(treeiter)
+        if new_path is not None:
+            selected_treeview.set_cursor(new_path)
+
+    btn_move_up.connect("clicked", lambda b: on_move_clicked(b, -1))
+    btn_move_down.connect("clicked", lambda b: on_move_clicked(b, 1))
+    sep_buttons = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+    sep_buttons.set_margin_top(10)
+    sep_buttons.set_margin_bottom(10)
+
+    box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    box_buttons.set_vexpand(True)
+    box_buttons.set_valign(Gtk.Align.CENTER)
+    box_buttons.append(btn_copy)
+    box_buttons.append(sep_buttons)
+    box_buttons.append(btn_move_up)
+    box_buttons.append(btn_move_down)
+
     def on_copy_clicked(btn):
         selection = tree_presets.get_selection()
         model, treeiter = selection.get_selected()
@@ -1356,7 +1425,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     size_group.add_widget(box_presets)
 
     hbox.append(box_args)
-    hbox.append(btn_copy)
+    hbox.append(box_buttons)
     hbox.append(box_presets)
 
     def build_hook_command_box(title, current_value, key, tooltip):
