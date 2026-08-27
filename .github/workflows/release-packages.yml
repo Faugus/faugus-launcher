@@ -63,7 +63,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y meson ninja-build python3-pip python3-dev curl libgtk-3-bin \
-            build-essential pkg-config libdbus-1-dev libglib2.0-dev
+            build-essential pkg-config libdbus-1-dev libglib2.0-dev gettext
 
       - name: Build AppImage
         run: |
