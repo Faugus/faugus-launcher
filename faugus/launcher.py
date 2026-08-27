@@ -332,6 +332,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
             )
 
+        if self.interface_mode not in ("List", "Grid", "Covers", "Carrousel"):
+            self.interface_mode = "List"
+
         if self.interface_mode == "List":
             self.setup_interface()
         if self.interface_mode in ("Grid", "Covers", "Carrousel"):
@@ -341,9 +344,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.fullscreen()
                 self.fullscreen_activated = True
             self.setup_interface(True)
-        if not self.interface_mode:
-            self.interface_mode = "List"
-            self.setup_interface()
 
         right_click = Gtk.GestureClick()
         right_click.set_button(Gdk.BUTTON_SECONDARY)
