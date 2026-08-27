@@ -331,6 +331,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 """,
                 Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
             )
+            
+        if self.interface_mode not in ("List", "Grid", "Covers", "Carrousel"):
+            self.interface_mode = "List"
 
         if self.interface_mode not in ("List", "Grid", "Covers", "Carrousel"):
             self.interface_mode = "List"
