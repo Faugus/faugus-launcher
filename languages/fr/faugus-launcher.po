@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-23 18:23+0000\n"
+"POT-Creation-Date: 2026-08-26 21:03+0000\n"
 "PO-Revision-Date: 2026-08-19 02:17+0000\n"
 "Last-Translator: Loïc <weblate.plethora939@passmail.net>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -91,15 +91,15 @@ msgstr "Dernière sauvegarde :"
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Les préfixes et protons ne seront pas sauvegardés !"
 
-#: faugus/backup.py:269 faugus/launcher.py:5264 faugus/launcher.py:6227
-#: faugus/launcher.py:6671 faugus/launcher.py:7235 faugus/proton_manager.py:311
+#: faugus/backup.py:269 faugus/launcher.py:5434 faugus/launcher.py:6410
+#: faugus/launcher.py:6860 faugus/launcher.py:7424 faugus/proton_manager.py:311
 #: faugus/shortcut.py:87 faugus/utils.py:491 faugus/utils.py:601
 #: faugus/utils.py:612
 msgid "Cancel"
 msgstr "Annuler"
 
-#: faugus/backup.py:273 faugus/launcher.py:5268 faugus/launcher.py:5995
-#: faugus/launcher.py:6231 faugus/launcher.py:6675 faugus/launcher.py:7231
+#: faugus/backup.py:273 faugus/launcher.py:5438 faugus/launcher.py:6177
+#: faugus/launcher.py:6414 faugus/launcher.py:6864 faugus/launcher.py:7420
 #: faugus/shortcut.py:91 faugus/utils.py:495 faugus/utils.py:803
 msgid "Ok"
 msgstr "Ok"
@@ -109,14 +109,14 @@ msgid "Select the backup destination"
 msgstr "Sélectionner l'emplacement de la sauvegarde"
 
 #: faugus/launcher.py:952 faugus/launcher.py:1143 faugus/launcher.py:1429
-#: faugus/launcher.py:1628 faugus/launcher.py:2032 faugus/launcher.py:2173
-#: faugus/launcher.py:2230 faugus/launcher.py:2274 faugus/launcher.py:2293
+#: faugus/launcher.py:1628 faugus/launcher.py:2192 faugus/launcher.py:2333
+#: faugus/launcher.py:2390 faugus/launcher.py:2437 faugus/launcher.py:2459
 msgid "All"
 msgstr "Tout"
 
 #: faugus/launcher.py:954 faugus/launcher.py:1145 faugus/launcher.py:1439
-#: faugus/launcher.py:1637 faugus/launcher.py:2032 faugus/launcher.py:2173
-#: faugus/launcher.py:2230 faugus/launcher.py:2307
+#: faugus/launcher.py:1637 faugus/launcher.py:2192 faugus/launcher.py:2333
+#: faugus/launcher.py:2390 faugus/launcher.py:2473
 msgid "Uncategorized"
 msgstr "Non-catégorisé"
 
@@ -140,669 +140,679 @@ msgstr "Temps de jeu"
 msgid "Last played"
 msgstr "Dernier jeu lancé"
 
-#: faugus/launcher.py:1126 faugus/launcher.py:5129
+#: faugus/launcher.py:1126 faugus/launcher.py:5299
 msgid "Custom"
 msgstr "Custom"
 
 #: faugus/launcher.py:1440 faugus/launcher.py:1443 faugus/launcher.py:1638
-#: faugus/launcher.py:1641 faugus/launcher.py:2173 faugus/launcher.py:2230
-#: faugus/launcher.py:2273 faugus/launcher.py:2308 faugus/launcher.py:2311
-#: faugus/launcher.py:2467 faugus/launcher.py:2478 faugus/launcher.py:2768
+#: faugus/launcher.py:1641 faugus/launcher.py:2333 faugus/launcher.py:2390
+#: faugus/launcher.py:2436 faugus/launcher.py:2474 faugus/launcher.py:2477
+#: faugus/launcher.py:2631 faugus/launcher.py:2642 faugus/launcher.py:2932
 msgid "None"
 msgstr "Aucun"
 
-#: faugus/launcher.py:2054
+#: faugus/launcher.py:2214
 msgid "Manage categories..."
 msgstr "Gérer les catégories..."
 
-#: faugus/launcher.py:2091
+#: faugus/launcher.py:2251
 msgid "Manage Categories"
 msgstr "Gérer les catégories"
 
-#: faugus/launcher.py:2137
+#: faugus/launcher.py:2297
 msgid "Add"
 msgstr "Ajouter"
 
-#: faugus/launcher.py:2138 faugus/launcher.py:2520
+#: faugus/launcher.py:2298 faugus/launcher.py:2684
 msgid "Edit"
 msgstr "Modifier"
 
-#: faugus/launcher.py:2139 faugus/proton_manager.py:223
+#: faugus/launcher.py:2299 faugus/proton_manager.py:223
 #: faugus/proton_manager.py:346
 msgid "Remove"
 msgstr "Enlever"
 
-#: faugus/launcher.py:2394
+#: faugus/launcher.py:2558
 msgid "Shut down"
 msgstr "Eteindre"
 
-#: faugus/launcher.py:2397
+#: faugus/launcher.py:2561
 msgid "Reboot"
 msgstr "Redémarrer"
 
-#: faugus/launcher.py:2400
+#: faugus/launcher.py:2564
 msgid "Close"
 msgstr "Fermer"
 
-#: faugus/launcher.py:2459
+#: faugus/launcher.py:2623
 msgid "Remove from hidden"
 msgstr "Enlever des jeux cachés"
 
-#: faugus/launcher.py:2459
+#: faugus/launcher.py:2623
 msgid "Hide"
 msgstr "Masquer"
 
-#: faugus/launcher.py:2460
+#: faugus/launcher.py:2624
 msgid "Stop"
 msgstr "Arrêter"
 
-#: faugus/launcher.py:2460
+#: faugus/launcher.py:2624
 msgid "Play"
 msgstr "Jouer"
 
-#: faugus/launcher.py:2521
+#: faugus/launcher.py:2685
 msgid "Delete"
 msgstr "Supprimer"
 
-#: faugus/launcher.py:2524
+#: faugus/launcher.py:2688
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: faugus/launcher.py:2527
+#: faugus/launcher.py:2691
 msgid "Category"
 msgstr "Catégorie"
 
-#: faugus/launcher.py:2530
+#: faugus/launcher.py:2694
 msgid "Open game location"
 msgstr "Ouvrir l'emplacement du jeu"
 
-#: faugus/launcher.py:2533
+#: faugus/launcher.py:2697
 msgid "Open prefix location"
 msgstr "Ouvrir l'emplacement du préfixe"
 
-#: faugus/launcher.py:2536
+#: faugus/launcher.py:2700
 msgid "Show logs"
 msgstr "Afficher les journaux"
 
-#: faugus/launcher.py:2543
+#: faugus/launcher.py:2707
 msgid "Run file in the prefix"
 msgstr "Lancer un fichier dans le préfixe"
 
-#: faugus/launcher.py:2557
+#: faugus/launcher.py:2721
 msgid "Clear recent"
 msgstr "Vider récent"
 
-#: faugus/launcher.py:2560 faugus/launcher.py:2618
+#: faugus/launcher.py:2724 faugus/launcher.py:2782
 msgid "Recent"
 msgstr "Récent"
 
-#: faugus/launcher.py:2674
+#: faugus/launcher.py:2838
 msgid "hour"
 msgstr "heure"
 
-#: faugus/launcher.py:2675
+#: faugus/launcher.py:2839
 msgid "hours"
 msgstr "heures"
 
-#: faugus/launcher.py:2676
+#: faugus/launcher.py:2840
 msgid "minute"
 msgstr "minute"
 
-#: faugus/launcher.py:2677
+#: faugus/launcher.py:2841
 msgid "minutes"
 msgstr "minutes"
 
-#: faugus/launcher.py:2860 faugus/launcher.py:5862 faugus/launcher.py:7815
+#: faugus/launcher.py:3033 faugus/launcher.py:6044 faugus/launcher.py:8008
 msgid "Select a file to run in the prefix"
 msgstr "Sélectionner un fichier à lancer dans le préfixe"
 
-#: faugus/launcher.py:2903
+#: faugus/launcher.py:3076
 #, python-format
 msgid "%s Logs"
 msgstr "%s Journaux"
 
-#: faugus/launcher.py:2943
+#: faugus/launcher.py:3116
 msgid "Copy to clipboard"
 msgstr "Copier vers le presse-papier"
 
-#: faugus/launcher.py:2947
+#: faugus/launcher.py:3120
 msgid "Open file location"
 msgstr "Ouvrir l'emplacement du fichier"
 
-#: faugus/launcher.py:3026 faugus/launcher.py:4152
+#: faugus/launcher.py:3199 faugus/launcher.py:4322
 #, python-format
 msgid "%s already exists"
 msgstr "%s existe déjà"
 
-#: faugus/launcher.py:3163 faugus/launcher.py:3984
+#: faugus/launcher.py:3336 faugus/launcher.py:4154
 #, python-format
 msgid "%s is running"
 msgstr "%s est en cours d'exécution"
 
-#: faugus/launcher.py:3645
+#: faugus/launcher.py:3815
 msgid "Proton may generate huge log files."
 msgstr "Proton peut générer des journaux lourds."
 
-#: faugus/launcher.py:3646
+#: faugus/launcher.py:3816
 msgid "Enable logging only when debugging a problem."
 msgstr "Activer la journalisation uniquement lors du débogage d'un problème."
 
-#: faugus/launcher.py:3908
+#: faugus/launcher.py:4078
 #, python-format
 msgid "Edit %s"
 msgstr "Modifier %s"
 
-#: faugus/launcher.py:4046
+#: faugus/launcher.py:4216
 msgid "Failed to remove prefix"
 msgstr "La suppression du préfixe a échoué"
 
-#: faugus/launcher.py:4294
+#: faugus/launcher.py:4464
 msgid "No internet connection"
 msgstr "Aucune connexion internet"
 
-#: faugus/launcher.py:4362 faugus/launcher.py:4530
+#: faugus/launcher.py:4532 faugus/launcher.py:4700
 #, python-format
 msgid "Installing %s..."
 msgstr "Installation de %s..."
 
-#: faugus/launcher.py:4374 faugus/launcher.py:4378 faugus/launcher.py:4382
-#: faugus/launcher.py:4386 faugus/launcher.py:4390 faugus/launcher.py:4394
-#: faugus/launcher.py:4398 faugus/launcher.py:4402 faugus/runner.py:613
+#: faugus/launcher.py:4544 faugus/launcher.py:4548 faugus/launcher.py:4552
+#: faugus/launcher.py:4556 faugus/launcher.py:4560 faugus/launcher.py:4564
+#: faugus/launcher.py:4568 faugus/launcher.py:4572 faugus/runner.py:613
 msgid "Downloading"
 msgstr "Téléchargement"
 
-#: faugus/launcher.py:4479
+#: faugus/launcher.py:4649
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s n'est pas installé !"
 
-#: faugus/launcher.py:4524
+#: faugus/launcher.py:4694
 msgid "Download complete"
 msgstr "Téléchargement terminé"
 
-#: faugus/launcher.py:4527
+#: faugus/launcher.py:4697
 #, python-format
 msgid "Error during download: %s"
 msgstr "Erreur lors du téléchargement : %s"
 
-#: faugus/launcher.py:4532 faugus/launcher.py:4535 faugus/launcher.py:4538
-#: faugus/launcher.py:4553
+#: faugus/launcher.py:4702 faugus/launcher.py:4705 faugus/launcher.py:4708
+#: faugus/launcher.py:4723
 msgid "Please close the login window and wait."
 msgstr "Veuillez fermer la fenêtre de connexion et attendre."
 
-#: faugus/launcher.py:4552
+#: faugus/launcher.py:4722
 msgid "Please don't change the installation path."
 msgstr "Veuillez ne pas changer le chemin d'installation."
 
-#: faugus/launcher.py:4559
+#: faugus/launcher.py:4729
 msgid "Please close Wargaming to finish the installation."
 msgstr "Veuillez fermer Wargaming afin de terminer l'installation."
 
-#: faugus/launcher.py:4964
+#: faugus/launcher.py:5134
 msgid "Settings"
 msgstr "Paramètres"
 
-#: faugus/launcher.py:5085
+#: faugus/launcher.py:5255
 msgid "Language"
 msgstr "Langue"
 
-#: faugus/launcher.py:5089
+#: faugus/launcher.py:5259
 msgid "Interface Mode"
 msgstr "Mode d'interface"
 
-#: faugus/launcher.py:5093
+#: faugus/launcher.py:5263
 msgid "List"
 msgstr "Liste"
 
-#: faugus/launcher.py:5094
+#: faugus/launcher.py:5264
 msgid "Grid"
 msgstr "Grille"
 
-#: faugus/launcher.py:5095
+#: faugus/launcher.py:5265
 msgid "Covers"
 msgstr "Affiches"
 
-#: faugus/launcher.py:5098
-msgid "Background"
-msgstr "Arrière-plan"
-
-#: faugus/launcher.py:5101 faugus/launcher.py:5111 faugus/launcher.py:5120
-#: faugus/launcher.py:5128 faugus/utils.py:1095 faugus/utils.py:1692
-msgid "Default"
-msgstr "Défaut"
-
-#: faugus/launcher.py:5102
-msgid "Accent color"
-msgstr "Couleur d'accentuation"
-
-#: faugus/launcher.py:5103
-msgid "Dominant color"
-msgstr "Couleur dominante"
-
-#: faugus/launcher.py:5106
-msgid "Banner"
-msgstr "Bannière"
-
-#: faugus/launcher.py:5108
-msgid "Theme"
-msgstr "Thème"
-
-#: faugus/launcher.py:5112
-msgid "System Theme"
-msgstr "Thème du système"
-
-#: faugus/launcher.py:5117
-msgid "Color Scheme"
-msgstr "Schéma de couleur"
-
-#: faugus/launcher.py:5121
-msgid "Light"
-msgstr "Clair"
-
-#: faugus/launcher.py:5122
-msgid "Dark"
-msgstr "Sombre"
-
-#: faugus/launcher.py:5125
-msgid "Accent Color"
-msgstr "Couleur d'accentuation"
-
-#: faugus/launcher.py:5140
-msgid "Startup Window Size"
-msgstr "Taille de la fenêtre de démarrage"
-
-#: faugus/launcher.py:5144
-msgid "Default size"
-msgstr "Taille par défaut"
-
-#: faugus/launcher.py:5145
-msgid "Remember size"
-msgstr "Se souvenir de la taille"
-
-#: faugus/launcher.py:5146
-msgid "Maximized"
-msgstr "Maximisée"
-
-#: faugus/launcher.py:5147
-msgid "Fullscreen"
-msgstr "Plein écran"
-
-#: faugus/launcher.py:5148 faugus/launcher.py:5636
-msgid "Alt+Enter toggles fullscreen"
-msgstr "Alt+Entrer active le mode plein écran"
-
-#: faugus/launcher.py:5150
-msgid "Labels"
-msgstr "Etiquettes"
-
-#: faugus/launcher.py:5153
-msgid "Zoom"
-msgstr "Zoom"
-
-#: faugus/launcher.py:5156
+#: faugus/launcher.py:5266
 msgid "Carrousel"
 msgstr ""
 
-#: faugus/launcher.py:5161
-msgid "SteamGridDB API Key"
+#: faugus/launcher.py:5268
+msgid "Background"
+msgstr "Arrière-plan"
+
+#: faugus/launcher.py:5271 faugus/launcher.py:5281 faugus/launcher.py:5290
+#: faugus/launcher.py:5298 faugus/utils.py:1095 faugus/utils.py:1761
+msgid "Default"
+msgstr "Défaut"
+
+#: faugus/launcher.py:5272
+msgid "Accent color"
+msgstr "Couleur d'accentuation"
+
+#: faugus/launcher.py:5273
+msgid "Dominant color"
+msgstr "Couleur dominante"
+
+#: faugus/launcher.py:5276
+msgid "Banner"
+msgstr "Bannière"
+
+#: faugus/launcher.py:5278
+msgid "Theme"
+msgstr "Thème"
+
+#: faugus/launcher.py:5282
+msgid "System Theme"
+msgstr "Thème du système"
+
+#: faugus/launcher.py:5287
+msgid "Color Scheme"
+msgstr "Schéma de couleur"
+
+#: faugus/launcher.py:5291
+msgid "Light"
+msgstr "Clair"
+
+#: faugus/launcher.py:5292
+msgid "Dark"
+msgstr "Sombre"
+
+#: faugus/launcher.py:5295
+msgid "Accent Color"
+msgstr "Couleur d'accentuation"
+
+#: faugus/launcher.py:5310
+msgid "Startup Window Size"
+msgstr "Taille de la fenêtre de démarrage"
+
+#: faugus/launcher.py:5314
+msgid "Default size"
+msgstr "Taille par défaut"
+
+#: faugus/launcher.py:5315
+msgid "Remember size"
+msgstr "Se souvenir de la taille"
+
+#: faugus/launcher.py:5316
+msgid "Maximized"
+msgstr "Maximisée"
+
+#: faugus/launcher.py:5317
+msgid "Fullscreen"
+msgstr "Plein écran"
+
+#: faugus/launcher.py:5318 faugus/launcher.py:5799
+msgid "Alt+Enter toggles fullscreen"
+msgstr "Alt+Entrer active le mode plein écran"
+
+#: faugus/launcher.py:5320
+msgid "Labels"
+msgstr "Etiquettes"
+
+#: faugus/launcher.py:5323
+msgid "Zoom"
+msgstr "Zoom"
+
+#: faugus/launcher.py:5326
+#, fuzzy
+#| msgid "SteamGridDB API Key"
+msgid "SteamGridDB"
 msgstr "clé d'API SteamGridDB"
 
-#: faugus/launcher.py:5168
+#: faugus/launcher.py:5331
+msgid "API Key"
+msgstr ""
+
+#: faugus/launcher.py:5338
 msgid "Default Prefixes Location"
 msgstr "Emplacement par défaut des préfixes"
 
-#: faugus/launcher.py:5172
+#: faugus/launcher.py:5342
 msgid "The location where prefixes are created"
 msgstr "L'emplacement où les préfixes sont créés"
 
-#: faugus/launcher.py:5182
+#: faugus/launcher.py:5352
 msgid "Default Prefix Tools"
 msgstr "Outils par défaut des préfixes"
 
-#: faugus/launcher.py:5188
+#: faugus/launcher.py:5358
 msgid "Default Proton"
 msgstr "Proton par défaut"
 
-#: faugus/launcher.py:5192 faugus/proton_manager.py:84
+#: faugus/launcher.py:5362 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr "Gestionnaire de Proton"
 
-#: faugus/launcher.py:5195
+#: faugus/launcher.py:5365
 msgid "Miscellaneous"
 msgstr "Divers"
 
-#: faugus/launcher.py:5198
+#: faugus/launcher.py:5368
 msgid "Discrete GPU"
 msgstr "GPU discret"
 
-#: faugus/launcher.py:5200
+#: faugus/launcher.py:5370
 msgid "Auto-close on launch"
 msgstr "Fermer automatiquement au lancement"
 
-#: faugus/launcher.py:5202
+#: faugus/launcher.py:5372
 msgid "Autostart"
 msgstr "Démarrage automatique"
 
-#: faugus/launcher.py:5204
+#: faugus/launcher.py:5374
 msgid "System tray icon"
 msgstr "Icône dans la barre des tâches"
 
-#: faugus/launcher.py:5207
+#: faugus/launcher.py:5377
 msgid "Minimized startup"
 msgstr "Démarrage minimisé"
 
-#: faugus/launcher.py:5210
+#: faugus/launcher.py:5380
 msgid "Monochrome icon"
 msgstr "Icône monochrome"
 
-#: faugus/launcher.py:5213
+#: faugus/launcher.py:5383
 msgid "Splash window"
 msgstr "Ecran de démarrage"
 
-#: faugus/launcher.py:5216
+#: faugus/launcher.py:5386
 msgid "Automatic updates"
 msgstr "Mises à jour automatiques"
 
-#: faugus/launcher.py:5219
+#: faugus/launcher.py:5389
 msgid "Logging"
 msgstr "Journalisation"
 
-#: faugus/launcher.py:5222
+#: faugus/launcher.py:5392
 #, fuzzy
 #| msgid "Category"
 msgid "Categories"
 msgstr "Catégorie"
 
-#: faugus/launcher.py:5224
+#: faugus/launcher.py:5394
 msgid "Sort"
 msgstr ""
 
-#: faugus/launcher.py:5226
+#: faugus/launcher.py:5396
 msgid "Header bar"
 msgstr "Barre d'en-tête"
 
-#: faugus/launcher.py:5228
+#: faugus/launcher.py:5398
 msgid "Hidden games"
 msgstr "Jeux masqués"
 
-#: faugus/launcher.py:5229
+#: faugus/launcher.py:5399
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H montre les jeux masqués"
 
-#: faugus/launcher.py:5231
+#: faugus/launcher.py:5401
 msgid "Gamepad navigation"
 msgstr "Navigation à la manette"
 
-#: faugus/launcher.py:5234
+#: faugus/launcher.py:5404
 msgid "Wayland driver (experimental)"
 msgstr "driver Wayland (expérimental)"
 
-#: faugus/launcher.py:5237
+#: faugus/launcher.py:5407
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (expérimental)"
 
-#: faugus/launcher.py:5247 faugus/launcher.py:6628
+#: faugus/launcher.py:5417 faugus/launcher.py:6817
 msgid "Run"
 msgstr "Lancer"
 
-#: faugus/launcher.py:5250 faugus/launcher.py:6631
+#: faugus/launcher.py:5420 faugus/launcher.py:6820
 msgid "Run a file in the prefix"
 msgstr "Lancer un fichier dans le préfixe"
 
-#: faugus/launcher.py:5254 faugus/launcher.py:6616 faugus/shortcut.py:83
+#: faugus/launcher.py:5424 faugus/launcher.py:6805 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
 msgstr "Pourrait régler pour certains jeux des problèmes avec les manettes"
 
-#: faugus/launcher.py:5255 faugus/launcher.py:6617 faugus/shortcut.py:84
+#: faugus/launcher.py:5425 faugus/launcher.py:6806 faugus/shortcut.py:84
 msgid "No Sleep"
 msgstr "Pas de veille"
 
-#: faugus/launcher.py:5256 faugus/launcher.py:6618 faugus/shortcut.py:85
+#: faugus/launcher.py:5426 faugus/launcher.py:6807 faugus/shortcut.py:85
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
 "Empêcher le système d'entrer en veille quand un jeu est en cours d'éxécution"
 
-#: faugus/launcher.py:5258
+#: faugus/launcher.py:5428
 msgid "Support the Project"
 msgstr "Soutenir le projet"
 
-#: faugus/launcher.py:5272
+#: faugus/launcher.py:5442
 msgid "Backup/Restore Settings"
 msgstr "Paramètres de sauvegarde / restauration"
 
-#: faugus/launcher.py:5276
+#: faugus/launcher.py:5446
 msgid "Backup"
 msgstr "Sauvegarder"
 
-#: faugus/launcher.py:5279
+#: faugus/launcher.py:5449
 msgid "Restore"
 msgstr "Restaurer"
 
-#: faugus/launcher.py:5286
+#: faugus/launcher.py:5456
 msgid "Global Environment Variables"
 msgstr "Variables d'environnement globales"
 
-#: faugus/launcher.py:5567
+#: faugus/launcher.py:5737
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Nettoyer les journaux (%s)"
 
-#: faugus/launcher.py:5570
+#: faugus/launcher.py:5740
 msgid "Clear Logs"
 msgstr "Nettoyer les journaux"
 
-#: faugus/launcher.py:5618
+#: faugus/launcher.py:5787
 #, fuzzy
 #| msgid "SteamGridDB API Key"
-msgid "Covers and SteamGridDB modes"
+msgid "Covers or Carrousel mode"
 msgstr "clé d'API SteamGridDB"
 
-#: faugus/launcher.py:5619
+#: faugus/launcher.py:5788
 #, fuzzy
 #| msgid "SteamGridDB API Key"
-msgid "SteamGridDB mode"
+msgid "Grid, Covers or Carrousel mode"
 msgstr "clé d'API SteamGridDB"
 
-#: faugus/launcher.py:5620
+#: faugus/launcher.py:5815
 #, fuzzy
 #| msgid "SteamGridDB API Key"
-msgid "Grid, Covers and SteamGridDB modes"
+msgid "Covers or Carrousel mode with SteamGridDB"
 msgstr "clé d'API SteamGridDB"
 
-#: faugus/launcher.py:5806
+#: faugus/launcher.py:5840
+msgid "Adwaita theme"
+msgstr ""
+
+#: faugus/launcher.py:5988
 msgid "Do you want to save the changes?"
 msgstr "Voulez-vous enregistrer les modifications ?"
 
-#: faugus/launcher.py:5916
+#: faugus/launcher.py:6098
 msgid "Select a backup file to restore"
 msgstr "Sélectionner une sauvegarde à restaurer"
 
-#: faugus/launcher.py:5922
+#: faugus/launcher.py:6104
 msgid "ZIP files"
 msgstr "Fichiers ZIP"
 
-#: faugus/launcher.py:5937 faugus/launcher.py:5947
+#: faugus/launcher.py:6119 faugus/launcher.py:6129
 msgid "This is not a valid Faugus backup file."
 msgstr "Ceci n'est pas un fichier de sauvegarde de Faugus valide."
 
-#: faugus/launcher.py:5986
+#: faugus/launcher.py:6168
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Etes-vous sûr de vouloir remplacer les paramètres ?"
 
-#: faugus/launcher.py:5995 faugus/launcher.py:6298
+#: faugus/launcher.py:6177 faugus/launcher.py:6481
 msgid "Yes"
 msgstr "Oui"
 
-#: faugus/launcher.py:5996 faugus/launcher.py:6294
+#: faugus/launcher.py:6178 faugus/launcher.py:6477
 msgid "No"
 msgstr "Non"
 
-#: faugus/launcher.py:6003 faugus/launcher.py:8053
+#: faugus/launcher.py:6185 faugus/launcher.py:8246
 msgid "Select a prefix location"
 msgstr "Sélectionnez un emplacement pour le préfixe"
 
-#: faugus/launcher.py:6214
+#: faugus/launcher.py:6397
 #, python-format
 msgid "Duplicate %s"
 msgstr "Doublon %s"
 
-#: faugus/launcher.py:6220 faugus/launcher.py:6491 faugus/launcher.py:6504
+#: faugus/launcher.py:6403 faugus/launcher.py:6680 faugus/launcher.py:6693
 #: faugus/shortcut.py:44
 msgid "Title"
 msgstr "Titre"
 
-#: faugus/launcher.py:6269
+#: faugus/launcher.py:6452
 #, python-format
 msgid "Delete %s"
 msgstr "Supprimer %s"
 
-#: faugus/launcher.py:6277
+#: faugus/launcher.py:6460
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Etes-vous sûr de vouloirs supprimer %s ?"
 
-#: faugus/launcher.py:6286
+#: faugus/launcher.py:6469
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "ATTENTION : ce préfixe est utilisé par %d autres jeux."
 
-#: faugus/launcher.py:6288
+#: faugus/launcher.py:6471
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "ATTENTION : ce préfixe est utilisé par 1 autre jeu."
 
-#: faugus/launcher.py:6302
+#: faugus/launcher.py:6485
 msgid "Also remove the prefix:"
 msgstr "Egalement supprimer le préfixe :"
 
-#: faugus/launcher.py:6349
+#: faugus/launcher.py:6532
 msgid "New Game/App"
 msgstr "Nouveau jeu / application"
 
-#: faugus/launcher.py:6474
+#: faugus/launcher.py:6663
 msgid "Steam User"
 msgstr "Utilisateur Steam"
 
-#: faugus/launcher.py:6488 faugus/launcher.py:7028 faugus/launcher.py:7030
+#: faugus/launcher.py:6677 faugus/launcher.py:7217 faugus/launcher.py:7219
 msgid "No Steam users found"
 msgstr "Aucun utilisateur Steam trouvé"
 
-#: faugus/launcher.py:6556 faugus/utils.py:1478
+#: faugus/launcher.py:6745 faugus/utils.py:1547
 msgid "Path"
 msgstr "Chemin"
 
-#: faugus/launcher.py:6560
+#: faugus/launcher.py:6749
 msgid "Path to the game executable"
 msgstr "Chemin vers l'exécutable du jeu"
 
-#: faugus/launcher.py:6568
+#: faugus/launcher.py:6757
 msgid "Prefix"
 msgstr "Préfixe"
 
-#: faugus/launcher.py:6572
+#: faugus/launcher.py:6761
 msgid "Path to the prefix"
 msgstr "Chemin vers le préfixe"
 
-#: faugus/launcher.py:6580
+#: faugus/launcher.py:6769
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/launcher.py:6594 faugus/shortcut.py:61
+#: faugus/launcher.py:6783 faugus/shortcut.py:61
 msgid "Game Arguments"
 msgstr "Arguments du jeu"
 
-#: faugus/launcher.py:6599 faugus/shortcut.py:66 faugus/utils.py:1185
+#: faugus/launcher.py:6788 faugus/shortcut.py:66 faugus/utils.py:1185
 msgid "Launch Settings"
 msgstr "Paramètres de lancement"
 
-#: faugus/launcher.py:6602 faugus/shortcut.py:69 faugus/utils.py:1449
+#: faugus/launcher.py:6791 faugus/shortcut.py:69 faugus/utils.py:1518
 msgid "Additional Application"
 msgstr "Application additionnelle"
 
-#: faugus/launcher.py:6605 faugus/shortcut.py:72
+#: faugus/launcher.py:6794 faugus/shortcut.py:72
 msgid "Additional application to run with the game"
 msgstr "Application additionnelle à lance avec le jeu"
 
-#: faugus/launcher.py:6607 faugus/shortcut.py:74 faugus/utils.py:1576
+#: faugus/launcher.py:6796 faugus/shortcut.py:74 faugus/utils.py:1645
 msgid "Lossless Scaling Frame Generation"
 msgstr "Lossless Scaling Frame Generation"
 
-#: faugus/launcher.py:6611
+#: faugus/launcher.py:6800
 msgid "Disable UMU"
 msgstr "Désactiver UMU"
 
-#: faugus/launcher.py:6613
+#: faugus/launcher.py:6802
 msgid "Runs the game without the Steam Runtime"
 msgstr "Lance le jeu sans Steam Runtime"
 
-#: faugus/launcher.py:6633
+#: faugus/launcher.py:6822
 msgid "Shortcut"
 msgstr "Raccourci"
 
-#: faugus/launcher.py:6638
+#: faugus/launcher.py:6827
 msgid "Desktop"
 msgstr "Bureau"
 
-#: faugus/launcher.py:6639
+#: faugus/launcher.py:6828
 msgid "App Menu"
 msgstr "Menu des applications"
 
-#: faugus/launcher.py:6640
+#: faugus/launcher.py:6829
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:6694 faugus/launcher.py:6884
+#: faugus/launcher.py:6883 faugus/launcher.py:7073
 msgid "Game/App"
 msgstr "Jeu / Application"
 
-#: faugus/launcher.py:6695 faugus/launcher.py:6893
+#: faugus/launcher.py:6884 faugus/launcher.py:7082
 msgid "Tools"
 msgstr "Outils"
 
-#: faugus/launcher.py:6868
+#: faugus/launcher.py:7057
 msgid "Refresh"
 msgstr "Rafraîchir"
 
-#: faugus/launcher.py:6871
+#: faugus/launcher.py:7060
 msgid "Load from file"
 msgstr "Charger depuis un fichier"
 
-#: faugus/launcher.py:6874
+#: faugus/launcher.py:7063
 msgid "Load from URL"
 msgstr "Charger depuis une URL"
 
-#: faugus/launcher.py:7036 faugus/shortcut.py:175
+#: faugus/launcher.py:7225 faugus/shortcut.py:175
 msgid "Vulkan Layer not found"
 msgstr "Vulkan Layer introuvable"
 
-#: faugus/launcher.py:7191
+#: faugus/launcher.py:7380
 msgid "Select an image for the cover"
 msgstr "Sélectionner une image pour l'affiche"
 
-#: faugus/launcher.py:7192
+#: faugus/launcher.py:7381
 msgid "Select an image for the banner"
 msgstr "Sélectionner une image pour la bannière"
 
-#: faugus/launcher.py:7193
+#: faugus/launcher.py:7382
 msgid "Select an image for the icon"
 msgstr "Sélectionner une image pour l'icône"
 
-#: faugus/launcher.py:7223
+#: faugus/launcher.py:7412
 msgid "Enter the image URL"
 msgstr "Entrer l'URL de l'image"
 
-#: faugus/launcher.py:7783
+#: faugus/launcher.py:7976
 msgid "Windows Game"
 msgstr "Jeu Windows"
 
-#: faugus/launcher.py:7784
+#: faugus/launcher.py:7977
 msgid "Linux Game"
 msgstr "Jeu Linux"
 
-#: faugus/launcher.py:7785
+#: faugus/launcher.py:7978
 msgid "Steam Game"
 msgstr "Jeu Steam"
 
-#: faugus/launcher.py:8022
+#: faugus/launcher.py:8215
 msgid "Select the game executable"
 msgstr "Sélectionner l'exécutable du jeu"
 
@@ -932,125 +942,128 @@ msgstr "système"
 msgid "Presets"
 msgstr "Préréglages"
 
-#: faugus/utils.py:1321
+#: faugus/utils.py:1337
 msgid "Launch Arguments"
 msgstr "Arguments de lancement"
 
-#: faugus/utils.py:1377
+#: faugus/utils.py:1446
 msgid "Select a command or script"
 msgstr "Sélectionner une commande ou un script"
 
-#: faugus/utils.py:1402
+#: faugus/utils.py:1471
 msgid "Pre-launch"
 msgstr "Pré-lancement"
 
-#: faugus/utils.py:1403
+#: faugus/utils.py:1472
 msgid "Command or script to run before the game"
 msgstr "Commande ou script à lancer avant le jeu"
 
-#: faugus/utils.py:1405
+#: faugus/utils.py:1474
 msgid "Post-launch"
 msgstr "Post-lancement"
 
-#: faugus/utils.py:1406
+#: faugus/utils.py:1475
 msgid "Command or script to run after the game"
 msgstr "Commande ou script à lancer après le jeu"
 
-#: faugus/utils.py:1474 faugus/utils.py:1658
+#: faugus/utils.py:1543 faugus/utils.py:1727
 msgid "Enable"
 msgstr "Activer"
 
-#: faugus/utils.py:1483
+#: faugus/utils.py:1552
 msgid "Path to the application"
 msgstr "Chemin vers l'application"
 
-#: faugus/utils.py:1495
+#: faugus/utils.py:1564
 msgid "Select an additional application"
 msgstr "Sélectionner une application additionnelle"
 
-#: faugus/utils.py:1512
+#: faugus/utils.py:1581
 msgid "Delay (seconds)"
 msgstr "Délai (secondes)"
 
-#: faugus/utils.py:1525
+#: faugus/utils.py:1594
 msgid "Run the application first"
 msgstr "Lancer l'application d'abord"
 
-#: faugus/utils.py:1609
+#: faugus/utils.py:1678
 msgid "Lossless Scaling Location"
 msgstr "Emplacement de Lossless Scaling"
 
-#: faugus/utils.py:1617
+#: faugus/utils.py:1686
 msgid "Lossless.dll location"
 msgstr "Emplacement de Lossless.dll"
 
-#: faugus/utils.py:1629
+#: faugus/utils.py:1698
 msgid "Select the Lossless.dll file"
 msgstr "Sélectionner le fichier Lossless.dll"
 
-#: faugus/utils.py:1662
+#: faugus/utils.py:1731
 msgid "Multiplier"
 msgstr "Multiplicateur"
 
-#: faugus/utils.py:1667
+#: faugus/utils.py:1736
 msgid "Multiply the FPS"
 msgstr "Multiplie les FPS"
 
-#: faugus/utils.py:1669
+#: faugus/utils.py:1738
 msgid "Flow Scale"
 msgstr "Échelle de débit"
 
-#: faugus/utils.py:1676
+#: faugus/utils.py:1745
 msgid "Lower the internal motion estimation resolution"
 msgstr "Baisse la résolution de l'estimation interne du mouvement"
 
-#: faugus/utils.py:1678
+#: faugus/utils.py:1747
 msgid "Performance Mode"
 msgstr "Mode performance"
 
-#: faugus/utils.py:1679
+#: faugus/utils.py:1748
 msgid "Massively improve performance at the cost of quality"
 msgstr "Améliore massivement les performances aux dépens de la qualité"
 
-#: faugus/utils.py:1682
+#: faugus/utils.py:1751
 msgid "HDR Mode"
 msgstr "Mode HDR"
 
-#: faugus/utils.py:1683
+#: faugus/utils.py:1752
 msgid "Enable special HDR-only behavior"
 msgstr "Active un comportement unique au HDR"
 
-#: faugus/utils.py:1686
+#: faugus/utils.py:1755
 msgid "Present Mode (Experimental)"
 msgstr "Mode présent (expérimental)"
 
-#: faugus/utils.py:1690
+#: faugus/utils.py:1759
 msgid "Override the present mode"
 msgstr "Outrepasse le mode présent"
 
-#: faugus/utils.py:2063
+#: faugus/utils.py:2132
 msgid "No SteamGridDB API key configured."
 msgstr "Aucune clé d'API SteamGridDB configurée."
 
-#: faugus/utils.py:2064
+#: faugus/utils.py:2133
 msgid "Add your API key in Settings first."
 msgstr "Ajoutez d'abord votre clé API dans les paramètres."
 
-#: faugus/utils.py:2077
+#: faugus/utils.py:2146
 msgid "Choose a cover"
 msgstr "Choisissez une affiche"
 
-#: faugus/utils.py:2078
+#: faugus/utils.py:2147
 msgid "Choose a banner"
 msgstr "Choisissez une bannière"
 
-#: faugus/utils.py:2079
+#: faugus/utils.py:2148
 msgid "Choose an icon"
 msgstr "Choisissez une icône"
 
-#: faugus/utils.py:2201
+#: faugus/utils.py:2270
 msgid "No results found"
 msgstr "Aucun résultat"
+
+#~ msgid "SteamGridDB API Key"
+#~ msgstr "clé d'API SteamGridDB"
 
 #~ msgid "Categories and sort"
 #~ msgstr "Catégories et tri"
