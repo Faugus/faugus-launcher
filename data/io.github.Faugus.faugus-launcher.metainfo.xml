@@ -90,20 +90,18 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.1.0-1" date="2026-08-13">
+    <release version="2.2.0-1" date="2026-08-27">
       <description>
         <ul>
-          <li>Added Amazon Games.</li>
-          <li>Added an option to toggle the zoom slider.</li>
-          <li>Added an option to disable UMU for Linux games as some of them don't run with the Steam Runtime.</li>
-          <li>The system tray icon now runs in a separate process, independent of the main window, using less RAM.</li>
-          <li>Now it also reads Protons installed in Steam's Flatpak data folder.</li>
-          <li>Reinforced games file handling to prevent data loss.</li>
-          <li>Fixed older icons not being updated.</li>
-          <li>Fixed Steam shortcut order when removing it.</li>
-          <li>Fixed AppImage not extracting icons from exe file.</li>
-          <li>Fixed the filechooser not opening in the migration process.</li>
-          <li>Updated translations.</li>
+          <li>Added a new Interface Mode: Carrousel</li>
+          <li>SteamGridDB is no longer a Interface Mode. Now it's a separeted option</li>
+          <li>Separated the Categories and Sort options so you can toggle them individually</li>
+          <li>Now allows Proton-CachyOS variants installed by other Proton Managers</li>
+          <li>Added the ability to move reorder launch arguments / presets</li>
+          <li>Now all the interface options are visible, but they are greyed out if they are not available for the current Interface Mode / Theme</li>
+          <li>Rearranged some interface options</li>
+          <li>Reworked the banner display on main launcher installation screens to prevent a line artifact when using fractional scaling</li>
+          <li>Update translations</li>
         </ul>
       </description>
     </release>

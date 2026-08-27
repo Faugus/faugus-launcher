@@ -22,7 +22,7 @@ from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
 from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 
-VERSION = "2.1.0"
+VERSION = "2.2.0"
 
 if IS_FLATPAK:
     tray_icon = 'io.github.Faugus.faugus-launcher'
