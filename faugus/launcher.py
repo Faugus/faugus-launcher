@@ -1085,6 +1085,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if g.title == title:
                     self.carrousel_index = i
                     self.render_carrousel()
+
+                    def grab_carrousel_focus():
+                        if hasattr(self, 'carrousel_fixed'):
+                            self.carrousel_fixed.grab_focus()
+                        return False
+
+                    GLib.idle_add(grab_carrousel_focus)
                     return
             return
 
@@ -1917,7 +1924,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             slot["_can_target"] = can_target
 
         carrousel_fixed = getattr(self, 'carrousel_fixed', None)
-        is_focused = carrousel_fixed is not None and carrousel_fixed.is_focus()
+        is_focused = carrousel_fixed is not None and carrousel_fixed.get_property("has-focus")
         if not is_focused and d < 0.5:
             scale = 1.0
 
