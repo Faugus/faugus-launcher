@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK, CONFIG_FILE_DIR
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, PROTON_GE, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, IS_FLATPAK, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -1046,6 +1046,10 @@ def update_games_json():
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
             changed = True
+        
+        if game.get("runner") == "Proton-GE":
+            game["runner"] = "Proton-GE (System)"
+            changed = True
 
         if "favorite" in game:
             if game["favorite"] == True:
@@ -1100,6 +1104,9 @@ def populate_combobox_with_runners(combobox):
 
     if os.path.exists(PROTON_CACHYOS):
         combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
+    
+    if os.path.exists(PROTON_GE):
+        combobox.append("Proton-GE (System)", "Proton-GE ({})".format(_("System")))
 
     try:
         versions = set()

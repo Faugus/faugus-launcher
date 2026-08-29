@@ -204,6 +204,9 @@ class FaugusRun(HiDpiMixin):
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
+            elif protonpath == "Proton-GE (System)" and not os.path.exists(PROTON_GE):
+                self.close_splash_window()
+                self.show_error_dialog(protonpath)
             elif protonpath == "Linux-Native":
                 pass
             elif protonpath == "Steam":
@@ -812,6 +815,9 @@ def build_launch_command(game):
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH={PROTON_CACHYOS}")
+        elif runner == "Proton-GE (System)":
+            command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
+            command_parts.append(f"PROTONPATH={PROTON_GE}")
         else:
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             command_parts.append(f"PROTONPATH='{runner}'")

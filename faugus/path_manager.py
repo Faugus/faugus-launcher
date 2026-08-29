@@ -189,6 +189,7 @@ RUNNING_GAMES = PathManager.user_state('faugus-launcher/running-games.json')
 FILECHOOSER_FOLDERS_FILE = PathManager.user_state('faugus-launcher/filechooser_folders.json')
 ICONS_DIR = PathManager.user_data('faugus-launcher/icons')
 PROTON_CACHYOS = PathManager.system_data('steam/compatibilitytools.d/proton-cachyos-slr/')
+PROTON_GE = PathManager.system_data('steam/compatibilitytools.d/proton-ge-custom/')
 UMU_RUN = PathManager.user_data('faugus-launcher/umu-run')
 COMPATIBILITY_DIR = Path(PathManager.get_compatibilitytools())
 COMPATIBILITY_DIRS = [Path(p) for p in PathManager.get_compatibilitytools_dirs()]
