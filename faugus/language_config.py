@@ -83,5 +83,5 @@ def setup_gettext(domain):
             translation = gettext.GNUTranslations(f)
         translation.install()
         return translation.gettext
-    gettext.install(domain, localedir=LOCALE_DIR)
+    gettext.NullTranslations().install()
     return gettext.gettext
