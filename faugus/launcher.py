@@ -1744,10 +1744,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         deco_entry.add_css_class("game")
         deco_entry.add_css_class("list-row-entry")
 
+        anim_box = Gtk.Box()
+        anim_box.add_css_class("launch-overlay")
+        anim_box.set_hexpand(True)
+        anim_box.set_vexpand(True)
+        anim_box.set_can_target(False)
+
         card_overlay = Gtk.Overlay()
         card_overlay.set_child(deco_entry)
         card_overlay.add_overlay(hbox)
         card_overlay.set_measure_overlay(hbox, True)
+        card_overlay.add_overlay(anim_box)
 
         card = GObject.new(Gtk.Box, css_name="entry")
         card.append(card_overlay)
@@ -1764,6 +1771,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             "card": card,
             "picture": picture,
             "label": label,
+            "anim_box": anim_box,
             "style_provider": style_provider,
             "offset": offset,
             "gameid": None,
