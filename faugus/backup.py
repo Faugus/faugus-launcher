@@ -60,11 +60,17 @@ def setup_autostart(enable):
 
     if enable:
         os.makedirs(autostart_dir, exist_ok=True)
+        if IS_FLATPAK:
+            exec_line = f"Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher --daemon\n"
+        elif LAUNCHER_MODULE_ARGS:
+            exec_line = f"Exec={sys.executable} -m faugus.backup --daemon\n"
+        else:
+            exec_line = f"Exec={LAUNCHER_PATH} --daemon\n"
         with open(desktop_file, "w") as f:
             f.write("[Desktop Entry]\n")
             f.write("Type=Application\n")
             f.write("Name=Faugus Backup Service\n")
-            f.write("Exec=python -m faugus.backup --daemon\n")
+            f.write(exec_line)
             f.write("Hidden=false\n")
             f.write("NoDisplay=false\n")
             f.write("X-GNOME-Autostart-enabled=true\n")

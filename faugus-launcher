@@ -11,5 +11,6 @@ case "$1" in
 	--shortcut) exec /usr/bin/python3 -m faugus.shortcut "$2";;
 	--game)     exec /usr/bin/python3 -m faugus.runner --game "$2";;
 	--run)      msg="$2"; shift 2; exec /usr/bin/python3 -m faugus.runner "$msg" "$@";;
+	--daemon)   exec /usr/bin/python3 -m faugus.backup --daemon;;
 	*)          exec /usr/bin/python3 -m faugus.tray_only "$@";;
 esac

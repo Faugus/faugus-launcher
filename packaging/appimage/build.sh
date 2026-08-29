@@ -98,6 +98,7 @@ case "$1" in
     --shortcut) shift; exec python3 -m faugus.shortcut "$@";;
     --game)     shift; exec python3 -m faugus.runner --game "$@";;
     --run)      shift; msg="$1"; shift; exec python3 -m faugus.runner "$msg" "$@";;
+    --daemon)   shift; exec python3 -m faugus.backup --daemon;;
     *)          exec python3 -m faugus.launcher "$@";;
 esac
 APPRUN
