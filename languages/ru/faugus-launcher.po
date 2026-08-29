@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-26 21:03+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
 "Language: ru\n"
@@ -365,7 +365,7 @@ msgstr "Обложки"
 
 #: faugus/launcher.py:5266
 msgid "Carrousel"
-msgstr ""
+msgstr "Карусель"
 
 #: faugus/launcher.py:5268
 msgid "Background"
@@ -442,17 +442,15 @@ msgstr "Названия"
 
 #: faugus/launcher.py:5323
 msgid "Zoom"
-msgstr ""
+msgstr "Масштаб"
 
 #: faugus/launcher.py:5326
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB"
-msgstr "API-ключ SteamGridDB"
+msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5331
 msgid "API Key"
-msgstr ""
+msgstr "API-ключ"
 
 #: faugus/launcher.py:5338
 msgid "Default Prefixes Location"
@@ -515,14 +513,12 @@ msgid "Logging"
 msgstr "Логирование"
 
 #: faugus/launcher.py:5392
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Категория"
+msgstr "Категории"
 
 #: faugus/launcher.py:5394
 msgid "Sort"
-msgstr ""
+msgstr "Сортировка"
 
 #: faugus/launcher.py:5396
 msgid "Header bar"
@@ -598,26 +594,20 @@ msgid "Clear Logs"
 msgstr "Очистить журнал"
 
 #: faugus/launcher.py:5787
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers or Carrousel mode"
-msgstr "API-ключ SteamGridDB"
+msgstr "Режим обложки или карусели"
 
 #: faugus/launcher.py:5788
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Grid, Covers or Carrousel mode"
-msgstr "API-ключ SteamGridDB"
+msgstr "Режим сетки, обложки или карусели"
 
 #: faugus/launcher.py:5815
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "API-ключ SteamGridDB"
+msgstr "Режим обложки или карусели вместе с SteamGridDB"
 
 #: faugus/launcher.py:5840
 msgid "Adwaita theme"
-msgstr ""
+msgstr "Тема Adwaita"
 
 #: faugus/launcher.py:5988
 msgid "Do you want to save the changes?"
@@ -737,14 +727,12 @@ msgid "Lossless Scaling Frame Generation"
 msgstr "Генерация кадров Lossless Scaling"
 
 #: faugus/launcher.py:6800
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disable UMU"
-msgstr "Отключить Hidraw"
+msgstr "Отключить UMU"
 
 #: faugus/launcher.py:6802
 msgid "Runs the game without the Steam Runtime"
-msgstr ""
+msgstr "Запускает игру без среды выполнения Steam"
 
 #: faugus/launcher.py:6822
 msgid "Shortcut"
