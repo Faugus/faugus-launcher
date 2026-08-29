@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-26 21:03+0000\n"
 "PO-Revision-Date: 2026-08-29 01:17+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
 "Language: es\n"
@@ -444,14 +444,12 @@ msgid "Zoom"
 msgstr "Zoom"
 
 #: faugus/launcher.py:5326
-#, fuzzy
-#| msgid "SteamGridDB mode"
 msgid "SteamGridDB"
-msgstr "Modo SteamGridDB"
+msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5331
 msgid "API Key"
-msgstr ""
+msgstr "API Key"
 
 #: faugus/launcher.py:5338
 msgid "Default Prefixes Location"
@@ -595,26 +593,20 @@ msgid "Clear Logs"
 msgstr "Borrar registros"
 
 #: faugus/launcher.py:5787
-#, fuzzy
-#| msgid "Covers and SteamGridDB modes"
 msgid "Covers or Carrousel mode"
-msgstr "Portadas y modos SteamGridDB"
+msgstr "Portadas o modo carrusel"
 
 #: faugus/launcher.py:5788
-#, fuzzy
-#| msgid "Grid, Covers and SteamGridDB modes"
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Grilla, Portadas y modos SteamGridDB"
+msgstr "Grilla, Portadas o modo Carrusel"
 
 #: faugus/launcher.py:5815
-#, fuzzy
-#| msgid "Covers and SteamGridDB modes"
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Portadas y modos SteamGridDB"
+msgstr "Portadas o modo Carrusel con SteamGridDB"
 
 #: faugus/launcher.py:5840
 msgid "Adwaita theme"
-msgstr ""
+msgstr "Tema Adwaita"
 
 #: faugus/launcher.py:5988
 msgid "Do you want to save the changes?"
