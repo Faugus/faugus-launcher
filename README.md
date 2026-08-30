@@ -138,8 +138,8 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 **Covers**
 <br><img src=screenshots/main-covers.png/>
 
-**SteamGridDB**
-<br><img src=screenshots/main-steamgriddb.png/>
+**Carrousel**
+<br><img src=screenshots/main-carrousel.png/>
 
 </details>
 
