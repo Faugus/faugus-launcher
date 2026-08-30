@@ -121,7 +121,7 @@ class FaugusRun(HiDpiMixin):
 
     def start_process(self):
         if self.show_donate:
-            if self.playtime >= 7200:
+            if self.playtime >= 14400:
                 current_month = GLib.DateTime.new_now_local().format("%Y-%m")
 
                 if self.cfg.config.get("donate-last", "") != current_month:
