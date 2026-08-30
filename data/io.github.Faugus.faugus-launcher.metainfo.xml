@@ -90,18 +90,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.2.0-1" date="2026-08-27">
+    <release version="2.2.1-1" date="2026-08-30">
       <description>
         <ul>
-          <li>Added a new Interface Mode: Carrousel</li>
-          <li>SteamGridDB is no longer a Interface Mode. Now it's a separeted option</li>
-          <li>Separated the Categories and Sort options so you can toggle them individually</li>
-          <li>Now allows Proton-CachyOS variants installed by other Proton Managers</li>
-          <li>Added the ability to move reorder launch arguments / presets</li>
-          <li>Now all the interface options are visible, but they are greyed out if they are not available for the current Interface Mode / Theme</li>
-          <li>Rearranged some interface options</li>
-          <li>Reworked the banner display on main launcher installation screens to prevent a line artifact when using fractional scaling</li>
-          <li>Update translations</li>
+          <li>Fixed automatic backup for Flatpak and AppImage</li>
+          <li>Fixed wrong language in Protons comboboxes</li>
+          <li>Fixed missing flash animation in Carrousel</li>
+          <li>Fixed launcher not being focused after installation in Carrousel</li>
         </ul>
       </description>
     </release>
