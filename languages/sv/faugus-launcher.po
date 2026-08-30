@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-26 21:03+0000\n"
-"PO-Revision-Date: 2026-08-29 01:19+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-08-31 14:51+0000\n"
+"Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
 "Language: sv\n"
@@ -444,14 +444,12 @@ msgid "Zoom"
 msgstr "Zoom"
 
 #: faugus/launcher.py:5326
-#, fuzzy
-#| msgid "SteamGridDB mode"
 msgid "SteamGridDB"
-msgstr "SteamGridDB läge"
+msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5331
 msgid "API Key"
-msgstr ""
+msgstr "API nyckel"
 
 #: faugus/launcher.py:5338
 msgid "Default Prefixes Location"
@@ -595,26 +593,20 @@ msgid "Clear Logs"
 msgstr "Rensa loggar"
 
 #: faugus/launcher.py:5787
-#, fuzzy
-#| msgid "Covers and SteamGridDB modes"
 msgid "Covers or Carrousel mode"
-msgstr "Omslag och SteamGridDB-lägen"
+msgstr "Omslag eller karusellläge"
 
 #: faugus/launcher.py:5788
-#, fuzzy
-#| msgid "Grid, Covers and SteamGridDB modes"
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Rutnät, Omslag och SteamGridDB-lägen"
+msgstr "Rutnät, Omslag eller karusellläge"
 
 #: faugus/launcher.py:5815
-#, fuzzy
-#| msgid "Covers and SteamGridDB modes"
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Omslag och SteamGridDB-lägen"
+msgstr "Omslag eller karusellläge med SteamGridDB"
 
 #: faugus/launcher.py:5840
 msgid "Adwaita theme"
-msgstr ""
+msgstr "Adwaita tema"
 
 #: faugus/launcher.py:5988
 msgid "Do you want to save the changes?"
