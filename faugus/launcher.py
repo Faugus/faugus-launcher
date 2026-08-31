@@ -3811,6 +3811,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
         if response_id == Gtk.ResponseType.OK:
+            settings_dialog.commit_pending_envar_edit()
             default_prefix = settings_dialog.entry_default_prefix.get_text()
             validation_result = self.validate_settings_fields(settings_dialog, default_prefix)
             if not validation_result:
@@ -5518,6 +5519,7 @@ class Settings(Gtk.Dialog):
         self.button_ok = Gtk.Button(label=_("Ok"))
         self.button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
         self.button_ok.set_hexpand(True)
+        self.button_ok.set_focus_on_click(False)
 
         self.label_settings = Gtk.Label(label=_("Backup/Restore Settings"))
         self.label_settings.set_halign(Gtk.Align.START)
@@ -5551,6 +5553,7 @@ class Settings(Gtk.Dialog):
         renderer.set_property("editable", True)
         renderer.set_property("ellipsize", 3)
         renderer.connect("edited", self.on_cell_edited, 0)
+        self.commit_pending_envar_edit = track_cell_editing(renderer)
 
         column = Gtk.TreeViewColumn("", renderer, text=0)
         treeview.set_headers_visible(False)

@@ -476,6 +476,17 @@ def build_grid(margin_top=True, margin_bottom=True, column_homogeneous=False):
     return grid
 
 
+def track_cell_editing(renderer):
+    state = {"editable": None}
+
+    def on_editing_started(r, editable, path):
+        state["editable"] = editable
+        editable.connect("remove-widget", lambda e: state.update(editable=None))
+
+    renderer.connect("editing-started", on_editing_started)
+    return lambda: state["editable"] and state["editable"].editing_done()
+
+
 def build_bottom_button_box(button_cancel, button_ok):
     bottom_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     bottom_box.set_homogeneous(True)
@@ -494,6 +505,7 @@ def build_dialog_ok_cancel_box(dialog):
 
     button_ok = Gtk.Button(label=_("Ok"))
     button_ok.set_hexpand(True)
+    button_ok.set_focus_on_click(False)
     button_ok.connect("clicked", lambda b: dialog.response(Gtk.ResponseType.OK))
 
     return build_bottom_button_box(button_cancel, button_ok)
@@ -1232,6 +1244,8 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
             return True
         return False
 
+    commit_presets_edit = track_cell_editing(renderer_presets)
+
     renderer_presets.connect("edited", on_preset_edited)
     key_controller_presets = Gtk.EventControllerKey()
     key_controller_presets.connect("key-pressed", on_preset_key_press)
@@ -1317,6 +1331,8 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
                     model.append([""])
             return True
         return False
+
+    commit_args_edit = track_cell_editing(renderer_args)
 
     renderer_args.connect("edited", on_arg_edited)
     key_controller_args = Gtk.EventControllerKey()
@@ -1499,6 +1515,9 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         pre_launch = current_pre_launch
         post_launch = current_post_launch
         if response == Gtk.ResponseType.OK:
+            commit_presets_edit()
+            commit_args_edit()
+
             presets_to_save = [row[0] for row in store_presets if row[0].strip()]
             save_json_file(presets_to_save, PRESETS_FILE)
 
