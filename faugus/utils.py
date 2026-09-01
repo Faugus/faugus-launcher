@@ -1113,25 +1113,32 @@ def populate_combobox_with_runners(combobox):
     if os.path.exists(PROTON_CACHYOS):
         combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
 
+    reserved_names = (
+        "UMU-Latest", "LegacyRuntime",
+        "Proton-GE Latest", "Proton-EM Latest",
+        "DW-Proton Latest", "Proton-CachyOS Latest",
+    )
+
     try:
-        versions = set()
+        flatpak_dir = COMPATIBILITY_DIRS[-1] if len(COMPATIBILITY_DIRS) > 1 else None
+        versions = {}
         for compat_dir in COMPATIBILITY_DIRS:
             if not os.path.exists(compat_dir):
                 continue
             for entry in os.listdir(compat_dir):
                 entry_path = os.path.join(compat_dir, entry)
-                if (
-                    os.path.isdir(entry_path)
-                    and entry not in (
-                        "UMU-Latest", "LegacyRuntime",
-                        "Proton-GE Latest", "Proton-EM Latest",
-                        "DW-Proton Latest", "Proton-CachyOS Latest",
-                    )
-                ):
-                    versions.add(entry)
+                if not os.path.isdir(entry_path):
+                    continue
+                if entry in reserved_names:
+                    if compat_dir == flatpak_dir:
+                        combobox.append(entry_path, f"{entry} ({_('Flatpak')})")
+                    continue
+                if entry not in versions:
+                    versions[entry] = compat_dir
 
         for version in sorted(versions, key=version_key, reverse=True):
-            combobox.append(version, version)
+            label = f"{version} ({_('Flatpak')})" if versions[version] == flatpak_dir else version
+            combobox.append(version, label)
     except Exception as e:
         print(f"Error accessing the directory: {e}")
 
