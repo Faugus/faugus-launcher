@@ -1905,6 +1905,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return 2
         return 3
 
+    def carrousel_fit_radius(self, n, width):
+        max_radius = self.carrousel_radius_for_count(n)
+        if max_radius <= 1 or not width or not self.carrousel_step:
+            return max_radius
+        fit = int((width / self.carrousel_step - 1) / 2)
+        return max(1, min(max_radius, fit))
+
+    def place_carrousel_slot_base(self, slot):
+        _, natural_w, _, _ = slot["box"].measure(Gtk.Orientation.HORIZONTAL, -1)
+        _, natural_h, _, _ = slot["box"].measure(Gtk.Orientation.VERTICAL, natural_w)
+        base_x = self.carrousel_center_x - natural_w / 2
+        base_y = self.carrousel_center_y - natural_h / 2
+        self.carrousel_fixed.move(slot["box"], base_x, base_y)
+
+    def update_carrousel_layout(self, width):
+        if not width or not self.carrousel_step or not getattr(self, 'carrousel_slots', None):
+            return
+        self.carrousel_center_x = width / 2
+        n = len(self.carrousel_visible_games())
+        self.carrousel_radius = self.carrousel_fit_radius(n, width)
+        for slot in self.carrousel_slots:
+            self.place_carrousel_slot_base(slot)
+            self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
+
     def on_carrousel_focus_changed(self, widget, pspec):
         for slot in getattr(self, 'carrousel_slots', []):
             self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
@@ -1953,7 +1977,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         outer = Gtk.Fixed()
         outer.set_can_focus(True)
         outer.set_focusable(True)
-        outer.set_halign(Gtk.Align.CENTER)
+        outer.set_halign(Gtk.Align.FILL)
         outer.set_valign(Gtk.Align.CENTER)
         outer.set_hexpand(True)
         outer.set_overflow(Gtk.Overflow.HIDDEN)
@@ -1986,7 +2010,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for slot in self.carrousel_slots:
             outer.put(slot["box"], 0, 0)
 
+        self.connect_carrousel_resize()
+
         return outer
+
+    def connect_carrousel_resize(self):
+        surface = self.get_surface()
+        if surface is not None:
+            surface.connect("notify::width", lambda s, p: self.update_carrousel_layout(s.get_width()))
+        else:
+            self.connect("realize", lambda w: self.connect_carrousel_resize())
 
     def render_carrousel(self):
         if not hasattr(self, 'carrousel_slots'):
@@ -2000,20 +2033,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.carrousel_step = max_width + 20
         glow_margin = 40
         total_height = max_height + 50 + glow_margin * 2
-        self.carrousel_fixed.set_size_request(self.carrousel_step * 7, total_height)
-        self.carrousel_center_x = self.carrousel_step * 7 / 2
+        self.carrousel_fixed.set_size_request(self.carrousel_step * 3, total_height)
+        current_width = self.get_width() or self.carrousel_step * 3
+        self.carrousel_center_x = current_width / 2
         self.carrousel_center_y = total_height / 2
 
         games = self.carrousel_visible_games()
         n = len(games)
-        self.carrousel_radius = self.carrousel_radius_for_count(n)
-
-        def place_base(slot):
-            _, natural_w, _, _ = slot["box"].measure(Gtk.Orientation.HORIZONTAL, -1)
-            _, natural_h, _, _ = slot["box"].measure(Gtk.Orientation.VERTICAL, natural_w)
-            base_x = self.carrousel_center_x - natural_w / 2
-            base_y = self.carrousel_center_y - natural_h / 2
-            self.carrousel_fixed.move(slot["box"], base_x, base_y)
+        self.carrousel_radius = self.carrousel_fit_radius(n, current_width)
 
         if n == 0:
             for slot in self.carrousel_slots:
@@ -2021,7 +2048,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot["gameid"] = None
                 slot["label"].set_text("")
                 slot["box"].game = None
-                place_base(slot)
+                self.place_carrousel_slot_base(slot)
                 slot["box"].set_opacity(0.0)
                 slot["box"].set_can_target(False)
                 slot["_can_target"] = False
@@ -2034,7 +2061,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for slot in self.carrousel_slots:
             idx = (self.carrousel_index + slot["offset"]) % n
             self.set_carrousel_slot_content(slot, games[idx])
-            place_base(slot)
+            self.place_carrousel_slot_base(slot)
             self.layout_carrousel_slot(slot, slot["offset"])
 
         self.schedule_background_update()
@@ -2053,7 +2080,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot.pop("_settle_offset", None)
                 self.layout_carrousel_slot(slot, slot["offset"])
 
-        self.carrousel_radius = self.carrousel_radius_for_count(n)
+        self.carrousel_radius = self.carrousel_fit_radius(n, self.get_width())
         self.carrousel_index = (self.carrousel_index + delta) % n
 
         span = self.carrousel_max_offset - self.carrousel_min_offset + 1
