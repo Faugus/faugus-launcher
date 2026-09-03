@@ -4156,7 +4156,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 edit_game_dialog.combobox_launcher.set_active_id_silent("linux")
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
                 edit_game_dialog.combobox_runtime.set_active_id_silent(
-                    game.runtime or ("disable-runtime" if game.disable_umu else "auto")
+                    game.runtime or ("disable-runtime" if game.disable_umu else "umu-steamrt4")
                 )
             if game_runner == "Steam":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("steam")
@@ -7326,7 +7326,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.populate_combobox_with_runners()
         self.populate_combobox_with_runtimes()
-        self.combobox_runtime.set_active_id("auto")
+        self.combobox_runtime.set_active_id("umu-steamrt4")
 
         if not self.combobox_runner.set_active_id(self.default_runner):
             self.combobox_runner.set_active(0)
@@ -8114,12 +8114,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runtimes(self):
-        self.combobox_runtime.append("auto", "{} ({})".format(_("Auto"), _("Default")))
-        self.combobox_runtime.append("disable-runtime", _("Disable Runtime"))
-        self.combobox_runtime.append("umu-steamrt4", _("SteamRT4"))
+        self.combobox_runtime.append("umu-steamrt4", "{} ({})".format(_("SteamRT4"), _("Default")))
         self.combobox_runtime.append("umu-sniper", _("Sniper"))
         self.combobox_runtime.append("umu-soldier", _("Soldier"))
         self.combobox_runtime.append("umu-scout", _("Scout"))
+        self.combobox_runtime.append("disable-runtime", _("Disable Runtime"))
 
     def populate_combobox_with_runners(self):
         populate_combobox_with_runners(self.combobox_runner)
