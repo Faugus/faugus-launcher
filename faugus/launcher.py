@@ -1295,6 +1295,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.scale_zoom = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
         self.scale_zoom.set_size_request(150, -1)
         self.scale_zoom.set_draw_value(True)
+        self.scale_zoom.set_value_pos(Gtk.PositionType.LEFT)
         self.scale_zoom.set_digits(0)
         self.scale_zoom.set_margin_end(10)
 
