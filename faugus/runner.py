@@ -808,7 +808,7 @@ def build_launch_command(game):
         command_parts.append(f"GAMEID={protonfix}")
     if runner:
         if runner == "Linux-Native":
-            if not disable_umu:
+            if not disable_umu and linux_runtime and linux_runtime != "auto":
                 command_parts.append(f"PROTONPATH={linux_runtime}")
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
