@@ -300,15 +300,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.startup_window_size = "Fullscreen"
 
         placeholder_r, placeholder_g, placeholder_b = self.get_accent_rgb()
-        add_css_once(
-            "placeholder_accent",
-            f"""
-            .cover-placeholder,
-            .banner-placeholder {{
-                background-color: rgba({placeholder_r}, {placeholder_g}, {placeholder_b}, 0.4);
-            }}
-            """,
-        )
+        self.update_placeholder_accent_css()
 
         if self.theme_engine != "adwaita":
             add_css_once(
@@ -432,6 +424,36 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         css = f".accent-background {{ background-color: rgb({fade_r}, {fade_g}, {fade_b}); }}"
         self._accent_background_provider.load_from_data(css.encode("utf-8"))
 
+    def update_placeholder_accent_css(self):
+        r, g, b = self.get_accent_rgb()
+
+        if getattr(self, "_placeholder_accent_provider", None) is None:
+            self._placeholder_accent_provider = Gtk.CssProvider()
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(), self._placeholder_accent_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
+            )
+
+        css = f"""
+        .cover-placeholder,
+        .banner-placeholder,
+        .cover-empty {{
+            background-color: rgba({r}, {g}, {b}, 0.4);
+        }}
+        """
+        self._placeholder_accent_provider.load_from_data(css.encode("utf-8"))
+
+    def refresh_placeholder_covers(self):
+        if hasattr(self, 'flowbox'):
+            for child in widget_children(self.flowbox):
+                game = getattr(child, 'game', None)
+                if game and not os.path.isfile(game.cover):
+                    self.update_game_visual(child)
+
+        for slot in getattr(self, 'carrousel_slots', []):
+            game = getattr(slot['box'], 'game', None)
+            if game and not os.path.isfile(game.cover):
+                self.set_carrousel_slot_content(slot, game)
+
     def apply_popover_background_mode(self, popover, game=None):
         if self.theme_engine != "adwaita":
             return
@@ -482,6 +504,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self._bg_content_widget = content_widget
         self._bg_no_overlay_widget = None
         self._bg_base_box = None
+        content_widget.remove_css_class("accent-background")
 
         if not show_banner and base_mode != "dominant_color":
             if base_mode == "accent":
@@ -782,7 +805,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.update_launcher_banner_css()
 
         if old_had_overlay:
-            self.schedule_background_update()
+            self.update_background()
 
         return True
 
@@ -808,9 +831,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         wrapper.append(self.build_background_container(content_widget))
 
         if self.banner_overlay_enabled() or self.background_mode == "dominant_color":
-            self.schedule_background_update()
+            self.apply_background_update_now()
 
         return True
+
+    def apply_background_update_now(self):
+        self.update_launcher_banner_css()
+        self.update_background()
 
     def schedule_background_update(self):
         self.update_launcher_banner_css()
@@ -3775,7 +3802,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def get_cover_paintable(self, game, width, height):
         if not os.path.isfile(game.cover):
-            return create_accent_placeholder_paintable(width, height)
+            return create_accent_placeholder_paintable(width, height, rgb=self.get_accent_rgb())
 
         texture = self.get_cover_texture(game.cover, self.is_game_installed(game))
         return HiDpiPaintable(texture, width, height)
@@ -4945,7 +4972,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.select_game_by_title(game.title)
             self.launcher_banner_dominant_rgb = None
-            self.schedule_background_update()
+            self.apply_background_update_now()
         else:
             if os.path.isfile(edit_game_dialog.icon_temp):
                 os.remove(edit_game_dialog.icon_temp)
@@ -5941,8 +5968,20 @@ class Settings(Gtk.Dialog):
 
         apply_interface_customization(self.interface_theme, self.accent_color, self.theme_engine)
 
-        if hasattr(self.parent, 'schedule_background_update'):
-            self.parent.schedule_background_update()
+        self.parent.interface_theme = self.interface_theme
+        self.parent.accent_color = self.accent_color
+
+        if hasattr(self.parent, 'update_placeholder_accent_css'):
+            self.parent.update_placeholder_accent_css()
+
+        if hasattr(self.parent, 'refresh_placeholder_covers'):
+            self.parent.refresh_placeholder_covers()
+
+        if self.parent.background_mode == "accent" and hasattr(self.parent, 'update_accent_background_css'):
+            self.parent.update_accent_background_css()
+
+        if hasattr(self.parent, 'apply_background_update_now'):
+            self.parent.apply_background_update_now()
 
     def on_background_changed(self, widget):
         new_mode = self.combobox_background.get_active_id()
@@ -6740,16 +6779,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_addapp = build_grid(margin_bottom=False)
 
         self.grid_tools = build_grid()
-
-        cover_placeholder_r, cover_placeholder_g, cover_placeholder_b = self.parent_window.get_accent_rgb()
-        add_css_once(
-            "addgame_cover_empty",
-            f"""
-            .cover-empty {{
-                background-color: rgba({cover_placeholder_r}, {cover_placeholder_g}, {cover_placeholder_b}, 0.4);
-            }}
-            """,
-        )
 
         add_css_once("addgame_dialog", """
         .entry {

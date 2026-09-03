@@ -253,8 +253,8 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
-def create_accent_placeholder_paintable(width, height, alpha=0.4):
-    r, g, b = get_effective_accent_rgb()
+def create_accent_placeholder_paintable(width, height, alpha=0.4, rgb=None):
+    r, g, b = rgb if rgb is not None else get_effective_accent_rgb()
 
     w = width * HIDPI_SCALE
     h = height * HIDPI_SCALE
