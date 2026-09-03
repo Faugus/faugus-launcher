@@ -1059,6 +1059,10 @@ def update_games_json():
             game["runner"] = "Proton-CachyOS (System)"
             changed = True
 
+        if game.get("disable_umu") and game.get("runtime") != "disable-runtime":
+            game["runtime"] = "disable-runtime"
+            changed = True
+
         if "favorite" in game:
             if game["favorite"] == True:
                 game["category"] = False
