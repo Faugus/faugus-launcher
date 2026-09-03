@@ -6452,6 +6452,10 @@ class Settings(Gtk.Dialog):
         self.combobox_startup_window_size.set_active_id(startup_window_size)
 
         index_language = 0
+        for i, lang_code in enumerate(self.combobox_language.get_ids()):
+            if lang_code == "en_US":
+                index_language = i
+                break
 
         if self.language != "":
             language_primary = self.language.split("_")[0].split("-")[0].lower()
