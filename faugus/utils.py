@@ -1059,6 +1059,10 @@ def update_games_json():
             game["runner"] = "Proton-CachyOS (System)"
             changed = True
 
+        if game.get("disable_umu") and game.get("runtime") != "disable-runtime":
+            game["runtime"] = "disable-runtime"
+            changed = True
+
         if "favorite" in game:
             if game["favorite"] == True:
                 game["category"] = False
@@ -1157,7 +1161,7 @@ GAME_FIELDS = [
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "no_sleep", "category", "icon",
     "steamgriddb_id", "pre_launch", "post_launch",
-    "steam_user", "disable_umu",
+    "steam_user", "disable_umu", "runtime",
 ]
 
 

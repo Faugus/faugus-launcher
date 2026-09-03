@@ -4156,7 +4156,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if game_runner == "Linux-Native":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("linux")
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
-                edit_game_dialog.checkbox_disable_umu.set_active(game.disable_umu == True)
+                edit_game_dialog.combobox_runtime.set_active_id_silent(
+                    game.runtime or ("disable-runtime" if game.disable_umu else "umu-steamrt4")
+                )
             if game_runner == "Steam":
                 edit_game_dialog.combobox_launcher.set_active_id_silent("steam")
                 edit_game_dialog.on_combobox_changed(edit_game_dialog.combobox_launcher, skip_cleanup=True)
@@ -4516,7 +4518,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 no_sleep = True if add_game_dialog.checkbox_no_sleep.get_active() else ""
 
             disable_umu = True if (
-                launcher_id == "linux" and add_game_dialog.checkbox_disable_umu.get_active()
+                launcher_id == "linux" and add_game_dialog.combobox_runtime.get_active_id() == "disable-runtime"
             ) else ""
 
             game = Game(
@@ -4553,6 +4555,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 post_launch=add_game_dialog.post_launch,
                 steam_user=add_game_dialog.combobox_steam_user.get_active_id() if launcher_id == "steam" else "",
                 disable_umu=disable_umu,
+                runtime=add_game_dialog.combobox_runtime.get_active_id()
             )
 
             desktop_shortcut_state = add_game_dialog.checkbox_shortcut_desktop.get_active()
@@ -4914,7 +4917,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if edit_game_dialog.combobox_launcher.get_active_id() == "linux":
                 game.runner = "Linux-Native"
-                game.disable_umu = True if edit_game_dialog.checkbox_disable_umu.get_active() else ""
+                game.runtime = edit_game_dialog.combobox_runtime.get_active_id()
+                game.disable_umu = True if game.runtime == "disable-runtime" else ""
             else:
                 game.disable_umu = ""
             if edit_game_dialog.combobox_launcher.get_active_id() == "steam":
@@ -6467,6 +6471,7 @@ class Game:
         post_launch="",
         steam_user="",
         disable_umu="",
+        runtime="",
     ):
         self.gameid = gameid
         self.title = title
@@ -6496,11 +6501,13 @@ class Game:
         self.no_sleep = no_sleep
         self.category = category
         self.icon = icon
+        self.runtime = runtime
         self.steamgriddb_id = steamgriddb_id
         self.pre_launch = pre_launch
         self.post_launch = post_launch
         self.steam_user = steam_user
         self.disable_umu = disable_umu
+        self.runtime = runtime
 
 
 class DuplicateDialog(Gtk.Dialog):
@@ -6711,6 +6718,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_path = build_grid(margin_bottom=False)
 
+        self.grid_runtime = build_grid(margin_bottom=False)
+
         self.grid_prefix = build_grid(margin_bottom=False)
 
         self.grid_runner = build_grid(margin_bottom=False)
@@ -6865,6 +6874,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_search.connect("clicked", self.on_button_search_clicked)
         self.button_search.set_size_request(50, -1)
 
+        self.label_runtime = Gtk.Label(label=_("Runtime"))
+        self.label_runtime.set_halign(Gtk.Align.START)
+        self.label_runtime.set_visible(False)
+        self.combobox_runtime = IdComboBox()
+        self.combobox_runtime.set_visible(False)
+
         self.label_prefix = Gtk.Label(label=_("Prefix"))
         self.label_prefix.set_halign(Gtk.Align.START)
         self.entry_prefix = Gtk.Entry()
@@ -6908,10 +6923,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_lossless.connect("clicked", self.on_button_lossless_clicked)
 
         create_mangohud_gamemode_checkboxes(self)
-        self.checkbox_disable_umu = Gtk.CheckButton(label=_("Disable UMU"))
-        self.checkbox_disable_umu.set_tooltip_text(
-            _("Runs the game without the Steam Runtime"))
-        self.checkbox_disable_umu.set_visible(False)
         self.checkbox_sdl = Gtk.CheckButton(label="SDL")
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
@@ -7212,8 +7223,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_path.attach(self.entry_path, 0, 1, 3, 1)
         self.entry_path.set_hexpand(True)
         self.grid_path.attach(self.button_search, 3, 1, 1, 1)
-        self.grid_path.attach(self.checkbox_disable_umu, 0, 2, 4, 1)
-        self.checkbox_disable_umu.set_hexpand(True)
+
+        self.grid_runtime.attach(self.label_runtime, 0, 0, 1, 1)
+        self.grid_runtime.attach(self.combobox_runtime, 0, 1, 1, 1)
+        self.combobox_runtime.set_hexpand(True)
 
         self.grid_prefix.attach(self.label_prefix, 0, 0, 1, 1)
         self.grid_prefix.attach(self.entry_prefix, 0, 1, 3, 1)
@@ -7241,6 +7254,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1.append(self.grid_steam_title)
         page1.append(self.grid_title)
         page1.append(self.grid_path)
+        page1.append(self.grid_runtime)
         page1.append(self.grid_prefix)
         page1.append(self.grid_runner)
         page1.append(self.label_shortcut)
@@ -7312,6 +7326,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.connect("changed", self.on_combobox_changed)
 
         self.populate_combobox_with_runners()
+        self.populate_combobox_with_runtimes()
+        self.combobox_runtime.set_active_id("umu-steamrt4")
 
         if not self.combobox_runner.set_active_id(self.default_runner):
             self.combobox_runner.set_active(0)
@@ -7950,7 +7966,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_gamemode.set_active(self.default_gamemode)
         self.checkbox_sdl.set_active(self.default_sdl_enabled)
         self.checkbox_no_sleep.set_active(self.default_no_sleep)
-        self.checkbox_disable_umu.set_active(False)
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
         if os.path.isfile(self.cover_path_temp):
             os.remove(self.cover_path_temp)
@@ -7982,6 +7997,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_steam_user.set_visible(False)
         self.grid_path.set_visible(False)
         self.grid_runner.set_visible(False)
+        self.grid_runtime.set_visible(False)
         self.grid_prefix.set_visible(False)
         self.button_winetricks.set_visible(False)
         self.button_winecfg.set_visible(False)
@@ -7989,10 +8005,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_protonfix.set_visible(False)
         self.grid_addapp.set_visible(False)
         self.checkbox_sdl.set_visible(False)
-        self.checkbox_disable_umu.set_visible(False)
         self.checkbox_no_sleep.set_visible(True)
         self.checkbox_shortcut_steam.set_visible(True)
         self.combobox_steam_shortcut_user.set_visible(True)
+        self.combobox_runtime.set_visible(False)
         self.grid_page2.set_visible(True)
         self.tab_button_widgets[self.tab_names.index("page2")].set_visible(True)
         self.tab_switcher.set_visible(True)
@@ -8014,8 +8030,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         elif active_id == "linux":
             self.grid_title.set_visible(True)
             self.grid_path.set_visible(True)
+            self.grid_runtime.set_visible(True)
+            self.label_runtime.set_visible(True)
             self.button_shortcut_icon.set_visible(True)
-            self.checkbox_disable_umu.set_visible(True)
+            self.combobox_runtime.set_visible(True)
 
         elif active_id == "steam":
             self.grid_steam_title.set_visible(True)
@@ -8095,6 +8113,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("rockstar", "Rockstar Launcher")
         self.combobox_launcher.append("ubisoft", "Ubisoft Connect")
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
+
+    def populate_combobox_with_runtimes(self):
+        self.combobox_runtime.append("umu-steamrt4", "{} ({})".format(_("SteamRT4"), _("Default")))
+        self.combobox_runtime.append("umu-sniper", _("Sniper"))
+        self.combobox_runtime.append("umu-soldier", _("Soldier"))
+        self.combobox_runtime.append("umu-scout", _("Scout"))
+        self.combobox_runtime.append("disable-runtime", _("Disable Runtime"))
 
     def populate_combobox_with_runners(self):
         populate_combobox_with_runners(self.combobox_runner)
