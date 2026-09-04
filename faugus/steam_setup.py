@@ -195,6 +195,27 @@ def read_installed_games(account_id=None):
     return sorted(games, key=lambda x: x[1].lower())
 
 
+def get_steam_app_paths(appid):
+    for lib in read_library_folders():
+        manifest = lib / "steamapps" / f"appmanifest_{appid}.acf"
+        if not manifest.exists():
+            continue
+
+        installdir = None
+        try:
+            with open(manifest, "r", errors="ignore") as f:
+                data = vdf.load(f)
+            installdir = data.get("AppState", {}).get("installdir")
+        except Exception:
+            pass
+
+        game_dir = lib / "steamapps" / "common" / installdir if installdir else None
+        prefix_dir = lib / "steamapps" / "compatdata" / str(appid) / "pfx"
+        return game_dir, prefix_dir
+
+    return None, None
+
+
 def get_steam_icon_path(appid):
     if not LIBRARYCACHE or not LIBRARYCACHE.exists():
         return None
