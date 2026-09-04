@@ -2786,27 +2786,44 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             category_menu.append_item(cat_item)
 
         show_duplicate = game.runner != "Steam"
-        show_game_location = game.runner != "Steam"
-        show_prefix_location = game.runner not in ("Steam", "Linux-Native")
+        show_game_location = True
+        show_prefix_location = game.runner != "Linux-Native"
         show_run = game.runner not in ("Steam", "Linux-Native")
         show_logs_item = self.logging_enabled and game.runner not in ("Steam", "Linux-Native")
 
-        game_path = expand_path(game.path)
-        game_prefix = expand_path(game.prefix)
+        if game.runner == "Steam":
+            steam_game_dir, steam_prefix_dir = get_steam_app_paths(game.path)
 
-        if os.path.dirname(game_path):
-            self.action_context_game_location.set_enabled(True)
-            self.current_game = os.path.dirname(game_path)
-        else:
-            self.action_context_game_location.set_enabled(False)
-            self.current_game = None
+            if steam_game_dir and os.path.isdir(steam_game_dir):
+                self.action_context_game_location.set_enabled(True)
+                self.current_game = str(steam_game_dir)
+            else:
+                self.action_context_game_location.set_enabled(False)
+                self.current_game = None
 
-        if os.path.isdir(game_prefix):
-            self.action_context_prefix_location.set_enabled(True)
-            self.current_prefix = game_prefix
+            if steam_prefix_dir and os.path.isdir(steam_prefix_dir):
+                self.action_context_prefix_location.set_enabled(True)
+                self.current_prefix = str(steam_prefix_dir)
+            else:
+                self.action_context_prefix_location.set_enabled(False)
+                self.current_prefix = None
         else:
-            self.action_context_prefix_location.set_enabled(False)
-            self.current_prefix = None
+            game_path = expand_path(game.path)
+            game_prefix = expand_path(game.prefix)
+
+            if os.path.dirname(game_path):
+                self.action_context_game_location.set_enabled(True)
+                self.current_game = os.path.dirname(game_path)
+            else:
+                self.action_context_game_location.set_enabled(False)
+                self.current_game = None
+
+            if os.path.isdir(game_prefix):
+                self.action_context_prefix_location.set_enabled(True)
+                self.current_prefix = game_prefix
+            else:
+                self.action_context_prefix_location.set_enabled(False)
+                self.current_prefix = None
 
         root = Gio.Menu()
 
