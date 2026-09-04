@@ -216,6 +216,30 @@ def get_steam_app_paths(appid):
     return None, None
 
 
+def get_steam_app_playtime_minutes(appid, account_id=None):
+    if not steam_folder:
+        return 0
+
+    account_ids = [account_id] if account_id and account_id != "all" else list_steam_account_ids()
+
+    total = 0
+    for aid in account_ids:
+        path = steam_folder / "userdata" / aid / "config" / "localconfig.vdf"
+        if not path.exists():
+            continue
+        try:
+            with open(path, "r", errors="ignore") as f:
+                data = vdf.load(f)
+            apps = data.get("UserLocalConfigStore", {}).get("Software", {}).get("Valve", {}).get("Steam", {}).get("apps", {})
+            entry = apps.get(str(appid))
+            if entry:
+                total += int(entry.get("Playtime", 0))
+        except Exception:
+            pass
+
+    return total
+
+
 def get_steam_icon_path(appid):
     if not LIBRARYCACHE or not LIBRARYCACHE.exists():
         return None
