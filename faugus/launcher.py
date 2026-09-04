@@ -157,14 +157,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: alpha(@theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container {
-                box-shadow: none;
+                box-shadow: 0 6px 14px alpha(black, 0.65);
                 transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
             entry.flowbox-entry.cover-container .game {
                 border: none;
             }
             entry.flowbox-entry.cover-container:selected {
-                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
+                box-shadow: 0 6px 14px alpha(black, 0.65),
+                            0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container:selected .game {
@@ -176,14 +177,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected:focus {
                 transform: scale(1.05);
-                box-shadow: 0 0 8px 2px alpha(@theme_selected_bg_color, 1),
+                box-shadow: 0 6px 14px alpha(black, 0.65),
+                            0 0 8px 2px alpha(@theme_selected_bg_color, 1),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
             }
             entry.flowbox-entry.cover-container:selected:focus .game {
                 background-color: @theme_selected_bg_color;
             }
             entry.flowbox-entry.cover-container:selected:backdrop {
-                box-shadow: none;
+                box-shadow: 0 6px 14px alpha(black, 0.65);
             }
             entry.flowbox-entry.cover-container:selected:backdrop .game {
                 background-color: alpha(@theme_selected_bg_color, 0.25);
@@ -1983,10 +1985,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         glow_t = self.carrousel_glow_alpha(offset)
         if not is_focused:
             glow_t *= 0.5
-        box_shadow = "none"
+        box_shadow = "0 6px 14px alpha(black, 0.65)"
         if glow_t > 0.0:
-            box_shadow = (
-                f"0 0 8px 2px alpha(@theme_selected_bg_color, {glow_t:.3f}), "
+            box_shadow += (
+                f", 0 0 8px 2px alpha(@theme_selected_bg_color, {glow_t:.3f}), "
                 f"0 0 30px 10px alpha(@theme_selected_bg_color, {glow_t * 0.5:.3f})"
             )
         sliding = self._carrousel_anim_id is not None
@@ -2059,7 +2061,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         max_width, max_height = self.carrousel_slot_size()
         self.carrousel_step = max_width + 20
-        glow_margin = 40
+        glow_margin = 70
         total_height = max_height + 50 + glow_margin * 2
         self.carrousel_fixed.set_size_request(self.carrousel_step * 3, total_height)
         current_width = self.get_width() or self.carrousel_step * 3
