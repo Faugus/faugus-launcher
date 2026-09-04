@@ -2727,14 +2727,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_title.add_css_class("heading")
         label_menu_title.set_margin_bottom(4)
 
-        data = load_json_file(GAMES_JSON, [])
-
         formatted = None
-        for item_data in data:
-            if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
-                game.playtime = item_data.get("playtime", 0)
-                formatted = self.format_playtime(game.playtime)
-                break
+        if game.runner == "Steam":
+            steam_minutes = get_steam_app_playtime_minutes(game.path, game.steam_user)
+            formatted = self.format_playtime(steam_minutes * 60)
+        else:
+            data = load_json_file(GAMES_JSON, [])
+            for item_data in data:
+                if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
+                    game.playtime = item_data.get("playtime", 0)
+                    formatted = self.format_playtime(game.playtime)
+                    break
 
         label_menu_playtime = Gtk.Label(label=formatted or "")
         label_menu_playtime.set_halign(Gtk.Align.START)
