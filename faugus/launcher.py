@@ -8170,11 +8170,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runtimes(self):
-        self.combobox_runtime.append("umu-steamrt4", "{} ({})".format(_("SteamRT4"), _("Default")))
-        self.combobox_runtime.append("umu-sniper", _("Sniper"))
-        self.combobox_runtime.append("umu-soldier", _("Soldier"))
-        self.combobox_runtime.append("umu-scout", _("Scout"))
-        self.combobox_runtime.append("disable-runtime", _("Disable Runtime"))
+        self.combobox_runtime.append("umu-steamrt4", "SteamRT4 ({})".format(_("Default")))
+        self.combobox_runtime.append("umu-sniper", "Sniper")
+        self.combobox_runtime.append("umu-soldier", "Soldier")
+        self.combobox_runtime.append("umu-scout", "Scout")
+        self.combobox_runtime.append("disable-runtime", _("Disabled"))
 
     def populate_combobox_with_runners(self):
         populate_combobox_with_runners(self.combobox_runner)
