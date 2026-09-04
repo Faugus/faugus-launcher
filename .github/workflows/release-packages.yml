@@ -224,7 +224,7 @@ jobs:
           Section: games
           Priority: optional
           Architecture: all
-          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, python3-icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
+          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
           Maintainer: Faugus <felix.ribeiro@live.com>
           Description: A simple and lightweight app for running Windows games using UMU-Launcher
           Homepage: https://github.com/Faugus/${PACKAGE_NAME}
@@ -319,7 +319,7 @@ jobs:
 
           Package: $PACKAGE
           Architecture: all
-          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, python3-icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
+          Depends: python3-gi, python3-requests, python3-pil, python3-vdf, python3-psutil, python3-dbus, icoextract, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-manette-0.2
           Description: A simple and lightweight app for running Windows games using UMU-Launcher
           EOF
 
