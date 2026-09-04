@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-03 13:31+0000\n"
-"PO-Revision-Date: 2026-08-29 01:19+0000\n"
+"PO-Revision-Date: 2026-09-04 20:03+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.9.1.dev0\n"
 
 #: faugus/backup.py:159
 msgid "Backup Settings"
@@ -696,7 +696,7 @@ msgstr "游戏的可执行文件路径"
 
 #: faugus/launcher.py:6877
 msgid "Runtime"
-msgstr ""
+msgstr "运行时"
 
 #: faugus/launcher.py:6883
 msgid "Prefix"
@@ -799,28 +799,24 @@ msgid "Steam Game"
 msgstr "Steam 游戏"
 
 #: faugus/launcher.py:8118
-#, fuzzy
-#| msgid "Steam"
 msgid "SteamRT4"
-msgstr "Steam"
+msgstr "SteamRT4"
 
 #: faugus/launcher.py:8119
 msgid "Sniper"
-msgstr ""
+msgstr "Sniper"
 
 #: faugus/launcher.py:8120
 msgid "Soldier"
-msgstr ""
+msgstr "Soldier"
 
 #: faugus/launcher.py:8121
 msgid "Scout"
-msgstr ""
+msgstr "Scout"
 
 #: faugus/launcher.py:8122
-#, fuzzy
-#| msgid "Disable UMU"
 msgid "Disable Runtime"
-msgstr "禁用 UMU"
+msgstr "禁用运行时"
 
 #: faugus/launcher.py:8351
 msgid "Select the game executable"
