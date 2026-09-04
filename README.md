@@ -36,6 +36,42 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
+### Ubuntu 24.04+ / AppArmor (unprivileged user namespaces)
+
+If a `.deb`/PPA install fails with:
+
+```text
+bwrap: setting up uid map: Permission denied
+```
+
+load an AppArmor exception for both system `bwrap` and the `srt-bwrap` bundled by umu:
+
+```bash
+sudo tee /etc/apparmor.d/umu-bwrap > /dev/null <<'EOF'
+abi <abi/4.0>,
+include <tunables/global>
+
+profile umu-bwrap /usr/bin/bwrap flags=(unconfined) {
+  userns,
+  include if exists <local/umu-bwrap>
+}
+
+profile umu-srt-bwrap /home/*/.local/share/umu/steamrt*/pressure-vessel/libexec/steam-runtime-tools-*/srt-bwrap flags=(unconfined) {
+  userns,
+  include if exists <local/umu-srt-bwrap>
+}
+EOF
+sudo apparmor_parser -r /etc/apparmor.d/umu-bwrap
+```
+
+Verify:
+
+```bash
+bwrap --unshare-user --ro-bind / / /bin/true && echo "bwrap OK"
+```
+
+The Flatpak build is unaffected because Flatpak uses its own sandbox path.
+
 ## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
 ### Installation:
 ```
