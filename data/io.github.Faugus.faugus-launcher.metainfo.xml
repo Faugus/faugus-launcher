@@ -90,13 +90,23 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.2.1-1" date="2026-08-30">
+    <release version="2.2.2-1" date="2026-09-05">
       <description>
         <ul>
-          <li>Fixed automatic backup for Flatpak and AppImage</li>
-          <li>Fixed wrong language in Protons comboboxes</li>
-          <li>Fixed missing flash animation in Carrousel</li>
-          <li>Fixed launcher not being focused after installation in Carrousel</li>
+          <li>Added shadow to covers.</li>
+          <li>Added Steam game location option.</li>
+          <li>Added Steam game prefix location option.</li>
+          <li>Added Steam game playtime.</li>
+          <li>Added support for Steam Linux Runtime selection for Linux Games.</li>
+          <li>Pressing OK commits the field being edited in Global Environment Variables and Launch Arguments.</li>
+          <li>Protons installed in Steam Flatpak sandbox are displayed as (Flatpak). These are not handled by Faugus.</li>
+          <li>Displays the number of games in the Carousel according to the window width.</li>
+          <li>Fallback to English if the system language is not supported.</li>
+          <li>The Proton Manager now only fetches the selected Proton, allowing more requests to GitHub before hitting the rate limit.</li>
+          <li>Updated Debian/Ubuntu icoextract dependency.</li>
+          <li>Fixed Accent Color and Color Scheme change inconsistency.</li>
+          <li>Minor visual adjustments.</li>
+          <li>Updated translations.</li>
         </ul>
       </description>
     </release>
