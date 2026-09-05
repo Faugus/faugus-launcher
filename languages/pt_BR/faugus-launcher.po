@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 21:52+0000\n"
-"PO-Revision-Date: 2026-09-04 21:52+0000\n"
+"PO-Revision-Date: 2026-09-05 15:05+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -799,10 +799,8 @@ msgid "Steam Game"
 msgstr "Jogo da Steam"
 
 #: faugus/launcher.py:8177
-#, fuzzy
-#| msgid "Disable UMU"
 msgid "Disabled"
-msgstr "Desativar UMU"
+msgstr "Desativado"
 
 #: faugus/launcher.py:8406
 msgid "Select the game executable"
