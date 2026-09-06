@@ -4307,9 +4307,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             edit_game_dialog.check_existing_shortcut()
 
-            edit_game_dialog.entry_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_user.set_sensitive(False)
+            edit_game_dialog.entry_title.handler_block(edit_game_dialog.update_prefix_entry_handler_id)
 
             if gameid in self.running:
                 edit_game_dialog.button_winetricks.set_sensitive(False)
@@ -4933,15 +4933,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.no_sleep = edit_game_dialog.checkbox_no_sleep.get_active()
             game.steamgriddb_id = edit_game_dialog._steamgriddb_suggestion_id or ""
 
-            title_formatted = format_title(game.title)
-
-            game.gameid = title_formatted
-            game.addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
+            game.addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{game.gameid}.bat"
 
             if self.interface_mode in ("Covers", "Carrousel"):
                 temp_cover_path = edit_game_dialog.cover_path_temp
                 if os.path.isfile(temp_cover_path):
-                    cover = os.path.join(COVERS_DIR, f"{title_formatted}.png")
+                    cover = os.path.join(COVERS_DIR, f"{game.gameid}.png")
                     try:
                         resize_image_file(temp_cover_path, cover, 460, 690)
                         game.cover = cover
@@ -4952,17 +4949,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 temp_banner_path = edit_game_dialog.banner_path_temp
                 if os.path.isfile(temp_banner_path):
-                    banner = os.path.join(BANNERS_DIR, f"{title_formatted}.png")
+                    banner = os.path.join(BANNERS_DIR, f"{game.gameid}.png")
                     try:
                         resize_image_file(temp_banner_path, banner, 1920, 620)
                     except Exception as e:
                         print(f"Error resizing banner: {e}")
 
             icon_temp = os.path.expanduser(edit_game_dialog.icon_temp)
-            icon_final = f'{edit_game_dialog.icons_path}/{title_formatted}.png'
+            icon_final = f'{edit_game_dialog.icons_path}/{game.gameid}.png'
             game.icon = icon_final
 
-            legacy_icon = f'{edit_game_dialog.icons_path}/{title_formatted}.ico'
+            legacy_icon = f'{edit_game_dialog.icons_path}/{game.gameid}.ico'
             if os.path.isfile(legacy_icon):
                 os.remove(legacy_icon)
 
@@ -7072,7 +7069,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.load_config()
 
-        self.entry_title.connect("changed", self.update_prefix_entry)
+        self.update_prefix_entry_handler_id = self.entry_title.connect("changed", self.update_prefix_entry)
 
         self.view_stack = Gtk.Stack()
 
