@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 21:52+0000\n"
-"PO-Revision-Date: 2026-09-04 20:03+0000\n"
+"PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -799,10 +799,8 @@ msgid "Steam Game"
 msgstr "Steam 游戏"
 
 #: faugus/launcher.py:8177
-#, fuzzy
-#| msgid "Disable Runtime"
 msgid "Disabled"
-msgstr "禁用运行时"
+msgstr "已禁用"
 
 #: faugus/launcher.py:8406
 msgid "Select the game executable"
