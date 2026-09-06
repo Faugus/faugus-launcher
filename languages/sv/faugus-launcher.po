@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 21:52+0000\n"
-"PO-Revision-Date: 2026-08-31 14:51+0000\n"
+"PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.9.1.dev0\n"
 
 #: faugus/backup.py:159
 msgid "Backup Settings"
@@ -696,7 +696,7 @@ msgstr "Sökväg till spelets körbara fil"
 
 #: faugus/launcher.py:6932
 msgid "Runtime"
-msgstr ""
+msgstr "Körtid"
 
 #: faugus/launcher.py:6938
 msgid "Prefix"
@@ -799,10 +799,8 @@ msgid "Steam Game"
 msgstr "Steam-spel"
 
 #: faugus/launcher.py:8177
-#, fuzzy
-#| msgid "Disable UMU"
 msgid "Disabled"
-msgstr "Inaktivera UMU"
+msgstr "Inaktiverad"
 
 #: faugus/launcher.py:8406
 msgid "Select the game executable"
