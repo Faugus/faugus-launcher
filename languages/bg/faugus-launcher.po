@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 21:52+0000\n"
-"PO-Revision-Date: 2026-09-04 20:03+0000\n"
+"PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -800,10 +800,8 @@ msgid "Steam Game"
 msgstr "Игра от Steam"
 
 #: faugus/launcher.py:8177
-#, fuzzy
-#| msgid "Disable Runtime"
 msgid "Disabled"
-msgstr "Изключване на средата за изпълнение"
+msgstr "Изключено"
 
 #: faugus/launcher.py:8406
 msgid "Select the game executable"
