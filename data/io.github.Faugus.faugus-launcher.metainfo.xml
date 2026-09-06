@@ -53,39 +53,39 @@
   <launchable type="desktop-id">io.github.Faugus.faugus-launcher.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-list.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/main-list.png</image>
       <caption>Main window: List interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-grid.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/main-grid.png</image>
       <caption>Main window: Grid interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/main-covers.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/main-covers.png</image>
       <caption>Main window: Covers interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f85d84a/screenshots/main-carrousel.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/main-carrousel.png</image>
       <caption>Main window: Carrousel interface mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/add-main.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/add-main.png</image>
       <caption>Add/Edit Game: Main</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1300d99/screenshots/add-tool.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/add-tool.png</image>
       <caption>Add/Edit Game: Tools</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/e54c4d4/screenshots/launch-settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/launch-settings.png</image>
       <caption>Add/Edit Game: Launch Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/e54c4d4/screenshots/settings.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/settings.png</image>
       <caption>Settings</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/f82eba2/screenshots/proton-manager.png</image>
+      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/ad92719/screenshots/proton-manager.png</image>
       <caption>Proton Manager</caption>
     </screenshot>
   </screenshots>
