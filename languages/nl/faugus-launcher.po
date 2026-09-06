@@ -8,17 +8,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-04 21:52+0000\n"
-"PO-Revision-Date: 2026-08-29 01:19+0000\n"
-"Last-Translator: GitHub webhook <noreply-webhook-github-"
-"integration@weblate.org>\n"
+"PO-Revision-Date: 2026-09-06 16:38+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.9.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 3.9\n"
 
 #: faugus/backup.py:159
 msgid "Backup Settings"
@@ -86,7 +85,7 @@ msgstr "Er is nog geen reservekopie gemaakt"
 
 #: faugus/backup.py:267 faugus/backup.py:359
 msgid "Last backup:"
-msgstr ""
+msgstr "Recentste reservekopie:"
 
 #: faugus/backup.py:272
 msgid "Prefixes and Protons will not be backed up!"
@@ -231,11 +230,11 @@ msgstr "Voer een bestand in de profielmap uit"
 
 #: faugus/launcher.py:2878
 msgid "Clear recent"
-msgstr ""
+msgstr "Recente items wissen"
 
 #: faugus/launcher.py:2881 faugus/launcher.py:2939
 msgid "Recent"
-msgstr ""
+msgstr "Recent"
 
 #: faugus/launcher.py:2995
 msgid "hour"
@@ -348,9 +347,8 @@ msgid "Language"
 msgstr "Taal"
 
 #: faugus/launcher.py:5421
-#, fuzzy
 msgid "Interface Mode"
-msgstr "Venstermodus"
+msgstr "Vormgeving"
 
 #: faugus/launcher.py:5425
 msgid "List"
@@ -366,7 +364,7 @@ msgstr "Hoezen"
 
 #: faugus/launcher.py:5428
 msgid "Carrousel"
-msgstr ""
+msgstr "Carrousel"
 
 #: faugus/launcher.py:5430
 msgid "Background"
@@ -396,11 +394,11 @@ msgstr "Thema"
 
 #: faugus/launcher.py:5444
 msgid "System Theme"
-msgstr ""
+msgstr "Systeemthema"
 
 #: faugus/launcher.py:5449
 msgid "Color Scheme"
-msgstr ""
+msgstr "Kleurenschema"
 
 #: faugus/launcher.py:5453
 msgid "Light"
@@ -444,16 +442,15 @@ msgstr "Labels"
 
 #: faugus/launcher.py:5485
 msgid "Zoom"
-msgstr ""
+msgstr "Zoomniveau"
 
 #: faugus/launcher.py:5488
-#, fuzzy
 msgid "SteamGridDB"
-msgstr "Steam"
+msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5493
 msgid "API Key"
-msgstr ""
+msgstr "Api-sleutel"
 
 #: faugus/launcher.py:5500
 msgid "Default Prefixes Location"
@@ -516,18 +513,16 @@ msgid "Logging"
 msgstr "Logboek"
 
 #: faugus/launcher.py:5554
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Categorie"
+msgstr "Categorieën"
 
 #: faugus/launcher.py:5556
 msgid "Sort"
-msgstr ""
+msgstr "Sorteren"
 
 #: faugus/launcher.py:5558
 msgid "Header bar"
-msgstr ""
+msgstr "Kopbalk"
 
 #: faugus/launcher.py:5560
 msgid "Hidden games"
@@ -599,23 +594,20 @@ msgid "Clear Logs"
 msgstr "Logboeken wissen"
 
 #: faugus/launcher.py:5951
-#, fuzzy
 msgid "Covers or Carrousel mode"
-msgstr "Steam"
+msgstr "Hoezen of carrouselmodus"
 
 #: faugus/launcher.py:5952
-#, fuzzy
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Steam"
+msgstr "Rooster, hoezen of carrouselmodus"
 
 #: faugus/launcher.py:5979
-#, fuzzy
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Steam"
+msgstr "Hoezen of carrouselmodus met SteamGridDB"
 
 #: faugus/launcher.py:6016
 msgid "Adwaita theme"
-msgstr ""
+msgstr "Adwaita-thema"
 
 #: faugus/launcher.py:6164
 msgid "Do you want to save the changes?"
@@ -704,7 +696,7 @@ msgstr "De locatie van het uitvoerbare gamebestand"
 
 #: faugus/launcher.py:6932
 msgid "Runtime"
-msgstr ""
+msgstr "Uitvoerbaar bestand"
 
 #: faugus/launcher.py:6938
 msgid "Prefix"
@@ -807,10 +799,8 @@ msgid "Steam Game"
 msgstr "Steam-game"
 
 #: faugus/launcher.py:8177
-#, fuzzy
-#| msgid "Disable Hidraw"
 msgid "Disabled"
-msgstr "Hidraw uitschakelen"
+msgstr "Uitgeschakeld"
 
 #: faugus/launcher.py:8406
 msgid "Select the game executable"
@@ -932,11 +922,11 @@ msgstr "Kies een snelkoppelingspictogram"
 #: faugus/utils.py:1111 faugus/utils.py:1112 faugus/utils.py:1113
 #: faugus/utils.py:1114 faugus/utils.py:1115
 msgid "Latest"
-msgstr ""
+msgstr "Nieuwste"
 
 #: faugus/utils.py:1118
 msgid "System"
-msgstr ""
+msgstr "Systeem"
 
 #: faugus/utils.py:1276
 msgid "Presets"
