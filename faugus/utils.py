@@ -2381,7 +2381,19 @@ def show_steamgriddb_picker(obj, category):
     stack.add_named(scrolled, "content")
     stack.set_visible_child_name("loading")
 
-    dialog.get_content_area().append(stack)
+    search_entry = Gtk.SearchEntry()
+    search_entry.set_text(game_name)
+    search_entry.set_margin_start(10)
+    search_entry.set_margin_end(10)
+    search_entry.set_margin_top(10)
+
+    content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    content_box.set_vexpand(True)
+    content_box.set_hexpand(True)
+    content_box.append(search_entry)
+    content_box.append(stack)
+
+    dialog.get_content_area().append(content_box)
 
     thumb_w = 660 if is_list else 160
     thumb_h = int(thumb_w / ratios.get(category, 1.0))
@@ -2417,9 +2429,19 @@ def show_steamgriddb_picker(obj, category):
             GLib.idle_add(apply_ui)
         run_in_background(fetch_full)
 
-    def populate(items):
-        if closed_state[0]:
+    search_token = [0]
+
+    def clear_items():
+        child = items_container.get_first_child()
+        while child:
+            next_child = child.get_next_sibling()
+            items_container.remove(child)
+            child = next_child
+
+    def populate(items, token):
+        if closed_state[0] or token != search_token[0]:
             return False
+        clear_items()
         if not items:
             empty_label = Gtk.Label(label=_("No results found"))
             empty_label.set_margin_top(20)
@@ -2453,11 +2475,9 @@ def show_steamgriddb_picker(obj, category):
         stack.set_visible_child_name("content")
         return False
 
-    def fetch_candidates():
-        import requests
-
+    def fetch_candidates(term, term_game_id, term_steam_appid, token):
         candidates = fetch_steamgriddb_candidates(
-            api_key, game_name, limit=24, game_id=game_id, steam_appid=steam_appid
+            api_key, term, limit=24, game_id=term_game_id, steam_appid=term_steam_appid
         )
         items = candidates.get(keys.get(category), [])
 
@@ -2480,10 +2500,23 @@ def show_steamgriddb_picker(obj, category):
                 downloaded = list(pool.map(download_thumb, items))
             results = [d for d in downloaded if d]
 
-        if not closed_state[0]:
-            GLib.idle_add(populate, results)
+        if not closed_state[0] and token == search_token[0]:
+            GLib.idle_add(populate, results, token)
 
-    run_in_background(fetch_candidates)
+    def start_search(term, term_game_id=None, term_steam_appid=None):
+        if closed_state[0] or not term:
+            return
+        search_token[0] += 1
+        token = search_token[0]
+        stack.set_visible_child_name("loading")
+        run_in_background(fetch_candidates, term, term_game_id, term_steam_appid, token)
+
+    def on_search_activate(entry):
+        start_search(entry.get_text().strip())
+
+    search_entry.connect("activate", on_search_activate)
+
+    start_search(game_name, game_id, steam_appid)
 
     dialog.present()
 

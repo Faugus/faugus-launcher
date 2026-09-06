@@ -428,8 +428,7 @@ def navigate_main_screen(window, focused, direction):
                 selected = flowbox.get_selected_children()
                 reference_child = selected[0] if selected else None
             if reference_child is not None and not _flowbox_has_row_above(reference_child.get_parent(), reference_child):
-                focus_top_bar(window)
-                return True
+                return focus_top_bar(window)
             return False
 
         bottom_container = getattr(window, "bottom_bar", None) or getattr(window, "box_bottom", None)
@@ -527,6 +526,16 @@ def navigate_focus(direction):
                     if isinstance(titlebar, Gtk.HeaderBar):
                         titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
             return True
+
+    if direction == Gtk.DirectionType.UP and isinstance(focused, Gtk.FlowBoxChild):
+        flowbox = focused.get_parent()
+        if flowbox is not None and not _flowbox_has_row_above(flowbox, focused):
+            node = flowbox
+            while node is not None:
+                prev = node.get_prev_sibling()
+                if prev is not None and (prev.grab_focus() or prev.child_focus(Gtk.DirectionType.TAB_BACKWARD)):
+                    return True
+                node = node.get_parent()
 
     if is_horizontal:
         if _focus_nearest_in_direction(focused, direction, active_window):
