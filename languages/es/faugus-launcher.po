@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 04:28+0000\n"
-"PO-Revision-Date: 2026-08-29 01:17+0000\n"
+"PO-Revision-Date: 2026-09-07 16:39+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.9.1.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:159
@@ -301,16 +301,12 @@ msgid "No internet connection"
 msgstr "Sin conexión a internet"
 
 #: faugus/launcher.py:4668
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard these prefixes?"
-msgstr "¿Deseas guardar los cambios?"
+msgstr "¿Desea descartar estos prefixes?"
 
 #: faugus/launcher.py:4669
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
-msgstr "¿Deseas guardar los cambios?"
+msgstr "¿Desea descartar este prefix?"
 
 #: faugus/launcher.py:4682 faugus/launcher.py:6378 faugus/launcher.py:6689
 msgid "Yes"
@@ -708,20 +704,16 @@ msgid "Path to the game executable"
 msgstr "Ruta al ejecutable del juego"
 
 #: faugus/launcher.py:6966
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "Seleccionar el ejecutable del juego"
+msgstr "Seleccione un ejecutable"
 
 #: faugus/launcher.py:6967
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "¡%s no fue instalado!"
+msgstr "Ejecutar un instalador"
 
 #: faugus/launcher.py:6984
 msgid "Runtime"
-msgstr ""
+msgstr "Runtime"
 
 #: faugus/launcher.py:6990
 msgid "Prefix"
@@ -824,16 +816,12 @@ msgid "Steam Game"
 msgstr "Juego de Steam"
 
 #: faugus/launcher.py:8233
-#, fuzzy
-#| msgid "Disable UMU"
 msgid "Disabled"
-msgstr "Desactivar UMU"
+msgstr "Deshabilitado"
 
 #: faugus/launcher.py:8311
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "Seleccionar el ejecutable del juego"
+msgstr "Seleccione el instalador del juego"
 
 #: faugus/launcher.py:8524
 msgid "Select the game executable"
