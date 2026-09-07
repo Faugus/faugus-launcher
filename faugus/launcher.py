@@ -8364,7 +8364,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     process.wait()
                     GLib.idle_add(self.record_created_prefix, prefix)
 
-                    detected_path = detect_installed_executable(prefix, existing_shortcuts)
+                    detected_path = None
+                    for attempt in range(10):
+                        detected_path = detect_installed_executable(prefix, existing_shortcuts)
+                        if detected_path or attempt == 9:
+                            break
+                        threading.Event().wait(2)
+
                     if detected_path:
                         GLib.idle_add(self.entry_path.set_text, detected_path)
 
@@ -8675,69 +8681,50 @@ def build_desktop_file_content(title, exec_args, icon_path, working_directory):
 
 def create_shortcuts_from_installer(prefix, existing_shortcuts):
     new_shortcuts = list_prefix_shortcuts(prefix) - existing_shortcuts
-    candidates = [p for p in new_shortcuts if "uninstall" not in os.path.basename(p).lower()]
+    resolved = resolve_new_shortcuts(prefix, new_shortcuts)
+    best = pick_best_shortcut(resolved)
+    if not best:
+        return
 
-    targets = {}
-    for lnk_path in candidates:
-        target = parse_lnk_target_path(lnk_path)
-        if not target:
-            continue
-        unix_path = windows_path_to_prefix_path(target, prefix)
-        if not unix_path or not os.path.isfile(unix_path) or not unix_path.lower().endswith(".exe"):
-            continue
+    unix_path = best["target"]
+    title = best["name"]
+    on_desktop = any(r["on_desktop"] for r in resolved if r["target"] == unix_path)
+    on_appmenu = any(r["on_appmenu"] for r in resolved if r["target"] == unix_path)
+    if not (on_desktop or on_appmenu):
+        return
 
-        entry = targets.setdefault(unix_path, {"lnk_paths": [], "on_desktop": False, "on_appmenu": False})
-        entry["lnk_paths"].append(lnk_path)
-        normalized = lnk_path.replace(os.sep, "/")
-        if "/Desktop/" in normalized:
-            entry["on_desktop"] = True
-        if "/Start Menu/" in normalized:
-            entry["on_appmenu"] = True
+    title_formatted = format_title(title)
+    applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
+    desktop_shortcut_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
 
-    if not targets:
+    needs_appmenu = on_appmenu and not os.path.isfile(applications_shortcut_path)
+    needs_desktop = on_desktop and not os.path.isfile(desktop_shortcut_path)
+    if not (needs_appmenu or needs_desktop):
         return
 
     os.makedirs(SHORTCUT_ICONS_DIR, exist_ok=True)
     os.makedirs(APP_DIR, exist_ok=True)
     os.makedirs(DESKTOP_DIR, exist_ok=True)
 
-    for unix_path, info in targets.items():
-        if not (info["on_desktop"] or info["on_appmenu"]):
-            continue
+    icon_final = os.path.join(SHORTCUT_ICONS_DIR, f"{title_formatted}.png")
+    status = extract_ico(unix_path, icon_final, best_frame=True)
+    icon_path = icon_final if status == "ok" else FAUGUS_PNG
 
-        best_lnk = min(info["lnk_paths"], key=rank_shortcut_candidate)
-        title = os.path.splitext(os.path.basename(best_lnk))[0].strip()
-        if not title:
-            continue
+    game_directory = os.path.dirname(unix_path)
 
-        title_formatted = format_title(title)
-        applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
-        desktop_shortcut_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
+    desktop_file_content = build_desktop_file_content(
+        title, f'"{unix_path}"', icon_path, game_directory
+    )
 
-        needs_appmenu = info["on_appmenu"] and not os.path.isfile(applications_shortcut_path)
-        needs_desktop = info["on_desktop"] and not os.path.isfile(desktop_shortcut_path)
-        if not (needs_appmenu or needs_desktop):
-            continue
+    if needs_appmenu:
+        with open(applications_shortcut_path, 'w') as f:
+            f.write(desktop_file_content)
+        os.chmod(applications_shortcut_path, 0o755)
 
-        icon_final = os.path.join(SHORTCUT_ICONS_DIR, f"{title_formatted}.png")
-        status = extract_ico(unix_path, icon_final, best_frame=True)
-        icon_path = icon_final if status == "ok" else FAUGUS_PNG
-
-        game_directory = os.path.dirname(unix_path)
-
-        desktop_file_content = build_desktop_file_content(
-            title, f'"{unix_path}"', icon_path, game_directory
-        )
-
-        if needs_appmenu:
-            with open(applications_shortcut_path, 'w') as f:
-                f.write(desktop_file_content)
-            os.chmod(applications_shortcut_path, 0o755)
-
-        if needs_desktop:
-            with open(desktop_shortcut_path, 'w') as f:
-                f.write(desktop_file_content)
-            os.chmod(desktop_shortcut_path, 0o755)
+    if needs_desktop:
+        with open(desktop_shortcut_path, 'w') as f:
+            f.write(desktop_file_content)
+        os.chmod(desktop_shortcut_path, 0o755)
 
 
 def run_file(file_path):
@@ -8784,6 +8771,12 @@ def run_file(file_path):
         existing_shortcuts = list_prefix_shortcuts(prefix)
         process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir, env=subprocess_env())
         process.wait()
+
+        for attempt in range(10):
+            if list_prefix_shortcuts(prefix) - existing_shortcuts or attempt == 9:
+                break
+            threading.Event().wait(2)
+
         create_shortcuts_from_installer(prefix, existing_shortcuts)
     else:
         subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir, env=subprocess_env())

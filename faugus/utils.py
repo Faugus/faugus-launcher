@@ -700,7 +700,101 @@ def list_prefix_shortcuts(prefix):
             for filename in filenames:
                 if filename.lower().endswith(".lnk"):
                     found.add(os.path.join(dirpath, filename))
+
+    proton_shortcuts_dir = os.path.join(prefix, "drive_c", "proton_shortcuts")
+    if os.path.isdir(proton_shortcuts_dir):
+        for filename in os.listdir(proton_shortcuts_dir):
+            if filename.lower().endswith(".desktop"):
+                found.add(os.path.join(proton_shortcuts_dir, filename))
+
     return found
+
+
+def _desktop_entry_field(content, key):
+    match = re.search(rf'^{key}=(.*)$', content, re.MULTILINE)
+    return match.group(1).strip() if match else ""
+
+
+def _resolve_proton_desktop_shortcut(desktop_path):
+    try:
+        with open(desktop_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+    except OSError:
+        return None
+
+    working_dir = _desktop_entry_field(content, "Path")
+    wm_class = _desktop_entry_field(content, "StartupWMClass")
+    if not wm_class or not os.path.isdir(working_dir):
+        return None
+
+    try:
+        target = next(
+            (os.path.join(working_dir, f) for f in os.listdir(working_dir) if f.lower() == wm_class.lower()),
+            None,
+        )
+    except OSError:
+        return None
+
+    if not target or not os.path.isfile(target):
+        return None
+
+    name = _desktop_entry_field(content, "Name") or os.path.splitext(os.path.basename(desktop_path))[0]
+    location_hint = _desktop_entry_field(content, "Exec").strip('"')
+    return name, target, location_hint
+
+
+def _resolve_lnk_shortcut(shortcut_path, prefix):
+    target_win = parse_lnk_target_path(shortcut_path)
+    if not target_win:
+        return None
+
+    candidate = windows_path_to_prefix_path(target_win, prefix)
+    target = resolve_case_insensitive_path(candidate) if candidate else None
+    if not target:
+        return None
+
+    name = os.path.splitext(os.path.basename(shortcut_path))[0].strip()
+    return name, target, shortcut_path
+
+
+_SHORTCUT_UTILITY_KEYWORDS = ("uninstall", "setup", "config", "readme")
+
+
+def is_utility_shortcut(*names):
+    combined = " ".join(n for n in names if n).lower()
+    return any(keyword in combined for keyword in _SHORTCUT_UTILITY_KEYWORDS)
+
+
+def resolve_new_shortcuts(prefix, shortcut_paths):
+    results = []
+    for shortcut_path in shortcut_paths:
+        lower = shortcut_path.lower()
+        if lower.endswith(".desktop"):
+            resolved = _resolve_proton_desktop_shortcut(shortcut_path)
+        elif lower.endswith(".lnk"):
+            resolved = _resolve_lnk_shortcut(shortcut_path, prefix)
+        else:
+            resolved = None
+
+        if not resolved:
+            continue
+
+        name, target, location_hint = resolved
+        if not name or not target.lower().endswith(".exe"):
+            continue
+        if is_utility_shortcut(os.path.basename(shortcut_path), name):
+            continue
+
+        normalized = location_hint.replace("\\", "/")
+        results.append({
+            "name": name,
+            "target": target,
+            "on_desktop": "/Desktop/" in normalized,
+            "on_appmenu": "/Start Menu/" in normalized,
+            "shortcut_path": shortcut_path,
+        })
+
+    return results
 
 
 def parse_lnk_target_path(lnk_path):
@@ -781,28 +875,43 @@ def windows_path_to_prefix_path(win_path, prefix):
     return None
 
 
-def rank_shortcut_candidate(lnk_path):
-    name = os.path.splitext(os.path.basename(lnk_path))[0]
-    parent = os.path.basename(os.path.dirname(lnk_path))
-    exact_match = name.strip().lower() == parent.strip().lower()
-    depth = lnk_path.count(os.sep)
-    return (0 if exact_match else 1, depth)
+def resolve_case_insensitive_path(path):
+    if os.path.isfile(path):
+        return path
+
+    directory = os.path.dirname(path)
+    target_name = os.path.basename(path)
+    if not os.path.isdir(directory):
+        return None
+
+    try:
+        for entry in os.listdir(directory):
+            if entry.lower() == target_name.lower() and os.path.isfile(os.path.join(directory, entry)):
+                return os.path.join(directory, entry)
+    except OSError:
+        pass
+
+    return None
+
+
+def pick_best_shortcut(resolved):
+    if not resolved:
+        return None
+
+    def rank(item):
+        path = item["shortcut_path"]
+        exact_match = os.path.splitext(os.path.basename(path))[0].strip().lower() \
+            == os.path.basename(os.path.dirname(path)).strip().lower()
+        return (0 if exact_match else 1, path.count(os.sep))
+
+    return min(resolved, key=rank)
 
 
 def detect_installed_executable(prefix, existing_shortcuts):
     new_shortcuts = list_prefix_shortcuts(prefix) - existing_shortcuts
-    candidates = [p for p in new_shortcuts if "uninstall" not in os.path.basename(p).lower()]
-    candidates.sort(key=rank_shortcut_candidate)
-
-    for lnk_path in candidates:
-        target = parse_lnk_target_path(lnk_path)
-        if not target:
-            continue
-        unix_path = windows_path_to_prefix_path(target, prefix)
-        if unix_path and os.path.isfile(unix_path) and unix_path.lower().endswith(".exe"):
-            return unix_path
-
-    return None
+    resolved = resolve_new_shortcuts(prefix, new_shortcuts)
+    best = pick_best_shortcut(resolved)
+    return best["target"] if best else None
 
 
 def add_image_file_filters(filechooser, include_ico=True):
