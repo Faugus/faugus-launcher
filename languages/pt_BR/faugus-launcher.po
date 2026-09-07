@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 00:52+0000\n"
-"PO-Revision-Date: 2026-09-05 15:05+0000\n"
+"PO-Revision-Date: 2026-09-07 04:28+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -695,16 +695,12 @@ msgid "Path to the game executable"
 msgstr "Caminho para o executável do jogo"
 
 #: faugus/launcher.py:6939
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "Selecione o executável do jogo"
+msgstr "Selecionar um executável"
 
 #: faugus/launcher.py:6940
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "%s não foi instalado!"
+msgstr "Executar um instalador"
 
 #: faugus/launcher.py:6957
 msgid "Runtime"
@@ -815,10 +811,8 @@ msgid "Disabled"
 msgstr "Desativado"
 
 #: faugus/launcher.py:8279
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "Selecione o executável do jogo"
+msgstr "Selecione o instalador do jogo"
 
 #: faugus/launcher.py:8489
 msgid "Select the game executable"
