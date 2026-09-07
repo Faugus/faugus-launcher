@@ -5056,27 +5056,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             new_icon_path = FAUGUS_PNG
 
         game_directory = os.path.dirname(expand_path(game.path))
-
-        if IS_FLATPAK:
-            desktop_file_content = (
-                f'[Desktop Entry]\n'
-                f'Name={game.title}\n'
-                f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}--game {game.gameid}\n'
-                f'Icon={new_icon_path}\n'
-                f'Type=Application\n'
-                f'Categories=Game;\n'
-                f'Path={game_directory}\n'
-            )
-        else:
-            desktop_file_content = (
-                f'[Desktop Entry]\n'
-                f'Name={game.title}\n'
-                f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}--game {game.gameid}\n'
-                f'Icon={new_icon_path}\n'
-                f'Type=Application\n'
-                f'Categories=Game;\n'
-                f'Path={game_directory}\n'
-            )
+        desktop_file_content = build_desktop_file_content(
+            game.title, f'--game {game.gameid}', new_icon_path, game_directory
+        )
 
         if not os.path.exists(APP_DIR):
             os.makedirs(APP_DIR)
@@ -5573,6 +5555,12 @@ class Settings(Gtk.Dialog):
         self.checkbox_automatic_updates = Gtk.CheckButton(label=_("Automatic updates"))
         self.checkbox_automatic_updates.set_active(True)
 
+        self.checkbox_auto_create_shortcuts = Gtk.CheckButton(label=_("Auto-create shortcuts"))
+        self.checkbox_auto_create_shortcuts.set_active(False)
+        self.checkbox_auto_create_shortcuts.set_tooltip_text(
+            _("Automatically creates shortcuts when installing something through the file manager")
+        )
+
         self.checkbox_logging = Gtk.CheckButton(label=_("Logging"))
         self.checkbox_logging.set_active(False)
 
@@ -5780,8 +5768,9 @@ class Settings(Gtk.Dialog):
         grid_miscellaneous.attach(self.checkbox_system_tray, 0, 8, 1, 1)
         grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 9, 1, 1)
         grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_auto_create_shortcuts, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wow64, 0, 13, 1, 1)
 
         grid_theme_accent.attach(self.label_interface, 0, 0, 1, 1)
         grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -6081,6 +6070,7 @@ class Settings(Gtk.Dialog):
         config.set_value("autostart-enabled", self.checkbox_autostart.get_active())
         config.set_value("mono-icon", self.checkbox_mono_icon.get_active())
         config.set_value("auto-close-on-launch", self.checkbox_auto_close_on_launch.get_active())
+        config.set_value("auto-create-shortcuts", self.checkbox_auto_create_shortcuts.get_active())
         config.set_value("logging-enabled", self.checkbox_logging.get_active())
         config.set_value("show-hidden", self.checkbox_hidden_games.get_active())
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
@@ -6423,6 +6413,7 @@ class Settings(Gtk.Dialog):
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
         steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
+        auto_create_shortcuts = cfg.config.get('auto-create-shortcuts', 'False') == 'True'
         logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
@@ -6464,6 +6455,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_steamgriddb.set_active(steamgriddb_enabled)
         self.on_checkbox_steamgriddb_toggled(self.checkbox_steamgriddb)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
+        self.checkbox_auto_create_shortcuts.set_active(auto_create_shortcuts)
         self.checkbox_logging.set_active(logging_enabled)
         self.checkbox_hidden_games.set_active(show_hidden)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
@@ -8637,6 +8629,90 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         return True
 
 
+def build_desktop_file_content(title, exec_args, icon_path, working_directory):
+    if IS_FLATPAK:
+        exec_line = f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}{exec_args}\n'
+    else:
+        exec_line = f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}{exec_args}\n'
+
+    return (
+        f'[Desktop Entry]\n'
+        f'Name={title}\n'
+        f'{exec_line}'
+        f'Icon={icon_path}\n'
+        f'Type=Application\n'
+        f'Categories=Game;\n'
+        f'Path={working_directory}\n'
+    )
+
+
+def create_shortcuts_from_installer(prefix, existing_shortcuts):
+    new_shortcuts = list_prefix_shortcuts(prefix) - existing_shortcuts
+    candidates = [p for p in new_shortcuts if "uninstall" not in os.path.basename(p).lower()]
+
+    targets = {}
+    for lnk_path in candidates:
+        target = parse_lnk_target_path(lnk_path)
+        if not target:
+            continue
+        unix_path = windows_path_to_prefix_path(target, prefix)
+        if not unix_path or not os.path.isfile(unix_path) or not unix_path.lower().endswith(".exe"):
+            continue
+
+        entry = targets.setdefault(unix_path, {"lnk_paths": [], "on_desktop": False, "on_appmenu": False})
+        entry["lnk_paths"].append(lnk_path)
+        normalized = lnk_path.replace(os.sep, "/")
+        if "/Desktop/" in normalized:
+            entry["on_desktop"] = True
+        if "/Start Menu/" in normalized:
+            entry["on_appmenu"] = True
+
+    if not targets:
+        return
+
+    os.makedirs(SHORTCUT_ICONS_DIR, exist_ok=True)
+    os.makedirs(APP_DIR, exist_ok=True)
+    os.makedirs(DESKTOP_DIR, exist_ok=True)
+
+    for unix_path, info in targets.items():
+        if not (info["on_desktop"] or info["on_appmenu"]):
+            continue
+
+        best_lnk = min(info["lnk_paths"], key=rank_shortcut_candidate)
+        title = os.path.splitext(os.path.basename(best_lnk))[0].strip()
+        if not title:
+            continue
+
+        title_formatted = format_title(title)
+        applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
+        desktop_shortcut_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
+
+        needs_appmenu = info["on_appmenu"] and not os.path.isfile(applications_shortcut_path)
+        needs_desktop = info["on_desktop"] and not os.path.isfile(desktop_shortcut_path)
+        if not (needs_appmenu or needs_desktop):
+            continue
+
+        icon_final = os.path.join(SHORTCUT_ICONS_DIR, f"{title_formatted}.png")
+        status = extract_ico(unix_path, icon_final, best_frame=True)
+        icon_path = icon_final if status == "ok" else FAUGUS_PNG
+
+        game_directory = os.path.dirname(unix_path)
+
+        desktop_file_content = build_desktop_file_content(
+            title, f'"{unix_path}"', icon_path, game_directory
+        )
+
+        if needs_appmenu:
+            with open(applications_shortcut_path, 'w') as f:
+                f.write(desktop_file_content)
+            os.chmod(applications_shortcut_path, 0o755)
+
+        if needs_desktop:
+            with open(desktop_shortcut_path, 'w') as f:
+                f.write(desktop_file_content)
+            os.chmod(desktop_shortcut_path, 0o755)
+
+
 def run_file(file_path):
     cfg = ConfigManager()
 
@@ -8646,6 +8722,7 @@ def run_file(file_path):
     sdl_enabled = cfg.config.get('sdl-enabled', 'False') == 'True'
     no_sleep = cfg.config.get('no-sleep-enabled', 'False') == 'True'
     default_runner = cfg.config.get('default-runner', '').strip('"')
+    auto_create_shortcuts = cfg.config.get('auto-create-shortcuts', 'False') == 'True'
 
     if file_path.endswith(".reg"):
         mangohud = False
@@ -8654,13 +8731,14 @@ def run_file(file_path):
         no_sleep = False
 
     file_dir = os.path.dirname(os.path.abspath(file_path))
+    prefix = f"{expand_path(default_prefix)}/default"
     command_parts = []
 
     if sdl_enabled:
         command_parts.append("PROTON_PREFER_SDL=1")
     if no_sleep:
         command_parts.append("NO_SLEEP=1")
-    command_parts.append(f'WINEPREFIX="{expand_path(default_prefix)}/default"')
+    command_parts.append(f'WINEPREFIX="{prefix}"')
     if default_runner:
         command_parts.append(f'PROTONPATH="{resolve_protonpath(default_runner)}"')
     if gamemode:
@@ -8674,7 +8752,14 @@ def run_file(file_path):
         command_parts.append(f'"{file_path}"')
 
     command = ' '.join(command_parts)
-    subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir, env=subprocess_env())
+
+    if auto_create_shortcuts and not file_path.endswith(".reg"):
+        existing_shortcuts = list_prefix_shortcuts(prefix)
+        process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir, env=subprocess_env())
+        process.wait()
+        create_shortcuts_from_installer(prefix, existing_shortcuts)
+    else:
+        subprocess.Popen([sys.executable, "-m", "faugus.runner", command], cwd=file_dir, env=subprocess_env())
 
 
 def main():

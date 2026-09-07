@@ -22,6 +22,7 @@ class ConfigManager:
             'labels-enabled': 'False',
             'zoom-enabled': 'True',
             'logging-enabled': 'False',
+            'auto-create-shortcuts': 'False',
             'wayland-driver': 'False',
             'wow64-enabled': 'False',
             'language': lang,
