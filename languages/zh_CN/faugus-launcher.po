@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 00:52+0000\n"
-"PO-Revision-Date: 2026-09-06 21:30+0000\n"
+"PO-Revision-Date: 2026-09-07 04:28+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -695,16 +695,12 @@ msgid "Path to the game executable"
 msgstr "游戏的可执行文件路径"
 
 #: faugus/launcher.py:6939
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "选择游戏的可执行文件"
+msgstr "选择可执行文件"
 
 #: faugus/launcher.py:6940
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "%s 未被安装!"
+msgstr "运行安装程序"
 
 #: faugus/launcher.py:6957
 msgid "Runtime"
@@ -815,10 +811,8 @@ msgid "Disabled"
 msgstr "已禁用"
 
 #: faugus/launcher.py:8279
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "选择游戏的可执行文件"
+msgstr "选择游戏的安装程序"
 
 #: faugus/launcher.py:8489
 msgid "Select the game executable"
