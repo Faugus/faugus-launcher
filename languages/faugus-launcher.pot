@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -809,7 +809,7 @@ msgid "Disabled"
 msgstr ""
 
 #: faugus/launcher.py:8279
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr ""
 
 #: faugus/launcher.py:8489
