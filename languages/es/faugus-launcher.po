@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: 2026-08-29 01:17+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -820,7 +820,7 @@ msgstr "Desactivar UMU"
 #: faugus/launcher.py:8279
 #, fuzzy
 #| msgid "Select the game executable"
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr "Seleccionar el ejecutable del juego"
 
 #: faugus/launcher.py:8489

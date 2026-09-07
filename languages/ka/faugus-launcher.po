@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: 2026-08-29 01:19+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -850,7 +850,7 @@ msgstr "'hidraw'-ის გათიშვა"
 
 #: faugus/launcher.py:8279
 #, fuzzy
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr "აირჩიეთ თამაშის .exe"
 
 #: faugus/launcher.py:8489

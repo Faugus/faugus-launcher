@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: 2026-09-04 20:03+0000\n"
 "Last-Translator: Oleg <VengeanceWrangler@proton.me>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -820,7 +820,7 @@ msgstr "Отключить"
 #: faugus/launcher.py:8279
 #, fuzzy
 #| msgid "Select the game executable"
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr "Выберите .exe файл игры"
 
 #: faugus/launcher.py:8489

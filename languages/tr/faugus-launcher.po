@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: 2026-09-04 20:03+0000\n"
 "Last-Translator: howoz <howoz@proton.me>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -819,7 +819,7 @@ msgstr "Yürütme Ortamını Devre Dışı Bırak"
 #: faugus/launcher.py:8279
 #, fuzzy
 #| msgid "Select the game executable"
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr "Oyunun çalıştırma dosyasını seç"
 
 #: faugus/launcher.py:8489

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 00:24+0000\n"
+"POT-Creation-Date: 2026-09-07 00:52+0000\n"
 "PO-Revision-Date: 2026-09-05 15:05+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
@@ -817,7 +817,7 @@ msgstr "Desativado"
 #: faugus/launcher.py:8279
 #, fuzzy
 #| msgid "Select the game executable"
-msgid "Select an game installer"
+msgid "Select the game installer"
 msgstr "Selecione o executável do jogo"
 
 #: faugus/launcher.py:8489
