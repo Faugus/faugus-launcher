@@ -348,6 +348,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         right_click.connect("pressed", on_right_click)
         self.flowbox.add_controller(right_click)
+
+        file_drop_target = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
+        file_drop_target.connect("drop", self.on_window_file_drop)
+        self.add_controller(file_drop_target)
+
         def on_selected_children_changed(*_):
             GLib.idle_add(self.update_icon)
             GLib.idle_add(self.schedule_background_update)
@@ -4190,6 +4195,28 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
 
         add_game_dialog.present()
+
+    def on_window_file_drop(self, drop_target, value, x, y):
+        files = value.get_files()
+        if not files:
+            return False
+
+        file_path = files[0].get_path()
+        if not file_path or not os.path.isfile(file_path):
+            return False
+
+        windows_extensions = (".exe", ".msi", ".bat", ".lnk", ".reg")
+        launcher_id = "windows" if file_path.lower().endswith(windows_extensions) else "linux"
+
+        add_game_dialog = AddGame(self, self.interface_mode)
+        add_game_dialog.connect("response", self.on_dialog_response, add_game_dialog)
+
+        add_game_dialog.combobox_launcher.set_active_id_silent(launcher_id)
+        add_game_dialog.on_combobox_changed(add_game_dialog.combobox_launcher, skip_cleanup=True)
+        add_game_dialog.entry_path.set_text(file_path)
+
+        add_game_dialog.present()
+        return True
 
     def on_button_edit_clicked(self, widget):
         game = self.selected()
