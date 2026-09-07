@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 04:28+0000\n"
+"POT-Creation-Date: 2026-09-07 16:40+0000\n"
 "PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -91,15 +91,15 @@ msgstr "Senaste säkerhetskopia:"
 msgid "Prefixes and Protons will not be backed up!"
 msgstr "Prefix och Proton-versioner säkerhetskopieras inte!"
 
-#: faugus/backup.py:275 faugus/launcher.py:5621 faugus/launcher.py:6618
-#: faugus/launcher.py:7089 faugus/launcher.py:7658 faugus/proton_manager.py:315
+#: faugus/backup.py:275 faugus/launcher.py:5609 faugus/launcher.py:6610
+#: faugus/launcher.py:7081 faugus/launcher.py:7650 faugus/proton_manager.py:315
 #: faugus/shortcut.py:87 faugus/utils.py:510 faugus/utils.py:621
 #: faugus/utils.py:632
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: faugus/backup.py:279 faugus/launcher.py:5625 faugus/launcher.py:6378
-#: faugus/launcher.py:6622 faugus/launcher.py:7093 faugus/launcher.py:7654
+#: faugus/backup.py:279 faugus/launcher.py:5613 faugus/launcher.py:6368
+#: faugus/launcher.py:6614 faugus/launcher.py:7085 faugus/launcher.py:7646
 #: faugus/shortcut.py:91 faugus/utils.py:514 faugus/utils.py:945
 msgid "Ok"
 msgstr "Ok"
@@ -140,7 +140,7 @@ msgstr "Speltid"
 msgid "Last played"
 msgstr "Senast spelat"
 
-#: faugus/launcher.py:1227 faugus/launcher.py:5486
+#: faugus/launcher.py:1227 faugus/launcher.py:5468
 msgid "Custom"
 msgstr "Anpassat"
 
@@ -252,7 +252,7 @@ msgstr "minut"
 msgid "minutes"
 msgstr "minuter"
 
-#: faugus/launcher.py:3190 faugus/launcher.py:6245 faugus/launcher.py:8259
+#: faugus/launcher.py:3190 faugus/launcher.py:6235 faugus/launcher.py:8251
 msgid "Select a file to run in the prefix"
 msgstr "Välj en fil att köra i prefixet"
 
@@ -312,11 +312,11 @@ msgstr "Vill du spara ändringarna?"
 msgid "Do you want to discard this prefix?"
 msgstr "Vill du spara ändringarna?"
 
-#: faugus/launcher.py:4682 faugus/launcher.py:6378 faugus/launcher.py:6689
+#: faugus/launcher.py:4682 faugus/launcher.py:6368 faugus/launcher.py:6681
 msgid "Yes"
 msgstr "Ja"
 
-#: faugus/launcher.py:4683 faugus/launcher.py:6379 faugus/launcher.py:6685
+#: faugus/launcher.py:4683 faugus/launcher.py:6369 faugus/launcher.py:6677
 msgid "No"
 msgstr "Nej"
 
@@ -358,481 +358,491 @@ msgstr "Ändra inte installationssökvägen."
 msgid "Please close Wargaming to finish the installation."
 msgstr "Stäng Wargaming för att slutföra installationen."
 
-#: faugus/launcher.py:5321
+#: faugus/launcher.py:5303
 msgid "Settings"
 msgstr "Inställningar"
 
-#: faugus/launcher.py:5442
+#: faugus/launcher.py:5424
 msgid "Language"
 msgstr "Språk"
 
-#: faugus/launcher.py:5446
+#: faugus/launcher.py:5428
 msgid "Interface Mode"
 msgstr "Gränssnittsläge"
 
-#: faugus/launcher.py:5450
+#: faugus/launcher.py:5432
 msgid "List"
 msgstr "Lista"
 
-#: faugus/launcher.py:5451
+#: faugus/launcher.py:5433
 msgid "Grid"
 msgstr "Rutnät"
 
-#: faugus/launcher.py:5452
+#: faugus/launcher.py:5434
 msgid "Covers"
 msgstr "Omslag"
 
-#: faugus/launcher.py:5453
+#: faugus/launcher.py:5435
 msgid "Carrousel"
 msgstr "Karusell"
 
-#: faugus/launcher.py:5455
+#: faugus/launcher.py:5437
 msgid "Background"
 msgstr "Bakgrund"
 
-#: faugus/launcher.py:5458 faugus/launcher.py:5468 faugus/launcher.py:5477
-#: faugus/launcher.py:5485 faugus/launcher.py:8229 faugus/utils.py:1243
+#: faugus/launcher.py:5440 faugus/launcher.py:5450 faugus/launcher.py:5459
+#: faugus/launcher.py:5467 faugus/launcher.py:8221 faugus/utils.py:1243
 #: faugus/utils.py:1923
 msgid "Default"
 msgstr "Standard"
 
-#: faugus/launcher.py:5459
+#: faugus/launcher.py:5441
 msgid "Accent color"
 msgstr "Accentfärg"
 
-#: faugus/launcher.py:5460
+#: faugus/launcher.py:5442
 msgid "Dominant color"
 msgstr "Dominerande färg"
 
-#: faugus/launcher.py:5463
+#: faugus/launcher.py:5445
 msgid "Banner"
 msgstr "Banner"
 
-#: faugus/launcher.py:5465
+#: faugus/launcher.py:5447
 msgid "Theme"
 msgstr "Tema"
 
-#: faugus/launcher.py:5469
+#: faugus/launcher.py:5451
 msgid "System Theme"
 msgstr "Systemtema"
 
-#: faugus/launcher.py:5474
+#: faugus/launcher.py:5456
 msgid "Color Scheme"
 msgstr "Färgschema"
 
-#: faugus/launcher.py:5478
+#: faugus/launcher.py:5460
 msgid "Light"
 msgstr "Ljust"
 
-#: faugus/launcher.py:5479
+#: faugus/launcher.py:5461
 msgid "Dark"
 msgstr "Mörkt"
 
-#: faugus/launcher.py:5482
+#: faugus/launcher.py:5464
 msgid "Accent Color"
 msgstr "Accentfärg"
 
-#: faugus/launcher.py:5497
+#: faugus/launcher.py:5479
 msgid "Startup Window Size"
 msgstr "Fönsterstorlek vid start"
 
-#: faugus/launcher.py:5501
+#: faugus/launcher.py:5483
 msgid "Default size"
 msgstr "Standardstorlek"
 
-#: faugus/launcher.py:5502
+#: faugus/launcher.py:5484
 msgid "Remember size"
 msgstr "Kom ihåg storleken"
 
-#: faugus/launcher.py:5503
+#: faugus/launcher.py:5485
 msgid "Maximized"
 msgstr "Maximerat"
 
-#: faugus/launcher.py:5504
+#: faugus/launcher.py:5486
 msgid "Fullscreen"
 msgstr "Helskärm"
 
-#: faugus/launcher.py:5505 faugus/launcher.py:5988
+#: faugus/launcher.py:5487 faugus/launcher.py:5977
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter växlar helskärmsläge"
 
-#: faugus/launcher.py:5507
+#: faugus/launcher.py:5489
 msgid "Labels"
 msgstr "Etiketter"
 
-#: faugus/launcher.py:5510
+#: faugus/launcher.py:5492
 msgid "Zoom"
 msgstr "Zoom"
 
-#: faugus/launcher.py:5513
+#: faugus/launcher.py:5495
 msgid "SteamGridDB"
 msgstr "SteamGridDB"
 
-#: faugus/launcher.py:5518
+#: faugus/launcher.py:5500
 msgid "API Key"
 msgstr "API nyckel"
 
-#: faugus/launcher.py:5525
+#: faugus/launcher.py:5507
 msgid "Default Prefixes Location"
 msgstr "Standardplats för prefix"
 
-#: faugus/launcher.py:5529
+#: faugus/launcher.py:5511
 msgid "The location where prefixes are created"
 msgstr "Platsen där prefix skapas"
 
-#: faugus/launcher.py:5539
+#: faugus/launcher.py:5521
 msgid "Default Prefix Tools"
 msgstr "Standardverktyg för prefix"
 
-#: faugus/launcher.py:5545
+#: faugus/launcher.py:5527
 msgid "Default Proton"
 msgstr "Standardversion av Proton"
 
-#: faugus/launcher.py:5549 faugus/proton_manager.py:84
+#: faugus/launcher.py:5531 faugus/proton_manager.py:84
 msgid "Proton Manager"
 msgstr "Proton-hanterare"
 
-#: faugus/launcher.py:5552
+#: faugus/launcher.py:5534
 msgid "Miscellaneous"
 msgstr "Övrigt"
 
-#: faugus/launcher.py:5555
+#: faugus/launcher.py:5537
 msgid "Discrete GPU"
 msgstr "Dedikerad GPU"
 
-#: faugus/launcher.py:5557
+#: faugus/launcher.py:5539
 msgid "Auto-close on launch"
 msgstr "Stäng automatiskt när spelet startas"
 
-#: faugus/launcher.py:5559
+#: faugus/launcher.py:5541
 msgid "Autostart"
 msgstr "Autostart"
 
-#: faugus/launcher.py:5561
+#: faugus/launcher.py:5543
 msgid "System tray icon"
 msgstr "Ikon i systemfältet"
 
-#: faugus/launcher.py:5564
+#: faugus/launcher.py:5546
 msgid "Minimized startup"
 msgstr "Starta minimerat"
 
-#: faugus/launcher.py:5567
+#: faugus/launcher.py:5549
 msgid "Monochrome icon"
 msgstr "Monokrom ikon"
 
-#: faugus/launcher.py:5570
+#: faugus/launcher.py:5552
 msgid "Splash window"
 msgstr "Startfönster"
 
-#: faugus/launcher.py:5573
+#: faugus/launcher.py:5555
 msgid "Automatic updates"
 msgstr "Automatiska uppdateringar"
 
-#: faugus/launcher.py:5576
+#: faugus/launcher.py:5558
+msgid "Auto-create shortcuts"
+msgstr ""
+
+#: faugus/launcher.py:5561
+msgid ""
+"Automatically creates shortcuts when installing something through the file "
+"manager"
+msgstr ""
+
+#: faugus/launcher.py:5564
 msgid "Logging"
 msgstr "Loggning"
 
-#: faugus/launcher.py:5579
+#: faugus/launcher.py:5567
 msgid "Categories"
 msgstr "Kategorier"
 
-#: faugus/launcher.py:5581
+#: faugus/launcher.py:5569
 msgid "Sort"
 msgstr "Sortering"
 
-#: faugus/launcher.py:5583
+#: faugus/launcher.py:5571
 msgid "Header bar"
 msgstr "Rubrikfält"
 
-#: faugus/launcher.py:5585
+#: faugus/launcher.py:5573
 msgid "Hidden games"
 msgstr "Dolda spel"
 
-#: faugus/launcher.py:5586
+#: faugus/launcher.py:5574
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H visar eller döljer dolda spel"
 
-#: faugus/launcher.py:5588
+#: faugus/launcher.py:5576
 msgid "Gamepad navigation"
 msgstr "Navigering med handkontroll"
 
-#: faugus/launcher.py:5591
+#: faugus/launcher.py:5579
 msgid "Wayland driver (experimental)"
 msgstr "Wayland-drivrutin (experimentell)"
 
-#: faugus/launcher.py:5594
+#: faugus/launcher.py:5582
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (experimentellt)"
 
-#: faugus/launcher.py:5604 faugus/launcher.py:7046
+#: faugus/launcher.py:5592 faugus/launcher.py:7038
 msgid "Run"
 msgstr "Kör"
 
-#: faugus/launcher.py:5607 faugus/launcher.py:7049
+#: faugus/launcher.py:5595 faugus/launcher.py:7041
 msgid "Run a file in the prefix"
 msgstr "Kör en fil i prefixet"
 
-#: faugus/launcher.py:5611 faugus/launcher.py:7034 faugus/shortcut.py:83
+#: faugus/launcher.py:5599 faugus/launcher.py:7026 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
 msgstr "Kan åtgärda problem med handkontroller i vissa spel"
 
-#: faugus/launcher.py:5612 faugus/launcher.py:7035 faugus/shortcut.py:84
+#: faugus/launcher.py:5600 faugus/launcher.py:7027 faugus/shortcut.py:84
 msgid "No Sleep"
 msgstr "Förhindra viloläge"
 
-#: faugus/launcher.py:5613 faugus/launcher.py:7036 faugus/shortcut.py:85
+#: faugus/launcher.py:5601 faugus/launcher.py:7028 faugus/shortcut.py:85
 msgid "Prevents the system from suspending while gaming"
 msgstr "Förhindrar att systemet försätts i viloläge medan du spelar"
 
-#: faugus/launcher.py:5615
+#: faugus/launcher.py:5603
 msgid "Support the Project"
 msgstr "Stöd projektet"
 
-#: faugus/launcher.py:5630
+#: faugus/launcher.py:5618
 msgid "Backup/Restore Settings"
 msgstr "Säkerhetskopiera/återställ inställningar"
 
-#: faugus/launcher.py:5634
+#: faugus/launcher.py:5622
 msgid "Backup"
 msgstr "Säkerhetskopiera"
 
-#: faugus/launcher.py:5637
+#: faugus/launcher.py:5625
 msgid "Restore"
 msgstr "Återställ"
 
-#: faugus/launcher.py:5644
+#: faugus/launcher.py:5632
 msgid "Global Environment Variables"
 msgstr "Globala miljövariabler"
 
-#: faugus/launcher.py:5926
+#: faugus/launcher.py:5915
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Rensa loggar (%s)"
 
-#: faugus/launcher.py:5929
+#: faugus/launcher.py:5918
 msgid "Clear Logs"
 msgstr "Rensa loggar"
 
-#: faugus/launcher.py:5976
+#: faugus/launcher.py:5965
 msgid "Covers or Carrousel mode"
 msgstr "Omslag eller karusellläge"
 
-#: faugus/launcher.py:5977
+#: faugus/launcher.py:5966
 msgid "Grid, Covers or Carrousel mode"
 msgstr "Rutnät, Omslag eller karusellläge"
 
-#: faugus/launcher.py:6004
+#: faugus/launcher.py:5993
 msgid "Covers or Carrousel mode with SteamGridDB"
 msgstr "Omslag eller karusellläge med SteamGridDB"
 
-#: faugus/launcher.py:6041
+#: faugus/launcher.py:6030
 msgid "Adwaita theme"
 msgstr "Adwaita tema"
 
-#: faugus/launcher.py:6189
+#: faugus/launcher.py:6179
 msgid "Do you want to save the changes?"
 msgstr "Vill du spara ändringarna?"
 
-#: faugus/launcher.py:6299
+#: faugus/launcher.py:6289
 msgid "Select a backup file to restore"
 msgstr "Välj en säkerhetskopia att återställa"
 
-#: faugus/launcher.py:6305
+#: faugus/launcher.py:6295
 msgid "ZIP files"
 msgstr "ZIP-filer"
 
-#: faugus/launcher.py:6320 faugus/launcher.py:6330
+#: faugus/launcher.py:6310 faugus/launcher.py:6320
 msgid "This is not a valid Faugus backup file."
 msgstr "Det här är inte en giltig säkerhetskopia från Faugus."
 
-#: faugus/launcher.py:6369
+#: faugus/launcher.py:6359
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Är du säker på att du vill skriva över inställningarna?"
 
-#: faugus/launcher.py:6386 faugus/launcher.py:8555
+#: faugus/launcher.py:6376 faugus/launcher.py:8547
 msgid "Select a prefix location"
 msgstr "Välj plats för prefixet"
 
-#: faugus/launcher.py:6605
+#: faugus/launcher.py:6597
 #, python-format
 msgid "Duplicate %s"
 msgstr "Duplicera %s"
 
-#: faugus/launcher.py:6611 faugus/launcher.py:6881 faugus/launcher.py:6894
+#: faugus/launcher.py:6603 faugus/launcher.py:6873 faugus/launcher.py:6886
 #: faugus/shortcut.py:44
 msgid "Title"
 msgstr "Titel"
 
-#: faugus/launcher.py:6660
+#: faugus/launcher.py:6652
 #, python-format
 msgid "Delete %s"
 msgstr "Ta bort %s"
 
-#: faugus/launcher.py:6668
+#: faugus/launcher.py:6660
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Är du säker på att du vill ta bort %s?"
 
-#: faugus/launcher.py:6677
+#: faugus/launcher.py:6669
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "VARNING: Det här prefixet används av %d andra spel."
 
-#: faugus/launcher.py:6679
+#: faugus/launcher.py:6671
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "VARNING: Det här prefixet används av 1 annat spel."
 
-#: faugus/launcher.py:6693
+#: faugus/launcher.py:6685
 msgid "Also remove the prefix:"
 msgstr "Ta även bort prefixet:"
 
-#: faugus/launcher.py:6740
+#: faugus/launcher.py:6732
 msgid "New Game/App"
 msgstr "Nytt spel/program"
 
-#: faugus/launcher.py:6864
+#: faugus/launcher.py:6856
 msgid "Steam User"
 msgstr "Steam-användare"
 
-#: faugus/launcher.py:6878 faugus/launcher.py:7451 faugus/launcher.py:7453
+#: faugus/launcher.py:6870 faugus/launcher.py:7443 faugus/launcher.py:7445
 msgid "No Steam users found"
 msgstr "Inga Steam-användare hittades"
 
-#: faugus/launcher.py:6946 faugus/utils.py:1709
+#: faugus/launcher.py:6938 faugus/utils.py:1709
 msgid "Path"
 msgstr "Sökväg"
 
-#: faugus/launcher.py:6950
+#: faugus/launcher.py:6942
 msgid "Path to the game executable"
 msgstr "Sökväg till spelets körbara fil"
 
-#: faugus/launcher.py:6966
+#: faugus/launcher.py:6958
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select an executable"
 msgstr "Välj spelets körbara fil"
 
-#: faugus/launcher.py:6967
+#: faugus/launcher.py:6959
 #, fuzzy
 #| msgid "%s was not installed!"
 msgid "Run an installer"
 msgstr "%s installerades inte!"
 
-#: faugus/launcher.py:6984
+#: faugus/launcher.py:6976
 msgid "Runtime"
 msgstr "Körtid"
 
-#: faugus/launcher.py:6990
+#: faugus/launcher.py:6982
 msgid "Prefix"
 msgstr "Prefix"
 
-#: faugus/launcher.py:6994
+#: faugus/launcher.py:6986
 msgid "Path to the prefix"
 msgstr "Sökväg till prefixet"
 
-#: faugus/launcher.py:7002
+#: faugus/launcher.py:6994
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/launcher.py:7016 faugus/shortcut.py:61
+#: faugus/launcher.py:7008 faugus/shortcut.py:61
 msgid "Game Arguments"
 msgstr "Spelargument"
 
-#: faugus/launcher.py:7021 faugus/shortcut.py:66 faugus/utils.py:1340
+#: faugus/launcher.py:7013 faugus/shortcut.py:66 faugus/utils.py:1340
 msgid "Launch Settings"
 msgstr "Startinställningar"
 
-#: faugus/launcher.py:7024 faugus/shortcut.py:69 faugus/utils.py:1680
+#: faugus/launcher.py:7016 faugus/shortcut.py:69 faugus/utils.py:1680
 msgid "Additional Application"
 msgstr "Ytterligare program"
 
-#: faugus/launcher.py:7027 faugus/shortcut.py:72
+#: faugus/launcher.py:7019 faugus/shortcut.py:72
 msgid "Additional application to run with the game"
 msgstr "Ytterligare program som ska köras tillsammans med spelet"
 
-#: faugus/launcher.py:7029 faugus/shortcut.py:74 faugus/utils.py:1807
+#: faugus/launcher.py:7021 faugus/shortcut.py:74 faugus/utils.py:1807
 msgid "Lossless Scaling Frame Generation"
 msgstr "Bildrutegenerering med Lossless Scaling"
 
-#: faugus/launcher.py:7051
+#: faugus/launcher.py:7043
 msgid "Shortcut"
 msgstr "Genväg"
 
-#: faugus/launcher.py:7056
+#: faugus/launcher.py:7048
 msgid "Desktop"
 msgstr "Skrivbord"
 
-#: faugus/launcher.py:7057
+#: faugus/launcher.py:7049
 msgid "App Menu"
 msgstr "Programmeny"
 
-#: faugus/launcher.py:7058
+#: faugus/launcher.py:7050
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:7112 faugus/launcher.py:7302
+#: faugus/launcher.py:7104 faugus/launcher.py:7294
 msgid "Game/App"
 msgstr "Spel/program"
 
-#: faugus/launcher.py:7113 faugus/launcher.py:7311
+#: faugus/launcher.py:7105 faugus/launcher.py:7303
 msgid "Tools"
 msgstr "Verktyg"
 
-#: faugus/launcher.py:7286
+#: faugus/launcher.py:7278
 msgid "Refresh"
 msgstr "Uppdatera"
 
-#: faugus/launcher.py:7289
+#: faugus/launcher.py:7281
 msgid "Load from file"
 msgstr "Läs in från fil"
 
-#: faugus/launcher.py:7292
+#: faugus/launcher.py:7284
 msgid "Load from URL"
 msgstr "Läs in från URL"
 
-#: faugus/launcher.py:7459 faugus/shortcut.py:175
+#: faugus/launcher.py:7451 faugus/shortcut.py:175
 msgid "Vulkan Layer not found"
 msgstr "Vulkan-lagret hittades inte"
 
-#: faugus/launcher.py:7614
+#: faugus/launcher.py:7606
 msgid "Select an image for the cover"
 msgstr "Välj en bild för omslaget"
 
-#: faugus/launcher.py:7615
+#: faugus/launcher.py:7607
 msgid "Select an image for the banner"
 msgstr "Välj en bild för bannern"
 
-#: faugus/launcher.py:7616
+#: faugus/launcher.py:7608
 msgid "Select an image for the icon"
 msgstr "Välj en bild för ikonen"
 
-#: faugus/launcher.py:7646
+#: faugus/launcher.py:7638
 msgid "Enter the image URL"
 msgstr "Ange bildens URL"
 
-#: faugus/launcher.py:8216
+#: faugus/launcher.py:8208
 msgid "Windows Game"
 msgstr "Windows-spel"
 
-#: faugus/launcher.py:8217
+#: faugus/launcher.py:8209
 msgid "Linux Game"
 msgstr "Linux-spel"
 
-#: faugus/launcher.py:8218
+#: faugus/launcher.py:8210
 msgid "Steam Game"
 msgstr "Steam-spel"
 
-#: faugus/launcher.py:8233
+#: faugus/launcher.py:8225
 msgid "Disabled"
 msgstr "Inaktiverad"
 
-#: faugus/launcher.py:8311
+#: faugus/launcher.py:8303
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select the game installer"
 msgstr "Välj spelets körbara fil"
 
-#: faugus/launcher.py:8524
+#: faugus/launcher.py:8516
 msgid "Select the game executable"
 msgstr "Välj spelets körbara fil"
 
