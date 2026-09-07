@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 04:28+0000\n"
-"PO-Revision-Date: 2026-09-07 04:28+0000\n"
+"PO-Revision-Date: 2026-09-07 16:39+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -301,16 +301,12 @@ msgid "No internet connection"
 msgstr "Sem conexão com a internet"
 
 #: faugus/launcher.py:4668
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard these prefixes?"
-msgstr "Você deseja salvar as alterações?"
+msgstr "Você deseja descartar esses prefixos?"
 
 #: faugus/launcher.py:4669
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
-msgstr "Você deseja salvar as alterações?"
+msgstr "Você desaja descartar esse prefixo?"
 
 #: faugus/launcher.py:4682 faugus/launcher.py:6378 faugus/launcher.py:6689
 msgid "Yes"
