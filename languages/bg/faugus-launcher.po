@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 04:28+0000\n"
-"PO-Revision-Date: 2026-09-06 21:30+0000\n"
+"PO-Revision-Date: 2026-09-07 16:39+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -302,16 +302,12 @@ msgid "No internet connection"
 msgstr "Няма връзка с Интернет"
 
 #: faugus/launcher.py:4668
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard these prefixes?"
-msgstr "Искате ли да запазите промените?"
+msgstr "Искате ли да отхвърлите тези префикси?"
 
 #: faugus/launcher.py:4669
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
-msgstr "Искате ли да запазите промените?"
+msgstr "Искате ли да отхвърлите този префикс?"
 
 #: faugus/launcher.py:4682 faugus/launcher.py:6378 faugus/launcher.py:6689
 msgid "Yes"
@@ -708,16 +704,12 @@ msgid "Path to the game executable"
 msgstr "Път до изпълнимия файл на играта"
 
 #: faugus/launcher.py:6966
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "Изберете изпълнимия файл на играта"
+msgstr "Изберете изпълним файл"
 
 #: faugus/launcher.py:6967
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "%s не се инсталира!"
+msgstr "Стартиране на инсталатор"
 
 #: faugus/launcher.py:6984
 msgid "Runtime"
@@ -828,10 +820,8 @@ msgid "Disabled"
 msgstr "Изключено"
 
 #: faugus/launcher.py:8311
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "Изберете изпълнимия файл на играта"
+msgstr "Изберете инсталатора на играта"
 
 #: faugus/launcher.py:8524
 msgid "Select the game executable"
