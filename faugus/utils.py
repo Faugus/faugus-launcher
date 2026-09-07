@@ -909,6 +909,12 @@ def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel
     content_area.set_vexpand(True)
     content_area.set_hexpand(True)
 
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
+
     box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
     box_top.set_margin_start(20)
     box_top.set_margin_end(20)
@@ -941,7 +947,9 @@ def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel
     button_confirm.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
     box_bottom.append(button_confirm)
 
-    content_area.append(box_top)
+    frame.set_child(box_top)
+
+    content_area.append(frame)
     content_area.append(box_bottom)
 
     def on_response(d, response_id):
