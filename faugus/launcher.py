@@ -4654,11 +4654,37 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.select_game_by_title(title)
 
         else:
-            if os.path.isfile(add_game_dialog.icon_temp):
-                os.remove(add_game_dialog.icon_temp)
-            if os.path.isdir(add_game_dialog.icon_directory):
-                shutil.rmtree(add_game_dialog.icon_directory)
-            destroy_add_game_dialog()
+            def finish_cancel():
+                if os.path.isfile(add_game_dialog.icon_temp):
+                    os.remove(add_game_dialog.icon_temp)
+                if os.path.isdir(add_game_dialog.icon_directory):
+                    shutil.rmtree(add_game_dialog.icon_directory)
+                destroy_add_game_dialog()
+
+            prefixes = add_game_dialog.created_prefixes
+            if prefixes:
+                prefix_list = "\n".join(prefixes)
+                question = (
+                    _("Do you want to discard these prefixes?") if len(prefixes) > 1
+                    else _("Do you want to discard this prefix?")
+                )
+
+                def on_discard_confirmed(confirmed):
+                    if confirmed:
+                        for prefix in prefixes:
+                            shutil.rmtree(prefix, ignore_errors=True)
+                    finish_cancel()
+
+                show_message_dialog(
+                    question,
+                    prefix_list,
+                    parent=add_game_dialog,
+                    confirm_label=_("Yes"),
+                    cancel_label=_("No"),
+                    callback=on_discard_confirmed,
+                )
+            else:
+                finish_cancel()
             dialog_destroyed = True
         if os.path.isfile(cover_path_temp):
             os.remove(cover_path_temp)
@@ -6721,6 +6747,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.parent_window = parent
         self.interface_mode = interface_mode
+        self.created_prefixes = []
 
         cfg = ConfigManager()
         self.steamgriddb_enabled = (
@@ -8218,6 +8245,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.default_sdl_enabled = cfg.config.get('sdl-enabled') == 'True'
         self.default_no_sleep = cfg.config.get('no-sleep-enabled') == 'True'
 
+    def record_created_prefix(self, prefix):
+        if prefix and os.path.isdir(prefix) and prefix not in self.created_prefixes:
+            self.created_prefixes.append(prefix)
+
     def on_button_run_clicked(self, widget):
         validation_result = self.validate_fields(entry="prefix")
         if not validation_result:
@@ -8261,6 +8292,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 def run_command():
                     process = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
                     process.wait()
+                    GLib.idle_add(self.record_created_prefix, prefix)
 
                 run_in_background(run_command)
 
@@ -8311,6 +8343,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 def run_command():
                     process = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
                     process.wait()
+                    GLib.idle_add(self.record_created_prefix, prefix)
 
                     detected_path = detect_installed_executable(prefix, existing_shortcuts)
                     if detected_path:
@@ -8438,6 +8471,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         def run_command():
             process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command], env=subprocess_env())
             process.wait()
+            GLib.idle_add(self.record_created_prefix, prefix)
             GLib.idle_add(self.set_sensitive, True)
 
         run_in_background(run_command)
@@ -8476,6 +8510,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         def run_command():
             process = subprocess.Popen([sys.executable, "-m", "faugus.runner", command, "winetricks"], env=subprocess_env())
             process.wait()
+            GLib.idle_add(self.record_created_prefix, prefix)
             GLib.idle_add(self.set_sensitive, True)
 
         run_in_background(run_command)
