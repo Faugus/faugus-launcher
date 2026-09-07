@@ -8276,7 +8276,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         filechooser = new_file_chooser(
             self,
-            _("Select an game installer"),
+            _("Select the game installer"),
             Gtk.FileChooserAction.OPEN,
         )
         set_file_chooser_start_folder(filechooser, "run_in_prefix")
