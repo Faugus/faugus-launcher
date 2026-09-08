@@ -9,7 +9,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 16:40+0000\n"
 "PO-Revision-Date: 2026-09-08 18:51+0000\n"
-"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: Hosted Weblate user 158752 "
+"<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -979,7 +980,7 @@ msgstr "Wähle einen Befehl oder ein Skript aus"
 
 #: faugus/utils.py:1630
 msgid "Pre-launch"
-msgstr "Vor dem Starten"
+msgstr "Ausführen vor dem Start"
 
 #: faugus/utils.py:1631
 msgid "Command or script to run before the game"
