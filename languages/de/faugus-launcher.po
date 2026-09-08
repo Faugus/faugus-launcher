@@ -9,8 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 16:40+0000\n"
 "PO-Revision-Date: 2026-09-08 18:51+0000\n"
-"Last-Translator: Hosted Weblate user 158752 "
-"<mistahl@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -381,7 +380,7 @@ msgstr "Cover"
 
 #: faugus/launcher.py:5435
 msgid "Carrousel"
-msgstr "Carrousel"
+msgstr "Karussell"
 
 #: faugus/launcher.py:5437
 msgid "Background"
@@ -459,7 +458,7 @@ msgstr "Beschriftungen"
 
 #: faugus/launcher.py:5492
 msgid "Zoom"
-msgstr "Vergrößern"
+msgstr "Vergrößerung einstellen"
 
 #: faugus/launcher.py:5495
 msgid "SteamGridDB"
@@ -630,11 +629,11 @@ msgstr "Cover- oder Karussell-Modus"
 
 #: faugus/launcher.py:5966
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Kachel-, Cover- oder Carrousel-Modus"
+msgstr "Kachel-, Cover- oder Karussell-Modus"
 
 #: faugus/launcher.py:5993
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Cover- oder Carrousel-Modus mit SteamGridDB"
+msgstr "Cover- oder Karussell-Modus mit SteamGridDB"
 
 #: faugus/launcher.py:6030
 msgid "Adwaita theme"
@@ -988,7 +987,7 @@ msgstr "Befehl oder Skript, das vor dem Spiel ausgeführt werden soll"
 
 #: faugus/utils.py:1633
 msgid "Post-launch"
-msgstr "Nach dem Starten"
+msgstr "Ausführen nach dem Beenden"
 
 #: faugus/utils.py:1634
 msgid "Command or script to run after the game"
