@@ -9,7 +9,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 16:40+0000\n"
 "PO-Revision-Date: 2026-09-08 18:51+0000\n"
-"Last-Translator: numerfolt <numerfolt@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: Hosted Weblate user 158752 "
+"<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
@@ -234,7 +235,7 @@ msgstr "Zuletzt verwendet leeren"
 
 #: faugus/launcher.py:2881 faugus/launcher.py:2939
 msgid "Recent"
-msgstr ""
+msgstr "Letzte"
 
 #: faugus/launcher.py:2995
 msgid "hour"
@@ -302,7 +303,7 @@ msgstr "Keine Internetverbindung"
 
 #: faugus/launcher.py:4668
 msgid "Do you want to discard these prefixes?"
-msgstr "Möchtest du diese Prefixe verwerfen?"
+msgstr "Möchtest du diese Präfixe verwerfen?"
 
 #: faugus/launcher.py:4669
 msgid "Do you want to discard this prefix?"
@@ -380,7 +381,7 @@ msgstr "Cover"
 
 #: faugus/launcher.py:5435
 msgid "Carrousel"
-msgstr "Karussell"
+msgstr "Carrousel"
 
 #: faugus/launcher.py:5437
 msgid "Background"
@@ -830,10 +831,8 @@ msgid "Steam Game"
 msgstr "Steam-Spiel"
 
 #: faugus/launcher.py:8225
-#, fuzzy
-#| msgid "Disable Runtime"
 msgid "Disabled"
-msgstr "Deaktiviere Runtime"
+msgstr "Deaktiviert"
 
 #: faugus/launcher.py:8303
 msgid "Select the game installer"
