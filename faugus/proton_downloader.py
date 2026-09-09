@@ -34,6 +34,12 @@ CONFIGS = {
         "api": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases/latest",
         "archive_ext": "x86_64.tar.xz",
     },
+    "wineland": {
+        "label": "Proton-Wineland",
+        "dir": "Proton-Wineland Latest",
+        "api": "https://api.github.com/repos/nanomatters/proton-cachyos/releases/latest",
+        "archive_ext": "x86_64.tar.xz",
+    },
 }
 
 FOREIGN_ARCH_TOKENS = {
@@ -107,6 +113,8 @@ def normalize_version(v):
          .replace("GE-Proton", "")
          .replace("Proton-EM-", "")
          .replace("EM-", "")
+         .replace("cachyos-wineland-", "")
+         .replace("wineland-", "")
          .replace("cachyos-", "")
          .replace("dwproton-", "")
          .replace("DW-Proton-", "")
@@ -189,6 +197,7 @@ def main():
     group.add_argument("--em", action="store_true")
     group.add_argument("--cachyos", action="store_true")
     group.add_argument("--dw", action="store_true")
+    group.add_argument("--wineland", action="store_true")
     args = parser.parse_args()
 
     for key in vars(args):

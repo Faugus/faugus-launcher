@@ -200,7 +200,7 @@ class FaugusRun(HiDpiMixin):
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath not in ["Proton-GE Latest", "Proton-EM Latest", "Proton-CachyOS Latest", "DW-Proton Latest", "umu-steamrt4", "umu-sniper", "umu-soldier", "umu-scout", "umu-host"]:
+        if protonpath and protonpath not in ["Proton-GE Latest", "Proton-EM Latest", "Proton-CachyOS Latest", "DW-Proton Latest", "Proton-Wineland Latest", "umu-steamrt4", "umu-sniper", "umu-soldier", "umu-scout", "umu-host"]:
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -228,6 +228,14 @@ class FaugusRun(HiDpiMixin):
         if protonpath == "DW-Proton Latest":
             self.proton_latest = "--dw"
             self.proton_exists = find_compatibilitytool("DW-Proton Latest") is not None
+
+        if protonpath == "Proton-Wineland Latest":
+            self.proton_latest = "--wineland"
+            self.proton_exists = find_compatibilitytool("Proton-Wineland Latest") is not None
+
+        if protonpath and "wineland" in protonpath.lower():
+            os.environ.pop("PROTON_ENABLE_WAYLAND", None)
+            _env_set.discard("PROTON_ENABLE_WAYLAND")
 
         self.components_exists = (
             os.path.exists(EAC_DIR) and
@@ -603,6 +611,8 @@ class FaugusRun(HiDpiMixin):
                 component = "Proton-CachyOS"
             elif "DW-Proton" in clean_line:
                 component = "DW-Proton"
+            elif "Proton-Wineland" in clean_line:
+                component = "Proton-Wineland"
             elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
                 component = "Steam Runtime"
 
@@ -818,6 +828,7 @@ def build_launch_command(game):
             reserved_names = (
                 "Proton-GE Latest", "Proton-EM Latest",
                 "DW-Proton Latest", "Proton-CachyOS Latest",
+                "Proton-Wineland Latest",
             )
             if os.path.isdir(runner):
                 command_parts.append(f"PROTONPATH={shlex.quote(runner)}")
