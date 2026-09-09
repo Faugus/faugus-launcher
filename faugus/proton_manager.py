@@ -106,6 +106,7 @@ class ProtonDownloader(Gtk.Dialog):
         self.view_stack = Gtk.Stack()
         self.view_stack.set_halign(Gtk.Align.FILL)
         self.view_stack.set_valign(Gtk.Align.FILL)
+        self.view_stack.set_vhomogeneous(False)
         self.view_stack.set_vexpand(True)
         self.view_stack.set_hexpand(True)
 
@@ -139,6 +140,7 @@ class ProtonDownloader(Gtk.Dialog):
         for key, variant in VARIANTS.items():
             grid = Gtk.Grid()
             grid.set_hexpand(True)
+            grid.set_valign(Gtk.Align.CENTER)
             grid.set_row_spacing(5)
             grid.set_column_spacing(20)
             grid.set_margin_start(10)
