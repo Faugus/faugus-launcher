@@ -1297,6 +1297,7 @@ def populate_combobox_with_runners(combobox):
     combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
     combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
     combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
+    combobox.append("Proton-Wineland Latest", "Proton-Wineland {}".format(_("Latest")))
     combobox.append("", "UMU-Proton {}".format(_("Latest")))
 
     if os.path.exists(PROTON_CACHYOS):
@@ -1306,6 +1307,7 @@ def populate_combobox_with_runners(combobox):
         "UMU-Latest", "LegacyRuntime",
         "Proton-GE Latest", "Proton-EM Latest",
         "DW-Proton Latest", "Proton-CachyOS Latest",
+        "Proton-Wineland Latest",
     )
 
     try:

@@ -54,6 +54,13 @@ VARIANTS = {
         "archive_ext": ["x86_64.tar.xz"],
         "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
+    "wineland": {
+        "tab_label": "Proton-Wineland",
+        "api_url": "https://api.github.com/repos/nanomatters/proton-cachyos/releases",
+        "tag_prefix": "",
+        "archive_ext": ["x86_64.tar.xz"],
+        "tag_to_display": lambda tag: f"Proton-Wineland-{tag.removeprefix('cachyos-wineland-').removeprefix('wineland-')}",
+    },
 }
 
 
