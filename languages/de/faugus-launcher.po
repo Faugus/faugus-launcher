@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 16:40+0000\n"
-"PO-Revision-Date: 2026-09-07 16:39+0000\n"
+"PO-Revision-Date: 2026-09-08 18:51+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.9.1.dev0\n"
+"X-Generator: Weblate 2026.9.1\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:159
@@ -235,7 +235,7 @@ msgstr "Zuletzt verwendet leeren"
 
 #: faugus/launcher.py:2881 faugus/launcher.py:2939
 msgid "Recent"
-msgstr ""
+msgstr "Letzte"
 
 #: faugus/launcher.py:2995
 msgid "hour"
@@ -303,13 +303,11 @@ msgstr "Keine Internetverbindung"
 
 #: faugus/launcher.py:4668
 msgid "Do you want to discard these prefixes?"
-msgstr "Möchtest du diese Prefixe verwerfen?"
+msgstr "Möchtest du diese Präfixe verwerfen?"
 
 #: faugus/launcher.py:4669
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
-msgstr "Möchtest du die Änderungen speichern?"
+msgstr "Möchtest du dieses Präfix verwerfen?"
 
 #: faugus/launcher.py:4682 faugus/launcher.py:6368 faugus/launcher.py:6681
 msgid "Yes"
@@ -383,7 +381,7 @@ msgstr "Cover"
 
 #: faugus/launcher.py:5435
 msgid "Carrousel"
-msgstr ""
+msgstr "Karussell"
 
 #: faugus/launcher.py:5437
 msgid "Background"
@@ -461,17 +459,15 @@ msgstr "Beschriftungen"
 
 #: faugus/launcher.py:5492
 msgid "Zoom"
-msgstr "Vergrößern"
+msgstr "Vergrößerung einstellen"
 
 #: faugus/launcher.py:5495
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "SteamGridDB"
-msgstr "SteamGridDB API Key"
+msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5500
 msgid "API Key"
-msgstr ""
+msgstr "API-Schlüssel"
 
 #: faugus/launcher.py:5507
 msgid "Default Prefixes Location"
@@ -531,27 +527,27 @@ msgstr "Automatische Updates"
 
 #: faugus/launcher.py:5558
 msgid "Auto-create shortcuts"
-msgstr ""
+msgstr "Verknüpfungen automatisch erstellen"
 
 #: faugus/launcher.py:5561
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
 msgstr ""
+"Erstellt automatisch Verknüpfungen, wenn etwas mithilfe der Dateiverwaltung "
+"installiert wird"
 
 #: faugus/launcher.py:5564
 msgid "Logging"
 msgstr "Protokollierung"
 
 #: faugus/launcher.py:5567
-#, fuzzy
-#| msgid "Category"
 msgid "Categories"
-msgstr "Kategorie"
+msgstr "Kategorien"
 
 #: faugus/launcher.py:5569
 msgid "Sort"
-msgstr ""
+msgstr "Sortieren"
 
 #: faugus/launcher.py:5571
 msgid "Header bar"
@@ -629,18 +625,16 @@ msgid "Clear Logs"
 msgstr "Protokolle löschen"
 
 #: faugus/launcher.py:5965
-#, fuzzy
-#| msgid "SteamGridDB API Key"
 msgid "Covers or Carrousel mode"
-msgstr "SteamGridDB API Key"
+msgstr "Cover- oder Karussell-Modus"
 
 #: faugus/launcher.py:5966
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Kachel-, Cover- oder Carrousel-Modus"
+msgstr "Kachel-, Cover- oder Karussell-Modus"
 
 #: faugus/launcher.py:5993
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Cover- oder Carrousel-Modus mit SteamGridDB"
+msgstr "Cover- oder Karussell-Modus mit SteamGridDB"
 
 #: faugus/launcher.py:6030
 msgid "Adwaita theme"
@@ -724,16 +718,12 @@ msgid "Path to the game executable"
 msgstr "Pfad zur ausführbaren Spieldatei"
 
 #: faugus/launcher.py:6958
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "Wähle die .exe-Datei des Spiels aus"
+msgstr "Wähle eine ausführbare Datei aus"
 
 #: faugus/launcher.py:6959
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "%s wurde nicht installiert!"
+msgstr "Führe einen Installationsassistenten aus"
 
 #: faugus/launcher.py:6976
 msgid "Runtime"
@@ -841,16 +831,12 @@ msgid "Steam Game"
 msgstr "Steam-Spiel"
 
 #: faugus/launcher.py:8225
-#, fuzzy
-#| msgid "Disable Runtime"
 msgid "Disabled"
-msgstr "Deaktiviere Runtime"
+msgstr "Deaktiviert"
 
 #: faugus/launcher.py:8303
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "Wähle die .exe-Datei des Spiels aus"
+msgstr "Wähle den Installationsassistenten des Spiels aus"
 
 #: faugus/launcher.py:8516
 msgid "Select the game executable"
@@ -994,7 +980,7 @@ msgstr "Wähle einen Befehl oder ein Skript aus"
 
 #: faugus/utils.py:1630
 msgid "Pre-launch"
-msgstr "Vor dem Starten"
+msgstr "Ausführen vor dem Start"
 
 #: faugus/utils.py:1631
 msgid "Command or script to run before the game"
@@ -1002,7 +988,7 @@ msgstr "Befehl oder Skript, das vor dem Spiel ausgeführt werden soll"
 
 #: faugus/utils.py:1633
 msgid "Post-launch"
-msgstr "Nach dem Starten"
+msgstr "Ausführen nach dem Beenden"
 
 #: faugus/utils.py:1634
 msgid "Command or script to run after the game"

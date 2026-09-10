@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 16:40+0000\n"
-"PO-Revision-Date: 2026-09-07 16:39+0000\n"
+"PO-Revision-Date: 2026-09-08 18:51+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.9.1.dev0\n"
+"X-Generator: Weblate 2026.9.1\n"
 
 #: faugus/backup.py:159
 msgid "Backup Settings"
@@ -527,13 +527,15 @@ msgstr "Автоматично обновяване"
 
 #: faugus/launcher.py:5558
 msgid "Auto-create shortcuts"
-msgstr ""
+msgstr "Автоматично създаване на преки пътища"
 
 #: faugus/launcher.py:5561
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
 msgstr ""
+"Автоматично създаване на преки пътища при инсталиране на нещо през файловия "
+"мениджър"
 
 #: faugus/launcher.py:5564
 msgid "Logging"
