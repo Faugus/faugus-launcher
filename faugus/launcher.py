@@ -1932,13 +1932,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         slot["label"].set_visible(getattr(self, 'labels_enabled', False))
 
     def carrousel_radius_for_count(self, n):
-        if n < 3:
+        if n < 2:
             return 0
-        if n < 5:
-            return 1
-        if n < 7:
-            return 2
-        return 3
+        return min(3, n // 2)
 
     def carrousel_fit_radius(self, n, width):
         max_radius = self.carrousel_radius_for_count(n)
