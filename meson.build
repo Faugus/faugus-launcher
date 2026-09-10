@@ -1,6 +1,6 @@
 project(
   'faugus-launcher',
-  version: '2.2.2',
+  version: '2.3.0',
   meson_version: '>=1.2.0',
   license: 'MIT',
   license_files: 'LICENSE',

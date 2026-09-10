@@ -90,22 +90,17 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.2.2-1" date="2026-09-05">
+    <release version="2.3.0-1" date="2026-09-10">
       <description>
         <ul>
-          <li>Added shadow to covers.</li>
-          <li>Added Steam game location option.</li>
-          <li>Added Steam game prefix location option.</li>
-          <li>Added Steam game playtime.</li>
-          <li>Added support for Steam Linux Runtime selection for Linux Games.</li>
-          <li>Pressing OK commits the field being edited in Global Environment Variables and Launch Arguments.</li>
-          <li>Protons installed in Steam Flatpak sandbox are displayed as (Flatpak). These are not handled by Faugus.</li>
-          <li>Displays the number of games in the Carousel according to the window width.</li>
-          <li>Fallback to English if the system language is not supported.</li>
-          <li>The Proton Manager now only fetches the selected Proton, allowing more requests to GitHub before hitting the rate limit.</li>
-          <li>Updated Debian/Ubuntu icoextract dependency.</li>
-          <li>Fixed Accent Color and Color Scheme change inconsistency.</li>
-          <li>Minor visual adjustments.</li>
+          <li>Added an option to run an installer when adding a new game. It automatically grabs the path of the game executable after the installation.</li>
+          <li>Added an option to automatically create shortcuts when installing something through the file manager.</li>
+          <li>The features above are not always 100% accurate because the path is obtained from shortcuts created by Windows and sometimes more than one shortcut is created, which can cause the algorithm to select the wrong path.</li>
+          <li>Added support for Proton-Wineland, which aims to make Windows games and their supporting applications feel at home on a Wayland desktop.</li>
+          <li>Now you can drag and drop a file onto the launcher to start adding a new game.</li>
+          <li>Added a field to search for other SteamGridDB assets.</li>
+          <li>Reworked to allow editing the game title.</li>
+          <li>Show a message asking whether to discard the prefix created when canceling a new game addition.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
