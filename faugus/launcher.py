@@ -4094,6 +4094,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     pass
                 if hasattr(self, 'flowbox'):
                     self.flowbox.invalidate_sort()
+                if self.carrousel_active() and getattr(self, 'carrousel_slots', None):
+                    self.carrousel_resync_after_reorder(game.gameid)
 
         if game.runner == "Steam":
             update_latest_and_sort()
