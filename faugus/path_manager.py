@@ -340,8 +340,8 @@ def _backup_before_legacy_migration():
     try:
         from faugus.migration import _backup_before_migration
         _backup_before_migration()
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Error backing up before migration: {e}")
 
 
 _backup_before_legacy_migration()

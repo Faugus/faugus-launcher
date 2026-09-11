@@ -484,7 +484,7 @@ def _backup_before_migration():
         sys.exit(0)
 
     backup_root = Path(chosen_dir)
-    zip_path = backup_root / f"faugus-migration-backup-{date.today().isoformat()}.zip"
+    archive_base = backup_root / f"faugus-migration-backup-{date.today().isoformat()}"
 
     staging_dir = Path(tempfile.mkdtemp(prefix="faugus-migration-backup-"))
 
@@ -515,7 +515,7 @@ def _backup_before_migration():
     restore_script.chmod(0o755)
 
     backup_root.mkdir(parents=True, exist_ok=True)
-    shutil.make_archive(str(zip_path.with_suffix("")), "zip", root_dir=str(staging_dir))
+    shutil.make_archive(str(archive_base), "gztar", root_dir=str(staging_dir))
     shutil.rmtree(staging_dir)
 
     marker.parent.mkdir(parents=True, exist_ok=True)
