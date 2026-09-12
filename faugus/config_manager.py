@@ -50,6 +50,7 @@ class ConfigManager:
             'steamgriddb-enabled': 'False',
             'background-mode': 'default',
             'banner-enabled': 'True',
+            'grid-position': 'Middle',
             'width': '1280',
             'height': '720',
             'cover-size': '100',

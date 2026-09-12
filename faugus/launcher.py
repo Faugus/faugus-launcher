@@ -394,6 +394,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def carrousel_active(self):
         return self.interface_mode == "Carrousel"
 
+    def grid_position_align(self):
+        return {
+            "Top": Gtk.Align.START,
+            "Middle": Gtk.Align.CENTER,
+            "Bottom": Gtk.Align.END,
+        }.get(getattr(self, 'grid_position', 'Middle'), Gtk.Align.CENTER)
+
     def get_named_rgb(self, name, fallback=(30, 30, 34)):
         found, rgba = Gtk.Box().get_style_context().lookup_color(name)
         if not found:
@@ -1612,6 +1619,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.carrousel_box = self.build_carrousel_widget()
                 self.carrousel_box.set_vexpand(True)
                 right_vbox.append(self.carrousel_box)
+            elif self.interface_mode == "Covers":
+                covers_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
+                covers_wrapper.set_vexpand(True)
+                scroll_box.set_vexpand(False)
+                scroll_box.set_propagate_natural_height(True)
+                self.flowbox.set_margin_top(40)
+                self.flowbox.set_margin_bottom(40)
+                self.flowbox.set_margin_start(40)
+                self.flowbox.set_margin_end(40)
+                if self.grid_position == "Top":
+                    covers_wrapper.set_start_widget(scroll_box)
+                elif self.grid_position == "Bottom":
+                    covers_wrapper.set_end_widget(scroll_box)
+                else:
+                    covers_wrapper.set_center_widget(scroll_box)
+                right_vbox.append(covers_wrapper)
             else:
                 right_vbox.append(scroll_box)
                 scroll_box.set_vexpand(True)
@@ -2009,7 +2032,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         outer.set_can_focus(True)
         outer.set_focusable(True)
         outer.set_halign(Gtk.Align.FILL)
-        outer.set_valign(Gtk.Align.CENTER)
+        outer.set_valign(self.grid_position_align())
         outer.set_hexpand(True)
         outer.set_overflow(Gtk.Overflow.HIDDEN)
 
@@ -3518,6 +3541,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.window_width = int(cfg.config.get('width', 1280))
         self.window_height = int(cfg.config.get('height', 720))
         self.cover_size = int(cfg.config.get('cover-size', 100))
+        self.grid_position = cfg.config.get('grid-position', 'Middle').strip('"')
         self.sort = cfg.config.get('sort', '')
         self.category = cfg.config.get('category', '')
         self.steam_user = cfg.config.get('steam-user', 'all')
@@ -3939,6 +3963,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.zoom_enabled != settings_dialog.checkbox_zoom.get_active():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.grid_position != settings_dialog.combobox_grid_position.get_active_id():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.language != settings_dialog.combobox_language.get_active_id():
@@ -5517,6 +5544,13 @@ class Settings(Gtk.Dialog):
         self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
         self.checkbox_zoom.set_active(True)
 
+        self.label_grid_position = Gtk.Label(label=_("Position"))
+        self.label_grid_position.set_halign(Gtk.Align.START)
+        self.combobox_grid_position = IdComboBox()
+        self.combobox_grid_position.append("Top", _("Top"))
+        self.combobox_grid_position.append("Middle", _("Middle"))
+        self.combobox_grid_position.append("Bottom", _("Bottom"))
+
         self.checkbox_steamgriddb = Gtk.CheckButton(label=_("SteamGridDB"))
         self.checkbox_steamgriddb.set_active(False)
         self.checkbox_steamgriddb.connect("toggled", self.on_checkbox_steamgriddb_toggled)
@@ -5837,6 +5871,9 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.label_startup_window_size, 0, 2, 2, 1)
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
         self.combobox_startup_window_size.set_hexpand(True)
+        self.grid_big_interface.attach(self.label_grid_position, 0, 4, 2, 1)
+        self.grid_big_interface.attach(self.combobox_grid_position, 0, 5, 2, 1)
+        self.combobox_grid_position.set_hexpand(True)
         self.entry_steamgriddb_key.set_hexpand(True)
 
         grid_support.attach(self.label_support, 0, 0, 2, 1)
@@ -5996,6 +6033,10 @@ class Settings(Gtk.Dialog):
 
         self._refresh_banner_checkbox_sensitivity()
 
+        self.label_grid_position.set_sensitive(covers_or_carrousel)
+        self.combobox_grid_position.set_sensitive(covers_or_carrousel)
+        self.combobox_grid_position.set_tooltip_text(None if covers_or_carrousel else covers_carrousel_tip)
+
         self.label_startup_window_size.set_sensitive(not_list)
         self.combobox_startup_window_size.set_sensitive(not_list)
         self.combobox_startup_window_size.set_tooltip_text(
@@ -6103,6 +6144,7 @@ class Settings(Gtk.Dialog):
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
+        config.set_value("grid-position", self.combobox_grid_position.get_active_id())
         config.set_value("labels-enabled", self.checkbox_labels.get_active())
         config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
         config.set_value("steamgriddb-enabled", self.checkbox_steamgriddb.get_active())
@@ -6451,6 +6493,7 @@ class Settings(Gtk.Dialog):
         sort_enabled = cfg.config.get('sort-enabled', 'False') == 'True'
         header_bar = cfg.config.get('header-bar', 'False') == 'True'
         startup_window_size = cfg.config.get('startup-window-size', '')
+        grid_position = cfg.config.get('grid-position', 'Middle').strip('"')
         self.interface_theme = cfg.config.get('interface-theme', 'system')
         self.accent_color = cfg.config.get('accent-color', 'system')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
@@ -6489,6 +6532,7 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.set_active_id(self.interface_mode)
         self.combobox_background.set_active_id(background_mode)
         self.checkbox_banner.set_active(banner_enabled)
+        self.combobox_grid_position.set_active_id(grid_position)
 
         if not self.combobox_theme_engine.set_active_id(self.theme_engine):
             self.combobox_theme_engine.set_active_id("adwaita")
