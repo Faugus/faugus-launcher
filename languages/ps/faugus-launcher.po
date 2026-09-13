@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-12 12:20+0000\n"
+"POT-Creation-Date: 2026-09-13 19:01+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -20,94 +20,213 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 2026.9.dev0\n"
 
-#: faugus/backup.py:159
+#: faugus/backup.py:102
+#, fuzzy
+#| msgid "Default Prefix Tools"
+msgid "Default Prefix"
+msgstr "د پرېفېکس تلواله اوزارونه"
+
+#: faugus/backup.py:348 faugus/backup.py:356
+#, fuzzy
+#| msgid "Last backup:"
+msgid "Faugus Backup"
+msgstr "وروستی شاتړ:"
+
+#: faugus/backup.py:348
+#, fuzzy
+#| msgid "Backup Destination"
+msgid "Backup started"
+msgstr "د شاتړ ځای"
+
+#: faugus/backup.py:356
+#, fuzzy
+#| msgid "Backup now"
+msgid "Backup completed"
+msgstr "همدا اوس شاتړ جوړ کړئ"
+
+#: faugus/backup.py:559 faugus/backup.py:704
+msgid "Calculating..."
+msgstr ""
+
+#: faugus/backup.py:581
+#, fuzzy
+#| msgid "Game/App"
+msgid "Game"
+msgstr "لوبه/اپلېکېشن"
+
+#: faugus/backup.py:586 faugus/backup.py:744 faugus/launcher.py:7069
+msgid "Prefix"
+msgstr "پرېفېکس"
+
+#: faugus/backup.py:591 faugus/backup.py:769
+msgid "Size"
+msgstr ""
+
+#: faugus/backup.py:602 faugus/backup.py:675 faugus/backup.py:780
+#: faugus/backup.py:917
+msgid "Total: {}"
+msgstr ""
+
+#: faugus/backup.py:725 faugus/launcher.py:7191 faugus/launcher.py:7381
+msgid "Game/App"
+msgstr "لوبه/اپلېکېشن"
+
+#: faugus/backup.py:755
+#, fuzzy
+#| msgid "Shortcut"
+msgid "Shortcuts"
+msgstr "لنډلار"
+
+#: faugus/backup.py:943
 msgid "Backup Settings"
 msgstr "د شاتړ امستنې"
 
-#: faugus/backup.py:187
+#: faugus/backup.py:990 faugus/backup.py:1522 faugus/launcher.py:7081
+msgid "Proton"
+msgstr "پروټون"
+
+#: faugus/backup.py:990 faugus/backup.py:1522 faugus/launcher.py:7025
+#: faugus/utils.py:1779
+msgid "Path"
+msgstr "لاره"
+
+#: faugus/backup.py:1022
 msgid "Backup Destination"
 msgstr "د شاتړ ځای"
 
-#: faugus/backup.py:200
+#: faugus/backup.py:1035
 msgid "Backup destination path"
 msgstr "د شاتړ ځای لاره"
 
-#: faugus/backup.py:211
-msgid "Backup now"
-msgstr "همدا اوس شاتړ جوړ کړئ"
-
-#: faugus/backup.py:217
-msgid "Automatic Backup"
-msgstr "اتومات شاتړ"
-
-#: faugus/backup.py:226
-msgid "Daily"
-msgstr "هره ورځ"
-
-#: faugus/backup.py:227
-msgid "Weekly"
-msgstr "هره اونۍ"
-
-#: faugus/backup.py:229
-msgid "Monthly"
-msgstr "هره میاشت"
-
-#: faugus/backup.py:241
-msgid "Monday"
-msgstr "دوشنبه"
-
-#: faugus/backup.py:242
-msgid "Tuesday"
-msgstr "سه‌شنبه"
-
-#: faugus/backup.py:243
-msgid "Wednesday"
-msgstr "چهارشنبه"
-
-#: faugus/backup.py:244
-msgid "Thursday"
-msgstr "پنجشنبه"
-
-#: faugus/backup.py:245
-msgid "Friday"
-msgstr "جمعه"
-
-#: faugus/backup.py:246
-msgid "Saturday"
-msgstr "شنبه"
-
-#: faugus/backup.py:247
-msgid "Sunday"
-msgstr "یکشنبه"
-
-#: faugus/backup.py:266
+#: faugus/backup.py:1048
 msgid "No backup yet"
 msgstr "تر اوسه شاتړ نشته"
 
-#: faugus/backup.py:267 faugus/backup.py:359
+#: faugus/backup.py:1049 faugus/backup.py:1361
 msgid "Last backup:"
 msgstr "وروستی شاتړ:"
 
-#: faugus/backup.py:272
-msgid "Prefixes and Protons will not be backed up!"
-msgstr "پرېفېکسونه او پروټونونه به شاتړ نه شي!"
+#: faugus/backup.py:1053
+msgid "Backup now"
+msgstr "همدا اوس شاتړ جوړ کړئ"
 
-#: faugus/backup.py:275 faugus/launcher.py:5668 faugus/launcher.py:6679
-#: faugus/launcher.py:7150 faugus/launcher.py:7719 faugus/proton_manager.py:324
-#: faugus/shortcut.py:87 faugus/utils.py:510 faugus/utils.py:621
-#: faugus/utils.py:632
+#: faugus/backup.py:1064
+msgid "Automatic Backup"
+msgstr "اتومات شاتړ"
+
+#: faugus/backup.py:1070
+msgid "Monday"
+msgstr "دوشنبه"
+
+#: faugus/backup.py:1071
+msgid "Tuesday"
+msgstr "سه‌شنبه"
+
+#: faugus/backup.py:1072
+msgid "Wednesday"
+msgstr "چهارشنبه"
+
+#: faugus/backup.py:1073
+msgid "Thursday"
+msgstr "پنجشنبه"
+
+#: faugus/backup.py:1074
+msgid "Friday"
+msgstr "جمعه"
+
+#: faugus/backup.py:1075
+msgid "Saturday"
+msgstr "شنبه"
+
+#: faugus/backup.py:1076
+msgid "Sunday"
+msgstr "یکشنبه"
+
+#: faugus/backup.py:1170 faugus/backup.py:1447 faugus/launcher.py:5668
+#: faugus/launcher.py:6697 faugus/launcher.py:7168 faugus/launcher.py:7737
+#: faugus/proton_manager.py:324 faugus/shortcut.py:87 faugus/utils.py:510
+#: faugus/utils.py:621 faugus/utils.py:632
 msgid "Cancel"
 msgstr "لغوه"
 
-#: faugus/backup.py:279 faugus/launcher.py:5672 faugus/launcher.py:6435
-#: faugus/launcher.py:6683 faugus/launcher.py:7154 faugus/launcher.py:7715
-#: faugus/shortcut.py:91 faugus/utils.py:514 faugus/utils.py:998
+#: faugus/backup.py:1174 faugus/backup.py:1451 faugus/backup.py:1614
+#: faugus/launcher.py:5672 faugus/launcher.py:6453 faugus/launcher.py:6701
+#: faugus/launcher.py:7172 faugus/launcher.py:7733 faugus/shortcut.py:91
+#: faugus/utils.py:514 faugus/utils.py:998
 msgid "Ok"
 msgstr "سمه ده"
 
-#: faugus/backup.py:329
+#: faugus/backup.py:1214 faugus/backup.py:1252 faugus/launcher.py:8312
+msgid "Disabled"
+msgstr ""
+
+#: faugus/backup.py:1218 faugus/backup.py:1254
+msgid "Daily"
+msgstr "هره ورځ"
+
+#: faugus/backup.py:1227 faugus/backup.py:1248
+msgid "Weekly"
+msgstr "هره اونۍ"
+
+#: faugus/backup.py:1233 faugus/backup.py:1250
+msgid "Monthly"
+msgstr "هره میاشت"
+
+#: faugus/backup.py:1250
+msgid "Day {}"
+msgstr ""
+
+#: faugus/backup.py:1297
 msgid "Select the backup destination"
 msgstr "د شاتړ ځای وټاکئ"
+
+#: faugus/backup.py:1329
+#, fuzzy
+#| msgid "Backup now"
+msgid "Backup now ({})"
+msgstr "همدا اوس شاتړ جوړ کړئ"
+
+#: faugus/backup.py:1344
+#, fuzzy
+#| msgid "Backup"
+msgid "Backing up..."
+msgstr "شاتړ"
+
+#: faugus/backup.py:1408
+#, fuzzy
+#| msgid "Restore"
+msgid "Restore Backup"
+msgstr "بېرته راګرځول"
+
+#: faugus/backup.py:1437
+#, fuzzy
+#| msgid "Extracting"
+msgid "Extracting backup..."
+msgstr "راایستل"
+
+#: faugus/backup.py:1579
+msgid "Restoring backup..."
+msgstr ""
+
+#: faugus/backup.py:1612
+#, fuzzy
+#| msgid "Failed to remove prefix"
+msgid "Failed to restore backup:"
+msgstr "د پرېفېکس په لرې کولو کې پاتې راغلل"
+
+#: faugus/backup.py:1624 faugus/launcher.py:6441
+msgid "Are you sure you want to overwrite the settings?"
+msgstr "ایا ډاډه یاست چې امستنې بیا ولیکئ؟"
+
+#: faugus/backup.py:1626 faugus/launcher.py:4734 faugus/launcher.py:6453
+#: faugus/launcher.py:6768
+msgid "Yes"
+msgstr "هو"
+
+#: faugus/backup.py:1627 faugus/launcher.py:4735 faugus/launcher.py:6454
+#: faugus/launcher.py:6764
+msgid "No"
+msgstr "نه"
 
 #: faugus/launcher.py:1058 faugus/launcher.py:1256 faugus/launcher.py:1543
 #: faugus/launcher.py:1758 faugus/launcher.py:2353 faugus/launcher.py:2494
@@ -253,7 +372,7 @@ msgstr "دقیقه"
 msgid "minutes"
 msgstr "دقیقې"
 
-#: faugus/launcher.py:3214 faugus/launcher.py:6302 faugus/launcher.py:8320
+#: faugus/launcher.py:3214 faugus/launcher.py:6302 faugus/launcher.py:8338
 msgid "Select a file to run in the prefix"
 msgstr "په پرېفېکس کې د چلولو لپاره فایل وټاکئ"
 
@@ -312,14 +431,6 @@ msgstr "ایا غواړئ بدلونونه خوندي کړئ؟"
 #| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
 msgstr "ایا غواړئ بدلونونه خوندي کړئ؟"
-
-#: faugus/launcher.py:4734 faugus/launcher.py:6435 faugus/launcher.py:6750
-msgid "Yes"
-msgstr "هو"
-
-#: faugus/launcher.py:4735 faugus/launcher.py:6436 faugus/launcher.py:6746
-msgid "No"
-msgstr "نه"
 
 #: faugus/launcher.py:4773 faugus/launcher.py:4941
 #, python-format
@@ -392,8 +503,8 @@ msgid "Background"
 msgstr "شالید"
 
 #: faugus/launcher.py:5492 faugus/launcher.py:5502 faugus/launcher.py:5511
-#: faugus/launcher.py:5519 faugus/launcher.py:8290 faugus/utils.py:1296
-#: faugus/utils.py:1978
+#: faugus/launcher.py:5519 faugus/launcher.py:8308 faugus/utils.py:1311
+#: faugus/utils.py:1993
 msgid "Default"
 msgstr "تلواله"
 
@@ -595,23 +706,23 @@ msgstr "د Wayland چلوونکی (ازمایښتي)"
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (ازمایښتي)"
 
-#: faugus/launcher.py:5651 faugus/launcher.py:7107
+#: faugus/launcher.py:5651 faugus/launcher.py:7125
 msgid "Run"
 msgstr "چلول"
 
-#: faugus/launcher.py:5654 faugus/launcher.py:7110
+#: faugus/launcher.py:5654 faugus/launcher.py:7128
 msgid "Run a file in the prefix"
 msgstr "په پرېفېکس کې فایل چلول"
 
-#: faugus/launcher.py:5658 faugus/launcher.py:7095 faugus/shortcut.py:83
+#: faugus/launcher.py:5658 faugus/launcher.py:7113 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
 msgstr "ښايي په ځینو لوبو کې د لوبې کنټرولر ستونزې هوارې کړي"
 
-#: faugus/launcher.py:5659 faugus/launcher.py:7096 faugus/shortcut.py:84
+#: faugus/launcher.py:5659 faugus/launcher.py:7114 faugus/shortcut.py:84
 msgid "No Sleep"
 msgstr "د خوب مخنیوی"
 
-#: faugus/launcher.py:5660 faugus/launcher.py:7097 faugus/shortcut.py:85
+#: faugus/launcher.py:5660 faugus/launcher.py:7115 faugus/shortcut.py:85
 msgid "Prevents the system from suspending while gaming"
 msgstr "د لوبې پر مهال سیستم له ځنډېدو څخه ساتي"
 
@@ -675,201 +786,177 @@ msgid "Select a backup file to restore"
 msgstr "د بېرته راګرځولو لپاره د شاتړ فایل وټاکئ"
 
 #: faugus/launcher.py:6362
-msgid "ZIP files"
-msgstr "ZIP فایلونه"
+msgid "Faugus Backup files"
+msgstr ""
 
-#: faugus/launcher.py:6377 faugus/launcher.py:6387
+#: faugus/launcher.py:6378 faugus/launcher.py:6417
 msgid "This is not a valid Faugus backup file."
 msgstr "دا د Faugus معتبر شاتړ فایل نه دی."
 
-#: faugus/launcher.py:6426
-msgid "Are you sure you want to overwrite the settings?"
-msgstr "ایا ډاډه یاست چې امستنې بیا ولیکئ؟"
-
-#: faugus/launcher.py:6443 faugus/launcher.py:8622
+#: faugus/launcher.py:6461 faugus/launcher.py:8640
 msgid "Select a prefix location"
 msgstr "د پرېفېکس ځای وټاکئ"
 
-#: faugus/launcher.py:6666
+#: faugus/launcher.py:6684
 #, python-format
 msgid "Duplicate %s"
 msgstr "د %s نقل جوړول"
 
-#: faugus/launcher.py:6672 faugus/launcher.py:6942 faugus/launcher.py:6955
+#: faugus/launcher.py:6690 faugus/launcher.py:6960 faugus/launcher.py:6973
 #: faugus/shortcut.py:44
 msgid "Title"
 msgstr "سرلیک"
 
-#: faugus/launcher.py:6721
+#: faugus/launcher.py:6739
 #, python-format
 msgid "Delete %s"
 msgstr "%s ړنګول"
 
-#: faugus/launcher.py:6729
+#: faugus/launcher.py:6747
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "ایا ډاډه یاست چې %s ړنګ کړئ؟"
 
-#: faugus/launcher.py:6738
+#: faugus/launcher.py:6756
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "خبرداری: دا پرېفېکس د %d نورو لوبو له خوا کارول کېږي."
 
-#: faugus/launcher.py:6740
+#: faugus/launcher.py:6758
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "خبرداری: دا پرېفېکس د یوې بلې لوبې له خوا کارول کېږي."
 
-#: faugus/launcher.py:6754
+#: faugus/launcher.py:6772
 msgid "Also remove the prefix:"
 msgstr "پرېفېکس هم لرې کړئ:"
 
-#: faugus/launcher.py:6801
+#: faugus/launcher.py:6819
 msgid "New Game/App"
 msgstr "نوې لوبه/اپلېکېشن"
 
-#: faugus/launcher.py:6925
+#: faugus/launcher.py:6943
 msgid "Steam User"
 msgstr "د Steam کارن"
 
-#: faugus/launcher.py:6939 faugus/launcher.py:7512 faugus/launcher.py:7514
+#: faugus/launcher.py:6957 faugus/launcher.py:7530 faugus/launcher.py:7532
 msgid "No Steam users found"
 msgstr "د Steam هېڅ کارن ونه موندل شو"
 
-#: faugus/launcher.py:7007 faugus/utils.py:1764
-msgid "Path"
-msgstr "لاره"
-
-#: faugus/launcher.py:7011
+#: faugus/launcher.py:7029
 msgid "Path to the game executable"
 msgstr "د لوبې د اجرا کېدونکي فایل لاره"
 
-#: faugus/launcher.py:7027
+#: faugus/launcher.py:7045
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select an executable"
 msgstr "د لوبې اجرا کېدونکی فایل وټاکئ"
 
-#: faugus/launcher.py:7028
+#: faugus/launcher.py:7046
 #, fuzzy
 #| msgid "%s was not installed!"
 msgid "Run an installer"
 msgstr "%s نصب نه شو!"
 
-#: faugus/launcher.py:7045
+#: faugus/launcher.py:7063
 msgid "Runtime"
 msgstr ""
 
-#: faugus/launcher.py:7051
-msgid "Prefix"
-msgstr "پرېفېکس"
-
-#: faugus/launcher.py:7055
+#: faugus/launcher.py:7073
 msgid "Path to the prefix"
 msgstr "د پرېفېکس لاره"
 
-#: faugus/launcher.py:7063
-msgid "Proton"
-msgstr "پروټون"
-
-#: faugus/launcher.py:7077 faugus/shortcut.py:61
+#: faugus/launcher.py:7095 faugus/shortcut.py:61
 msgid "Game Arguments"
 msgstr "د لوبې پارامترونه"
 
-#: faugus/launcher.py:7082 faugus/shortcut.py:66 faugus/utils.py:1395
+#: faugus/launcher.py:7100 faugus/shortcut.py:66 faugus/utils.py:1410
 msgid "Launch Settings"
 msgstr "د پیل امستنې"
 
-#: faugus/launcher.py:7085 faugus/shortcut.py:69 faugus/utils.py:1735
+#: faugus/launcher.py:7103 faugus/shortcut.py:69 faugus/utils.py:1750
 msgid "Additional Application"
 msgstr "اضافي اپلېکېشن"
 
-#: faugus/launcher.py:7088 faugus/shortcut.py:72
+#: faugus/launcher.py:7106 faugus/shortcut.py:72
 msgid "Additional application to run with the game"
 msgstr "اضافي اپلېکېشن چې له لوبې سره وچلول شي"
 
-#: faugus/launcher.py:7090 faugus/shortcut.py:74 faugus/utils.py:1862
+#: faugus/launcher.py:7108 faugus/shortcut.py:74 faugus/utils.py:1877
 msgid "Lossless Scaling Frame Generation"
 msgstr "د Lossless Scaling چوکاټ جوړونه"
 
-#: faugus/launcher.py:7112
+#: faugus/launcher.py:7130
 msgid "Shortcut"
 msgstr "لنډلار"
 
-#: faugus/launcher.py:7117
+#: faugus/launcher.py:7135
 msgid "Desktop"
 msgstr "ډېسکټاپ"
 
-#: faugus/launcher.py:7118
+#: faugus/launcher.py:7136
 msgid "App Menu"
 msgstr "د اپلېکېشن غورنۍ"
 
-#: faugus/launcher.py:7119
+#: faugus/launcher.py:7137
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:7173 faugus/launcher.py:7363
-msgid "Game/App"
-msgstr "لوبه/اپلېکېشن"
-
-#: faugus/launcher.py:7174 faugus/launcher.py:7372
+#: faugus/launcher.py:7192 faugus/launcher.py:7390
 msgid "Tools"
 msgstr "اوزارونه"
 
-#: faugus/launcher.py:7347
+#: faugus/launcher.py:7365
 msgid "Refresh"
 msgstr "تازه کول"
 
-#: faugus/launcher.py:7350
+#: faugus/launcher.py:7368
 msgid "Load from file"
 msgstr "له فایل څخه پورته کول"
 
-#: faugus/launcher.py:7353
+#: faugus/launcher.py:7371
 msgid "Load from URL"
 msgstr "له URL څخه پورته کول"
 
-#: faugus/launcher.py:7520 faugus/shortcut.py:175
+#: faugus/launcher.py:7538 faugus/shortcut.py:175
 msgid "Vulkan Layer not found"
 msgstr "د Vulkan پوړ ونه موندل شو"
 
-#: faugus/launcher.py:7675
+#: faugus/launcher.py:7693
 msgid "Select an image for the cover"
 msgstr "د پوښ لپاره انځور وټاکئ"
 
-#: faugus/launcher.py:7676
+#: faugus/launcher.py:7694
 msgid "Select an image for the banner"
 msgstr "د بینر لپاره انځور وټاکئ"
 
-#: faugus/launcher.py:7677
+#: faugus/launcher.py:7695
 msgid "Select an image for the icon"
 msgstr "د نښې لپاره انځور وټاکئ"
 
-#: faugus/launcher.py:7707
+#: faugus/launcher.py:7725
 msgid "Enter the image URL"
 msgstr "د انځور URL دننه کړئ"
 
-#: faugus/launcher.py:8277
+#: faugus/launcher.py:8295
 msgid "Windows Game"
 msgstr "د Windows لوبه"
 
-#: faugus/launcher.py:8278
+#: faugus/launcher.py:8296
 msgid "Linux Game"
 msgstr "د Linux لوبه"
 
-#: faugus/launcher.py:8279
+#: faugus/launcher.py:8297
 msgid "Steam Game"
 msgstr "د Steam لوبه"
 
-#: faugus/launcher.py:8294
-msgid "Disabled"
-msgstr ""
-
-#: faugus/launcher.py:8372
+#: faugus/launcher.py:8390
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select the game installer"
 msgstr "د لوبې اجرا کېدونکی فایل وټاکئ"
 
-#: faugus/launcher.py:8591
+#: faugus/launcher.py:8609
 msgid "Select the game executable"
 msgstr "د لوبې اجرا کېدونکی فایل وټاکئ"
 
@@ -984,138 +1071,144 @@ msgstr "GameMode ونه موندل شو"
 msgid "Select an icon for the shortcut"
 msgstr "د لنډلار لپاره نښه وټاکئ"
 
-#: faugus/utils.py:1296 faugus/utils.py:1297 faugus/utils.py:1298
-#: faugus/utils.py:1299 faugus/utils.py:1300 faugus/utils.py:1301
+#: faugus/utils.py:1311 faugus/utils.py:1312 faugus/utils.py:1313
+#: faugus/utils.py:1314 faugus/utils.py:1315 faugus/utils.py:1316
 msgid "Latest"
 msgstr "وروستی"
 
-#: faugus/utils.py:1304
+#: faugus/utils.py:1319
 msgid "System"
 msgstr "سیستم"
 
-#: faugus/utils.py:1463
+#: faugus/utils.py:1478
 msgid "Presets"
 msgstr "مخکېني تنظیمات"
 
-#: faugus/utils.py:1551
+#: faugus/utils.py:1566
 msgid "Launch Arguments"
 msgstr "د پیل پارامترونه"
 
-#: faugus/utils.py:1660
+#: faugus/utils.py:1675
 msgid "Select a command or script"
 msgstr "یوه قومانده یا سکرېپټ وټاکئ"
 
-#: faugus/utils.py:1685
+#: faugus/utils.py:1700
 msgid "Pre-launch"
 msgstr "له پیل مخکې"
 
-#: faugus/utils.py:1686
+#: faugus/utils.py:1701
 msgid "Command or script to run before the game"
 msgstr "قومانده یا سکرېپټ چې له لوبې مخکې وچلول شي"
 
-#: faugus/utils.py:1688
+#: faugus/utils.py:1703
 msgid "Post-launch"
 msgstr "له لوبې وروسته"
 
-#: faugus/utils.py:1689
+#: faugus/utils.py:1704
 msgid "Command or script to run after the game"
 msgstr "قومانده یا سکرېپټ چې له لوبې وروسته وچلول شي"
 
-#: faugus/utils.py:1760 faugus/utils.py:1944
+#: faugus/utils.py:1775 faugus/utils.py:1959
 msgid "Enable"
 msgstr "فعالول"
 
-#: faugus/utils.py:1769
+#: faugus/utils.py:1784
 msgid "Path to the application"
 msgstr "د اپلېکېشن لاره"
 
-#: faugus/utils.py:1781
+#: faugus/utils.py:1796
 msgid "Select an additional application"
 msgstr "اضافي اپلېکېشن وټاکئ"
 
-#: faugus/utils.py:1798
+#: faugus/utils.py:1813
 msgid "Delay (seconds)"
 msgstr "ځنډ (ثانیې)"
 
-#: faugus/utils.py:1811
+#: faugus/utils.py:1826
 msgid "Run the application first"
 msgstr "اپلېکېشن لومړی وچلوئ"
 
-#: faugus/utils.py:1895
+#: faugus/utils.py:1910
 msgid "Lossless Scaling Location"
 msgstr "د Lossless Scaling ځای"
 
-#: faugus/utils.py:1903
+#: faugus/utils.py:1918
 msgid "Lossless.dll location"
 msgstr "د Lossless.dll ځای"
 
-#: faugus/utils.py:1915
+#: faugus/utils.py:1930
 msgid "Select the Lossless.dll file"
 msgstr "د Lossless.dll فایل وټاکئ"
 
-#: faugus/utils.py:1948
+#: faugus/utils.py:1963
 msgid "Multiplier"
 msgstr "ضربوونکی"
 
-#: faugus/utils.py:1953
+#: faugus/utils.py:1968
 msgid "Multiply the FPS"
 msgstr "FPS څو برابره کړئ"
 
-#: faugus/utils.py:1955
+#: faugus/utils.py:1970
 msgid "Flow Scale"
 msgstr "د جریان کچه"
 
-#: faugus/utils.py:1962
+#: faugus/utils.py:1977
 msgid "Lower the internal motion estimation resolution"
 msgstr "د حرکت د داخلي اټکل ریزولوشن کم کړئ"
 
-#: faugus/utils.py:1964
+#: faugus/utils.py:1979
 msgid "Performance Mode"
 msgstr "د فعالیت حالت"
 
-#: faugus/utils.py:1965
+#: faugus/utils.py:1980
 msgid "Massively improve performance at the cost of quality"
 msgstr "د کیفیت په بیه فعالیت ډېر ښه کوي"
 
-#: faugus/utils.py:1968
+#: faugus/utils.py:1983
 msgid "HDR Mode"
 msgstr "د HDR حالت"
 
-#: faugus/utils.py:1969
+#: faugus/utils.py:1984
 msgid "Enable special HDR-only behavior"
 msgstr "یوازې د HDR ځانګړی چلند فعال کړئ"
 
-#: faugus/utils.py:1972
+#: faugus/utils.py:1987
 msgid "Present Mode (Experimental)"
 msgstr "د وړاندې کولو حالت (ازمایښتي)"
 
-#: faugus/utils.py:1976
+#: faugus/utils.py:1991
 msgid "Override the present mode"
 msgstr "د وړاندې کولو ټاکلی حالت بدل کړئ"
 
-#: faugus/utils.py:2349
+#: faugus/utils.py:2364
 msgid "No SteamGridDB API key configured."
 msgstr "د SteamGridDB API کیلي نه ده ټاکل شوې."
 
-#: faugus/utils.py:2350
+#: faugus/utils.py:2365
 msgid "Add your API key in Settings first."
 msgstr "لومړی خپله API کیلي په امستنو کې زیاته کړئ."
 
-#: faugus/utils.py:2363
+#: faugus/utils.py:2378
 msgid "Choose a cover"
 msgstr "یو پوښ وټاکئ"
 
-#: faugus/utils.py:2364
+#: faugus/utils.py:2379
 msgid "Choose a banner"
 msgstr "یو بینر وټاکئ"
 
-#: faugus/utils.py:2365
+#: faugus/utils.py:2380
 msgid "Choose an icon"
 msgstr "یوه نښه وټاکئ"
 
-#: faugus/utils.py:2509
+#: faugus/utils.py:2524
 msgid "No results found"
 msgstr "هېڅ پایله ونه موندل شوه"
+
+#~ msgid "Prefixes and Protons will not be backed up!"
+#~ msgstr "پرېفېکسونه او پروټونونه به شاتړ نه شي!"
+
+#~ msgid "ZIP files"
+#~ msgstr "ZIP فایلونه"
 
 #, fuzzy
 #~| msgid "Select a file to run in the prefix"
