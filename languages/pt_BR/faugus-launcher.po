@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-13 22:10+0000\n"
-"PO-Revision-Date: 2026-09-13 22:10+0000\n"
+"PO-Revision-Date: 2026-09-14 01:43+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -20,40 +20,28 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 
 #: faugus/backup.py:102
-#, fuzzy
-#| msgid "Default Prefix Tools"
 msgid "Default Prefix"
-msgstr "Ferramentas do Prefixo Padrão"
+msgstr "Prefixo Padrão"
 
 #: faugus/backup.py:348 faugus/backup.py:356
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Faugus Backup"
-msgstr "Último backup:"
+msgstr "Backup do Faugus"
 
 #: faugus/backup.py:348
-#, fuzzy
-#| msgid "Backup Path"
 msgid "Backup started"
-msgstr "Caminho do Backup"
+msgstr "Backup iniciado"
 
 #: faugus/backup.py:356
-#, fuzzy
-#| msgid "Extraction complete"
 msgid "Backup completed"
-msgstr "Extração finalizada"
+msgstr "Backup finalizado"
 
 #: faugus/backup.py:620 faugus/backup.py:765
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Calculating..."
-msgstr "Extraindo..."
+msgstr "Calculando..."
 
 #: faugus/backup.py:642
-#, fuzzy
-#| msgid "Game/App"
 msgid "Game"
-msgstr "Jogo/Aplicativo"
+msgstr "Jogo"
 
 #: faugus/backup.py:647 faugus/backup.py:805 faugus/launcher.py:7073
 msgid "Prefix"
@@ -66,17 +54,15 @@ msgstr "Tamanho"
 #: faugus/backup.py:663 faugus/backup.py:736 faugus/backup.py:841
 #: faugus/backup.py:978
 msgid "Total:"
-msgstr ""
+msgstr "Total:"
 
 #: faugus/backup.py:786 faugus/launcher.py:7195 faugus/launcher.py:7385
 msgid "Game/App"
 msgstr "Jogo/Aplicativo"
 
 #: faugus/backup.py:816
-#, fuzzy
-#| msgid "Shortcut"
 msgid "Shortcuts"
-msgstr "Atalho"
+msgstr "Atalhos"
 
 #: faugus/backup.py:1004
 msgid "Backup Settings"
@@ -174,42 +160,32 @@ msgid "Monthly"
 msgstr "Mensal"
 
 #: faugus/backup.py:1311
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "Diário"
+msgstr "Dia"
 
 #: faugus/backup.py:1358
 msgid "Select the backup destination"
 msgstr "Selecione o destino do backup"
 
 #: faugus/backup.py:1405
-#, fuzzy
-#| msgid "Backup"
 msgid "Backing up..."
-msgstr "Backup"
+msgstr "Fazendo backup..."
 
 #: faugus/backup.py:1470
-#, fuzzy
-#| msgid "Restore"
 msgid "Restore Backup"
-msgstr "Restaurar"
+msgstr "Restaurar Backup"
 
 #: faugus/backup.py:1499
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Extracting backup..."
-msgstr "Extraindo..."
+msgstr "Extraindo backup..."
 
 #: faugus/backup.py:1641
 msgid "Restoring backup..."
-msgstr ""
+msgstr "Restaurando o backup..."
 
 #: faugus/backup.py:1674
-#, fuzzy
-#| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
-msgstr "Falha ao remover o prefixo"
+msgstr "Falha ao restaurar o backup:"
 
 #: faugus/backup.py:1686 faugus/launcher.py:6445
 msgid "Are you sure you want to overwrite the settings?"
@@ -571,19 +547,19 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5551
 msgid "Position"
-msgstr ""
+msgstr "Posição"
 
 #: faugus/launcher.py:5554
 msgid "Top"
-msgstr ""
+msgstr "Topo"
 
 #: faugus/launcher.py:5555
 msgid "Middle"
-msgstr ""
+msgstr "Meio"
 
 #: faugus/launcher.py:5556
 msgid "Bottom"
-msgstr ""
+msgstr "Base"
 
 #: faugus/launcher.py:5558
 msgid "SteamGridDB"
@@ -771,7 +747,7 @@ msgstr "Selecione um arquivo de backup para restaurar"
 
 #: faugus/launcher.py:6366
 msgid "Faugus Backup files"
-msgstr ""
+msgstr "Arquivos de Backup do Faugus"
 
 #: faugus/launcher.py:6382 faugus/launcher.py:6421
 msgid "This is not a valid Faugus backup file."
