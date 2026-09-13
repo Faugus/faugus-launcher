@@ -113,6 +113,34 @@ def _focus_nearest_in_direction(current, direction, root):
     return True
 
 
+def _column_has_toggle(column):
+    return any(isinstance(r, Gtk.CellRendererToggle) for r in column.get_cells())
+
+
+def _focus_treeview_header(treeview, column):
+    columns = treeview.get_columns()
+    target_column = column if column in columns else (columns[0] if columns else None)
+    if target_column is None:
+        return False
+    button = target_column.get_button()
+    if button is None or not button.get_mapped() or not button.get_focusable():
+        return False
+    button.grab_focus()
+    return True
+
+
+def _find_treeview_column_for_header_button(button):
+    widget = button.get_parent()
+    while widget is not None:
+        if isinstance(widget, Gtk.TreeView):
+            for column in widget.get_columns():
+                if column.get_button() is button:
+                    return widget, column
+            return None, None
+        widget = widget.get_parent()
+    return None, None
+
+
 def _find_list_base_view(widget):
     while widget:
         if type(widget).__name__ in ("GtkColumnListView", "GridView"):
@@ -452,6 +480,27 @@ def navigate_focus(direction):
     if navigate_main_screen(active_window, focused, direction):
         return True
 
+    if isinstance(focused, Gtk.Button) and direction != Gtk.DirectionType.UP:
+        treeview, column = _find_treeview_column_for_header_button(focused)
+        if treeview is not None:
+            if direction == Gtk.DirectionType.DOWN:
+                model = treeview.get_model()
+                if model and len(model) > 0:
+                    new_path = Gtk.TreePath(0)
+                    treeview.set_cursor(new_path, column, False)
+                    treeview.grab_focus()
+                return True
+
+            columns = [c for c in treeview.get_columns() if c.get_visible() and _column_has_toggle(c)]
+            if column in columns:
+                current_index = columns.index(column)
+                new_index = current_index - 1 if direction == Gtk.DirectionType.LEFT else current_index + 1
+                if 0 <= new_index < len(columns):
+                    other_button = columns[new_index].get_button()
+                    if other_button is not None:
+                        other_button.grab_focus()
+            return True
+
     if isinstance(focused, Gtk.ScrolledWindow):
         target = _find_list_base_descendant(focused)
         if target:
@@ -505,9 +554,17 @@ def navigate_focus(direction):
 
     if isinstance(focused, Gtk.TreeView):
         model = focused.get_model()
-        path, _ = focused.get_cursor()
+        path, column = focused.get_cursor()
 
         if is_horizontal:
+            columns = [c for c in focused.get_columns() if c.get_visible() and _column_has_toggle(c)]
+            if path and columns:
+                current_column = column if column in columns else columns[0]
+                current_index = columns.index(current_column)
+                new_index = current_index - 1 if direction == Gtk.DirectionType.LEFT else current_index + 1
+                if 0 <= new_index < len(columns):
+                    focused.set_cursor(path, columns[new_index], False)
+                    return True
             _focus_nearest_in_direction(focused, direction, active_window)
             return True
 
@@ -519,8 +576,10 @@ def navigate_focus(direction):
 
                 if 0 <= new_index < count:
                     new_path = Gtk.TreePath(new_index)
-                    focused.set_cursor(new_path)
+                    focused.set_cursor(new_path, column, False)
                     focused.scroll_to_cell(new_path, None, False, 0.0, 0.0)
+                elif direction == Gtk.DirectionType.UP and _focus_treeview_header(focused, column):
+                    pass
                 elif not _focus_nearest_in_direction(focused, direction, active_window) and direction == Gtk.DirectionType.UP:
                     titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
                     if isinstance(titlebar, Gtk.HeaderBar):
