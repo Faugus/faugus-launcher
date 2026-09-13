@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-12 12:20+0000\n"
-"PO-Revision-Date: 2026-09-12 12:20+0000\n"
+"PO-Revision-Date: 2026-09-13 19:00+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -462,19 +462,19 @@ msgstr "缩放"
 
 #: faugus/launcher.py:5547
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: faugus/launcher.py:5550
 msgid "Top"
-msgstr ""
+msgstr "顶部"
 
 #: faugus/launcher.py:5551
 msgid "Middle"
-msgstr ""
+msgstr "居中"
 
 #: faugus/launcher.py:5552
 msgid "Bottom"
-msgstr ""
+msgstr "底部"
 
 #: faugus/launcher.py:5554
 msgid "SteamGridDB"
