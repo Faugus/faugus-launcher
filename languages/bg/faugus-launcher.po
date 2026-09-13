@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-12 12:20+0000\n"
-"PO-Revision-Date: 2026-09-08 18:51+0000\n"
+"PO-Revision-Date: 2026-09-13 19:01+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.9.1\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: faugus/backup.py:159
 msgid "Backup Settings"
@@ -463,19 +463,19 @@ msgstr "Мащабиране"
 
 #: faugus/launcher.py:5547
 msgid "Position"
-msgstr ""
+msgstr "Позиция"
 
 #: faugus/launcher.py:5550
 msgid "Top"
-msgstr ""
+msgstr "Най-отгоре"
 
 #: faugus/launcher.py:5551
 msgid "Middle"
-msgstr ""
+msgstr "В средата"
 
 #: faugus/launcher.py:5552
 msgid "Bottom"
-msgstr ""
+msgstr "Най-отдолу"
 
 #: faugus/launcher.py:5554
 msgid "SteamGridDB"
