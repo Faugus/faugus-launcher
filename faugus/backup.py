@@ -444,14 +444,16 @@ def should_run_backup(config):
     if config.get('backup-auto-enabled', 'False') != 'True':
         return False
 
-    last_backup_str = config.get('backup-last-date', '2000-01-01')
-    if not last_backup_str or last_backup_str.strip() == "":
-        last_backup_str = '2000-01-01'
+    last_backup_str = config.get('backup-last-auto-date', '')
 
-    try:
-        last_backup = datetime.strptime(last_backup_str.split(" ")[0], "%Y-%m-%d").date()
-    except ValueError:
-        last_backup = datetime(2000, 1, 1).date()
+    last_backup = datetime(2000, 1, 1)
+    if last_backup_str and last_backup_str.strip():
+        for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
+            try:
+                last_backup = datetime.strptime(last_backup_str.strip(), fmt)
+                break
+            except ValueError:
+                continue
 
     now = datetime.now()
     today = now.date()
@@ -461,24 +463,20 @@ def should_run_backup(config):
     except ValueError:
         target_time = datetime.strptime('00:00', "%H:%M").time()
 
-    if today <= last_backup or now.time() < target_time:
-        return False
-
     freq = config.get('backup-frequency', 'daily')
     target_day = int(config.get('backup-target-day', '0'))
 
-    if freq == 'daily':
-        return True
-    elif freq == 'weekly':
-        today_dow = today.weekday()
-        days_ago = (today_dow - target_day) % 7
-        last_target_date = today - timedelta(days=days_ago)
-        return last_backup < last_target_date
+    if freq == 'weekly':
+        days_ago = (today.weekday() - target_day) % 7
+        target_date = today - timedelta(days=days_ago)
     elif freq == 'monthly':
-        last_target_date = get_last_monthly_target(today, target_day)
-        return last_backup < last_target_date
+        target_date = get_last_monthly_target(today, target_day)
+    else:
+        target_date = today
 
-    return False
+    target_datetime = datetime.combine(target_date, target_time)
+
+    return now >= target_datetime and last_backup < target_datetime
 
 
 def daemon_mode():
@@ -495,6 +493,7 @@ def daemon_mode():
                 prefixes, shortcuts, protons, games = backup_selection_from_config(config)
                 new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
                 config['backup-last-date'] = new_date
+                config['backup-last-auto-date'] = new_date
                 save_config(config)
         except Exception:
             pass
@@ -1433,6 +1432,7 @@ class BackupWindow(Gtk.Dialog):
 
                 new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
                 self.config['backup-last-date'] = new_date
+                self.config['backup-last-auto-date'] = new_date
                 save_config(self.config)
             except Exception:
                 pass
