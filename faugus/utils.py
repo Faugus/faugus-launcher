@@ -1113,17 +1113,17 @@ def choose_shortcut_icon(obj):
     filechooser.present()
 
 
-_registered_css_keys = set()
+_css_providers = {}
 
 
 def add_css_once(key, css, priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION):
-    if key in _registered_css_keys:
-        return
-    _registered_css_keys.add(key)
+    css_provider = _css_providers.get(key)
+    if css_provider is None:
+        css_provider = Gtk.CssProvider()
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, priority)
+        _css_providers[key] = css_provider
 
-    css_provider = Gtk.CssProvider()
     css_provider.load_from_data(css.encode('utf-8') if isinstance(css, str) else css)
-    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, priority)
 
 
 def load_red_entry_css():
@@ -1148,6 +1148,21 @@ def load_frame_css():
         }
         """,
         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+    )
+
+
+def load_compact_time_spin_css():
+    add_css_once(
+        "compact_time_spin",
+        """
+        spinbutton.compact-time-spin {
+            padding: 0;
+        }
+        spinbutton.compact-time-spin text {
+            padding: 0 2px;
+        }
+        """,
+        Gtk.STYLE_PROVIDER_PRIORITY_USER,
     )
 
 

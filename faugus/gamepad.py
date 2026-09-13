@@ -453,6 +453,14 @@ def _handle_treeview_confirm(treeview):
     if column is None:
         return
 
+    toggle_renderer = next(
+        (r for r in column.get_cells() if isinstance(r, Gtk.CellRendererToggle)),
+        None
+    )
+    if toggle_renderer:
+        toggle_renderer.emit("toggled", path.to_string())
+        return
+
     editable_renderer = next(
         (r for r in column.get_cells() if isinstance(r, Gtk.CellRendererText) and r.get_property("editable")),
         None

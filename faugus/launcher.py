@@ -6359,7 +6359,8 @@ class Settings(Gtk.Dialog):
         set_file_chooser_start_folder(filechooser, "restore_backup")
 
         zip_filter = Gtk.FileFilter()
-        zip_filter.set_name(_("ZIP files"))
+        zip_filter.set_name(_("Faugus Backup files"))
+        zip_filter.add_pattern("*.tar")
         zip_filter.add_pattern("*.zip")
         filechooser.add_filter(zip_filter)
         filechooser.set_filter(zip_filter)
@@ -6377,53 +6378,70 @@ class Settings(Gtk.Dialog):
                     self, _("This is not a valid Faugus backup file."), False, lambda ok: None)
                 return
 
+            from faugus.backup import RestoreWindow, restore_legacy_flat
+
+            restore_dialog = RestoreWindow(self)
+
+            def on_restore_response(dialog, response_id):
+                if response_id == Gtk.ResponseType.OK:
+                    global faugus_backup
+                    faugus_backup = True
+                    self.response(Gtk.ResponseType.OK)
+                destroy_and_release(dialog)
+
+            restore_dialog.connect("response", on_restore_response)
+            restore_dialog.present()
+
             temp_dir = os.path.join(FAUGUS_TEMP, "temp-restore")
-            shutil.unpack_archive(zip_file, temp_dir, "zip")
 
-            marker_path = os.path.join(temp_dir, ".faugus_marker")
-            if not os.path.exists(marker_path):
-                shutil.rmtree(temp_dir)
+            def extract_worker():
+                error = None
+                try:
+                    if zip_file.lower().endswith(".zip"):
+                        shutil.unpack_archive(zip_file, temp_dir)
+                    else:
+                        shutil.unpack_archive(zip_file, temp_dir, filter="fully_trusted")
+                except Exception as e:
+                    error = e
+                GLib.idle_add(on_extracted, error)
+
+            def on_extracted(error):
+                if restore_dialog.is_closed:
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    return False
+
+                if error is not None or not os.path.exists(os.path.join(temp_dir, ".faugus_marker")):
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    restore_dialog.discard()
+                    self.show_warning_dialog_settings(
+                        self, _("This is not a valid Faugus backup file."), False, lambda ok: None)
+                    return False
+
+                manifest_path = os.path.join(temp_dir, "manifest.json")
+
+                if os.path.isfile(manifest_path):
+                    manifest = load_json_file(manifest_path, default={})
+                    restore_dialog.load_content(temp_dir, manifest)
+                    return False
+
+                restore_dialog.discard()
+
+                def on_confirm(ok):
+                    if not ok:
+                        shutil.rmtree(temp_dir)
+                        return
+
+                    restore_legacy_flat(temp_dir)
+                    shutil.rmtree(temp_dir)
+                    global faugus_backup
+                    faugus_backup = True
+                    self.response(Gtk.ResponseType.OK)
+
                 self.show_warning_dialog_settings(
-                    self, _("This is not a valid Faugus backup file."), False, lambda ok: None)
-                return
+                    self, _("Are you sure you want to overwrite the settings?"), True, on_confirm)
+                return False
 
-            def on_confirm(ok):
-                if not ok:
-                    return
-
-                for item in os.listdir(temp_dir):
-                    if item == ".faugus_marker":
-                        continue
-                    src = os.path.join(temp_dir, item)
-
-                    dst = BACKUP_ITEMS.get(item) or LEGACY_BACKUP_DIR_ITEMS.get(item)
-                    if dst is None:
-                        legacy = LEGACY_FORMAT_ITEMS.get(item)
-                        if legacy is None:
-                            continue
-                        dst, kind = legacy
-                        convert_legacy_format_file(src, dst, kind)
-                        continue
-
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-
-                    if os.path.isdir(dst):
-                        shutil.rmtree(dst)
-                    elif os.path.isfile(dst):
-                        os.remove(dst)
-
-                    if os.path.isdir(src):
-                        shutil.copytree(src, dst)
-                    elif os.path.isfile(src):
-                        shutil.copy2(src, dst)
-
-                shutil.rmtree(temp_dir)
-                global faugus_backup
-                faugus_backup = True
-                self.response(Gtk.ResponseType.OK)
-
-            self.show_warning_dialog_settings(
-                self, _("Are you sure you want to overwrite the settings?"), True, on_confirm)
+            run_in_background(extract_worker)
 
         filechooser.connect("response", on_fc_response)
         filechooser.present()
