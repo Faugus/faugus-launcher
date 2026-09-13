@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-13 19:01+0000\n"
-"PO-Revision-Date: 2026-09-08 18:51+0000\n"
+"PO-Revision-Date: 2026-09-13 22:10+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.9.1\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 
 #: faugus/backup.py:102
@@ -61,7 +61,7 @@ msgstr "Prefixo"
 
 #: faugus/backup.py:591 faugus/backup.py:769
 msgid "Size"
-msgstr ""
+msgstr "Tamanho"
 
 #: faugus/backup.py:602 faugus/backup.py:675 faugus/backup.py:780
 #: faugus/backup.py:917
