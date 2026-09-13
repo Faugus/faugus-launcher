@@ -660,7 +660,7 @@ class PrefixSelectionList(_RowCapMixin):
         self.scrolled_window.set_child(self.treeview)
         self.treeview.connect("map", self._on_treeview_mapped)
 
-        self.label_total_size = Gtk.Label(label=_("Total: {}").format(format_size(0)))
+        self.label_total_size = Gtk.Label(label="{} {}".format(_("Total:"), format_size(0)))
         self.label_total_size.set_halign(Gtk.Align.END)
         self.label_total_size.set_hexpand(True)
 
@@ -733,7 +733,7 @@ class PrefixSelectionList(_RowCapMixin):
                 combined.update(self.inode_maps.get(row[4], {}))
         total = sum(combined.values())
         self.total_size_bytes = total
-        self.label_total_size.set_text(_("Total: {}").format(format_size(total)))
+        self.label_total_size.set_text("{} {}".format(_("Total:"), format_size(total)))
         if self.on_total_changed:
             self.on_total_changed()
 
@@ -838,7 +838,7 @@ class PrefixShortcutList(_RowCapMixin):
         self.scrolled_window.set_child(self.treeview)
         self.treeview.connect("map", self._on_treeview_mapped)
 
-        self.label_total_size = Gtk.Label(label=_("Total: {}").format(format_size(0)))
+        self.label_total_size = Gtk.Label(label="{} {}".format(_("Total:"), format_size(0)))
         self.label_total_size.set_halign(Gtk.Align.END)
         self.label_total_size.set_hexpand(True)
 
@@ -975,7 +975,7 @@ class PrefixShortcutList(_RowCapMixin):
                 combined.update(self.inode_maps.get(row[7], {}))
         total = sum(combined.values())
         self.total_size_bytes = total
-        self.label_total_size.set_text(_("Total: {}").format(format_size(total)))
+        self.label_total_size.set_text("{} {}".format(_("Total:"), format_size(total)))
         if self.on_total_changed:
             self.on_total_changed()
 
@@ -1308,7 +1308,7 @@ class BackupWindow(Gtk.Dialog):
             day_name = self.backup_weekday_choices[self.backup_target_day][1]
             label = "{} ({})".format(_("Weekly"), day_name)
         elif self.backup_frequency == 'monthly':
-            label = "{} ({})".format(_("Monthly"), _("Day {}").format(self.backup_target_day))
+            label = "{} ({} {})".format(_("Monthly"), _("Day"), self.backup_target_day)
         elif self.backup_frequency == 'disabled':
             label = _("Disabled")
         else:
@@ -1387,7 +1387,7 @@ class BackupWindow(Gtk.Dialog):
 
     def update_backup_button_label(self):
         total = self.settings_size_bytes + self.prefix_list.total_size_bytes + self.proton_list.total_size_bytes
-        self.button_backup_now.set_label(_("Backup now ({})").format(format_size(total)))
+        self.button_backup_now.set_label("{} ({})".format(_("Backup now"), format_size(total)))
 
     def on_backup_now_clicked(self, widget):
         if not self.entry_dest.get_text():
