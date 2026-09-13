@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import sys
 import time
 import calendar
@@ -357,18 +358,53 @@ def run_backup_with_notification(dest_path, prefixes, shortcuts=None, protons=No
     return new_date
 
 
+def _daemon_exec_args():
+    if IS_FLATPAK:
+        return ["flatpak", "run", f"--command={LAUNCHER_PATH}", "io.github.Faugus.faugus-launcher", "--daemon"]
+    if LAUNCHER_MODULE_ARGS:
+        return [sys.executable, "-m", "faugus.backup", "--daemon"]
+    return [LAUNCHER_PATH, "--daemon"]
+
+
+def _daemon_is_running():
+    try:
+        for entry in os.scandir("/proc"):
+            if not entry.name.isdigit():
+                continue
+            try:
+                with open(f"/proc/{entry.name}/cmdline", "rb") as f:
+                    cmdline = f.read().decode(errors="ignore")
+            except OSError:
+                continue
+            if "faugus.backup" in cmdline and "--daemon" in cmdline:
+                return True
+    except OSError:
+        pass
+    return False
+
+
+def start_daemon_now():
+    if _daemon_is_running():
+        return
+    try:
+        subprocess.Popen(
+            _daemon_exec_args(),
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        pass
+
+
 def setup_autostart(enable):
     autostart_dir = os.path.expanduser("~/.config/autostart")
     desktop_file = os.path.join(autostart_dir, "faugus-backup.desktop")
 
     if enable:
         os.makedirs(autostart_dir, exist_ok=True)
-        if IS_FLATPAK:
-            exec_line = f"Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher --daemon\n"
-        elif LAUNCHER_MODULE_ARGS:
-            exec_line = f"Exec={sys.executable} -m faugus.backup --daemon\n"
-        else:
-            exec_line = f"Exec={LAUNCHER_PATH} --daemon\n"
+        exec_line = "Exec=" + " ".join(_daemon_exec_args()) + "\n"
         with open(desktop_file, "w") as f:
             f.write("[Desktop Entry]\n")
             f.write("Type=Application\n")
@@ -377,6 +413,7 @@ def setup_autostart(enable):
             f.write("Hidden=false\n")
             f.write("NoDisplay=false\n")
             f.write("X-GNOME-Autostart-enabled=true\n")
+        start_daemon_now()
     else:
         if os.path.exists(desktop_file):
             os.remove(desktop_file)
