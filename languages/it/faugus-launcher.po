@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-13 19:01+0000\n"
-"PO-Revision-Date: 2026-09-13 19:00+0000\n"
+"PO-Revision-Date: 2026-09-13 21:17+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -20,63 +20,49 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:102
-#, fuzzy
-#| msgid "Default Prefix Tools"
 msgid "Default Prefix"
-msgstr "Strumenti Predefiniti del Prefix"
+msgstr "Prefisso Predefinito"
 
 #: faugus/backup.py:348 faugus/backup.py:356
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Faugus Backup"
-msgstr "Ultimo backup:"
+msgstr "Backup di Faugus"
 
 #: faugus/backup.py:348
-#, fuzzy
-#| msgid "Backup Destination"
 msgid "Backup started"
-msgstr "Destinazione Backup"
+msgstr "Backup iniziato"
 
 #: faugus/backup.py:356
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup completed"
-msgstr "Esegui un Backup adesso"
+msgstr "Backup completato"
 
 #: faugus/backup.py:559 faugus/backup.py:704
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Calculating..."
-msgstr "Estrazione in corso..."
+msgstr "Calcolando..."
 
 #: faugus/backup.py:581
-#, fuzzy
-#| msgid "Game/App"
 msgid "Game"
-msgstr "Gioco/App"
+msgstr "Gioco"
 
 #: faugus/backup.py:586 faugus/backup.py:744 faugus/launcher.py:7069
 msgid "Prefix"
-msgstr "Prefix"
+msgstr "Prefisso"
 
 #: faugus/backup.py:591 faugus/backup.py:769
 msgid "Size"
-msgstr ""
+msgstr "Dimensione"
 
 #: faugus/backup.py:602 faugus/backup.py:675 faugus/backup.py:780
 #: faugus/backup.py:917
 msgid "Total: {}"
-msgstr ""
+msgstr "Totale: {}"
 
 #: faugus/backup.py:725 faugus/launcher.py:7191 faugus/launcher.py:7381
 msgid "Game/App"
 msgstr "Gioco/App"
 
 #: faugus/backup.py:755
-#, fuzzy
-#| msgid "Shortcut"
 msgid "Shortcuts"
-msgstr "Scorciatoia"
+msgstr "Scorciatoie"
 
 #: faugus/backup.py:943
 msgid "Backup Settings"
@@ -175,45 +161,35 @@ msgstr "Mensile"
 
 #: faugus/backup.py:1250
 msgid "Day {}"
-msgstr ""
+msgstr "Giorno {}"
 
 #: faugus/backup.py:1297
 msgid "Select the backup destination"
 msgstr "Seleziona la destinazione del backup"
 
 #: faugus/backup.py:1329
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup now ({})"
-msgstr "Esegui un Backup adesso"
+msgstr "Esegui un Backup adesso ({})"
 
 #: faugus/backup.py:1344
-#, fuzzy
-#| msgid "Backup"
 msgid "Backing up..."
-msgstr "Backup"
+msgstr "Eseguendo Backup..."
 
 #: faugus/backup.py:1408
-#, fuzzy
-#| msgid "Restore"
 msgid "Restore Backup"
-msgstr "Ripristina"
+msgstr "Ripristina Backup"
 
 #: faugus/backup.py:1437
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Extracting backup..."
-msgstr "Estrazione in corso..."
+msgstr "Estrazione del backup..."
 
 #: faugus/backup.py:1579
 msgid "Restoring backup..."
-msgstr ""
+msgstr "Ripristinando backup..."
 
 #: faugus/backup.py:1612
-#, fuzzy
-#| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
-msgstr "Rimozione prefix fallita"
+msgstr "Ripristino del backup fallito:"
 
 #: faugus/backup.py:1624 faugus/launcher.py:6441
 msgid "Are you sure you want to overwrite the settings?"
@@ -339,7 +315,7 @@ msgstr "Apri posizione del gioco"
 
 #: faugus/launcher.py:2878
 msgid "Open prefix location"
-msgstr "Apri posizione del prefix"
+msgstr "Apri posizione del prefisso"
 
 #: faugus/launcher.py:2881
 msgid "Show logs"
@@ -347,7 +323,7 @@ msgstr "Visualizza registri"
 
 #: faugus/launcher.py:2888
 msgid "Run file in the prefix"
-msgstr "Esegui file all'interno del prefix"
+msgstr "Esegui file all'interno del prefisso"
 
 #: faugus/launcher.py:2902
 msgid "Clear recent"
@@ -375,7 +351,7 @@ msgstr "minuti"
 
 #: faugus/launcher.py:3214 faugus/launcher.py:6302 faugus/launcher.py:8338
 msgid "Select a file to run in the prefix"
-msgstr "Seleziona un file da avviare all'interno del prefix"
+msgstr "Seleziona un file da avviare all'interno del prefisso"
 
 #: faugus/launcher.py:3257
 #, python-format
@@ -415,7 +391,7 @@ msgstr "Modifica %s"
 
 #: faugus/launcher.py:4430
 msgid "Failed to remove prefix"
-msgstr "Rimozione prefix fallita"
+msgstr "Rimozione prefisso fallita"
 
 #: faugus/launcher.py:4679
 msgid "No internet connection"
@@ -423,11 +399,11 @@ msgstr "Nessuna connessione a internet"
 
 #: faugus/launcher.py:4720
 msgid "Do you want to discard these prefixes?"
-msgstr "Vuoi cancellare questi prefix?"
+msgstr "Vuoi cancellare questi prefissi?"
 
 #: faugus/launcher.py:4721
 msgid "Do you want to discard this prefix?"
-msgstr "Vuoi cancellare questo prefix?"
+msgstr "Vuoi cancellare questo prefisso?"
 
 #: faugus/launcher.py:4773 faugus/launcher.py:4941
 #, python-format
@@ -599,15 +575,15 @@ msgstr "Chiave API"
 
 #: faugus/launcher.py:5566
 msgid "Default Prefixes Location"
-msgstr "Posizione Predefinita dei Prefix"
+msgstr "Posizione Predefinita dei Prefisso"
 
 #: faugus/launcher.py:5570
 msgid "The location where prefixes are created"
-msgstr "La posizione dove i prefix verranno creati"
+msgstr "La posizione dove i prefissi verranno creati"
 
 #: faugus/launcher.py:5580
 msgid "Default Prefix Tools"
-msgstr "Strumenti Predefiniti del Prefix"
+msgstr "Strumenti Predefiniti del Prefisso"
 
 #: faugus/launcher.py:5586
 msgid "Default Proton"
@@ -707,7 +683,7 @@ msgstr "Esegui"
 
 #: faugus/launcher.py:5654 faugus/launcher.py:7128
 msgid "Run a file in the prefix"
-msgstr "Esegui un file all'interno del prefix"
+msgstr "Esegui un file all'interno del prefisso"
 
 #: faugus/launcher.py:5658 faugus/launcher.py:7113 faugus/shortcut.py:83
 msgid "May fix gamepad issues with some games"
@@ -777,7 +753,7 @@ msgstr "Seleziona un file di backup da ripristinare"
 
 #: faugus/launcher.py:6362
 msgid "Faugus Backup files"
-msgstr ""
+msgstr "File del backup di Faugus"
 
 #: faugus/launcher.py:6378 faugus/launcher.py:6417
 msgid "This is not a valid Faugus backup file."
@@ -785,7 +761,7 @@ msgstr "Questo non è un file di backup valido di Faugus."
 
 #: faugus/launcher.py:6461 faugus/launcher.py:8640
 msgid "Select a prefix location"
-msgstr "Seleziona la posizione del prefix"
+msgstr "Seleziona la posizione del prefisso"
 
 #: faugus/launcher.py:6684
 #, python-format
@@ -810,15 +786,15 @@ msgstr "Sicuri di voler eliminare %s?"
 #: faugus/launcher.py:6756
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
-msgstr "ATTENZIONE: Questo prefix è usato anche da altri %d giochi."
+msgstr "ATTENZIONE: Questo prefisso è usato anche da altri %d giochi."
 
 #: faugus/launcher.py:6758
 msgid "WARNING: This prefix is used by 1 other game."
-msgstr "ATTENZIONE: Questo prefix è usato anche da un altro gioco."
+msgstr "ATTENZIONE: Questo prefisso è usato anche da un altro gioco."
 
 #: faugus/launcher.py:6772
 msgid "Also remove the prefix:"
-msgstr "Rimuovi anche il prefix:"
+msgstr "Rimuovi anche il prefisso:"
 
 #: faugus/launcher.py:6819
 msgid "New Game/App"
@@ -850,7 +826,7 @@ msgstr "Runtime"
 
 #: faugus/launcher.py:7073
 msgid "Path to the prefix"
-msgstr "Percorso del prefix"
+msgstr "Percorso del prefisso"
 
 #: faugus/launcher.py:7095 faugus/shortcut.py:61
 msgid "Game Arguments"
