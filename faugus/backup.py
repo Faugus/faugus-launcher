@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 import sys
 import time
 import calendar
@@ -366,36 +365,48 @@ def _daemon_exec_args():
     return [LAUNCHER_PATH, "--daemon"]
 
 
-def _daemon_is_running():
+def _daemon_token_path():
+    return os.path.join(FAUGUS_LAUNCHER_STATE_DIR, "daemon.token")
+
+
+def _run_scheduled_backup_if_due(config):
+    if not should_run_backup(config):
+        return
+    dest_dir = config.get('backup-dest-dir', '')
+    if not dest_dir:
+        dest_dir = os.path.expanduser("~")
+    dest_path = os.path.join(dest_dir, backup_filename())
+    prefixes, shortcuts, protons, games = backup_selection_from_config(config)
+
+    def worker():
+        try:
+            new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
+            config['backup-last-date'] = new_date
+            config['backup-last-auto-date'] = new_date
+            save_config(config)
+        except Exception:
+            pass
+
+    run_in_background(worker)
+
+
+_daemon_timer_id = None
+
+
+def _daemon_timer_tick():
     try:
-        for entry in os.scandir("/proc"):
-            if not entry.name.isdigit():
-                continue
-            try:
-                with open(f"/proc/{entry.name}/cmdline", "rb") as f:
-                    cmdline = f.read().decode(errors="ignore")
-            except OSError:
-                continue
-            if "faugus.backup" in cmdline and "--daemon" in cmdline:
-                return True
-    except OSError:
+        _run_scheduled_backup_if_due(load_config())
+    except Exception:
         pass
-    return False
+    return True
 
 
 def start_daemon_now():
-    if _daemon_is_running():
+    global _daemon_timer_id
+    if _daemon_timer_id is not None:
         return
-    try:
-        subprocess.Popen(
-            _daemon_exec_args(),
-            start_new_session=True,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-    except OSError:
-        pass
+    _daemon_timer_id = GLib.timeout_add_seconds(60, _daemon_timer_tick)
+    _daemon_timer_tick()
 
 
 def setup_autostart(enable):
@@ -480,7 +491,21 @@ def should_run_backup(config):
 
 
 def daemon_mode():
+    os.makedirs(FAUGUS_LAUNCHER_STATE_DIR, exist_ok=True)
+    token_path = _daemon_token_path()
+    my_token = f"{os.getpid()}-{time.time()}"
+    with open(token_path, "w") as f:
+        f.write(my_token)
+
     while True:
+        try:
+            with open(token_path) as f:
+                current_token = f.read().strip()
+        except OSError:
+            current_token = my_token
+        if current_token != my_token:
+            break
+
         try:
             config = load_config()
             if should_run_backup(config):

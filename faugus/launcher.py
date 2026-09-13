@@ -86,6 +86,10 @@ class FaugusApp(Gtk.Application):
             theme_engine,
         )
 
+        if cfg.config.get('backup-auto-enabled', 'False') == 'True':
+            from faugus.backup import start_daemon_now
+            start_daemon_now()
+
     def do_activate(self):
         if not self.window:
             self.window = Main(self)
