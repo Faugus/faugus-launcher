@@ -14,16 +14,21 @@ from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entr
 from faugus.backup_daemon import (
     load_config,
     save_config,
+    load_json_file,
+    save_json_file,
     get_dir_inode_map,
     get_dir_size,
     get_settings_size_bytes,
     format_size,
     list_installed_protons,
     list_game_prefixes_with_shortcuts,
+    list_faugus_shortcut_files,
     resolve_excluded_ids,
     run_backup_with_notification,
     setup_autostart,
     backup_filename,
+    suppress_immediate_auto_backup,
+    _copy_dir_including,
 )
 
 _ = setup_gettext('faugus-launcher')
@@ -1128,6 +1133,7 @@ class RestoreWindow(Gtk.Dialog):
             self._show_progress(_("Restoring backup..."))
 
             temp_dir = self.temp_dir
+            selected_games = self.prefix_list.get_selected_games()
             selected_shortcuts = self.prefix_list.get_selected_shortcuts()
             selected_prefixes = self.prefix_list.get_selected_prefixes()
             selected_protons = self.proton_list.get_selected()
@@ -1135,7 +1141,15 @@ class RestoreWindow(Gtk.Dialog):
             def restore_worker():
                 error = None
                 try:
-                    restore_settings(os.path.join(temp_dir, "settings"))
+                    restore_settings(os.path.join(temp_dir, "settings"), selected_games)
+                    suppress_immediate_auto_backup(load_config())
+
+                    apps_files, desktop_files = list_faugus_shortcut_files()
+                    for existing in apps_files + desktop_files:
+                        try:
+                            os.remove(existing)
+                        except OSError:
+                            pass
 
                     for item in selected_shortcuts:
                         restore_shortcut_group(temp_dir, item["gameid"], item["files"])
@@ -1178,7 +1192,7 @@ class RestoreWindow(Gtk.Dialog):
         )
 
 
-def restore_settings(settings_dir):
+def restore_settings(settings_dir, selected_games=None):
     if not os.path.isdir(settings_dir):
         return
 
@@ -1199,8 +1213,24 @@ def restore_settings(settings_dir):
         "data": os.path.realpath(FAUGUS_LAUNCHER_SHARE_DIR),
         "state": os.path.realpath(FAUGUS_LAUNCHER_STATE_DIR),
     }
+    is_nested = any(os.path.isdir(os.path.join(settings_dir, name)) for name in faugus_roots)
 
-    if any(os.path.isdir(os.path.join(settings_dir, name)) for name in faugus_roots):
+    selected_ids = set(selected_games) if selected_games is not None else None
+    all_games = []
+    included_image_basenames = set()
+    if selected_ids is not None:
+        games_json_src = os.path.join(settings_dir, "data", "games.json") if is_nested else os.path.join(settings_dir, "games.json")
+        all_games = load_json_file(games_json_src, default=[])
+        for entry in all_games:
+            if not isinstance(entry, dict) or entry.get("gameid") not in selected_ids:
+                continue
+            included_image_basenames.add(f"{entry['gameid']}.png")
+            for field in ("cover", "icon"):
+                value = entry.get(field) or ""
+                if value:
+                    included_image_basenames.add(os.path.basename(value))
+
+    if is_nested:
         for root_name, root_path in faugus_roots.items():
             src_root = os.path.join(settings_dir, root_name)
             if not os.path.isdir(src_root):
@@ -1208,14 +1238,26 @@ def restore_settings(settings_dir):
             os.makedirs(root_path, exist_ok=True)
             for entry in os.scandir(src_root):
                 target = os.path.join(root_path, entry.name)
-                if entry.is_dir():
+                if selected_ids is not None and entry.name == "games.json":
+                    filtered = [g for g in all_games if isinstance(g, dict) and g.get("gameid") in selected_ids]
+                    save_json_file(filtered, target)
+                elif selected_ids is not None and entry.name in ("covers", "banners", "icons"):
+                    _copy_dir_including(entry.path, target, included_image_basenames)
+                elif entry.is_dir():
                     shutil.copytree(entry.path, target, dirs_exist_ok=True)
                 else:
                     shutil.copy2(entry.path, target)
         return
 
     for item in os.listdir(settings_dir):
-        _restore_flat_item(item, os.path.join(settings_dir, item))
+        src = os.path.join(settings_dir, item)
+        if selected_ids is not None and item == "games.json":
+            filtered = [g for g in all_games if isinstance(g, dict) and g.get("gameid") in selected_ids]
+            save_json_file(filtered, GAMES_JSON)
+        elif selected_ids is not None and item in ("covers", "banners", "icons"):
+            _copy_dir_including(src, BACKUP_ITEMS[item], included_image_basenames)
+        else:
+            _restore_flat_item(item, src)
 
 
 def _restore_flat_item(item, src, wipe_existing=False):

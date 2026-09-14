@@ -534,6 +534,12 @@ def backup_filename():
     return f"faugus-launcher-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.tar"
 
 
+def suppress_immediate_auto_backup(config):
+    if 'backup-last-auto-date' in config or config.get('backup-auto-enabled') == 'True':
+        config['backup-last-auto-date'] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        save_config(config)
+
+
 def get_last_monthly_target(today, target_day):
     def safe_replace(date_obj, day):
         try:
