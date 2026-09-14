@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-14 03:32+0000\n"
-"PO-Revision-Date: 2026-09-08 18:51+0000\n"
+"PO-Revision-Date: 2026-09-15 03:51+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -17,17 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.9.1\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: faugus/backup.py:121 faugus/backup.py:266
 msgid "Calculating..."
-msgstr ""
+msgstr "Beräknar..."
 
 #: faugus/backup.py:143
-#, fuzzy
-#| msgid "Game/App"
 msgid "Game"
-msgstr "Spel/program"
+msgstr "Spel"
 
 #: faugus/backup.py:148 faugus/backup.py:306 faugus/launcher.py:7073
 msgid "Prefix"
@@ -35,22 +33,20 @@ msgstr "Prefix"
 
 #: faugus/backup.py:153 faugus/backup.py:331
 msgid "Size"
-msgstr ""
+msgstr "Storlek"
 
 #: faugus/backup.py:164 faugus/backup.py:237 faugus/backup.py:342
 #: faugus/backup.py:479
 msgid "Total:"
-msgstr ""
+msgstr "Totalt:"
 
 #: faugus/backup.py:287 faugus/launcher.py:7195 faugus/launcher.py:7385
 msgid "Game/App"
 msgstr "Spel/program"
 
 #: faugus/backup.py:317
-#, fuzzy
-#| msgid "Shortcut"
 msgid "Shortcuts"
-msgstr "Genväg"
+msgstr "Genvägar"
 
 #: faugus/backup.py:505
 msgid "Backup Settings"
@@ -148,42 +144,32 @@ msgid "Monthly"
 msgstr "Varje månad"
 
 #: faugus/backup.py:812
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "Dagligen"
+msgstr "Dag"
 
 #: faugus/backup.py:859
 msgid "Select the backup destination"
 msgstr "Välj plats för säkerhetskopian"
 
 #: faugus/backup.py:906
-#, fuzzy
-#| msgid "Backup"
 msgid "Backing up..."
-msgstr "Säkerhetskopiera"
+msgstr "Säkerhetskopierar..."
 
 #: faugus/backup.py:957
-#, fuzzy
-#| msgid "Restore"
 msgid "Restore Backup"
-msgstr "Återställ"
+msgstr "Återställ säkerhetskopia"
 
 #: faugus/backup.py:986
-#, fuzzy
-#| msgid "Extracting"
 msgid "Extracting backup..."
-msgstr "Packar upp"
+msgstr "Packar upp säkerhetskopia..."
 
 #: faugus/backup.py:1128
 msgid "Restoring backup..."
-msgstr ""
+msgstr "Återställer säkerhetskopia..."
 
 #: faugus/backup.py:1161
-#, fuzzy
-#| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
-msgstr "Det gick inte att ta bort prefixet"
+msgstr "Misslyckades med att återställa säkerhetskopia:"
 
 #: faugus/backup.py:1173 faugus/launcher.py:6445
 msgid "Are you sure you want to overwrite the settings?"
@@ -200,22 +186,16 @@ msgid "No"
 msgstr "Nej"
 
 #: faugus/backup_daemon.py:145
-#, fuzzy
-#| msgid "Default Prefix Tools"
 msgid "Default Prefix"
-msgstr "Standardverktyg för prefix"
+msgstr "Standard prefix"
 
 #: faugus/backup_daemon.py:391
-#, fuzzy
-#| msgid "Backup Destination"
 msgid "Backup started"
-msgstr "Plats för säkerhetskopia"
+msgstr "Säkerhetskopiering startad"
 
 #: faugus/backup_daemon.py:399
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup completed"
-msgstr "Säkerhetskopiera nu"
+msgstr "Säkerhetskopiering slutförd"
 
 #: faugus/launcher.py:1062 faugus/launcher.py:1260 faugus/launcher.py:1547
 #: faugus/launcher.py:1762 faugus/launcher.py:2357 faugus/launcher.py:2498
@@ -563,19 +543,19 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5551
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: faugus/launcher.py:5554
 msgid "Top"
-msgstr ""
+msgstr "Högst upp"
 
 #: faugus/launcher.py:5555
 msgid "Middle"
-msgstr ""
+msgstr "Mitten"
 
 #: faugus/launcher.py:5556
 msgid "Bottom"
-msgstr ""
+msgstr "Nederst"
 
 #: faugus/launcher.py:5558
 msgid "SteamGridDB"
@@ -762,7 +742,7 @@ msgstr "Välj en säkerhetskopia att återställa"
 
 #: faugus/launcher.py:6366
 msgid "Faugus Backup files"
-msgstr ""
+msgstr "Faugus säkerhetskopieringsfiler"
 
 #: faugus/launcher.py:6382 faugus/launcher.py:6421
 msgid "This is not a valid Faugus backup file."
