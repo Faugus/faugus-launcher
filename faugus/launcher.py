@@ -87,7 +87,7 @@ class FaugusApp(Gtk.Application):
         )
 
         if cfg.config.get('backup-auto-enabled', 'False') == 'True':
-            from faugus.backup import start_daemon_now
+            from faugus.backup_daemon import start_daemon_now
             start_daemon_now()
 
     def do_activate(self):
