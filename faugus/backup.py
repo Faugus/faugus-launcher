@@ -533,11 +533,11 @@ class BackupWindow(Gtk.Dialog):
         self.box_columns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20, homogeneous=True)
         self.main_box.append(self.box_columns)
 
-        self.box_column_auto = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.box_columns.append(self.box_column_auto)
-
         self.box_column_dest = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.box_columns.append(self.box_column_dest)
+
+        self.box_column_auto = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.box_columns.append(self.box_column_auto)
 
         self.box_column_action = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.box_columns.append(self.box_column_action)
