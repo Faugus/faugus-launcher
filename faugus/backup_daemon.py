@@ -445,13 +445,30 @@ def _daemon_timer_tick():
     return True
 
 
+def _daemon_process_running():
+    try:
+        for entry in os.scandir("/proc"):
+            if not entry.name.isdigit():
+                continue
+            try:
+                with open(f"/proc/{entry.name}/cmdline", "rb") as f:
+                    cmdline = f.read().decode(errors="ignore")
+            except OSError:
+                continue
+            if "faugus.backup_daemon" in cmdline and "--daemon" in cmdline:
+                return True
+    except OSError:
+        pass
+    return False
+
+
 def start_daemon_now():
     global _daemon_timer_id
     if _daemon_timer_id is None:
         _daemon_timer_id = GLib.timeout_add_seconds(60, _daemon_timer_tick)
         _daemon_timer_tick()
 
-    if IS_FLATPAK:
+    if IS_FLATPAK or _daemon_process_running():
         return
 
     try:
@@ -462,6 +479,20 @@ def start_daemon_now():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+    except OSError:
+        pass
+
+
+def stop_daemon():
+    global _daemon_timer_id
+    if _daemon_timer_id is not None:
+        GLib.source_remove(_daemon_timer_id)
+        _daemon_timer_id = None
+
+    try:
+        os.makedirs(FAUGUS_LAUNCHER_STATE_DIR, exist_ok=True)
+        with open(_daemon_token_path(), "w") as f:
+            f.write("__stopped__")
     except OSError:
         pass
 
@@ -485,6 +516,7 @@ def setup_autostart(enable):
     else:
         if os.path.exists(desktop_file):
             os.remove(desktop_file)
+        stop_daemon()
 
 
 def backup_filename():
@@ -554,6 +586,7 @@ def daemon_mode():
     with open(token_path, "w") as f:
         f.write(my_token)
 
+    last_check = 0
     while True:
         try:
             with open(token_path) as f:
@@ -563,23 +596,26 @@ def daemon_mode():
         if current_token != my_token:
             break
 
-        try:
-            config = load_config()
-            if should_run_backup(config):
-                dest_dir = config.get('backup-dest-dir', '')
-                if not dest_dir:
-                    dest_dir = os.path.expanduser("~")
+        now = time.monotonic()
+        if now - last_check >= 60:
+            last_check = now
+            try:
+                config = load_config()
+                if should_run_backup(config):
+                    dest_dir = config.get('backup-dest-dir', '')
+                    if not dest_dir:
+                        dest_dir = os.path.expanduser("~")
 
-                dest_path = os.path.join(dest_dir, backup_filename())
+                    dest_path = os.path.join(dest_dir, backup_filename())
 
-                prefixes, shortcuts, protons, games = backup_selection_from_config(config)
-                new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
-                config['backup-last-date'] = new_date
-                config['backup-last-auto-date'] = new_date
-                save_config(config)
-        except Exception:
-            pass
-        time.sleep(60)
+                    prefixes, shortcuts, protons, games = backup_selection_from_config(config)
+                    new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
+                    config['backup-last-date'] = new_date
+                    config['backup-last-auto-date'] = new_date
+                    save_config(config)
+            except Exception:
+                pass
+        time.sleep(5)
 
 
 _ = setup_gettext('faugus-launcher')
