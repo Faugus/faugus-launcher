@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-13 22:10+0000\n"
+"POT-Creation-Date: 2026-09-14 01:43+0000\n"
 "PO-Revision-Date: 2026-08-29 01:19+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -21,210 +21,210 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 
-#: faugus/backup.py:102
-#, fuzzy
-#| msgid "Default Prefix Tools"
-msgid "Default Prefix"
-msgstr "أدوات Prefix الافتراضية"
-
-#: faugus/backup.py:348 faugus/backup.py:356
-#, fuzzy
-#| msgid "Backup"
-msgid "Faugus Backup"
-msgstr "نسخ احتياطي"
-
-#: faugus/backup.py:348
-#, fuzzy
-msgid "Backup started"
-msgstr "نسخ احتياطي / استعادة الإعدادات"
-
-#: faugus/backup.py:356
-#, fuzzy
-#| msgid "Extraction complete"
-msgid "Backup completed"
-msgstr "تم الاستخراج"
-
-#: faugus/backup.py:620 faugus/backup.py:765
+#: faugus/backup.py:128 faugus/backup.py:273
 msgid "Calculating..."
 msgstr ""
 
-#: faugus/backup.py:642
+#: faugus/backup.py:150
 #, fuzzy
 #| msgid "Game/App"
 msgid "Game"
 msgstr "لعبة/تطبيق"
 
-#: faugus/backup.py:647 faugus/backup.py:805 faugus/launcher.py:7073
+#: faugus/backup.py:155 faugus/backup.py:313 faugus/launcher.py:7073
 msgid "Prefix"
 msgstr "Prefix"
 
-#: faugus/backup.py:652 faugus/backup.py:830
+#: faugus/backup.py:160 faugus/backup.py:338
 msgid "Size"
 msgstr ""
 
-#: faugus/backup.py:663 faugus/backup.py:736 faugus/backup.py:841
-#: faugus/backup.py:978
+#: faugus/backup.py:171 faugus/backup.py:244 faugus/backup.py:349
+#: faugus/backup.py:486
 msgid "Total:"
 msgstr ""
 
-#: faugus/backup.py:786 faugus/launcher.py:7195 faugus/launcher.py:7385
+#: faugus/backup.py:294 faugus/launcher.py:7195 faugus/launcher.py:7385
 msgid "Game/App"
 msgstr "لعبة/تطبيق"
 
-#: faugus/backup.py:816
+#: faugus/backup.py:324
 #, fuzzy
 #| msgid "Shortcut"
 msgid "Shortcuts"
 msgstr "اختصار"
 
-#: faugus/backup.py:1004
+#: faugus/backup.py:512
 #, fuzzy
 msgid "Backup Settings"
 msgstr "نسخ احتياطي / استعادة الإعدادات"
 
-#: faugus/backup.py:1051 faugus/backup.py:1584 faugus/launcher.py:7085
+#: faugus/backup.py:559 faugus/backup.py:1092 faugus/launcher.py:7085
 msgid "Proton"
 msgstr ""
 
-#: faugus/backup.py:1051 faugus/backup.py:1584 faugus/launcher.py:7029
+#: faugus/backup.py:559 faugus/backup.py:1092 faugus/launcher.py:7029
 #: faugus/utils.py:1779
 msgid "Path"
 msgstr "المسار"
 
-#: faugus/backup.py:1083
+#: faugus/backup.py:591
 msgid "Backup Destination"
 msgstr ""
 
-#: faugus/backup.py:1096
+#: faugus/backup.py:604
 msgid "Backup destination path"
 msgstr ""
 
-#: faugus/backup.py:1109
+#: faugus/backup.py:617
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:1110 faugus/backup.py:1422
+#: faugus/backup.py:618 faugus/backup.py:930
 msgid "Last backup:"
 msgstr ""
 
-#: faugus/backup.py:1114 faugus/backup.py:1390
+#: faugus/backup.py:622 faugus/backup.py:898
 #, fuzzy
 msgid "Backup now"
 msgstr "نسخ احتياطي"
 
-#: faugus/backup.py:1125
+#: faugus/backup.py:633
 msgid "Automatic Backup"
 msgstr ""
 
-#: faugus/backup.py:1131
+#: faugus/backup.py:639
 msgid "Monday"
 msgstr ""
 
-#: faugus/backup.py:1132
+#: faugus/backup.py:640
 msgid "Tuesday"
 msgstr ""
 
-#: faugus/backup.py:1133
+#: faugus/backup.py:641
 msgid "Wednesday"
 msgstr ""
 
-#: faugus/backup.py:1134
+#: faugus/backup.py:642
 msgid "Thursday"
 msgstr ""
 
-#: faugus/backup.py:1135
+#: faugus/backup.py:643
 msgid "Friday"
 msgstr ""
 
-#: faugus/backup.py:1136
+#: faugus/backup.py:644
 msgid "Saturday"
 msgstr ""
 
-#: faugus/backup.py:1137
+#: faugus/backup.py:645
 msgid "Sunday"
 msgstr ""
 
-#: faugus/backup.py:1231 faugus/backup.py:1509 faugus/launcher.py:5672
+#: faugus/backup.py:739 faugus/backup.py:1017 faugus/launcher.py:5672
 #: faugus/launcher.py:6701 faugus/launcher.py:7172 faugus/launcher.py:7741
 #: faugus/proton_manager.py:324 faugus/shortcut.py:87 faugus/utils.py:510
 #: faugus/utils.py:621 faugus/utils.py:632
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: faugus/backup.py:1235 faugus/backup.py:1513 faugus/backup.py:1676
+#: faugus/backup.py:743 faugus/backup.py:1021 faugus/backup.py:1184
 #: faugus/launcher.py:5676 faugus/launcher.py:6457 faugus/launcher.py:6705
 #: faugus/launcher.py:7176 faugus/launcher.py:7737 faugus/shortcut.py:91
 #: faugus/utils.py:514 faugus/utils.py:998
 msgid "Ok"
 msgstr "موافق"
 
-#: faugus/backup.py:1275 faugus/backup.py:1313 faugus/launcher.py:8316
+#: faugus/backup.py:783 faugus/backup.py:821 faugus/launcher.py:8316
 #, fuzzy
 #| msgid "Disable Hidraw"
 msgid "Disabled"
 msgstr "تعطيل Hidraw"
 
-#: faugus/backup.py:1279 faugus/backup.py:1315
+#: faugus/backup.py:787 faugus/backup.py:823
 msgid "Daily"
 msgstr ""
 
-#: faugus/backup.py:1288 faugus/backup.py:1309
+#: faugus/backup.py:796 faugus/backup.py:817
 msgid "Weekly"
 msgstr ""
 
-#: faugus/backup.py:1294 faugus/backup.py:1311
+#: faugus/backup.py:802 faugus/backup.py:819
 msgid "Monthly"
 msgstr ""
 
-#: faugus/backup.py:1311
+#: faugus/backup.py:819
 msgid "Day"
 msgstr ""
 
-#: faugus/backup.py:1358
+#: faugus/backup.py:866
 #, fuzzy
 msgid "Select the backup destination"
 msgstr "حدد ملف نسخ احتياطي لاستعادته"
 
-#: faugus/backup.py:1405
+#: faugus/backup.py:913
 #, fuzzy
 #| msgid "Backup"
 msgid "Backing up..."
 msgstr "نسخ احتياطي"
 
-#: faugus/backup.py:1470
+#: faugus/backup.py:978
 #, fuzzy
 #| msgid "Restore"
 msgid "Restore Backup"
 msgstr "استعادة"
 
-#: faugus/backup.py:1499
+#: faugus/backup.py:1007
 #, fuzzy
 #| msgid "Extracting {tag}..."
 msgid "Extracting backup..."
 msgstr "جاري استخراج {tag}..."
 
-#: faugus/backup.py:1641
+#: faugus/backup.py:1149
 msgid "Restoring backup..."
 msgstr ""
 
-#: faugus/backup.py:1674
+#: faugus/backup.py:1182
 #, fuzzy
 msgid "Failed to restore backup:"
 msgstr "إزالة prefix أيضًا"
 
-#: faugus/backup.py:1686 faugus/launcher.py:6445
+#: faugus/backup.py:1194 faugus/launcher.py:6445
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "هل أنت متأكد أنك تريد الكتابة فوق الإعدادات؟"
 
-#: faugus/backup.py:1688 faugus/launcher.py:4738 faugus/launcher.py:6457
+#: faugus/backup.py:1196 faugus/launcher.py:4738 faugus/launcher.py:6457
 #: faugus/launcher.py:6772
 msgid "Yes"
 msgstr "نعم"
 
-#: faugus/backup.py:1689 faugus/launcher.py:4739 faugus/launcher.py:6458
+#: faugus/backup.py:1197 faugus/launcher.py:4739 faugus/launcher.py:6458
 #: faugus/launcher.py:6768
 msgid "No"
 msgstr "لا"
+
+#: faugus/backup_daemon.py:146
+#, fuzzy
+#| msgid "Default Prefix Tools"
+msgid "Default Prefix"
+msgstr "أدوات Prefix الافتراضية"
+
+#: faugus/backup_daemon.py:392 faugus/backup_daemon.py:400
+#, fuzzy
+#| msgid "Backup"
+msgid "Faugus Backup"
+msgstr "نسخ احتياطي"
+
+#: faugus/backup_daemon.py:392
+#, fuzzy
+msgid "Backup started"
+msgstr "نسخ احتياطي / استعادة الإعدادات"
+
+#: faugus/backup_daemon.py:400
+#, fuzzy
+#| msgid "Extraction complete"
+msgid "Backup completed"
+msgstr "تم الاستخراج"
 
 #: faugus/launcher.py:1062 faugus/launcher.py:1260 faugus/launcher.py:1547
 #: faugus/launcher.py:1762 faugus/launcher.py:2357 faugus/launcher.py:2498
