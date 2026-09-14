@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-14 03:32+0000\n"
-"PO-Revision-Date: 2026-09-13 21:17+0000\n"
-"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-09-15 03:51+0000\n"
+"Last-Translator: nixxo <nixxo@protonmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -37,10 +37,8 @@ msgstr "Dimensione"
 
 #: faugus/backup.py:164 faugus/backup.py:237 faugus/backup.py:342
 #: faugus/backup.py:479
-#, fuzzy
-#| msgid "Total: {}"
 msgid "Total:"
-msgstr "Totale: {}"
+msgstr "Totale:"
 
 #: faugus/backup.py:287 faugus/launcher.py:7195 faugus/launcher.py:7385
 msgid "Game/App"
@@ -146,10 +144,8 @@ msgid "Monthly"
 msgstr "Mensile"
 
 #: faugus/backup.py:812
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "Giornaliero"
+msgstr "Giorno"
 
 #: faugus/backup.py:859
 msgid "Select the backup destination"
