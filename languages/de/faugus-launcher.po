@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-13 22:10+0000\n"
-"PO-Revision-Date: 2026-09-13 19:00+0000\n"
+"PO-Revision-Date: 2026-09-14 01:43+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -21,40 +21,28 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:102
-#, fuzzy
-#| msgid "Default Prefix Tools"
 msgid "Default Prefix"
-msgstr "Werkzeuge für das Standardpräfix"
+msgstr "Standardpräfix"
 
 #: faugus/backup.py:348 faugus/backup.py:356
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Faugus Backup"
-msgstr "Letzte Sicherung:"
+msgstr "Faugus-Sicherung"
 
 #: faugus/backup.py:348
-#, fuzzy
-#| msgid "Backup Destination"
 msgid "Backup started"
-msgstr "Sicherungs-Ziel"
+msgstr "Sicherungs gestartet"
 
 #: faugus/backup.py:356
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup completed"
-msgstr "Jetzt sichern"
+msgstr "Sicherung beendet"
 
 #: faugus/backup.py:620 faugus/backup.py:765
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Calculating..."
-msgstr "Extrahiere %s..."
+msgstr "Berechne..."
 
 #: faugus/backup.py:642
-#, fuzzy
-#| msgid "Game/App"
 msgid "Game"
-msgstr "Spiel/Anwendung"
+msgstr "Spiel"
 
 #: faugus/backup.py:647 faugus/backup.py:805 faugus/launcher.py:7073
 msgid "Prefix"
@@ -62,22 +50,20 @@ msgstr "Präfix"
 
 #: faugus/backup.py:652 faugus/backup.py:830
 msgid "Size"
-msgstr ""
+msgstr "Größe"
 
 #: faugus/backup.py:663 faugus/backup.py:736 faugus/backup.py:841
 #: faugus/backup.py:978
 msgid "Total:"
-msgstr ""
+msgstr "Total:"
 
 #: faugus/backup.py:786 faugus/launcher.py:7195 faugus/launcher.py:7385
 msgid "Game/App"
 msgstr "Spiel/Anwendung"
 
 #: faugus/backup.py:816
-#, fuzzy
-#| msgid "Shortcut"
 msgid "Shortcuts"
-msgstr "Verknüpfung"
+msgstr "Verknüpfungen"
 
 #: faugus/backup.py:1004
 msgid "Backup Settings"
@@ -175,42 +161,32 @@ msgid "Monthly"
 msgstr "Monatlich"
 
 #: faugus/backup.py:1311
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "Täglich"
+msgstr "Tag"
 
 #: faugus/backup.py:1358
 msgid "Select the backup destination"
 msgstr "Wähle den Speicherort für die Sicherung aus"
 
 #: faugus/backup.py:1405
-#, fuzzy
-#| msgid "Backup"
 msgid "Backing up..."
-msgstr "Sichern"
+msgstr "Sichere..."
 
 #: faugus/backup.py:1470
-#, fuzzy
-#| msgid "Restore"
 msgid "Restore Backup"
-msgstr "Wiederherstellen"
+msgstr "Sicherung wiederherstellen"
 
 #: faugus/backup.py:1499
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Extracting backup..."
-msgstr "Extrahiere %s..."
+msgstr "Extrahiere Sicherung..."
 
 #: faugus/backup.py:1641
 msgid "Restoring backup..."
-msgstr ""
+msgstr "Stelle Sicherung wieder her..."
 
 #: faugus/backup.py:1674
-#, fuzzy
-#| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
-msgstr "Konnte Präfix nicht entfernen"
+msgstr "Konnte Sicherung nicht wiederherstellen:"
 
 #: faugus/backup.py:1686 faugus/launcher.py:6445
 msgid "Are you sure you want to overwrite the settings?"
@@ -775,7 +751,7 @@ msgstr "Wähle eine Sicherungsdatei zur Wiederherstellung aus"
 
 #: faugus/launcher.py:6366
 msgid "Faugus Backup files"
-msgstr ""
+msgstr "Faugus Sicherungsdateien"
 
 #: faugus/launcher.py:6382 faugus/launcher.py:6421
 msgid "This is not a valid Faugus backup file."
