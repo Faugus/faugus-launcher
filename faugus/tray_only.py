@@ -89,7 +89,7 @@ def run_tray_entrypoint(launch_ui, console_mode=False):
     mono_icon = config.get("mono-icon", "False") == "True"
 
     if config.get('backup-auto-enabled', 'False') == 'True':
-        from faugus.backup import start_daemon_now
+        from faugus.backup_daemon import start_daemon_now
         start_daemon_now()
 
     loop = GLib.MainLoop()

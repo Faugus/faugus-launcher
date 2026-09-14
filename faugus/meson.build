@@ -1,5 +1,6 @@
 py.install_sources(
   'backup.py',
+  'backup_daemon.py',
   'components.py',
   'config_manager.py',
   'ea_fix.py',
