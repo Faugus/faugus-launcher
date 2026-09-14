@@ -10,7 +10,6 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import gi
 from gi.repository import GLib, Gio
 
 from faugus.language_config import *
@@ -389,7 +388,7 @@ def backup_selection_from_config(config):
 
 
 def run_backup_with_notification(dest_path, prefixes, shortcuts=None, protons=None, games=None):
-    send_desktop_notification(_("Faugus Backup"), _("Backup started"))
+    send_desktop_notification("Faugus", _("Backup started"))
     new_date = perform_backup(
         dest_path,
         prefixes=prefixes,
@@ -397,15 +396,24 @@ def run_backup_with_notification(dest_path, prefixes, shortcuts=None, protons=No
         protons=protons,
         games=games,
     )
-    send_desktop_notification(_("Faugus Backup"), _("Backup completed"))
+    send_desktop_notification("Faugus", _("Backup completed"))
     return new_date
 
 
-def _daemon_exec_args():
+_MODULE_DAEMON_ARGS = [sys.executable, "-m", "faugus.backup_daemon", "--daemon"]
+
+
+def _daemon_autostart_exec_args():
     if IS_FLATPAK:
         return ["flatpak", "run", f"--command={LAUNCHER_PATH}", "io.github.Faugus.faugus-launcher", "--daemon"]
     if LAUNCHER_MODULE_ARGS:
-        return [sys.executable, "-m", "faugus.backup_daemon", "--daemon"]
+        return _MODULE_DAEMON_ARGS
+    return [LAUNCHER_PATH, "--daemon"]
+
+
+def _daemon_spawn_args():
+    if LAUNCHER_MODULE_ARGS or IS_FLATPAK:
+        return _MODULE_DAEMON_ARGS
     return [LAUNCHER_PATH, "--daemon"]
 
 
@@ -413,21 +421,23 @@ def _daemon_token_path():
     return os.path.join(FAUGUS_LAUNCHER_STATE_DIR, "daemon.token")
 
 
+def _perform_scheduled_backup(config):
+    dest_dir = config.get('backup-dest-dir', '') or os.path.expanduser("~")
+    dest_path = os.path.join(dest_dir, backup_filename())
+    prefixes, shortcuts, protons, games = backup_selection_from_config(config)
+    new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
+    config['backup-last-date'] = new_date
+    config['backup-last-auto-date'] = new_date
+    save_config(config)
+
+
 def _run_scheduled_backup_if_due(config):
     if not should_run_backup(config):
         return
-    dest_dir = config.get('backup-dest-dir', '')
-    if not dest_dir:
-        dest_dir = os.path.expanduser("~")
-    dest_path = os.path.join(dest_dir, backup_filename())
-    prefixes, shortcuts, protons, games = backup_selection_from_config(config)
 
     def worker():
         try:
-            new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
-            config['backup-last-date'] = new_date
-            config['backup-last-auto-date'] = new_date
-            save_config(config)
+            _perform_scheduled_backup(config)
         except Exception:
             pass
 
@@ -468,17 +478,18 @@ def start_daemon_now():
         _daemon_timer_id = GLib.timeout_add_seconds(60, _daemon_timer_tick)
         _daemon_timer_tick()
 
-    if IS_FLATPAK or _daemon_process_running():
+    if _daemon_process_running():
         return
 
     try:
-        subprocess.Popen(
-            _daemon_exec_args(),
+        proc = subprocess.Popen(
+            _daemon_spawn_args(),
             start_new_session=True,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+        GLib.child_watch_add(proc.pid, lambda pid, status: None)
     except OSError:
         pass
 
@@ -503,7 +514,7 @@ def setup_autostart(enable):
 
     if enable:
         os.makedirs(autostart_dir, exist_ok=True)
-        exec_line = "Exec=" + " ".join(_daemon_exec_args()) + "\n"
+        exec_line = "Exec=" + " ".join(_daemon_autostart_exec_args()) + "\n"
         with open(desktop_file, "w") as f:
             f.write("[Desktop Entry]\n")
             f.write("Type=Application\n")
@@ -602,17 +613,7 @@ def daemon_mode():
             try:
                 config = load_config()
                 if should_run_backup(config):
-                    dest_dir = config.get('backup-dest-dir', '')
-                    if not dest_dir:
-                        dest_dir = os.path.expanduser("~")
-
-                    dest_path = os.path.join(dest_dir, backup_filename())
-
-                    prefixes, shortcuts, protons, games = backup_selection_from_config(config)
-                    new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
-                    config['backup-last-date'] = new_date
-                    config['backup-last-auto-date'] = new_date
-                    save_config(config)
+                    _perform_scheduled_backup(config)
             except Exception:
                 pass
         time.sleep(5)

@@ -1,11 +1,6 @@
 import os
 import shutil
-import sys
-import time
-import calendar
 import warnings
-from pathlib import Path
-from datetime import datetime, timedelta
 import gi
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -13,7 +8,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib, Gio, Gdk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, load_json_file, save_json_file, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog
+from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog
 
 
 from faugus.backup_daemon import (
@@ -25,12 +20,10 @@ from faugus.backup_daemon import (
     format_size,
     list_installed_protons,
     list_game_prefixes_with_shortcuts,
-    perform_backup,
     resolve_excluded_ids,
     run_backup_with_notification,
     setup_autostart,
     backup_filename,
-    should_run_backup,
 )
 
 _ = setup_gettext('faugus-launcher')
@@ -944,7 +937,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
 
-        prefixes, shortcuts, protons, games = self.current_selection()
+        _prefixes, _shortcuts, protons, _games = self.current_selection()
         self.config['backup-excluded-game-ids'] = [row[7] for row in self.prefix_list.liststore if not row[0]]
         self.config['backup-excluded-prefix-ids'] = [row[7] for row in self.prefix_list.liststore if not row[1]]
         self.config['backup-excluded-shortcut-ids'] = [row[7] for row in self.prefix_list.liststore if row[3] and not row[2]]
@@ -955,20 +948,6 @@ class BackupWindow(Gtk.Dialog):
         save_config(self.config)
 
         setup_autostart(is_enabled)
-
-        if is_enabled and should_run_backup(self.config):
-            try:
-                dest_dir = self.config.get('backup-dest-dir', '')
-                if not dest_dir:
-                    dest_dir = os.path.expanduser("~")
-                dest_path = os.path.join(dest_dir, backup_filename())
-
-                new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
-                self.config['backup-last-date'] = new_date
-                self.config['backup-last-auto-date'] = new_date
-                save_config(self.config)
-            except Exception:
-                pass
 
         destroy_and_release(self)
 
