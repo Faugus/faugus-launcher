@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-15 15:40+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
-"Last-Translator: nixxo <nixxo@protonmail.com>\n"
+"PO-Revision-Date: 2026-09-16 00:41+0000\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -274,10 +274,8 @@ msgid "Close"
 msgstr "Chiudi"
 
 #: faugus/launcher.py:2788
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Ultimo utilizzo"
+msgstr "Mai giocato"
 
 #: faugus/launcher.py:2812
 msgid "Remove from hidden"
@@ -349,62 +347,52 @@ msgstr "minuti"
 
 #: faugus/launcher.py:3072
 msgid "Just now"
-msgstr ""
+msgstr "Proprio adesso"
 
 #: faugus/launcher.py:3077
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "minuto"
+msgstr "Un minuto fa"
 
 #: faugus/launcher.py:3078 faugus/launcher.py:3084 faugus/launcher.py:3090
 #: faugus/launcher.py:3096 faugus/launcher.py:3102 faugus/launcher.py:3107
 msgid "ago"
-msgstr ""
+msgstr "fa"
 
 #: faugus/launcher.py:3083
 msgid "An hour ago"
-msgstr ""
+msgstr "Un'ora fa"
 
 #: faugus/launcher.py:3089
 msgid "Yesterday"
-msgstr ""
+msgstr "Ieri"
 
 #: faugus/launcher.py:3090
 msgid "days"
-msgstr ""
+msgstr "giorni"
 
 #: faugus/launcher.py:3095
-#, fuzzy
-#| msgid "Last played"
 msgid "Last week"
-msgstr "Ultimo utilizzo"
+msgstr "Ultima settimana"
 
 #: faugus/launcher.py:3096
 msgid "weeks"
-msgstr ""
+msgstr "settimane"
 
 #: faugus/launcher.py:3101
-#, fuzzy
-#| msgid "Monthly"
 msgid "Last month"
-msgstr "Mensile"
+msgstr "Ultimo mese"
 
 #: faugus/launcher.py:3102
-#, fuzzy
-#| msgid "Monthly"
 msgid "months"
-msgstr "Mensile"
+msgstr "mesi"
 
 #: faugus/launcher.py:3106
-#, fuzzy
-#| msgid "Last played"
 msgid "Last year"
-msgstr "Ultimo utilizzo"
+msgstr "Ultimo anno"
 
 #: faugus/launcher.py:3107
 msgid "years"
-msgstr ""
+msgstr "anni"
 
 #: faugus/launcher.py:3287 faugus/launcher.py:6373 faugus/launcher.py:8411
 msgid "Select a file to run in the prefix"
