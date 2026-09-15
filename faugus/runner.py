@@ -9,6 +9,7 @@ import time
 import shlex
 import signal
 import warnings
+from datetime import datetime
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -931,6 +932,22 @@ def main():
         game = load_game_from_json(args.game)
         if not game:
             return
+
+        games = load_json_file(GAMES_JSON, [])
+        for entry in games:
+            if entry.get("gameid") == args.game:
+                entry["last-played"] = datetime.now().isoformat()
+                break
+        save_json_file(games, GAMES_JSON)
+
+        try:
+            connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+            connection.call_sync(
+                TRAY_BUS_NAME, TRAY_OBJECT_PATH, TRAY_INTERFACE, "RefreshMenu",
+                None, None, Gio.DBusCallFlags.NONE, -1, None,
+            )
+        except GLib.Error:
+            pass
 
         launch_options = build_launch_command(game)
         FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game).run()
