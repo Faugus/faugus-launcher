@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-15 15:40+0000\n"
-"PO-Revision-Date: 2026-09-15 15:40+0000\n"
+"PO-Revision-Date: 2026-09-15 18:02+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -274,10 +274,8 @@ msgid "Close"
 msgstr "Fechar"
 
 #: faugus/launcher.py:2788
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Último jogado"
+msgstr "Nunca jogado"
 
 #: faugus/launcher.py:2812
 msgid "Remove from hidden"
@@ -349,13 +347,11 @@ msgstr "minutos"
 
 #: faugus/launcher.py:3072
 msgid "Just now"
-msgstr ""
+msgstr "Agora"
 
 #: faugus/launcher.py:3077
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "minuto"
+msgstr "Um minuto atrás"
 
 #: faugus/launcher.py:3078 faugus/launcher.py:3084 faugus/launcher.py:3090
 #: faugus/launcher.py:3096 faugus/launcher.py:3102 faugus/launcher.py:3107
@@ -364,43 +360,35 @@ msgstr "atrás"
 
 #: faugus/launcher.py:3083
 msgid "An hour ago"
-msgstr ""
+msgstr "Uma hora atrás"
 
 #: faugus/launcher.py:3089
 msgid "Yesterday"
-msgstr ""
+msgstr "Ontem"
 
 #: faugus/launcher.py:3090
 msgid "days"
 msgstr "dias"
 
 #: faugus/launcher.py:3095
-#, fuzzy
-#| msgid "Last played"
 msgid "Last week"
-msgstr "Último jogado"
+msgstr "Semana passada"
 
 #: faugus/launcher.py:3096
 msgid "weeks"
-msgstr ""
+msgstr "semanas"
 
 #: faugus/launcher.py:3101
-#, fuzzy
-#| msgid "Monthly"
 msgid "Last month"
-msgstr "Mensal"
+msgstr "Mês passado"
 
 #: faugus/launcher.py:3102
-#, fuzzy
-#| msgid "Monthly"
 msgid "months"
-msgstr "Mensal"
+msgstr "meses"
 
 #: faugus/launcher.py:3106
-#, fuzzy
-#| msgid "Last played"
 msgid "Last year"
-msgstr "Último jogado"
+msgstr "Mês passado"
 
 #: faugus/launcher.py:3107
 msgid "years"
