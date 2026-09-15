@@ -8,6 +8,7 @@ import warnings
 import gi
 import vdf
 import signal
+from datetime import datetime
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -1276,18 +1277,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def update_sort_data():
             self.playtime_data.clear()
+            self.latest_games_order.clear()
             try:
                 data = load_json_file(GAMES_JSON, [])
                 for item in data:
                     if isinstance(item, dict) and "gameid" in item:
                         self.playtime_data[item["gameid"]] = item.get("playtime", 0)
-            except:
-                pass
-
-            self.latest_games_order.clear()
-            try:
-                for idx, gid in enumerate(load_json_file(LATEST_GAMES, default=[])):
-                    self.latest_games_order[gid.strip()] = idx
+                        last_played = item.get("last-played")
+                        if last_played:
+                            try:
+                                self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
+                            except ValueError:
+                                pass
             except:
                 pass
 
@@ -2756,21 +2757,40 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_title.set_margin_bottom(4)
 
         formatted = None
+        last_played_text = None
+        last_played_exact = None
+        data = load_json_file(GAMES_JSON, [])
+        for item_data in data:
+            if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
+                last_played_iso = item_data.get("last-played")
+                last_played_text = self.format_last_played(last_played_iso)
+                if last_played_iso:
+                    try:
+                        last_played_exact = datetime.fromisoformat(last_played_iso).strftime("%Y-%m-%d %H:%M")
+                    except ValueError:
+                        pass
+                if game.runner != "Steam":
+                    game.playtime = item_data.get("playtime", 0)
+                break
+
         if game.runner == "Steam":
             steam_minutes = get_steam_app_playtime_minutes(game.path, game.steam_user)
             formatted = self.format_playtime(steam_minutes * 60)
         else:
-            data = load_json_file(GAMES_JSON, [])
-            for item_data in data:
-                if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
-                    game.playtime = item_data.get("playtime", 0)
-                    formatted = self.format_playtime(game.playtime)
-                    break
+            formatted = self.format_playtime(game.playtime)
 
         label_menu_playtime = Gtk.Label(label=formatted or "")
         label_menu_playtime.set_halign(Gtk.Align.START)
         label_menu_playtime.set_margin_bottom(4)
         label_menu_playtime.set_visible(bool(formatted))
+
+        never_played = not formatted and not last_played_text
+        label_menu_last_played = Gtk.Label(label=last_played_text or (_("Never played") if never_played else ""))
+        label_menu_last_played.set_halign(Gtk.Align.START)
+        label_menu_last_played.set_margin_bottom(4)
+        label_menu_last_played.set_visible(bool(last_played_text) or never_played)
+        if last_played_exact:
+            label_menu_last_played.set_tooltip_text(last_played_exact)
 
         header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         header_box.set_margin_start(6)
@@ -2778,6 +2798,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         header_box.set_margin_top(6)
         header_box.append(label_menu_title)
         header_box.append(label_menu_playtime)
+        header_box.append(label_menu_last_played)
 
         self.proton_log = f"{LOGS_DIR}/{game.gameid}/proton.log"
         self.umu_log = f"{LOGS_DIR}/{game.gameid}/umu.log"
@@ -3036,6 +3057,43 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             parts.append(f"{minutes} {word}")
 
         return " ".join(parts)
+
+    def format_last_played(self, last_played_iso):
+        if not last_played_iso:
+            return None
+
+        try:
+            played_at = datetime.fromisoformat(last_played_iso)
+        except ValueError:
+            return None
+
+        seconds = (datetime.now() - played_at).total_seconds()
+        if seconds < 60:
+            return _("Less than a minute ago")
+
+        minutes = int(seconds // 60)
+        if minutes < 60:
+            word = _("minute") if minutes == 1 else _("minutes")
+            return "{} {} {}".format(minutes, word, _("ago"))
+
+        hours = int(seconds // 3600)
+        if hours < 24:
+            word = _("hour") if hours == 1 else _("hours")
+            return "{} {} {}".format(hours, word, _("ago"))
+
+        days = int(seconds // 86400)
+        if days < 30:
+            word = _("day") if days == 1 else _("days")
+            return "{} {} {}".format(days, word, _("ago"))
+
+        months = int(days // 30)
+        if months < 12:
+            word = _("month") if months == 1 else _("months")
+            return "{} {} {}".format(months, word, _("ago"))
+
+        years = int(days // 365)
+        word = _("year") if years == 1 else _("years")
+        return "{} {} {}".format(years, word, _("ago"))
 
     def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
@@ -4115,12 +4173,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
         def update_latest_and_sort():
-            self.update_latest_games_file(game.gameid)
+            self.update_last_played(game.gameid)
             if hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed:
                 self.latest_games_order.clear()
                 try:
-                    for idx, gid in enumerate(load_json_file(LATEST_GAMES, default=[])):
-                        self.latest_games_order[gid.strip()] = idx
+                    for item in load_json_file(GAMES_JSON, default=[]):
+                        if not isinstance(item, dict) or "gameid" not in item:
+                            continue
+                        last_played = item.get("last-played")
+                        if last_played:
+                            try:
+                                self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
+                            except ValueError:
+                                pass
                 except:
                     pass
                 if hasattr(self, 'flowbox'):
@@ -4189,15 +4254,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         GLib.idle_add(self.update_icon)
 
-    def update_latest_games_file(self, gameid):
-        games = load_json_file(LATEST_GAMES, default=[])
+    def update_last_played(self, gameid):
+        games = load_json_file(GAMES_JSON, default=[])
 
-        valid_ids = {g.gameid for g in self.games}
+        timestamp = datetime.now().isoformat()
+        for entry in games:
+            if isinstance(entry, dict) and entry.get("gameid") == gameid:
+                entry["last-played"] = timestamp
+                break
 
-        games = [g for g in games if g in valid_ids and g != gameid]
-        games.insert(0, gameid)
-
-        save_json_file(games, LATEST_GAMES)
+        save_json_file(games, GAMES_JSON)
         self.notify_tray_menu_changed()
 
     def on_button_kill_clicked(self, widget):
@@ -4493,22 +4559,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     pass
 
     def remove_latest_and_order(self, gameid):
-        try:
-            recent_games = load_json_file(LATEST_GAMES, default=[])
-
-            if gameid in recent_games:
-                recent_games.remove(gameid)
-
-                save_json_file(recent_games, LATEST_GAMES)
-                self.notify_tray_menu_changed()
-
-        except FileNotFoundError:
-            pass
-
         custom_order_data = load_json_file(CUSTOM_ORDER, default={})
         if gameid in custom_order_data:
             del custom_order_data[gameid]
             save_json_file(custom_order_data, CUSTOM_ORDER)
+
+        self.notify_tray_menu_changed()
 
     def show_warning_dialog_main(self, parent, text1, text2, callback=None):
         show_message_dialog(text1, text2, parent=parent, callback=callback)
