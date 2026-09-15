@@ -936,7 +936,7 @@ def main():
         games = load_json_file(GAMES_JSON, [])
         for entry in games:
             if entry.get("gameid") == args.game:
-                entry["last-played"] = datetime.now().isoformat()
+                entry["last_played"] = datetime.now().isoformat()
                 break
         save_json_file(games, GAMES_JSON)
 

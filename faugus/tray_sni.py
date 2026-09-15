@@ -248,7 +248,7 @@ class TrayIcon:
         entries = []
         for entry in load_json_file(GAMES_JSON, []):
             gameid = entry.get("gameid")
-            last_played = entry.get("last-played")
+            last_played = entry.get("last_played")
             if gameid and last_played:
                 entries.append((last_played, gameid, entry.get("title", gameid)))
 

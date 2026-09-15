@@ -1283,7 +1283,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 for item in data:
                     if isinstance(item, dict) and "gameid" in item:
                         self.playtime_data[item["gameid"]] = item.get("playtime", 0)
-                        last_played = item.get("last-played")
+                        last_played = item.get("last_played")
                         if last_played:
                             try:
                                 self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
@@ -2762,7 +2762,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         data = load_json_file(GAMES_JSON, [])
         for item_data in data:
             if isinstance(item_data, dict) and item_data.get("gameid") == game.gameid:
-                last_played_iso = item_data.get("last-played")
+                last_played_iso = item_data.get("last_played")
                 last_played_text = self.format_last_played(last_played_iso)
                 if last_played_iso:
                     try:
@@ -4180,7 +4180,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     for item in load_json_file(GAMES_JSON, default=[]):
                         if not isinstance(item, dict) or "gameid" not in item:
                             continue
-                        last_played = item.get("last-played")
+                        last_played = item.get("last_played")
                         if last_played:
                             try:
                                 self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
@@ -4260,7 +4260,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         timestamp = datetime.now().isoformat()
         for entry in games:
             if isinstance(entry, dict) and entry.get("gameid") == gameid:
-                entry["last-played"] = timestamp
+                entry["last_played"] = timestamp
                 break
 
         save_json_file(games, GAMES_JSON)
@@ -6701,6 +6701,7 @@ class Game:
         steam_user="",
         disable_umu="",
         runtime="",
+        last_played="",
     ):
         self.gameid = gameid
         self.title = title
@@ -6737,6 +6738,7 @@ class Game:
         self.steam_user = steam_user
         self.disable_umu = disable_umu
         self.runtime = runtime
+        self.last_played = last_played
 
 
 class DuplicateDialog(Gtk.Dialog):
