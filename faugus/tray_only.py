@@ -178,6 +178,9 @@ def bootstrap():
         return
 
     config = load_config()
+    if not start_hidden and config.get("minimized-startup-enabled", "False") == "True":
+        start_hidden = True
+
     if config.get("system-tray", "False") != "True":
         ui_args = []
         if start_hidden:
