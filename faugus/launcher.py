@@ -3069,31 +3069,42 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         seconds = (datetime.now() - played_at).total_seconds()
         if seconds < 60:
-            return _("Less than a minute ago")
+            return _("Just now")
 
         minutes = int(seconds // 60)
         if minutes < 60:
-            word = _("minute") if minutes == 1 else _("minutes")
-            return "{} {} {}".format(minutes, word, _("ago"))
+            if minutes == 1:
+                return _("A minute ago")
+            return "{} {} {}".format(minutes, _("minutes"), _("ago"))
 
         hours = int(seconds // 3600)
         if hours < 24:
-            word = _("hour") if hours == 1 else _("hours")
-            return "{} {} {}".format(hours, word, _("ago"))
+            if hours == 1:
+                return _("An hour ago")
+            return "{} {} {}".format(hours, _("hours"), _("ago"))
 
         days = int(seconds // 86400)
-        if days < 30:
-            word = _("day") if days == 1 else _("days")
-            return "{} {} {}".format(days, word, _("ago"))
+        if days < 7:
+            if days == 1:
+                return _("Yesterday")
+            return "{} {} {}".format(days, _("days"), _("ago"))
+
+        weeks = int(days // 7)
+        if weeks < 4:
+            if weeks == 1:
+                return _("Last week")
+            return "{} {} {}".format(weeks, _("weeks"), _("ago"))
 
         months = int(days // 30)
         if months < 12:
-            word = _("month") if months == 1 else _("months")
-            return "{} {} {}".format(months, word, _("ago"))
+            if months == 1:
+                return _("Last month")
+            return "{} {} {}".format(months, _("months"), _("ago"))
 
         years = int(days // 365)
-        word = _("year") if years == 1 else _("years")
-        return "{} {} {}".format(years, word, _("ago"))
+        if years == 1:
+            return _("Last year")
+        return "{} {} {}".format(years, _("years"), _("ago"))
 
     def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
