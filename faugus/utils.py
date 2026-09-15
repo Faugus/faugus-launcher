@@ -1363,7 +1363,7 @@ GAME_FIELDS = [
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "no_sleep", "category", "icon",
     "steamgriddb_id", "pre_launch", "post_launch",
-    "steam_user", "disable_umu", "runtime",
+    "steam_user", "disable_umu", "runtime", "last_played",
 ]
 
 
