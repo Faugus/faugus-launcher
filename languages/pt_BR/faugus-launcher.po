@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-15 13:18+0000\n"
-"PO-Revision-Date: 2026-09-14 01:43+0000\n"
+"PO-Revision-Date: 2026-09-15 15:40+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -349,12 +349,12 @@ msgstr "minutos"
 
 #: faugus/launcher.py:3072
 msgid "Less than a minute ago"
-msgstr ""
+msgstr "Menos de um minuto atrás"
 
 #: faugus/launcher.py:3077 faugus/launcher.py:3082 faugus/launcher.py:3087
 #: faugus/launcher.py:3092 faugus/launcher.py:3096
 msgid "ago"
-msgstr ""
+msgstr "atrás"
 
 #: faugus/launcher.py:3086
 #, fuzzy
@@ -364,7 +364,7 @@ msgstr "Dia"
 
 #: faugus/launcher.py:3086
 msgid "days"
-msgstr ""
+msgstr "dias"
 
 #: faugus/launcher.py:3091
 #, fuzzy
@@ -380,11 +380,11 @@ msgstr "Mensal"
 
 #: faugus/launcher.py:3095
 msgid "year"
-msgstr ""
+msgstr "ano"
 
 #: faugus/launcher.py:3095
 msgid "years"
-msgstr ""
+msgstr "anos"
 
 #: faugus/launcher.py:3276 faugus/launcher.py:6362 faugus/launcher.py:8398
 msgid "Select a file to run in the prefix"
