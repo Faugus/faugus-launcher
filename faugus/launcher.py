@@ -841,12 +841,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 """
                 fade_provider.load_from_data(fade_css.encode("utf-8"))
 
-            if old_cache_path and old_cache_path != cache_path and os.path.isfile(old_cache_path):
-                try:
-                    os.remove(old_cache_path)
-                except OSError:
-                    pass
-
     def apply_background_mode_live(self, new_mode):
         show_banner = self.banner_overlay_enabled()
         old_had_overlay = self.background_mode == "dominant_color" or show_banner
