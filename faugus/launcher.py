@@ -4435,29 +4435,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
-        def update_latest_and_sort():
-            self.update_last_played(game.gameid)
-            if hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed:
-                self.latest_games_order.clear()
-                try:
-                    for item in load_json_file(GAMES_JSON, default=[]):
-                        if not isinstance(item, dict) or "gameid" not in item:
-                            continue
-                        last_played = item.get("last_played")
-                        if last_played:
-                            try:
-                                self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
-                            except ValueError:
-                                pass
-                except:
-                    pass
-                if hasattr(self, 'flowbox'):
-                    self.flowbox.invalidate_sort()
-                if self.carrousel_active() and getattr(self, 'carrousel_slots', None):
-                    self.carrousel_resync_after_reorder(game.gameid)
-
         if game.runner == "Steam":
-            update_latest_and_sort()
+            self.update_last_played(gameid)
+            self.sync_last_played_order(gameid)
             subprocess.Popen(
                 [sys.executable, "-m", "faugus.runner", "--game", gameid],
                 cwd=cwd,
@@ -4481,7 +4461,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
             return
 
-        update_latest_and_sort()
+        self.update_last_played(gameid)
+        self.sync_last_played_order(gameid)
+
         cmd = (sys.executable, "-m", "faugus.runner", "--game", gameid)
         proc = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
 
@@ -4504,6 +4486,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.save_running()
 
         self.reload_playtimes()
+        self.sync_last_played_order(game)
 
         if hasattr(self, 'current_sort') and hasattr(self, 'opt_playtime') and self.current_sort == self.opt_playtime:
             try:
@@ -4531,6 +4514,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         save_json_file(games, GAMES_JSON)
         self.notify_tray_menu_changed()
+
+    def sync_last_played_order(self, gameid):
+        if not (hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed):
+            return
+
+        self.latest_games_order.clear()
+        try:
+            for item in load_json_file(GAMES_JSON, default=[]):
+                if not isinstance(item, dict) or "gameid" not in item:
+                    continue
+                last_played = item.get("last_played")
+                if last_played:
+                    try:
+                        self.latest_games_order[item["gameid"]] = -datetime.fromisoformat(last_played).timestamp()
+                    except ValueError:
+                        pass
+        except:
+            pass
+
+        if hasattr(self, 'flowbox'):
+            self.flowbox.invalidate_sort()
+        if self.carrousel_active() and getattr(self, 'carrousel_slots', None):
+            self.carrousel_resync_after_reorder(gameid)
 
     def on_button_kill_clicked(self, widget):
         for gameid, pid in list(self.running.items()):
