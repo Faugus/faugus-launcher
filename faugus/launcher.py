@@ -3315,9 +3315,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             formatted_playtime = self.format_playtime(steam_minutes * 60)
         else:
             formatted_playtime = self.format_playtime(game.playtime)
+        playtime_visible = bool(formatted_playtime)
         self.label_info_playtime.set_text(
-            _("Playtime: {}").format(formatted_playtime) if formatted_playtime else _("Playtime: —")
+            _("Playtime: {}").format(formatted_playtime) if formatted_playtime else ""
         )
+        self.label_info_playtime.set_visible(playtime_visible)
 
         categories = game.category if isinstance(game.category, list) else ([game.category] if game.category else [])
         categories_visible = bool(categories)
@@ -3337,8 +3339,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             self.label_info_last_played.set_tooltip_text(None)
 
-        self.label_info_sep1.set_visible(categories_visible)
-        self.label_info_sep2.set_visible(last_played_visible)
+        self.label_info_sep1.set_visible(playtime_visible and categories_visible)
+        self.label_info_sep2.set_visible((playtime_visible or categories_visible) and last_played_visible)
 
     def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
