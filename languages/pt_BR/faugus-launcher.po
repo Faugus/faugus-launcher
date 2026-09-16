@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 17:45+0000\n"
-"PO-Revision-Date: 2026-09-16 13:10+0000\n"
+"PO-Revision-Date: 2026-09-16 19:41+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -278,10 +278,8 @@ msgid "Playtime: {}"
 msgstr "Tempo de jogo: {}"
 
 #: faugus/launcher.py:2906 faugus/launcher.py:3358
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "Último jogado"
+msgstr "Jogado pela última vez: {}"
 
 #: faugus/launcher.py:2907
 msgid "Never played"
@@ -340,28 +338,20 @@ msgid "Recent"
 msgstr "Recentes"
 
 #: faugus/launcher.py:3167
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "hora"
+msgstr "{} hora"
 
 #: faugus/launcher.py:3167
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "horas"
+msgstr "{} horas"
 
 #: faugus/launcher.py:3170
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "minuto"
+msgstr "{} minuto"
 
 #: faugus/launcher.py:3170
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "minutos"
+msgstr "{} minutos"
 
 #: faugus/launcher.py:3185
 msgid "Just now"
@@ -372,20 +362,16 @@ msgid "A minute ago"
 msgstr "Um minuto atrás"
 
 #: faugus/launcher.py:3191
-#, fuzzy
-#| msgid "A minute ago"
 msgid "{} minutes ago"
-msgstr "Um minuto atrás"
+msgstr "{} minutos atrás"
 
 #: faugus/launcher.py:3196
 msgid "An hour ago"
 msgstr "Uma hora atrás"
 
 #: faugus/launcher.py:3197
-#, fuzzy
-#| msgid "An hour ago"
 msgid "{} hours ago"
-msgstr "Uma hora atrás"
+msgstr "{} horas atrás"
 
 #: faugus/launcher.py:3202
 msgid "Yesterday"
@@ -393,45 +379,35 @@ msgstr "Ontem"
 
 #: faugus/launcher.py:3203
 msgid "{} days ago"
-msgstr ""
+msgstr "{} dias atrás"
 
 #: faugus/launcher.py:3208
-#, fuzzy
-#| msgid "A minute ago"
 msgid "A week ago"
-msgstr "Um minuto atrás"
+msgstr "Uma semana atrás"
 
 #: faugus/launcher.py:3209
 msgid "{} weeks ago"
-msgstr ""
+msgstr "{} semanas atrás"
 
 #: faugus/launcher.py:3214
-#, fuzzy
-#| msgid "A minute ago"
 msgid "A month ago"
-msgstr "Um minuto atrás"
+msgstr "Um mês atrás"
 
 #: faugus/launcher.py:3215
-#, fuzzy
-#| msgid "A minute ago"
 msgid "{} months ago"
-msgstr "Um minuto atrás"
+msgstr "{} meses atrás"
 
 #: faugus/launcher.py:3219
-#, fuzzy
-#| msgid "An hour ago"
 msgid "A year ago"
-msgstr "Uma hora atrás"
+msgstr "Um ano atrás"
 
 #: faugus/launcher.py:3220
 msgid "{} years ago"
-msgstr ""
+msgstr "{} anos atrás"
 
 #: faugus/launcher.py:3347
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playtime: —"
-msgstr "Tempo de jogo: {}"
+msgstr "Tempo de jogo: —"
 
 #: faugus/launcher.py:3549 faugus/launcher.py:6793 faugus/launcher.py:8839
 msgid "Select a file to run in the prefix"
@@ -774,7 +750,7 @@ msgstr "Ctrl+H alterna os jogos ocultos"
 
 #: faugus/launcher.py:6019
 msgid "Info"
-msgstr ""
+msgstr "Informações"
 
 #: faugus/launcher.py:6021
 msgid "Gamepad navigation"
