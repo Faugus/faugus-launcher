@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 10:56+0000\n"
+"POT-Creation-Date: 2026-09-16 11:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -272,7 +272,7 @@ msgid "Close"
 msgstr ""
 
 #: faugus/launcher.py:2863
-msgid "Played for {}"
+msgid "{} played"
 msgstr ""
 
 #: faugus/launcher.py:2870
