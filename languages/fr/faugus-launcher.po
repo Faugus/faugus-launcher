@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 02:37+0000\n"
-"PO-Revision-Date: 2026-08-29 01:18+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2026-09-16 10:56+0000\n"
+"Last-Translator: THE_lulu57 <thelulu57310@gmail.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: faugus/backup.py:126 faugus/backup.py:271
 msgid "Calculating..."
-msgstr ""
+msgstr "Calcul en cours..."
 
 #: faugus/backup.py:148
 #, fuzzy
@@ -35,7 +35,7 @@ msgstr "Préfixe"
 
 #: faugus/backup.py:158 faugus/backup.py:336
 msgid "Size"
-msgstr ""
+msgstr "Taille"
 
 #: faugus/backup.py:169 faugus/backup.py:242 faugus/backup.py:347
 #: faugus/backup.py:484
