@@ -2031,18 +2031,37 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_y = self.carrousel_center_y - natural_h / 2
         self.carrousel_fixed.move(slot["box"], base_x, base_y)
 
+    def carrousel_layout_extent(self, vertical):
+        fixed = getattr(self, 'carrousel_fixed', None)
+        if fixed is not None:
+            allocated = fixed.get_height() if vertical else fixed.get_width()
+            if allocated:
+                return allocated
+        return (self.get_height() if vertical else self.get_width()) or 0
+
     def update_carrousel_layout(self, *_args):
         if not self.carrousel_step or not getattr(self, 'carrousel_slots', None):
             return
-        current_width = self.get_width() or self.carrousel_step * 3
-        current_height = self.get_height() or self.carrousel_step * 3
+        if getattr(self, '_carrousel_layout_tick_id', None) is not None:
+            return
+
+        def do_layout(_widget, _frame_clock):
+            self._carrousel_layout_tick_id = None
+            self.apply_carrousel_layout()
+            return GLib.SOURCE_REMOVE
+
+        self._carrousel_layout_tick_id = self.add_tick_callback(do_layout)
+
+    def apply_carrousel_layout(self):
+        if not self.carrousel_step or not getattr(self, 'carrousel_slots', None):
+            return
+        extent = self.carrousel_layout_extent(self.carrousel_vertical) or self.carrousel_step * 3
         n = len(self.carrousel_visible_games())
-        fan_extent = current_height if self.carrousel_vertical else current_width
-        self.carrousel_radius = self.carrousel_fit_radius(n, fan_extent)
+        self.carrousel_radius = self.carrousel_fit_radius(n, extent)
         if self.carrousel_vertical:
-            self.carrousel_center_y = self.carrousel_fan_center(current_height, self.grid_position_valign())
+            self.carrousel_center_y = self.carrousel_fan_center(extent, self.grid_position_valign())
         else:
-            self.carrousel_center_x = self.carrousel_fan_center(current_width, self.grid_position_halign())
+            self.carrousel_center_x = self.carrousel_fan_center(extent, self.grid_position_halign())
         for slot in self.carrousel_slots:
             self.place_carrousel_slot_base(slot)
             self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
@@ -2168,18 +2187,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             cross_size = max_height + 50 + glow_margin * 2
             self.carrousel_fixed.set_size_request(self.carrousel_step * 3, cross_size)
 
-        current_width = self.get_width() or (cross_size if self.carrousel_vertical else self.carrousel_step * 3)
-        current_height = self.get_height() or (self.carrousel_step * 3 if self.carrousel_vertical else cross_size)
+        extent = self.carrousel_layout_extent(self.carrousel_vertical) or self.carrousel_step * 3
 
         games = self.carrousel_visible_games()
         n = len(games)
-        fan_extent = current_height if self.carrousel_vertical else current_width
-        self.carrousel_radius = self.carrousel_fit_radius(n, fan_extent)
+        self.carrousel_radius = self.carrousel_fit_radius(n, extent)
         if self.carrousel_vertical:
-            self.carrousel_center_y = self.carrousel_fan_center(current_height, self.grid_position_valign())
+            self.carrousel_center_y = self.carrousel_fan_center(extent, self.grid_position_valign())
             self.carrousel_center_x = cross_size / 2
         else:
-            self.carrousel_center_x = self.carrousel_fan_center(current_width, self.grid_position_halign())
+            self.carrousel_center_x = self.carrousel_fan_center(extent, self.grid_position_halign())
             self.carrousel_center_y = cross_size / 2
 
         if n == 0:
@@ -2220,7 +2237,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot.pop("_settle_offset", None)
                 self.layout_carrousel_slot(slot, slot["offset"])
 
-        self.carrousel_radius = self.carrousel_fit_radius(n, self.get_height() if self.carrousel_vertical else self.get_width())
+        self.carrousel_radius = self.carrousel_fit_radius(n, self.carrousel_layout_extent(self.carrousel_vertical))
         self.carrousel_index = (self.carrousel_index + delta) % n
 
         span = self.carrousel_max_offset - self.carrousel_min_offset + 1
