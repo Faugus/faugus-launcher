@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 02:37+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
+"PO-Revision-Date: 2026-09-16 10:56+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -274,10 +274,8 @@ msgid "Close"
 msgstr "Затваряне"
 
 #: faugus/launcher.py:2857
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Последно пускане"
+msgstr "Не е пускано"
 
 #: faugus/launcher.py:2881
 msgid "Remove from hidden"
@@ -349,13 +347,11 @@ msgstr "минути"
 
 #: faugus/launcher.py:3141
 msgid "Just now"
-msgstr ""
+msgstr "Току-що"
 
 #: faugus/launcher.py:3146
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "минута"
+msgstr "Преди минута"
 
 #: faugus/launcher.py:3147 faugus/launcher.py:3153 faugus/launcher.py:3159
 #: faugus/launcher.py:3165 faugus/launcher.py:3171 faugus/launcher.py:3176
@@ -364,47 +360,39 @@ msgstr ""
 
 #: faugus/launcher.py:3152
 msgid "An hour ago"
-msgstr ""
+msgstr "Преди час"
 
 #: faugus/launcher.py:3158
 msgid "Yesterday"
-msgstr ""
+msgstr "Вчера"
 
 #: faugus/launcher.py:3159
 msgid "days"
-msgstr ""
+msgstr "дни"
 
 #: faugus/launcher.py:3164
-#, fuzzy
-#| msgid "Last played"
 msgid "Last week"
-msgstr "Последно пускане"
+msgstr "Миналата седмица"
 
 #: faugus/launcher.py:3165
 msgid "weeks"
-msgstr ""
+msgstr "седмици"
 
 #: faugus/launcher.py:3170
-#, fuzzy
-#| msgid "Monthly"
 msgid "Last month"
-msgstr "Ежемесечно"
+msgstr "Миналия месец"
 
 #: faugus/launcher.py:3171
-#, fuzzy
-#| msgid "Monthly"
 msgid "months"
-msgstr "Ежемесечно"
+msgstr "месеца"
 
 #: faugus/launcher.py:3175
-#, fuzzy
-#| msgid "Last played"
 msgid "Last year"
-msgstr "Последно пускане"
+msgstr "Миналата година"
 
 #: faugus/launcher.py:3176
 msgid "years"
-msgstr ""
+msgstr "години"
 
 #: faugus/launcher.py:3356 faugus/launcher.py:6589 faugus/launcher.py:8633
 msgid "Select a file to run in the prefix"
@@ -612,67 +600,59 @@ msgstr "Позиция"
 
 #: faugus/launcher.py:5701
 msgid "Top left"
-msgstr ""
+msgstr "Горе вляво"
 
 #: faugus/launcher.py:5702
 msgid "Top"
-msgstr "Най-отгоре"
+msgstr "Горе"
 
 #: faugus/launcher.py:5703
 msgid "Top right"
-msgstr ""
+msgstr "Горе вдясно"
 
 #: faugus/launcher.py:5704
 msgid "Left"
-msgstr ""
+msgstr "Ляво"
 
 #: faugus/launcher.py:5705
 msgid "Middle"
 msgstr "В средата"
 
 #: faugus/launcher.py:5706
-#, fuzzy
-#| msgid "Light"
 msgid "Right"
-msgstr "Светла"
+msgstr "Дясно"
 
 #: faugus/launcher.py:5707
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom left"
-msgstr "Най-отдолу"
+msgstr "Долу вляво"
 
 #: faugus/launcher.py:5708
 msgid "Bottom"
-msgstr "Най-отдолу"
+msgstr "Долу"
 
 #: faugus/launcher.py:5709
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom right"
-msgstr "Най-отдолу"
+msgstr "Долу вдясно"
 
 #: faugus/launcher.py:5711
 msgid "Orientation"
-msgstr ""
+msgstr "Ориентация"
 
 #: faugus/launcher.py:5714
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Азбучен ред"
+msgstr "Вертикално"
 
 #: faugus/launcher.py:5715
 msgid "Horizontal"
-msgstr ""
+msgstr "Хоризонтално"
 
 #: faugus/launcher.py:5717 faugus/launcher.py:5737
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Максимален брой колони"
 
 #: faugus/launcher.py:5735
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Максимален брой редове"
 
 #: faugus/launcher.py:5741
 msgid "SteamGridDB"
@@ -832,13 +812,11 @@ msgstr "Глобални променливи на средата"
 
 #: faugus/launcher.py:6135
 msgid "General"
-msgstr ""
+msgstr "Общи"
 
 #: faugus/launcher.py:6136
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Режим на интерфейса"
+msgstr "Интерфейс"
 
 #: faugus/launcher.py:6249
 #, python-format
@@ -858,10 +836,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Режим с решетка, обложки или въртележка"
 
 #: faugus/launcher.py:6315
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Режим с решетка, обложки или въртележка"
+msgstr "Режим с решетка или обложки"
 
 #: faugus/launcher.py:6343
 msgid "Covers or Carrousel mode with SteamGridDB"
