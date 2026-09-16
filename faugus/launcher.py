@@ -5780,6 +5780,9 @@ class Settings(Gtk.Dialog):
         self.label_miscellaneous = Gtk.Label(label=_("Miscellaneous"))
         self.label_miscellaneous.set_halign(Gtk.Align.START)
 
+        self.label_display = Gtk.Label(label=_("Display"))
+        self.label_display.set_halign(Gtk.Align.START)
+
         self.checkbox_discrete_gpu = Gtk.CheckButton(label=_("Discrete GPU"))
 
         self.checkbox_auto_close_on_launch = Gtk.CheckButton(label=_("Auto-close on launch"))
@@ -5924,27 +5927,30 @@ class Settings(Gtk.Dialog):
 
         label_version = Gtk.Label()
         label_version.set_markup(
-            '<a href="https://github.com/Faugus/faugus-launcher/releases/tag/{0}">{0}</a>'.format(VERSION)
+            '<a href="https://github.com/Faugus/faugus-launcher/releases/tag/{0}">Faugus {0}</a>'.format(VERSION)
         )
         label_version.set_use_markup(True)
-        label_version.set_halign(Gtk.Align.END)
-        label_version.set_valign(Gtk.Align.START)
-        label_version.set_margin_end(10)
-        label_version.set_margin_top(10)
+        label_version.set_halign(Gtk.Align.START)
 
-        box_main = Gtk.Grid()
-        box_main.set_column_homogeneous(True)
-        box_main.set_column_spacing(10)
-        box_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_mid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        grid_page_general = Gtk.Grid()
+        grid_page_general.set_column_homogeneous(True)
+        grid_page_general.set_column_spacing(10)
+        grid_page_interface = Gtk.Grid()
+        grid_page_interface.set_column_homogeneous(True)
+        grid_page_interface.set_column_spacing(10)
+
+        box_general_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_general_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_general_col3 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        box_interface_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_interface_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_interface_col3 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_buttons.set_valign(Gtk.Align.CENTER)
 
         grid_language = build_grid()
-        grid_language.set_vexpand(True)
-        grid_language.set_valign(Gtk.Align.END)
 
         grid_prefix = build_grid()
 
@@ -5954,13 +5960,21 @@ class Settings(Gtk.Dialog):
 
         grid_logs = build_grid()
 
+        grid_version = build_grid()
+        grid_version.set_vexpand(True)
+        grid_version.set_valign(Gtk.Align.END)
+
         grid_miscellaneous = build_grid()
 
         grid_envar = build_grid()
 
-        grid_theme_accent = build_grid()
+        grid_interface_mode = build_grid()
 
-        grid_theme_rest = build_grid(margin_top=False)
+        grid_steamgriddb = build_grid(margin_top=False)
+
+        grid_theme_colors = build_grid()
+
+        grid_interface_checkboxes = build_grid()
 
         grid_support = build_grid(column_homogeneous=True)
         grid_support.set_vexpand(True)
@@ -6003,46 +6017,49 @@ class Settings(Gtk.Dialog):
         grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
         self.button_clearlogs.set_hexpand(True)
 
+        grid_version.attach(label_version, 0, 0, 1, 1)
+
         grid_miscellaneous.attach(self.label_miscellaneous, 0, 0, 1, 1)
         grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 1, 1, 1)
         grid_miscellaneous.attach(self.checkbox_splash_window, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_hidden_games, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_autostart, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_auto_create_shortcuts, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 12, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wow64, 0, 13, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_autostart, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_auto_create_shortcuts, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wow64, 0, 12, 1, 1)
 
-        grid_theme_accent.attach(self.label_interface, 0, 0, 1, 1)
-        grid_theme_accent.attach(self.combobox_interface, 0, 1, 1, 1)
+        grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
+        grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
         self.combobox_interface.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_theme_engine, 0, 0, 2, 1)
-        grid_theme_rest.attach(self.combobox_theme_engine, 0, 1, 2, 1)
+        grid_theme_colors.attach(self.label_theme_engine, 0, 0, 2, 1)
+        grid_theme_colors.attach(self.combobox_theme_engine, 0, 1, 2, 1)
         self.combobox_theme_engine.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_theme, 0, 2, 2, 1)
-        grid_theme_rest.attach(self.combobox_theme, 0, 3, 2, 1)
+        grid_theme_colors.attach(self.label_theme, 0, 2, 2, 1)
+        grid_theme_colors.attach(self.combobox_theme, 0, 3, 2, 1)
         self.combobox_theme.set_hexpand(True)
-        grid_theme_rest.attach(self.label_accent, 0, 4, 2, 1)
-        grid_theme_rest.attach(self.box_accent, 0, 5, 2, 1)
+        grid_theme_colors.attach(self.label_accent, 0, 4, 2, 1)
+        grid_theme_colors.attach(self.box_accent, 0, 5, 2, 1)
         self.combobox_accent.set_hexpand(True)
 
-        grid_theme_rest.attach(self.label_background, 0, 6, 2, 1)
-        grid_theme_rest.attach(self.combobox_background, 0, 7, 2, 1)
+        grid_theme_colors.attach(self.label_background, 0, 6, 2, 1)
+        grid_theme_colors.attach(self.combobox_background, 0, 7, 2, 1)
         self.combobox_background.set_hexpand(True)
 
-        grid_theme_rest.attach(self.checkbox_labels, 0, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_zoom, 1, 8, 1, 1)
-        grid_theme_rest.attach(self.checkbox_sort, 0, 9, 1, 1)
-        grid_theme_rest.attach(self.checkbox_categories, 1, 9, 1, 1)
-        grid_theme_rest.attach(self.checkbox_banner, 0, 10, 1, 1)
-        grid_theme_rest.attach(self.checkbox_header_bar, 1, 10, 1, 1)
+        grid_interface_checkboxes.attach(self.label_display, 0, 0, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_labels, 0, 1, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_zoom, 0, 2, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_sort, 0, 3, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_categories, 0, 4, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_banner, 0, 5, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_header_bar, 0, 6, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_hidden_games, 0, 7, 1, 1)
 
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
@@ -6052,53 +6069,116 @@ class Settings(Gtk.Dialog):
         grid_backup.attach(button_backup, 0, 1, 1, 1)
         grid_backup.attach(button_restore, 1, 1, 1, 1)
 
-        self.grid_big_interface.attach(self.checkbox_steamgriddb, 0, 0, 2, 1)
-        self.grid_big_interface.attach(self.entry_steamgriddb_key, 0, 1, 1, 1)
-        self.grid_big_interface.attach(self.button_steamgriddb_key, 1, 1, 1, 1)
-        self.grid_big_interface.attach(self.label_startup_window_size, 0, 2, 2, 1)
-        self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 3, 2, 1)
-        self.combobox_startup_window_size.set_hexpand(True)
-        self.grid_big_interface.attach(self.label_grid_position, 0, 4, 2, 1)
-        self.grid_big_interface.attach(self.combobox_grid_position, 0, 5, 2, 1)
-        self.combobox_grid_position.set_hexpand(True)
-        self.grid_big_interface.attach(self.label_grid_orientation, 0, 6, 2, 1)
-        self.grid_big_interface.attach(self.combobox_grid_orientation, 0, 7, 2, 1)
-        self.combobox_grid_orientation.set_hexpand(True)
-        self.grid_big_interface.attach(self.checkbox_grid_max_children, 0, 8, 2, 1)
-        self.grid_big_interface.attach(self.entry_grid_max_children, 0, 9, 2, 1)
+        grid_steamgriddb.attach(self.checkbox_steamgriddb, 0, 0, 2, 1)
+        grid_steamgriddb.attach(self.entry_steamgriddb_key, 0, 1, 1, 1)
+        grid_steamgriddb.attach(self.button_steamgriddb_key, 1, 1, 1, 1)
         self.entry_steamgriddb_key.set_hexpand(True)
+
+        self.grid_big_interface.attach(self.label_startup_window_size, 0, 0, 2, 1)
+        self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 1, 2, 1)
+        self.combobox_startup_window_size.set_hexpand(True)
+        self.grid_big_interface.attach(self.label_grid_position, 0, 2, 2, 1)
+        self.grid_big_interface.attach(self.combobox_grid_position, 0, 3, 2, 1)
+        self.combobox_grid_position.set_hexpand(True)
+        self.grid_big_interface.attach(self.label_grid_orientation, 0, 4, 2, 1)
+        self.grid_big_interface.attach(self.combobox_grid_orientation, 0, 5, 2, 1)
+        self.combobox_grid_orientation.set_hexpand(True)
+        self.grid_big_interface.attach(self.checkbox_grid_max_children, 0, 6, 2, 1)
+        self.grid_big_interface.attach(self.entry_grid_max_children, 0, 7, 2, 1)
 
         grid_support.attach(self.label_support, 0, 0, 2, 1)
         grid_support.attach(button_kofi, 0, 1, 1, 1)
         grid_support.attach(button_paypal, 1, 1, 1, 1)
 
-        box_left.append(grid_prefix)
-        box_left.append(grid_runner)
-        box_left.append(self.label_default_prefix_tools)
-        box_left.append(grid_tools)
-        box_left.append(grid_envar)
-        box_left.append(grid_language)
+        box_general_col1.append(grid_prefix)
+        box_general_col1.append(grid_runner)
+        box_general_col1.append(self.label_default_prefix_tools)
+        box_general_col1.append(grid_tools)
+        box_general_col1.append(grid_version)
 
-        box_mid.append(grid_miscellaneous)
-        box_mid.append(grid_logs)
-        box_mid.append(grid_backup)
+        box_general_col2.append(grid_miscellaneous)
 
-        box_right.append(grid_theme_accent)
-        box_right.append(self.grid_big_interface)
-        box_right.append(grid_theme_rest)
-        box_right.append(grid_support)
+        box_general_col3.append(grid_envar)
+        box_general_col3.append(grid_logs)
 
-        box_main.attach(box_left, 0, 0, 1, 1)
-        box_main.attach(box_right, 1, 0, 1, 1)
-        box_main.attach(box_mid, 2, 0, 1, 1)
-        box_left.set_hexpand(True)
-        box_mid.set_hexpand(True)
+        grid_page_general.attach(box_general_col1, 0, 0, 1, 1)
+        grid_page_general.attach(box_general_col2, 1, 0, 1, 1)
+        grid_page_general.attach(box_general_col3, 2, 0, 1, 1)
+        box_general_col1.set_hexpand(True)
+        box_general_col3.set_hexpand(True)
 
-        box_main_overlay = Gtk.Overlay()
-        box_main_overlay.set_child(box_main)
-        box_main_overlay.add_overlay(label_version)
+        box_interface_col1.append(grid_interface_mode)
+        box_interface_col1.append(self.grid_big_interface)
 
-        frame.set_child(box_main_overlay)
+        box_interface_col2.append(grid_theme_colors)
+        box_interface_col2.append(grid_steamgriddb)
+
+        box_interface_col3.append(grid_interface_checkboxes)
+
+        grid_page_interface.attach(box_interface_col1, 0, 0, 1, 1)
+        grid_page_interface.attach(box_interface_col2, 1, 0, 1, 1)
+        grid_page_interface.attach(box_interface_col3, 2, 0, 1, 1)
+        box_interface_col1.set_hexpand(True)
+        box_interface_col3.set_hexpand(True)
+
+        self.settings_view_stack = Gtk.Stack()
+
+        settings_tab_switcher = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        settings_tab_switcher.add_css_class("linked")
+        settings_tab_switcher.set_homogeneous(True)
+        settings_tab_switcher.set_hexpand(True)
+        settings_tab_switcher.set_margin_top(10)
+        settings_tab_switcher.set_margin_start(10)
+        settings_tab_switcher.set_margin_end(10)
+
+        settings_tab_pages = [
+            ("general", _("General"), grid_page_general),
+            ("interface", _("Interface"), grid_page_interface),
+        ]
+        first_settings_tab_button = None
+        for name, label, page in settings_tab_pages:
+            self.settings_view_stack.add_titled(page, name, label)
+            button = Gtk.ToggleButton(label=label)
+            button.set_focusable(False)
+            if first_settings_tab_button is None:
+                first_settings_tab_button = button
+                button.set_active(True)
+            else:
+                button.set_group(first_settings_tab_button)
+            button.connect(
+                "toggled",
+                lambda btn, n=name: self.settings_view_stack.set_visible_child_name(n) if btn.get_active() else None,
+            )
+            settings_tab_switcher.append(button)
+
+        box_settings_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_settings_tabs.append(settings_tab_switcher)
+        box_settings_tabs.append(self.settings_view_stack)
+
+        grid_outside_tabs = Gtk.Grid()
+        grid_outside_tabs.set_column_homogeneous(True)
+        grid_outside_tabs.set_column_spacing(10)
+        grid_outside_tabs.set_margin_top(10)
+
+        box_outside_col1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_outside_col2 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_outside_col3 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        box_outside_col1.append(grid_language)
+        box_outside_col2.append(grid_support)
+        box_outside_col3.append(grid_backup)
+
+        grid_outside_tabs.attach(box_outside_col1, 0, 0, 1, 1)
+        grid_outside_tabs.attach(box_outside_col2, 1, 0, 1, 1)
+        grid_outside_tabs.attach(box_outside_col3, 2, 0, 1, 1)
+        box_outside_col1.set_hexpand(True)
+        box_outside_col3.set_hexpand(True)
+
+        box_settings_root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_settings_root.append(box_settings_tabs)
+        box_settings_root.append(grid_outside_tabs)
+
+        frame.set_child(box_settings_root)
 
         box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_bottom.set_homogeneous(True)
