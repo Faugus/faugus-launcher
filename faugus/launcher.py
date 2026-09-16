@@ -722,6 +722,31 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.launcher_banner_base_provider = base_provider
         return base_box
 
+    def cache_busted_uri(self, source_path, cache_key):
+        counter_attr = f"_{cache_key}_counter"
+        path_attr = f"_{cache_key}_path"
+
+        cache_path = source_path
+        if os.path.getsize(source_path) > 0:
+            counter = getattr(self, counter_attr, 0) + 1
+            setattr(self, counter_attr, counter)
+            candidate_path = f"{source_path}.cache{counter}"
+            try:
+                shutil.copyfile(source_path, candidate_path)
+                cache_path = candidate_path
+            except OSError:
+                cache_path = source_path
+
+        old_cache_path = getattr(self, path_attr, None)
+        setattr(self, path_attr, cache_path if cache_path != source_path else None)
+        if old_cache_path and old_cache_path != cache_path and os.path.isfile(old_cache_path):
+            try:
+                os.remove(old_cache_path)
+            except OSError:
+                pass
+
+        return Gio.File.new_for_path(cache_path).get_uri()
+
     def update_launcher_banner_css(self):
         base_box = getattr(self, 'launcher_banner_base_box', None)
         base_provider = getattr(self, 'launcher_banner_base_provider', None)
@@ -768,20 +793,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_provider.load_from_data(base_css.encode("utf-8"))
 
         if banner_image_box is not None and provider is not None and banner_path is not None and os.path.isfile(banner_path):
-            cache_path = banner_path
-            if os.path.getsize(banner_path) > 0:
-                self._banner_css_cache_counter = getattr(self, '_banner_css_cache_counter', 0) + 1
-                candidate_path = f"{banner_path}.cache{self._banner_css_cache_counter}"
-                try:
-                    shutil.copyfile(banner_path, candidate_path)
-                    cache_path = candidate_path
-                except OSError:
-                    cache_path = banner_path
-
-            old_cache_path = getattr(self, '_banner_css_cache_path', None)
-            self._banner_css_cache_path = cache_path if cache_path != banner_path else None
-
-            banner_uri = Gio.File.new_for_path(cache_path).get_uri()
+            banner_uri = self.cache_busted_uri(banner_path, 'launcher_banner_css_cache')
             banner_css = f"""
             .launcher-screen-banner-image {{
                 background-image: url("{banner_uri}");
@@ -917,7 +929,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if show_banner and banner_image_box is not None:
                     candidate = f"{BANNERS_DIR}/{game.gameid}.png"
                     if os.path.isfile(candidate):
-                        banner_uri = Gio.File.new_for_path(candidate).get_uri()
+                        banner_uri = self.cache_busted_uri(candidate, 'background_banner_cache')
 
                         window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
                         if base_mode == "dominant_color" and color_css:
@@ -5219,6 +5231,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if edited_child is not None:
                 edited_child.label.set_text(game.title)
                 self.update_game_visual(edited_child)
+
+            self.flowbox.invalidate_sort()
 
             self.select_game_by_title(game.title)
             self.launcher_banner_dominant_rgb = None
