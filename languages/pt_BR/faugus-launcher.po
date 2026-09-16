@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 12:17+0000\n"
-"PO-Revision-Date: 2026-09-16 10:56+0000\n"
+"PO-Revision-Date: 2026-09-16 13:10+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -274,10 +274,8 @@ msgid "Close"
 msgstr "Fechar"
 
 #: faugus/launcher.py:2863
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "Tempo de jogo"
+msgstr "Tempo de jogo: {}"
 
 #: faugus/launcher.py:2870
 #, fuzzy
