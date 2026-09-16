@@ -415,6 +415,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return Gtk.Align.END
         return Gtk.Align.CENTER
 
+    def wrap_content_with_position(self, content_widget, info_panel):
+        grid_valign = self.grid_position_valign()
+        info_below = grid_valign != Gtk.Align.END
+
+        content_group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        content_group.set_hexpand(True)
+        if info_panel is not None and not info_below:
+            content_group.append(info_panel)
+        content_group.append(content_widget)
+        if info_panel is not None and info_below:
+            content_group.append(info_panel)
+
+        position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
+        position_wrapper.set_hexpand(True)
+        position_wrapper.set_vexpand(True)
+        if grid_valign == Gtk.Align.START:
+            position_wrapper.set_start_widget(content_group)
+        elif grid_valign == Gtk.Align.END:
+            position_wrapper.set_end_widget(content_group)
+        else:
+            position_wrapper.set_center_widget(content_group)
+
+        return position_wrapper
+
     def get_named_rgb(self, name, fallback=(30, 30, 34)):
         found, rgba = Gtk.Box().get_style_context().lookup_color(name)
         if not found:
@@ -1654,37 +1678,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if self.carrousel_active():
                 self.carrousel_box = self.build_carrousel_widget()
-
-                info_below = self.grid_position_valign() != Gtk.Align.END
-
-                position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
-                position_wrapper.set_hexpand(True)
-                position_wrapper.set_vexpand(True)
-
                 self.carrousel_box.set_vexpand(False)
-
-                content_group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                content_group.set_hexpand(True)
-                if info_panel is not None and not info_below:
-                    content_group.append(info_panel)
-                content_group.append(self.carrousel_box)
-                if info_panel is not None and info_below:
-                    content_group.append(info_panel)
-
-                grid_valign = self.grid_position_valign()
-                if grid_valign == Gtk.Align.START:
-                    position_wrapper.set_start_widget(content_group)
-                elif grid_valign == Gtk.Align.END:
-                    position_wrapper.set_end_widget(content_group)
-                else:
-                    position_wrapper.set_center_widget(content_group)
-
-                right_vbox.append(position_wrapper)
+                right_vbox.append(self.wrap_content_with_position(self.carrousel_box, info_panel))
             elif self.interface_mode in ("Covers", "Grid"):
-                position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
-                position_wrapper.set_hexpand(True)
-                position_wrapper.set_vexpand(True)
-
                 scroll_box.set_vexpand(False)
                 scroll_box.set_propagate_natural_height(True)
 
@@ -1706,25 +1702,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.flowbox.set_margin_start(40)
                     self.flowbox.set_margin_end(40)
 
-                grid_valign = self.grid_position_valign()
-                info_below = grid_valign != Gtk.Align.END
-
-                content_group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-                content_group.set_hexpand(True)
-                if info_panel is not None and not info_below:
-                    content_group.append(info_panel)
-                content_group.append(scroll_box)
-                if info_panel is not None and info_below:
-                    content_group.append(info_panel)
-
-                if grid_valign == Gtk.Align.START:
-                    position_wrapper.set_start_widget(content_group)
-                elif grid_valign == Gtk.Align.END:
-                    position_wrapper.set_end_widget(content_group)
-                else:
-                    position_wrapper.set_center_widget(content_group)
-
-                right_vbox.append(position_wrapper)
+                right_vbox.append(self.wrap_content_with_position(scroll_box, info_panel))
             else:
                 right_vbox.append(scroll_box)
                 scroll_box.set_vexpand(True)
@@ -5862,14 +5840,14 @@ class Settings(Gtk.Dialog):
         self.combobox_theme.append("system", _("Default"))
         self.combobox_theme.append("light", _("Light"))
         self.combobox_theme.append("dark", _("Dark"))
-        self.combobox_theme.connect("changed", self.on_theme_accent_changed)
+        self._combobox_theme_handler = self.combobox_theme.connect("changed", self.on_theme_accent_changed)
 
         self.label_accent = Gtk.Label(label=_("Accent Color"))
         self.label_accent.set_halign(Gtk.Align.START)
         self.combobox_accent = IdComboBox()
         self.combobox_accent.append("system", _("Default"))
         self.combobox_accent.append("custom", _("Custom"))
-        self.combobox_accent.connect("changed", self.on_theme_accent_changed)
+        self._combobox_accent_handler = self.combobox_accent.connect("changed", self.on_theme_accent_changed)
 
         self.color_button = Gtk.ColorButton()
         self.color_button.set_sensitive(False)
@@ -7051,6 +7029,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_grid_max_children.set_active(grid_max_children_enabled)
         self.entry_grid_max_children.set_value(grid_max_children_per_line)
 
+        self.combobox_theme.handler_block(self._combobox_theme_handler)
+        self.combobox_accent.handler_block(self._combobox_accent_handler)
+
         if not self.combobox_theme_engine.set_active_id(self.theme_engine):
             self.combobox_theme_engine.set_active_id("adwaita")
         self.on_theme_engine_changed(self.combobox_theme_engine)
@@ -7066,6 +7047,9 @@ class Settings(Gtk.Dialog):
 
         self.combobox_theme.set_active_id(loaded_theme)
         self.combobox_accent.set_active_id("custom" if is_custom_accent else "system")
+
+        self.combobox_theme.handler_unblock(self._combobox_theme_handler)
+        self.combobox_accent.handler_unblock(self._combobox_accent_handler)
 
         self.interface_theme = loaded_theme
         self.accent_color = loaded_accent
