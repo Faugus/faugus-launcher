@@ -399,12 +399,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def carrousel_active(self):
         return self.interface_mode == "Carrousel"
 
-    def grid_position_align(self):
-        return {
-            "Top": Gtk.Align.START,
-            "Middle": Gtk.Align.CENTER,
-            "Bottom": Gtk.Align.END,
-        }.get(getattr(self, 'grid_position', 'Middle'), Gtk.Align.CENTER)
+    def grid_position_valign(self):
+        position = getattr(self, 'grid_position', 'Middle')
+        if position.startswith("Top"):
+            return Gtk.Align.START
+        if position.startswith("Bottom"):
+            return Gtk.Align.END
+        return Gtk.Align.CENTER
+
+    def grid_position_halign(self):
+        position = getattr(self, 'grid_position', 'Middle')
+        if position.endswith("Left"):
+            return Gtk.Align.START
+        if position.endswith("Right"):
+            return Gtk.Align.END
+        return Gtk.Align.CENTER
 
     def get_named_rgb(self, name, fallback=(30, 30, 34)):
         found, rgba = Gtk.Box().get_style_context().lookup_color(name)
@@ -1162,17 +1171,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 return child
         return None
 
-    def on_flowbox_key(self, controller, keyval, keycode, state):
-        direction = {
-            Gdk.KEY_Right: Gtk.DirectionType.RIGHT,
-            Gdk.KEY_Left: Gtk.DirectionType.LEFT,
-            Gdk.KEY_Down: Gtk.DirectionType.DOWN,
-            Gdk.KEY_Up: Gtk.DirectionType.UP,
-        }.get(keyval)
-        if direction is None:
-            return False
-        return navigate_focus(direction)
-
     def on_flowbox_keyval_tracker(self, controller, keyval, keycode, state):
         self._last_flowbox_keyval = keyval
         if self.interface_mode == "List" and keyval in (Gdk.KEY_Left, Gdk.KEY_Right):
@@ -1493,8 +1491,24 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if is_big:
             self.flowbox.set_halign(Gtk.Align.CENTER)
             self.flowbox.set_valign(Gtk.Align.CENTER)
-            self.flowbox.set_min_children_per_line(2)
-            self.flowbox.set_max_children_per_line(20)
+            if self.interface_mode in ("Grid", "Covers"):
+                max_children = getattr(self, 'grid_max_children_per_line', 20)
+                self.flowbox.set_min_children_per_line(min(2, max_children))
+                self.flowbox.set_max_children_per_line(max_children)
+            else:
+                self.flowbox.set_min_children_per_line(2)
+                self.flowbox.set_max_children_per_line(20)
+
+            horizontal_mode = (
+                self.interface_mode in ("Grid", "Covers")
+                and getattr(self, 'grid_orientation', 'Vertical') == 'Horizontal'
+            )
+            if horizontal_mode:
+                self.flowbox.set_orientation(Gtk.Orientation.VERTICAL)
+                scroll_box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+            else:
+                self.flowbox.set_orientation(Gtk.Orientation.HORIZONTAL)
+                scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         else:
             self.flowbox.set_halign(Gtk.Align.FILL)
             self.flowbox.set_valign(Gtk.Align.START)
@@ -1624,22 +1638,41 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.carrousel_box = self.build_carrousel_widget()
                 self.carrousel_box.set_vexpand(True)
                 right_vbox.append(self.carrousel_box)
-            elif self.interface_mode == "Covers":
-                covers_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
-                covers_wrapper.set_vexpand(True)
+            elif self.interface_mode in ("Covers", "Grid"):
+                position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
+                position_wrapper.set_hexpand(True)
+                position_wrapper.set_vexpand(True)
+
                 scroll_box.set_vexpand(False)
                 scroll_box.set_propagate_natural_height(True)
-                self.flowbox.set_margin_top(40)
-                self.flowbox.set_margin_bottom(40)
-                self.flowbox.set_margin_start(40)
-                self.flowbox.set_margin_end(40)
-                if self.grid_position == "Top":
-                    covers_wrapper.set_start_widget(scroll_box)
-                elif self.grid_position == "Bottom":
-                    covers_wrapper.set_end_widget(scroll_box)
+
+                position_halign = self.grid_position_halign()
+                self.flowbox.set_halign(Gtk.Align.CENTER)
+                if horizontal_mode or position_halign != Gtk.Align.CENTER:
+                    self.flowbox.set_hexpand(False)
+                    scroll_box.set_hexpand(False)
+                    scroll_box.set_halign(position_halign)
+                    scroll_box.set_propagate_natural_width(True)
                 else:
-                    covers_wrapper.set_center_widget(scroll_box)
-                right_vbox.append(covers_wrapper)
+                    self.flowbox.set_hexpand(True)
+                    scroll_box.set_hexpand(True)
+                    scroll_box.set_halign(Gtk.Align.FILL)
+                    scroll_box.set_propagate_natural_width(False)
+                if self.interface_mode == "Covers":
+                    self.flowbox.set_margin_top(40)
+                    self.flowbox.set_margin_bottom(40)
+                    self.flowbox.set_margin_start(40)
+                    self.flowbox.set_margin_end(40)
+
+                grid_valign = self.grid_position_valign()
+                if grid_valign == Gtk.Align.START:
+                    position_wrapper.set_start_widget(scroll_box)
+                elif grid_valign == Gtk.Align.END:
+                    position_wrapper.set_end_widget(scroll_box)
+                else:
+                    position_wrapper.set_center_widget(scroll_box)
+
+                right_vbox.append(position_wrapper)
             else:
                 right_vbox.append(scroll_box)
                 scroll_box.set_vexpand(True)
@@ -1971,6 +2004,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         fit = int((width / self.carrousel_step - 1) / 2)
         return max(1, min(max_radius, fit))
 
+    def carrousel_fan_center(self, extent, align):
+        if align == Gtk.Align.CENTER:
+            return extent / 2
+        margin = min(extent / 2, self.carrousel_radius * self.carrousel_step + self.carrousel_step / 2)
+        if align == Gtk.Align.START:
+            return margin
+        return extent - margin
+
     def place_carrousel_slot_base(self, slot):
         _, natural_w, _, _ = slot["box"].measure(Gtk.Orientation.HORIZONTAL, -1)
         _, natural_h, _, _ = slot["box"].measure(Gtk.Orientation.VERTICAL, natural_w)
@@ -1978,12 +2019,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_y = self.carrousel_center_y - natural_h / 2
         self.carrousel_fixed.move(slot["box"], base_x, base_y)
 
-    def update_carrousel_layout(self, width):
-        if not width or not self.carrousel_step or not getattr(self, 'carrousel_slots', None):
+    def update_carrousel_layout(self, *_args):
+        if not self.carrousel_step or not getattr(self, 'carrousel_slots', None):
             return
-        self.carrousel_center_x = width / 2
+        current_width = self.get_width() or self.carrousel_step * 3
+        current_height = self.get_height() or self.carrousel_step * 3
         n = len(self.carrousel_visible_games())
-        self.carrousel_radius = self.carrousel_fit_radius(n, width)
+        fan_extent = current_height if self.carrousel_vertical else current_width
+        self.carrousel_radius = self.carrousel_fit_radius(n, fan_extent)
+        if self.carrousel_vertical:
+            self.carrousel_center_y = self.carrousel_fan_center(current_height, self.grid_position_valign())
+        else:
+            self.carrousel_center_x = self.carrousel_fan_center(current_width, self.grid_position_halign())
         for slot in self.carrousel_slots:
             self.place_carrousel_slot_base(slot)
             self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
@@ -1998,7 +2045,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         d = abs(offset)
         if d > radius:
             opacity *= max(0.0, radius + 1 - d)
-        translate_x = offset * self.carrousel_step
+        if self.carrousel_vertical:
+            translate_x, translate_y = 0, offset * self.carrousel_step
+        else:
+            translate_x, translate_y = offset * self.carrousel_step, 0
         slot["box"].set_opacity(opacity)
 
         can_target = abs(offset) <= radius + 0.5
@@ -2025,7 +2075,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
-            f"transform: translate({translate_x:.2f}px, 0) scale({scale:.4f}); "
+            f"transform: translate({translate_x:.2f}px, {translate_y:.2f}px) scale({scale:.4f}); "
             f"box-shadow: {box_shadow}; }}"
         )
         slot["style_provider"].load_from_data(css.encode("utf-8"))
@@ -2033,11 +2083,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         slot["visual_offset"] = offset
 
     def build_carrousel_widget(self):
+        self.carrousel_vertical = getattr(self, 'grid_orientation', 'Vertical') == 'Vertical'
+
         outer = Gtk.Fixed()
         outer.set_can_focus(True)
         outer.set_focusable(True)
-        outer.set_halign(Gtk.Align.FILL)
-        outer.set_valign(self.grid_position_align())
+        if self.carrousel_vertical:
+            outer.set_halign(self.grid_position_halign())
+            outer.set_valign(Gtk.Align.FILL)
+        else:
+            outer.set_halign(Gtk.Align.FILL)
+            outer.set_valign(self.grid_position_valign())
         outer.set_hexpand(True)
         outer.set_overflow(Gtk.Overflow.HIDDEN)
 
@@ -2076,7 +2132,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def connect_carrousel_resize(self):
         surface = self.get_surface()
         if surface is not None:
-            surface.connect("notify::width", lambda s, p: self.update_carrousel_layout(s.get_width()))
+            surface.connect("notify::width", lambda s, p: self.update_carrousel_layout())
+            surface.connect("notify::height", lambda s, p: self.update_carrousel_layout())
         else:
             self.connect("realize", lambda w: self.connect_carrousel_resize())
 
@@ -2089,17 +2146,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._carrousel_anim_id = None
 
         max_width, max_height = self.carrousel_slot_size()
-        self.carrousel_step = max_width + 20
         glow_margin = 70
-        total_height = max_height + 50 + glow_margin * 2
-        self.carrousel_fixed.set_size_request(self.carrousel_step * 3, total_height)
-        current_width = self.get_width() or self.carrousel_step * 3
-        self.carrousel_center_x = current_width / 2
-        self.carrousel_center_y = total_height / 2
+        if self.carrousel_vertical:
+            self.carrousel_step = max_height + 20
+            cross_size = max_width + 50 + glow_margin * 2
+            self.carrousel_fixed.set_size_request(cross_size, self.carrousel_step * 3)
+        else:
+            self.carrousel_step = max_width + 20
+            cross_size = max_height + 50 + glow_margin * 2
+            self.carrousel_fixed.set_size_request(self.carrousel_step * 3, cross_size)
+
+        current_width = self.get_width() or (cross_size if self.carrousel_vertical else self.carrousel_step * 3)
+        current_height = self.get_height() or (self.carrousel_step * 3 if self.carrousel_vertical else cross_size)
 
         games = self.carrousel_visible_games()
         n = len(games)
-        self.carrousel_radius = self.carrousel_fit_radius(n, current_width)
+        fan_extent = current_height if self.carrousel_vertical else current_width
+        self.carrousel_radius = self.carrousel_fit_radius(n, fan_extent)
+        if self.carrousel_vertical:
+            self.carrousel_center_y = self.carrousel_fan_center(current_height, self.grid_position_valign())
+            self.carrousel_center_x = cross_size / 2
+        else:
+            self.carrousel_center_x = self.carrousel_fan_center(current_width, self.grid_position_halign())
+            self.carrousel_center_y = cross_size / 2
 
         if n == 0:
             for slot in self.carrousel_slots:
@@ -2139,7 +2208,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot.pop("_settle_offset", None)
                 self.layout_carrousel_slot(slot, slot["offset"])
 
-        self.carrousel_radius = self.carrousel_fit_radius(n, self.get_width())
+        self.carrousel_radius = self.carrousel_fit_radius(n, self.get_height() if self.carrousel_vertical else self.get_width())
         self.carrousel_index = (self.carrousel_index + delta) % n
 
         span = self.carrousel_max_offset - self.carrousel_min_offset + 1
@@ -3615,6 +3684,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.window_height = int(cfg.config.get('height', 720))
         self.cover_size = int(cfg.config.get('cover-size', 100))
         self.grid_position = cfg.config.get('grid-position', 'Middle').strip('"')
+        self.grid_orientation = cfg.config.get('grid-orientation', 'Vertical').strip('"')
+        grid_max_children_enabled = cfg.config.get('grid-max-children-enabled', 'False') == 'True'
+        self.grid_max_children_per_line = int(cfg.config.get('grid-max-children-per-line', 20)) if grid_max_children_enabled else 20
         self.sort = cfg.config.get('sort', '')
         self.category = cfg.config.get('category', '')
         self.steam_user = cfg.config.get('steam-user', 'all')
@@ -4039,6 +4111,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.grid_position != settings_dialog.combobox_grid_position.get_active_id():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                if self.grid_orientation != settings_dialog.combobox_grid_orientation.get_active_id():
+                    os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
+
+                new_grid_max_children_enabled = settings_dialog.checkbox_grid_max_children.get_active()
+                new_grid_max_children = int(settings_dialog.entry_grid_max_children.get_value()) if new_grid_max_children_enabled else 20
+                if self.grid_max_children_per_line != new_grid_max_children:
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.language != settings_dialog.combobox_language.get_active_id():
@@ -5618,9 +5698,45 @@ class Settings(Gtk.Dialog):
         self.label_grid_position = Gtk.Label(label=_("Position"))
         self.label_grid_position.set_halign(Gtk.Align.START)
         self.combobox_grid_position = IdComboBox()
+        self.combobox_grid_position.append("TopLeft", _("Top left"))
         self.combobox_grid_position.append("Top", _("Top"))
+        self.combobox_grid_position.append("TopRight", _("Top right"))
+        self.combobox_grid_position.append("Left", _("Left"))
         self.combobox_grid_position.append("Middle", _("Middle"))
+        self.combobox_grid_position.append("Right", _("Right"))
+        self.combobox_grid_position.append("BottomLeft", _("Bottom left"))
         self.combobox_grid_position.append("Bottom", _("Bottom"))
+        self.combobox_grid_position.append("BottomRight", _("Bottom right"))
+
+        self.label_grid_orientation = Gtk.Label(label=_("Orientation"))
+        self.label_grid_orientation.set_halign(Gtk.Align.START)
+        self.combobox_grid_orientation = IdComboBox()
+        self.combobox_grid_orientation.append("Vertical", _("Vertical"))
+        self.combobox_grid_orientation.append("Horizontal", _("Horizontal"))
+
+        self.checkbox_grid_max_children = Gtk.CheckButton(label=_("Maximum Columns"))
+        self.checkbox_grid_max_children.set_active(False)
+
+        adjustment_grid_max_children = Gtk.Adjustment(
+            value=getattr(self.parent, 'grid_max_children_per_line', 20),
+            lower=1, upper=50, step_increment=1, page_increment=5, page_size=0
+        )
+        self.entry_grid_max_children = Gtk.SpinButton(adjustment=adjustment_grid_max_children, climb_rate=1, digits=0)
+        self.entry_grid_max_children.set_hexpand(True)
+        self.entry_grid_max_children.set_sensitive(False)
+
+        def on_checkbox_grid_max_children_toggled(checkbox):
+            self.entry_grid_max_children.set_sensitive(checkbox.get_active())
+
+        self.checkbox_grid_max_children.connect("toggled", on_checkbox_grid_max_children_toggled)
+
+        def on_grid_orientation_changed(combobox):
+            if combobox.get_active_id() == "Horizontal":
+                self.checkbox_grid_max_children.set_label(_("Maximum Rows"))
+            else:
+                self.checkbox_grid_max_children.set_label(_("Maximum Columns"))
+
+        self.combobox_grid_orientation.connect("changed", on_grid_orientation_changed)
 
         self.checkbox_steamgriddb = Gtk.CheckButton(label=_("SteamGridDB"))
         self.checkbox_steamgriddb.set_active(False)
@@ -5945,6 +6061,11 @@ class Settings(Gtk.Dialog):
         self.grid_big_interface.attach(self.label_grid_position, 0, 4, 2, 1)
         self.grid_big_interface.attach(self.combobox_grid_position, 0, 5, 2, 1)
         self.combobox_grid_position.set_hexpand(True)
+        self.grid_big_interface.attach(self.label_grid_orientation, 0, 6, 2, 1)
+        self.grid_big_interface.attach(self.combobox_grid_orientation, 0, 7, 2, 1)
+        self.combobox_grid_orientation.set_hexpand(True)
+        self.grid_big_interface.attach(self.checkbox_grid_max_children, 0, 8, 2, 1)
+        self.grid_big_interface.attach(self.entry_grid_max_children, 0, 9, 2, 1)
         self.entry_steamgriddb_key.set_hexpand(True)
 
         grid_support.attach(self.label_support, 0, 0, 2, 1)
@@ -6104,9 +6225,21 @@ class Settings(Gtk.Dialog):
 
         self._refresh_banner_checkbox_sensitivity()
 
-        self.label_grid_position.set_sensitive(covers_or_carrousel)
-        self.combobox_grid_position.set_sensitive(covers_or_carrousel)
-        self.combobox_grid_position.set_tooltip_text(None if covers_or_carrousel else covers_carrousel_tip)
+        covers_carrousel_or_grid = active_id in ("Covers", "Carrousel", "Grid")
+        covers_carrousel_grid_tip = _("Grid, Covers or Carrousel mode")
+        self.label_grid_position.set_sensitive(covers_carrousel_or_grid)
+        self.combobox_grid_position.set_sensitive(covers_carrousel_or_grid)
+        self.combobox_grid_position.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
+
+        grid_or_covers = active_id in ("Grid", "Covers")
+        grid_covers_tip = _("Grid or Covers mode")
+        self.label_grid_orientation.set_sensitive(covers_carrousel_or_grid)
+        self.combobox_grid_orientation.set_sensitive(covers_carrousel_or_grid)
+        self.combobox_grid_orientation.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
+
+        self.checkbox_grid_max_children.set_sensitive(grid_or_covers)
+        self.entry_grid_max_children.set_sensitive(grid_or_covers and self.checkbox_grid_max_children.get_active())
+        self.checkbox_grid_max_children.set_tooltip_text(None if grid_or_covers else grid_covers_tip)
 
         self.label_startup_window_size.set_sensitive(not_list)
         self.combobox_startup_window_size.set_sensitive(not_list)
@@ -6216,6 +6349,9 @@ class Settings(Gtk.Dialog):
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("grid-position", self.combobox_grid_position.get_active_id())
+        config.set_value("grid-orientation", self.combobox_grid_orientation.get_active_id())
+        config.set_value("grid-max-children-enabled", self.checkbox_grid_max_children.get_active())
+        config.set_value("grid-max-children-per-line", int(self.entry_grid_max_children.get_value()))
         config.set_value("labels-enabled", self.checkbox_labels.get_active())
         config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
         config.set_value("steamgriddb-enabled", self.checkbox_steamgriddb.get_active())
@@ -6583,6 +6719,9 @@ class Settings(Gtk.Dialog):
         header_bar = cfg.config.get('header-bar', 'False') == 'True'
         startup_window_size = cfg.config.get('startup-window-size', '')
         grid_position = cfg.config.get('grid-position', 'Middle').strip('"')
+        grid_orientation = cfg.config.get('grid-orientation', 'Vertical').strip('"')
+        grid_max_children_enabled = cfg.config.get('grid-max-children-enabled', 'False') == 'True'
+        grid_max_children_per_line = int(cfg.config.get('grid-max-children-per-line', 20))
         self.interface_theme = cfg.config.get('interface-theme', 'system')
         self.accent_color = cfg.config.get('accent-color', 'system')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
@@ -6622,6 +6761,9 @@ class Settings(Gtk.Dialog):
         self.combobox_background.set_active_id(background_mode)
         self.checkbox_banner.set_active(banner_enabled)
         self.combobox_grid_position.set_active_id(grid_position)
+        self.combobox_grid_orientation.set_active_id(grid_orientation)
+        self.checkbox_grid_max_children.set_active(grid_max_children_enabled)
+        self.entry_grid_max_children.set_value(grid_max_children_per_line)
 
         if not self.combobox_theme_engine.set_active_id(self.theme_engine):
             self.combobox_theme_engine.set_active_id("adwaita")
