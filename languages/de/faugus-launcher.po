@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 02:37+0000\n"
-"PO-Revision-Date: 2026-09-14 01:43+0000\n"
+"PO-Revision-Date: 2026-09-16 10:56+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -275,10 +275,8 @@ msgid "Close"
 msgstr "Schließen"
 
 #: faugus/launcher.py:2857
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Zuletzt gespielt"
+msgstr "Nie gespielt"
 
 #: faugus/launcher.py:2881
 msgid "Remove from hidden"
@@ -350,62 +348,52 @@ msgstr "Minuten"
 
 #: faugus/launcher.py:3141
 msgid "Just now"
-msgstr ""
+msgstr "Gerade"
 
 #: faugus/launcher.py:3146
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "Minute"
+msgstr "Vor einer Minute"
 
 #: faugus/launcher.py:3147 faugus/launcher.py:3153 faugus/launcher.py:3159
 #: faugus/launcher.py:3165 faugus/launcher.py:3171 faugus/launcher.py:3176
 msgid "ago"
-msgstr ""
+msgstr "vorher"
 
 #: faugus/launcher.py:3152
 msgid "An hour ago"
-msgstr ""
+msgstr "Vor einer Stunde"
 
 #: faugus/launcher.py:3158
 msgid "Yesterday"
-msgstr ""
+msgstr "Gestern"
 
 #: faugus/launcher.py:3159
 msgid "days"
-msgstr ""
+msgstr "Tage"
 
 #: faugus/launcher.py:3164
-#, fuzzy
-#| msgid "Last played"
 msgid "Last week"
-msgstr "Zuletzt gespielt"
+msgstr "Letzte Woche"
 
 #: faugus/launcher.py:3165
 msgid "weeks"
-msgstr ""
+msgstr "Wochen"
 
 #: faugus/launcher.py:3170
-#, fuzzy
-#| msgid "Monthly"
 msgid "Last month"
-msgstr "Monatlich"
+msgstr "Letzten Monat"
 
 #: faugus/launcher.py:3171
-#, fuzzy
-#| msgid "Monthly"
 msgid "months"
-msgstr "Monatlich"
+msgstr "Monate"
 
 #: faugus/launcher.py:3175
-#, fuzzy
-#| msgid "Last played"
 msgid "Last year"
-msgstr "Zuletzt gespielt"
+msgstr "Letztes Jahr"
 
 #: faugus/launcher.py:3176
 msgid "years"
-msgstr ""
+msgstr "Jahre"
 
 #: faugus/launcher.py:3356 faugus/launcher.py:6589 faugus/launcher.py:8633
 msgid "Select a file to run in the prefix"
@@ -613,7 +601,7 @@ msgstr "Position"
 
 #: faugus/launcher.py:5701
 msgid "Top left"
-msgstr ""
+msgstr "Oben links"
 
 #: faugus/launcher.py:5702
 msgid "Top"
@@ -621,59 +609,51 @@ msgstr "Oben"
 
 #: faugus/launcher.py:5703
 msgid "Top right"
-msgstr ""
+msgstr "Open rechts"
 
 #: faugus/launcher.py:5704
 msgid "Left"
-msgstr ""
+msgstr "Links"
 
 #: faugus/launcher.py:5705
 msgid "Middle"
 msgstr "Mitte"
 
 #: faugus/launcher.py:5706
-#, fuzzy
-#| msgid "Light"
 msgid "Right"
-msgstr "Hell"
+msgstr "Rechts"
 
 #: faugus/launcher.py:5707
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom left"
-msgstr "Unten"
+msgstr "Unten links"
 
 #: faugus/launcher.py:5708
 msgid "Bottom"
 msgstr "Unten"
 
 #: faugus/launcher.py:5709
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom right"
-msgstr "Unten"
+msgstr "Unten rechts"
 
 #: faugus/launcher.py:5711
 msgid "Orientation"
-msgstr ""
+msgstr "Orientierung"
 
 #: faugus/launcher.py:5714
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Alphabetisch"
+msgstr "Senkrecht"
 
 #: faugus/launcher.py:5715
 msgid "Horizontal"
-msgstr ""
+msgstr "Waagerecht"
 
 #: faugus/launcher.py:5717 faugus/launcher.py:5737
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Maximum Spalten"
 
 #: faugus/launcher.py:5735
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Maximum Zeilen"
 
 #: faugus/launcher.py:5741
 msgid "SteamGridDB"
@@ -709,7 +689,7 @@ msgstr "Sonstiges"
 
 #: faugus/launcher.py:5783
 msgid "Display"
-msgstr ""
+msgstr "Anzeige"
 
 #: faugus/launcher.py:5786
 msgid "Discrete GPU"
@@ -835,13 +815,11 @@ msgstr "Globale Umgebungsvariablen"
 
 #: faugus/launcher.py:6135
 msgid "General"
-msgstr ""
+msgstr "Allgemein"
 
 #: faugus/launcher.py:6136
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Ansichtsmodus"
+msgstr "Ansicht"
 
 #: faugus/launcher.py:6249
 #, python-format
@@ -861,10 +839,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Kachel-, Cover- oder Karussell-Modus"
 
 #: faugus/launcher.py:6315
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Kachel-, Cover- oder Karussell-Modus"
+msgstr "Kachel- oder Cover-Modus"
 
 #: faugus/launcher.py:6343
 msgid "Covers or Carrousel mode with SteamGridDB"
