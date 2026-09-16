@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 19:48+0000\n"
-"PO-Revision-Date: 2026-09-16 17:45+0000\n"
+"PO-Revision-Date: 2026-09-16 20:37+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -747,7 +747,7 @@ msgstr "Premi Ctrl+H per mostrare/nascondere i giochi"
 
 #: faugus/launcher.py:5993
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: faugus/launcher.py:5995
 msgid "Gamepad navigation"
