@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 10:56+0000\n"
+"POT-Creation-Date: 2026-09-16 11:55+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -287,8 +287,10 @@ msgid "Close"
 msgstr "बन्द गर्नुहोस्"
 
 #: faugus/launcher.py:2863
-msgid "Played for {}"
-msgstr ""
+#, fuzzy
+#| msgid "Last played"
+msgid "{} played"
+msgstr "अन्तिम पटक खेलेको"
 
 #: faugus/launcher.py:2870
 #, fuzzy

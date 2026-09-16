@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 10:56+0000\n"
+"POT-Creation-Date: 2026-09-16 11:55+0000\n"
 "PO-Revision-Date: 2026-09-01 13:48+0000\n"
 "Last-Translator: Han Andre <darahzmail@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/faugus-"
@@ -298,8 +298,10 @@ msgid "Close"
 msgstr "Lukk"
 
 #: faugus/launcher.py:2863
-msgid "Played for {}"
-msgstr ""
+#, fuzzy
+#| msgid "Last played"
+msgid "{} played"
+msgstr "Sist spilt"
 
 #: faugus/launcher.py:2870
 #, fuzzy

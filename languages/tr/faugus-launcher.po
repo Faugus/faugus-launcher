@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 10:56+0000\n"
+"POT-Creation-Date: 2026-09-16 11:55+0000\n"
 "PO-Revision-Date: 2026-09-04 20:03+0000\n"
 "Last-Translator: howoz <howoz@proton.me>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -298,8 +298,10 @@ msgid "Close"
 msgstr "Kapat"
 
 #: faugus/launcher.py:2863
-msgid "Played for {}"
-msgstr ""
+#, fuzzy
+#| msgid "Last played"
+msgid "{} played"
+msgstr "En son oynanan"
 
 #: faugus/launcher.py:2870
 #, fuzzy
