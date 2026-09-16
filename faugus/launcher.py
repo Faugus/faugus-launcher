@@ -2860,7 +2860,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             formatted = self.format_playtime(game.playtime)
 
-        label_menu_playtime = Gtk.Label(label=_("Played for {}").format(formatted) if formatted else "")
+        label_menu_playtime = Gtk.Label(label=_("{} played").format(formatted) if formatted else "")
         label_menu_playtime.set_halign(Gtk.Align.START)
         label_menu_playtime.set_margin_bottom(4)
         label_menu_playtime.set_visible(bool(formatted))
