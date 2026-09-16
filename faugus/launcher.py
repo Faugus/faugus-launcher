@@ -4503,6 +4503,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.processes.pop(game, None)
         self.save_running()
 
+        self.reload_playtimes()
+
         if hasattr(self, 'current_sort') and hasattr(self, 'opt_playtime') and self.current_sort == self.opt_playtime:
             try:
                 data = load_json_file(GAMES_JSON, [])
@@ -4516,6 +4518,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 GLib.idle_add(self.flowbox.invalidate_sort)
 
         GLib.idle_add(self.update_icon)
+        GLib.idle_add(self.update_info_panel)
 
     def update_last_played(self, gameid):
         games = load_json_file(GAMES_JSON, default=[])
@@ -4791,11 +4794,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not games_data:
             return
 
-        playtime_map = {g["gameid"]: g.get("playtime", 0) for g in games_data}
+        data_map = {g["gameid"]: g for g in games_data if isinstance(g, dict) and "gameid" in g}
 
         for game in self.games:
-            if game.gameid in playtime_map:
-                game.playtime = playtime_map[game.gameid]
+            entry = data_map.get(game.gameid)
+            if entry:
+                game.playtime = entry.get("playtime", 0)
+                game.last_played = entry.get("last_played", game.last_played)
 
     def remove_steam_shortcut(self, title):
         for path in get_all_shortcut_paths(self.steam_user):
