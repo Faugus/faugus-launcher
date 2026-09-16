@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -296,14 +296,14 @@ msgstr "تړل"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "وروستی ځل لوبول"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "د لوبې وخت"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "وروستی ځل لوبول"
 
 #: faugus/launcher.py:2871
@@ -1351,6 +1351,11 @@ msgstr "یوه نښه وټاکئ"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "هېڅ پایله ونه موندل شوه"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "وروستی ځل لوبول"
 
 #, fuzzy
 #~| msgid "Last played"

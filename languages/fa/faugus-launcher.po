@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-08-29 01:20+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -299,11 +299,12 @@ msgid "Close"
 msgstr "بستن"
 
 #: faugus/launcher.py:2863
-msgid "{} played"
-msgstr ""
+#, fuzzy
+msgid "Playtime: {}"
+msgstr "باز کردن"
 
 #: faugus/launcher.py:2870
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr ""
 
 #: faugus/launcher.py:2871

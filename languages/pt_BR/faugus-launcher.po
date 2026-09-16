@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-09-16 10:56+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
@@ -275,14 +275,14 @@ msgstr "Fechar"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "Último jogado"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "Tempo de jogo"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "Último jogado"
 
 #: faugus/launcher.py:2871
@@ -1302,6 +1302,11 @@ msgstr "Escolha um ícone"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "Nenhum resultado encontrado"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "Último jogado"
 
 #~ msgid "ago"
 #~ msgstr "atrás"

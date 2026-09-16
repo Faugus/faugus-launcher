@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-09-15 03:51+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -275,14 +275,14 @@ msgstr "Stäng"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "Senast spelat"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "Speltid"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "Senast spelat"
 
 #: faugus/launcher.py:2871
@@ -1316,6 +1316,11 @@ msgstr "Välj en ikon"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "Inga resultat hittades"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "Senast spelat"
 
 #, fuzzy
 #~| msgid "Last played"

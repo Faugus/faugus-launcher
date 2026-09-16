@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-09-15 03:51+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
@@ -275,14 +275,14 @@ msgstr "关闭"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "上次游玩"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "游玩时间"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "上次游玩"
 
 #: faugus/launcher.py:2871
@@ -1314,6 +1314,11 @@ msgstr "选择一个图标"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "没有结果"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "上次游玩"
 
 #, fuzzy
 #~| msgid "Last played"

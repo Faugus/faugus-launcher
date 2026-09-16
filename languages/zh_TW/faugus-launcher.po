@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-08-29 01:20+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -300,14 +300,14 @@ msgstr "關閉"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "最後遊玩"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "遊玩時間"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "最後遊玩"
 
 #: faugus/launcher.py:2871
@@ -1355,6 +1355,11 @@ msgstr "選擇一個圖示"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "沒有找到結果"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "最後遊玩"
 
 #, fuzzy
 #~| msgid "Last played"

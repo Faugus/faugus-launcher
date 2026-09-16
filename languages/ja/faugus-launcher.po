@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 11:55+0000\n"
+"POT-Creation-Date: 2026-09-16 12:17+0000\n"
 "PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -297,14 +297,14 @@ msgstr "閉じる"
 
 #: faugus/launcher.py:2863
 #, fuzzy
-#| msgid "Last played"
-msgid "{} played"
-msgstr "最後に遊んだ日"
+#| msgid "Playtime"
+msgid "Playtime: {}"
+msgstr "遊んだ時間"
 
 #: faugus/launcher.py:2870
 #, fuzzy
 #| msgid "Last played"
-msgid "Last played {}"
+msgid "Last played: {}"
 msgstr "最後に遊んだ日"
 
 #: faugus/launcher.py:2871
@@ -1342,6 +1342,11 @@ msgstr "アイコンを選んでください"
 #: faugus/utils.py:2524
 msgid "No results found"
 msgstr "結果が見つかりませんでした"
+
+#, fuzzy
+#~| msgid "Last played"
+#~ msgid "{} played"
+#~ msgstr "最後に遊んだ日"
 
 #, fuzzy
 #~| msgid "Last played"
