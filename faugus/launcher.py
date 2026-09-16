@@ -2860,13 +2860,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             formatted = self.format_playtime(game.playtime)
 
-        label_menu_playtime = Gtk.Label(label=formatted or "")
+        label_menu_playtime = Gtk.Label(label=_("Played for {}").format(formatted) if formatted else "")
         label_menu_playtime.set_halign(Gtk.Align.START)
         label_menu_playtime.set_margin_bottom(4)
         label_menu_playtime.set_visible(bool(formatted))
 
         never_played = not formatted and not last_played_text
-        label_menu_last_played = Gtk.Label(label=last_played_text or (_("Never played") if never_played else ""))
+        label_menu_last_played = Gtk.Label(
+            label=_("Last played {}").format(last_played_text) if last_played_text
+            else (_("Never played") if never_played else "")
+        )
         label_menu_last_played.set_halign(Gtk.Align.START)
         label_menu_last_played.set_margin_bottom(4)
         label_menu_last_played.set_visible(bool(last_played_text) or never_played)
@@ -3122,20 +3125,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if hours == 0 and minutes == 0:
             return None
 
-        txt_hour   = _("hour")
-        txt_hours  = _("hours")
-        txt_minute = _("minute")
-        txt_minutes = _("minutes")
-
         parts = []
 
         if hours > 0:
-            word = txt_hour if hours == 1 else txt_hours
-            parts.append(f"{hours} {word}")
+            parts.append((_("{} hour") if hours == 1 else _("{} hours")).format(hours))
 
         if minutes > 0:
-            word = txt_minute if minutes == 1 else txt_minutes
-            parts.append(f"{minutes} {word}")
+            parts.append((_("{} minute") if minutes == 1 else _("{} minutes")).format(minutes))
 
         return " ".join(parts)
 
@@ -3156,36 +3152,36 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if minutes < 60:
             if minutes == 1:
                 return _("A minute ago")
-            return "{} {} {}".format(minutes, _("minutes"), _("ago"))
+            return _("{} minutes ago").format(minutes)
 
         hours = int(seconds // 3600)
         if hours < 24:
             if hours == 1:
                 return _("An hour ago")
-            return "{} {} {}".format(hours, _("hours"), _("ago"))
+            return _("{} hours ago").format(hours)
 
         days = int(seconds // 86400)
         if days < 7:
             if days == 1:
                 return _("Yesterday")
-            return "{} {} {}".format(days, _("days"), _("ago"))
+            return _("{} days ago").format(days)
 
         weeks = int(days // 7)
         if weeks < 4:
             if weeks == 1:
-                return _("Last week")
-            return "{} {} {}".format(weeks, _("weeks"), _("ago"))
+                return _("A week ago")
+            return _("{} weeks ago").format(weeks)
 
         months = int(days // 30)
         if months < 12:
             if months == 1:
-                return _("Last month")
-            return "{} {} {}".format(months, _("months"), _("ago"))
+                return _("A month ago")
+            return _("{} months ago").format(months)
 
         years = int(days // 365)
         if years == 1:
-            return _("Last year")
-        return "{} {} {}".format(years, _("years"), _("ago"))
+            return _("A year ago")
+        return _("{} years ago").format(years)
 
     def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
