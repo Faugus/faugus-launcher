@@ -405,13 +405,18 @@ def navigate_main_screen(window, focused, direction):
     carrousel_fixed = getattr(window, "carrousel_fixed", None)
     if carrousel_fixed is not None and getattr(window, "carrousel_active", lambda: False)() \
             and (focused is carrousel_fixed or _is_descendant_of(focused, carrousel_fixed)):
-        if direction == Gtk.DirectionType.LEFT:
+        vertical = getattr(window, "carrousel_vertical", False)
+        move_directions = (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN) if vertical \
+            else (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT)
+        escape_directions = (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT) if vertical \
+            else (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN)
+        if direction == move_directions[0]:
             carrousel_move_coalesced(window, -1)
             return True
-        if direction == Gtk.DirectionType.RIGHT:
+        if direction == move_directions[1]:
             carrousel_move_coalesced(window, 1)
             return True
-        if direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
+        if direction in escape_directions:
             result = escape_focus(window, carrousel_fixed, direction)
             refresh = getattr(window, "on_carrousel_focus_changed", None)
             if refresh:
