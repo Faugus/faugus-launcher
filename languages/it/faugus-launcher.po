@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 02:37+0000\n"
-"PO-Revision-Date: 2026-09-16 00:41+0000\n"
+"PO-Revision-Date: 2026-09-16 10:56+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -600,7 +600,7 @@ msgstr "Posizione"
 
 #: faugus/launcher.py:5701
 msgid "Top left"
-msgstr ""
+msgstr "In alto a sinistra"
 
 #: faugus/launcher.py:5702
 msgid "Top"
@@ -608,59 +608,51 @@ msgstr "In alto"
 
 #: faugus/launcher.py:5703
 msgid "Top right"
-msgstr ""
+msgstr "In alto a destra"
 
 #: faugus/launcher.py:5704
 msgid "Left"
-msgstr ""
+msgstr "Sinistra"
 
 #: faugus/launcher.py:5705
 msgid "Middle"
 msgstr "Al centro"
 
 #: faugus/launcher.py:5706
-#, fuzzy
-#| msgid "Light"
 msgid "Right"
-msgstr "Chiaro"
+msgstr "Destra"
 
 #: faugus/launcher.py:5707
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom left"
-msgstr "In basso"
+msgstr "In basso a sinistra"
 
 #: faugus/launcher.py:5708
 msgid "Bottom"
 msgstr "In basso"
 
 #: faugus/launcher.py:5709
-#, fuzzy
-#| msgid "Bottom"
 msgid "Bottom right"
-msgstr "In basso"
+msgstr "In basso a destra"
 
 #: faugus/launcher.py:5711
 msgid "Orientation"
-msgstr ""
+msgstr "Orientamento"
 
 #: faugus/launcher.py:5714
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Alfabetico"
+msgstr "Verticale"
 
 #: faugus/launcher.py:5715
 msgid "Horizontal"
-msgstr ""
+msgstr "Orizzontale"
 
 #: faugus/launcher.py:5717 faugus/launcher.py:5737
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Colonne Massime"
 
 #: faugus/launcher.py:5735
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Righe Massime"
 
 #: faugus/launcher.py:5741
 msgid "SteamGridDB"
@@ -696,7 +688,7 @@ msgstr "Varie"
 
 #: faugus/launcher.py:5783
 msgid "Display"
-msgstr ""
+msgstr "Schermo"
 
 #: faugus/launcher.py:5786
 msgid "Discrete GPU"
@@ -821,13 +813,11 @@ msgstr "Variabili d'Ambiente Globali"
 
 #: faugus/launcher.py:6135
 msgid "General"
-msgstr ""
+msgstr "Generale"
 
 #: faugus/launcher.py:6136
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Modalità Interfaccia"
+msgstr "Interfaccia"
 
 #: faugus/launcher.py:6249
 #, python-format
@@ -847,10 +837,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Modalità Griglia, Copertine o Carosello"
 
 #: faugus/launcher.py:6315
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Modalità Griglia, Copertine o Carosello"
+msgstr "Modalità Griglia o Copertine"
 
 #: faugus/launcher.py:6343
 msgid "Covers or Carrousel mode with SteamGridDB"
