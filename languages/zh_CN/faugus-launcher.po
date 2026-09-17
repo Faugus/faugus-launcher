@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 19:48+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
+"PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -274,22 +274,16 @@ msgid "Close"
 msgstr "关闭"
 
 #: faugus/launcher.py:2871 faugus/launcher.py:3320
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "游玩时间"
+msgstr "游玩时间: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3332
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "上次游玩"
+msgstr "上次游玩: {}"
 
 #: faugus/launcher.py:2879
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "上次游玩"
+msgstr "从未游玩"
 
 #: faugus/launcher.py:2904
 msgid "Remove from hidden"
@@ -344,92 +338,72 @@ msgid "Recent"
 msgstr "最近"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "小时"
+msgstr "{} 小时"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "小时"
+msgstr "{} 小时"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "分钟"
+msgstr "{} 分钟"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "分钟"
+msgstr "{} 分钟"
 
 #: faugus/launcher.py:3157
 msgid "Just now"
-msgstr ""
+msgstr "刚刚"
 
 #: faugus/launcher.py:3162
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "分钟"
+msgstr "一分钟之前"
 
 #: faugus/launcher.py:3163
-#, fuzzy
-#| msgid "minute"
 msgid "{} minutes ago"
-msgstr "分钟"
+msgstr "{} 分钟之前"
 
 #: faugus/launcher.py:3168
 msgid "An hour ago"
-msgstr ""
+msgstr "一个小时之前"
 
 #: faugus/launcher.py:3169
 msgid "{} hours ago"
-msgstr ""
+msgstr "{} 小时之前"
 
 #: faugus/launcher.py:3174
 msgid "Yesterday"
-msgstr ""
+msgstr "昨天"
 
 #: faugus/launcher.py:3175
 msgid "{} days ago"
-msgstr ""
+msgstr "{} 天之前"
 
 #: faugus/launcher.py:3180
-#, fuzzy
-#| msgid "minute"
 msgid "A week ago"
-msgstr "分钟"
+msgstr "一周前"
 
 #: faugus/launcher.py:3181
 msgid "{} weeks ago"
-msgstr ""
+msgstr "{} 周之前"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "minute"
 msgid "A month ago"
-msgstr "分钟"
+msgstr "一月前"
 
 #: faugus/launcher.py:3187
-#, fuzzy
-#| msgid "minute"
 msgid "{} months ago"
-msgstr "分钟"
+msgstr "{} 月之前"
 
 #: faugus/launcher.py:3191
-#, fuzzy
-#| msgid "minute"
 msgid "A year ago"
-msgstr "分钟"
+msgstr "一年前"
 
 #: faugus/launcher.py:3192
 msgid "{} years ago"
-msgstr ""
+msgstr "{} 年之前"
 
 #: faugus/launcher.py:3523 faugus/launcher.py:6767 faugus/launcher.py:8819
 msgid "Select a file to run in the prefix"
@@ -649,25 +623,23 @@ msgstr "底部"
 
 #: faugus/launcher.py:5879
 msgid "Orientation"
-msgstr ""
+msgstr "方向"
 
 #: faugus/launcher.py:5882
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "字母顺序"
+msgstr "垂直"
 
 #: faugus/launcher.py:5883
 msgid "Horizontal"
-msgstr ""
+msgstr "水平"
 
 #: faugus/launcher.py:5885 faugus/launcher.py:5905
 msgid "Maximum Columns"
-msgstr ""
+msgstr "最大列数"
 
 #: faugus/launcher.py:5903
 msgid "Maximum Rows"
-msgstr ""
+msgstr "最大行数"
 
 #: faugus/launcher.py:5909
 msgid "SteamGridDB"
@@ -703,7 +675,7 @@ msgstr "杂项"
 
 #: faugus/launcher.py:5951
 msgid "Display"
-msgstr ""
+msgstr "显示"
 
 #: faugus/launcher.py:5954
 msgid "Discrete GPU"
@@ -773,7 +745,7 @@ msgstr "按 Ctrl+H 显示/隐藏游戏"
 
 #: faugus/launcher.py:5993
 msgid "Info"
-msgstr ""
+msgstr "信息"
 
 #: faugus/launcher.py:5995
 msgid "Gamepad navigation"
@@ -829,13 +801,11 @@ msgstr "全局环境变量"
 
 #: faugus/launcher.py:6306
 msgid "General"
-msgstr ""
+msgstr "常规"
 
 #: faugus/launcher.py:6307
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "界面样式"
+msgstr "界面"
 
 #: faugus/launcher.py:6420
 #, python-format
@@ -855,10 +825,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "网格、封面或轮播模式"
 
 #: faugus/launcher.py:6489
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "网格、封面或轮播模式"
+msgstr "网格或封面模式"
 
 #: faugus/launcher.py:6517
 msgid "Covers or Carrousel mode with SteamGridDB"
