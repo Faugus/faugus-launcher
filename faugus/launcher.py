@@ -4515,6 +4515,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         save_json_file(games, GAMES_JSON)
         self.notify_tray_menu_changed()
 
+        for game in self.games:
+            if game.gameid == gameid:
+                game.last_played = timestamp
+                break
+        self.update_info_panel()
+
     def sync_last_played_order(self, gameid):
         if not (hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed):
             return
