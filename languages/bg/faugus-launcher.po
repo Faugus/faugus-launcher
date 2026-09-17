@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 19:48+0000\n"
-"PO-Revision-Date: 2026-09-16 10:56+0000\n"
+"PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -274,16 +274,12 @@ msgid "Close"
 msgstr "Затваряне"
 
 #: faugus/launcher.py:2871 faugus/launcher.py:3320
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "Игрално време"
+msgstr "Игрално време: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3332
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "Последно пускане"
+msgstr "Последно пускане: {}"
 
 #: faugus/launcher.py:2879
 msgid "Never played"
@@ -342,28 +338,20 @@ msgid "Recent"
 msgstr "Скорошни"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "час"
+msgstr "{} час"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "часа"
+msgstr "{} часа"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "минута"
+msgstr "{} минута"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "минути"
+msgstr "{} минути"
 
 #: faugus/launcher.py:3157
 msgid "Just now"
@@ -374,20 +362,16 @@ msgid "A minute ago"
 msgstr "Преди минута"
 
 #: faugus/launcher.py:3163
-#, fuzzy
-#| msgid "A minute ago"
 msgid "{} minutes ago"
-msgstr "Преди минута"
+msgstr "Преди {} минути"
 
 #: faugus/launcher.py:3168
 msgid "An hour ago"
 msgstr "Преди час"
 
 #: faugus/launcher.py:3169
-#, fuzzy
-#| msgid "An hour ago"
 msgid "{} hours ago"
-msgstr "Преди час"
+msgstr "Преди {} часа"
 
 #: faugus/launcher.py:3174
 msgid "Yesterday"
@@ -395,39 +379,31 @@ msgstr "Вчера"
 
 #: faugus/launcher.py:3175
 msgid "{} days ago"
-msgstr ""
+msgstr "Преди {} дни"
 
 #: faugus/launcher.py:3180
-#, fuzzy
-#| msgid "A minute ago"
 msgid "A week ago"
-msgstr "Преди минута"
+msgstr "Миналата седмица"
 
 #: faugus/launcher.py:3181
 msgid "{} weeks ago"
-msgstr ""
+msgstr "Преди {} седмици"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "A minute ago"
 msgid "A month ago"
-msgstr "Преди минута"
+msgstr "Миналия месец"
 
 #: faugus/launcher.py:3187
-#, fuzzy
-#| msgid "A minute ago"
 msgid "{} months ago"
-msgstr "Преди минута"
+msgstr "Преди {} месеца"
 
 #: faugus/launcher.py:3191
-#, fuzzy
-#| msgid "An hour ago"
 msgid "A year ago"
-msgstr "Преди час"
+msgstr "Миналата година"
 
 #: faugus/launcher.py:3192
 msgid "{} years ago"
-msgstr ""
+msgstr "Преди {} години"
 
 #: faugus/launcher.py:3523 faugus/launcher.py:6767 faugus/launcher.py:8819
 msgid "Select a file to run in the prefix"
@@ -699,7 +675,7 @@ msgstr "Разни"
 
 #: faugus/launcher.py:5951
 msgid "Display"
-msgstr ""
+msgstr "Видими елементи"
 
 #: faugus/launcher.py:5954
 msgid "Discrete GPU"
@@ -771,7 +747,7 @@ msgstr "Ctrl+H превключва видимостта на скритите �
 
 #: faugus/launcher.py:5993
 msgid "Info"
-msgstr ""
+msgstr "Информация"
 
 #: faugus/launcher.py:5995
 msgid "Gamepad navigation"
