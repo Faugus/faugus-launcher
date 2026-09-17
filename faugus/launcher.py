@@ -3705,6 +3705,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             new_cover = ""
 
+        banner = f"{BANNERS_DIR}/{game.gameid}.png"
+        if os.path.isfile(banner):
+            shutil.copyfile(banner, f"{BANNERS_DIR}/{title_formatted}.png")
+
         new_addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{title_formatted}.bat"
         if os.path.exists(expand_path(game.addapp_bat)):
             shutil.copyfile(expand_path(game.addapp_bat), new_addapp_bat)
