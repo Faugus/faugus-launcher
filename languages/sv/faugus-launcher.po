@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 19:48+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
+"PO-Revision-Date: 2026-09-21 09:51+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -274,22 +274,16 @@ msgid "Close"
 msgstr "Stäng"
 
 #: faugus/launcher.py:2871 faugus/launcher.py:3320
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "Speltid"
+msgstr "Speltid: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3332
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "Senast spelat"
+msgstr "Senast spelat: {}"
 
 #: faugus/launcher.py:2879
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Senast spelat"
+msgstr "Aldrig spelat"
 
 #: faugus/launcher.py:2904
 msgid "Remove from hidden"
@@ -344,92 +338,72 @@ msgid "Recent"
 msgstr "Senaste"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "timme"
+msgstr "{} timme"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "timmar"
+msgstr "{} timmar"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "minut"
+msgstr "{} minut"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "minuter"
+msgstr "{} minuter"
 
 #: faugus/launcher.py:3157
 msgid "Just now"
-msgstr ""
+msgstr "Just nu"
 
 #: faugus/launcher.py:3162
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "minut"
+msgstr "En minut sedan"
 
 #: faugus/launcher.py:3163
-#, fuzzy
-#| msgid "minute"
 msgid "{} minutes ago"
-msgstr "minut"
+msgstr "{} minuter sedan"
 
 #: faugus/launcher.py:3168
 msgid "An hour ago"
-msgstr ""
+msgstr "En timme sedan"
 
 #: faugus/launcher.py:3169
 msgid "{} hours ago"
-msgstr ""
+msgstr "{} timmar sedan"
 
 #: faugus/launcher.py:3174
 msgid "Yesterday"
-msgstr ""
+msgstr "Igår"
 
 #: faugus/launcher.py:3175
 msgid "{} days ago"
-msgstr ""
+msgstr "{} dagar sedan"
 
 #: faugus/launcher.py:3180
-#, fuzzy
-#| msgid "minute"
 msgid "A week ago"
-msgstr "minut"
+msgstr "En vecka sedan"
 
 #: faugus/launcher.py:3181
 msgid "{} weeks ago"
-msgstr ""
+msgstr "{} veckor sedan"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "minute"
 msgid "A month ago"
-msgstr "minut"
+msgstr "En månad sedan"
 
 #: faugus/launcher.py:3187
-#, fuzzy
-#| msgid "minute"
 msgid "{} months ago"
-msgstr "minut"
+msgstr "{} månader sedan"
 
 #: faugus/launcher.py:3191
-#, fuzzy
-#| msgid "minute"
 msgid "A year ago"
-msgstr "minut"
+msgstr "Ett år sedan"
 
 #: faugus/launcher.py:3192
 msgid "{} years ago"
-msgstr ""
+msgstr "{} år sedan"
 
 #: faugus/launcher.py:3523 faugus/launcher.py:6767 faugus/launcher.py:8819
 msgid "Select a file to run in the prefix"
@@ -649,25 +623,23 @@ msgstr "Nederst"
 
 #: faugus/launcher.py:5879
 msgid "Orientation"
-msgstr ""
+msgstr "Orientering"
 
 #: faugus/launcher.py:5882
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Alfabetiskt"
+msgstr "Vertikal"
 
 #: faugus/launcher.py:5883
 msgid "Horizontal"
-msgstr ""
+msgstr "Horisontell"
 
 #: faugus/launcher.py:5885 faugus/launcher.py:5905
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Maximalt antal kolumner"
 
 #: faugus/launcher.py:5903
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Maximalt antal rader"
 
 #: faugus/launcher.py:5909
 msgid "SteamGridDB"
@@ -703,7 +675,7 @@ msgstr "Övrigt"
 
 #: faugus/launcher.py:5951
 msgid "Display"
-msgstr ""
+msgstr "Display"
 
 #: faugus/launcher.py:5954
 msgid "Discrete GPU"
@@ -773,7 +745,7 @@ msgstr "Ctrl+H visar eller döljer dolda spel"
 
 #: faugus/launcher.py:5993
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: faugus/launcher.py:5995
 msgid "Gamepad navigation"
@@ -829,13 +801,11 @@ msgstr "Globala miljövariabler"
 
 #: faugus/launcher.py:6306
 msgid "General"
-msgstr ""
+msgstr "Allmäna"
 
 #: faugus/launcher.py:6307
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Gränssnittsläge"
+msgstr "Gränssnitt"
 
 #: faugus/launcher.py:6420
 #, python-format
@@ -855,10 +825,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Rutnät, Omslag eller karusellläge"
 
 #: faugus/launcher.py:6489
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Rutnät, Omslag eller karusellläge"
+msgstr "Rutnät eller Omslag läge"
 
 #: faugus/launcher.py:6517
 msgid "Covers or Carrousel mode with SteamGridDB"
