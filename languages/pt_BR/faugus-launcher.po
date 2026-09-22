@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-22 20:25+0000\n"
-"PO-Revision-Date: 2026-09-22 20:25+0000\n"
+"PO-Revision-Date: 2026-09-22 20:27+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -212,10 +212,8 @@ msgid "Backup completed"
 msgstr "Backup finalizado"
 
 #: faugus/backup_daemon.py:538
-#, fuzzy
-#| msgid "Backup cancelled"
 msgid "Backup failed."
-msgstr "Backup cancelado"
+msgstr "Falha no backup."
 
 #: faugus/backup_daemon.py:721
 #, fuzzy
