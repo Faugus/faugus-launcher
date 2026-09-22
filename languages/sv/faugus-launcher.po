@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-22 14:13+0000\n"
-"PO-Revision-Date: 2026-09-21 09:51+0000\n"
+"PO-Revision-Date: 2026-09-22 19:03+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -278,10 +278,8 @@ msgid "Playtime: {}"
 msgstr "Speltid: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3359
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
-msgstr "Speltid: {}"
+msgstr "Spelar för: {}"
 
 #: faugus/launcher.py:2883 faugus/launcher.py:3366
 msgid "Last played: {}"
@@ -305,7 +303,7 @@ msgstr "Stoppa"
 
 #: faugus/launcher.py:2917
 msgid "Play with logs"
-msgstr ""
+msgstr "Spela med loggar"
 
 #: faugus/launcher.py:2919
 msgid "Play"
@@ -365,7 +363,7 @@ msgstr "{} minuter"
 
 #: faugus/launcher.py:3170
 msgid "Less than a minute"
-msgstr ""
+msgstr "Mindre än en minut"
 
 #: faugus/launcher.py:3183
 msgid "Just now"
