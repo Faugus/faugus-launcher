@@ -541,8 +541,8 @@ class BackupWindow(Gtk.Dialog):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
-        self.connect("response", lambda d, r: destroy_and_release(d))
-        self.connect("destroy", self._on_destroy)
+        self.connect("response", lambda d, r: d.close_dialog())
+        self.connect("close-request", lambda d: d.close_dialog() or True)
 
         self.backup_active = False
         self.backup_running_poll_id = GLib.timeout_add(1000, self._poll_backup_running)
@@ -985,11 +985,6 @@ class BackupWindow(Gtk.Dialog):
             self.label_last_backup.set_text("{} {}".format(_("Last backup:"), new_date))
         return False
 
-    def _on_destroy(self, widget):
-        if self.backup_running_poll_id is not None:
-            GLib.source_remove(self.backup_running_poll_id)
-            self.backup_running_poll_id = None
-
     def _poll_backup_running(self):
         running = is_backup_running()
         if running and not self.backup_active:
@@ -1001,8 +996,14 @@ class BackupWindow(Gtk.Dialog):
             self.on_backup_finished(self.config.get('backup-last-date'))
         return True
 
-    def on_cancel_clicked(self, widget):
+    def close_dialog(self):
+        if self.backup_running_poll_id is not None:
+            GLib.source_remove(self.backup_running_poll_id)
+            self.backup_running_poll_id = None
         destroy_and_release(self)
+
+    def on_cancel_clicked(self, widget):
+        self.close_dialog()
 
     def on_ok_clicked(self, widget):
         is_enabled = self.backup_frequency != 'disabled'
@@ -1028,7 +1029,7 @@ class BackupWindow(Gtk.Dialog):
 
         setup_autostart(is_enabled)
 
-        destroy_and_release(self)
+        self.close_dialog()
 
 
 class RestoreWindow(Gtk.Dialog):
