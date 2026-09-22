@@ -27,6 +27,8 @@ from faugus.backup_daemon import (
     resolve_excluded_ids,
     run_backup_with_notification,
     send_desktop_notification,
+    is_backup_running,
+    request_backup_cancel,
     setup_autostart,
     backup_filename,
     suppress_immediate_auto_backup,
@@ -540,6 +542,10 @@ class BackupWindow(Gtk.Dialog):
         self.set_modal(True)
         self.set_resizable(False)
         self.connect("response", lambda d, r: destroy_and_release(d))
+        self.connect("destroy", self._on_destroy)
+
+        self.backup_active = False
+        self.backup_running_poll_id = GLib.timeout_add(1000, self._poll_backup_running)
 
         self.config = load_config()
 
@@ -929,6 +935,12 @@ class BackupWindow(Gtk.Dialog):
         self.button_backup_now.set_label("{} ({})".format(_("Backup now"), format_size(total)))
 
     def on_backup_now_clicked(self, widget):
+        if self.backup_active:
+            request_backup_cancel()
+            self.button_backup_now.set_sensitive(False)
+            self.button_backup_now.set_label(_("Cancelling..."))
+            return
+
         if not self.entry_dest.get_text():
             self.entry_dest.add_css_class("entry")
             return
@@ -950,14 +962,15 @@ class BackupWindow(Gtk.Dialog):
 
         prefixes, shortcuts, protons, games = self.current_selection()
 
-        self.button_backup_now.set_sensitive(False)
-        self.button_backup_now.set_label(_("Backing up..."))
+        self.backup_active = True
+        self.button_backup_now.set_label(_("Cancel backup"))
 
         def do_backup():
             try:
                 new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
-                self.config['backup-last-date'] = new_date
-                save_config(self.config)
+                if new_date:
+                    self.config['backup-last-date'] = new_date
+                    save_config(self.config)
                 GLib.idle_add(self.on_backup_finished, new_date)
             except Exception:
                 GLib.idle_add(self.on_backup_finished, None)
@@ -965,11 +978,28 @@ class BackupWindow(Gtk.Dialog):
         run_in_background(do_backup)
 
     def on_backup_finished(self, new_date):
+        self.backup_active = False
         self.button_backup_now.set_sensitive(True)
         self.update_backup_button_label()
         if new_date:
             self.label_last_backup.set_text("{} {}".format(_("Last backup:"), new_date))
         return False
+
+    def _on_destroy(self, widget):
+        if self.backup_running_poll_id is not None:
+            GLib.source_remove(self.backup_running_poll_id)
+            self.backup_running_poll_id = None
+
+    def _poll_backup_running(self):
+        running = is_backup_running()
+        if running and not self.backup_active:
+            self.backup_active = True
+            self.button_backup_now.set_sensitive(True)
+            self.button_backup_now.set_label(_("Cancel backup"))
+        elif not running and self.backup_active:
+            self.config = load_config()
+            self.on_backup_finished(self.config.get('backup-last-date'))
+        return True
 
     def on_cancel_clicked(self, widget):
         destroy_and_release(self)
