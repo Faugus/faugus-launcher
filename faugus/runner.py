@@ -87,12 +87,13 @@ def warm_up_gpu():
 
 
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid=""):
+    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid="", with_logs=False):
         self.message = message
         self.command = command
         self.pre_launch = pre_launch
         self.post_launch = post_launch
         self.gameid = gameid
+        self.logging_enabled = with_logs
         self.process = None
         self.splash_window = None
         self.log_window = None
@@ -504,7 +505,6 @@ class FaugusRun(HiDpiMixin):
         self.default_runner = self.cfg.config.get('default-runner', '')
         self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
         self.default_prefix = expand_path(self.cfg.config.get('default-prefix', ''))
-        self.logging_enabled = True
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
         self.wow64_enabled = self.cfg.config.get('wow64-enabled', 'False') == 'True'
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'
@@ -935,6 +935,7 @@ def main():
     parser.add_argument("--game")
     parser.add_argument("--pre-launch", default="")
     parser.add_argument("--post-launch", default="")
+    parser.add_argument("--logs", action="store_true")
 
     args = parser.parse_args()
 
@@ -944,9 +945,9 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game).run()
+        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game, with_logs=args.logs).run()
     else:
-        FaugusRun(args.message, args.command, args.pre_launch, args.post_launch).run()
+        FaugusRun(args.message, args.command, args.pre_launch, args.post_launch, with_logs=args.logs).run()
 
 
 if __name__ == "__main__":

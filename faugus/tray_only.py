@@ -46,8 +46,6 @@ def spawn(module_args):
         [sys.executable, "-m"] + module_args,
         env=subprocess_env(),
         stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
         close_fds=True,
     )
     GLib.child_watch_add(proc.pid, lambda pid, status: None)
