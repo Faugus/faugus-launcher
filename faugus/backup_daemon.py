@@ -127,7 +127,7 @@ def list_game_prefixes():
         if not prefix:
             continue
         path = expand_path(prefix)
-        if not path or not os.path.isdir(path):
+        if not path:
             continue
         gameid = game.get('gameid', '')
         title = game.get('title', '') or gameid
