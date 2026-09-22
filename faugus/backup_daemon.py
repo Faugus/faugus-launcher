@@ -718,7 +718,7 @@ def daemon_mode():
                 if should_run_backup(config):
                     _perform_scheduled_backup(config)
             except Exception:
-                send_desktop_notification("Faugus", _("Automatic backup failed."))
+                send_desktop_notification("Faugus", _("Backup failed."))
                 suppress_immediate_auto_backup(config)
         time.sleep(5)
 
