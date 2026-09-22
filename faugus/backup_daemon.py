@@ -535,7 +535,7 @@ def _run_scheduled_backup_if_due(config):
         try:
             _perform_scheduled_backup(config)
         except Exception:
-            send_desktop_notification("Faugus", _("Automatic backup failed."))
+            send_desktop_notification("Faugus", _("Backup failed."))
             suppress_immediate_auto_backup(config)
 
     run_in_background(worker)
