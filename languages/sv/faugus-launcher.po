@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-09-22 19:03+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -215,17 +215,11 @@ msgstr "Säkerhetskopiering slutförd"
 msgid "Backup completed"
 msgstr "Säkerhetskopiering slutförd"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup completed"
 msgid "Backup failed."
 msgstr "Säkerhetskopiering slutförd"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "Automatisk säkerhetskopiering"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1288,6 +1282,11 @@ msgstr "Välj en ikon"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Inga resultat hittades"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "Automatisk säkerhetskopiering"
 
 #~ msgid "Backing up..."
 #~ msgstr "Säkerhetskopierar..."

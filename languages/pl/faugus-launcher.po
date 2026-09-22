@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-08-29 01:17+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -239,17 +239,11 @@ msgstr "Wypakowanie zakończone"
 msgid "Backup completed"
 msgstr "Wypakowanie zakończone"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Extraction complete"
 msgid "Backup failed."
 msgstr "Wypakowanie zakończone"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "Automatyczna kopia zapasowa"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1368,6 +1362,11 @@ msgstr "Wybierz ikonę"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Nie znaleziono"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "Automatyczna kopia zapasowa"
 
 #, fuzzy
 #~| msgid "Backup"

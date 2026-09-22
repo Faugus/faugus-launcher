@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-08-29 01:20+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -235,16 +235,10 @@ msgstr "پشتیبان گیری"
 msgid "Backup completed"
 msgstr "پشتیبان گیری"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 msgid "Backup failed."
 msgstr "پشتیبان گیری"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Save the backup file as..."
-msgid "Automatic backup failed."
-msgstr "ذخیره کردن فایل پشتیبان گیری به عنوان..."
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1397,6 +1391,11 @@ msgstr "نشان دادن آیکون در system tray"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~| msgid "Save the backup file as..."
+#~ msgid "Automatic backup failed."
+#~ msgstr "ذخیره کردن فایل پشتیبان گیری به عنوان..."
 
 #, fuzzy
 #~| msgid "Backup"

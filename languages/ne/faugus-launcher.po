@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -228,17 +228,11 @@ msgstr "अहिल्यै ब्याकअप गर्नुहोस्"
 msgid "Backup completed"
 msgstr "अहिल्यै ब्याकअप गर्नुहोस्"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup now"
 msgid "Backup failed."
 msgstr "अहिल्यै ब्याकअप गर्नुहोस्"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "स्वचालित ब्याकअप"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1335,6 +1329,11 @@ msgstr ""
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "स्वचालित ब्याकअप"
 
 #~ msgid "Proton may generate huge log files."
 #~ msgstr "प्रोटोनले धेरै ठूला लग फाइलहरू बनाउन सक्छ।"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-09-15 03:51+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -215,17 +215,11 @@ msgstr "Copia de seguridad completa"
 msgid "Backup completed"
 msgstr "Copia de seguridad completa"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup completed"
 msgid "Backup failed."
 msgstr "Copia de seguridad completa"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "Copia de seguridad automática"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1324,6 +1318,11 @@ msgstr "Elije un ícono"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "No se encontraron resultados"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "Copia de seguridad automática"
 
 #~ msgid "Backing up..."
 #~ msgstr "Creando copia de seguridad..."

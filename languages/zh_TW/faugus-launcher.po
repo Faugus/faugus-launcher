@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-08-29 01:20+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -238,17 +238,11 @@ msgstr "立即備份"
 msgid "Backup completed"
 msgstr "立即備份"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup now"
 msgid "Backup failed."
 msgstr "立即備份"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "自動備份"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1363,6 +1357,11 @@ msgstr "選擇一個圖示"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "沒有找到結果"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "自動備份"
 
 #, fuzzy
 #~| msgid "Backup"

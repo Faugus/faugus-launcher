@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
@@ -216,17 +216,11 @@ msgstr "Sicherung beendet"
 msgid "Backup completed"
 msgstr "Sicherung beendet"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup completed"
 msgid "Backup failed."
 msgstr "Sicherung beendet"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "Automatische Sicherung"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1298,6 +1292,11 @@ msgstr "Wähle ein Symbol"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "Automatische Sicherung"
 
 #~ msgid "Backing up..."
 #~ msgstr "Sichere..."

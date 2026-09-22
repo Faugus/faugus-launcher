@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:25+0000\n"
+"POT-Creation-Date: 2026-09-22 20:27+0000\n"
 "PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
@@ -215,17 +215,11 @@ msgstr "Създаването на резервно копие приключи
 msgid "Backup completed"
 msgstr "Създаването на резервно копие приключи"
 
-#: faugus/backup_daemon.py:538
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Backup completed"
 msgid "Backup failed."
 msgstr "Създаването на резервно копие приключи"
-
-#: faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Automatic Backup"
-msgid "Automatic backup failed."
-msgstr "Автоматични резервни копия"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -1293,6 +1287,11 @@ msgstr "Изберете иконка"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Няма намерени резултати"
+
+#, fuzzy
+#~| msgid "Automatic Backup"
+#~ msgid "Automatic backup failed."
+#~ msgstr "Автоматични резервни копия"
 
 #~ msgid "Backing up..."
 #~ msgstr "Създаване на резервно копие…"
