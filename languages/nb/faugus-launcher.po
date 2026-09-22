@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:22+0000\n"
+"POT-Creation-Date: 2026-09-22 20:25+0000\n"
 "PO-Revision-Date: 2026-09-01 13:48+0000\n"
 "Last-Translator: Han Andre <darahzmail@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/faugus-"
@@ -237,7 +237,13 @@ msgstr "Ta en sikkerhetskopi nå"
 msgid "Backup completed"
 msgstr "Ta en sikkerhetskopi nå"
 
-#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
+#: faugus/backup_daemon.py:538
+#, fuzzy
+#| msgid "Backup now"
+msgid "Backup failed."
+msgstr "Ta en sikkerhetskopi nå"
+
+#: faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Automatic Backup"
 msgid "Automatic backup failed."

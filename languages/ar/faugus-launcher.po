@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:22+0000\n"
+"POT-Creation-Date: 2026-09-22 20:25+0000\n"
 "PO-Revision-Date: 2026-08-29 01:19+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -236,7 +236,13 @@ msgstr "تم الاستخراج"
 msgid "Backup completed"
 msgstr "تم الاستخراج"
 
-#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
+#: faugus/backup_daemon.py:538
+#, fuzzy
+#| msgid "Extraction complete"
+msgid "Backup failed."
+msgstr "تم الاستخراج"
+
+#: faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Save the backup file as..."
 msgid "Automatic backup failed."

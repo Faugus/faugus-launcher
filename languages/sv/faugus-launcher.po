@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:22+0000\n"
+"POT-Creation-Date: 2026-09-22 20:25+0000\n"
 "PO-Revision-Date: 2026-09-22 19:03+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -215,7 +215,13 @@ msgstr "Säkerhetskopiering slutförd"
 msgid "Backup completed"
 msgstr "Säkerhetskopiering slutförd"
 
-#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
+#: faugus/backup_daemon.py:538
+#, fuzzy
+#| msgid "Backup completed"
+msgid "Backup failed."
+msgstr "Säkerhetskopiering slutförd"
+
+#: faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Automatic Backup"
 msgid "Automatic backup failed."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:22+0000\n"
+"POT-Creation-Date: 2026-09-22 20:25+0000\n"
 "PO-Revision-Date: 2026-09-06 21:30+0000\n"
 "Last-Translator: skyhighcaterpie <okitasoji1868@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -235,7 +235,13 @@ msgstr "今すぐバックアップ"
 msgid "Backup completed"
 msgstr "今すぐバックアップ"
 
-#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
+#: faugus/backup_daemon.py:538
+#, fuzzy
+#| msgid "Backup now"
+msgid "Backup failed."
+msgstr "今すぐバックアップ"
+
+#: faugus/backup_daemon.py:721
 #, fuzzy
 #| msgid "Automatic Backup"
 msgid "Automatic backup failed."
