@@ -305,7 +305,7 @@ class FaugusRun(HiDpiMixin):
                 if log_file:
                     def close_log_later():
                         for t in threads:
-                            t.join(timeout=5)
+                            t.join()
                         log_file.flush()
                         log_file.close()
                     Thread(target=close_log_later, daemon=True).start()
