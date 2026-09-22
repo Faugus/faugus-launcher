@@ -22,6 +22,7 @@ from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
 from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
+from faugus.tray_only import spawn as tray_only_spawn
 
 VERSION = "2.3.0"
 
@@ -1058,15 +1059,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             pass
 
     def start_tray_daemon(self):
-        proc = subprocess.Popen(
-            [sys.executable, "-m", "faugus.tray_only", "--hide"],
-            env=subprocess_env(),
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            close_fds=True,
-        )
-        GLib.child_watch_add(proc.pid, lambda pid, status: None)
+        tray_only_spawn(["faugus.tray_only", "--hide"])
 
     def ensure_tray_daemon(self, force_restart=False):
         connection, running = self.tray_daemon_running()
@@ -2902,7 +2895,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.action_context_show_logs.set_enabled(False)
 
         hide_label = _("Remove from hidden") if game.hidden else _("Hide")
-        play_label = _("Stop") if game.gameid in self.running else _("Play with logs")
+        supports_logs = game.runner not in ("Steam", "Linux-Native")
+        if game.gameid in self.running:
+            play_label = _("Stop")
+        elif supports_logs:
+            play_label = _("Play with logs")
+        else:
+            play_label = _("Play")
 
         categories = sorted(
             [cat.strip() for cat in load_json_file(CATEGORIES_FILE, default=[]) if cat.strip()],
@@ -2933,7 +2932,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         show_game_location = True
         show_prefix_location = game.runner != "Linux-Native"
         show_run = game.runner not in ("Steam", "Linux-Native")
-        show_logs_item = game.runner not in ("Steam", "Linux-Native")
+        show_logs_item = supports_logs
 
         if game.runner == "Steam":
             steam_game_dir, steam_prefix_dir = get_steam_app_paths(game.path)
@@ -3346,7 +3345,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu.popdown()
         game = self.selected()
         if game:
-            self.on_button_play_clicked(None, game)
+            supports_logs = game.runner not in ("Steam", "Linux-Native")
+            self.on_button_play_clicked(None, game, with_logs=supports_logs)
 
     def on_context_menu_edit(self, action, param):
         self.context_menu.popdown()
@@ -4385,7 +4385,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(autostart_path):
                 os.remove(autostart_path)
 
-    def on_button_play_clicked(self, widget=None, game=None):
+    def on_button_play_clicked(self, widget=None, game=None, with_logs=False):
         self.button_play.set_sensitive(False)
 
         def reenable():
@@ -4427,18 +4427,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
+        cmd = [sys.executable, "-m", "faugus.runner", "--game", gameid]
+        if with_logs:
+            cmd.append("--logs")
+
         if game.runner == "Steam":
             self.update_last_played(gameid)
             self.sync_last_played_order(gameid)
-            subprocess.Popen(
-                [sys.executable, "-m", "faugus.runner", "--game", gameid],
-                cwd=cwd,
-                env=subprocess_env(),
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                close_fds=True
-            )
+            subprocess.Popen(cmd, cwd=cwd, env=subprocess_env())
             return
 
         if gameid in self.running:
@@ -4456,8 +4452,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.update_last_played(gameid)
         self.sync_last_played_order(gameid)
 
-        cmd = (sys.executable, "-m", "faugus.runner", "--game", gameid)
-        proc = subprocess.Popen(cmd, cwd=cwd if cwd else None, env=subprocess_env())
+        proc = subprocess.Popen(cmd, cwd=cwd, env=subprocess_env())
 
         if not IS_FLATPAK or not self.auto_close_on_launch:
             self.running[gameid] = proc.pid
