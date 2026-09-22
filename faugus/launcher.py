@@ -3758,10 +3758,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             try:
                 config = ConfigManager()
                 current = config.config.get("show-hidden", "False")
-                config.set_value("show-hidden", "False" if current == "True" else "True")
+                new_value = "False" if current == "True" else "True"
+                config.set_value("show-hidden", new_value)
                 config.save_config()
 
-                self.load_config()
+                self.show_hidden = new_value == "True"
                 self.apply_show_hidden_change()
                 self.select_first_child_when_ready()
                 return True
