@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-22 14:13+0000\n"
-"PO-Revision-Date: 2026-09-16 19:41+0000\n"
+"PO-Revision-Date: 2026-09-22 19:03+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -278,10 +278,8 @@ msgid "Playtime: {}"
 msgstr "Tempo de jogo: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3359
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
-msgstr "Tempo de jogo: {}"
+msgstr "Jogando há: {}"
 
 #: faugus/launcher.py:2883 faugus/launcher.py:3366
 msgid "Last played: {}"
@@ -305,7 +303,7 @@ msgstr "Parar"
 
 #: faugus/launcher.py:2917
 msgid "Play with logs"
-msgstr ""
+msgstr "Executar com logs"
 
 #: faugus/launcher.py:2919
 msgid "Play"
@@ -364,10 +362,8 @@ msgid "{} minutes"
 msgstr "{} minutos"
 
 #: faugus/launcher.py:3170
-#, fuzzy
-#| msgid "Less than a minute ago"
 msgid "Less than a minute"
-msgstr "Menos de um minuto atrás"
+msgstr "Menos de um minuto"
 
 #: faugus/launcher.py:3183
 msgid "Just now"
