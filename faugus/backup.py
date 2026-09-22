@@ -19,12 +19,14 @@ from faugus.backup_daemon import (
     get_dir_inode_map,
     get_dir_size,
     get_settings_size_bytes,
+    get_free_space_bytes,
     format_size,
     list_installed_protons,
     list_game_prefixes_with_shortcuts,
     list_faugus_shortcut_files,
     resolve_excluded_ids,
     run_backup_with_notification,
+    send_desktop_notification,
     setup_autostart,
     backup_filename,
     suppress_immediate_auto_backup,
@@ -254,6 +256,16 @@ class PrefixSelectionList(_RowCapMixin):
 
 
 class PrefixShortcutList(_RowCapMixin):
+    COL_GAME_ACTIVE = 0
+    COL_PREFIX_ACTIVE = 1
+    COL_SHORTCUT_ACTIVE = 2
+    COL_HAS_SHORTCUT = 3
+    COL_HAS_PREFIX = 4
+    COL_TITLE = 5
+    COL_PATH = 6
+    COL_SIZE_TEXT = 7
+    COL_GAMEID = 8
+
     def __init__(self, items, size_lookup=None):
         self.items = items
         self.sizes = {}
@@ -265,10 +277,15 @@ class PrefixShortcutList(_RowCapMixin):
         self._suppress_prefix_all = False
         self._suppress_shortcut_all = False
 
-        self.liststore = Gtk.ListStore(bool, bool, bool, bool, str, str, str, str)
+        self.liststore = Gtk.ListStore(bool, bool, bool, bool, bool, str, str, str, str)
+        any_has_prefix = False
+        any_has_shortcut = False
         for item in items:
             has_shortcut = bool(item.get("shortcut_files"))
-            self.liststore.append([False, False, False, has_shortcut, item["title"], item["path"], _("Calculating..."), item["gameid"]])
+            has_prefix = item["has_prefix"]
+            any_has_prefix = any_has_prefix or has_prefix
+            any_has_shortcut = any_has_shortcut or has_shortcut
+            self.liststore.append([False, False, False, has_shortcut, has_prefix, item["title"], item["path"], _("Calculating..."), item["gameid"]])
 
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_headers_visible(True)
@@ -281,7 +298,7 @@ class PrefixShortcutList(_RowCapMixin):
         game_renderer.set_property("xalign", 0.0)
         game_renderer.set_property("xpad", 4)
         game_renderer.connect("toggled", self.on_game_toggled)
-        column_game_toggle = Gtk.TreeViewColumn("", game_renderer, active=0)
+        column_game_toggle = Gtk.TreeViewColumn("", game_renderer, active=self.COL_GAME_ACTIVE)
         column_game_toggle.set_widget(self.checkbox_game_all)
         column_game_toggle.set_clickable(True)
         column_game_toggle.connect("clicked", self._on_game_header_clicked)
@@ -289,18 +306,20 @@ class PrefixShortcutList(_RowCapMixin):
         enable_header_focus_highlight(column_game_toggle.get_button())
 
         title_renderer = Gtk.CellRendererText()
-        column_title = Gtk.TreeViewColumn(_("Game/App"), title_renderer, text=4)
+        column_title = Gtk.TreeViewColumn(_("Game/App"), title_renderer, text=self.COL_TITLE)
         column_title.set_expand(True)
         self.treeview.append_column(column_title)
 
         self.checkbox_prefix_all = Gtk.CheckButton()
         self.checkbox_prefix_all.set_can_target(False)
         self.checkbox_prefix_all.connect("toggled", self.on_prefix_all_toggled)
+        self.checkbox_prefix_all.set_sensitive(any_has_prefix)
         prefix_renderer = Gtk.CellRendererToggle()
         prefix_renderer.set_property("xalign", 0.0)
         prefix_renderer.set_property("xpad", 4)
         prefix_renderer.connect("toggled", self.on_prefix_toggled)
-        column_prefix_toggle = Gtk.TreeViewColumn("", prefix_renderer, active=1)
+        column_prefix_toggle = Gtk.TreeViewColumn(
+            "", prefix_renderer, active=self.COL_PREFIX_ACTIVE, visible=self.COL_HAS_PREFIX, activatable=self.COL_HAS_PREFIX)
         column_prefix_toggle.set_widget(self.checkbox_prefix_all)
         column_prefix_toggle.set_clickable(True)
         column_prefix_toggle.connect("clicked", self._on_prefix_header_clicked)
@@ -308,14 +327,14 @@ class PrefixShortcutList(_RowCapMixin):
         enable_header_focus_highlight(column_prefix_toggle.get_button())
 
         path_renderer = Gtk.CellRendererText()
-        column_path = Gtk.TreeViewColumn(_("Prefix"), path_renderer, text=5)
+        column_path = Gtk.TreeViewColumn(_("Prefix"), path_renderer, text=self.COL_PATH)
         column_path.set_expand(True)
         self.treeview.append_column(column_path)
 
         self.checkbox_shortcut_all = Gtk.CheckButton()
         self.checkbox_shortcut_all.set_can_target(False)
         self.checkbox_shortcut_all.connect("toggled", self.on_shortcut_all_toggled)
-        self.checkbox_shortcut_all.set_sensitive(any(item.get("shortcut_files") for item in items))
+        self.checkbox_shortcut_all.set_sensitive(any_has_shortcut)
 
         box_shortcut_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         box_shortcut_header.append(self.checkbox_shortcut_all)
@@ -325,7 +344,8 @@ class PrefixShortcutList(_RowCapMixin):
         shortcut_renderer.set_property("xalign", 0.0)
         shortcut_renderer.set_property("xpad", 4)
         shortcut_renderer.connect("toggled", self.on_shortcut_toggled)
-        column_shortcut_toggle = Gtk.TreeViewColumn("", shortcut_renderer, active=2, visible=3, activatable=3)
+        column_shortcut_toggle = Gtk.TreeViewColumn(
+            "", shortcut_renderer, active=self.COL_SHORTCUT_ACTIVE, visible=self.COL_HAS_SHORTCUT, activatable=self.COL_HAS_SHORTCUT)
         column_shortcut_toggle.set_widget(box_shortcut_header)
         column_shortcut_toggle.set_clickable(True)
         column_shortcut_toggle.connect("clicked", self._on_shortcut_header_clicked)
@@ -333,7 +353,7 @@ class PrefixShortcutList(_RowCapMixin):
         enable_header_focus_highlight(column_shortcut_toggle.get_button())
 
         size_renderer = Gtk.CellRendererText()
-        column_size = Gtk.TreeViewColumn(_("Size"), size_renderer, text=6)
+        column_size = Gtk.TreeViewColumn(_("Size"), size_renderer, text=self.COL_SIZE_TEXT)
         self.treeview.append_column(column_size)
 
         enable_cursor_cell_highlight(self.treeview)
@@ -375,21 +395,23 @@ class PrefixShortcutList(_RowCapMixin):
 
     def _apply_size(self, gameid, size_bytes):
         for row in self.liststore:
-            if row[7] == gameid:
-                row[6] = format_size(size_bytes)
+            if row[self.COL_GAMEID] == gameid:
+                row[self.COL_SIZE_TEXT] = format_size(size_bytes)
                 break
         self.update_total_size()
         return False
 
     def refresh_size_column(self):
         for row in self.liststore:
-            row[6] = format_size(self.sizes.get(row[7], 0))
+            row[self.COL_SIZE_TEXT] = format_size(self.sizes.get(row[self.COL_GAMEID], 0))
         self.update_total_size()
 
     def _on_game_header_clicked(self, column):
         self.checkbox_game_all.set_active(not self.checkbox_game_all.get_active())
 
     def _on_prefix_header_clicked(self, column):
+        if not self.checkbox_prefix_all.get_sensitive():
+            return
         self.checkbox_prefix_all.set_active(not self.checkbox_prefix_all.get_active())
 
     def _on_shortcut_header_clicked(self, column):
@@ -399,11 +421,12 @@ class PrefixShortcutList(_RowCapMixin):
 
     def on_game_toggled(self, renderer, path):
         it = self.liststore.get_iter(path)
-        value = not self.liststore.get_value(it, 0)
-        has_shortcut = self.liststore.get_value(it, 3)
-        self.liststore.set_value(it, 0, value)
-        self.liststore.set_value(it, 1, value)
-        self.liststore.set_value(it, 2, value and has_shortcut)
+        value = not self.liststore.get_value(it, self.COL_GAME_ACTIVE)
+        has_shortcut = self.liststore.get_value(it, self.COL_HAS_SHORTCUT)
+        has_prefix = self.liststore.get_value(it, self.COL_HAS_PREFIX)
+        self.liststore.set_value(it, self.COL_GAME_ACTIVE, value)
+        self.liststore.set_value(it, self.COL_PREFIX_ACTIVE, value and has_prefix)
+        self.liststore.set_value(it, self.COL_SHORTCUT_ACTIVE, value and has_shortcut)
         self.sync_game_all_checkbox()
         self.sync_prefix_all_checkbox()
         self.sync_shortcut_all_checkbox()
@@ -411,17 +434,19 @@ class PrefixShortcutList(_RowCapMixin):
 
     def on_prefix_toggled(self, renderer, path):
         it = self.liststore.get_iter(path)
-        current = self.liststore.get_value(it, 1)
-        self.liststore.set_value(it, 1, not current)
+        if not self.liststore.get_value(it, self.COL_HAS_PREFIX):
+            return
+        current = self.liststore.get_value(it, self.COL_PREFIX_ACTIVE)
+        self.liststore.set_value(it, self.COL_PREFIX_ACTIVE, not current)
         self.sync_prefix_all_checkbox()
         self.update_total_size()
 
     def on_shortcut_toggled(self, renderer, path):
         it = self.liststore.get_iter(path)
-        if not self.liststore.get_value(it, 3):
+        if not self.liststore.get_value(it, self.COL_HAS_SHORTCUT):
             return
-        current = self.liststore.get_value(it, 2)
-        self.liststore.set_value(it, 2, not current)
+        current = self.liststore.get_value(it, self.COL_SHORTCUT_ACTIVE)
+        self.liststore.set_value(it, self.COL_SHORTCUT_ACTIVE, not current)
         self.sync_shortcut_all_checkbox()
 
     def on_game_all_toggled(self, widget):
@@ -430,10 +455,11 @@ class PrefixShortcutList(_RowCapMixin):
         value = widget.get_active()
         it = self.liststore.get_iter_first()
         while it is not None:
-            has_shortcut = self.liststore.get_value(it, 3)
-            self.liststore.set_value(it, 0, value)
-            self.liststore.set_value(it, 1, value)
-            self.liststore.set_value(it, 2, value and has_shortcut)
+            has_shortcut = self.liststore.get_value(it, self.COL_HAS_SHORTCUT)
+            has_prefix = self.liststore.get_value(it, self.COL_HAS_PREFIX)
+            self.liststore.set_value(it, self.COL_GAME_ACTIVE, value)
+            self.liststore.set_value(it, self.COL_PREFIX_ACTIVE, value and has_prefix)
+            self.liststore.set_value(it, self.COL_SHORTCUT_ACTIVE, value and has_shortcut)
             it = self.liststore.iter_next(it)
         self.sync_prefix_all_checkbox()
         self.sync_shortcut_all_checkbox()
@@ -444,7 +470,8 @@ class PrefixShortcutList(_RowCapMixin):
             return
         value = widget.get_active()
         for row in self.liststore:
-            row[1] = value
+            if row[self.COL_HAS_PREFIX]:
+                row[self.COL_PREFIX_ACTIVE] = value
         self.update_total_size()
 
     def on_shortcut_all_toggled(self, widget):
@@ -452,24 +479,25 @@ class PrefixShortcutList(_RowCapMixin):
             return
         value = widget.get_active()
         for row in self.liststore:
-            if row[3]:
-                row[2] = value
+            if row[self.COL_HAS_SHORTCUT]:
+                row[self.COL_SHORTCUT_ACTIVE] = value
 
     def sync_game_all_checkbox(self):
-        all_selected = len(self.liststore) > 0 and all(row[0] for row in self.liststore)
+        all_selected = len(self.liststore) > 0 and all(row[self.COL_GAME_ACTIVE] for row in self.liststore)
         self._suppress_game_all = True
         self.checkbox_game_all.set_active(all_selected)
         self._suppress_game_all = False
 
     def sync_prefix_all_checkbox(self):
-        all_selected = len(self.liststore) > 0 and all(row[1] for row in self.liststore)
+        eligible = [row for row in self.liststore if row[self.COL_HAS_PREFIX]]
+        all_selected = len(eligible) > 0 and all(row[self.COL_PREFIX_ACTIVE] for row in eligible)
         self._suppress_prefix_all = True
         self.checkbox_prefix_all.set_active(all_selected)
         self._suppress_prefix_all = False
 
     def sync_shortcut_all_checkbox(self):
-        eligible = [row for row in self.liststore if row[3]]
-        all_selected = len(eligible) > 0 and all(row[2] for row in eligible)
+        eligible = [row for row in self.liststore if row[self.COL_HAS_SHORTCUT]]
+        all_selected = len(eligible) > 0 and all(row[self.COL_SHORTCUT_ACTIVE] for row in eligible)
         self._suppress_shortcut_all = True
         self.checkbox_shortcut_all.set_active(all_selected)
         self._suppress_shortcut_all = False
@@ -477,8 +505,8 @@ class PrefixShortcutList(_RowCapMixin):
     def update_total_size(self):
         combined = {}
         for row in self.liststore:
-            if row[1]:
-                combined.update(self.inode_maps.get(row[7], {}))
+            if row[self.COL_PREFIX_ACTIVE]:
+                combined.update(self.inode_maps.get(row[self.COL_GAMEID], {}))
         total = sum(combined.values())
         self.total_size_bytes = total
         self.label_total_size.set_text("{} {}".format(_("Total:"), format_size(total)))
@@ -486,14 +514,14 @@ class PrefixShortcutList(_RowCapMixin):
             self.on_total_changed()
 
     def get_selected_games(self):
-        return [row[7] for row in self.liststore if row[0]]
+        return [row[self.COL_GAMEID] for row in self.liststore if row[self.COL_GAME_ACTIVE]]
 
     def get_selected_prefixes(self):
-        selected_ids = {row[7] for row in self.liststore if row[1]}
+        selected_ids = {row[self.COL_GAMEID] for row in self.liststore if row[self.COL_PREFIX_ACTIVE] and row[self.COL_HAS_PREFIX]}
         return [item for item in self.items if item["gameid"] in selected_ids]
 
     def get_selected_shortcuts(self):
-        selected_ids = {row[7] for row in self.liststore if row[2] and row[3]}
+        selected_ids = {row[self.COL_GAMEID] for row in self.liststore if row[self.COL_SHORTCUT_ACTIVE] and row[self.COL_HAS_SHORTCUT]}
         result = []
         for item in self.items:
             if item["gameid"] in selected_ids:
@@ -565,14 +593,16 @@ class BackupWindow(Gtk.Dialog):
         excluded_shortcut_ids = resolve_excluded_ids(
             self.config, 'backup-excluded-shortcut-ids', 'backup-shortcut-ids', shortcut_gameids)
 
-        it = self.prefix_list.liststore.get_iter_first()
+        pl = self.prefix_list
+        it = pl.liststore.get_iter_first()
         while it is not None:
-            gameid = self.prefix_list.liststore.get_value(it, 7)
-            has_shortcut = self.prefix_list.liststore.get_value(it, 3)
-            self.prefix_list.liststore.set_value(it, 0, gameid not in excluded_game_ids)
-            self.prefix_list.liststore.set_value(it, 1, gameid not in excluded_prefix_ids)
-            self.prefix_list.liststore.set_value(it, 2, has_shortcut and gameid not in excluded_shortcut_ids)
-            it = self.prefix_list.liststore.iter_next(it)
+            gameid = pl.liststore.get_value(it, pl.COL_GAMEID)
+            has_shortcut = pl.liststore.get_value(it, pl.COL_HAS_SHORTCUT)
+            has_prefix = pl.liststore.get_value(it, pl.COL_HAS_PREFIX)
+            pl.liststore.set_value(it, pl.COL_GAME_ACTIVE, gameid not in excluded_game_ids)
+            pl.liststore.set_value(it, pl.COL_PREFIX_ACTIVE, has_prefix and gameid not in excluded_prefix_ids)
+            pl.liststore.set_value(it, pl.COL_SHORTCUT_ACTIVE, has_shortcut and gameid not in excluded_shortcut_ids)
+            it = pl.liststore.iter_next(it)
         self.prefix_list.sync_game_all_checkbox()
         self.prefix_list.sync_prefix_all_checkbox()
         self.prefix_list.sync_shortcut_all_checkbox()
@@ -891,8 +921,11 @@ class BackupWindow(Gtk.Dialog):
         self.update_backup_button_label()
         return False
 
+    def total_backup_size_bytes(self):
+        return self.settings_size_bytes + self.prefix_list.total_size_bytes + self.proton_list.total_size_bytes
+
     def update_backup_button_label(self):
-        total = self.settings_size_bytes + self.prefix_list.total_size_bytes + self.proton_list.total_size_bytes
+        total = self.total_backup_size_bytes()
         self.button_backup_now.set_label("{} ({})".format(_("Backup now"), format_size(total)))
 
     def on_backup_now_clicked(self, widget):
@@ -902,6 +935,16 @@ class BackupWindow(Gtk.Dialog):
         dest_dir = self.entry_dest.get_text()
         if not dest_dir:
             dest_dir = os.path.expanduser("~")
+
+        needed_bytes = self.total_backup_size_bytes()
+        free_bytes = get_free_space_bytes(expand_path(dest_dir))
+        if free_bytes is not None and needed_bytes > free_bytes:
+            send_desktop_notification(
+                "Faugus",
+                _("Backup failed: not enough disk space ({} needed, {} available).").format(
+                    format_size(needed_bytes), format_size(free_bytes)),
+            )
+            return
 
         dest_path = os.path.join(dest_dir, backup_filename())
 
@@ -943,9 +986,10 @@ class BackupWindow(Gtk.Dialog):
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
 
         _prefixes, _shortcuts, protons, _games = self.current_selection()
-        self.config['backup-excluded-game-ids'] = [row[7] for row in self.prefix_list.liststore if not row[0]]
-        self.config['backup-excluded-prefix-ids'] = [row[7] for row in self.prefix_list.liststore if not row[1]]
-        self.config['backup-excluded-shortcut-ids'] = [row[7] for row in self.prefix_list.liststore if row[3] and not row[2]]
+        pl = self.prefix_list
+        self.config['backup-excluded-game-ids'] = [row[pl.COL_GAMEID] for row in pl.liststore if not row[pl.COL_GAME_ACTIVE]]
+        self.config['backup-excluded-prefix-ids'] = [row[pl.COL_GAMEID] for row in pl.liststore if not row[pl.COL_PREFIX_ACTIVE]]
+        self.config['backup-excluded-shortcut-ids'] = [row[pl.COL_GAMEID] for row in pl.liststore if row[pl.COL_HAS_SHORTCUT] and not row[pl.COL_SHORTCUT_ACTIVE]]
         self.config.pop('backup-prefix-ids', None)
         self.config.pop('backup-shortcut-ids', None)
         self.config['backup-proton-ids'] = [item["gameid"] for item in protons]
@@ -1017,6 +1061,7 @@ class RestoreWindow(Gtk.Dialog):
     def load_content(self, temp_dir, manifest):
         self.temp_dir = temp_dir
 
+        manifest_games = manifest.get("games", [])
         manifest_shortcuts = manifest.get("shortcuts", [])
         manifest_prefixes = manifest.get("prefixes", [])
         manifest_protons = manifest.get("protons", [])
@@ -1029,32 +1074,51 @@ class RestoreWindow(Gtk.Dialog):
             gameid = entry["gameid"]
             seen_gameids.add(gameid)
             src = os.path.join(temp_dir, "prefixes", gameid)
-            size_bytes = get_dir_size(src) if os.path.isdir(src) else 0
+            has_prefix = os.path.isdir(src)
+            size_bytes = get_dir_size(src) if has_prefix else 0
             shortcut_group = shortcuts_by_gameid.get(gameid)
             items.append({
                 "gameid": gameid,
                 "title": entry.get("title", gameid),
                 "path": entry.get("original_path", ""),
                 "size_bytes": size_bytes,
+                "has_prefix": has_prefix,
                 "shortcut_files": shortcut_group.get("original_paths", []) if shortcut_group else [],
             })
 
         for gameid, group in shortcuts_by_gameid.items():
             if gameid in seen_gameids:
                 continue
+            seen_gameids.add(gameid)
             items.append({
                 "gameid": gameid,
                 "title": group.get("title", gameid),
                 "path": "",
                 "size_bytes": 0,
+                "has_prefix": False,
                 "shortcut_files": group.get("original_paths", []),
             })
 
+        for entry in manifest_games:
+            gameid = entry["gameid"]
+            if gameid in seen_gameids:
+                continue
+            seen_gameids.add(gameid)
+            items.append({
+                "gameid": gameid,
+                "title": entry.get("title", gameid),
+                "path": "",
+                "size_bytes": 0,
+                "has_prefix": False,
+                "shortcut_files": [],
+            })
+
         self.prefix_list = PrefixShortcutList(items)
-        for row in self.prefix_list.liststore:
-            row[0] = True
-            row[1] = True
-            row[2] = row[3]
+        pl = self.prefix_list
+        for row in pl.liststore:
+            row[pl.COL_GAME_ACTIVE] = True
+            row[pl.COL_PREFIX_ACTIVE] = row[pl.COL_HAS_PREFIX]
+            row[pl.COL_SHORTCUT_ACTIVE] = row[pl.COL_HAS_SHORTCUT]
         self.prefix_list.sync_game_all_checkbox()
         self.prefix_list.sync_prefix_all_checkbox()
         self.prefix_list.sync_shortcut_all_checkbox()

@@ -115,6 +115,37 @@ def format_size(num_bytes):
     return f"{size:.2f} TB"
 
 
+def get_free_space_bytes(path):
+    while path and not os.path.isdir(path):
+        parent = os.path.dirname(path)
+        if parent == path:
+            return None
+        path = parent
+    if not path:
+        return None
+    try:
+        return shutil.disk_usage(path).free
+    except OSError:
+        return None
+
+
+def estimate_backup_size_bytes(prefixes, shortcuts, protons):
+    total = get_settings_size_bytes()
+    for entry in prefixes:
+        if os.path.isdir(entry.get("path", "")):
+            total += get_dir_size(entry["path"])
+    for entry in shortcuts:
+        for file_path in entry.get("files") or []:
+            try:
+                total += os.path.getsize(file_path)
+            except OSError:
+                pass
+    for entry in protons:
+        if os.path.isdir(entry.get("path", "")):
+            total += get_dir_size(entry["path"])
+    return total
+
+
 def list_game_prefixes():
     games = load_json_file(GAMES_JSON, default=[])
     result = []
@@ -133,7 +164,7 @@ def list_game_prefixes():
         title = game.get('title', '') or gameid
         if not gameid:
             continue
-        result.append({"gameid": gameid, "title": title, "path": path})
+        result.append({"gameid": gameid, "title": title, "path": path, "has_prefix": os.path.isdir(path)})
 
     result.sort(key=lambda item: item["title"].lower())
 
@@ -142,7 +173,7 @@ def list_game_prefixes():
     if default_prefix_base:
         default_path = os.path.join(default_prefix_base, "default")
         if os.path.isdir(default_path):
-            result.insert(0, {"gameid": "default", "title": _("Default Prefix"), "path": default_path})
+            result.insert(0, {"gameid": "default", "title": _("Default Prefix"), "path": default_path, "has_prefix": True})
 
     return result
 
@@ -253,6 +284,7 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
 
     manifest = {
         "version": 2,
+        "games": [],
         "prefixes": [],
         "shortcuts": [],
         "protons": [],
@@ -266,6 +298,7 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
     for entry in all_games:
         if not isinstance(entry, dict) or entry.get("gameid") not in games:
             continue
+        manifest["games"].append({"gameid": entry["gameid"], "title": entry.get("title", entry["gameid"])})
         included_image_basenames.add(f"{entry['gameid']}.png")
         for field in ("cover", "icon"):
             value = entry.get(field) or ""
@@ -425,6 +458,18 @@ def _perform_scheduled_backup(config):
     dest_dir = config.get('backup-dest-dir', '') or os.path.expanduser("~")
     dest_path = os.path.join(dest_dir, backup_filename())
     prefixes, shortcuts, protons, games = backup_selection_from_config(config)
+
+    needed_bytes = estimate_backup_size_bytes(prefixes, shortcuts, protons)
+    free_bytes = get_free_space_bytes(expand_path(dest_dir))
+    if free_bytes is not None and needed_bytes > free_bytes:
+        send_desktop_notification(
+            "Faugus",
+            _("Backup failed: not enough disk space ({} needed, {} available).").format(
+                format_size(needed_bytes), format_size(free_bytes)),
+        )
+        suppress_immediate_auto_backup(config)
+        return
+
     new_date = run_backup_with_notification(dest_path, prefixes, shortcuts, protons, games)
     config['backup-last-date'] = new_date
     config['backup-last-auto-date'] = new_date
@@ -439,7 +484,8 @@ def _run_scheduled_backup_if_due(config):
         try:
             _perform_scheduled_backup(config)
         except Exception:
-            pass
+            send_desktop_notification("Faugus", _("Automatic backup failed."))
+            suppress_immediate_auto_backup(config)
 
     run_in_background(worker)
 
@@ -616,12 +662,13 @@ def daemon_mode():
         now = time.monotonic()
         if now - last_check >= 60:
             last_check = now
+            config = load_config()
             try:
-                config = load_config()
                 if should_run_backup(config):
                     _perform_scheduled_backup(config)
             except Exception:
-                pass
+                send_desktop_notification("Faugus", _("Automatic backup failed."))
+                suppress_immediate_auto_backup(config)
         time.sleep(5)
 
 
