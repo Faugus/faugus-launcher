@@ -662,10 +662,17 @@ def set_file_chooser_start_folder(filechooser, key, preferred_path=None):
     filechooser.set_current_folder(Gio.File.new_for_path(folder))
 
     def remember_folder(fc, response):
-        current = fc.get_current_folder()
-        path = current.get_path() if current else None
-        if path and _last_filechooser_folder.get(key) != path:
-            _last_filechooser_folder[key] = path
+        if response != Gtk.ResponseType.ACCEPT:
+            return
+
+        selected = fc.get_file()
+        path = selected.get_path() if selected else None
+        if not path:
+            return
+
+        folder = path if os.path.isdir(path) else os.path.dirname(path)
+        if folder and _last_filechooser_folder.get(key) != folder:
+            _last_filechooser_folder[key] = folder
             save_json_file(_last_filechooser_folder, FILECHOOSER_FOLDERS_FILE)
 
     filechooser.connect("response", remember_folder)
@@ -1796,6 +1803,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
             _("Select an additional application"),
             Gtk.FileChooserAction.OPEN,
         )
+        set_file_chooser_start_folder(filechooser, "addapp", entry_addapp.get_text() or None)
         add_windows_file_filters(filechooser)
 
         def on_search_response(dialog_fc, resp):
