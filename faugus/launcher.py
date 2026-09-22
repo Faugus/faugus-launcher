@@ -8912,6 +8912,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     if detected_path:
                         GLib.idle_add(self.entry_path.set_text, detected_path)
 
+                        if not self.steamgriddb_enabled:
+                            status = self.extract_shortcut_icon(detected_path)
+                            GLib.idle_add(self.apply_shortcut_icon_status, status)
+
                 run_in_background(run_command)
 
             destroy_and_release(dialog_fc)
@@ -8926,6 +8930,17 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         image = new_picture(surface)
 
         return image
+
+    def extract_shortcut_icon(self, path):
+        os.makedirs(self.icon_directory, exist_ok=True)
+        return extract_ico(path, self.icon_temp, best_frame=True)
+
+    def apply_shortcut_icon_status(self, status):
+        if status == "ok":
+            surface = self.new_texture_from_image(self.icon_temp, 50, 50)
+            self.button_shortcut_icon.set_child(new_picture(surface))
+        elif status == "no_icons":
+            self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
     def on_combobox_steam_shortcut_user_changed(self, combobox):
         title = self.entry_title.get_text().strip()
@@ -9097,13 +9112,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 path = dialog_fc.get_file().get_path()
 
                 if not self.steamgriddb_enabled:
-                    os.makedirs(self.icon_directory, exist_ok=True)
-                    status = extract_ico(path, self.icon_temp, best_frame=True)
-                    if status == "ok":
-                        surface = self.new_texture_from_image(self.icon_temp, 50, 50)
-                        self.button_shortcut_icon.set_child(new_picture(surface))
-                    elif status == "no_icons":
-                        self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
+                    status = self.extract_shortcut_icon(path)
+                    self.apply_shortcut_icon_status(status)
 
                 self.entry_path.set_text(path)
 
