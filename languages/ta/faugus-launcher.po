@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:05+0000\n"
+"POT-Creation-Date: 2026-09-22 20:22+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -19,172 +19,176 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 2026.9.dev0\n"
 
-#: faugus/backup.py:128 faugus/backup.py:288
+#: faugus/backup.py:130 faugus/backup.py:290
 msgid "Calculating..."
 msgstr ""
 
-#: faugus/backup.py:150
+#: faugus/backup.py:152
 msgid "Game"
 msgstr ""
 
-#: faugus/backup.py:155 faugus/backup.py:330 faugus/launcher.py:7587
+#: faugus/backup.py:157 faugus/backup.py:332 faugus/launcher.py:7587
 msgid "Prefix"
 msgstr ""
 
-#: faugus/backup.py:160 faugus/backup.py:356
+#: faugus/backup.py:162 faugus/backup.py:358
 msgid "Size"
 msgstr ""
 
-#: faugus/backup.py:171 faugus/backup.py:244 faugus/backup.py:367
-#: faugus/backup.py:512
+#: faugus/backup.py:173 faugus/backup.py:246 faugus/backup.py:369
+#: faugus/backup.py:514
 msgid "Total:"
 msgstr ""
 
-#: faugus/backup.py:309 faugus/launcher.py:7709 faugus/launcher.py:7899
+#: faugus/backup.py:311 faugus/launcher.py:7709 faugus/launcher.py:7899
 msgid "Game/App"
 msgstr ""
 
-#: faugus/backup.py:341
+#: faugus/backup.py:343
 msgid "Shortcuts"
 msgstr ""
 
-#: faugus/backup.py:538
+#: faugus/backup.py:540
 msgid "Backup Settings"
 msgstr ""
 
-#: faugus/backup.py:585 faugus/backup.py:1140 faugus/launcher.py:7599
+#: faugus/backup.py:591 faugus/backup.py:1170 faugus/launcher.py:7599
 msgid "Proton"
 msgstr ""
 
-#: faugus/backup.py:585 faugus/backup.py:1140 faugus/launcher.py:7543
+#: faugus/backup.py:591 faugus/backup.py:1170 faugus/launcher.py:7543
 #: faugus/utils.py:1786
 msgid "Path"
 msgstr ""
 
-#: faugus/backup.py:619
+#: faugus/backup.py:625
 msgid "Backup Destination"
 msgstr ""
 
-#: faugus/backup.py:632
+#: faugus/backup.py:638
 msgid "Backup destination path"
 msgstr ""
 
-#: faugus/backup.py:645
+#: faugus/backup.py:651
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:646 faugus/backup.py:971
+#: faugus/backup.py:652 faugus/backup.py:985
 msgid "Last backup:"
 msgstr ""
 
-#: faugus/backup.py:650 faugus/backup.py:929
+#: faugus/backup.py:656 faugus/backup.py:935
 msgid "Backup now"
 msgstr ""
 
-#: faugus/backup.py:661
+#: faugus/backup.py:667
 msgid "Automatic Backup"
 msgstr ""
 
-#: faugus/backup.py:667
+#: faugus/backup.py:673
 msgid "Monday"
 msgstr ""
 
-#: faugus/backup.py:668
+#: faugus/backup.py:674
 msgid "Tuesday"
 msgstr ""
 
-#: faugus/backup.py:669
+#: faugus/backup.py:675
 msgid "Wednesday"
 msgstr ""
 
-#: faugus/backup.py:670
+#: faugus/backup.py:676
 msgid "Thursday"
 msgstr ""
 
-#: faugus/backup.py:671
+#: faugus/backup.py:677
 msgid "Friday"
 msgstr ""
 
-#: faugus/backup.py:672
+#: faugus/backup.py:678
 msgid "Saturday"
 msgstr ""
 
-#: faugus/backup.py:673
+#: faugus/backup.py:679
 msgid "Sunday"
 msgstr ""
 
-#: faugus/backup.py:767 faugus/backup.py:1045 faugus/launcher.py:6072
+#: faugus/backup.py:773 faugus/backup.py:1075 faugus/launcher.py:6072
 #: faugus/launcher.py:7215 faugus/launcher.py:7686 faugus/launcher.py:8255
 #: faugus/proton_manager.py:324 faugus/shortcut.py:87 faugus/utils.py:510
 #: faugus/utils.py:621 faugus/utils.py:632
 msgid "Cancel"
 msgstr ""
 
-#: faugus/backup.py:771 faugus/backup.py:1049 faugus/backup.py:1241
+#: faugus/backup.py:777 faugus/backup.py:1079 faugus/backup.py:1271
 #: faugus/launcher.py:6076 faugus/launcher.py:6958 faugus/launcher.py:7219
 #: faugus/launcher.py:7690 faugus/launcher.py:8251 faugus/shortcut.py:91
 #: faugus/utils.py:514 faugus/utils.py:1005
 msgid "Ok"
 msgstr ""
 
-#: faugus/backup.py:811 faugus/backup.py:849 faugus/launcher.py:8830
+#: faugus/backup.py:817 faugus/backup.py:855 faugus/launcher.py:8830
 msgid "Disabled"
 msgstr ""
 
-#: faugus/backup.py:815 faugus/backup.py:851
+#: faugus/backup.py:821 faugus/backup.py:857
 msgid "Daily"
 msgstr ""
 
-#: faugus/backup.py:824 faugus/backup.py:845
+#: faugus/backup.py:830 faugus/backup.py:851
 msgid "Weekly"
 msgstr ""
 
-#: faugus/backup.py:830 faugus/backup.py:847
+#: faugus/backup.py:836 faugus/backup.py:853
 msgid "Monthly"
 msgstr ""
 
-#: faugus/backup.py:847
+#: faugus/backup.py:853
 msgid "Day"
 msgstr ""
 
-#: faugus/backup.py:894
+#: faugus/backup.py:900
 msgid "Select the backup destination"
 msgstr ""
 
-#: faugus/backup.py:944 faugus/backup_daemon.py:467
+#: faugus/backup.py:941
+msgid "Cancelling..."
+msgstr ""
+
+#: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
 
-#: faugus/backup.py:954
-msgid "Backing up..."
+#: faugus/backup.py:966 faugus/backup.py:998
+msgid "Cancel backup"
 msgstr ""
 
-#: faugus/backup.py:1006
+#: faugus/backup.py:1036
 msgid "Restore Backup"
 msgstr ""
 
-#: faugus/backup.py:1035
+#: faugus/backup.py:1065
 msgid "Extracting backup..."
 msgstr ""
 
-#: faugus/backup.py:1197
+#: faugus/backup.py:1227
 msgid "Restoring backup..."
 msgstr ""
 
-#: faugus/backup.py:1239
+#: faugus/backup.py:1269
 msgid "Failed to restore backup:"
 msgstr ""
 
-#: faugus/backup.py:1251 faugus/launcher.py:6946
+#: faugus/backup.py:1281 faugus/launcher.py:6946
 msgid "Are you sure you want to overwrite the settings?"
 msgstr ""
 
-#: faugus/backup.py:1253 faugus/launcher.py:5105 faugus/launcher.py:6958
+#: faugus/backup.py:1283 faugus/launcher.py:5105 faugus/launcher.py:6958
 #: faugus/launcher.py:7286
 msgid "Yes"
 msgstr ""
 
-#: faugus/backup.py:1254 faugus/launcher.py:5106 faugus/launcher.py:6959
+#: faugus/backup.py:1284 faugus/launcher.py:5106 faugus/launcher.py:6959
 #: faugus/launcher.py:7282
 msgid "No"
 msgstr ""
@@ -193,15 +197,19 @@ msgstr ""
 msgid "Default Prefix"
 msgstr ""
 
-#: faugus/backup_daemon.py:424
+#: faugus/backup_daemon.py:468
 msgid "Backup started"
 msgstr ""
 
-#: faugus/backup_daemon.py:432
+#: faugus/backup_daemon.py:478
+msgid "Backup cancelled"
+msgstr ""
+
+#: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr ""
 
-#: faugus/backup_daemon.py:487 faugus/backup_daemon.py:670
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 msgid "Automatic backup failed."
 msgstr ""
 

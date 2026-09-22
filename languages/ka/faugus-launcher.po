@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 20:05+0000\n"
+"POT-Creation-Date: 2026-09-22 20:22+0000\n"
 "PO-Revision-Date: 2026-08-29 01:19+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -20,193 +20,199 @@ msgstr ""
 "X-Generator: Weblate 2026.9.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: faugus/backup.py:128 faugus/backup.py:288
+#: faugus/backup.py:130 faugus/backup.py:290
 #, fuzzy
 #| msgid "Extracting %s..."
 msgid "Calculating..."
 msgstr "%s-ის გაშლა..."
 
-#: faugus/backup.py:150
+#: faugus/backup.py:152
 #, fuzzy
 #| msgid "Game/App"
 msgid "Game"
 msgstr "თამაში/აპლიკაცია"
 
-#: faugus/backup.py:155 faugus/backup.py:330 faugus/launcher.py:7587
+#: faugus/backup.py:157 faugus/backup.py:332 faugus/launcher.py:7587
 msgid "Prefix"
 msgstr "პრეფიქსი"
 
-#: faugus/backup.py:160 faugus/backup.py:356
+#: faugus/backup.py:162 faugus/backup.py:358
 msgid "Size"
 msgstr ""
 
-#: faugus/backup.py:171 faugus/backup.py:244 faugus/backup.py:367
-#: faugus/backup.py:512
+#: faugus/backup.py:173 faugus/backup.py:246 faugus/backup.py:369
+#: faugus/backup.py:514
 msgid "Total:"
 msgstr ""
 
-#: faugus/backup.py:309 faugus/launcher.py:7709 faugus/launcher.py:7899
+#: faugus/backup.py:311 faugus/launcher.py:7709 faugus/launcher.py:7899
 msgid "Game/App"
 msgstr "თამაში/აპლიკაცია"
 
-#: faugus/backup.py:341
+#: faugus/backup.py:343
 #, fuzzy
 #| msgid "Shortcut"
 msgid "Shortcuts"
 msgstr "მალსახმობი"
 
-#: faugus/backup.py:538
+#: faugus/backup.py:540
 #, fuzzy
 msgid "Backup Settings"
 msgstr "პარამეტრების მარქაფი/აღდგენა"
 
-#: faugus/backup.py:585 faugus/backup.py:1140 faugus/launcher.py:7599
+#: faugus/backup.py:591 faugus/backup.py:1170 faugus/launcher.py:7599
 msgid "Proton"
 msgstr "პროტონი"
 
-#: faugus/backup.py:585 faugus/backup.py:1140 faugus/launcher.py:7543
+#: faugus/backup.py:591 faugus/backup.py:1170 faugus/launcher.py:7543
 #: faugus/utils.py:1786
 msgid "Path"
 msgstr "ბილიკი"
 
-#: faugus/backup.py:619
+#: faugus/backup.py:625
 msgid "Backup Destination"
 msgstr ""
 
-#: faugus/backup.py:632
+#: faugus/backup.py:638
 msgid "Backup destination path"
 msgstr ""
 
-#: faugus/backup.py:645
+#: faugus/backup.py:651
 msgid "No backup yet"
 msgstr ""
 
-#: faugus/backup.py:646 faugus/backup.py:971
+#: faugus/backup.py:652 faugus/backup.py:985
 msgid "Last backup:"
 msgstr ""
 
-#: faugus/backup.py:650 faugus/backup.py:929
+#: faugus/backup.py:656 faugus/backup.py:935
 #, fuzzy
 msgid "Backup now"
 msgstr "მარქაფი"
 
-#: faugus/backup.py:661
+#: faugus/backup.py:667
 msgid "Automatic Backup"
 msgstr ""
 
-#: faugus/backup.py:667
+#: faugus/backup.py:673
 msgid "Monday"
 msgstr ""
 
-#: faugus/backup.py:668
+#: faugus/backup.py:674
 msgid "Tuesday"
 msgstr ""
 
-#: faugus/backup.py:669
+#: faugus/backup.py:675
 msgid "Wednesday"
 msgstr ""
 
-#: faugus/backup.py:670
+#: faugus/backup.py:676
 msgid "Thursday"
 msgstr ""
 
-#: faugus/backup.py:671
+#: faugus/backup.py:677
 msgid "Friday"
 msgstr ""
 
-#: faugus/backup.py:672
+#: faugus/backup.py:678
 msgid "Saturday"
 msgstr ""
 
-#: faugus/backup.py:673
+#: faugus/backup.py:679
 msgid "Sunday"
 msgstr ""
 
-#: faugus/backup.py:767 faugus/backup.py:1045 faugus/launcher.py:6072
+#: faugus/backup.py:773 faugus/backup.py:1075 faugus/launcher.py:6072
 #: faugus/launcher.py:7215 faugus/launcher.py:7686 faugus/launcher.py:8255
 #: faugus/proton_manager.py:324 faugus/shortcut.py:87 faugus/utils.py:510
 #: faugus/utils.py:621 faugus/utils.py:632
 msgid "Cancel"
 msgstr "გაუქმება"
 
-#: faugus/backup.py:771 faugus/backup.py:1049 faugus/backup.py:1241
+#: faugus/backup.py:777 faugus/backup.py:1079 faugus/backup.py:1271
 #: faugus/launcher.py:6076 faugus/launcher.py:6958 faugus/launcher.py:7219
 #: faugus/launcher.py:7690 faugus/launcher.py:8251 faugus/shortcut.py:91
 #: faugus/utils.py:514 faugus/utils.py:1005
 msgid "Ok"
 msgstr "დიახ"
 
-#: faugus/backup.py:811 faugus/backup.py:849 faugus/launcher.py:8830
+#: faugus/backup.py:817 faugus/backup.py:855 faugus/launcher.py:8830
 #, fuzzy
 #| msgid "Disable Hidraw"
 msgid "Disabled"
 msgstr "'hidraw'-ის გათიშვა"
 
-#: faugus/backup.py:815 faugus/backup.py:851
+#: faugus/backup.py:821 faugus/backup.py:857
 msgid "Daily"
 msgstr "დღიური"
 
-#: faugus/backup.py:824 faugus/backup.py:845
+#: faugus/backup.py:830 faugus/backup.py:851
 msgid "Weekly"
 msgstr ""
 
-#: faugus/backup.py:830 faugus/backup.py:847
+#: faugus/backup.py:836 faugus/backup.py:853
 msgid "Monthly"
 msgstr ""
 
-#: faugus/backup.py:847
+#: faugus/backup.py:853
 #, fuzzy
 #| msgid "Daily"
 msgid "Day"
 msgstr "დღიური"
 
-#: faugus/backup.py:894
+#: faugus/backup.py:900
 #, fuzzy
 msgid "Select the backup destination"
 msgstr "აღსადგენად აირჩიეთ მარქაფის ფაილი"
 
-#: faugus/backup.py:944 faugus/backup_daemon.py:467
+#: faugus/backup.py:941
+#, fuzzy
+#| msgid "Extracting %s..."
+msgid "Cancelling..."
+msgstr "%s-ის გაშლა..."
+
+#: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
 
-#: faugus/backup.py:954
+#: faugus/backup.py:966 faugus/backup.py:998
 #, fuzzy
-#| msgid "Backup"
-msgid "Backing up..."
-msgstr "მარქაფი"
+#| msgid "Cancel"
+msgid "Cancel backup"
+msgstr "გაუქმება"
 
-#: faugus/backup.py:1006
+#: faugus/backup.py:1036
 #, fuzzy
 #| msgid "Restore"
 msgid "Restore Backup"
 msgstr "აღდგენა"
 
-#: faugus/backup.py:1035
+#: faugus/backup.py:1065
 #, fuzzy
 #| msgid "Extracting %s..."
 msgid "Extracting backup..."
 msgstr "%s-ის გაშლა..."
 
-#: faugus/backup.py:1197
+#: faugus/backup.py:1227
 msgid "Restoring backup..."
 msgstr ""
 
-#: faugus/backup.py:1239
+#: faugus/backup.py:1269
 #, fuzzy
 #| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
 msgstr "პრეფიქსის წაშლა ჩავარდა"
 
-#: faugus/backup.py:1251 faugus/launcher.py:6946
+#: faugus/backup.py:1281 faugus/launcher.py:6946
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "მართლა გნებავთ, თავზე გადააწეროთ პარამეტრები?"
 
-#: faugus/backup.py:1253 faugus/launcher.py:5105 faugus/launcher.py:6958
+#: faugus/backup.py:1283 faugus/launcher.py:5105 faugus/launcher.py:6958
 #: faugus/launcher.py:7286
 msgid "Yes"
 msgstr "დიახ"
 
-#: faugus/backup.py:1254 faugus/launcher.py:5106 faugus/launcher.py:6959
+#: faugus/backup.py:1284 faugus/launcher.py:5106 faugus/launcher.py:6959
 #: faugus/launcher.py:7282
 msgid "No"
 msgstr "არა"
@@ -217,17 +223,22 @@ msgstr "არა"
 msgid "Default Prefix"
 msgstr "ნაგულისხმევი პრეფიქსის ხელსაწყოები"
 
-#: faugus/backup_daemon.py:424
+#: faugus/backup_daemon.py:468
 #, fuzzy
 msgid "Backup started"
 msgstr "პარამეტრების მარქაფი/აღდგენა"
 
-#: faugus/backup_daemon.py:432
+#: faugus/backup_daemon.py:478
+#, fuzzy
+msgid "Backup cancelled"
+msgstr "მარქაფი"
+
+#: faugus/backup_daemon.py:480
 #, fuzzy
 msgid "Backup completed"
 msgstr "მარქაფი"
 
-#: faugus/backup_daemon.py:487 faugus/backup_daemon.py:670
+#: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 #, fuzzy
 msgid "Automatic backup failed."
 msgstr "ავტომატური განახლებების გათიშვა"
@@ -1360,6 +1371,11 @@ msgstr "სისტემური პანელის ხატულა"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~| msgid "Backup"
+#~ msgid "Backing up..."
+#~ msgstr "მარქაფი"
 
 #~ msgid "Proton may generate huge log files."
 #~ msgstr "Proton-მა, შეიძლება, უზარმაზარი ჟურნალის ფაილები შექმნას."
