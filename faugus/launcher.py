@@ -3242,17 +3242,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         stats_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
         stats_row.set_halign(Gtk.Align.CENTER)
 
-        self.label_info_playtime = Gtk.Label()
-        self.label_info_playtime.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_playtime)
+        self.label_info_categories = Gtk.Label()
+        self.label_info_categories.add_css_class("info-panel-stat")
+        stats_row.append(self.label_info_categories)
 
         self.label_info_sep1 = Gtk.Label(label="•")
         self.label_info_sep1.add_css_class("info-panel-stat")
         stats_row.append(self.label_info_sep1)
 
-        self.label_info_categories = Gtk.Label()
-        self.label_info_categories.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_categories)
+        self.label_info_playtime = Gtk.Label()
+        self.label_info_playtime.add_css_class("info-panel-stat")
+        stats_row.append(self.label_info_playtime)
 
         self.label_info_sep2 = Gtk.Label(label="•")
         self.label_info_sep2.add_css_class("info-panel-stat")
