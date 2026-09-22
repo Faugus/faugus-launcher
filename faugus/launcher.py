@@ -2902,7 +2902,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.action_context_show_logs.set_enabled(False)
 
         hide_label = _("Remove from hidden") if game.hidden else _("Hide")
-        play_label = _("Stop") if game.gameid in self.running else _("Play")
+        play_label = _("Stop") if game.gameid in self.running else _("Play with logs")
 
         categories = sorted(
             [cat.strip() for cat in load_json_file(CATEGORIES_FILE, default=[]) if cat.strip()],
@@ -2933,7 +2933,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         show_game_location = True
         show_prefix_location = game.runner != "Linux-Native"
         show_run = game.runner not in ("Steam", "Linux-Native")
-        show_logs_item = self.logging_enabled and game.runner not in ("Steam", "Linux-Native")
+        show_logs_item = game.runner not in ("Steam", "Linux-Native")
 
         if game.runner == "Steam":
             steam_game_dir, steam_prefix_dir = get_steam_app_paths(game.path)
@@ -3843,7 +3843,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
-        self.logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -4322,19 +4321,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 destroy_and_release(settings_dialog)
 
-            def proceed():
-                if not settings_dialog.logging_warning and settings_dialog.checkbox_logging.get_active():
-                    settings_dialog.logging_warning = True
-                    self.show_warning_dialog_main(
-                        self,
-                        _("Proton may generate huge log files."),
-                        _("Enable logging only when debugging a problem."),
-                        callback=lambda confirmed: finish_settings()
-                    )
-                else:
-                    finish_settings()
-
-            proceed()
+            finish_settings()
 
         else:
             apply_interface_customization(
@@ -5705,7 +5692,6 @@ class Settings(Gtk.Dialog):
         self.set_resizable(False)
 
         self.parent = parent
-        self.logging_warning = False
         self.modified = False
 
         add_css_once("settings_dialog", """
@@ -5999,9 +5985,6 @@ class Settings(Gtk.Dialog):
             _("Automatically creates shortcuts when installing something through the file manager")
         )
 
-        self.checkbox_logging = Gtk.CheckButton(label=_("Logging"))
-        self.checkbox_logging.set_active(False)
-
         self.checkbox_categories = Gtk.CheckButton(label=_("Categories"))
 
         self.checkbox_sort = Gtk.CheckButton(label=_("Sort"))
@@ -6204,8 +6187,7 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.checkbox_sdl, 0, 3, 1, 1)
         grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
-        grid_logs.attach(self.checkbox_logging, 0, 0, 1, 1)
-        grid_logs.attach(self.button_clearlogs, 0, 1, 1, 1)
+        grid_logs.attach(self.button_clearlogs, 0, 0, 1, 1)
         self.button_clearlogs.set_hexpand(True)
 
         grid_version.attach(label_version, 0, 0, 1, 1)
@@ -6601,7 +6583,6 @@ class Settings(Gtk.Dialog):
         entry_default_prefix = self.entry_default_prefix.get_text()
         combobox_default_runner = self.get_default_runner()
         language = self.combobox_language.get_active_id()
-        logging_warning = self.logging_warning
 
         config = ConfigManager()
         config.set_value("language", language)
@@ -6619,7 +6600,6 @@ class Settings(Gtk.Dialog):
         config.set_value("mono-icon", self.checkbox_mono_icon.get_active())
         config.set_value("auto-close-on-launch", self.checkbox_auto_close_on_launch.get_active())
         config.set_value("auto-create-shortcuts", self.checkbox_auto_create_shortcuts.get_active())
-        config.set_value("logging-enabled", self.checkbox_logging.get_active())
         config.set_value("show-hidden", self.checkbox_hidden_games.get_active())
         config.set_value("info-enabled", self.checkbox_info.get_active())
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
@@ -6635,7 +6615,6 @@ class Settings(Gtk.Dialog):
         config.set_value("zoom-enabled", self.checkbox_zoom.get_active())
         config.set_value("steamgriddb-enabled", self.checkbox_steamgriddb.get_active())
         config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
-        config.set_value("logging-warning", logging_warning)
         config.set_value("gamepad-navigation", self.checkbox_gamepad_navigation.get_active())
         config.set_value("minimized-startup-enabled", self.checkbox_minimized_startup.get_active())
         config.set_value("categories-enabled", self.checkbox_categories.get_active())
@@ -6985,14 +6964,12 @@ class Settings(Gtk.Dialog):
         steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         auto_create_shortcuts = cfg.config.get('auto-create-shortcuts', 'False') == 'True'
-        logging_enabled = cfg.config.get('logging-enabled', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
         info_enabled = cfg.config.get('info-enabled', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         wow64_enabled = cfg.config.get('wow64-enabled', 'False') == 'True'
         self.language = cfg.config.get('language', '')
-        self.logging_warning = cfg.config.get('logging-warning', 'False') == 'True'
         minimized_startup_enabled = cfg.config.get('minimized-startup-enabled', 'False') == 'True'
         categories_enabled = cfg.config.get('categories-enabled', 'False') == 'True'
         sort_enabled = cfg.config.get('sort-enabled', 'False') == 'True'
@@ -7032,7 +7009,6 @@ class Settings(Gtk.Dialog):
         self.on_checkbox_steamgriddb_toggled(self.checkbox_steamgriddb)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_auto_create_shortcuts.set_active(auto_create_shortcuts)
-        self.checkbox_logging.set_active(logging_enabled)
         self.checkbox_hidden_games.set_active(show_hidden)
         self.checkbox_info.set_active(info_enabled)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)

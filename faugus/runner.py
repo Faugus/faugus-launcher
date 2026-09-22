@@ -504,7 +504,7 @@ class FaugusRun(HiDpiMixin):
         self.default_runner = self.cfg.config.get('default-runner', '')
         self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
         self.default_prefix = expand_path(self.cfg.config.get('default-prefix', ''))
-        self.logging_enabled = self.cfg.config.get('logging-enabled', 'False') == 'True'
+        self.logging_enabled = True
         self.wayland_driver = self.cfg.config.get('wayland-driver', 'False') == 'True'
         self.wow64_enabled = self.cfg.config.get('wow64-enabled', 'False') == 'True'
         self.show_donate = self.cfg.config.get('show-donate', 'False') == 'True'

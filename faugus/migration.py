@@ -193,7 +193,6 @@ def _migrate_config_json_values():
         "prevent-sleep": "no-sleep-enabled",
         "close-onlaunch": "auto-close-on-launch",
         "show-labels": "labels-enabled",
-        "enable-logging": "logging-enabled",
         "start-boot": "autostart-enabled",
         "start-minimized": "minimized-startup-enabled",
         "show-categories": "categories-and-sort-enabled",
