@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-16 19:48+0000\n"
-"PO-Revision-Date: 2026-09-04 20:03+0000\n"
+"PO-Revision-Date: 2026-09-22 12:31+0000\n"
 "Last-Translator: howoz <howoz@proton.me>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/tr/>\n"
@@ -16,20 +16,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.9.1.dev0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:126 faugus/backup.py:271
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Calculating..."
-msgstr "Ayıklanıyor..."
+msgstr "Hesaplanıyor..."
 
 #: faugus/backup.py:148
-#, fuzzy
-#| msgid "Game/App"
 msgid "Game"
-msgstr "Oyun/Uygulama"
+msgstr "Oyun"
 
 #: faugus/backup.py:153 faugus/backup.py:311 faugus/launcher.py:7550
 msgid "Prefix"
@@ -37,22 +33,20 @@ msgstr "Ortam"
 
 #: faugus/backup.py:158 faugus/backup.py:336
 msgid "Size"
-msgstr ""
+msgstr "Boyut"
 
 #: faugus/backup.py:169 faugus/backup.py:242 faugus/backup.py:347
 #: faugus/backup.py:484
 msgid "Total:"
-msgstr ""
+msgstr "Toplam:"
 
 #: faugus/backup.py:292 faugus/launcher.py:7672 faugus/launcher.py:7862
 msgid "Game/App"
 msgstr "Oyun/Uygulama"
 
 #: faugus/backup.py:322
-#, fuzzy
-#| msgid "Shortcut"
 msgid "Shortcuts"
-msgstr "Kısayol"
+msgstr "Kısayollar"
 
 #: faugus/backup.py:510
 msgid "Backup Settings"
@@ -73,7 +67,7 @@ msgstr "Yedekleme Konumu"
 
 #: faugus/backup.py:602
 msgid "Backup destination path"
-msgstr "Yedekleme Konum Yolu"
+msgstr "Yedekleme konum yolu"
 
 #: faugus/backup.py:615
 msgid "No backup yet"
@@ -134,10 +128,8 @@ msgid "Ok"
 msgstr "Tamam"
 
 #: faugus/backup.py:781 faugus/backup.py:819 faugus/launcher.py:8793
-#, fuzzy
-#| msgid "Disable Runtime"
 msgid "Disabled"
-msgstr "Yürütme Ortamını Devre Dışı Bırak"
+msgstr "Devre Dışı"
 
 #: faugus/backup.py:785 faugus/backup.py:821
 msgid "Daily"
@@ -152,42 +144,32 @@ msgid "Monthly"
 msgstr "Aylık"
 
 #: faugus/backup.py:817
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "Günlük"
+msgstr "Gün"
 
 #: faugus/backup.py:864
 msgid "Select the backup destination"
 msgstr "Geri yüklenecek yedek konumunu seç"
 
 #: faugus/backup.py:911
-#, fuzzy
-#| msgid "Backup"
 msgid "Backing up..."
-msgstr "Yedekle"
+msgstr "Yedekleniyor..."
 
 #: faugus/backup.py:962
-#, fuzzy
-#| msgid "Restore"
 msgid "Restore Backup"
-msgstr "Geri Yükle"
+msgstr "Yedeği Geri Yükle"
 
 #: faugus/backup.py:991
-#, fuzzy
-#| msgid "Extracting..."
 msgid "Extracting backup..."
-msgstr "Ayıklanıyor..."
+msgstr "Yedek ayıklanıyor..."
 
 #: faugus/backup.py:1133
 msgid "Restoring backup..."
-msgstr ""
+msgstr "Yedek geri yükleniyor..."
 
 #: faugus/backup.py:1175
-#, fuzzy
-#| msgid "Failed to remove prefix"
 msgid "Failed to restore backup:"
-msgstr "Ortamı kaldırmak başarısız oldu"
+msgstr "Yedeği geri yükleme başarısız:"
 
 #: faugus/backup.py:1187 faugus/launcher.py:6906
 msgid "Are you sure you want to overwrite the settings?"
@@ -204,22 +186,16 @@ msgid "No"
 msgstr "Hayır"
 
 #: faugus/backup_daemon.py:145
-#, fuzzy
-#| msgid "Default Prefix Tools"
 msgid "Default Prefix"
-msgstr "Varsayılan Ortam Araçları"
+msgstr "Varsayılan Ortam"
 
 #: faugus/backup_daemon.py:391
-#, fuzzy
-#| msgid "Backup Destination"
 msgid "Backup started"
-msgstr "Yedekleme Konumu"
+msgstr "Yedekleme başladı"
 
 #: faugus/backup_daemon.py:399
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup completed"
-msgstr "Şimdi yedekle"
+msgstr "Yedekleme tamamlandı"
 
 #: faugus/launcher.py:1104 faugus/launcher.py:1291 faugus/launcher.py:1594
 #: faugus/launcher.py:1820 faugus/launcher.py:2447 faugus/launcher.py:2588
@@ -298,22 +274,16 @@ msgid "Close"
 msgstr "Kapat"
 
 #: faugus/launcher.py:2871 faugus/launcher.py:3320
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "Oynama süresi"
+msgstr "Oynama süresi: {}"
 
 #: faugus/launcher.py:2878 faugus/launcher.py:3332
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "En son oynanan"
+msgstr "En son oynanan: {}"
 
 #: faugus/launcher.py:2879
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "En son oynanan"
+msgstr "Hiç oynanmadı"
 
 #: faugus/launcher.py:2904
 msgid "Remove from hidden"
@@ -368,92 +338,72 @@ msgid "Recent"
 msgstr "Geçmiş"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "saat"
+msgstr "{} saat"
 
 #: faugus/launcher.py:3139
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "saat"
+msgstr "{} saat"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "dakika"
+msgstr "{} dakika"
 
 #: faugus/launcher.py:3142
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "dakika"
+msgstr "{} dakika"
 
 #: faugus/launcher.py:3157
 msgid "Just now"
-msgstr ""
+msgstr "Az önce"
 
 #: faugus/launcher.py:3162
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "dakika"
+msgstr "Bir dakika önce"
 
 #: faugus/launcher.py:3163
-#, fuzzy
-#| msgid "minute"
 msgid "{} minutes ago"
-msgstr "dakika"
+msgstr "{} dakika önce"
 
 #: faugus/launcher.py:3168
 msgid "An hour ago"
-msgstr ""
+msgstr "Bir saat önce"
 
 #: faugus/launcher.py:3169
 msgid "{} hours ago"
-msgstr ""
+msgstr "{} saat önce"
 
 #: faugus/launcher.py:3174
 msgid "Yesterday"
-msgstr ""
+msgstr "Dün"
 
 #: faugus/launcher.py:3175
 msgid "{} days ago"
-msgstr ""
+msgstr "{} gün önce"
 
 #: faugus/launcher.py:3180
-#, fuzzy
-#| msgid "minute"
 msgid "A week ago"
-msgstr "dakika"
+msgstr "Bir hafta önce"
 
 #: faugus/launcher.py:3181
 msgid "{} weeks ago"
-msgstr ""
+msgstr "{} hafta önce"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "minute"
 msgid "A month ago"
-msgstr "dakika"
+msgstr "Bir ay önce"
 
 #: faugus/launcher.py:3187
-#, fuzzy
-#| msgid "minute"
 msgid "{} months ago"
-msgstr "dakika"
+msgstr "{} ay önce"
 
 #: faugus/launcher.py:3191
-#, fuzzy
-#| msgid "minute"
 msgid "A year ago"
-msgstr "dakika"
+msgstr "Bir yıl önce"
 
 #: faugus/launcher.py:3192
 msgid "{} years ago"
-msgstr ""
+msgstr "{} yıl önce"
 
 #: faugus/launcher.py:3523 faugus/launcher.py:6767 faugus/launcher.py:8819
 msgid "Select a file to run in the prefix"
@@ -504,16 +454,12 @@ msgid "No internet connection"
 msgstr "İnternet bağlantısı yok"
 
 #: faugus/launcher.py:5043
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard these prefixes?"
-msgstr "Değişiklikleri kaydetmek istiyor musunuz?"
+msgstr "Bu yürütme ortamlarını silmek istiyor musunuz?"
 
 #: faugus/launcher.py:5044
-#, fuzzy
-#| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
-msgstr "Değişiklikleri kaydetmek istiyor musunuz?"
+msgstr "Bu yürütme ortamını silmek istiyor musunuz?"
 
 #: faugus/launcher.py:5096 faugus/launcher.py:5264
 #, python-format
@@ -661,41 +607,39 @@ msgstr "Yakınlaştırma"
 
 #: faugus/launcher.py:5872
 msgid "Position"
-msgstr ""
+msgstr "Konum"
 
 #: faugus/launcher.py:5875
 msgid "Top"
-msgstr ""
+msgstr "Üst"
 
 #: faugus/launcher.py:5876
 msgid "Middle"
-msgstr ""
+msgstr "Orta"
 
 #: faugus/launcher.py:5877
 msgid "Bottom"
-msgstr ""
+msgstr "Alt"
 
 #: faugus/launcher.py:5879
 msgid "Orientation"
-msgstr ""
+msgstr "Yön"
 
 #: faugus/launcher.py:5882
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Alfabetik"
+msgstr "Dikey"
 
 #: faugus/launcher.py:5883
 msgid "Horizontal"
-msgstr ""
+msgstr "Yatay"
 
 #: faugus/launcher.py:5885 faugus/launcher.py:5905
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Maksimum Sütun"
 
 #: faugus/launcher.py:5903
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Maksimum Satır"
 
 #: faugus/launcher.py:5909
 msgid "SteamGridDB"
@@ -731,7 +675,7 @@ msgstr "Diğer"
 
 #: faugus/launcher.py:5951
 msgid "Display"
-msgstr ""
+msgstr "Görünüm"
 
 #: faugus/launcher.py:5954
 msgid "Discrete GPU"
@@ -767,13 +711,13 @@ msgstr "Otomatik güncelleştirmeler"
 
 #: faugus/launcher.py:5975
 msgid "Auto-create shortcuts"
-msgstr ""
+msgstr "Otomatik kısayol oluştur"
 
 #: faugus/launcher.py:5978
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
-msgstr ""
+msgstr "Dosya yöneticisinden yükleme yaparken otomatik kısayol oluştur"
 
 #: faugus/launcher.py:5981
 msgid "Logging"
@@ -801,7 +745,7 @@ msgstr "Ctrl+H ile gizli oyunları göstermeyi aç/kapat"
 
 #: faugus/launcher.py:5993
 msgid "Info"
-msgstr ""
+msgstr "Bilgi"
 
 #: faugus/launcher.py:5995
 msgid "Gamepad navigation"
@@ -857,13 +801,11 @@ msgstr "Genel Ortam Değişkenleri"
 
 #: faugus/launcher.py:6306
 msgid "General"
-msgstr ""
+msgstr "Genel"
 
 #: faugus/launcher.py:6307
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Arayüz Modu"
+msgstr "Arayüz"
 
 #: faugus/launcher.py:6420
 #, python-format
@@ -883,10 +825,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Izgara, Kapak Görseli veya Kayan Kartlar modu"
 
 #: faugus/launcher.py:6489
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Izgara, Kapak Görseli veya Kayan Kartlar modu"
+msgstr "Izgara veya Kapak Görseli modu"
 
 #: faugus/launcher.py:6517
 msgid "Covers or Carrousel mode with SteamGridDB"
@@ -906,7 +846,7 @@ msgstr "Geri yüklenecek bir yedek dosyası seç"
 
 #: faugus/launcher.py:6827
 msgid "Faugus Backup files"
-msgstr ""
+msgstr "Faugus Yedek dosyaları"
 
 #: faugus/launcher.py:6843 faugus/launcher.py:6882
 msgid "This is not a valid Faugus backup file."
@@ -966,16 +906,12 @@ msgid "Path to the game executable"
 msgstr "Oyun çalıştırma dosyası yolu"
 
 #: faugus/launcher.py:7526
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select an executable"
-msgstr "Oyunun çalıştırma dosyasını seç"
+msgstr "Bir çalıştırma dosyası seç"
 
 #: faugus/launcher.py:7527
-#, fuzzy
-#| msgid "%s was not installed!"
 msgid "Run an installer"
-msgstr "%s yüklenmedi!"
+msgstr "Bir yükleyici çalıştır"
 
 #: faugus/launcher.py:7544
 msgid "Runtime"
@@ -1070,10 +1006,8 @@ msgid "Steam Game"
 msgstr "Steam Oyunu"
 
 #: faugus/launcher.py:8871
-#, fuzzy
-#| msgid "Select the game executable"
 msgid "Select the game installer"
-msgstr "Oyunun çalıştırma dosyasını seç"
+msgstr "Oyunun yükleme dosyasını seç"
 
 #: faugus/launcher.py:9090
 msgid "Select the game executable"
