@@ -119,7 +119,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.games = []
 
         self.processes = {}
-        self.play_start_times = {}
+        self.play_sessions = {}
 
         if not os.path.exists(RUNNING_GAMES):
             save_json_file({}, RUNNING_GAMES)
@@ -1016,7 +1016,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
 
         if self.running:
-            self.update_info_panel()
+            selected_game = self.selected()
+            if selected_game and selected_game.gameid in self.running:
+                self.update_info_panel()
 
         return True
 
@@ -2874,7 +2876,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_playtime.set_visible(bool(formatted))
 
         if is_running:
-            playing_for_text = self.format_playing_for(self.play_start_times.get(game.gameid))
+            session_start = self.play_sessions.get(game.gameid, (None, 0))[0]
+            playing_for_text = self.format_playing_for(session_start)
             last_played_label_text = _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
             last_played_label_visible = bool(playing_for_text)
         else:
@@ -3157,7 +3160,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return " ".join(parts)
 
-    def format_playing_for(self, start_iso):
+    def elapsed_seconds_since(self, start_iso):
         if not start_iso:
             return None
 
@@ -3166,19 +3169,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         except ValueError:
             return None
 
-        seconds = max(0, (datetime.now() - started_at).total_seconds())
+        return max(0, (datetime.now() - started_at).total_seconds())
+
+    def format_playing_for(self, start_iso):
+        seconds = self.elapsed_seconds_since(start_iso)
+        if seconds is None:
+            return None
         return self.format_playtime(seconds) or _("Less than a minute")
 
     def format_last_played(self, last_played_iso):
-        if not last_played_iso:
+        seconds = self.elapsed_seconds_since(last_played_iso)
+        if seconds is None:
             return None
 
-        try:
-            played_at = datetime.fromisoformat(last_played_iso)
-        except ValueError:
-            return None
-
-        seconds = (datetime.now() - played_at).total_seconds()
         if seconds < 60:
             return _("Just now")
 
@@ -3336,7 +3339,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         panel.set_visible(True)
         self.label_info_title.set_text(game.title)
 
-        if game.runner == "Steam":
+        is_running = game.gameid in self.running
+        session_start, session_baseline_playtime = self.play_sessions.get(game.gameid, (None, game.playtime))
+
+        if is_running:
+            elapsed = self.elapsed_seconds_since(session_start) or 0
+            formatted_playtime = self.format_playtime(session_baseline_playtime + elapsed)
+        elif game.runner == "Steam":
             steam_minutes = get_steam_app_playtime_minutes(game.path, game.steam_user)
             formatted_playtime = self.format_playtime(steam_minutes * 60)
         else:
@@ -3352,8 +3361,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_info_categories.set_text(", ".join(categories) if categories else "")
         self.label_info_categories.set_visible(categories_visible)
 
-        if game.gameid in self.running:
-            playing_for_text = self.format_playing_for(self.play_start_times.get(game.gameid))
+        if is_running:
+            playing_for_text = self.format_playing_for(session_start)
             last_played_visible = bool(playing_for_text)
             self.label_info_last_played.set_text(
                 _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
@@ -4489,7 +4498,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not IS_FLATPAK or not self.auto_close_on_launch:
             self.running[gameid] = proc.pid
             self.processes[gameid] = proc
-            self.play_start_times[gameid] = datetime.now().isoformat()
+            self.play_sessions[gameid] = (datetime.now().isoformat(), game.playtime)
             GLib.child_watch_add(proc.pid, self.on_exit, gameid)
             self.save_running()
             self.update_info_panel()
@@ -4504,11 +4513,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_exit(self, pid, status, game):
         self.running.pop(game, None)
         self.processes.pop(game, None)
-        self.play_start_times.pop(game, None)
+        self.play_sessions.pop(game, None)
         self.save_running()
 
         self.reload_playtimes()
-        self.update_last_played(game)
         self.sync_last_played_order(game)
 
         if hasattr(self, 'current_sort') and hasattr(self, 'opt_playtime') and self.current_sort == self.opt_playtime:

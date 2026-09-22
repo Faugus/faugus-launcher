@@ -303,6 +303,7 @@ class FaugusRun(HiDpiMixin):
                 self.process = process
                 GLib.child_watch_add(GLib.PRIORITY_DEFAULT, process.pid, self.on_process_exit)
                 Thread(target=self._watch_game_process, daemon=True).start()
+                self.progress_save_source = GLib.timeout_add_seconds(30, self._save_progress_tick)
                 if log_file:
                     def close_log_later():
                         for t in threads:
@@ -349,6 +350,15 @@ class FaugusRun(HiDpiMixin):
 
         game_cmd = popen_prefix + shlex.split(self.message)
         self.start_time = time.time()
+
+        self.cfg_playtime_baseline = self.playtime
+        self.game_playtime_baseline = 0
+        if self.gameid:
+            for saved_game in load_json_file(GAMES_JSON, []):
+                if saved_game.get("gameid") == self.gameid:
+                    self.game_playtime_baseline = saved_game.get("playtime", 0)
+                    break
+
         start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
@@ -702,6 +712,30 @@ class FaugusRun(HiDpiMixin):
 
         return False
 
+    def _save_progress_tick(self):
+        self._save_progress()
+        return True
+
+    def _save_progress(self):
+        runtime = int(time.time() - self.start_time)
+        if runtime <= 0:
+            return
+
+        self.cfg.load_config()
+        self.cfg.set_value("playtime", self.cfg_playtime_baseline + runtime)
+        self.cfg.save_config()
+
+        if not self.gameid:
+            return
+
+        games = load_json_file(GAMES_JSON, [])
+        for game in games:
+            if game.get("gameid") == self.gameid:
+                game["playtime"] = self.game_playtime_baseline + runtime
+                game["last_played"] = datetime.now().isoformat()
+                break
+        save_json_file(games, GAMES_JSON)
+
     def on_process_exit(self, pid, condition):
         import psutil
 
@@ -725,34 +759,19 @@ class FaugusRun(HiDpiMixin):
                 except psutil.NoSuchProcess:
                     pass
 
-        end_time = time.time()
-        runtime = int(end_time - getattr(self, "start_time", end_time))
-
         if self.post_launch:
             try:
                 subprocess.Popen(self.post_launch, shell=True, env=child_env())
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
-        self.cfg.load_config()
-        self.playtime = int(self.cfg.config.get("playtime", 0))
-        self.cfg.set_value("playtime", self.playtime + runtime)
-        self.cfg.save_config()
+        if getattr(self, "progress_save_source", None):
+            GLib.source_remove(self.progress_save_source)
+            self.progress_save_source = None
 
-        game_id = os.environ.get("FAUGUSID")
+        self._save_progress()
 
-        if game_id:
-            games = load_json_file(GAMES_JSON, [])
-            if games:
-                for game in games:
-                    if game.get("gameid") == game_id:
-                        old_time = game.get("playtime", 0)
-                        game["playtime"] = old_time + runtime
-                        game["last_played"] = datetime.now().isoformat()
-                        break
-
-                save_json_file(games, GAMES_JSON)
-
+        if self.gameid:
             try:
                 connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
                 connection.call_sync(
