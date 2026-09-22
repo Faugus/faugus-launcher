@@ -119,6 +119,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.games = []
 
         self.processes = {}
+        self.play_start_times = {}
 
         if not os.path.exists(RUNNING_GAMES):
             save_json_file({}, RUNNING_GAMES)
@@ -1013,6 +1014,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.running or changed:
             self.update_icon()
+
+        if self.running:
+            self.update_info_panel()
 
         return True
 
@@ -2838,7 +2842,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_title.add_css_class("heading")
         label_menu_title.set_margin_bottom(4)
 
+        is_running = game.gameid in self.running
+
         formatted = None
+        last_played_iso = None
         last_played_text = None
         last_played_exact = None
         data = load_json_file(GAMES_JSON, [])
@@ -2866,15 +2873,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_playtime.set_margin_bottom(4)
         label_menu_playtime.set_visible(bool(formatted))
 
-        never_played = not formatted and not last_played_text
-        label_menu_last_played = Gtk.Label(
-            label=_("Last played: {}").format(last_played_text) if last_played_text
-            else (_("Never played") if never_played else "")
-        )
+        if is_running:
+            playing_for_text = self.format_playing_for(self.play_start_times.get(game.gameid))
+            last_played_label_text = _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
+            last_played_label_visible = bool(playing_for_text)
+        else:
+            never_played = not formatted and not last_played_text
+            last_played_label_text = (
+                _("Last played: {}").format(last_played_text) if last_played_text
+                else (_("Never played") if never_played else "")
+            )
+            last_played_label_visible = bool(last_played_text) or never_played
+
+        label_menu_last_played = Gtk.Label(label=last_played_label_text)
         label_menu_last_played.set_halign(Gtk.Align.START)
         label_menu_last_played.set_margin_bottom(4)
-        label_menu_last_played.set_visible(bool(last_played_text) or never_played)
-        if last_played_exact:
+        label_menu_last_played.set_visible(last_played_label_visible)
+        if last_played_exact and not is_running:
             label_menu_last_played.set_tooltip_text(last_played_exact)
 
         header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
@@ -2896,7 +2911,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         hide_label = _("Remove from hidden") if game.hidden else _("Hide")
         supports_logs = game.runner not in ("Steam", "Linux-Native")
-        if game.gameid in self.running:
+        if is_running:
             play_label = _("Stop")
         elif supports_logs:
             play_label = _("Play with logs")
@@ -3142,6 +3157,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return " ".join(parts)
 
+    def format_playing_for(self, start_iso):
+        if not start_iso:
+            return None
+
+        try:
+            started_at = datetime.fromisoformat(start_iso)
+        except ValueError:
+            return None
+
+        seconds = max(0, (datetime.now() - started_at).total_seconds())
+        return self.format_playtime(seconds) or _("Less than a minute")
+
     def format_last_played(self, last_played_iso):
         if not last_played_iso:
             return None
@@ -3325,18 +3352,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_info_categories.set_text(", ".join(categories) if categories else "")
         self.label_info_categories.set_visible(categories_visible)
 
-        last_played_text = self.format_last_played(game.last_played)
-        last_played_visible = bool(last_played_text)
-        self.label_info_last_played.set_text(
-            _("Last played: {}").format(last_played_text) if last_played_text else ""
-        )
-        self.label_info_last_played.set_visible(last_played_visible)
-        if game.last_played:
-            self.label_info_last_played.set_tooltip_text(
-                datetime.fromisoformat(game.last_played).strftime("%Y-%m-%d %H:%M")
+        if game.gameid in self.running:
+            playing_for_text = self.format_playing_for(self.play_start_times.get(game.gameid))
+            last_played_visible = bool(playing_for_text)
+            self.label_info_last_played.set_text(
+                _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
             )
-        else:
             self.label_info_last_played.set_tooltip_text(None)
+        else:
+            last_played_text = self.format_last_played(game.last_played)
+            last_played_visible = bool(last_played_text)
+            self.label_info_last_played.set_text(
+                _("Last played: {}").format(last_played_text) if last_played_text else ""
+            )
+            if game.last_played:
+                self.label_info_last_played.set_tooltip_text(
+                    datetime.fromisoformat(game.last_played).strftime("%Y-%m-%d %H:%M")
+                )
+            else:
+                self.label_info_last_played.set_tooltip_text(None)
+        self.label_info_last_played.set_visible(last_played_visible)
 
         self.label_info_sep1.set_visible(playtime_visible and categories_visible)
         self.label_info_sep2.set_visible((playtime_visible or categories_visible) and last_played_visible)
@@ -4449,16 +4484,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
             return
 
-        self.update_last_played(gameid)
-        self.sync_last_played_order(gameid)
-
         proc = subprocess.Popen(cmd, cwd=cwd, env=subprocess_env())
 
         if not IS_FLATPAK or not self.auto_close_on_launch:
             self.running[gameid] = proc.pid
             self.processes[gameid] = proc
+            self.play_start_times[gameid] = datetime.now().isoformat()
             GLib.child_watch_add(proc.pid, self.on_exit, gameid)
             self.save_running()
+            self.update_info_panel()
 
         if self.auto_close_on_launch:
             sys.exit()
@@ -4470,9 +4504,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_exit(self, pid, status, game):
         self.running.pop(game, None)
         self.processes.pop(game, None)
+        self.play_start_times.pop(game, None)
         self.save_running()
 
         self.reload_playtimes()
+        self.update_last_played(game)
         self.sync_last_played_order(game)
 
         if hasattr(self, 'current_sort') and hasattr(self, 'opt_playtime') and self.current_sort == self.opt_playtime:
