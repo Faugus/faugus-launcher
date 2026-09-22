@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-22 20:22+0000\n"
-"PO-Revision-Date: 2026-09-22 19:03+0000\n"
+"PO-Revision-Date: 2026-09-22 20:25+0000\n"
 "Last-Translator: Faugus <felix.ribeiro@live.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -152,20 +152,18 @@ msgid "Select the backup destination"
 msgstr "Selecione o destino do backup"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Calculando..."
+msgstr "Cancelando..."
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Falha no backup: sem espaço suficiente em disco ({} necessário, {} "
+"disponível)."
 
 #: faugus/backup.py:966 faugus/backup.py:998
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Último backup:"
+msgstr "Cancelar backup"
 
 #: faugus/backup.py:1036
 msgid "Restore Backup"
@@ -206,10 +204,8 @@ msgid "Backup started"
 msgstr "Backup iniciado"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Backup finalizado"
+msgstr "Backup cancelado"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
