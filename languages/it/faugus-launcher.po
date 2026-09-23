@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-22 19:03+0000\n"
+"PO-Revision-Date: 2026-09-23 13:30+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -152,20 +152,18 @@ msgid "Select the backup destination"
 msgstr "Seleziona la destinazione del backup"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Calcolando..."
+msgstr "Cancellando..."
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Backup fallito: non abbastanza spazio sul disco ({} necessario, {} "
+"disponibile)."
 
 #: faugus/backup.py:966 faugus/backup.py:993
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Ultimo backup:"
+msgstr "Annulla backup"
 
 #: faugus/backup.py:1037
 msgid "Restore Backup"
@@ -206,20 +204,16 @@ msgid "Backup started"
 msgstr "Backup iniziato"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Backup completato"
+msgstr "Backup annullato"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "Backup completato"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Backup completato"
+msgstr "Backup fallito"
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
@@ -556,10 +550,8 @@ msgid "Carrousel"
 msgstr "Carosello"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Sfondo"
+msgstr "Colore Sfondo"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
 #: faugus/launcher.py:5922 faugus/launcher.py:5930 faugus/launcher.py:8885
@@ -577,7 +569,7 @@ msgstr "Colore dominante"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "Colore Panoramica"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -777,7 +769,7 @@ msgstr "Premi Ctrl+H per mostrare/nascondere i giochi"
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "Panoramica"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
