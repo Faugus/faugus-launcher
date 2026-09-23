@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-22 20:27+0000\n"
-"PO-Revision-Date: 2026-09-17 11:17+0000\n"
+"PO-Revision-Date: 2026-09-23 03:29+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -152,20 +152,16 @@ msgid "Select the backup destination"
 msgstr "选择备份的目标地址"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "正在计算……"
+msgstr "正在取消……"
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
-msgstr ""
+msgstr "备份失败：磁盘空间不足 (需要 {}，可用 {})"
 
 #: faugus/backup.py:966 faugus/backup.py:998
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "上次备份:"
+msgstr "取消备份"
 
 #: faugus/backup.py:1036
 msgid "Restore Backup"
@@ -206,20 +202,16 @@ msgid "Backup started"
 msgstr "备份已开始"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "备份已完成"
+msgstr "备份已取消"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "备份已完成"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "备份已完成"
+msgstr "备份失败"
 
 #: faugus/launcher.py:1103 faugus/launcher.py:1290 faugus/launcher.py:1593
 #: faugus/launcher.py:1819 faugus/launcher.py:2446 faugus/launcher.py:2587
@@ -302,10 +294,8 @@ msgid "Playtime: {}"
 msgstr "游玩时间: {}"
 
 #: faugus/launcher.py:2881 faugus/launcher.py:3368
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
-msgstr "游玩时间: {}"
+msgstr "正在游玩: {}"
 
 #: faugus/launcher.py:2886 faugus/launcher.py:3375
 msgid "Last played: {}"
@@ -329,7 +319,7 @@ msgstr "停止"
 
 #: faugus/launcher.py:2920
 msgid "Play with logs"
-msgstr ""
+msgstr "游玩并记录日志"
 
 #: faugus/launcher.py:2922
 msgid "Play"
@@ -389,7 +379,7 @@ msgstr "{} 分钟"
 
 #: faugus/launcher.py:3178
 msgid "Less than a minute"
-msgstr ""
+msgstr "少于一分钟"
 
 #: faugus/launcher.py:3186
 msgid "Just now"
