@@ -154,7 +154,9 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 <details>
 <summary><b>Settings</b></summary>
 <br>
-<img src=screenshots/settings.png/>
+<img src=screenshots/settings-general.png/>
+<br>
+<img src=screenshots/settings-interface.png/>
 </details>
 
 <details>
