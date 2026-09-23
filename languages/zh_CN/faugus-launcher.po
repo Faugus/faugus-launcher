@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-23 03:29+0000\n"
+"PO-Revision-Date: 2026-09-23 15:19+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -548,10 +548,8 @@ msgid "Carrousel"
 msgstr "轮播"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "背景"
+msgstr "背景颜色"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
 #: faugus/launcher.py:5922 faugus/launcher.py:5930 faugus/launcher.py:8885
@@ -569,7 +567,7 @@ msgstr "主题色"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "概览颜色"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -767,7 +765,7 @@ msgstr "按 Ctrl+H 显示/隐藏游戏"
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "概览"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
