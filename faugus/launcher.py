@@ -1042,10 +1042,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.running or changed:
             self.update_icon()
 
-        if self.running:
-            selected_game = self.selected()
-            if selected_game and selected_game.gameid in self.running:
-                self.update_overview_panel()
+        if self.selected():
+            self.update_overview_panel()
 
         return True
 
@@ -2903,7 +2901,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         label_menu_playtime.set_visible(bool(formatted))
 
         if is_running:
-            session_start = self.play_sessions.get(game.gameid, (None, 0))[0]
+            session_start = self.get_play_session(game)[0]
             playing_for_text = self.format_playing_for(session_start)
             last_played_label_text = _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
             last_played_label_visible = bool(playing_for_text)
@@ -3209,6 +3207,30 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return None
         return self.format_playtime(seconds) or _("Less than a minute")
 
+    def get_play_session(self, game):
+        session = self.play_sessions.get(game.gameid)
+        if session is not None:
+            return session
+
+        if game.gameid not in self.running:
+            return None, game.playtime
+
+        pid = self.running.get(game.gameid)
+        if isinstance(pid, dict):
+            pid = next(iter(pid.values()), None)
+
+        session_start = None
+        if pid:
+            try:
+                import psutil
+                session_start = datetime.fromtimestamp(psutil.Process(pid).create_time()).isoformat()
+            except (psutil.NoSuchProcess, psutil.AccessDenied, ValueError, OSError):
+                session_start = None
+
+        session = (session_start, game.playtime)
+        self.play_sessions[game.gameid] = session
+        return session
+
     def format_last_played(self, last_played_iso):
         seconds = self.elapsed_seconds_since(last_played_iso)
         if seconds is None:
@@ -3373,7 +3395,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.label_overview_title.set_text(game.title)
 
         is_running = game.gameid in self.running
-        session_start, session_baseline_playtime = self.play_sessions.get(game.gameid, (None, game.playtime))
+        session_start, session_baseline_playtime = self.get_play_session(game)
 
         if is_running:
             elapsed = self.elapsed_seconds_since(session_start) or 0
