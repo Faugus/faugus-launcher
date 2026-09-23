@@ -47,6 +47,7 @@ class ConfigManager:
             'steamgriddb-api-key': '',
             'steamgriddb-enabled': 'False',
             'background-mode': 'default',
+            'info-color-mode': 'default',
             'banner-enabled': 'True',
             'grid-position': 'Middle',
             'grid-orientation': 'Vertical',
