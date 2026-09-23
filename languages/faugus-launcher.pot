@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -546,7 +546,7 @@ msgid "Carrousel"
 msgstr ""
 
 #: faugus/launcher.py:5892
-msgid "Background"
+msgid "Background Color"
 msgstr ""
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -563,8 +563,8 @@ msgstr ""
 msgid "Dominant color"
 msgstr ""
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
 msgstr ""
 
 #: faugus/launcher.py:5908
@@ -759,6 +759,10 @@ msgstr ""
 
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
+msgstr ""
+
+#: faugus/launcher.py:6076
+msgid "Overview"
 msgstr ""
 
 #: faugus/launcher.py:6079
