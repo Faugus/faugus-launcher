@@ -4,7 +4,7 @@ import gettext
 
 from faugus.path_manager import *
 
-MIN_TRANSLATION_PERCENT = 90
+MIN_TRANSLATION_PERCENT = 70
 
 
 def get_system_locale():
