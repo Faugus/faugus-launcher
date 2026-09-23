@@ -419,15 +419,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def wrap_content_with_position(self, content_widget, overview_panel):
         grid_valign = self.grid_position_valign()
-        overview_below = grid_valign != Gtk.Align.END
 
         content_group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         content_group.set_hexpand(True)
-        if overview_panel is not None and not overview_below:
+        if overview_panel is not None:
             content_group.append(overview_panel)
         content_group.append(content_widget)
-        if overview_panel is not None and overview_below:
-            content_group.append(overview_panel)
 
         position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
         position_wrapper.set_hexpand(True)
