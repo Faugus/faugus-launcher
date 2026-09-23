@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-17 11:17+0000\n"
+"PO-Revision-Date: 2026-09-23 13:30+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
@@ -152,20 +152,18 @@ msgid "Select the backup destination"
 msgstr "Изберете местоположение за резервното копие"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Изчисляване…"
+msgstr "Отказване…"
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Не може да се създаде резервно копие: няма достатъчно свободно място "
+"(необходимо: {}, налично: {})."
 
 #: faugus/backup.py:966 faugus/backup.py:993
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Последно резервно копие:"
+msgstr "Отказване на резервното копие"
 
 #: faugus/backup.py:1037
 msgid "Restore Backup"
@@ -206,20 +204,16 @@ msgid "Backup started"
 msgstr "Създаването на резервно копие е стартирано"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Създаването на резервно копие приключи"
+msgstr "Създаването на резервно копие е отказано"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "Създаването на резервно копие приключи"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Създаването на резервно копие приключи"
+msgstr "Създаването на резервно копие беше неуспешно."
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
@@ -302,10 +296,8 @@ msgid "Playtime: {}"
 msgstr "Игрално време: {}"
 
 #: faugus/launcher.py:2908 faugus/launcher.py:3396
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
-msgstr "Игрално време: {}"
+msgstr "Текущо игрално време: {}"
 
 #: faugus/launcher.py:2913 faugus/launcher.py:3403
 msgid "Last played: {}"
@@ -329,7 +321,7 @@ msgstr "Спиране"
 
 #: faugus/launcher.py:2947
 msgid "Play with logs"
-msgstr ""
+msgstr "Пускане с журнали"
 
 #: faugus/launcher.py:2949
 msgid "Play"
@@ -389,7 +381,7 @@ msgstr "{} минути"
 
 #: faugus/launcher.py:3205
 msgid "Less than a minute"
-msgstr ""
+msgstr "По-малко от минута"
 
 #: faugus/launcher.py:3213
 msgid "Just now"
@@ -558,10 +550,8 @@ msgid "Carrousel"
 msgstr "Въртележка"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Фон"
+msgstr "Фонов цвят"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
 #: faugus/launcher.py:5922 faugus/launcher.py:5930 faugus/launcher.py:8885
@@ -579,7 +569,7 @@ msgstr "Преобладаващ цвят"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "Общ цвят"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -779,7 +769,7 @@ msgstr "Ctrl+H превключва видимостта на скритите �
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "Преглед"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
