@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-09-01 13:48+0000\n"
 "Last-Translator: Han Andre <darahzmail@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/faugus-"
@@ -610,7 +610,9 @@ msgid "Carrousel"
 msgstr "Karusell"
 
 #: faugus/launcher.py:5892
-msgid "Background"
+#, fuzzy
+#| msgid "Background"
+msgid "Background Color"
 msgstr "Bakgrunn"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -627,8 +629,8 @@ msgstr "Aksentfarge"
 msgid "Dominant color"
 msgstr "Dominant farge"
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
 msgstr ""
 
 #: faugus/launcher.py:5908
@@ -826,6 +828,10 @@ msgstr "Skjulte spill"
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H Viser skjulte spill"
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"

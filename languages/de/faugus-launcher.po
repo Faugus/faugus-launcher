@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
@@ -559,7 +559,9 @@ msgid "Carrousel"
 msgstr "Karussell"
 
 #: faugus/launcher.py:5892
-msgid "Background"
+#, fuzzy
+#| msgid "Background"
+msgid "Background Color"
 msgstr "Hintergrund"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -576,9 +578,9 @@ msgstr "Akzentfarbe"
 msgid "Dominant color"
 msgstr "Hauptfarbe"
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
-msgstr "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
+msgstr ""
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -775,6 +777,10 @@ msgstr "Zeige versteckte Spiele"
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
 msgstr "Strg+H schaltet die Anzeige von versteckten Spielen um"
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
@@ -1292,6 +1298,9 @@ msgstr "Wähle ein Symbol"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
+
+#~ msgid "Info"
+#~ msgstr "Info"
 
 #, fuzzy
 #~| msgid "Automatic Backup"

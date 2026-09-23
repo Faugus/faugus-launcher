@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-09-22 19:03+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -556,7 +556,9 @@ msgid "Carrousel"
 msgstr "Karusell"
 
 #: faugus/launcher.py:5892
-msgid "Background"
+#, fuzzy
+#| msgid "Background"
+msgid "Background Color"
 msgstr "Bakgrund"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -573,9 +575,9 @@ msgstr "Accentfärg"
 msgid "Dominant color"
 msgstr "Dominerande färg"
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
-msgstr "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
+msgstr ""
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -770,6 +772,10 @@ msgstr "Dolda spel"
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H visar eller döljer dolda spel"
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
@@ -1282,6 +1288,9 @@ msgstr "Välj en ikon"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Inga resultat hittades"
+
+#~ msgid "Info"
+#~ msgstr "Info"
 
 #, fuzzy
 #~| msgid "Automatic Backup"

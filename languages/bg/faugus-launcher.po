@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-09-17 11:17+0000\n"
 "Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
@@ -558,7 +558,9 @@ msgid "Carrousel"
 msgstr "Въртележка"
 
 #: faugus/launcher.py:5892
-msgid "Background"
+#, fuzzy
+#| msgid "Background"
+msgid "Background Color"
 msgstr "Фон"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -575,9 +577,9 @@ msgstr "Акцентен цвят"
 msgid "Dominant color"
 msgstr "Преобладаващ цвят"
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
-msgstr "Информация"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
+msgstr ""
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -774,6 +776,10 @@ msgstr "Скрити игри"
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H превключва видимостта на скритите игри"
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
@@ -1287,6 +1293,9 @@ msgstr "Изберете иконка"
 #: faugus/utils.py:2532
 msgid "No results found"
 msgstr "Няма намерени резултати"
+
+#~ msgid "Info"
+#~ msgstr "Информация"
 
 #, fuzzy
 #~| msgid "Automatic Backup"

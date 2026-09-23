@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-08-29 01:17+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -612,7 +612,9 @@ msgid "Carrousel"
 msgstr ""
 
 #: faugus/launcher.py:5892
-msgid "Background"
+#, fuzzy
+#| msgid "Background"
+msgid "Background Color"
 msgstr "Tło"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -629,8 +631,8 @@ msgstr "Kolor akcentu"
 msgid "Dominant color"
 msgstr "Kolor dominujący"
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
 msgstr ""
 
 #: faugus/launcher.py:5908
@@ -834,6 +836,10 @@ msgstr "Ukryte gry"
 #: faugus/launcher.py:6074
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H przełącza ukryte gry"
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"

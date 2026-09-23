@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 03:29+0000\n"
+"POT-Creation-Date: 2026-09-23 04:00+0000\n"
 "PO-Revision-Date: 2026-08-29 01:20+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -613,7 +613,7 @@ msgstr ""
 
 #: faugus/launcher.py:5892
 #, fuzzy
-msgid "Background"
+msgid "Background Color"
 msgstr "پشتیبان گیری"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
@@ -631,8 +631,8 @@ msgstr ""
 msgid "Dominant color"
 msgstr ""
 
-#: faugus/launcher.py:5900 faugus/launcher.py:6076
-msgid "Info"
+#: faugus/launcher.py:5900
+msgid "Overview Color"
 msgstr ""
 
 #: faugus/launcher.py:5908
@@ -836,6 +836,10 @@ msgstr "نمایش بازی های پنهان شده"
 #, fuzzy
 msgid "Ctrl+H toggles hidden games"
 msgstr "برای نمایش دادن یا پنهان کردن بازی‌ها Ctrl+H را فشار دهید."
+
+#: faugus/launcher.py:6076
+msgid "Overview"
+msgstr ""
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
