@@ -2893,9 +2893,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if game.runner == "Steam":
             steam_minutes = get_steam_app_playtime_minutes(game.path, game.steam_user)
-            formatted = self.format_playtime(steam_minutes * 60)
+            formatted = self.format_playtime_display(steam_minutes * 60)
         else:
-            formatted = self.format_playtime(game.playtime)
+            formatted = self.format_playtime_display(game.playtime)
 
         label_menu_playtime = Gtk.Label(label=_("Playtime: {}").format(formatted) if formatted else "")
         label_menu_playtime.set_halign(Gtk.Align.START)
@@ -3187,6 +3187,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return " ".join(parts)
 
+    def format_playtime_display(self, seconds):
+        if not seconds:
+            return None
+        return self.format_playtime(seconds) or _("Less than a minute")
+
     def elapsed_seconds_since(self, start_iso):
         if not start_iso:
             return None
@@ -3372,12 +3377,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if is_running:
             elapsed = self.elapsed_seconds_since(session_start) or 0
-            formatted_playtime = self.format_playtime(session_baseline_playtime + elapsed)
+            formatted_playtime = self.format_playtime_display(session_baseline_playtime + elapsed)
         elif game.runner == "Steam":
             steam_minutes = get_steam_app_playtime_minutes(game.path, game.steam_user)
-            formatted_playtime = self.format_playtime(steam_minutes * 60)
+            formatted_playtime = self.format_playtime_display(steam_minutes * 60)
         else:
-            formatted_playtime = self.format_playtime(game.playtime)
+            formatted_playtime = self.format_playtime_display(game.playtime)
         playtime_visible = bool(formatted_playtime)
         self.label_overview_playtime.set_text(
             _("Playtime: {}").format(formatted_playtime) if formatted_playtime else ""
@@ -3398,9 +3403,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.label_overview_last_played.set_tooltip_text(None)
         else:
             last_played_text = self.format_last_played(game.last_played)
-            last_played_visible = bool(last_played_text)
+            never_played = not formatted_playtime and not last_played_text
+            last_played_visible = bool(last_played_text) or never_played
             self.label_overview_last_played.set_text(
-                _("Last played: {}").format(last_played_text) if last_played_text else ""
+                _("Last played: {}").format(last_played_text) if last_played_text
+                else (_("Never played") if never_played else "")
             )
             if game.last_played:
                 self.label_overview_last_played.set_tooltip_text(
