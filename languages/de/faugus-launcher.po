@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-17 11:17+0000\n"
+"PO-Revision-Date: 2026-09-24 11:52+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -161,12 +161,11 @@ msgstr "Berechne..."
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Sicherung fehlgeschlagen: Zu wenig Speicherplatz ({} benötigt, {} verfügbar)."
 
 #: faugus/backup.py:966 faugus/backup.py:993
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Letzte Sicherung:"
+msgstr "Breche Sicherung ab"
 
 #: faugus/backup.py:1037
 msgid "Restore Backup"
@@ -207,20 +206,16 @@ msgid "Backup started"
 msgstr "Sicherungs gestartet"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Sicherung beendet"
+msgstr "Sicherung abgebrochen"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "Sicherung beendet"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Sicherung beendet"
+msgstr "Sicherung fehlgeschlagen."
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
@@ -303,10 +298,8 @@ msgid "Playtime: {}"
 msgstr "Spielzeit: {}"
 
 #: faugus/launcher.py:2908 faugus/launcher.py:3396
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
-msgstr "Spielzeit: {}"
+msgstr "Spiele für: {}"
 
 #: faugus/launcher.py:2913 faugus/launcher.py:3403
 msgid "Last played: {}"
@@ -330,7 +323,7 @@ msgstr "Stoppen"
 
 #: faugus/launcher.py:2947
 msgid "Play with logs"
-msgstr ""
+msgstr "Spiel mit Logs"
 
 #: faugus/launcher.py:2949
 msgid "Play"
@@ -390,7 +383,7 @@ msgstr "{} Minuten"
 
 #: faugus/launcher.py:3205
 msgid "Less than a minute"
-msgstr ""
+msgstr "Weniger als eine Minute"
 
 #: faugus/launcher.py:3213
 msgid "Just now"
@@ -559,10 +552,8 @@ msgid "Carrousel"
 msgstr "Karussell"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Hintergrund"
+msgstr "Hintergrundfarbe"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
 #: faugus/launcher.py:5922 faugus/launcher.py:5930 faugus/launcher.py:8885
@@ -580,7 +571,7 @@ msgstr "Hauptfarbe"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "Überblicksfarbe"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -780,7 +771,7 @@ msgstr "Strg+H schaltet die Anzeige von versteckten Spielen um"
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "Überblick"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
