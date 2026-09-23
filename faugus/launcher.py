@@ -417,17 +417,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return Gtk.Align.END
         return Gtk.Align.CENTER
 
-    def wrap_content_with_position(self, content_widget, info_panel):
+    def wrap_content_with_position(self, content_widget, overview_panel):
         grid_valign = self.grid_position_valign()
-        info_below = grid_valign != Gtk.Align.END
+        overview_below = grid_valign != Gtk.Align.END
 
         content_group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         content_group.set_hexpand(True)
-        if info_panel is not None and not info_below:
-            content_group.append(info_panel)
+        if overview_panel is not None and not overview_below:
+            content_group.append(overview_panel)
         content_group.append(content_widget)
-        if info_panel is not None and info_below:
-            content_group.append(info_panel)
+        if overview_panel is not None and overview_below:
+            content_group.append(overview_panel)
 
         position_wrapper = Gtk.CenterBox(orientation=Gtk.Orientation.VERTICAL)
         position_wrapper.set_hexpand(True)
@@ -462,8 +462,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return self.get_named_rgb("theme_selected_bg_color")
 
-    def get_info_rgb(self):
-        mode = getattr(self, 'info_color_mode', 'default')
+    def get_overview_rgb(self):
+        mode = getattr(self, 'overview_color_mode', 'default')
 
         if mode == 'default':
             return self.get_named_rgb("theme_text_color", fallback=(255, 255, 255))
@@ -483,11 +483,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not os.path.isfile(color_source):
             return self.get_accent_rgb()
 
-        if getattr(self, '_info_panel_dominant_gameid', None) != game.gameid:
-            self._info_panel_dominant_gameid = game.gameid
-            self._info_panel_dominant_rgb = get_dominant_color(color_source)
+        if getattr(self, '_overview_panel_dominant_gameid', None) != game.gameid:
+            self._overview_panel_dominant_gameid = game.gameid
+            self._overview_panel_dominant_rgb = get_dominant_color(color_source)
 
-        return self._info_panel_dominant_rgb
+        return self._overview_panel_dominant_rgb
 
     def update_accent_background_css(self):
         window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
@@ -925,11 +925,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def apply_background_update_now(self):
         self.update_launcher_banner_css()
         self.update_background()
-        self.update_info_panel()
+        self.update_overview_panel()
 
     def schedule_background_update(self):
         self.update_launcher_banner_css()
-        self.update_info_panel()
+        self.update_overview_panel()
 
         if getattr(self, 'stack_banner', None) is None:
             return
@@ -1045,7 +1045,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.running:
             selected_game = self.selected()
             if selected_game and selected_game.gameid in self.running:
-                self.update_info_panel()
+                self.update_overview_panel()
 
         return True
 
@@ -1692,14 +1692,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.scale_zoom.set_valign(Gtk.Align.CENTER)
             self.scale_zoom.set_vexpand(False)
 
-            info_panel = None
-            if self.info_enabled and self.interface_mode in ("Grid", "Covers", "Carrousel"):
-                info_panel = self.build_info_panel()
+            overview_panel = None
+            if self.overview_enabled and self.interface_mode in ("Grid", "Covers", "Carrousel"):
+                overview_panel = self.build_overview_panel()
 
             if self.carrousel_active():
                 self.carrousel_box = self.build_carrousel_widget()
                 self.carrousel_box.set_vexpand(False)
-                right_vbox.append(self.wrap_content_with_position(self.carrousel_box, info_panel))
+                right_vbox.append(self.wrap_content_with_position(self.carrousel_box, overview_panel))
             elif self.interface_mode in ("Covers", "Grid"):
                 scroll_box.set_vexpand(False)
                 scroll_box.set_propagate_natural_height(True)
@@ -1722,7 +1722,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.flowbox.set_margin_start(40)
                     self.flowbox.set_margin_end(40)
 
-                right_vbox.append(self.wrap_content_with_position(scroll_box, info_panel))
+                right_vbox.append(self.wrap_content_with_position(scroll_box, overview_panel))
             else:
                 right_vbox.append(scroll_box)
                 scroll_box.set_vexpand(True)
@@ -3247,7 +3247,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return _("A year ago")
         return _("{} years ago").format(years)
 
-    def build_info_panel(self):
+    def build_overview_panel(self):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box.set_margin_top(20)
         box.set_margin_bottom(10)
@@ -3255,69 +3255,69 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         box.set_margin_end(30)
         box.set_halign(Gtk.Align.CENTER)
 
-        self.label_info_title = Gtk.Label()
-        self.label_info_title.add_css_class("info-panel-title")
-        self.label_info_title.set_halign(Gtk.Align.CENTER)
-        self.label_info_title.set_ellipsize(Pango.EllipsizeMode.END)
-        box.append(self.label_info_title)
+        self.label_overview_title = Gtk.Label()
+        self.label_overview_title.add_css_class("overview-panel-title")
+        self.label_overview_title.set_halign(Gtk.Align.CENTER)
+        self.label_overview_title.set_ellipsize(Pango.EllipsizeMode.END)
+        box.append(self.label_overview_title)
 
         separator = Gtk.Box()
-        separator.add_css_class("info-panel-separator")
+        separator.add_css_class("overview-panel-separator")
         separator.set_hexpand(True)
         box.append(separator)
 
         stats_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
         stats_row.set_halign(Gtk.Align.CENTER)
 
-        self.label_info_categories = Gtk.Label()
-        self.label_info_categories.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_categories)
+        self.label_overview_categories = Gtk.Label()
+        self.label_overview_categories.add_css_class("overview-panel-stat")
+        stats_row.append(self.label_overview_categories)
 
-        self.label_info_sep1 = Gtk.Label(label="•")
-        self.label_info_sep1.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_sep1)
+        self.label_overview_sep1 = Gtk.Label(label="•")
+        self.label_overview_sep1.add_css_class("overview-panel-stat")
+        stats_row.append(self.label_overview_sep1)
 
-        self.label_info_playtime = Gtk.Label()
-        self.label_info_playtime.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_playtime)
+        self.label_overview_playtime = Gtk.Label()
+        self.label_overview_playtime.add_css_class("overview-panel-stat")
+        stats_row.append(self.label_overview_playtime)
 
-        self.label_info_sep2 = Gtk.Label(label="•")
-        self.label_info_sep2.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_sep2)
+        self.label_overview_sep2 = Gtk.Label(label="•")
+        self.label_overview_sep2.add_css_class("overview-panel-stat")
+        stats_row.append(self.label_overview_sep2)
 
-        self.label_info_last_played = Gtk.Label()
-        self.label_info_last_played.add_css_class("info-panel-stat")
-        stats_row.append(self.label_info_last_played)
+        self.label_overview_last_played = Gtk.Label()
+        self.label_overview_last_played.add_css_class("overview-panel-stat")
+        stats_row.append(self.label_overview_last_played)
 
         box.append(stats_row)
 
-        self.info_panel = box
-        self.connect_info_panel_resize()
-        self.apply_info_panel_width()
-        self.update_info_panel()
+        self.overview_panel = box
+        self.connect_overview_panel_resize()
+        self.apply_overview_panel_width()
+        self.update_overview_panel()
         return box
 
-    def connect_info_panel_resize(self):
+    def connect_overview_panel_resize(self):
         surface = self.get_surface()
         if surface is not None:
-            surface.connect("notify::width", lambda s, p: self.update_info_panel_width())
-            surface.connect("notify::height", lambda s, p: self.update_info_panel_width())
+            surface.connect("notify::width", lambda s, p: self.update_overview_panel_width())
+            surface.connect("notify::height", lambda s, p: self.update_overview_panel_width())
         else:
-            self.connect("realize", lambda w: self.connect_info_panel_resize())
+            self.connect("realize", lambda w: self.connect_overview_panel_resize())
 
-    def update_info_panel_width(self):
-        if getattr(self, '_info_width_tick_id', None) is not None:
+    def update_overview_panel_width(self):
+        if getattr(self, '_overview_width_tick_id', None) is not None:
             return
 
         def do_resize(_widget, _frame_clock):
-            self._info_width_tick_id = None
-            self.apply_info_panel_width()
+            self._overview_width_tick_id = None
+            self.apply_overview_panel_width()
             return GLib.SOURCE_REMOVE
 
-        self._info_width_tick_id = self.add_tick_callback(do_resize)
+        self._overview_width_tick_id = self.add_tick_callback(do_resize)
 
-    def apply_info_panel_width(self):
-        panel = getattr(self, 'info_panel', None)
+    def apply_overview_panel_width(self):
+        panel = getattr(self, 'overview_panel', None)
         if panel is None:
             return
         width = self.get_width() or self.window_width
@@ -3325,47 +3325,47 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         title_size = 56
         stat_size = 22
-        info_r, info_g, info_b = self.get_info_rgb()
-        info_rgb = f"rgb({info_r}, {info_g}, {info_b})"
-        info_transparent = f"rgba({info_r}, {info_g}, {info_b}, 0)"
-        add_css_once("info_panel", f"""
-            .info-panel-title {{
+        overview_r, overview_g, overview_b = self.get_overview_rgb()
+        overview_rgb = f"rgb({overview_r}, {overview_g}, {overview_b})"
+        overview_transparent = f"rgba({overview_r}, {overview_g}, {overview_b}, 0)"
+        add_css_once("overview_panel", f"""
+            .overview-panel-title {{
                 font-size: {title_size}px;
                 font-weight: bold;
-                color: {info_rgb};
+                color: {overview_rgb};
                 text-shadow: 0 2px 4px alpha(black, 0.6);
             }}
-            .info-panel-separator {{
+            .overview-panel-separator {{
                 margin-top: 20px;
                 margin-bottom: 20px;
                 min-height: 3px;
                 background-image: linear-gradient(to right,
-                    {info_transparent},
-                    {info_rgb} 25%,
-                    {info_rgb} 75%,
-                    {info_transparent}
+                    {overview_transparent},
+                    {overview_rgb} 25%,
+                    {overview_rgb} 75%,
+                    {overview_transparent}
                 );
             }}
-            .info-panel-stat {{
+            .overview-panel-stat {{
                 font-size: {stat_size}px;
-                color: {info_rgb};
+                color: {overview_rgb};
                 text-shadow: 0 1px 3px alpha(black, 0.6);
             }}
         """)
 
-    def update_info_panel(self):
-        panel = getattr(self, 'info_panel', None)
+    def update_overview_panel(self):
+        panel = getattr(self, 'overview_panel', None)
         if panel is None:
             return
 
-        game = self.selected() if getattr(self, 'info_enabled', False) else None
+        game = self.selected() if getattr(self, 'overview_enabled', False) else None
         if not game:
             panel.set_visible(False)
             return
 
         panel.set_visible(True)
-        self.apply_info_panel_width()
-        self.label_info_title.set_text(game.title)
+        self.apply_overview_panel_width()
+        self.label_overview_title.set_text(game.title)
 
         is_running = game.gameid in self.running
         session_start, session_baseline_playtime = self.play_sessions.get(game.gameid, (None, game.playtime))
@@ -3379,39 +3379,39 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             formatted_playtime = self.format_playtime(game.playtime)
         playtime_visible = bool(formatted_playtime)
-        self.label_info_playtime.set_text(
+        self.label_overview_playtime.set_text(
             _("Playtime: {}").format(formatted_playtime) if formatted_playtime else ""
         )
-        self.label_info_playtime.set_visible(playtime_visible)
+        self.label_overview_playtime.set_visible(playtime_visible)
 
         categories = game.category if isinstance(game.category, list) else ([game.category] if game.category else [])
         categories_visible = bool(categories)
-        self.label_info_categories.set_text(", ".join(categories) if categories else "")
-        self.label_info_categories.set_visible(categories_visible)
+        self.label_overview_categories.set_text(", ".join(categories) if categories else "")
+        self.label_overview_categories.set_visible(categories_visible)
 
         if is_running:
             playing_for_text = self.format_playing_for(session_start)
             last_played_visible = bool(playing_for_text)
-            self.label_info_last_played.set_text(
+            self.label_overview_last_played.set_text(
                 _("Playing for: {}").format(playing_for_text) if playing_for_text else ""
             )
-            self.label_info_last_played.set_tooltip_text(None)
+            self.label_overview_last_played.set_tooltip_text(None)
         else:
             last_played_text = self.format_last_played(game.last_played)
             last_played_visible = bool(last_played_text)
-            self.label_info_last_played.set_text(
+            self.label_overview_last_played.set_text(
                 _("Last played: {}").format(last_played_text) if last_played_text else ""
             )
             if game.last_played:
-                self.label_info_last_played.set_tooltip_text(
+                self.label_overview_last_played.set_tooltip_text(
                     datetime.fromisoformat(game.last_played).strftime("%Y-%m-%d %H:%M")
                 )
             else:
-                self.label_info_last_played.set_tooltip_text(None)
-        self.label_info_last_played.set_visible(last_played_visible)
+                self.label_overview_last_played.set_tooltip_text(None)
+        self.label_overview_last_played.set_visible(last_played_visible)
 
-        self.label_info_sep1.set_visible(playtime_visible and categories_visible)
-        self.label_info_sep2.set_visible((playtime_visible or categories_visible) and last_played_visible)
+        self.label_overview_sep1.set_visible(playtime_visible and categories_visible)
+        self.label_overview_sep2.set_visible((playtime_visible or categories_visible) and last_played_visible)
 
     def on_context_menu_play(self, action, param):
         self.context_menu.popdown()
@@ -3910,7 +3910,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.auto_close_on_launch = cfg.config.get('auto-close-on-launch', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
-        self.info_color_mode = cfg.config.get('info-color-mode', 'default').strip('"')
+        self.overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
@@ -3931,7 +3931,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.grid_orientation = cfg.config.get('grid-orientation', 'Vertical').strip('"')
         grid_max_children_enabled = cfg.config.get('grid-max-children-enabled', 'False') == 'True'
         self.grid_max_children_per_line = int(cfg.config.get('grid-max-children-per-line', 20)) if grid_max_children_enabled else 20
-        self.info_enabled = cfg.config.get('info-enabled', 'False') == 'True'
+        self.overview_enabled = cfg.config.get('overview-enabled', 'False') == 'True'
         self.sort = cfg.config.get('sort', '')
         self.category = cfg.config.get('category', '')
         self.steam_user = cfg.config.get('steam-user', 'all')
@@ -4315,7 +4315,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     settings_dialog.accent_color,
                     settings_dialog.combobox_theme_engine.get_active_id(),
                 )
-                self.apply_info_panel_width()
+                self.apply_overview_panel_width()
 
                 self.save_interface_settings()
                 settings_dialog.update_config_file()
@@ -4367,7 +4367,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if self.grid_max_children_per_line != new_grid_max_children:
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
-                if self.info_enabled != settings_dialog.checkbox_info.get_active():
+                if self.overview_enabled != settings_dialog.checkbox_overview.get_active():
                     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
                 if self.language != settings_dialog.combobox_language.get_active_id():
@@ -4404,8 +4404,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 settings_dialog.original_theme_engine,
             )
             self.apply_background_mode_live(settings_dialog.original_background_mode)
-            self.info_color_mode = settings_dialog.original_info_color_mode
-            self.apply_info_panel_width()
+            self.overview_color_mode = settings_dialog.original_overview_color_mode
+            self.apply_overview_panel_width()
             destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
@@ -4532,7 +4532,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.play_sessions[gameid] = (datetime.now().isoformat(), game.playtime)
             GLib.child_watch_add(proc.pid, self.on_exit, gameid)
             self.save_running()
-            self.update_info_panel()
+            self.update_overview_panel()
 
         if self.auto_close_on_launch:
             sys.exit()
@@ -4563,7 +4563,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 GLib.idle_add(self.flowbox.invalidate_sort)
 
         GLib.idle_add(self.update_icon)
-        GLib.idle_add(self.update_info_panel)
+        GLib.idle_add(self.update_overview_panel)
 
     def update_last_played(self, gameid):
         games = load_json_file(GAMES_JSON, default=[])
@@ -4581,7 +4581,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if game.gameid == gameid:
                 game.last_played = timestamp
                 break
-        self.update_info_panel()
+        self.update_overview_panel()
 
     def sync_last_played_order(self, gameid):
         if not (hasattr(self, 'current_sort') and self.current_sort == self.opt_lastplayed):
@@ -5889,7 +5889,7 @@ class Settings(Gtk.Dialog):
         self.combobox_interface.append("Covers", _("Covers"))
         self.combobox_interface.append("Carrousel", _("Carrousel"))
 
-        self.label_background = Gtk.Label(label=_("Background"))
+        self.label_background = Gtk.Label(label=_("Background Color"))
         self.label_background.set_halign(Gtk.Align.START)
         self.combobox_background = IdComboBox()
         self.combobox_background.append("default", _("Default"))
@@ -5897,13 +5897,13 @@ class Settings(Gtk.Dialog):
         self.combobox_background.append("dominant_color", _("Dominant color"))
         self.combobox_background.connect("changed", self.on_background_changed)
 
-        self.label_info_color = Gtk.Label(label=_("Info"))
-        self.label_info_color.set_halign(Gtk.Align.START)
-        self.combobox_info_color = IdComboBox()
-        self.combobox_info_color.append("default", _("Default"))
-        self.combobox_info_color.append("accent", _("Accent color"))
-        self.combobox_info_color.append("dominant_color", _("Dominant color"))
-        self.combobox_info_color.connect("changed", self.on_info_color_changed)
+        self.label_overview_color = Gtk.Label(label=_("Overview Color"))
+        self.label_overview_color.set_halign(Gtk.Align.START)
+        self.combobox_overview_color = IdComboBox()
+        self.combobox_overview_color.append("default", _("Default"))
+        self.combobox_overview_color.append("accent", _("Accent color"))
+        self.combobox_overview_color.append("dominant_color", _("Dominant color"))
+        self.combobox_overview_color.connect("changed", self.on_overview_color_changed)
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
@@ -6073,8 +6073,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_hidden_games = Gtk.CheckButton(label=_("Hidden games"))
         self.checkbox_hidden_games.set_tooltip_text(_("Ctrl+H toggles hidden games"))
 
-        self.checkbox_info = Gtk.CheckButton(label=_("Info"))
-        self.checkbox_info.connect("toggled", self.on_checkbox_info_toggled)
+        self.checkbox_overview = Gtk.CheckButton(label=_("Overview"))
+        self.checkbox_overview.connect("toggled", self.on_checkbox_overview_toggled)
 
         self.checkbox_gamepad_navigation = Gtk.CheckButton(label=_("Gamepad navigation"))
         self.checkbox_gamepad_navigation.set_active(False)
@@ -6305,9 +6305,9 @@ class Settings(Gtk.Dialog):
         grid_theme_colors.attach(self.combobox_background, 0, 7, 2, 1)
         self.combobox_background.set_hexpand(True)
 
-        grid_theme_colors.attach(self.label_info_color, 0, 8, 2, 1)
-        grid_theme_colors.attach(self.combobox_info_color, 0, 9, 2, 1)
-        self.combobox_info_color.set_hexpand(True)
+        grid_theme_colors.attach(self.label_overview_color, 0, 8, 2, 1)
+        grid_theme_colors.attach(self.combobox_overview_color, 0, 9, 2, 1)
+        self.combobox_overview_color.set_hexpand(True)
 
         grid_interface_checkboxes.attach(self.label_display, 0, 0, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_labels, 0, 1, 1, 1)
@@ -6315,7 +6315,7 @@ class Settings(Gtk.Dialog):
         grid_interface_checkboxes.attach(self.checkbox_sort, 0, 3, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_categories, 0, 4, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_banner, 0, 5, 1, 1)
-        grid_interface_checkboxes.attach(self.checkbox_info, 0, 6, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_overview, 0, 6, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_header_bar, 0, 7, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_hidden_games, 0, 8, 1, 1)
 
@@ -6569,8 +6569,8 @@ class Settings(Gtk.Dialog):
         self.combobox_grid_position.set_sensitive(covers_carrousel_or_grid)
         self.combobox_grid_position.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
 
-        self.checkbox_info.set_sensitive(covers_carrousel_or_grid)
-        self.checkbox_info.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
+        self.checkbox_overview.set_sensitive(covers_carrousel_or_grid)
+        self.checkbox_overview.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
 
         grid_or_covers = active_id in ("Grid", "Covers")
         grid_covers_tip = _("Grid or Covers mode")
@@ -6624,8 +6624,8 @@ class Settings(Gtk.Dialog):
         if hasattr(self.parent, 'refresh_placeholder_covers'):
             self.parent.refresh_placeholder_covers()
 
-        if hasattr(self.parent, 'apply_info_panel_width'):
-            self.parent.apply_info_panel_width()
+        if hasattr(self.parent, 'apply_overview_panel_width'):
+            self.parent.apply_overview_panel_width()
 
         if self.parent.background_mode == "accent" and hasattr(self.parent, 'update_accent_background_css'):
             self.parent.update_accent_background_css()
@@ -6638,15 +6638,15 @@ class Settings(Gtk.Dialog):
         if hasattr(self.parent, 'apply_background_mode_live'):
             self.parent.apply_background_mode_live(new_mode)
 
-    def on_info_color_changed(self, widget):
-        self.parent.info_color_mode = self.combobox_info_color.get_active_id()
-        if hasattr(self.parent, 'apply_info_panel_width'):
-            self.parent.apply_info_panel_width()
+    def on_overview_color_changed(self, widget):
+        self.parent.overview_color_mode = self.combobox_overview_color.get_active_id()
+        if hasattr(self.parent, 'apply_overview_panel_width'):
+            self.parent.apply_overview_panel_width()
 
-    def on_checkbox_info_toggled(self, widget):
+    def on_checkbox_overview_toggled(self, widget):
         enabled = widget.get_active()
-        self.label_info_color.set_sensitive(enabled)
-        self.combobox_info_color.set_sensitive(enabled)
+        self.label_overview_color.set_sensitive(enabled)
+        self.combobox_overview_color.set_sensitive(enabled)
 
     def on_theme_engine_changed(self, widget):
         self.theme_engine = self.combobox_theme_engine.get_active_id()
@@ -6695,12 +6695,12 @@ class Settings(Gtk.Dialog):
         config.set_value("auto-close-on-launch", self.checkbox_auto_close_on_launch.get_active())
         config.set_value("auto-create-shortcuts", self.checkbox_auto_create_shortcuts.get_active())
         config.set_value("show-hidden", self.checkbox_hidden_games.get_active())
-        config.set_value("info-enabled", self.checkbox_info.get_active())
+        config.set_value("overview-enabled", self.checkbox_overview.get_active())
         config.set_value("wayland-driver", self.checkbox_wayland_driver.get_active())
         config.set_value("wow64-enabled", self.checkbox_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
-        config.set_value("info-color-mode", self.combobox_info_color.get_active_id())
+        config.set_value("overview-color-mode", self.combobox_overview_color.get_active_id())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("grid-position", self.combobox_grid_position.get_active_id())
         config.set_value("grid-orientation", self.combobox_grid_orientation.get_active_id())
@@ -7053,7 +7053,7 @@ class Settings(Gtk.Dialog):
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         background_mode = cfg.config.get('background-mode', 'default').strip('"')
-        info_color_mode = cfg.config.get('info-color-mode', 'default').strip('"')
+        overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
@@ -7061,7 +7061,7 @@ class Settings(Gtk.Dialog):
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
         auto_create_shortcuts = cfg.config.get('auto-create-shortcuts', 'False') == 'True'
         show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
-        info_enabled = cfg.config.get('info-enabled', 'False') == 'True'
+        overview_enabled = cfg.config.get('overview-enabled', 'False') == 'True'
         gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         wayland_driver = cfg.config.get('wayland-driver', 'False') == 'True'
         wow64_enabled = cfg.config.get('wow64-enabled', 'False') == 'True'
@@ -7081,7 +7081,7 @@ class Settings(Gtk.Dialog):
         self.original_interface_theme = self.interface_theme
         self.original_accent_color = self.accent_color
         self.original_background_mode = background_mode
-        self.original_info_color_mode = info_color_mode
+        self.original_overview_color_mode = overview_color_mode
         self.original_theme_engine = self.theme_engine
 
         self.checkbox_auto_close_on_launch.set_active(auto_close_on_launch)
@@ -7107,14 +7107,14 @@ class Settings(Gtk.Dialog):
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.checkbox_auto_create_shortcuts.set_active(auto_create_shortcuts)
         self.checkbox_hidden_games.set_active(show_hidden)
-        self.checkbox_info.set_active(info_enabled)
-        self.on_checkbox_info_toggled(self.checkbox_info)
+        self.checkbox_overview.set_active(overview_enabled)
+        self.on_checkbox_overview_toggled(self.checkbox_overview)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_wow64.set_active(wow64_enabled)
         self.combobox_interface.set_active_id(self.interface_mode)
         self.combobox_background.set_active_id(background_mode)
-        self.combobox_info_color.set_active_id(info_color_mode)
+        self.combobox_overview_color.set_active_id(overview_color_mode)
         self.checkbox_banner.set_active(banner_enabled)
         self.combobox_grid_position.set_active_id(grid_position)
         self.combobox_grid_orientation.set_active_id(grid_orientation)
