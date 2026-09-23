@@ -462,6 +462,33 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return self.get_named_rgb("theme_selected_bg_color")
 
+    def get_info_rgb(self):
+        mode = getattr(self, 'info_color_mode', 'default')
+
+        if mode == 'default':
+            return self.get_named_rgb("theme_text_color", fallback=(255, 255, 255))
+
+        if mode != 'dominant_color':
+            return self.get_accent_rgb()
+
+        game = self.selected()
+        if not game:
+            return self.get_accent_rgb()
+
+        if self.interface_mode in ("Covers", "Carrousel"):
+            color_source = f"{COVERS_DIR}/{game.gameid}.png"
+        else:
+            color_source = f"{ICONS_DIR}/{game.gameid}.png"
+
+        if not os.path.isfile(color_source):
+            return self.get_accent_rgb()
+
+        if getattr(self, '_info_panel_dominant_gameid', None) != game.gameid:
+            self._info_panel_dominant_gameid = game.gameid
+            self._info_panel_dominant_rgb = get_dominant_color(color_source)
+
+        return self._info_panel_dominant_rgb
+
     def update_accent_background_css(self):
         window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
         ar, ag, ab = self.get_accent_rgb()
@@ -3298,14 +3325,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         title_size = 56
         stat_size = 22
-        accent_r, accent_g, accent_b = self.get_accent_rgb()
-        accent_rgb = f"rgb({accent_r}, {accent_g}, {accent_b})"
-        accent_transparent = f"rgba({accent_r}, {accent_g}, {accent_b}, 0)"
+        info_r, info_g, info_b = self.get_info_rgb()
+        info_rgb = f"rgb({info_r}, {info_g}, {info_b})"
+        info_transparent = f"rgba({info_r}, {info_g}, {info_b}, 0)"
         add_css_once("info_panel", f"""
             .info-panel-title {{
                 font-size: {title_size}px;
                 font-weight: bold;
-                color: {accent_rgb};
+                color: {info_rgb};
                 text-shadow: 0 2px 4px alpha(black, 0.6);
             }}
             .info-panel-separator {{
@@ -3313,15 +3340,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 margin-bottom: 20px;
                 min-height: 3px;
                 background-image: linear-gradient(to right,
-                    {accent_transparent},
-                    {accent_rgb} 25%,
-                    {accent_rgb} 75%,
-                    {accent_transparent}
+                    {info_transparent},
+                    {info_rgb} 25%,
+                    {info_rgb} 75%,
+                    {info_transparent}
                 );
             }}
             .info-panel-stat {{
                 font-size: {stat_size}px;
-                color: {accent_rgb};
+                color: {info_rgb};
                 text-shadow: 0 1px 3px alpha(black, 0.6);
             }}
         """)
@@ -3337,6 +3364,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         panel.set_visible(True)
+        self.apply_info_panel_width()
         self.label_info_title.set_text(game.title)
 
         is_running = game.gameid in self.running
@@ -3882,6 +3910,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.auto_close_on_launch = cfg.config.get('auto-close-on-launch', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
+        self.info_color_mode = cfg.config.get('info-color-mode', 'default').strip('"')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
@@ -4375,6 +4404,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 settings_dialog.original_theme_engine,
             )
             self.apply_background_mode_live(settings_dialog.original_background_mode)
+            self.info_color_mode = settings_dialog.original_info_color_mode
+            self.apply_info_panel_width()
             destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
@@ -5866,6 +5897,14 @@ class Settings(Gtk.Dialog):
         self.combobox_background.append("dominant_color", _("Dominant color"))
         self.combobox_background.connect("changed", self.on_background_changed)
 
+        self.label_info_color = Gtk.Label(label=_("Info"))
+        self.label_info_color.set_halign(Gtk.Align.START)
+        self.combobox_info_color = IdComboBox()
+        self.combobox_info_color.append("default", _("Default"))
+        self.combobox_info_color.append("accent", _("Accent color"))
+        self.combobox_info_color.append("dominant_color", _("Dominant color"))
+        self.combobox_info_color.connect("changed", self.on_info_color_changed)
+
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
         self.label_theme_engine = Gtk.Label(label=_("Theme"))
@@ -6035,6 +6074,7 @@ class Settings(Gtk.Dialog):
         self.checkbox_hidden_games.set_tooltip_text(_("Ctrl+H toggles hidden games"))
 
         self.checkbox_info = Gtk.CheckButton(label=_("Info"))
+        self.checkbox_info.connect("toggled", self.on_checkbox_info_toggled)
 
         self.checkbox_gamepad_navigation = Gtk.CheckButton(label=_("Gamepad navigation"))
         self.checkbox_gamepad_navigation.set_active(False)
@@ -6264,6 +6304,10 @@ class Settings(Gtk.Dialog):
         grid_theme_colors.attach(self.label_background, 0, 6, 2, 1)
         grid_theme_colors.attach(self.combobox_background, 0, 7, 2, 1)
         self.combobox_background.set_hexpand(True)
+
+        grid_theme_colors.attach(self.label_info_color, 0, 8, 2, 1)
+        grid_theme_colors.attach(self.combobox_info_color, 0, 9, 2, 1)
+        self.combobox_info_color.set_hexpand(True)
 
         grid_interface_checkboxes.attach(self.label_display, 0, 0, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_labels, 0, 1, 1, 1)
@@ -6594,6 +6638,16 @@ class Settings(Gtk.Dialog):
         if hasattr(self.parent, 'apply_background_mode_live'):
             self.parent.apply_background_mode_live(new_mode)
 
+    def on_info_color_changed(self, widget):
+        self.parent.info_color_mode = self.combobox_info_color.get_active_id()
+        if hasattr(self.parent, 'apply_info_panel_width'):
+            self.parent.apply_info_panel_width()
+
+    def on_checkbox_info_toggled(self, widget):
+        enabled = widget.get_active()
+        self.label_info_color.set_sensitive(enabled)
+        self.combobox_info_color.set_sensitive(enabled)
+
     def on_theme_engine_changed(self, widget):
         self.theme_engine = self.combobox_theme_engine.get_active_id()
         is_adwaita = self.theme_engine == "adwaita"
@@ -6646,6 +6700,7 @@ class Settings(Gtk.Dialog):
         config.set_value("wow64-enabled", self.checkbox_wow64.get_active())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
+        config.set_value("info-color-mode", self.combobox_info_color.get_active_id())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("grid-position", self.combobox_grid_position.get_active_id())
         config.set_value("grid-orientation", self.combobox_grid_orientation.get_active_id())
@@ -6998,6 +7053,7 @@ class Settings(Gtk.Dialog):
         self.mono_icon = cfg.config.get('mono-icon', 'False') == 'True'
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         background_mode = cfg.config.get('background-mode', 'default').strip('"')
+        info_color_mode = cfg.config.get('info-color-mode', 'default').strip('"')
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
@@ -7025,6 +7081,7 @@ class Settings(Gtk.Dialog):
         self.original_interface_theme = self.interface_theme
         self.original_accent_color = self.accent_color
         self.original_background_mode = background_mode
+        self.original_info_color_mode = info_color_mode
         self.original_theme_engine = self.theme_engine
 
         self.checkbox_auto_close_on_launch.set_active(auto_close_on_launch)
@@ -7051,11 +7108,13 @@ class Settings(Gtk.Dialog):
         self.checkbox_auto_create_shortcuts.set_active(auto_create_shortcuts)
         self.checkbox_hidden_games.set_active(show_hidden)
         self.checkbox_info.set_active(info_enabled)
+        self.on_checkbox_info_toggled(self.checkbox_info)
         self.checkbox_gamepad_navigation.set_active(gamepad_navigation)
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_wow64.set_active(wow64_enabled)
         self.combobox_interface.set_active_id(self.interface_mode)
         self.combobox_background.set_active_id(background_mode)
+        self.combobox_info_color.set_active_id(info_color_mode)
         self.checkbox_banner.set_active(banner_enabled)
         self.combobox_grid_position.set_active_id(grid_position)
         self.combobox_grid_orientation.set_active_id(grid_orientation)
