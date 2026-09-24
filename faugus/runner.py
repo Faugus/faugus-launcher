@@ -131,9 +131,6 @@ class FaugusRun(HiDpiMixin):
                     self.cfg.set_value("donate-last", current_month)
                     self.cfg.save_config()
 
-        if self.splash_window_enabled and self.automatic_updates:
-            GLib.idle_add(self.show_splash)
-
         set_env("PROTON_EAC_RUNTIME", EAC_DIR)
         set_env("PROTON_BATTLEYE_RUNTIME", BE_DIR)
 
@@ -153,6 +150,9 @@ class FaugusRun(HiDpiMixin):
         set_env("UMU_CONTAINER_NSENTER", "1")
 
         self.extract_env_from_message()
+
+        if self.splash_window_enabled and self.automatic_updates and not os.environ.get("DISABLE_UMU"):
+            GLib.idle_add(self.show_splash)
 
         if self.command == "winetricks":
             GLib.idle_add(self.show_log_window)
@@ -196,7 +196,7 @@ class FaugusRun(HiDpiMixin):
                         if "steam" in file or "proton" in file:
                             os.remove(f"{target_dir}/{file}")
 
-        if not os.environ.get("WINEPREFIX"):
+        if not os.environ.get("WINEPREFIX") and not os.environ.get("DISABLE_UMU"):
             if not os.environ.get("PROTONPATH") in ["umu-steamrt4", "umu-sniper", "umu-soldier", "umu-scout", "umu-host"]:
                 set_env("WINEPREFIX", f"{self.default_prefix}/default")
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
@@ -331,7 +331,7 @@ class FaugusRun(HiDpiMixin):
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
         force_off = os.environ.get("FAUGUS_DISABLE_UPDATES") or not self.automatic_updates
-        if not force_off or not self.components_exists:
+        if not os.environ.get("DISABLE_UMU") and (not force_off or not self.components_exists):
             cmds_to_run.append([sys.executable, "-m", "faugus.components"])
 
         if not is_sniper:
@@ -848,7 +848,9 @@ def build_launch_command(game):
         command_parts.append(f"GAMEID={protonfix}")
     if runner:
         if runner == "Linux-Native":
-            if not disable_umu and linux_runtime:
+            if disable_umu:
+                command_parts.append("DISABLE_UMU=1")
+            elif linux_runtime:
                 command_parts.append(f"PROTONPATH={linux_runtime}")
         elif runner == "Proton-CachyOS (System)":
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
