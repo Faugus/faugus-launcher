@@ -94,17 +94,25 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.3.0-1" date="2026-09-10">
+    <release version="2.4.0-1" date="2026-09-24">
       <description>
         <ul>
-          <li>Added an option to run an installer when adding a new game. It automatically grabs the path of the game executable after the installation.</li>
-          <li>Added an option to automatically create shortcuts when installing something through the file manager.</li>
-          <li>The features above are not always 100% accurate because the path is obtained from shortcuts created by Windows and sometimes more than one shortcut is created, which can cause the algorithm to select the wrong path.</li>
-          <li>Added support for Proton-Wineland, which aims to make Windows games and their supporting applications feel at home on a Wayland desktop.</li>
-          <li>Now you can drag and drop a file onto the launcher to start adding a new game.</li>
-          <li>Added a field to search for other SteamGridDB assets.</li>
-          <li>Reworked to allow editing the game title.</li>
-          <li>Show a message asking whether to discard the prefix created when canceling a new game addition.</li>
+          <li>New backup system. Now it can back up specific games, their prefixes, and shortcuts. It can also back up Protons.</li>
+          <li>Added an overview panel with the game name, playtime, and last played time for Grid, Covers, and Carousel modes.</li>
+          <li>Added an option to select the color of the overview.</li>
+          <li>Now it records the last time played.</li>
+          <li>Added an option to position the Grid, Covers, and Carousel.</li>
+          <li>Added an option to change the orientation of Grid and Covers.</li>
+          <li>Added an option to set the maximum number of rows/columns for Grid and Covers.</li>
+          <li>Added tabs to the Settings window, as there are now many interface customization options.</li>
+          <li>Removed the logging option from the Settings window. Apparently, even after being warned, users keep it enabled and experience performance issues. Now there's an option in the game's menu to launch it with logging enabled.</li>
+          <li>Now extracts the icon from the executable after running an installer.</li>
+          <li>Fixed hidden games having the wrong size.</li>
+          <li>Fixed the path not being remembered in the Path file chooser.</li>
+          <li>Fixed the banner not being updated on the main screen after changing it.</li>
+          <li>Fixed banners being duplicated.</li>
+          <li>Fixed the app not manually starting minimized to the tray.</li>
+          <li>Fixed a game mismatch in Carousel when sorted by last played.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
