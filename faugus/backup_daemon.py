@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -234,16 +235,23 @@ def list_game_prefixes_with_shortcuts():
 
 def send_desktop_notification(title, body):
     try:
+        icon = Gio.ThemedIcon.new("io.github.Faugus.faugus-launcher")
+        notification = {
+            "title": GLib.Variant("s", title),
+            "body": GLib.Variant("s", body),
+            "icon": icon.serialize(),
+            "priority": GLib.Variant("s", "normal"),
+        }
         bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
         bus.call_sync(
-            "org.freedesktop.Notifications",
-            "/org/freedesktop/Notifications",
-            "org.freedesktop.Notifications",
-            "Notify",
-            GLib.Variant("(susssasa{sv}i)", (
-                "Faugus", 0, str(FAUGUS_PNG_RASTER), title, body, [], {}, 5000
+            "org.freedesktop.portal.Desktop",
+            "/org/freedesktop/portal/desktop",
+            "org.freedesktop.portal.Notification",
+            "AddNotification",
+            GLib.Variant("(sa{sv})", (
+                f"faugus-backup-{uuid.uuid4()}", notification
             )),
-            GLib.VariantType.new("(u)"),
+            None,
             Gio.DBusCallFlags.NONE,
             2000,
             None,
