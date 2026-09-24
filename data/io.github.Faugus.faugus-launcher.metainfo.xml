@@ -94,7 +94,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.4.0-1" date="2026-09-24">
+    <release version="2.4.1-1" date="2026-09-24">
       <description>
         <ul>
           <li>New backup system. Now it can back up specific games, their prefixes, and shortcuts. It can also back up Protons.</li>
