@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-23 13:30+0000\n"
+"PO-Revision-Date: 2026-09-24 11:52+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -213,7 +213,7 @@ msgstr "Backup completato"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
 msgid "Backup failed."
-msgstr "Backup fallito"
+msgstr "Backup fallito."
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
