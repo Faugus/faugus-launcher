@@ -1023,15 +1023,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         changed = False
 
         for gameid, pid in list(self.running.items()):
-            if gameid not in self.processes:
-                try:
-                    if isinstance(pid, dict):
-                        pid = next(iter(pid.values()))
-                    os.kill(pid, 0)
-                except OSError:
-                    if not IS_FLATPAK:
-                        del self.running[gameid]
-                        changed = True
+            proc = self.processes.get(gameid)
+            if proc is not None:
+                if proc.poll() is not None:
+                    self.on_exit(proc.pid, proc.returncode, gameid)
+                    changed = True
+                continue
+
+            try:
+                if isinstance(pid, dict):
+                    pid = next(iter(pid.values()))
+                os.kill(pid, 0)
+            except OSError:
+                if not IS_FLATPAK:
+                    del self.running[gameid]
+                    changed = True
 
         if changed:
             self.save_running()
