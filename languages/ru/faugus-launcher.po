@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
-"Last-Translator: Oleg <dreamkepeer@gmail.com>\n"
+"PO-Revision-Date: 2026-09-24 22:20+0000\n"
+"Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
 "Language: ru\n"
@@ -153,20 +153,18 @@ msgid "Select the backup destination"
 msgstr "Выберите место назначения для резервной копии"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Высчитываю..."
+msgstr "Отмена..."
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Ошибка создания резервной копии: недостаточно места на диске (требуется {}, "
+"доступно {})."
 
 #: faugus/backup.py:966 faugus/backup.py:993
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Последняя резервная копия:"
+msgstr "Отменить резервное копирование"
 
 #: faugus/backup.py:1037
 msgid "Restore Backup"
@@ -207,20 +205,16 @@ msgid "Backup started"
 msgstr "Началась резервное копирование"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Резервное копирование завершено"
+msgstr "Резервное копирование отменено"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "Резервное копирование завершено"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Резервное копирование завершено"
+msgstr "Резервное копирование не удалось."
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
@@ -299,28 +293,20 @@ msgid "Close"
 msgstr "Закрыть"
 
 #: faugus/launcher.py:2900 faugus/launcher.py:3383
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "По времени в игре"
+msgstr "Вы играли: {}"
 
 #: faugus/launcher.py:2908 faugus/launcher.py:3396
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playing for: {}"
-msgstr "По времени в игре"
+msgstr "Время в игре: {}"
 
 #: faugus/launcher.py:2913 faugus/launcher.py:3403
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "По дате запуска"
+msgstr "Последний запуск: {}"
 
 #: faugus/launcher.py:2914
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "По дате запуска"
+msgstr "Не играл"
 
 #: faugus/launcher.py:2942
 msgid "Remove from hidden"
@@ -336,7 +322,7 @@ msgstr "Остановить"
 
 #: faugus/launcher.py:2947
 msgid "Play with logs"
-msgstr ""
+msgstr "Играть с логами"
 
 #: faugus/launcher.py:2949
 msgid "Play"
@@ -364,7 +350,7 @@ msgstr "Открыть папку префикса"
 
 #: faugus/launcher.py:3042
 msgid "Show logs"
-msgstr "Показать журнал"
+msgstr "Показать логи"
 
 #: faugus/launcher.py:3049
 msgid "Run file in the prefix"
@@ -379,96 +365,76 @@ msgid "Recent"
 msgstr "Недавние"
 
 #: faugus/launcher.py:3183
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "ч."
+msgstr "{} час"
 
 #: faugus/launcher.py:3183
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "ч."
+msgstr "{} часов"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "мин."
+msgstr "{} минута"
 
 #: faugus/launcher.py:3186
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "мин."
+msgstr "{} минут"
 
 #: faugus/launcher.py:3205
 msgid "Less than a minute"
-msgstr ""
+msgstr "Меньше минуты"
 
 #: faugus/launcher.py:3213
 msgid "Just now"
-msgstr ""
+msgstr "Только что"
 
 #: faugus/launcher.py:3218
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "мин."
+msgstr "Минуту назад"
 
 #: faugus/launcher.py:3219
-#, fuzzy
-#| msgid "minute"
 msgid "{} minutes ago"
-msgstr "мин."
+msgstr "{} минут назад"
 
 #: faugus/launcher.py:3224
 msgid "An hour ago"
-msgstr ""
+msgstr "Час назад"
 
 #: faugus/launcher.py:3225
 msgid "{} hours ago"
-msgstr ""
+msgstr "{} часов назад"
 
 #: faugus/launcher.py:3230
 msgid "Yesterday"
-msgstr ""
+msgstr "Вчера"
 
 #: faugus/launcher.py:3231
 msgid "{} days ago"
-msgstr ""
+msgstr "{} дней назад"
 
 #: faugus/launcher.py:3236
-#, fuzzy
-#| msgid "minute"
 msgid "A week ago"
-msgstr "мин."
+msgstr "Неделю назад"
 
 #: faugus/launcher.py:3237
 msgid "{} weeks ago"
-msgstr ""
+msgstr "{} недель назад"
 
 #: faugus/launcher.py:3242
-#, fuzzy
-#| msgid "minute"
 msgid "A month ago"
-msgstr "мин."
+msgstr "Месяц назад"
 
 #: faugus/launcher.py:3243
-#, fuzzy
-#| msgid "minute"
 msgid "{} months ago"
-msgstr "мин."
+msgstr "{} месяцев назад"
 
 #: faugus/launcher.py:3247
-#, fuzzy
-#| msgid "minute"
 msgid "A year ago"
-msgstr "мин."
+msgstr "Год назад"
 
 #: faugus/launcher.py:3248
 msgid "{} years ago"
-msgstr ""
+msgstr "{} лет назад"
 
 #: faugus/launcher.py:3595 faugus/launcher.py:6862 faugus/launcher.py:8915
 msgid "Select a file to run in the prefix"
@@ -585,8 +551,6 @@ msgid "Carrousel"
 msgstr "Карусель"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
 msgstr "Цвет фона"
 
@@ -686,25 +650,23 @@ msgstr "Снизу"
 
 #: faugus/launcher.py:5965
 msgid "Orientation"
-msgstr ""
+msgstr "Ориентация"
 
 #: faugus/launcher.py:5968
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "По алфавиту"
+msgstr "Вертикально"
 
 #: faugus/launcher.py:5969
 msgid "Horizontal"
-msgstr ""
+msgstr "Горизонтально"
 
 #: faugus/launcher.py:5971 faugus/launcher.py:5991
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Максимум столбцов"
 
 #: faugus/launcher.py:5989
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Максимум рядов"
 
 #: faugus/launcher.py:5995
 msgid "SteamGridDB"
@@ -740,7 +702,7 @@ msgstr "Разное"
 
 #: faugus/launcher.py:6037
 msgid "Display"
-msgstr ""
+msgstr "Показать"
 
 #: faugus/launcher.py:6040
 msgid "Discrete GPU"
@@ -806,7 +768,7 @@ msgstr "Ctrl+H переключает видимость скрытых игр"
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "Сводка"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"
@@ -862,13 +824,11 @@ msgstr "Глобальные переменные окружения"
 
 #: faugus/launcher.py:6393
 msgid "General"
-msgstr ""
+msgstr "Основные"
 
 #: faugus/launcher.py:6394
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Режим интерфейса"
+msgstr "Интерфейс"
 
 #: faugus/launcher.py:6507
 #, python-format
@@ -888,10 +848,8 @@ msgid "Grid, Covers or Carrousel mode"
 msgstr "Режим сетки, обложки или карусели"
 
 #: faugus/launcher.py:6576
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Режим сетки, обложки или карусели"
+msgstr "Режим сетки или обложки"
 
 #: faugus/launcher.py:6604
 msgid "Covers or Carrousel mode with SteamGridDB"
