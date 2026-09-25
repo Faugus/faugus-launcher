@@ -4548,10 +4548,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             try:
                 os.kill(self.running[gameid], signal.SIGUSR1)
             except ProcessLookupError:
-                kill_by_faugusid(gameid)
+                pass
+            kill_by_faugusid(gameid)
+
+            session = self.play_sessions.get(gameid)
+            if session:
+                elapsed = self.elapsed_seconds_since(session[0])
+                if elapsed:
+                    self.update_last_played(gameid, playtime=session[1] + int(elapsed))
 
             self.running.pop(gameid, None)
             self.processes.pop(gameid, None)
+            self.play_sessions.pop(gameid, None)
             self.save_running()
             self.update_icon()
             return
@@ -4562,7 +4570,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.running[gameid] = proc.pid
             self.processes[gameid] = proc
             self.play_sessions[gameid] = (datetime.now().isoformat(), game.playtime)
-            GLib.child_watch_add(proc.pid, self.on_exit, gameid)
             self.save_running()
             self.update_overview_panel()
 
@@ -4597,13 +4604,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         GLib.idle_add(self.update_icon)
         GLib.idle_add(self.update_overview_panel)
 
-    def update_last_played(self, gameid):
+    def update_last_played(self, gameid, playtime=None):
         games = load_json_file(GAMES_JSON, default=[])
 
         timestamp = datetime.now().isoformat()
         for entry in games:
             if isinstance(entry, dict) and entry.get("gameid") == gameid:
                 entry["last_played"] = timestamp
+                if playtime is not None:
+                    entry["playtime"] = playtime
                 break
 
         save_json_file(games, GAMES_JSON)
@@ -4612,6 +4621,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for game in self.games:
             if game.gameid == gameid:
                 game.last_played = timestamp
+                if playtime is not None:
+                    game.playtime = playtime
                 break
         self.update_overview_panel()
 
@@ -4643,10 +4654,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             try:
                 os.kill(pid, signal.SIGUSR1)
             except ProcessLookupError:
-                kill_by_faugusid(gameid)
+                pass
+            kill_by_faugusid(gameid)
+
+            session = self.play_sessions.get(gameid)
+            if session:
+                elapsed = self.elapsed_seconds_since(session[0])
+                if elapsed:
+                    self.update_last_played(gameid, playtime=session[1] + int(elapsed))
 
         self.running.clear()
         self.processes.clear()
+        self.play_sessions.clear()
         self.save_running()
         self.update_icon()
 
