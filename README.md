@@ -11,6 +11,11 @@ A simple and lightweight app for running Windows games using [UMU-Launcher](http
 yay -S --noconfirm faugus-launcher
 ```
 
+## aerynOS (moss)
+```
+moss it faugus-launcher
+```
+
 ## Fedora / Nobara (Copr)
 ```
 sudo dnf -y copr enable faugus/faugus-launcher
