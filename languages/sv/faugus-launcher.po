@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-22 19:03+0000\n"
+"PO-Revision-Date: 2026-09-24 19:41+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -152,20 +152,18 @@ msgid "Select the backup destination"
 msgstr "Välj plats för säkerhetskopian"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Beräknar..."
+msgstr "Avbryter..."
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Säkerhetskopieringen misslyckades: otillräckligt diskutrymme ({} krävs, {} "
+"tillgängligt)."
 
 #: faugus/backup.py:966 faugus/backup.py:993
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Senaste säkerhetskopia:"
+msgstr "Avbryt säkerhetskopia"
 
 #: faugus/backup.py:1037
 msgid "Restore Backup"
@@ -206,20 +204,16 @@ msgid "Backup started"
 msgstr "Säkerhetskopiering startad"
 
 #: faugus/backup_daemon.py:478
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Säkerhetskopiering slutförd"
+msgstr "Säkerhetskopiering avslutades"
 
 #: faugus/backup_daemon.py:480
 msgid "Backup completed"
 msgstr "Säkerhetskopiering slutförd"
 
 #: faugus/backup_daemon.py:538 faugus/backup_daemon.py:721
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Säkerhetskopiering slutförd"
+msgstr "Säkerhetskopiering misslyckades."
 
 #: faugus/launcher.py:1130 faugus/launcher.py:1317 faugus/launcher.py:1620
 #: faugus/launcher.py:1846 faugus/launcher.py:2473 faugus/launcher.py:2614
@@ -556,10 +550,8 @@ msgid "Carrousel"
 msgstr "Karusell"
 
 #: faugus/launcher.py:5892
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Bakgrund"
+msgstr "Bakgrundsfärg"
 
 #: faugus/launcher.py:5895 faugus/launcher.py:5903 faugus/launcher.py:5913
 #: faugus/launcher.py:5922 faugus/launcher.py:5930 faugus/launcher.py:8885
@@ -577,7 +569,7 @@ msgstr "Dominerande färg"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "Översikt färg"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
@@ -775,7 +767,7 @@ msgstr "Ctrl+H visar eller döljer dolda spel"
 
 #: faugus/launcher.py:6076
 msgid "Overview"
-msgstr ""
+msgstr "Översikt"
 
 #: faugus/launcher.py:6079
 msgid "Gamepad navigation"

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-24 11:52+0000\n"
+"PO-Revision-Date: 2026-09-26 00:39+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -153,10 +153,8 @@ msgid "Select the backup destination"
 msgstr "Wähle den Speicherort für die Sicherung aus"
 
 #: faugus/backup.py:941
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Berechne..."
+msgstr "Abbruch..."
 
 #: faugus/backup.py:956 faugus/backup_daemon.py:515
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
@@ -322,8 +320,9 @@ msgid "Stop"
 msgstr "Stoppen"
 
 #: faugus/launcher.py:2947
+#, fuzzy
 msgid "Play with logs"
-msgstr "Spiel mit Logs"
+msgstr "Spielen mit Logs"
 
 #: faugus/launcher.py:2949
 msgid "Play"
@@ -1159,8 +1158,9 @@ msgstr "Wählen Sie ein Symbol für die Verknüpfung aus"
 
 #: faugus/utils.py:1318 faugus/utils.py:1319 faugus/utils.py:1320
 #: faugus/utils.py:1321 faugus/utils.py:1322 faugus/utils.py:1323
+#, fuzzy
 msgid "Latest"
-msgstr "Neuste"
+msgstr "Neueste"
 
 #: faugus/utils.py:1326
 msgid "System"
