@@ -401,7 +401,7 @@ def main():
     apply_theme_engine(theme_engine)
     apply_interface_customization(
         cfg.config.get('interface-theme', 'system'),
-        cfg.config.get('accent-color', 'system'),
+        cfg.get_accent_color(),
         theme_engine,
     )
 
