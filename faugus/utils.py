@@ -54,7 +54,7 @@ def kill_by_faugusid(gameid):
 MARKER="FAUGUSID=$1"
 for d in /proc/[0-9]*; do
     pid=${d#/proc/}
-    if tr "\0" "\n" < "$d/environ" 2>/dev/null | grep -qxF "$MARKER"; then
+    if cat "$d"/task/*/environ 2>/dev/null | tr "\0" "\n" | grep -qxF "$MARKER"; then
         kill -9 "$pid" 2>/dev/null
     fi
 done
