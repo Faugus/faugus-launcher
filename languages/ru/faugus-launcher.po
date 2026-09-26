@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-23 04:00+0000\n"
-"PO-Revision-Date: 2026-09-24 22:20+0000\n"
-"Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
+"PO-Revision-Date: 2026-09-26 12:37+0000\n"
+"Last-Translator: RevengeRip <dreamkepeer@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
 "Language: ru\n"
@@ -570,7 +570,7 @@ msgstr "Преобладающий цвет"
 
 #: faugus/launcher.py:5900
 msgid "Overview Color"
-msgstr ""
+msgstr "Цвет кратких сведений"
 
 #: faugus/launcher.py:5908
 msgid "Banner"
