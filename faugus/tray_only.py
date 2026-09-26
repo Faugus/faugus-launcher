@@ -41,9 +41,10 @@ def load_running_ids():
         return set()
 
 
-def spawn(module_args):
+def spawn(module_args, cwd=None):
     proc = subprocess.Popen(
         [sys.executable, "-m"] + module_args,
+        cwd=cwd,
         env=subprocess_env(),
         stdin=subprocess.DEVNULL,
         close_fds=True,
@@ -105,10 +106,11 @@ def run_tray_entrypoint(launch_ui, console_mode=False):
                 pass
         loop.quit()
 
-    def on_launch(gameid):
+    def on_launch(gameid, path):
         if gameid in load_running_ids():
             return
-        spawn(["faugus.runner", "--game", gameid])
+        game_dir = os.path.dirname(os.path.expandvars(os.path.expanduser(path)))
+        spawn(["faugus.runner", "--game", gameid], cwd=game_dir if os.path.isdir(game_dir) else None)
 
     tray = TrayIcon(mono_icon=mono_icon, on_present=on_present, on_quit=on_quit, on_launch=on_launch)
     tray.start()

@@ -250,14 +250,14 @@ class TrayIcon:
             gameid = entry.get("gameid")
             last_played = entry.get("last_played")
             if gameid and last_played:
-                entries.append((last_played, gameid, entry.get("title", gameid)))
+                entries.append((last_played, gameid, entry.get("title", gameid), entry.get("path", "")))
 
         entries.sort(reverse=True)
-        recent = [(gameid, title) for _last_played, gameid, title in entries[:len(self.RECENT_SLOT_IDS)]]
+        recent = [(gameid, title, path) for _last_played, gameid, title, path in entries[:len(self.RECENT_SLOT_IDS)]]
 
         items = []
-        for slot_id, (gameid, title) in zip(self.RECENT_SLOT_IDS, recent):
-            items.append({"id": slot_id, "label": title, "action": lambda gid=gameid: self.on_launch(gid)})
+        for slot_id, (gameid, title, path) in zip(self.RECENT_SLOT_IDS, recent):
+            items.append({"id": slot_id, "label": title, "action": lambda gid=gameid, p=path: self.on_launch(gid, p)})
 
         if items:
             items.append({"id": self.SEPARATOR_ID, "separator": True})
