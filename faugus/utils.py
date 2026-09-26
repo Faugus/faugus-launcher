@@ -2159,7 +2159,7 @@ def get_effective_accent_rgb():
     from faugus.config_manager import ConfigManager
     cfg = ConfigManager()
     theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
-    accent_color = cfg.config.get('accent-color', 'system').strip('"')
+    accent_color = cfg.get_accent_color()
 
     if theme_engine == "adwaita":
         if accent_color and accent_color != "system":

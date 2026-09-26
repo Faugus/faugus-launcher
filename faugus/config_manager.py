@@ -1,5 +1,5 @@
 from faugus.language_config import *
-from faugus.utils import atomic_write, load_json_file, save_json_file
+from faugus.utils import load_json_file, save_json_file
 
 
 class ConfigManager:
@@ -42,12 +42,15 @@ class ConfigManager:
             'backup-last-date': '',
             'startup-window-size': 'None',
             'interface-theme': 'system',
-            'accent-color': 'system',
+            'accent-mode': 'system',
+            'accent-color': 'rgb(61,174,233)',
             'theme-engine': 'adwaita',
             'steamgriddb-api-key': '',
             'steamgriddb-enabled': 'False',
             'background-mode': 'default',
             'overview-color-mode': 'default',
+            'background-color': 'rgb(61,174,233)',
+            'overview-color': 'rgb(61,174,233)',
             'banner-enabled': 'True',
             'grid-position': 'Middle',
             'grid-orientation': 'Vertical',
@@ -79,6 +82,11 @@ class ConfigManager:
 
     def save_config(self):
         save_json_file(self.config, CONFIG_FILE_DIR)
+
+    def get_accent_color(self):
+        if self.config.get('accent-mode') == 'custom':
+            return self.config.get('accent-color')
+        return 'system'
 
     def set_value(self, key, value):
         if key not in self.default_config:

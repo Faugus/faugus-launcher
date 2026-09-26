@@ -13,9 +13,8 @@ from datetime import datetime
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 gi.require_version('Gtk', '4.0')
-gi.require_version('Adw', '1')
 
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio, GObject, Pango, Adw
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio, GObject, Pango
 from faugus.config_manager import *
 from faugus.utils import *
 from faugus.steam_setup import *
@@ -84,7 +83,7 @@ class FaugusApp(Gtk.Application):
         apply_theme_engine(theme_engine)
         apply_interface_customization(
             cfg.config.get('interface-theme', 'system'),
-            cfg.config.get('accent-color', 'system'),
+            cfg.get_accent_color(),
             theme_engine,
         )
 
@@ -444,12 +443,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return fallback
         return (int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255))
 
+    def parse_rgb(self, color):
+        rgba = Gdk.RGBA()
+        rgba.parse(color)
+        return (int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255))
+
+    def fade_rgb(self, rgb):
+        window_rgb = self.get_named_rgb("theme_bg_color")
+        return tuple(int(w * 0.8 + c * 0.2) for w, c in zip(window_rgb, rgb))
+
+    def dominant_color_source(self, game):
+        if self.interface_mode in ("Covers", "Carrousel"):
+            return f"{COVERS_DIR}/{game.gameid}.png"
+        return f"{ICONS_DIR}/{game.gameid}.png"
+
+    def get_background_rgb(self):
+        if self.background_mode == "custom":
+            return self.parse_rgb(self.background_color)
+        return self.get_accent_rgb()
+
     def get_accent_rgb(self):
         if self.theme_engine == "adwaita":
             if self.accent_color and self.accent_color != "system":
-                match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', self.accent_color)
-                if match:
-                    return tuple(int(v) for v in match.groups())
+                return self.parse_rgb(self.accent_color)
             return self.get_named_rgb("accent_bg_color")
 
         if self.theme_engine == "system":
@@ -465,6 +481,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if mode == 'default':
             return self.get_named_rgb("theme_text_color", fallback=(255, 255, 255))
 
+        if mode == 'custom':
+            return self.parse_rgb(self.overview_color)
+
         if mode != 'dominant_color':
             return self.get_accent_rgb()
 
@@ -472,11 +491,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not game:
             return self.get_accent_rgb()
 
-        if self.interface_mode in ("Covers", "Carrousel"):
-            color_source = f"{COVERS_DIR}/{game.gameid}.png"
-        else:
-            color_source = f"{ICONS_DIR}/{game.gameid}.png"
-
+        color_source = self.dominant_color_source(game)
         if not os.path.isfile(color_source):
             return self.get_accent_rgb()
 
@@ -487,11 +502,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return self._overview_panel_dominant_rgb
 
     def update_accent_background_css(self):
-        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
-        ar, ag, ab = self.get_accent_rgb()
-        fade_r = int(window_r * 0.8 + ar * 0.2)
-        fade_g = int(window_g * 0.8 + ag * 0.2)
-        fade_b = int(window_b * 0.8 + ab * 0.2)
+        fade_r, fade_g, fade_b = self.fade_rgb(self.get_background_rgb())
 
         if getattr(self, "_accent_background_provider", None) is None:
             self._accent_background_provider = Gtk.CssProvider()
@@ -540,26 +551,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             popover.add_css_class("popover-accent-background")
             return
 
-        if self.background_mode != "dominant_color":
-            return
+        if self.background_mode == "custom":
+            rgb = self.get_background_rgb()
+        elif self.background_mode == "dominant_color":
+            game = game or self.selected()
+            if not game:
+                return
 
-        game = game or self.selected()
-        if not game:
-            return
+            color_source = self.dominant_color_source(game)
+            if not os.path.isfile(color_source):
+                return
 
-        if self.interface_mode in ("Covers", "Carrousel"):
-            color_source = f"{COVERS_DIR}/{game.gameid}.png"
+            rgb = get_dominant_color(color_source)
         else:
-            color_source = f"{ICONS_DIR}/{game.gameid}.png"
-
-        if not os.path.isfile(color_source):
             return
 
-        r, g, b = get_dominant_color(color_source)
-        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
-        fade_r = int(window_r * 0.8 + r * 0.2)
-        fade_g = int(window_g * 0.8 + g * 0.2)
-        fade_b = int(window_b * 0.8 + b * 0.2)
+        fade_r, fade_g, fade_b = self.fade_rgb(rgb)
 
         if getattr(self, "_popover_dominant_provider", None) is None:
             self._popover_dominant_provider = Gtk.CssProvider()
@@ -585,7 +592,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         content_widget.remove_css_class("accent-background")
 
         if not show_banner and base_mode != "dominant_color":
-            if base_mode == "accent":
+            if base_mode in ("accent", "custom"):
                 content_widget.add_css_class("accent-background")
                 self.update_accent_background_css()
             self._bg_no_overlay_widget = content_widget
@@ -597,7 +604,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         base_box.add_css_class("background")
         base_box.set_hexpand(True)
         base_box.set_vexpand(True)
-        if base_mode == "accent":
+        if base_mode in ("accent", "custom"):
             base_box.add_css_class("accent-background")
             self.update_accent_background_css()
         overlay.set_child(base_box)
@@ -810,7 +817,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         banner_path = getattr(self, 'launcher_banner_path', None)
 
         base_mode = self.background_mode
-        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
+        fade_r, fade_g, fade_b = self.get_named_rgb("theme_bg_color")
 
         if base_mode == "dominant_color":
             dominant = getattr(self, 'launcher_banner_dominant_rgb', None)
@@ -821,19 +828,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     self.launcher_banner_dominant_rgb = dominant
 
             if dominant:
-                r, g, b = dominant
-                fade_r = int(window_r * 0.8 + r * 0.2)
-                fade_g = int(window_g * 0.8 + g * 0.2)
-                fade_b = int(window_b * 0.8 + b * 0.2)
-            else:
-                fade_r, fade_g, fade_b = window_r, window_g, window_b
-        elif base_mode == "accent":
-            ar, ag, ab = self.get_accent_rgb()
-            fade_r = int(window_r * 0.8 + ar * 0.2)
-            fade_g = int(window_g * 0.8 + ag * 0.2)
-            fade_b = int(window_b * 0.8 + ab * 0.2)
-        else:
-            fade_r, fade_g, fade_b = window_r, window_g, window_b
+                fade_r, fade_g, fade_b = self.fade_rgb(dominant)
+        elif base_mode in ("accent", "custom"):
+            fade_r, fade_g, fade_b = self.fade_rgb(self.get_background_rgb())
 
         base_css = f"""
         .launcher-screen-base {{
@@ -880,9 +877,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         widget = self._bg_no_overlay_widget if not old_had_overlay else self._bg_base_box
         if widget is not None:
-            if old_mode == "accent":
+            if old_mode in ("accent", "custom"):
                 widget.remove_css_class("accent-background")
-            if new_mode == "accent":
+            if new_mode in ("accent", "custom"):
                 widget.add_css_class("accent-background")
                 self.update_accent_background_css()
 
@@ -956,7 +953,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             next_index = 1 - self._banner_page_index
             page = self._banner_pages[next_index]
-            color_box = page.color_box
             banner_image_box = page.banner_image_box
             color_class = f"banner-bg-color-{next_index}"
             image_class = f"banner-bg-image-{next_index}"
@@ -964,12 +960,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             if game:
                 if base_mode == "dominant_color":
-                    if self.interface_mode in ("Covers", "Carrousel"):
-                        color_source = f"{COVERS_DIR}/{game.gameid}.png"
-                    else:
-                        color_source = f"{ICONS_DIR}/{game.gameid}.png"
+                    color_source = self.dominant_color_source(game)
                     if os.path.isfile(color_source):
-                        r, g, b = get_dominant_color(color_source)
+                        dominant = get_dominant_color(color_source)
+                        r, g, b = dominant
                         color_css = f".{color_class} {{ background-color: rgba({r}, {g}, {b}, 0.2); }}"
 
                 if show_banner and banner_image_box is not None:
@@ -977,18 +971,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if os.path.isfile(candidate):
                         banner_uri = self.cache_busted_uri(candidate, 'background_banner_cache')
 
-                        window_r, window_g, window_b = self.get_named_rgb("theme_bg_color")
                         if base_mode == "dominant_color" and color_css:
-                            fade_r = int(window_r * 0.8 + r * 0.2)
-                            fade_g = int(window_g * 0.8 + g * 0.2)
-                            fade_b = int(window_b * 0.8 + b * 0.2)
-                        elif base_mode == "accent":
-                            ar, ag, ab = self.get_accent_rgb()
-                            fade_r = int(window_r * 0.8 + ar * 0.2)
-                            fade_g = int(window_g * 0.8 + ag * 0.2)
-                            fade_b = int(window_b * 0.8 + ab * 0.2)
+                            fade_r, fade_g, fade_b = self.fade_rgb(dominant)
+                        elif base_mode in ("accent", "custom"):
+                            fade_r, fade_g, fade_b = self.fade_rgb(self.get_background_rgb())
                         else:
-                            fade_r, fade_g, fade_b = window_r, window_g, window_b
+                            fade_r, fade_g, fade_b = self.get_named_rgb("theme_bg_color")
 
                         banner_css = f"""
                         .{image_class} {{
@@ -3592,7 +3580,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         escaped_file_run = file_run.replace("'", "'\\''")
         command_parts = []
 
-        command_parts.append(f"FAUGUS_DISABLE_UPDATES=1")
+        command_parts.append("FAUGUS_DISABLE_UPDATES=1")
         if title_formatted:
             command_parts.append(f"LOG_DIR={title_formatted}")
         if prefix:
@@ -3943,8 +3931,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
         self.overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
+        self.background_color = cfg.config.get('background-color', 'rgb(61,174,233)').strip('"')
+        self.overview_color = cfg.config.get('overview-color', 'rgb(61,174,233)').strip('"')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
-        self.accent_color = cfg.config.get('accent-color', 'system').strip('"')
+        self.accent_color = cfg.get_accent_color()
         self.banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         self.steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
@@ -4435,6 +4425,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 settings_dialog.original_accent_color,
                 settings_dialog.original_theme_engine,
             )
+            self.background_color = settings_dialog.original_background_color
+            self.overview_color = settings_dialog.original_overview_color
             self.apply_background_mode_live(settings_dialog.original_background_mode)
             self.overview_color_mode = settings_dialog.original_overview_color_mode
             self.apply_overview_panel_width()
@@ -5946,7 +5938,11 @@ class Settings(Gtk.Dialog):
         self.combobox_background.append("default", _("Default"))
         self.combobox_background.append("accent", _("Accent color"))
         self.combobox_background.append("dominant_color", _("Dominant color"))
+        self.combobox_background.append("custom", _("Custom"))
         self.combobox_background.connect("changed", self.on_background_changed)
+        self.background_color_button, self.box_background = self.create_color_picker(
+            self.combobox_background, self.on_background_changed
+        )
 
         self.label_overview_color = Gtk.Label(label=_("Overview Color"))
         self.label_overview_color.set_halign(Gtk.Align.START)
@@ -5954,7 +5950,11 @@ class Settings(Gtk.Dialog):
         self.combobox_overview_color.append("default", _("Default"))
         self.combobox_overview_color.append("accent", _("Accent color"))
         self.combobox_overview_color.append("dominant_color", _("Dominant color"))
+        self.combobox_overview_color.append("custom", _("Custom"))
         self.combobox_overview_color.connect("changed", self.on_overview_color_changed)
+        self.overview_color_button, self.box_overview_color = self.create_color_picker(
+            self.combobox_overview_color, self.on_overview_color_changed
+        )
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
@@ -5981,14 +5981,10 @@ class Settings(Gtk.Dialog):
         self.combobox_accent.append("system", _("Default"))
         self.combobox_accent.append("custom", _("Custom"))
         self._combobox_accent_handler = self.combobox_accent.connect("changed", self.on_theme_accent_changed)
-
-        self.color_button = Gtk.ColorButton()
+        self.color_button, self.box_accent = self.create_color_picker(
+            self.combobox_accent, self.on_theme_accent_changed
+        )
         self.color_button.set_sensitive(False)
-        self.color_button.connect("color-set", self.on_theme_accent_changed)
-
-        self.box_accent = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.box_accent.append(self.combobox_accent)
-        self.box_accent.append(self.color_button)
 
         self.label_startup_window_size = Gtk.Label(label=_("Startup Window Size"))
         self.label_startup_window_size.set_halign(Gtk.Align.START)
@@ -6353,11 +6349,11 @@ class Settings(Gtk.Dialog):
         self.combobox_accent.set_hexpand(True)
 
         grid_theme_colors.attach(self.label_background, 0, 6, 2, 1)
-        grid_theme_colors.attach(self.combobox_background, 0, 7, 2, 1)
+        grid_theme_colors.attach(self.box_background, 0, 7, 2, 1)
         self.combobox_background.set_hexpand(True)
 
         grid_theme_colors.attach(self.label_overview_color, 0, 8, 2, 1)
-        grid_theme_colors.attach(self.combobox_overview_color, 0, 9, 2, 1)
+        grid_theme_colors.attach(self.box_overview_color, 0, 9, 2, 1)
         self.combobox_overview_color.set_hexpand(True)
 
         grid_interface_checkboxes.attach(self.label_display, 0, 0, 1, 1)
@@ -6655,6 +6651,25 @@ class Settings(Gtk.Dialog):
             None if enabled else _("Covers or Carrousel mode with SteamGridDB")
         )
 
+    def create_color_picker(self, combobox, on_changed):
+        button = Gtk.ColorButton()
+        button.connect("color-set", on_changed)
+        button.get_first_child().connect_after("clicked", self.on_color_button_clicked)
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box.append(combobox)
+        box.append(button)
+        return button, box
+
+    def set_button_color(self, button, color):
+        rgba = Gdk.RGBA()
+        rgba.parse(color)
+        button.set_rgba(rgba)
+
+    def on_color_button_clicked(self, button):
+        for window in Gtk.Window.get_toplevels():
+            if isinstance(window, Gtk.ColorChooserDialog):
+                window.get_content_area().get_first_child().set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
+
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
 
@@ -6669,35 +6684,29 @@ class Settings(Gtk.Dialog):
         self.parent.interface_theme = self.interface_theme
         self.parent.accent_color = self.accent_color
 
-        if hasattr(self.parent, 'update_placeholder_accent_css'):
-            self.parent.update_placeholder_accent_css()
-
-        if hasattr(self.parent, 'refresh_placeholder_covers'):
-            self.parent.refresh_placeholder_covers()
-
-        if hasattr(self.parent, 'apply_overview_panel_width'):
-            self.parent.apply_overview_panel_width()
-
-        if self.parent.background_mode == "accent" and hasattr(self.parent, 'update_accent_background_css'):
+        self.parent.update_placeholder_accent_css()
+        self.parent.refresh_placeholder_covers()
+        self.parent.apply_overview_panel_width()
+        if self.parent.background_mode == "accent":
             self.parent.update_accent_background_css()
-
-        if hasattr(self.parent, 'apply_background_update_now'):
-            self.parent.apply_background_update_now()
+        self.parent.apply_background_update_now()
 
     def on_background_changed(self, widget):
         new_mode = self.combobox_background.get_active_id()
-        if hasattr(self.parent, 'apply_background_mode_live'):
-            self.parent.apply_background_mode_live(new_mode)
+        self.background_color_button.set_sensitive(new_mode == "custom")
+        self.parent.background_color = self.background_color_button.get_rgba().to_string()
+        self.parent.apply_background_mode_live(new_mode)
 
     def on_overview_color_changed(self, widget):
         self.parent.overview_color_mode = self.combobox_overview_color.get_active_id()
-        if hasattr(self.parent, 'apply_overview_panel_width'):
-            self.parent.apply_overview_panel_width()
+        self.overview_color_button.set_sensitive(self.parent.overview_color_mode == "custom")
+        self.parent.overview_color = self.overview_color_button.get_rgba().to_string()
+        self.parent.apply_overview_panel_width()
 
     def on_checkbox_overview_toggled(self, widget):
         enabled = widget.get_active()
         self.label_overview_color.set_sensitive(enabled)
-        self.combobox_overview_color.set_sensitive(enabled)
+        self.box_overview_color.set_sensitive(enabled)
 
     def on_theme_engine_changed(self, widget):
         self.theme_engine = self.combobox_theme_engine.get_active_id()
@@ -6752,6 +6761,8 @@ class Settings(Gtk.Dialog):
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("overview-color-mode", self.combobox_overview_color.get_active_id())
+        config.set_value("background-color", self.background_color_button.get_rgba().to_string())
+        config.set_value("overview-color", self.overview_color_button.get_rgba().to_string())
         config.set_value("banner-enabled", self.checkbox_banner.get_active())
         config.set_value("grid-position", self.combobox_grid_position.get_active_id())
         config.set_value("grid-orientation", self.combobox_grid_orientation.get_active_id())
@@ -6768,7 +6779,8 @@ class Settings(Gtk.Dialog):
         config.set_value("header-bar", self.checkbox_header_bar.get_active())
         config.set_value("startup-window-size", self.combobox_startup_window_size.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
-        config.set_value("accent-color", self.accent_color)
+        config.set_value("accent-mode", self.combobox_accent.get_active_id())
+        config.set_value("accent-color", self.color_button.get_rgba().to_string())
         config.set_value("theme-engine", self.combobox_theme_engine.get_active_id())
         config.save_config()
 
@@ -6863,8 +6875,8 @@ class Settings(Gtk.Dialog):
             default_runner = self.get_default_runner()
             command_parts = []
 
-            command_parts.append(f"GAMEID=winetricks-gui")
-            command_parts.append(f"STORE=none")
+            command_parts.append("GAMEID=winetricks-gui")
+            command_parts.append("STORE=none")
             if default_runner:
                 command_parts.append(f"PROTONPATH='{resolve_protonpath(default_runner)}'")
 
@@ -7105,6 +7117,8 @@ class Settings(Gtk.Dialog):
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         background_mode = cfg.config.get('background-mode', 'default').strip('"')
         overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
+        background_color = cfg.config.get('background-color', 'rgb(61,174,233)').strip('"')
+        overview_color = cfg.config.get('overview-color', 'rgb(61,174,233)').strip('"')
         banner_enabled = cfg.config.get('banner-enabled', 'True') == 'True'
         labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
@@ -7127,12 +7141,15 @@ class Settings(Gtk.Dialog):
         grid_max_children_enabled = cfg.config.get('grid-max-children-enabled', 'False') == 'True'
         grid_max_children_per_line = int(cfg.config.get('grid-max-children-per-line', 20))
         self.interface_theme = cfg.config.get('interface-theme', 'system')
-        self.accent_color = cfg.config.get('accent-color', 'system')
+        self.accent_color = cfg.get_accent_color()
+        accent_color = cfg.config.get('accent-color', 'rgb(61,174,233)')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
         self.original_interface_theme = self.interface_theme
         self.original_accent_color = self.accent_color
         self.original_background_mode = background_mode
         self.original_overview_color_mode = overview_color_mode
+        self.original_background_color = background_color
+        self.original_overview_color = overview_color
         self.original_theme_engine = self.theme_engine
 
         self.checkbox_auto_close_on_launch.set_active(auto_close_on_launch)
@@ -7164,6 +7181,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_wayland_driver.set_active(wayland_driver)
         self.checkbox_wow64.set_active(wow64_enabled)
         self.combobox_interface.set_active_id(self.interface_mode)
+        self.set_button_color(self.background_color_button, background_color)
+        self.set_button_color(self.overview_color_button, overview_color)
         self.combobox_background.set_active_id(background_mode)
         self.combobox_overview_color.set_active_id(overview_color_mode)
         self.checkbox_banner.set_active(banner_enabled)
@@ -7182,10 +7201,8 @@ class Settings(Gtk.Dialog):
         loaded_theme = self.interface_theme
         loaded_accent = self.accent_color
 
-        is_custom_accent = loaded_accent not in (None, "", "system")
-        rgba = Gdk.RGBA()
-        rgba.parse(loaded_accent if is_custom_accent else "#3daee9")
-        self.color_button.set_rgba(rgba)
+        is_custom_accent = loaded_accent != "system"
+        self.set_button_color(self.color_button, accent_color)
         self.color_button.set_sensitive(is_custom_accent)
 
         self.combobox_theme.set_active_id(loaded_theme)
@@ -9223,8 +9240,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             command_parts.append(f"LOG_DIR={title_formatted}")
         if prefix:
             command_parts.append(f"WINEPREFIX='{prefix}'")
-        command_parts.append(f"GAMEID=winetricks-gui")
-        command_parts.append(f"STORE=none")
+        command_parts.append("GAMEID=winetricks-gui")
+        command_parts.append("STORE=none")
         if runner:
             command_parts.append(f"PROTONPATH='{resolve_protonpath(runner)}'")
 

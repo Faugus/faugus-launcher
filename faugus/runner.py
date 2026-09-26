@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 gi.require_version("Gtk", "4.0")
 
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, GLib
 from threading import Thread, Event
 from faugus.config_manager import *
 from faugus.utils import *
@@ -525,7 +525,7 @@ class FaugusRun(HiDpiMixin):
         apply_theme_engine(theme_engine)
         apply_interface_customization(
             self.cfg.config.get('interface-theme', 'system'),
-            self.cfg.config.get('accent-color', 'system'),
+            self.cfg.get_accent_color(),
             theme_engine,
         )
 

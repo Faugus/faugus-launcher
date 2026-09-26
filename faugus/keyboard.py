@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, GLib
 from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release, run_in_background, apply_titlebar_preference
 
 LAYOUT_LOWER = [

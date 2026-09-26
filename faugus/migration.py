@@ -210,6 +210,14 @@ def _migrate_config_json_values():
         config.setdefault("sort-enabled", value)
         changed = True
 
+    if 'accent-mode' not in config and 'accent-color' in config:
+        if config['accent-color'] == 'system':
+            config['accent-mode'] = 'system'
+            config['accent-color'] = 'rgb(61,174,233)'
+        else:
+            config['accent-mode'] = 'custom'
+        changed = True
+
     inverted_key_renames = {"splash-disable": "splash-window-enabled", "disable-updates": "automatic-updates"}
     for old_key, new_key in inverted_key_renames.items():
         if old_key in config:
