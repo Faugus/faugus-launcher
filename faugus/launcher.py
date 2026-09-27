@@ -6687,7 +6687,7 @@ class Settings(Gtk.Dialog):
         self.parent.update_placeholder_accent_css()
         self.parent.refresh_placeholder_covers()
         self.parent.apply_overview_panel_width()
-        if self.parent.background_mode == "accent":
+        if self.parent.background_mode in ("accent", "custom"):
             self.parent.update_accent_background_css()
         self.parent.apply_background_update_now()
 
