@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
+from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -273,10 +273,6 @@ class ProtonDownloader(Gtk.Dialog):
         else:
             button.remove_css_class("destructive-action")
 
-    def update_button(self, button, new_label):
-        self.set_button_label(button, new_label)
-        button.set_sensitive(True)
-
     def set_button_progress(self, button, fraction):
         provider = button.progress_css_provider
         if provider is None:
@@ -332,10 +328,6 @@ class ProtonDownloader(Gtk.Dialog):
         self.set_button_label(button, _("Cancel"))
         self.set_button_progress(button, 0)
 
-        def safe_idle_add(*args):
-            if not closed_event.is_set():
-                GLib.idle_add(*args)
-
         def finish(new_label):
             self.clear_button_progress(button)
             button.download_cancel_event = None
@@ -357,34 +349,34 @@ class ProtonDownloader(Gtk.Dialog):
                     pct = int(frac * 1000)
                     if pct != last_pct[0]:
                         last_pct[0] = pct
-                        safe_idle_add(self.set_button_progress, button, frac)
+                        idle_add_while_open(closed_event, self.set_button_progress, button, frac)
 
                 stream = _StreamProgress(response.raw, total_size, _progress)
 
                 with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
                     tar.extractall(path=COMPATIBILITY_DIR, filter="fully_trusted")
 
-                safe_idle_add(finish, _("Remove"))
+                idle_add_while_open(closed_event, finish, _("Remove"))
 
             except _DownloadCancelled:
                 version_path = self.get_installed_path(tag_name, variant)
-                if version_path and version_path.exists():
+                if version_path.exists():
                     shutil.rmtree(version_path, ignore_errors=True)
-                safe_idle_add(finish, _("Download"))
+                idle_add_while_open(closed_event, finish, _("Download"))
 
             except Exception as e:
                 print(f"Error during download/extraction: {e}")
-                safe_idle_add(finish, _("Download"))
+                idle_add_while_open(closed_event, finish, _("Download"))
 
         run_in_background(worker)
 
     def on_remove_clicked(self, widget, release, variant):
         tag_name = release["tag_name"]
         version_path = self.get_installed_path(tag_name, variant)
-        if version_path and version_path.exists():
+        if version_path.exists():
             try:
                 shutil.rmtree(version_path)
-                self.update_button(widget, _("Download"))
+                self.set_button_label(widget, _("Download"))
             except Exception:
                 pass
 

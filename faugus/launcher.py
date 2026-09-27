@@ -8262,7 +8262,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def artwork_target(self, category):
         if category == "banner":
-            return self.banner_path_temp, lambda: self.update_banner_preview(self.banner_path_temp)
+            return self.banner_path_temp, self.refresh_banner_preview
         if category == "icon":
             return self.icon_temp, self.refresh_icon_preview
         return self.cover_path_temp, self.update_image_cover
@@ -8319,13 +8319,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     return
                 session = get_steamgriddb_session()
                 content = verified_content(session.get(url, timeout=15))
-                if not closed_event.is_set():
-                    GLib.idle_add(self.apply_downloaded_artwork, category, content)
+                idle_add_while_open(closed_event, self.apply_downloaded_artwork, category, content)
             except requests.RequestException as e:
                 print(f"Error refreshing SteamGridDB {category}: {e}")
             finally:
-                if not closed_event.is_set():
-                    GLib.idle_add(loading_setter, False)
+                idle_add_while_open(closed_event, loading_setter, False)
 
         run_in_background(worker)
 
@@ -8450,18 +8448,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             set_spinner_loading((spinner,), loading)
         return False
 
-    def refresh_cover_preview(self):
-        self.update_image_cover()
-        return False
-
     def refresh_icon_preview(self):
         surface = self.new_texture_from_image(self.icon_temp, 50, 50)
         self.button_shortcut_icon.set_child(new_picture(surface))
-        return False
 
     def refresh_banner_preview(self):
         self.update_banner_preview(self.banner_path_temp)
-        return False
 
     def apply_downloaded_artwork(self, category, content):
         if category == "icon":
@@ -8469,11 +8461,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             content = resize_icon_bytes(content, 256)
         if not is_valid_image_bytes(content):
             print(f"Downloaded {category} artwork is corrupted or incomplete, ignoring.")
-            return False
+            return
         if category == "cover":
             with open(self.cover_path_temp, "wb") as f:
                 f.write(content)
-            self.refresh_cover_preview()
+            self.update_image_cover()
         elif category == "banner":
             with open(self.banner_path_temp, "wb") as f:
                 f.write(content)
@@ -8482,7 +8474,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             with open(self.icon_temp, "wb") as f:
                 f.write(content)
             self.refresh_icon_preview()
-        return False
 
     def update_banner_preview(self, banner_path):
         if banner_path and os.path.isfile(banner_path):
@@ -8505,7 +8496,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         closed_event = self.closed_event
         cover_path_temp = self.cover_path_temp
         banner_path_temp = self.banner_path_temp
-        interface_mode = self.interface_mode
         steamgriddb_enabled = self.steamgriddb_enabled
 
         game_name = self.entry_title.get_text().strip()
@@ -8519,8 +8509,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
 
         fetch_icon = steamgriddb_enabled
-        fetch_cover = interface_mode in ("Covers", "Carrousel")
-        fetch_banner_art = interface_mode in ("Covers", "Carrousel") and steamgriddb_enabled
+        fetch_cover = self.interface_mode in ("Covers", "Carrousel")
+        fetch_banner_art = fetch_cover and steamgriddb_enabled
 
         if fetch_icon:
             self.set_icon_loading(True)
@@ -8531,22 +8521,19 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         def fetch_artwork():
             try:
-                fetch_sgdb_icon = steamgriddb_enabled
-                fetch_sgdb_cover_banner = interface_mode in ("Covers", "Carrousel") and steamgriddb_enabled
-
                 icon_url = cover_url = banner_url = None
-                if fetch_sgdb_icon or fetch_sgdb_cover_banner:
+                if steamgriddb_enabled:
                     session = get_steamgriddb_session()
                     candidates = fetch_steamgriddb_candidates(
                         api_key, game_name, limit=1, game_id=suggestion_id, steam_appid=steam_appid
                     )
 
-                    if fetch_sgdb_icon:
+                    if fetch_icon:
                         icon_url = candidates["icons"][0]["url"] if candidates["icons"] else None
                         if not icon_url:
                             print(f"SteamGridDB: no icon found for '{game_name}'")
 
-                    if fetch_sgdb_cover_banner:
+                    if fetch_banner_art:
                         cover_url = candidates["grids"][0]["url"] if candidates["grids"] else None
                         banner_url = candidates["heroes"][0]["url"] if candidates["heroes"] else None
                         if not cover_url:
@@ -8554,19 +8541,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         if not banner_url:
                             print(f"SteamGridDB: no banner found for '{game_name}'")
 
-                    downloads = {}
-                    if icon_url:
-                        downloads["icon"] = icon_url
-                    if cover_url:
-                        downloads["cover"] = cover_url
-                    if banner_url:
-                        downloads["banner"] = banner_url
+                    downloads = {
+                        category: url
+                        for category, url in (("icon", icon_url), ("cover", cover_url), ("banner", banner_url))
+                        if url
+                    }
 
                     def download_one(category):
                         try:
                             content = verified_content(session.get(downloads[category], timeout=15))
-                            if not closed_event.is_set():
-                                GLib.idle_add(self.apply_downloaded_artwork, category, content)
+                            idle_add_while_open(closed_event, self.apply_downloaded_artwork, category, content)
                         except requests.RequestException as e:
                             print(f"Error fetching SteamGridDB {category}: {e}")
 
@@ -8574,18 +8558,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                         with ThreadPoolExecutor(max_workers=len(downloads)) as pool:
                             list(pool.map(download_one, downloads.keys()))
 
-                if fetch_sgdb_cover_banner:
+                if fetch_banner_art:
                     if not cover_url and os.path.isfile(cover_path_temp):
                         os.remove(cover_path_temp)
-                        if not closed_event.is_set():
-                            GLib.idle_add(self.refresh_cover_preview)
+                        idle_add_while_open(closed_event, self.update_image_cover)
                     if not banner_url and os.path.isfile(banner_path_temp):
                         os.remove(banner_path_temp)
-                        if not closed_event.is_set():
-                            GLib.idle_add(self.refresh_banner_preview)
+                        idle_add_while_open(closed_event, self.refresh_banner_preview)
                     return
 
-                if interface_mode not in ("Covers", "Carrousel"):
+                if not fetch_cover:
                     return
 
                 api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
@@ -8594,20 +8576,18 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                     response.raise_for_status()
                     image_url = response.text.strip('"')
                     content = verified_content(requests.get(image_url))
-
-                    if not closed_event.is_set():
-                        GLib.idle_add(self.apply_downloaded_artwork, "cover", content)
+                    idle_add_while_open(closed_event, self.apply_downloaded_artwork, "cover", content)
 
                 except requests.RequestException as e:
                     print(f"Error fetching the cover: {e}")
 
             finally:
                 if fetch_icon:
-                    GLib.idle_add(self.set_icon_loading, False)
+                    idle_add_while_open(closed_event, self.set_icon_loading, False)
                 if fetch_cover:
-                    GLib.idle_add(self.set_cover_loading, False)
+                    idle_add_while_open(closed_event, self.set_cover_loading, False)
                 if fetch_banner_art:
-                    GLib.idle_add(self.set_banner_loading, False)
+                    idle_add_while_open(closed_event, self.set_banner_loading, False)
 
         run_in_background(fetch_artwork)
 
@@ -8645,7 +8625,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
     def on_title_focus_leave_for_suggestions(self):
         closed_event = self.closed_event
         entry_title = self.entry_title
-        popover_suggestion = self.popover_suggestion
+        self.popover_suggestion = self.popover_suggestion
 
         def check():
             if closed_event.is_set():
@@ -8654,10 +8634,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             focus_widget = root.get_focus() if root else None
             w = focus_widget
             while w is not None:
-                if w is popover_suggestion:
+                if w is self.popover_suggestion:
                     return False
                 w = w.get_parent()
-            popover_suggestion.popdown()
+            self.popover_suggestion.popdown()
             return False
 
         GLib.idle_add(check)
@@ -8697,47 +8677,38 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             return
 
         closed_event = self.closed_event
-        entry_title = self.entry_title
-        listbox_suggestion = self.listbox_suggestion
-        popover_suggestion = self.popover_suggestion
 
         def fire():
             self._suggestion_source = None
             if closed_event.is_set():
                 return False
-            self.fetch_title_suggestions(
-                text, api_key, closed_event, entry_title, listbox_suggestion, popover_suggestion
-            )
+            self.fetch_title_suggestions(text, api_key)
             return False
 
         self._suggestion_source = GLib.timeout_add(350, fire)
 
-    def fetch_title_suggestions(self, term, api_key, closed_event, entry_title, listbox_suggestion, popover_suggestion):
+    def fetch_title_suggestions(self, term, api_key):
+        closed_event = self.closed_event
+
         def worker():
             suggestions = fetch_steamgriddb_autocomplete(api_key, term, limit=10)
-            if not closed_event.is_set():
-                GLib.idle_add(
-                    self.populate_suggestions, term, suggestions,
-                    closed_event, entry_title, listbox_suggestion, popover_suggestion
-                )
+            idle_add_while_open(closed_event, self.populate_suggestions, term, suggestions)
 
         run_in_background(worker)
 
-    def populate_suggestions(self, term, suggestions, closed_event, entry_title, listbox_suggestion, popover_suggestion):
-        if closed_event.is_set():
-            return False
-        if entry_title.get_text().strip() != term:
-            return False
+    def populate_suggestions(self, term, suggestions):
+        if self.entry_title.get_text().strip() != term:
+            return
 
-        child = listbox_suggestion.get_first_child()
+        child = self.listbox_suggestion.get_first_child()
         while child:
             nxt = child.get_next_sibling()
-            listbox_suggestion.remove(child)
+            self.listbox_suggestion.remove(child)
             child = nxt
 
         if not suggestions:
-            popover_suggestion.popdown()
-            return False
+            self.popover_suggestion.popdown()
+            return
 
         for item in suggestions:
             row = Gtk.ListBoxRow()
@@ -8750,10 +8721,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             row.set_child(label)
             row.steamgriddb_id = item["id"]
             row.steamgriddb_name = item["name"]
-            listbox_suggestion.append(row)
+            self.listbox_suggestion.append(row)
 
-        popover_suggestion.popup()
-        return False
+        self.popover_suggestion.popup()
 
     def on_suggestion_row_activated(self, listbox, row):
         clean_name = re.sub(r'\s*\(\d{4}\)\s*$', '', row.steamgriddb_name).strip()
