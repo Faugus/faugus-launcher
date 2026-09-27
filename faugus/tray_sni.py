@@ -257,7 +257,7 @@ class TrayIcon:
 
         items = []
         for slot_id, (gameid, title, path) in zip(self.RECENT_SLOT_IDS, recent):
-            items.append({"id": slot_id, "label": title, "action": lambda gid=gameid, p=path: self.on_launch(gid, p)})
+            items.append({"id": slot_id, "label": title.replace("_", "__"), "action": lambda gid=gameid, p=path: self.on_launch(gid, p)})
 
         if items:
             items.append({"id": self.SEPARATOR_ID, "separator": True})
