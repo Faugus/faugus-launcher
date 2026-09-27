@@ -46,6 +46,14 @@ def run_in_background(fn, *args, **kwargs):
     return _background_executor.submit(fn, *args, **kwargs)
 
 
+def idle_add_while_open(closed_event, fn, *args):
+    def run():
+        if not closed_event.is_set():
+            fn(*args)
+        return False
+    GLib.idle_add(run)
+
+
 def kill_by_faugusid(gameid):
     if not gameid:
         return
