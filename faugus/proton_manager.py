@@ -233,7 +233,8 @@ class ProtonDownloader(Gtk.Dialog):
         version_path = self.get_installed_path(tag_name, variant)
         is_installed = version_path.exists()
 
-        button = Gtk.Button(label=_("Remove") if is_installed else _("Download"))
+        button = Gtk.Button()
+        self.set_button_label(button, _("Remove") if is_installed else _("Download"))
         button.connect("clicked", self.on_button_clicked, release, variant)
         button.set_size_request(120, -1)
         button.download_cancel_event = None
@@ -265,8 +266,15 @@ class ProtonDownloader(Gtk.Dialog):
 
         return COMPATIBILITY_DIR / display_name
 
+    def set_button_label(self, button, label):
+        button.set_label(label)
+        if label == _("Remove"):
+            button.add_css_class("destructive-action")
+        else:
+            button.remove_css_class("destructive-action")
+
     def update_button(self, button, new_label):
-        button.set_label(new_label)
+        self.set_button_label(button, new_label)
         button.set_sensitive(True)
 
     def set_button_progress(self, button, fraction):
@@ -321,7 +329,7 @@ class ProtonDownloader(Gtk.Dialog):
         cancel_event = threading.Event()
         button.download_cancel_event = cancel_event
 
-        button.set_label(_("Cancel"))
+        self.set_button_label(button, _("Cancel"))
         self.set_button_progress(button, 0)
 
         def safe_idle_add(*args):
@@ -331,7 +339,7 @@ class ProtonDownloader(Gtk.Dialog):
         def finish(new_label):
             self.clear_button_progress(button)
             button.download_cancel_event = None
-            button.set_label(new_label)
+            self.set_button_label(button, new_label)
 
         def worker():
             try:
