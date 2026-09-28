@@ -3788,7 +3788,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             )
             return
 
-        title_formatted = format_title(new_title)
+        title_formatted = unique_gameid(gameid, self._existing_gameids())
+        if title_formatted != gameid:
+            print(f"Faugus Launcher: game ID '{gameid}' already in use, assigned '{title_formatted}'")
 
         icon = game.icon
         new_icon = f"{ICONS_DIR}/{title_formatted}.png"
