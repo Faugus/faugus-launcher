@@ -3338,7 +3338,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def run_file_in_prefix(self, game, file_run):
         prefix = expand_path(game.prefix)
         runner = game.runner
-        title_formatted = format_title(game.title)
+        title_formatted = game.gameid
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
         escaped_file_run = file_run.replace("'", "'\\''")
@@ -3492,6 +3492,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.connect("response", lambda d, r: destroy_and_release(d))
         dialog.present()
 
+    def _existing_gameids(self):
+        ids = {g.gameid for g in self.games}
+        ids.update(g.get("gameid") for g in load_json_file(GAMES_JSON, []))
+        return ids
+
     def on_duplicate_clicked(self):
         game = self.selected()
 
@@ -3519,6 +3524,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 ""
             )
             return
+
+        base_gameid = title_formatted
+        title_formatted = unique_gameid(base_gameid, self._existing_gameids())
+        if title_formatted != base_gameid:
+            print(f"Faugus Launcher: game ID '{base_gameid}' already in use, assigned '{title_formatted}'")
 
         icon = game.icon
         new_icon = f"{ICONS_DIR}/{title_formatted}.png"
@@ -4407,7 +4417,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             else:
                 edit_game_dialog.checkbox_shortcut_steam.set_active(False)
 
-        edit_game_dialog.check_existing_shortcut()
+        edit_game_dialog.check_existing_shortcut(game.gameid)
 
         edit_game_dialog.combobox_steam_title.set_sensitive(False)
         edit_game_dialog.combobox_steam_user.set_sensitive(False)
@@ -4598,7 +4608,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if launcher_id in LAUNCHER_EXE_PATHS:
                 path = f"{prefix}/{LAUNCHER_EXE_PATHS[launcher_id]}"
 
-            title_formatted = format_title(title)
+            base_gameid = format_title(title)
+            title_formatted = unique_gameid(base_gameid, self._existing_gameids())
+            if title_formatted != base_gameid:
+                print(f"Faugus Launcher: game ID '{base_gameid}' already in use, assigned '{title_formatted}'")
 
             addapp_bat = f"{os.path.dirname(expand_path(path))}/faugus-{title_formatted}.bat"
 
@@ -8385,12 +8398,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         choose_shortcut_icon(self)
 
-    def check_existing_shortcut(self):
-        title =self.entry_title.get_text().strip()
-        if not title:
+    def check_existing_shortcut(self, gameid=None):
+        title = self.entry_title.get_text().strip()
+        if not gameid and not title:
             return
 
-        title_formatted = format_title(title)
+        title_formatted = gameid or format_title(title)
         desktop_file_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
         applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
 
