@@ -3747,6 +3747,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.connect("response", lambda d, r: destroy_and_release(d))
         dialog.present()
 
+    def _existing_gameids(self):
+        ids = {g.gameid for g in self.games}
+        ids.update(g.get("gameid") for g in load_json_file(GAMES_JSON, []))
+        return ids
+
     def on_duplicate_clicked(self):
         game = self.selected()
         title = game.title
@@ -5018,7 +5023,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if launcher_id == "wargaming":
                 path = f"{prefix}/drive_c/ProgramData/Wargaming.net/GameCenter/wgc.exe"
 
-            title_formatted = format_title(title)
+            base_gameid = format_title(title)
+            title_formatted = unique_gameid(base_gameid, self._existing_gameids())
+            if title_formatted != base_gameid:
+                print(f"Faugus Launcher: game ID '{base_gameid}' already in use, assigned '{title_formatted}'")
 
             addapp_bat = f"{os.path.dirname(expand_path(path))}/faugus-{title_formatted}.bat"
 
