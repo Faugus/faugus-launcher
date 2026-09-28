@@ -9,7 +9,6 @@ from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker
 from faugus.main_screen_nav import (
     navigate_focus,
     get_active_window,
-    _is_descendant_of,
     _collect_focusable,
     _focus_nearest_in_direction,
     _find_list_base_view,
@@ -24,7 +23,7 @@ MAPPED_BUTTONS = {
     "rb": 12,
     "start": 9,
 }
-MAPPED_DPAD = {
+DPAD_DIRECTIONS = {
     0: Gtk.DirectionType.UP,
     1: Gtk.DirectionType.DOWN,
     2: Gtk.DirectionType.LEFT,
@@ -42,13 +41,7 @@ RAW_BUTTONS = {
 }
 RAW_HAT_AXES = (16, 17)
 
-BUTTON_ROLES = {}
-for _role, _code in MAPPED_BUTTONS.items():
-    BUTTON_ROLES[_code] = _role
-for _role, _code in RAW_BUTTONS.items():
-    BUTTON_ROLES[_code] = _role
-
-DPAD_DIRECTIONS = dict(MAPPED_DPAD)
+BUTTON_ROLES = {code: role for buttons in (MAPPED_BUTTONS, RAW_BUTTONS) for role, code in buttons.items()}
 
 _gamecontrollerdb = None
 
@@ -179,7 +172,7 @@ def _is_usable(self):
 def _tick_repeat(self):
     usable, _ = _is_usable(self)
 
-    if usable and getattr(self, "held_direction", None) is not None:
+    if usable and self.held_direction is not None:
         now = time.time()
         if now - self.hold_start_time >= self.repeat_delay:
             if now - self.last_repeat_time >= self.repeat_interval:
@@ -194,7 +187,7 @@ def _tick_repeat(self):
 
 def _set_held_direction(self, direction):
     if direction is not None:
-        if getattr(self, "held_direction", None) != direction:
+        if self.held_direction != direction:
             self.held_direction = direction
             self.hold_start_time = time.time()
             self.last_repeat_time = time.time()
@@ -204,13 +197,13 @@ def _set_held_direction(self, direction):
 
 
 def _dispatch_navigation(self, direction):
-    combo_popover = getattr(self, "gamepad_combo_popover", None)
-    if getattr(self, "gamepad_active_combo", None) and combo_popover and combo_popover.get_visible():
+    combo_popover = self.gamepad_combo_popover
+    if self.gamepad_active_combo and combo_popover and combo_popover.get_visible():
         _navigate_combo(self, direction)
         return
     self.gamepad_active_combo = None
 
-    active_popover = getattr(self, "active_popover", None)
+    active_popover = self.active_popover
     if active_popover and active_popover.get_visible():
         _navigate_popover(self, direction)
         return
@@ -259,7 +252,7 @@ def _on_absolute_axis(self, event):
                 self.can_move_y = False
         elif abs(value) < self.reset_threshold:
             self.can_move_y = True
-            if getattr(self, "held_direction", None) in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
+            if self.held_direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
                 _set_held_direction(self, None)
 
     elif axis == 0:
@@ -272,7 +265,7 @@ def _on_absolute_axis(self, event):
                 self.can_move_x = False
         elif abs(value) < self.reset_threshold:
             self.can_move_x = True
-            if getattr(self, "held_direction", None) in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
+            if self.held_direction in (Gtk.DirectionType.LEFT, Gtk.DirectionType.RIGHT):
                 _set_held_direction(self, None)
 
     elif axis == 3:
@@ -297,28 +290,14 @@ def _scroll_active_window(self):
     if scrolled is None:
         return
 
-    if self.right_stick_y:
-        vadj = scrolled.get_vadjustment()
-        if vadj:
-            new_value = vadj.get_value() + self.right_stick_y * self.scroll_speed
-            new_value = max(vadj.get_lower(), min(new_value, vadj.get_upper() - vadj.get_page_size()))
-            vadj.set_value(new_value)
-
-    if self.right_stick_x:
-        hadj = scrolled.get_hadjustment()
-        if hadj:
-            new_value = hadj.get_value() + self.right_stick_x * self.scroll_speed
-            new_value = max(hadj.get_lower(), min(new_value, hadj.get_upper() - hadj.get_page_size()))
-            hadj.set_value(new_value)
+    for delta, adj in ((self.right_stick_y, scrolled.get_vadjustment()), (self.right_stick_x, scrolled.get_hadjustment())):
+        if delta and adj:
+            adj.set_value(adj.get_value() + delta * self.scroll_speed)
 
 
 def _find_parent_scrolled_window(widget):
     parent = widget.get_parent() if widget else None
-    while parent:
-        if isinstance(parent, Gtk.ScrolledWindow):
-            return parent
-        parent = parent.get_parent()
-    return None
+    return parent.get_ancestor(Gtk.ScrolledWindow) if parent else None
 
 
 def _find_any_scrolled_window(widget):
@@ -347,14 +326,10 @@ def _on_button_press(self, event):
         _set_held_direction(self, direction)
         return
 
-    menu_visible = False
-    if getattr(self, "active_popover", None):
-        if self.active_popover.get_visible():
-            menu_visible = True
-        else:
-            self.active_popover = None
+    if self.active_popover and not self.active_popover.get_visible():
+        self.active_popover = None
 
-    if menu_visible:
+    if self.active_popover:
         _handle_menu_button(self, button)
     else:
         _handle_button_down(self, button, active_win)
@@ -366,14 +341,14 @@ def _on_button_release(self, event):
         return
 
     direction = DPAD_DIRECTIONS.get(button)
-    if direction is not None and getattr(self, "held_direction", None) == direction:
+    if direction is not None and self.held_direction == direction:
         _set_held_direction(self, None)
 
 
 def _handle_button_down(self, button, win):
     is_dialog_active = isinstance(win, Gtk.Dialog)
     role = BUTTON_ROLES.get(button)
-    active_combo = getattr(self, "gamepad_active_combo", None)
+    active_combo = self.gamepad_active_combo
 
     if role == "confirm":
         if active_combo:
@@ -528,15 +503,11 @@ def _open_context_menu(self):
 
 
 def find_combobox(widget):
-    while widget:
-        if isinstance(widget, IdComboBox):
-            return widget
-        widget = widget.get_parent()
-    return None
+    return widget.get_ancestor(IdComboBox) if widget else None
 
 
 def open_combobox(self, combo):
-    if getattr(self, "gamepad_active_combo", None):
+    if self.gamepad_active_combo:
         return
 
     model = combo.get_model()
@@ -592,7 +563,7 @@ def open_combobox(self, combo):
 
 
 def _on_combo_popover_closed(self, combo):
-    if getattr(self, "gamepad_active_combo", None) is combo:
+    if self.gamepad_active_combo is combo:
         popover = self.gamepad_combo_popover
         self.gamepad_active_combo = None
         self.gamepad_combo_popover = None
@@ -602,15 +573,22 @@ def _on_combo_popover_closed(self, combo):
 
 
 def _close_combo(self):
-    popover = getattr(self, "gamepad_combo_popover", None)
+    popover = self.gamepad_combo_popover
     if popover:
         popover.popdown()
     else:
         self.gamepad_active_combo = None
 
 
+def _move_focus_vertical(candidates, current, direction):
+    idx = candidates.index(current)
+    new_idx = idx + (-1 if direction == Gtk.DirectionType.UP else 1)
+    if 0 <= new_idx < len(candidates):
+        candidates[new_idx].grab_focus()
+
+
 def _navigate_combo(self, direction):
-    popover = getattr(self, "gamepad_combo_popover", None)
+    popover = self.gamepad_combo_popover
     if not popover or not popover.get_visible():
         self.gamepad_active_combo = None
         return
@@ -632,14 +610,11 @@ def _navigate_combo(self, direction):
         candidates[0].grab_focus()
         return
 
-    idx = candidates.index(current)
-    new_idx = idx + (-1 if direction == Gtk.DirectionType.UP else 1)
-    if 0 <= new_idx < len(candidates):
-        candidates[new_idx].grab_focus()
+    _move_focus_vertical(candidates, current, direction)
 
 
 def _navigate_popover(self, direction):
-    popover = getattr(self, "active_popover", None)
+    popover = self.active_popover
     if not popover or not popover.get_visible():
         self.active_popover = None
         return
@@ -658,10 +633,7 @@ def _navigate_popover(self, direction):
         return
 
     if direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
-        idx = candidates.index(current)
-        new_idx = idx + (-1 if direction == Gtk.DirectionType.UP else 1)
-        if 0 <= new_idx < len(candidates):
-            candidates[new_idx].grab_focus()
+        _move_focus_vertical(candidates, current, direction)
         return
 
     if not _focus_nearest_in_direction(current, direction, popover):
@@ -670,11 +642,7 @@ def _navigate_popover(self, direction):
 
 def _find_parent_popover(widget):
     parent = widget.get_parent() if widget else None
-    while parent:
-        if isinstance(parent, Gtk.Popover):
-            return parent
-        parent = parent.get_parent()
-    return None
+    return parent.get_ancestor(Gtk.Popover) if parent else None
 
 
 def _find_stack(widget):
@@ -714,7 +682,7 @@ def _find_row_by_label(widget, target_label):
 
 
 def _handle_menu_button(self, button):
-    popover = getattr(self, "active_popover", None)
+    popover = self.active_popover
     if not popover or not popover.get_visible():
         return
 
@@ -768,7 +736,7 @@ def activate_focused_widget(self):
         entry_title = getattr(parent, "entry_title", None)
         is_title_suggestion_field = (
             entry_title is not None
-            and (focused is entry_title or _is_descendant_of(focused, entry_title))
+            and (focused is entry_title or focused.is_ancestor(entry_title))
             and getattr(parent, "steamgriddb_enabled", False)
         )
         if is_title_suggestion_field:
@@ -794,7 +762,7 @@ def activate_focused_widget(self):
         focused.emit("clicked")
 
     elif isinstance(focused, Gtk.Button):
-        label = focused.get_label() if hasattr(focused, "get_label") else None
+        label = focused.get_label()
         focused.emit("clicked")
 
         if label in ("Shift", "Caps", "?123", "ABC"):
@@ -824,15 +792,7 @@ def activate_focused_widget(self):
     elif isinstance(focused, Gtk.FlowBoxChild) and hasattr(focused, "gamepad_activate"):
         focused.gamepad_activate()
 
-    elif isinstance(focused, Gtk.FlowBoxChild):
-        game = self.selected()
-        if game:
-            if game.gameid in self.running:
-                self.running_dialog(game.title)
-            else:
-                self.button_play.emit("clicked")
-
-    elif focused is getattr(active_window, "carrousel_fixed", None):
+    elif isinstance(focused, Gtk.FlowBoxChild) or focused is getattr(active_window, "carrousel_fixed", None):
         game = self.selected()
         if game:
             if game.gameid in self.running:
@@ -842,25 +802,15 @@ def activate_focused_widget(self):
 
     elif (getattr(active_window, "interface_mode", None) in ("Covers", "Carrousel")
           and getattr(active_window, "steamgriddb_enabled", False)
-          and focused in (
-              getattr(active_window, "banner_preview1", None), getattr(active_window, "banner_preview2", None)
-          )):
+          and focused is getattr(active_window, "banner_preview1", None)):
         show_steamgriddb_picker(active_window, "banner")
-
-    elif (getattr(active_window, "interface_mode", None) in ("Covers", "Carrousel")
-          and getattr(active_window, "steamgriddb_enabled", False)
-          and focused in (
-              getattr(active_window, "image_cover_stack", None), getattr(active_window, "image_cover2_stack", None)
-          )):
-        show_steamgriddb_picker(active_window, "cover")
 
     elif type(focused).__name__ == "GtkColorSwatch":
         chooser = focused.get_ancestor(Gtk.ColorChooser)
         if chooser:
             chooser.set_rgba(focused.get_property("rgba"))
 
-    elif _find_list_base_view(focused):
-        list_base_view = _find_list_base_view(focused)
+    elif list_base_view := _find_list_base_view(focused):
         model = list_base_view.get_model()
         current = model.get_selected() if model and hasattr(model, "get_selected") else Gtk.INVALID_LIST_POSITION
         if current != Gtk.INVALID_LIST_POSITION:

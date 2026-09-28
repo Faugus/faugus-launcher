@@ -105,10 +105,7 @@ class FaugusRun(HiDpiMixin):
         GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGUSR1, lambda: self.on_process_exit(None, None))
 
     def run(self):
-        def run_process():
-            self.start_process()
-
-        self.process_thread = Thread(target=run_process)
+        self.process_thread = Thread(target=self.start_process)
 
         def start_thread():
             self.process_thread.start()
@@ -136,11 +133,7 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_child_env("DRI_PRIME", "1")
-
-            def do_warm_up_gpu():
-                warm_up_gpu()
-                return False
-            GLib.idle_add(do_warm_up_gpu)
+            GLib.idle_add(warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
         if self.wow64_enabled:
@@ -170,7 +163,6 @@ class FaugusRun(HiDpiMixin):
             def close_app():
                 self.loop.quit()
                 sys.exit()
-                return False
 
             GLib.timeout_add(5000, close_app)
             return
@@ -215,25 +207,16 @@ class FaugusRun(HiDpiMixin):
                 if protonpath_path is None:
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
-        if protonpath == "Proton-EM Latest":
-            self.proton_latest = "--em"
-            self.proton_exists = find_compatibilitytool("Proton-EM Latest") is not None
-
-        if protonpath == "Proton-GE Latest":
-            self.proton_latest = "--ge"
-            self.proton_exists = find_compatibilitytool("Proton-GE Latest") is not None
-
-        if protonpath == "Proton-CachyOS Latest":
-            self.proton_latest = "--cachyos"
-            self.proton_exists = find_compatibilitytool("Proton-CachyOS Latest") is not None
-
-        if protonpath == "DW-Proton Latest":
-            self.proton_latest = "--dw"
-            self.proton_exists = find_compatibilitytool("DW-Proton Latest") is not None
-
-        if protonpath == "Proton-Wineland Latest":
-            self.proton_latest = "--wineland"
-            self.proton_exists = find_compatibilitytool("Proton-Wineland Latest") is not None
+        latest_flags = {
+            "Proton-EM Latest": "--em",
+            "Proton-GE Latest": "--ge",
+            "Proton-CachyOS Latest": "--cachyos",
+            "DW-Proton Latest": "--dw",
+            "Proton-Wineland Latest": "--wineland",
+        }
+        if protonpath in latest_flags:
+            self.proton_latest = latest_flags[protonpath]
+            self.proton_exists = find_compatibilitytool(protonpath) is not None
 
         if protonpath and "wineland" in protonpath.lower():
             os.environ.pop("PROTON_ENABLE_WAYLAND", None)
@@ -245,7 +228,7 @@ class FaugusRun(HiDpiMixin):
             os.path.exists(UMU_RUN)
         )
 
-        env_from_file = self.load_env_from_file(ENVAR_DIR)
+        env_from_file = self.load_env_from_file()
         if env_from_file:
             print("\n=== GLOBAL ENVIRONMENT VARIABLES ===")
             for key in sorted(env_from_file):
@@ -304,6 +287,8 @@ class FaugusRun(HiDpiMixin):
                 GLib.child_watch_add(GLib.PRIORITY_DEFAULT, process.pid, self.on_process_exit)
                 Thread(target=self._watch_game_process, daemon=True).start()
                 self.progress_save_source = GLib.timeout_add_seconds(30, self._save_progress_tick)
+                if self.gameid:
+                    self._mark_running(True)
                 if log_file:
                     def close_log_later():
                         for t in threads:
@@ -457,14 +442,11 @@ class FaugusRun(HiDpiMixin):
             self.cfg.set_value("show-donate", False)
             self.cfg.save_config()
 
-    def show_error_dialog(self, protonpath=None, network_error=False):
+    def show_error_dialog(self, protonpath):
         done = Event()
 
-        if network_error:
-            text1, text2 = _("Internet connection error"), ""
-        else:
-            text1 = _("%s was not found") % protonpath
-            text2 = _("Please install it or use another Proton version.")
+        text1 = _("%s was not found") % protonpath
+        text2 = _("Please install it or use another Proton version.")
 
         def build_and_show():
             show_message_dialog(text1, text2, callback=lambda ok: done.set())
@@ -599,32 +581,16 @@ class FaugusRun(HiDpiMixin):
                 if self.splash_window is None:
                     self.show_splash()
 
-            component = None
-
             if "Components are up to date" in clean_line:
                 if self.splash_window:
                     self.label.set_text(_("Components are up to date"))
                 return False
 
-            if "UMU-Launcher" in clean_line:
-                component = "UMU-Launcher"
-            elif "BattlEye" in clean_line:
-                component = "BattlEye"
-            elif "Easy Anti-Cheat" in clean_line:
-                component = "Easy Anti-Cheat"
-            elif "UMU-Proton" in clean_line:
-                component = "UMU-Proton"
-            elif "GE-Proton" in clean_line:
-                component = "GE-Proton"
-            elif "Proton-EM" in clean_line:
-                component = "Proton-EM"
-            elif "Proton-CachyOS" in clean_line:
-                component = "Proton-CachyOS"
-            elif "DW-Proton" in clean_line:
-                component = "DW-Proton"
-            elif "Proton-Wineland" in clean_line:
-                component = "Proton-Wineland"
-            elif "steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line:
+            component = next((c for c in (
+                "UMU-Launcher", "BattlEye", "Easy Anti-Cheat", "UMU-Proton", "GE-Proton",
+                "Proton-EM", "Proton-CachyOS", "DW-Proton", "Proton-Wineland",
+            ) if c in clean_line), None)
+            if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
                 component = "Steam Runtime"
 
             if component and self.splash_window:
@@ -712,6 +678,14 @@ class FaugusRun(HiDpiMixin):
 
         return False
 
+    def _mark_running(self, running):
+        games = load_json_file(RUNNING_GAMES, {})
+        if running:
+            games[self.gameid] = os.getpid()
+        else:
+            games.pop(self.gameid, None)
+        save_json_file(games, RUNNING_GAMES)
+
     def _save_progress_tick(self):
         self._save_progress()
         return True
@@ -772,6 +746,7 @@ class FaugusRun(HiDpiMixin):
         self._save_progress()
 
         if self.gameid:
+            self._mark_running(False)
             try:
                 connection = Gio.bus_get_sync(Gio.BusType.SESSION, None)
                 connection.call_sync(
@@ -887,21 +862,14 @@ def build_launch_command(game):
 
     if addapp_enabled == "addapp_enabled":
         command_parts.append(shlex.quote(addapp_bat))
+    elif runner != "Steam":
+        command_parts.append(shlex.quote(path))
     else:
-        if runner != "Steam":
-            command_parts.append(shlex.quote(path))
-        else:
-            steam_arguments = "-nobigpicture -nochatui -nofriendsui -silent -applaunch"
-            if IS_FLATPAK:
-                if IS_STEAM_FLATPAK:
-                    command_parts.append(f"flatpak-spawn --host flatpak run com.valvesoftware.Steam {steam_arguments} {path}")
-                else:
-                    command_parts.append(f"flatpak-spawn --host steam {steam_arguments} {path}")
-            else:
-                if IS_STEAM_FLATPAK:
-                    command_parts.append(f"flatpak run com.valvesoftware.Steam {steam_arguments} {path}")
-                else:
-                    command_parts.append(f"steam {steam_arguments} {path}")
+        steam_arguments = "-nobigpicture -nochatui -nofriendsui -silent -applaunch"
+        steam_cmd = "flatpak run com.valvesoftware.Steam" if IS_STEAM_FLATPAK else "steam"
+        if IS_FLATPAK:
+            steam_cmd = f"flatpak-spawn --host {steam_cmd}"
+        command_parts.append(f"{steam_cmd} {steam_arguments} {path}")
 
     if game_arguments:
         command_parts.append(game_arguments)
@@ -910,11 +878,7 @@ def build_launch_command(game):
 
 
 def load_game_from_json(gameid):
-    games = load_json_file(GAMES_JSON, None)
-    if games is None:
-        return None
-
-    for game in games:
+    for game in load_json_file(GAMES_JSON):
         if game.get("gameid") == gameid:
             return game
 
@@ -922,19 +886,9 @@ def load_game_from_json(gameid):
 
 
 def is_apple_silicon():
-    path = "/proc/device-tree/compatible"
-
-    if not os.path.exists(path):
-        return False
-
     try:
-        with open(path, "rb") as f:
-            dtcompat = f.read().decode('utf-8', errors='ignore')
-
-            if "apple,arm-platform" in dtcompat:
-                return True
-            else:
-                return False
+        with open("/proc/device-tree/compatible", "rb") as f:
+            return "apple,arm-platform" in f.read().decode('utf-8', errors='ignore')
     except:
         return False
 

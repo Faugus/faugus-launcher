@@ -132,9 +132,9 @@ def run_tray_entrypoint(launch_ui, console_mode=False):
             on_quit()
         elif method == "Restart":
             launch_ui = params[0]
-            GLib.timeout_add(100, lambda: (do_restart(launch_ui), False)[1])
+            GLib.timeout_add(100, do_restart, launch_ui)
         elif method == "Shutdown":
-            GLib.timeout_add(100, lambda: (do_shutdown(), False)[1])
+            GLib.timeout_add(100, do_shutdown)
         elif method == "RefreshMenu":
             tray.notify_menu_changed()
         elif method == "Open":
@@ -175,7 +175,6 @@ def bootstrap():
 
     if len(rest) == 1:
         os.execv(sys.executable, [sys.executable, "-m", "faugus.launcher"] + sys.argv[1:])
-        return
 
     config = load_config()
     system_tray_enabled = config.get("system-tray", "False") == "True"
@@ -189,7 +188,6 @@ def bootstrap():
         if console_mode:
             ui_args.append("--console")
         os.execv(sys.executable, [sys.executable, "-m", "faugus.launcher"] + ui_args)
-        return
 
     run_tray_entrypoint(launch_ui=not start_hidden, console_mode=console_mode)
 

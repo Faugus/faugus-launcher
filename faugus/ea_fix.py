@@ -37,7 +37,7 @@ def update_steam_shortcut(game_title, new_start_dir, new_exe):
 
         changed = False
         if "shortcuts" in shortcuts:
-            for app_id, game_info in shortcuts["shortcuts"].items():
+            for game_info in shortcuts["shortcuts"].values():
                 if isinstance(game_info, dict) and game_info.get("AppName") == game_title:
                     game_info["StartDir"] = new_start_dir
 
@@ -94,8 +94,6 @@ def update_ea_path(prefix):
         except Exception as e:
             print(f"Error processing EA directories: {e}")
 
-    new_executable_dir = os.path.dirname(new_path)
-
     games = load_json_file(GAMES_JSON, [])
 
     changed = False
@@ -113,13 +111,12 @@ def update_ea_path(prefix):
                 desktop_shortcut_path = f"{DESKTOP_DIR}/{gameid}.desktop"
 
                 if os.path.exists(applications_shortcut_path):
-                    update_desktop_path(applications_shortcut_path, new_executable_dir)
+                    update_desktop_path(applications_shortcut_path, target_ea_desktop)
 
                 if os.path.exists(desktop_shortcut_path):
-                    update_desktop_path(desktop_shortcut_path, new_executable_dir)
+                    update_desktop_path(desktop_shortcut_path, target_ea_desktop)
 
-            if game_title:
-                update_steam_shortcut(game_title, new_executable_dir, new_path)
+            update_steam_shortcut(game_title, target_ea_desktop, new_path)
 
     if changed:
         save_json_file(games, GAMES_JSON)

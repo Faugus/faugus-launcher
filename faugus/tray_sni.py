@@ -253,10 +253,9 @@ class TrayIcon:
                 entries.append((last_played, gameid, entry.get("title", gameid), entry.get("path", "")))
 
         entries.sort(reverse=True)
-        recent = [(gameid, title, path) for _last_played, gameid, title, path in entries[:len(self.RECENT_SLOT_IDS)]]
 
         items = []
-        for slot_id, (gameid, title, path) in zip(self.RECENT_SLOT_IDS, recent):
+        for slot_id, (_last_played, gameid, title, path) in zip(self.RECENT_SLOT_IDS, entries):
             items.append({"id": slot_id, "label": title.replace("_", "__"), "action": lambda gid=gameid, p=path: self.on_launch(gid, p)})
 
         if items:

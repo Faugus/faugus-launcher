@@ -96,10 +96,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         load_frame_css()
 
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.box.set_margin_start(0)
-        self.box.set_margin_end(0)
-        self.box.set_margin_top(0)
-        self.box.set_margin_bottom(0)
 
         frame = Gtk.Frame()
         frame.set_margin_start(10)
@@ -151,8 +147,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_shortcut_icon.set_hexpand(True)
         self.button_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
-        self.button_cancel.set_hexpand(True)
-        self.button_ok.set_hexpand(True)
         bottom_box = build_bottom_button_box(self.button_cancel, self.button_ok)
 
         self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -168,9 +162,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         disable_mangohud_gamemode_if_missing(self)
 
-        if os.path.exists(LSFGVK_PATH):
-            self.button_lossless.set_sensitive(True)
-        else:
+        if not os.path.exists(LSFGVK_PATH):
             self.button_lossless.set_sensitive(False)
             self.button_lossless.set_tooltip_text(_("Vulkan Layer not found"))
 
@@ -181,7 +173,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         os.makedirs(self.icon_directory, exist_ok=True)
 
-        status = extract_ico(self.file_path, self.icon_temp, best_frame=True)
+        status = extract_ico(self.file_path, self.icon_temp)
         if status == "ok":
             texture = self.new_texture_from_image(self.icon_temp, 50, 50)
             self.button_shortcut_icon.set_child(new_picture(texture))
@@ -228,11 +220,14 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.checkbox_sdl.set_active(sdl_enabled)
         self.checkbox_no_sleep.set_active(no_sleep)
 
-    def on_cancel_clicked(self, widget):
+    def _cleanup_icon_temp(self):
         if os.path.isfile(self.icon_temp):
             os.remove(self.icon_temp)
         if os.path.isdir(self.icon_directory):
             shutil.rmtree(self.icon_directory)
+
+    def on_cancel_clicked(self, widget):
+        self._cleanup_icon_temp()
         destroy_and_release(self)
 
     def on_ok_clicked(self, widget):
@@ -250,10 +245,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         if self.addapp_enabled:
             write_addapp_bat(addapp_bat, self.file_path, self.addapp, self.addapp_delay, self.addapp_first, game_arguments)
 
-        if os.path.isfile(os.path.expanduser(self.icon_temp)):
-            os.rename(os.path.expanduser(self.icon_temp), f'{self.icons_path}/{title_formatted}.png')
-
         new_icon_path = f"{SHORTCUT_ICONS_DIR}/{title_formatted}.png"
+        if os.path.isfile(self.icon_temp):
+            os.rename(self.icon_temp, new_icon_path)
         if not os.path.exists(new_icon_path):
             new_icon_path = FAUGUS_PNG
 
@@ -269,35 +263,22 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         launch_arguments = expand_path(" ".join(env_vars + other_args))
 
-        game_arguments = expand_path(self.entry_game_arguments.get_text())
-        lossless_enabled = self.lossless_enabled
-        lossless_multiplier = self.lossless_multiplier
-        lossless_flow = self.lossless_flow
-        lossless_performance = self.lossless_performance
-        lossless_hdr = self.lossless_hdr
-        lossless_present = self.lossless_present
-
-        mangohud = True if self.checkbox_mangohud.get_active() else ""
-        gamemode = True if self.checkbox_gamemode.get_active() else ""
-        sdl_enabled = True if self.checkbox_sdl.get_active() else ""
-        no_sleep = True if self.checkbox_no_sleep.get_active() else ""
-
         game_directory = os.path.dirname(self.file_path)
 
         command_parts = []
 
-        if sdl_enabled:
+        if self.checkbox_sdl.get_active():
             command_parts.append("PROTON_PREFER_SDL=1")
-        if no_sleep:
+        if self.checkbox_no_sleep.get_active():
             command_parts.append("NO_SLEEP=1")
         if protonfix:
             command_parts.append(f'GAMEID={protonfix}')
         if launch_arguments:
             command_parts.append(launch_arguments)
-        command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
-        if gamemode:
+        command_parts.extend(build_lossless_env(self.lossless_enabled, self.lossless_multiplier, self.lossless_flow, self.lossless_performance, self.lossless_hdr, self.lossless_present))
+        if self.checkbox_gamemode.get_active():
             command_parts.append("gamemoderun")
-        if mangohud:
+        if self.checkbox_mangohud.get_active():
             command_parts.append("mangohud")
 
         command_parts.append(f"'{UMU_RUN}'")
@@ -320,26 +301,16 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         if self.post_launch:
             hook_args += f' --post-launch "{self.post_launch}"'
 
-        if IS_FLATPAK:
-            desktop_file_content = (
-                f'[Desktop Entry]\n'
-                f'Name={title}\n'
-                f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
-                f'Icon={new_icon_path}\n'
-                f'Type=Application\n'
-                f'Categories=Game;\n'
-                f'Path={game_directory}\n'
-            )
-        else:
-            desktop_file_content = (
-                f'[Desktop Entry]\n'
-                f'Name={title}\n'
-                f'Exec={LAUNCHER_PATH} {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
-                f'Icon={new_icon_path}\n'
-                f'Type=Application\n'
-                f'Categories=Game;\n'
-                f'Path={game_directory}\n'
-            )
+        exec_prefix = f"flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher" if IS_FLATPAK else LAUNCHER_PATH
+        desktop_file_content = (
+            f'[Desktop Entry]\n'
+            f'Name={title}\n'
+            f'Exec={exec_prefix} {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
+            f'Icon={new_icon_path}\n'
+            f'Type=Application\n'
+            f'Categories=Game;\n'
+            f'Path={game_directory}\n'
+        )
 
         os.makedirs(APP_DIR, exist_ok=True)
         os.makedirs(DESKTOP_DIR, exist_ok=True)
@@ -355,10 +326,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         shutil.copyfile(applications_shortcut_path, desktop_shortcut_path)
         os.chmod(desktop_shortcut_path, 0o755)
 
-        if os.path.isfile(self.icon_temp):
-            os.remove(self.icon_temp)
-        if os.path.isdir(self.icon_directory):
-            shutil.rmtree(self.icon_directory)
+        self._cleanup_icon_temp()
         destroy_and_release(self)
 
     def set_image_shortcut_icon(self):
@@ -372,7 +340,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         if os.path.isfile(path):
             os.makedirs(self.icon_directory, exist_ok=True)
-            status = extract_ico(path, self.icon_converted, best_frame=False)
+            status = extract_ico(path, self.icon_converted)
             if status == "no_icons":
                 self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
