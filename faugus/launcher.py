@@ -4817,7 +4817,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 else:
                     edit_game_dialog.checkbox_shortcut_steam.set_active(False)
 
-            edit_game_dialog.check_existing_shortcut()
+            edit_game_dialog.check_existing_shortcut(game.gameid)
 
             edit_game_dialog.combobox_steam_title.set_sensitive(False)
             edit_game_dialog.combobox_steam_user.set_sensitive(False)
@@ -9145,13 +9145,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         choose_shortcut_icon(self)
 
-    def check_existing_shortcut(self):
+    def check_existing_shortcut(self, gameid=None):
 
         title = self.entry_title.get_text().strip()
-        if not title:
+        if not gameid and not title:
             return
 
-        title_formatted = format_title(title)
+        title_formatted = gameid or format_title(title)
         desktop_file_path = f"{DESKTOP_DIR}/{title_formatted}.desktop"
         applications_shortcut_path = f"{APP_DIR}/{title_formatted}.desktop"
 
