@@ -3574,7 +3574,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def run_file_in_prefix(self, game, file_run):
         prefix = expand_path(game.prefix)
         runner = game.runner
-        title_formatted = format_title(game.title)
+        title_formatted = game.gameid
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
         escaped_file_run = file_run.replace("'", "'\\''")
