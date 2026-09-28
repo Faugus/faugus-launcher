@@ -587,6 +587,15 @@ def format_title(title):
     return title
 
 
+def unique_gameid(base, existing_ids):
+    if not base or base not in existing_ids:
+        return base
+    n = 2
+    while f"{base}-{n}" in existing_ids:
+        n += 1
+    return f"{base}-{n}"
+
+
 def new_file_chooser(parent, title, action, accept_label=None, cancel_label=None):
     config = load_json_file(CONFIG_FILE_DIR, default={})
     gamepad_navigation = config.get('gamepad-navigation', 'False') == 'True'
