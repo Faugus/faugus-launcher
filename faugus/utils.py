@@ -1,4 +1,5 @@
 import os
+import functools
 import json
 import re
 import shutil
@@ -8,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIR, COMPATIBILITY_DIRS, find_compatibilitytool, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -24,13 +25,9 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
                     message = ctypes.string_at(f.value, f.length).decode("utf-8", "replace")
             except Exception:
                 message = ""
-            if "GtkGizmo" in message and "reported min" in message:
-                return GLib.LogWriterOutput.HANDLED
-            if "gtk_css_node_insert_after" in message:
-                return GLib.LogWriterOutput.HANDLED
-            if "mapped without a transient parent" in message:
-                return GLib.LogWriterOutput.HANDLED
-            if "swapchain" in message:
+            if ("GtkGizmo" in message and "reported min" in message) or any(
+                s in message for s in ("gtk_css_node_insert_after", "mapped without a transient parent", "swapchain")
+            ):
                 return GLib.LogWriterOutput.HANDLED
             break
     return GLib.log_writer_default(log_level, fields, user_data)
@@ -276,13 +273,8 @@ def create_accent_placeholder_paintable(width, height, alpha=0.4, rgb=None):
 def set_spinner_loading(spinners, loading):
     for spinner in spinners:
         spinner.set_visible(loading)
-        if loading:
-            spinner.start()
-        else:
-            spinner.stop()
-        dim = getattr(spinner, 'dim_overlay', None)
-        if dim is not None:
-            dim.set_visible(loading)
+        spinner.set_spinning(loading)
+        spinner.dim_overlay.set_visible(loading)
 
 
 class IdComboBox(Gtk.DropDown):
@@ -314,23 +306,20 @@ class IdComboBox(Gtk.DropDown):
         label = Gtk.Label(xalign=0)
         list_item.set_child(label)
 
-    def _on_factory_bind(self, factory, list_item):
-        label = list_item.get_child()
-        item = list_item.get_item()
-        text = item.get_string() if item else ""
-        text = self._short_label_map.get(text, text)
+    def _bind_label(self, label, text):
         label.set_text(text)
         if self._ellipsize:
             label.set_ellipsize(Pango.EllipsizeMode.END)
             label.set_max_width_chars(self._max_width_chars)
 
-    def _on_full_text_list_factory_bind(self, factory, list_item):
-        label = list_item.get_child()
+    def _on_factory_bind(self, factory, list_item):
         item = list_item.get_item()
-        label.set_text(item.get_string() if item else "")
-        if self._ellipsize:
-            label.set_ellipsize(Pango.EllipsizeMode.END)
-            label.set_max_width_chars(self._max_width_chars)
+        text = item.get_string() if item else ""
+        self._bind_label(list_item.get_child(), self._short_label_map.get(text, text))
+
+    def _on_full_text_list_factory_bind(self, factory, list_item):
+        item = list_item.get_item()
+        self._bind_label(list_item.get_child(), item.get_string() if item else "")
 
     def _on_notify_selected(self, *args):
         if not self._suppress:
@@ -390,9 +379,6 @@ class IdComboBox(Gtk.DropDown):
         self._store.append(text)
         self._suppress = False
 
-    def append_text(self, text):
-        self.append(None, text)
-
     def remove_all(self):
         n = self._store.get_n_items()
         if n:
@@ -435,14 +421,6 @@ class IdComboBox(Gtk.DropDown):
         result = self.set_active_id(id_)
         self._suppress = False
         return result
-
-    def set_active_silent(self, index):
-        self._suppress = True
-        self.set_active(index)
-        self._suppress = False
-
-    def get_texts(self):
-        return [self._store.get_string(i) for i in range(self._store.get_n_items())]
 
     def get_ids(self):
         return list(self._ids)
@@ -530,11 +508,8 @@ def build_dialog_ok_cancel_box(dialog):
 def _release_combo_boxes(widget):
     if isinstance(widget, IdComboBox):
         widget.release()
-    child = widget.get_first_child()
-    while child:
-        nxt = child.get_next_sibling()
+    for child in widget_children(widget):
         _release_combo_boxes(child)
-        child = nxt
     if isinstance(widget, Gtk.Popover):
         widget.popdown()
         widget.unparent()
@@ -553,11 +528,8 @@ def destroy_and_release(widget):
 
     if isinstance(widget, Gtk.Dialog):
         content = widget.get_content_area()
-        child = content.get_first_child()
-        while child:
-            nxt = child.get_next_sibling()
+        for child in widget_children(content):
             content.remove(child)
-            child = nxt
     elif hasattr(widget, "set_child"):
         widget.set_child(None)
 
@@ -916,16 +888,9 @@ def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
     if lossless_flow:
         parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}")
         parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
-    if lossless_performance:
-        parts.append("LSFG_PERFORMANCE_MODE=1")
-        parts.append("LSFGVK_PERFORMANCE_MODE=1")
-    else:
-        parts.append("LSFG_PERFORMANCE_MODE=0")
-        parts.append("LSFGVK_PERFORMANCE_MODE=0")
-    if lossless_hdr:
-        parts.append("LSFG_HDR_MODE=1")
-    else:
-        parts.append("LSFG_HDR_MODE=0")
+    parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance else 0}")
+    parts.append(f"LSFGVK_PERFORMANCE_MODE={1 if lossless_performance else 0}")
+    parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr else 0}")
     if lossless_present:
         parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
     return parts
@@ -935,24 +900,15 @@ def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, gam
     bat_path = expand_path(bat_path)
     exe_path = expand_path(exe_path)
     addapp = expand_path(addapp)
+    game_line = f'start "" "z:{exe_path}" {game_arguments}\n' if game_arguments else f'start "" "z:{exe_path}"\n'
+    addapp_line = f'start "" "z:{addapp}"\n'
+    first, second = (addapp_line, game_line) if addapp_first else (game_line, addapp_line)
     with open(bat_path, "w") as f:
         f.write('@echo off\n')
-        if not addapp_first:
-            if game_arguments:
-                f.write(f'start "" "z:{exe_path}" {game_arguments}\n')
-            else:
-                f.write(f'start "" "z:{exe_path}"\n')
-            if addapp_delay:
-                f.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
-            f.write(f'start "" "z:{addapp}"\n')
-        else:
-            f.write(f'start "" "z:{addapp}"\n')
-            if addapp_delay:
-                f.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
-            if game_arguments:
-                f.write(f'start "" "z:{exe_path}" {game_arguments}\n')
-            else:
-                f.write(f'start "" "z:{exe_path}"\n')
+        f.write(first)
+        if addapp_delay:
+            f.write(f'ping -n {addapp_delay} 127.0.0.1 >nul\n')
+        f.write(second)
 
 
 def is_valid_image(file_path):
@@ -1063,9 +1019,7 @@ def on_entry_query_tooltip(widget, x, y, keyboard_mode, tooltip):
 def on_treeview_query_tooltip(widget, x, y, keyboard_mode, tooltip, store):
     result = widget.get_path_at_pos(x, y)
     if result is not None:
-        path, column, cell_x, cell_y = result
-        tree_iter = store.get_iter(path)
-        value = store.get_value(tree_iter, 0)
+        value = store[result[0]][0]
         if value.strip():
             tooltip.set_text(value)
             return True
@@ -1181,7 +1135,7 @@ def load_compact_time_spin_css():
     )
 
 
-def extract_ico(exe_path, output_path, best_frame=False):
+def extract_ico(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:
         ensure_parent_dir(output_path)
@@ -1263,8 +1217,8 @@ def expand_path(value):
 
 
 def update_games_json():
-    games = load_json_file(GAMES_JSON, None)
-    if games is None:
+    games = load_json_file_or_none(GAMES_JSON)
+    if not games:
         return
 
     changed = False
@@ -1401,7 +1355,7 @@ def game_to_save_dict(game, hidden=None):
 def prepare_game_kwargs(data):
     defaults = {f: "" for f in GAME_FIELDS}
     defaults.update({"playtime": 0, "hidden": False, "no_sleep": False,
-                     "category": False, "icon": ""})
+                     "category": False})
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
 
 
@@ -1441,84 +1395,80 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     hbox.set_margin_top(10)
     hbox.set_margin_bottom(10)
 
+    def build_editable_list(store, header):
+        tree = Gtk.TreeView(model=store)
+        tree.add_css_class("selected-list")
+        tree.set_hexpand(True)
+        tree.set_vexpand(True)
+        renderer = Gtk.CellRendererText()
+        renderer.set_property("editable", True)
+        renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+
+        def on_edited(r, path, new_text):
+            store[path][0] = new_text
+            if path == str(len(store) - 1) and new_text.strip() != "":
+                store.append([""])
+
+        def on_key_press(controller, keyval, keycode, state):
+            if keyval == Gdk.KEY_Delete:
+                selection = tree.get_selection()
+                model, treeiter = selection.get_selected()
+                if treeiter is not None:
+                    if model[treeiter][0] != "" or len(model) > 1:
+                        model.remove(treeiter)
+                    if len(model) == 0 or model[-1][0] != "":
+                        model.append([""])
+                return True
+            return False
+
+        commit_edit = track_cell_editing(renderer)
+
+        renderer.connect("edited", on_edited)
+        key_controller = Gtk.EventControllerKey()
+        key_controller.connect("key-pressed", on_key_press)
+        tree.add_controller(key_controller)
+        column = Gtk.TreeViewColumn("", renderer, text=0)
+        column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        column.set_expand(True)
+        tree.append_column(column)
+        tree.set_headers_visible(False)
+        tree.set_has_tooltip(True)
+        tree.connect("query-tooltip", on_treeview_query_tooltip, store)
+
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_child(tree)
+
+        label_header = Gtk.Label(label=header)
+        label_header.set_halign(Gtk.Align.START)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        box.set_hexpand(True)
+        box.set_vexpand(True)
+        box.append(label_header)
+        box.append(scroll)
+        return tree, box, commit_edit
+
+    def build_arrow_button(css_class):
+        button = Gtk.Button()
+        button.set_size_request(50, 50)
+        button.set_valign(Gtk.Align.CENTER)
+        img = new_icon_image("faugus-play-symbolic.svg")
+        img.add_css_class(css_class)
+        button.set_child(img)
+        return button
+
     store_presets = Gtk.ListStore(str)
 
     for item in load_json_file(PRESETS_FILE, default=[]):
         store_presets.append([item])
     store_presets.append([""])
 
-    tree_presets = Gtk.TreeView(model=store_presets)
-    tree_presets.add_css_class("selected-list")
-    tree_presets.set_hexpand(True)
-    tree_presets.set_vexpand(True)
-    renderer_presets = Gtk.CellRendererText()
-    renderer_presets.set_property("editable", True)
-    renderer_presets.set_property("ellipsize", Pango.EllipsizeMode.END)
+    tree_presets, box_presets, commit_presets_edit = build_editable_list(store_presets, _("Presets"))
 
-    def on_preset_edited(renderer, path, new_text):
-        store_presets[path][0] = new_text
-        if path == str(len(store_presets) - 1) and new_text.strip() != "":
-            store_presets.append([""])
-
-    def on_preset_key_press(controller, keyval, keycode, state):
-        if keyval == Gdk.KEY_Delete:
-            selection = tree_presets.get_selection()
-            model, treeiter = selection.get_selected()
-            if treeiter is not None:
-                if model[treeiter][0] != "" or len(model) > 1:
-                    model.remove(treeiter)
-                if len(model) == 0 or model[-1][0] != "":
-                    model.append([""])
-            return True
-        return False
-
-    commit_presets_edit = track_cell_editing(renderer_presets)
-
-    renderer_presets.connect("edited", on_preset_edited)
-    key_controller_presets = Gtk.EventControllerKey()
-    key_controller_presets.connect("key-pressed", on_preset_key_press)
-    tree_presets.add_controller(key_controller_presets)
-    column_presets = Gtk.TreeViewColumn("", renderer_presets, text=0)
-    column_presets.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-    column_presets.set_expand(True)
-    tree_presets.append_column(column_presets)
-    tree_presets.set_headers_visible(False)
-    tree_presets.set_has_tooltip(True)
-    tree_presets.connect("query-tooltip", on_treeview_query_tooltip, store_presets)
-
-    scroll_presets = Gtk.ScrolledWindow()
-    scroll_presets.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-    scroll_presets.set_child(tree_presets)
-
-    label_presets_header = Gtk.Label(label=_("Presets"))
-    label_presets_header.set_halign(Gtk.Align.START)
-
-    box_presets = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-    box_presets.set_hexpand(True)
-    box_presets.set_vexpand(True)
-    box_presets.append(label_presets_header)
-    box_presets.append(scroll_presets)
-
-    btn_copy = Gtk.Button()
-    btn_copy.set_size_request(50, 50)
-    btn_copy.set_valign(Gtk.Align.CENTER)
-    img = new_icon_image("faugus-play-symbolic.svg")
-    img.add_css_class("flip-x")
-    btn_copy.set_child(img)
-
-    btn_move_up = Gtk.Button()
-    btn_move_up.set_size_request(50, 50)
-    btn_move_up.set_valign(Gtk.Align.CENTER)
-    img_move_up = new_icon_image("faugus-play-symbolic.svg")
-    img_move_up.add_css_class("move_up")
-    btn_move_up.set_child(img_move_up)
-
-    btn_move_down = Gtk.Button()
-    btn_move_down.set_size_request(50, 50)
-    btn_move_down.set_valign(Gtk.Align.CENTER)
-    img_move_down = new_icon_image("faugus-play-symbolic.svg")
-    img_move_down.add_css_class("move_down")
-    btn_move_down.set_child(img_move_down)
+    btn_copy = build_arrow_button("flip-x")
+    btn_move_up = build_arrow_button("move_up")
+    btn_move_down = build_arrow_button("move_down")
 
     add_css_once(
         "launch_arguments_flip",
@@ -1535,57 +1485,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
             store_args.append([arg])
     store_args.append([""])
 
-    tree_args = Gtk.TreeView(model=store_args)
-    tree_args.add_css_class("selected-list")
-    tree_args.set_hexpand(True)
-    tree_args.set_vexpand(True)
-    renderer_args = Gtk.CellRendererText()
-    renderer_args.set_property("editable", True)
-    renderer_args.set_property("ellipsize", Pango.EllipsizeMode.END)
-
-    def on_arg_edited(renderer, path, new_text):
-        store_args[path][0] = new_text
-        if path == str(len(store_args) - 1) and new_text.strip() != "":
-            store_args.append([""])
-
-    def on_arg_key_press(controller, keyval, keycode, state):
-        if keyval == Gdk.KEY_Delete:
-            selection = tree_args.get_selection()
-            model, treeiter = selection.get_selected()
-            if treeiter is not None:
-                if model[treeiter][0] != "" or len(model) > 1:
-                    model.remove(treeiter)
-                if len(model) == 0 or model[-1][0] != "":
-                    model.append([""])
-            return True
-        return False
-
-    commit_args_edit = track_cell_editing(renderer_args)
-
-    renderer_args.connect("edited", on_arg_edited)
-    key_controller_args = Gtk.EventControllerKey()
-    key_controller_args.connect("key-pressed", on_arg_key_press)
-    tree_args.add_controller(key_controller_args)
-    column_args = Gtk.TreeViewColumn("", renderer_args, text=0)
-    column_args.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-    column_args.set_expand(True)
-    tree_args.append_column(column_args)
-    tree_args.set_headers_visible(False)
-    tree_args.set_has_tooltip(True)
-    tree_args.connect("query-tooltip", on_treeview_query_tooltip, store_args)
-
-    scroll_args = Gtk.ScrolledWindow()
-    scroll_args.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-    scroll_args.set_child(tree_args)
-
-    label_args_header = Gtk.Label(label=_("Launch Arguments"))
-    label_args_header.set_halign(Gtk.Align.START)
-
-    box_args = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-    box_args.set_hexpand(True)
-    box_args.set_vexpand(True)
-    box_args.append(label_args_header)
-    box_args.append(scroll_args)
+    tree_args, box_args, commit_args_edit = build_editable_list(store_args, _("Launch Arguments"))
 
     sel_presets = tree_presets.get_selection()
     sel_args = tree_args.get_selection()
@@ -1608,7 +1508,6 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
             sel = tv.get_selection()
             model, treeiter = sel.get_selected()
             if treeiter is not None:
-                selected_treeview = tv
                 break
         else:
             return
@@ -1632,13 +1531,11 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
                 return
             other_iter = model.get_iter((index + 1,))
             model.move_after(treeiter, other_iter)
-        else:
-            return
 
         # move selection in the new position
         new_path = model.get_path(treeiter)
         if new_path is not None:
-            selected_treeview.set_cursor(new_path)
+            tv.set_cursor(new_path)
 
     btn_move_up.connect("clicked", lambda b: on_move_clicked(b, -1))
     btn_move_down.connect("clicked", lambda b: on_move_clicked(b, 1))
@@ -1774,18 +1671,12 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     frame.set_margin_top(10)
     frame.set_margin_bottom(10)
 
-    grid = Gtk.Grid()
-    grid.set_row_spacing(10)
-    grid.set_column_spacing(10)
-    grid.set_margin_top(10)
-    grid.set_margin_bottom(10)
-    grid.set_margin_start(10)
-    grid.set_margin_end(10)
+    grid = build_grid()
 
-    enabled = val if (val := addapp_enabled) != "" else False
-    cur_path = val if (val := addapp) != "" else ""
-    cur_delay = val if (val := addapp_delay) != "" else ""
-    cur_first = val if (val := addapp_first) != "" else False
+    enabled = addapp_enabled if addapp_enabled != "" else False
+    cur_path = addapp
+    cur_delay = addapp_delay
+    cur_first = addapp_first if addapp_first != "" else False
 
     checkbox_enable = Gtk.CheckButton(label=_("Enable"))
     checkbox_enable.set_active(enabled)
@@ -1845,12 +1736,8 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
 
     def on_enable_toggled(cb):
         active = cb.get_active()
-        label_path.set_sensitive(active)
-        entry_addapp.set_sensitive(active)
-        button_search_addapp.set_sensitive(active)
-        label_delay.set_sensitive(active)
-        entry_delay.set_sensitive(active)
-        checkbox_addapp_first.set_sensitive(active)
+        for widget in (label_path, entry_addapp, button_search_addapp, label_delay, entry_delay, checkbox_addapp_first):
+            widget.set_sensitive(active)
 
     checkbox_enable.connect("toggled", on_enable_toggled)
     on_enable_toggled(checkbox_enable)
@@ -1902,19 +1789,13 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     frame.set_margin_top(10)
     frame.set_margin_bottom(10)
 
-    grid = Gtk.Grid()
-    grid.set_row_spacing(10)
-    grid.set_column_spacing(10)
-    grid.set_margin_top(10)
-    grid.set_margin_bottom(10)
-    grid.set_margin_start(10)
-    grid.set_margin_end(10)
+    grid = build_grid()
 
-    enabled = val if (val := lossless_enabled) != "" else False
-    multiplier = val if (val := lossless_multiplier) != "" else 1
-    flow = val if (val := lossless_flow) != "" else 100
-    performance = val if (val := lossless_performance) != "" else False
-    hdr = val if (val := lossless_hdr) != "" else False
+    enabled = lossless_enabled if lossless_enabled != "" else False
+    multiplier = lossless_multiplier if lossless_multiplier != "" else 1
+    flow = lossless_flow if lossless_flow != "" else 100
+    performance = lossless_performance if lossless_performance != "" else False
+    hdr = lossless_hdr if lossless_hdr != "" else False
     from faugus.config_manager import ConfigManager
     from faugus.steam_setup import LOSSLESS_DLL
 
@@ -2015,17 +1896,9 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
 
     def on_enable_toggled(cb):
         active = cb.get_active()
-        label_location.set_sensitive(active)
-        entry_location.set_sensitive(active)
-        button_search_location.set_sensitive(active)
-        label_multiplier.set_sensitive(active)
-        spin_multiplier.set_sensitive(active)
-        label_flow.set_sensitive(active)
-        scale_flow.set_sensitive(active)
-        checkbox_performance.set_sensitive(active)
-        checkbox_hdr.set_sensitive(active)
-        label_present.set_sensitive(active)
-        combobox_present.set_sensitive(active)
+        for widget in (label_location, entry_location, button_search_location, label_multiplier, spin_multiplier,
+                       label_flow, scale_flow, checkbox_performance, checkbox_hdr, label_present, combobox_present):
+            widget.set_sensitive(active)
 
     checkbox_enable.connect("toggled", on_enable_toggled)
     on_enable_toggled(checkbox_enable)
@@ -2119,48 +1992,36 @@ def list_gtk4_themes():
     return sorted(names)
 
 
+def _read_appearance_setting(key):
+    bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+    result = bus.call_sync(
+        "org.freedesktop.portal.Desktop",
+        "/org/freedesktop/portal/desktop",
+        "org.freedesktop.portal.Settings",
+        "Read",
+        GLib.Variant("(ss)", ("org.freedesktop.appearance", key)),
+        None,
+        Gio.DBusCallFlags.NONE,
+        500,
+        None,
+    )
+    return result.unpack()[0]
+
+
 def get_system_accent_rgb():
     try:
-        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
-        result = bus.call_sync(
-            "org.freedesktop.portal.Desktop",
-            "/org/freedesktop/portal/desktop",
-            "org.freedesktop.portal.Settings",
-            "Read",
-            GLib.Variant("(ss)", ("org.freedesktop.appearance", "accent-color")),
-            None,
-            Gio.DBusCallFlags.NONE,
-            500,
-            None,
-        )
-        r, g, b = result.unpack()[0]
-        return int(r * 255), int(g * 255), int(b * 255)
+        r, g, b = _read_appearance_setting("accent-color")
     except GLib.Error:
         return None
+    return int(r * 255), int(g * 255), int(b * 255)
 
 
 def get_system_prefers_dark():
     try:
-        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
-        result = bus.call_sync(
-            "org.freedesktop.portal.Desktop",
-            "/org/freedesktop/portal/desktop",
-            "org.freedesktop.portal.Settings",
-            "Read",
-            GLib.Variant("(ss)", ("org.freedesktop.appearance", "color-scheme")),
-            None,
-            Gio.DBusCallFlags.NONE,
-            500,
-            None,
-        )
-        value = result.unpack()[0]
-        if value == 1:
-            return True
-        if value == 2:
-            return False
-        return None
+        value = _read_appearance_setting("color-scheme")
     except GLib.Error:
         return None
+    return {1: True, 2: False}.get(value)
 
 
 def get_effective_accent_rgb():
@@ -2169,22 +2030,19 @@ def get_effective_accent_rgb():
     theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
     accent_color = cfg.get_accent_color()
 
+    color_name = "theme_selected_bg_color"
     if theme_engine == "adwaita":
         if accent_color and accent_color != "system":
             match = re.match(r'rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', accent_color)
             if match:
                 return tuple(int(v) for v in match.groups())
-        found, rgba = Gtk.Box().get_style_context().lookup_color("accent_bg_color")
-        if found:
-            return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
-        return (30, 30, 34)
-
-    if theme_engine == "system":
+        color_name = "accent_bg_color"
+    elif theme_engine == "system":
         system_accent = get_system_accent_rgb()
         if system_accent:
             return system_accent
 
-    found, rgba = Gtk.Box().get_style_context().lookup_color("theme_selected_bg_color")
+    found, rgba = Gtk.Box().get_style_context().lookup_color(color_name)
     if found:
         return int(rgba.red * 255), int(rgba.green * 255), int(rgba.blue * 255)
     return (30, 30, 34)
@@ -2233,12 +2091,7 @@ def apply_interface_customization(interface_theme, accent_color, theme_engine="a
         Gtk.StyleContext.remove_provider_for_display(display, _accent_css_provider)
         _accent_css_provider = None
 
-    effective_accent = None
     if theme_engine == "adwaita" and accent_color and accent_color != "system":
-        effective_accent = accent_color
-
-    if effective_accent:
-        accent_color = effective_accent
         fg_color = _contrasting_fg_color(accent_color)
         provider = Gtk.CssProvider()
         css = f"""
@@ -2270,28 +2123,23 @@ def _contrasting_fg_color(rgb_color):
     return "#000000" if luminance > 0.55 else "#ffffff"
 
 
-_steamgriddb_session = None
-
-
+@functools.cache
 def get_steamgriddb_session():
-    global _steamgriddb_session
-    if _steamgriddb_session is None:
-        import requests
-        from requests.adapters import HTTPAdapter
-        from urllib3.util.retry import Retry
+    import requests
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
 
-        session = requests.Session()
-        retry = Retry(
-            total=3,
-            backoff_factor=0.3,
-            status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["GET"],
-        )
-        adapter = HTTPAdapter(max_retries=retry, pool_maxsize=16)
-        session.mount("https://", adapter)
-        session.mount("http://", adapter)
-        _steamgriddb_session = session
-    return _steamgriddb_session
+    session = requests.Session()
+    retry = Retry(
+        total=3,
+        backoff_factor=0.3,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retry, pool_maxsize=16)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
 
 
 def fetch_steamgriddb_autocomplete(api_key, term, limit=10):
@@ -2439,7 +2287,7 @@ def show_steamgriddb_picker(obj, category):
             outline-offset: -2px;
         }}
         """,
-        Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+        _OVERRIDE_PRIORITY,
     )
 
     is_list = category == "banner"
@@ -2525,17 +2373,10 @@ def show_steamgriddb_picker(obj, category):
 
     search_token = [0]
 
-    def clear_items():
-        child = items_container.get_first_child()
-        while child:
-            next_child = child.get_next_sibling()
-            items_container.remove(child)
-            child = next_child
-
     def populate(items, token):
         if closed_state[0] or token != search_token[0]:
             return False
-        clear_items()
+        items_container.remove_all()
         if not items:
             empty_label = Gtk.Label(label=_("No results found"))
             empty_label.set_margin_top(20)
@@ -2547,14 +2388,9 @@ def show_steamgriddb_picker(obj, category):
             picture.set_cursor(Gdk.Cursor.new_from_name("pointer"))
 
             child = Gtk.FlowBoxChild()
-            if is_list:
-                child.set_size_request(thumb_w, thumb_h)
-                child.set_halign(Gtk.Align.CENTER)
-                child.set_valign(Gtk.Align.START)
-            else:
-                child.set_size_request(thumb_w, thumb_h)
-                child.set_halign(Gtk.Align.CENTER)
-                child.set_valign(Gtk.Align.CENTER)
+            child.set_size_request(thumb_w, thumb_h)
+            child.set_halign(Gtk.Align.CENTER)
+            child.set_valign(Gtk.Align.START if is_list else Gtk.Align.CENTER)
             child.set_overflow(Gtk.Overflow.HIDDEN)
             child.set_child(picture)
             child.add_css_class("steamgriddb-candidate")

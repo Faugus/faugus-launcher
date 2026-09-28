@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -91,13 +92,9 @@ class PathManager:
     def get_compatibilitytools():
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
         native_steam = base_dir / 'Steam'
-        if native_steam.is_dir():
-            return str(native_steam / 'compatibilitytools.d')
-
         flatpak_steam = Path(PathManager.user_home('.var/app/com.valvesoftware.Steam/.local/share/Steam'))
-        if flatpak_steam.is_dir():
+        if not native_steam.is_dir() and flatpak_steam.is_dir():
             return str(flatpak_steam / 'compatibilitytools.d')
-
         return str(native_steam / 'compatibilitytools.d')
 
     @staticmethod
@@ -116,8 +113,7 @@ class PathManager:
     @staticmethod
     def get_applications():
         base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
-        compatibilitytools_folder = base_dir / 'applications'
-        return str(compatibilitytools_folder)
+        return str(base_dir / 'applications')
 
     @staticmethod
     def user_desktop():
@@ -246,8 +242,7 @@ def _migrate_legacy_item(old_path, new_path):
         try:
             old.rename(new)
         except OSError:
-            import shutil as _shutil
-            _shutil.move(str(old), str(new))
+            shutil.move(str(old), str(new))
     except OSError:
         pass
 

@@ -14,15 +14,6 @@ def get_active_window():
     return None
 
 
-def _is_descendant_of(widget, ancestor):
-    w = widget.get_parent()
-    while w is not None:
-        if w is ancestor:
-            return True
-        w = w.get_parent()
-    return False
-
-
 def _find_ancestor_by_typename(widget, type_name):
     while widget:
         if type(widget).__name__ == type_name:
@@ -129,15 +120,20 @@ def _focus_treeview_header(treeview, column):
     return True
 
 
+def _focus_titlebar(window):
+    titlebar = window.get_titlebar()
+    if isinstance(titlebar, Gtk.HeaderBar):
+        titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+        return True
+    return False
+
+
 def _find_treeview_column_for_header_button(button):
-    widget = button.get_parent()
-    while widget is not None:
-        if isinstance(widget, Gtk.TreeView):
-            for column in widget.get_columns():
-                if column.get_button() is button:
-                    return widget, column
-            return None, None
-        widget = widget.get_parent()
+    treeview = button.get_ancestor(Gtk.TreeView)
+    if treeview is not None:
+        for column in treeview.get_columns():
+            if column.get_button() is button:
+                return treeview, column
     return None, None
 
 
@@ -281,18 +277,22 @@ def _flowbox_has_row_above(flowbox, current_child):
     return False
 
 
-def focus_top_bar(window):
-    top_bar = getattr(window, "top_bar", None)
-    if top_bar is None:
-        return False
-
+def _focus_first_focusable(widget):
     candidates = []
-    _collect_focusable(top_bar, candidates)
+    _collect_focusable(widget, candidates)
     if not candidates:
         return False
 
     candidates[0].grab_focus()
     return True
+
+
+def focus_top_bar(window):
+    top_bar = getattr(window, "top_bar", None)
+    if top_bar is None:
+        return False
+
+    return _focus_first_focusable(top_bar)
 
 
 def focus_bottom_bar_by_column(window, focused_flowbox_child):
@@ -302,12 +302,7 @@ def focus_bottom_bar_by_column(window, focused_flowbox_child):
         box_bottom = getattr(window, "box_bottom", None)
         if box_bottom is None:
             return False
-        candidates = []
-        _collect_focusable(box_bottom, candidates)
-        if not candidates:
-            return False
-        candidates[0].grab_focus()
-        return True
+        return _focus_first_focusable(box_bottom)
 
     flowbox = focused_flowbox_child.get_parent() if focused_flowbox_child is not None else None
 
@@ -331,13 +326,7 @@ def focus_bottom_bar_by_column(window, focused_flowbox_child):
     if target_widget is None:
         return False
 
-    candidates = []
-    _collect_focusable(target_widget, candidates)
-    if not candidates:
-        return False
-
-    candidates[0].grab_focus()
-    return True
+    return _focus_first_focusable(target_widget)
 
 
 def focus_flowbox_child(flowbox, child):
@@ -404,7 +393,7 @@ def carrousel_move_coalesced(window, delta):
 def navigate_main_screen(window, focused, direction):
     carrousel_fixed = getattr(window, "carrousel_fixed", None)
     if carrousel_fixed is not None and getattr(window, "carrousel_active", lambda: False)() \
-            and (focused is carrousel_fixed or _is_descendant_of(focused, carrousel_fixed)):
+            and (focused is carrousel_fixed or focused.is_ancestor(carrousel_fixed)):
         if direction == Gtk.DirectionType.LEFT:
             carrousel_move_coalesced(window, -1)
             return True
@@ -431,7 +420,7 @@ def navigate_main_screen(window, focused, direction):
             return True
 
         for container in (getattr(window, "bottom_bar", None), getattr(window, "box_bottom", None), getattr(window, "top_bar", None)):
-            if container is not None and (focused is container or _is_descendant_of(focused, container)):
+            if container is not None and (focused is container or focused.is_ancestor(container)):
                 _focus_nearest_in_direction(focused, direction, container)
                 return True
 
@@ -460,7 +449,7 @@ def navigate_main_screen(window, focused, direction):
             return False
 
         bottom_container = getattr(window, "bottom_bar", None) or getattr(window, "box_bottom", None)
-        if bottom_container is not None and (focused is bottom_container or _is_descendant_of(focused, bottom_container)):
+        if bottom_container is not None and (focused is bottom_container or focused.is_ancestor(bottom_container)):
             return _focus_games_area(window)
 
     return False
@@ -537,9 +526,7 @@ def navigate_focus(direction):
 
     if is_vertical and _find_ancestor_by_typename(focused, "GtkPathBar"):
         if direction == Gtk.DirectionType.UP:
-            titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
-            if isinstance(titlebar, Gtk.HeaderBar):
-                titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+            if _focus_titlebar(active_window):
                 return True
         else:
             list_base_view = _find_list_base_descendant(active_window)
@@ -581,9 +568,7 @@ def navigate_focus(direction):
                 elif direction == Gtk.DirectionType.UP and _focus_treeview_header(focused, column):
                     pass
                 elif not _focus_nearest_in_direction(focused, direction, active_window) and direction == Gtk.DirectionType.UP:
-                    titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
-                    if isinstance(titlebar, Gtk.HeaderBar):
-                        titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+                    _focus_titlebar(active_window)
             return True
 
     if direction == Gtk.DirectionType.UP and isinstance(focused, Gtk.FlowBoxChild):
@@ -615,18 +600,12 @@ def navigate_focus(direction):
     new_focus = active_window.get_focus()
     stuck = new_focus is focused
 
-    if stuck and isinstance(focused, Gtk.Button):
-        parent = focused.get_parent()
-        while parent:
-            if isinstance(parent, Gtk.HeaderBar):
-                active_window.child_focus(Gtk.DirectionType.TAB_FORWARD if direction in (Gtk.DirectionType.DOWN, Gtk.DirectionType.RIGHT) else Gtk.DirectionType.TAB_BACKWARD)
-                return True
-            parent = parent.get_parent()
+    if stuck and isinstance(focused, Gtk.Button) and focused.get_ancestor(Gtk.HeaderBar):
+        active_window.child_focus(Gtk.DirectionType.TAB_FORWARD if direction in (Gtk.DirectionType.DOWN, Gtk.DirectionType.RIGHT) else Gtk.DirectionType.TAB_BACKWARD)
+        return True
 
     if stuck and direction == Gtk.DirectionType.UP:
-        titlebar = active_window.get_titlebar() if hasattr(active_window, "get_titlebar") else None
-        if isinstance(titlebar, Gtk.HeaderBar):
-            titlebar.child_focus(Gtk.DirectionType.TAB_FORWARD)
+        if _focus_titlebar(active_window):
             return True
 
     if stuck and direction == Gtk.DirectionType.DOWN:

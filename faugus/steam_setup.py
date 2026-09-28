@@ -51,11 +51,10 @@ USERDATA = steam_folder / "userdata" if steam_folder else None
 LIBRARY = steam_folder / "config/libraryfolders.vdf" if steam_folder else None
 LIBRARYCACHE = steam_folder / "appcache/librarycache" if steam_folder else None
 
-LOSSLESS_DLL = (
-    (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll")
-    if steam_folder and (steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll").is_file()
-    else ""
-)
+_LOSSLESS_DLL_PATH = steam_folder / "steamapps/common/Lossless Scaling/Lossless.dll" if steam_folder else None
+LOSSLESS_DLL = _LOSSLESS_DLL_PATH if _LOSSLESS_DLL_PATH and _LOSSLESS_DLL_PATH.is_file() else ""
+
+_STEAMID64_BASE = 76561197960265728
 
 
 def generate_steam_shortcut_id(exe, appname):
@@ -109,7 +108,7 @@ def read_steam_users():
                 data = vdf.load(f)
             for steamid64_str, info in data.get("users", {}).items():
                 try:
-                    account_id = str(int(steamid64_str) - 76561197960265728)
+                    account_id = str(int(steamid64_str) - _STEAMID64_BASE)
                 except ValueError:
                     continue
                 names[account_id] = info.get("PersonaName") or account_id
@@ -138,7 +137,7 @@ def read_library_folders():
 def _read_family_group_members(account_id):
     if not steam_folder:
         return set()
-    path = steam_folder / "userdata" / account_id / "config/localconfig.vdf"
+    path = USERDATA / account_id / "config/localconfig.vdf"
     if not path.exists():
         return set()
     try:
@@ -183,9 +182,9 @@ def read_installed_games(account_id=None):
                 owner_account_id = None
                 if last_owner:
                     try:
-                        owner_account_id = str(int(last_owner) - 76561197960265728)
+                        owner_account_id = str(int(last_owner) - _STEAMID64_BASE)
                     except ValueError:
-                        owner_account_id = None
+                        pass
                 if owner_account_id != account_id and owner_account_id not in family_members:
                     continue
 
@@ -224,7 +223,7 @@ def get_steam_app_playtime_minutes(appid, account_id=None):
 
     total = 0
     for aid in account_ids:
-        path = steam_folder / "userdata" / aid / "config" / "localconfig.vdf"
+        path = USERDATA / aid / "config" / "localconfig.vdf"
         if not path.exists():
             continue
         try:

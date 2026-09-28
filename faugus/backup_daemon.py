@@ -1,4 +1,5 @@
 import calendar
+import fcntl
 import json
 import os
 import shutil
@@ -84,11 +85,33 @@ def get_dir_size(path):
     return sum(get_dir_inode_map(path).values())
 
 
+def faugus_roots():
+    return {
+        "config": os.path.realpath(os.path.dirname(CONFIG_FILE_DIR)),
+        "data": os.path.realpath(FAUGUS_LAUNCHER_SHARE_DIR),
+        "state": os.path.realpath(FAUGUS_LAUNCHER_STATE_DIR),
+    }
+
+
+def filter_selected_games(all_games, ids):
+    return [g for g in all_games if isinstance(g, dict) and g.get("gameid") in ids]
+
+
+def image_basenames(games):
+    basenames = set()
+    for entry in games:
+        basenames.add(f"{entry['gameid']}.png")
+        for field in ("cover", "icon"):
+            value = entry.get(field) or ""
+            if value:
+                basenames.add(os.path.basename(value))
+    return basenames
+
+
 def get_settings_size_bytes():
     combined = {}
     temp_root = os.path.realpath(FAUGUS_TEMP)
-    for root in (os.path.dirname(CONFIG_FILE_DIR), FAUGUS_LAUNCHER_SHARE_DIR, FAUGUS_LAUNCHER_STATE_DIR):
-        root = os.path.realpath(root)
+    for root in faugus_roots().values():
         if not os.path.isdir(root):
             continue
         for entry in os.scandir(root):
@@ -113,7 +136,6 @@ def format_size(num_bytes):
                 return f"{int(size)} {unit}"
             return f"{size:.2f} {unit}"
         size /= 1024
-    return f"{size:.2f} TB"
 
 
 def get_free_space_bytes(path):
@@ -132,16 +154,13 @@ def get_free_space_bytes(path):
 
 def estimate_backup_size_bytes(prefixes, shortcuts, protons):
     total = get_settings_size_bytes()
-    for entry in prefixes:
-        if os.path.isdir(entry.get("path", "")):
-            total += get_dir_size(entry["path"])
     for entry in shortcuts:
         for file_path in entry.get("files") or []:
             try:
                 total += os.path.getsize(file_path)
             except OSError:
                 pass
-    for entry in protons:
+    for entry in (*prefixes, *protons):
         if os.path.isdir(entry.get("path", "")):
             total += get_dir_size(entry["path"])
     return total
@@ -288,7 +307,14 @@ class BackupCancelled(Exception):
 
 
 def is_backup_running():
-    return os.path.exists(BACKUP_LOCK_FILE)
+    try:
+        with open(BACKUP_LOCK_FILE) as f:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        return True
+    except OSError:
+        return False
+    return False
 
 
 def request_backup_cancel():
@@ -312,7 +338,8 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
     os.makedirs(FAUGUS_LAUNCHER_STATE_DIR, exist_ok=True)
     if os.path.exists(BACKUP_CANCEL_FILE):
         os.remove(BACKUP_CANCEL_FILE)
-    open(BACKUP_LOCK_FILE, "w").close()
+    lock_file = open(BACKUP_LOCK_FILE, "w")
+    fcntl.flock(lock_file, fcntl.LOCK_EX)
 
     try:
         if os.path.isdir(temp_dir):
@@ -330,24 +357,12 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
         settings_dir = os.path.join(temp_dir, "settings")
         temp_root = os.path.realpath(FAUGUS_TEMP)
 
-        all_games = load_json_file(GAMES_JSON, default=[])
-        included_image_basenames = set()
-        for entry in all_games:
-            if not isinstance(entry, dict) or entry.get("gameid") not in games:
-                continue
+        filtered_games = filter_selected_games(load_json_file(GAMES_JSON, default=[]), games)
+        for entry in filtered_games:
             manifest["games"].append({"gameid": entry["gameid"], "title": entry.get("title", entry["gameid"])})
-            included_image_basenames.add(f"{entry['gameid']}.png")
-            for field in ("cover", "icon"):
-                value = entry.get(field) or ""
-                if value:
-                    included_image_basenames.add(os.path.basename(value))
+        included_image_basenames = image_basenames(filtered_games)
 
-        faugus_roots = {
-            "config": os.path.realpath(os.path.dirname(CONFIG_FILE_DIR)),
-            "data": os.path.realpath(FAUGUS_LAUNCHER_SHARE_DIR),
-            "state": os.path.realpath(FAUGUS_LAUNCHER_STATE_DIR),
-        }
-        for root_name, root_path in faugus_roots.items():
+        for root_name, root_path in faugus_roots().items():
             _raise_if_backup_cancelled()
             if not os.path.isdir(root_path):
                 continue
@@ -358,7 +373,6 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
                 os.makedirs(dst_root, exist_ok=True)
                 target = os.path.join(dst_root, entry.name)
                 if entry.name == "games.json":
-                    filtered_games = [g for g in all_games if isinstance(g, dict) and g.get("gameid") in games]
                     save_json_file(filtered_games, target)
                 elif entry.name in ("covers", "banners", "icons"):
                     _copy_dir_including(entry.path, target, included_image_basenames)
@@ -441,6 +455,7 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
                 os.remove(state_file)
             except OSError:
                 pass
+        lock_file.close()
 
 
 def resolve_excluded_ids(config, new_key, old_key, all_ids):
@@ -454,11 +469,10 @@ def resolve_excluded_ids(config, new_key, old_key, all_ids):
 def backup_selection_from_config(config):
     entries = list_game_prefixes_with_shortcuts()
     game_ids = {entry["gameid"] for entry in entries}
-    prefix_ids = {entry["gameid"] for entry in entries}
     shortcut_ids = {entry["gameid"] for entry in entries if entry["shortcut_files"]}
 
     excluded_game_ids = set(config.get('backup-excluded-game-ids', []) or [])
-    excluded_prefix_ids = resolve_excluded_ids(config, 'backup-excluded-prefix-ids', 'backup-prefix-ids', prefix_ids)
+    excluded_prefix_ids = resolve_excluded_ids(config, 'backup-excluded-prefix-ids', 'backup-prefix-ids', game_ids)
     excluded_shortcut_ids = resolve_excluded_ids(config, 'backup-excluded-shortcut-ids', 'backup-shortcut-ids', shortcut_ids)
     proton_ids = set(config.get('backup-proton-ids', []) or [])
 
@@ -683,7 +697,7 @@ def should_run_backup(config):
     try:
         target_time = datetime.strptime(config.get('backup-target-time', '00:00'), "%H:%M").time()
     except ValueError:
-        target_time = datetime.strptime('00:00', "%H:%M").time()
+        target_time = datetime.min.time()
 
     freq = config.get('backup-frequency', 'daily')
     target_day = int(config.get('backup-target-day', '0'))
