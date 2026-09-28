@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib, Gio, Gdk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog
+from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog, widget_children
 
 
 from faugus.backup_daemon import (
@@ -33,6 +33,9 @@ from faugus.backup_daemon import (
     backup_filename,
     suppress_immediate_auto_backup,
     _copy_dir_including,
+    faugus_roots,
+    filter_selected_games,
+    image_basenames,
 )
 
 _ = setup_gettext('faugus-launcher')
@@ -115,6 +118,15 @@ class _RowCapMixin:
         self.scrolled_window.set_max_content_height(self._max_height_for_rows(10))
         return False
 
+    def _compute_sizes(self, size_lookup):
+        for item in self.items:
+            gameid = item["gameid"]
+            inode_map = size_lookup(item["path"])
+            self.inode_maps[gameid] = inode_map
+            size_bytes = sum(inode_map.values())
+            self.sizes[gameid] = size_bytes
+            GLib.idle_add(self._apply_size, gameid, size_bytes)
+
 
 class PrefixSelectionList(_RowCapMixin):
     def __init__(self, items, size_lookup=None, title_column_label=None, path_column_label=None):
@@ -123,7 +135,6 @@ class PrefixSelectionList(_RowCapMixin):
         self.inode_maps = {}
         self.total_size_bytes = 0
         self.on_total_changed = None
-        self._suppress_select_all = False
 
         self.liststore = Gtk.ListStore(bool, str, str, str, str)
         for item in items:
@@ -135,7 +146,7 @@ class PrefixSelectionList(_RowCapMixin):
 
         self.checkbox_select_all = Gtk.CheckButton()
         self.checkbox_select_all.set_can_target(False)
-        self.checkbox_select_all.connect("toggled", self.on_select_all_toggled)
+        self._select_all_handler = self.checkbox_select_all.connect("toggled", self.on_select_all_toggled)
 
         toggle_renderer = Gtk.CellRendererToggle()
         toggle_renderer.set_property("xalign", 0.0)
@@ -190,15 +201,6 @@ class PrefixSelectionList(_RowCapMixin):
         else:
             run_in_background(self._compute_sizes, size_lookup)
 
-    def _compute_sizes(self, size_lookup):
-        for item in self.items:
-            gameid = item["gameid"]
-            inode_map = size_lookup(item["path"])
-            self.inode_maps[gameid] = inode_map
-            size_bytes = sum(inode_map.values())
-            self.sizes[gameid] = size_bytes
-            GLib.idle_add(self._apply_size, gameid, size_bytes)
-
     def _apply_size(self, gameid, size_bytes):
         for row in self.liststore:
             if row[4] == gameid:
@@ -223,8 +225,6 @@ class PrefixSelectionList(_RowCapMixin):
         self.checkbox_select_all.set_active(not self.checkbox_select_all.get_active())
 
     def on_select_all_toggled(self, widget):
-        if self._suppress_select_all:
-            return
         value = widget.get_active()
         for row in self.liststore:
             row[0] = value
@@ -232,9 +232,8 @@ class PrefixSelectionList(_RowCapMixin):
 
     def sync_select_all_checkbox(self):
         all_selected = len(self.liststore) > 0 and all(row[0] for row in self.liststore)
-        self._suppress_select_all = True
-        self.checkbox_select_all.set_active(all_selected)
-        self._suppress_select_all = False
+        with self.checkbox_select_all.handler_block(self._select_all_handler):
+            self.checkbox_select_all.set_active(all_selected)
 
     def update_total_size(self):
         combined = {}
@@ -275,9 +274,6 @@ class PrefixShortcutList(_RowCapMixin):
         self.shortcut_files = {item["gameid"]: item.get("shortcut_files", []) for item in items}
         self.total_size_bytes = 0
         self.on_total_changed = None
-        self._suppress_game_all = False
-        self._suppress_prefix_all = False
-        self._suppress_shortcut_all = False
 
         self.liststore = Gtk.ListStore(bool, bool, bool, bool, bool, str, str, str, str)
         any_has_prefix = False
@@ -295,7 +291,7 @@ class PrefixShortcutList(_RowCapMixin):
 
         self.checkbox_game_all = Gtk.CheckButton()
         self.checkbox_game_all.set_can_target(False)
-        self.checkbox_game_all.connect("toggled", self.on_game_all_toggled)
+        self._game_all_handler = self.checkbox_game_all.connect("toggled", self.on_game_all_toggled)
         game_renderer = Gtk.CellRendererToggle()
         game_renderer.set_property("xalign", 0.0)
         game_renderer.set_property("xpad", 4)
@@ -314,7 +310,7 @@ class PrefixShortcutList(_RowCapMixin):
 
         self.checkbox_prefix_all = Gtk.CheckButton()
         self.checkbox_prefix_all.set_can_target(False)
-        self.checkbox_prefix_all.connect("toggled", self.on_prefix_all_toggled)
+        self._prefix_all_handler = self.checkbox_prefix_all.connect("toggled", self.on_prefix_all_toggled)
         self.checkbox_prefix_all.set_sensitive(any_has_prefix)
         prefix_renderer = Gtk.CellRendererToggle()
         prefix_renderer.set_property("xalign", 0.0)
@@ -335,7 +331,7 @@ class PrefixShortcutList(_RowCapMixin):
 
         self.checkbox_shortcut_all = Gtk.CheckButton()
         self.checkbox_shortcut_all.set_can_target(False)
-        self.checkbox_shortcut_all.connect("toggled", self.on_shortcut_all_toggled)
+        self._shortcut_all_handler = self.checkbox_shortcut_all.connect("toggled", self.on_shortcut_all_toggled)
         self.checkbox_shortcut_all.set_sensitive(any_has_shortcut)
 
         box_shortcut_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
@@ -385,15 +381,6 @@ class PrefixShortcutList(_RowCapMixin):
             self.refresh_size_column()
         else:
             run_in_background(self._compute_sizes, size_lookup)
-
-    def _compute_sizes(self, size_lookup):
-        for item in self.items:
-            gameid = item["gameid"]
-            inode_map = size_lookup(item["path"])
-            self.inode_maps[gameid] = inode_map
-            size_bytes = sum(inode_map.values())
-            self.sizes[gameid] = size_bytes
-            GLib.idle_add(self._apply_size, gameid, size_bytes)
 
     def _apply_size(self, gameid, size_bytes):
         for row in self.liststore:
@@ -452,8 +439,6 @@ class PrefixShortcutList(_RowCapMixin):
         self.sync_shortcut_all_checkbox()
 
     def on_game_all_toggled(self, widget):
-        if self._suppress_game_all:
-            return
         value = widget.get_active()
         it = self.liststore.get_iter_first()
         while it is not None:
@@ -468,8 +453,6 @@ class PrefixShortcutList(_RowCapMixin):
         self.update_total_size()
 
     def on_prefix_all_toggled(self, widget):
-        if self._suppress_prefix_all:
-            return
         value = widget.get_active()
         for row in self.liststore:
             if row[self.COL_HAS_PREFIX]:
@@ -477,8 +460,6 @@ class PrefixShortcutList(_RowCapMixin):
         self.update_total_size()
 
     def on_shortcut_all_toggled(self, widget):
-        if self._suppress_shortcut_all:
-            return
         value = widget.get_active()
         for row in self.liststore:
             if row[self.COL_HAS_SHORTCUT]:
@@ -486,23 +467,20 @@ class PrefixShortcutList(_RowCapMixin):
 
     def sync_game_all_checkbox(self):
         all_selected = len(self.liststore) > 0 and all(row[self.COL_GAME_ACTIVE] for row in self.liststore)
-        self._suppress_game_all = True
-        self.checkbox_game_all.set_active(all_selected)
-        self._suppress_game_all = False
+        with self.checkbox_game_all.handler_block(self._game_all_handler):
+            self.checkbox_game_all.set_active(all_selected)
 
     def sync_prefix_all_checkbox(self):
         eligible = [row for row in self.liststore if row[self.COL_HAS_PREFIX]]
         all_selected = len(eligible) > 0 and all(row[self.COL_PREFIX_ACTIVE] for row in eligible)
-        self._suppress_prefix_all = True
-        self.checkbox_prefix_all.set_active(all_selected)
-        self._suppress_prefix_all = False
+        with self.checkbox_prefix_all.handler_block(self._prefix_all_handler):
+            self.checkbox_prefix_all.set_active(all_selected)
 
     def sync_shortcut_all_checkbox(self):
         eligible = [row for row in self.liststore if row[self.COL_HAS_SHORTCUT]]
         all_selected = len(eligible) > 0 and all(row[self.COL_SHORTCUT_ACTIVE] for row in eligible)
-        self._suppress_shortcut_all = True
-        self.checkbox_shortcut_all.set_active(all_selected)
-        self._suppress_shortcut_all = False
+        with self.checkbox_shortcut_all.handler_block(self._shortcut_all_handler):
+            self.checkbox_shortcut_all.set_active(all_selected)
 
     def update_total_size(self):
         combined = {}
@@ -628,7 +606,7 @@ class BackupWindow(Gtk.Dialog):
 
         dest_dir = self.config.get('backup-dest-dir', '')
         if not dest_dir:
-            dest_dir = os.path.expanduser(PathManager.user_home('Faugus Backup'))
+            dest_dir = PathManager.user_home('Faugus Backup')
 
         self.box_dest = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.entry_dest = Gtk.Entry()
@@ -701,35 +679,24 @@ class BackupWindow(Gtk.Dialog):
             spin.set_text(f"{int(spin.get_value()):02d}")
             return True
 
-        def hide_spin_arrows(spin):
-            child = spin.get_first_child()
-            while child:
-                nxt = child.get_next_sibling()
+        def make_time_spin(upper, page_increment):
+            adjustment = Gtk.Adjustment(value=0, lower=0, upper=upper, step_increment=1, page_increment=page_increment, page_size=0)
+            spin = Gtk.SpinButton(adjustment=adjustment, numeric=True)
+            spin.set_wrap(True)
+            spin.set_width_chars(2)
+            spin.set_max_width_chars(2)
+            spin.add_css_class("compact-time-spin")
+            spin.set_alignment(0.5)
+            for child in widget_children(spin):
                 if isinstance(child, Gtk.Button):
                     child.set_visible(False)
-                child = nxt
+            spin.connect("output", format_two_digits)
+            return spin
 
         load_compact_time_spin_css()
 
-        adj_hour = Gtk.Adjustment(value=0, lower=0, upper=23, step_increment=1, page_increment=1, page_size=0)
-        self.spin_hour = Gtk.SpinButton(adjustment=adj_hour, numeric=True)
-        self.spin_hour.set_wrap(True)
-        self.spin_hour.set_width_chars(2)
-        self.spin_hour.set_max_width_chars(2)
-        self.spin_hour.add_css_class("compact-time-spin")
-        self.spin_hour.set_alignment(0.5)
-        hide_spin_arrows(self.spin_hour)
-        self.spin_hour.connect("output", format_two_digits)
-
-        adj_minute = Gtk.Adjustment(value=0, lower=0, upper=59, step_increment=1, page_increment=5, page_size=0)
-        self.spin_minute = Gtk.SpinButton(adjustment=adj_minute, numeric=True)
-        self.spin_minute.set_wrap(True)
-        self.spin_minute.set_width_chars(2)
-        self.spin_minute.set_max_width_chars(2)
-        self.spin_minute.add_css_class("compact-time-spin")
-        self.spin_minute.set_alignment(0.5)
-        hide_spin_arrows(self.spin_minute)
-        self.spin_minute.connect("output", format_two_digits)
+        self.spin_hour = make_time_spin(23, 1)
+        self.spin_minute = make_time_spin(59, 5)
 
         self.box_time.append(self.spin_hour)
         self.box_time.append(Gtk.Label(label=":"))
@@ -814,19 +781,12 @@ class BackupWindow(Gtk.Dialog):
     def build_backup_frequency_menu(self):
         menu = Gio.Menu()
 
-        disabled_item = Gio.MenuItem.new(_("Disabled"), None)
-        disabled_item.set_action_and_target_value("backupfreq.frequency", GLib.Variant.new_string("disabled"))
-        menu.append_item(disabled_item)
-
-        daily_item = Gio.MenuItem.new(_("Daily"), None)
-        daily_item.set_action_and_target_value("backupfreq.frequency", GLib.Variant.new_string("daily"))
-        menu.append_item(daily_item)
+        menu.append(_("Disabled"), "backupfreq.frequency::disabled")
+        menu.append(_("Daily"), "backupfreq.frequency::daily")
 
         weekly_menu = Gio.Menu()
         for day_id, day_name in self.backup_weekday_choices:
-            item = Gio.MenuItem.new(day_name, None)
-            item.set_action_and_target_value("backupfreq.weekday", GLib.Variant.new_string(day_id))
-            weekly_menu.append_item(item)
+            weekly_menu.append(day_name, f"backupfreq.weekday::{day_id}")
         menu.append_submenu(_("Weekly"), weekly_menu)
 
         monthly_menu = Gio.Menu()
@@ -945,8 +905,6 @@ class BackupWindow(Gtk.Dialog):
             self.entry_dest.add_css_class("entry")
             return
         dest_dir = self.entry_dest.get_text()
-        if not dest_dir:
-            dest_dir = os.path.expanduser("~")
 
         needed_bytes = self.total_backup_size_bytes()
         free_bytes = get_free_space_bytes(expand_path(dest_dir))
@@ -1016,7 +974,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.config['backup-dest-dir'] = self.entry_dest.get_text()
 
-        _prefixes, _shortcuts, protons, _games = self.current_selection()
+        protons = self.proton_list.get_selected()
         pl = self.prefix_list
         self.config['backup-excluded-game-ids'] = [row[pl.COL_GAMEID] for row in pl.liststore if not row[pl.COL_GAME_ACTIVE]]
         self.config['backup-excluded-prefix-ids'] = [row[pl.COL_GAMEID] for row in pl.liststore if not row[pl.COL_PREFIX_ACTIVE]]
@@ -1180,19 +1138,13 @@ class RestoreWindow(Gtk.Dialog):
 
     def _recenter(self):
         self.set_visible(False)
-        GLib.idle_add(self._recenter_after_load)
-
-    def _recenter_after_load(self):
-        self.present()
-        return False
+        GLib.idle_add(self.present)
 
     def _show_progress(self, text):
         self.progress_label.set_text(text)
         self.progress_box.set_visible(True)
-        if hasattr(self, "prefix_list"):
-            self.prefix_list.box.set_visible(False)
-        if hasattr(self, "proton_list"):
-            self.proton_list.box.set_visible(False)
+        self.prefix_list.box.set_visible(False)
+        self.proton_list.box.set_visible(False)
         if self.progress_timer_id is None:
             self.progress_timer_id = GLib.timeout_add(100, self._pulse_progress)
         self._recenter()
@@ -1292,8 +1244,7 @@ def restore_settings(settings_dir, selected_games=None):
         return
 
     keep = os.path.realpath(FAUGUS_TEMP)
-    for root in (os.path.dirname(CONFIG_FILE_DIR), FAUGUS_LAUNCHER_SHARE_DIR, FAUGUS_LAUNCHER_STATE_DIR):
-        root = os.path.realpath(root)
+    for root in faugus_roots().values():
         for entry in os.scandir(root) if os.path.isdir(root) else []:
             if entry.path == keep:
                 continue
@@ -1303,30 +1254,19 @@ def restore_settings(settings_dir, selected_games=None):
                 os.remove(entry.path)
         os.makedirs(root, exist_ok=True)
 
-    faugus_roots = {
-        "config": os.path.realpath(os.path.dirname(CONFIG_FILE_DIR)),
-        "data": os.path.realpath(FAUGUS_LAUNCHER_SHARE_DIR),
-        "state": os.path.realpath(FAUGUS_LAUNCHER_STATE_DIR),
-    }
-    is_nested = any(os.path.isdir(os.path.join(settings_dir, name)) for name in faugus_roots)
+    roots = faugus_roots()
+    is_nested = any(os.path.isdir(os.path.join(settings_dir, name)) for name in roots)
 
     selected_ids = set(selected_games) if selected_games is not None else None
-    all_games = []
+    filtered = []
     included_image_basenames = set()
     if selected_ids is not None:
         games_json_src = os.path.join(settings_dir, "data", "games.json") if is_nested else os.path.join(settings_dir, "games.json")
-        all_games = load_json_file(games_json_src, default=[])
-        for entry in all_games:
-            if not isinstance(entry, dict) or entry.get("gameid") not in selected_ids:
-                continue
-            included_image_basenames.add(f"{entry['gameid']}.png")
-            for field in ("cover", "icon"):
-                value = entry.get(field) or ""
-                if value:
-                    included_image_basenames.add(os.path.basename(value))
+        filtered = filter_selected_games(load_json_file(games_json_src, default=[]), selected_ids)
+        included_image_basenames = image_basenames(filtered)
 
     if is_nested:
-        for root_name, root_path in faugus_roots.items():
+        for root_name, root_path in roots.items():
             src_root = os.path.join(settings_dir, root_name)
             if not os.path.isdir(src_root):
                 continue
@@ -1334,7 +1274,6 @@ def restore_settings(settings_dir, selected_games=None):
             for entry in os.scandir(src_root):
                 target = os.path.join(root_path, entry.name)
                 if selected_ids is not None and entry.name == "games.json":
-                    filtered = [g for g in all_games if isinstance(g, dict) and g.get("gameid") in selected_ids]
                     save_json_file(filtered, target)
                 elif selected_ids is not None and entry.name in ("covers", "banners", "icons"):
                     _copy_dir_including(entry.path, target, included_image_basenames)
@@ -1347,7 +1286,6 @@ def restore_settings(settings_dir, selected_games=None):
     for item in os.listdir(settings_dir):
         src = os.path.join(settings_dir, item)
         if selected_ids is not None and item == "games.json":
-            filtered = [g for g in all_games if isinstance(g, dict) and g.get("gameid") in selected_ids]
             save_json_file(filtered, GAMES_JSON)
         elif selected_ids is not None and item in ("covers", "banners", "icons"):
             _copy_dir_including(src, BACKUP_ITEMS[item], included_image_basenames)

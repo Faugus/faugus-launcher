@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib
-from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release, run_in_background, apply_titlebar_preference
+from faugus.utils import hide_dialog_action_area, add_css_once, destroy_and_release, run_in_background, apply_titlebar_preference, widget_children
 
 LAYOUT_LOWER = [
     [("1", 1), ("2", 1), ("3", 1), ("4", 1), ("5", 1), ("6", 1), ("7", 1), ("8", 1), ("9", 1), ("0", 1), ("-", 1), ("=", 1), ("Back", 2)],
@@ -105,11 +105,8 @@ class VirtualKeyboard(Gtk.Dialog):
         """)
 
     def build_keys(self):
-        child = self.grid.get_first_child()
-        while child:
-            next_child = child.get_next_sibling()
+        for child in widget_children(self.grid):
             self.grid.remove(child)
-            child = next_child
 
         if self.mode == "symbols":
             layout = LAYOUT_SYMBOLS
@@ -120,8 +117,7 @@ class VirtualKeyboard(Gtk.Dialog):
 
         for r, row in enumerate(layout):
             col_offset = 0
-            for item in row:
-                label, span = item
+            for label, span in row:
                 display_label = label
 
                 if self.mode == "caps" and len(label) == 1 and label.isalpha():
@@ -129,8 +125,6 @@ class VirtualKeyboard(Gtk.Dialog):
 
                 btn = Gtk.Button(label=display_label)
                 if span == 1:
-                    btn.set_hexpand(False)
-                    btn.set_vexpand(False)
                     btn.set_size_request(50, 50)
                 else:
                     btn.set_hexpand(True)
@@ -154,7 +148,7 @@ class VirtualKeyboard(Gtk.Dialog):
                     btn.connect("clicked", self.on_toggle_symbols)
                 elif label == "Space":
                     btn.connect("clicked", self.on_key_clicked, " ")
-                elif label in ("Cancel",):
+                elif label == "Cancel":
                     btn.connect("clicked", self.on_cancel)
                 elif label == "Clear":
                     btn.connect("clicked", self.on_clear)
@@ -196,11 +190,7 @@ class VirtualKeyboard(Gtk.Dialog):
         if self.entry_display.get_text().strip() != term:
             return False
 
-        child = self.listbox_suggestions.get_first_child()
-        while child:
-            nxt = child.get_next_sibling()
-            self.listbox_suggestions.remove(child)
-            child = nxt
+        self.listbox_suggestions.remove_all()
 
         if not items:
             return False
@@ -244,53 +234,42 @@ class VirtualKeyboard(Gtk.Dialog):
         self.entry_display.set_position(len(new_text))
 
         if self.mode == "shift":
-            col = getattr(button, 'grid_col', 0)
-            row = getattr(button, 'grid_row', 0)
-
             self.mode = "lower"
-            self.build_keys()
+            self._rebuild_keys_keep_focus(button)
 
-            new_btn = self.grid.get_child_at(col, row)
-            if new_btn:
-                new_btn.grab_focus()
+    def _rebuild_keys_keep_focus(self, button):
+        col = getattr(button, 'grid_col', 0)
+        row = getattr(button, 'grid_row', 0)
+
+        self.build_keys()
+
+        new_btn = self.grid.get_child_at(col, row)
+        if new_btn:
+            new_btn.grab_focus()
 
     def on_backspace(self, button):
         text = self.entry_display.get_text()
-        if len(text) > 0:
+        if text:
             new_text = text[:-1]
             self.entry_display.set_text(new_text)
             self.entry_display.set_position(len(new_text))
 
     def on_toggle_mode(self, button, mode_type):
-        col = getattr(button, 'grid_col', 0)
-        row = getattr(button, 'grid_row', 0)
-
         target_mode = mode_type.lower()
         if self.mode == target_mode:
             self.mode = "lower"
         else:
             self.mode = target_mode
 
-        self.build_keys()
-
-        new_btn = self.grid.get_child_at(col, row)
-        if new_btn:
-            new_btn.grab_focus()
+        self._rebuild_keys_keep_focus(button)
 
     def on_toggle_symbols(self, button):
-        col = getattr(button, 'grid_col', 0)
-        row = getattr(button, 'grid_row', 0)
-
         if self.mode == "symbols":
             self.mode = "lower"
         else:
             self.mode = "symbols"
 
-        self.build_keys()
-
-        new_btn = self.grid.get_child_at(col, row)
-        if new_btn:
-            new_btn.grab_focus()
+        self._rebuild_keys_keep_focus(button)
 
     def on_clear(self, button):
         self.entry_display.set_text("")

@@ -51,13 +51,11 @@ FOREIGN_ARCH_TOKENS = {
 
 def select_asset(assets, archive_exts):
     foreign_tokens = FOREIGN_ARCH_TOKENS.get(platform.machine(), ())
-    if isinstance(archive_exts, str):
-        archive_exts = [archive_exts]
 
     return next(
         (
             a for a in assets
-            if any(a["name"].endswith(ext) for ext in archive_exts)
+            if a["name"].endswith(archive_exts)
             and not any(token in a["name"] for token in foreign_tokens)
         ),
         None,
@@ -193,11 +191,8 @@ def ensure_latest(kind):
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--ge", action="store_true")
-    group.add_argument("--em", action="store_true")
-    group.add_argument("--cachyos", action="store_true")
-    group.add_argument("--dw", action="store_true")
-    group.add_argument("--wineland", action="store_true")
+    for kind in CONFIGS:
+        group.add_argument(f"--{kind}", action="store_true")
     args = parser.parse_args()
 
     for key in vars(args):

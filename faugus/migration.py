@@ -130,10 +130,10 @@ def _migrate_artwork_directories():
 
 
 def _migrate_games_json_fields():
-    from faugus.utils import load_json_file, save_json_file
+    from faugus.utils import load_json_file_or_none, save_json_file
 
-    games = load_json_file(GAMES_JSON, None)
-    if games is None:
+    games = load_json_file_or_none(GAMES_JSON)
+    if not games:
         return
 
     field_renames = {
@@ -159,10 +159,10 @@ def _migrate_games_json_fields():
 
 
 def _migrate_config_json_values():
-    from faugus.utils import load_json_file, save_json_file
+    from faugus.utils import load_json_file_or_none, save_json_file
 
-    config = load_json_file(CONFIG_FILE_DIR, None)
-    if config is None:
+    config = load_json_file_or_none(CONFIG_FILE_DIR)
+    if not config:
         return
 
     changed = False
@@ -230,10 +230,10 @@ def _migrate_config_json_values():
 
 
 def _migrate_filechooser_folder_keys():
-    from faugus.utils import load_json_file, save_json_file
+    from faugus.utils import load_json_file_or_none, save_json_file
 
-    folders = load_json_file(FILECHOOSER_FOLDERS_FILE, None)
-    if folders is None:
+    folders = load_json_file_or_none(FILECHOOSER_FOLDERS_FILE)
+    if not folders:
         return
 
     key_renames = {"pre_launch_command": "pre_launch", "post_launch_command": "post_launch"}

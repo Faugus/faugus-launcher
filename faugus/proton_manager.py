@@ -15,7 +15,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, destroy_and_release, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
+from faugus.utils import widget_children, hide_dialog_action_area, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -29,14 +29,14 @@ VARIANTS = {
         "tab_label": "Proton-CachyOS",
         "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
         "tag_prefix": "cachyos-",
-        "archive_ext": ["x86_64.tar.xz"],
+        "archive_ext": ("x86_64.tar.xz",),
         "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
     },
     "ge": {
         "tab_label": "GE-Proton",
         "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
         "tag_prefix": "GE-Proton",
-        "archive_ext": [".tar.gz", ".tar.xz"],
+        "archive_ext": (".tar.gz", ".tar.xz"),
         "min_version": (9, 1),
         "tag_to_display": lambda tag: tag,
     },
@@ -44,21 +44,21 @@ VARIANTS = {
         "tab_label": "Proton-EM",
         "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
         "tag_prefix": "EM-",
-        "archive_ext": [".tar.xz"],
+        "archive_ext": (".tar.xz",),
         "tag_to_display": lambda tag: f"proton-{tag}",
     },
     "dw": {
         "tab_label": "DW-Proton",
         "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
         "tag_prefix": "dwproton-",
-        "archive_ext": ["x86_64.tar.xz"],
+        "archive_ext": ("x86_64.tar.xz",),
         "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
     "wineland": {
         "tab_label": "Proton-Wineland",
         "api_url": "https://api.github.com/repos/nanomatters/proton-cachyos/releases",
         "tag_prefix": "",
-        "archive_ext": ["x86_64.tar.xz"],
+        "archive_ext": ("x86_64.tar.xz",),
         "tag_to_display": lambda tag: f"Proton-Wineland-{tag.removeprefix('cachyos-wineland-').removeprefix('wineland-')}",
     },
 }
@@ -203,10 +203,7 @@ class ProtonDownloader(Gtk.Dialog):
                             continue
 
                     assets = release.get("assets", [])
-                    has_valid_asset = any(
-                        any(asset["name"].endswith(ext) for ext in variant["archive_ext"])
-                        for asset in assets
-                    )
+                    has_valid_asset = any(asset["name"].endswith(variant["archive_ext"]) for asset in assets)
                     if not has_valid_asset:
                         continue
 
@@ -259,8 +256,6 @@ class ProtonDownloader(Gtk.Dialog):
                 if not folder.is_dir():
                     continue
                 fn_lower = folder.name.lower()
-                if fn_lower == tag_lower or fn_lower == display_lower:
-                    return folder
                 if tag_lower in fn_lower or display_lower in fn_lower:
                     return folder
 
@@ -379,20 +374,3 @@ class ProtonDownloader(Gtk.Dialog):
                 self.set_button_label(widget, _("Download"))
             except Exception:
                 pass
-
-
-def main():
-    app = Gtk.Application()
-
-    def on_activate(app):
-        win = ProtonDownloader()
-        win.connect("response", lambda d, r: (d.closed_event.set(), destroy_and_release(d)))
-        win.connect("destroy", lambda *a: app.quit())
-        win.present()
-
-    app.connect("activate", on_activate)
-    app.run(None)
-
-
-if __name__ == "__main__":
-    main()
