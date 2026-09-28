@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-28 03:33+0000\n"
-"PO-Revision-Date: 2026-09-26 12:37+0000\n"
-"Last-Translator: RevengeRip <dreamkepeer@gmail.com>\n"
+"PO-Revision-Date: 2026-09-29 08:51+0000\n"
+"Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ru/>\n"
 "Language: ru\n"
@@ -765,7 +765,7 @@ msgstr "Ctrl+H переключает видимость скрытых игр"
 
 #: faugus/launcher.py:5638
 msgid "Overview"
-msgstr "Сводка"
+msgstr "Краткие сведения"
 
 #: faugus/launcher.py:5641
 msgid "Gamepad navigation"
