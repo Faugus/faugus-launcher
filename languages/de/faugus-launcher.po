@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-28 03:33+0000\n"
-"PO-Revision-Date: 2026-09-27 14:41+0000\n"
+"PO-Revision-Date: 2026-09-30 17:51+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -319,6 +319,7 @@ msgid "Stop"
 msgstr "Stoppen"
 
 #: faugus/launcher.py:2744
+#, fuzzy
 msgid "Play with logs"
 msgstr "Spielen mit Logs"
 
