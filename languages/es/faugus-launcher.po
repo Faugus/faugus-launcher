@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-28 03:33+0000\n"
-"PO-Revision-Date: 2026-09-15 03:51+0000\n"
+"PO-Revision-Date: 2026-09-29 08:51+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -152,20 +152,18 @@ msgid "Select the backup destination"
 msgstr "Seleccionar destino de la copia de seguridad"
 
 #: faugus/backup.py:901
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Calculando..."
+msgstr "Cancelando..."
 
 #: faugus/backup.py:914 faugus/backup_daemon.py:537
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Fallo al respaldar: no hay suficiente espacio en el disco ({} requerido, {} "
+"disponible)"
 
 #: faugus/backup.py:924 faugus/backup.py:951
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Última copia de seguridad:"
+msgstr "Cancelar copia de seguridad"
 
 #: faugus/backup.py:995
 msgid "Restore Backup"
@@ -206,10 +204,8 @@ msgid "Backup started"
 msgstr "Copia de seguridad iniciada"
 
 #: faugus/backup_daemon.py:500
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Copia de seguridad completa"
+msgstr "Copia de seguridad cancelada"
 
 #: faugus/backup_daemon.py:502
 msgid "Backup completed"
@@ -297,28 +293,20 @@ msgid "Close"
 msgstr "Cerrar"
 
 #: faugus/launcher.py:2697 faugus/launcher.py:3174
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playtime: {}"
-msgstr "Tiempo jugado"
+msgstr "Tiempo jugado: {}"
 
 #: faugus/launcher.py:2705 faugus/launcher.py:3187
-#, fuzzy
-#| msgid "Playtime"
 msgid "Playing for: {}"
-msgstr "Tiempo jugado"
+msgstr "Jugando durante: {}"
 
 #: faugus/launcher.py:2710 faugus/launcher.py:3195
-#, fuzzy
-#| msgid "Last played"
 msgid "Last played: {}"
-msgstr "Último jugado"
+msgstr "Última vez jugado: {}"
 
 #: faugus/launcher.py:2711 faugus/launcher.py:3196
-#, fuzzy
-#| msgid "Last played"
 msgid "Never played"
-msgstr "Último jugado"
+msgstr "Nunca jugado"
 
 #: faugus/launcher.py:2739
 msgid "Remove from hidden"
@@ -334,7 +322,7 @@ msgstr "Detener"
 
 #: faugus/launcher.py:2744
 msgid "Play with logs"
-msgstr ""
+msgstr "Jugar con logs"
 
 #: faugus/launcher.py:2746
 msgid "Play"
@@ -377,42 +365,32 @@ msgid "Recent"
 msgstr "Reciente"
 
 #: faugus/launcher.py:2947
-#, fuzzy
-#| msgid "hour"
 msgid "{} hour"
-msgstr "hora"
+msgstr "{} hora"
 
 #: faugus/launcher.py:2947
-#, fuzzy
-#| msgid "hours"
 msgid "{} hours"
-msgstr "horas"
+msgstr "{} horas"
 
 #: faugus/launcher.py:2950
-#, fuzzy
-#| msgid "minute"
 msgid "{} minute"
-msgstr "minuto"
+msgstr "{} minuto"
 
 #: faugus/launcher.py:2950
-#, fuzzy
-#| msgid "minutes"
 msgid "{} minutes"
-msgstr "minutos"
+msgstr "{} minutos"
 
 #: faugus/launcher.py:2957 faugus/launcher.py:2974
 msgid "Less than a minute"
-msgstr ""
+msgstr "Menos de un minuto"
 
 #: faugus/launcher.py:3006
 msgid "Just now"
 msgstr ""
 
 #: faugus/launcher.py:3011
-#, fuzzy
-#| msgid "minute"
 msgid "A minute ago"
-msgstr "minuto"
+msgstr "Hace un minuto"
 
 #: faugus/launcher.py:3012
 #, fuzzy
@@ -422,7 +400,7 @@ msgstr "minuto"
 
 #: faugus/launcher.py:3017
 msgid "An hour ago"
-msgstr ""
+msgstr "Hace una hora"
 
 #: faugus/launcher.py:3018
 msgid "{} hours ago"
@@ -430,27 +408,23 @@ msgstr ""
 
 #: faugus/launcher.py:3023
 msgid "Yesterday"
-msgstr ""
+msgstr "Ayer"
 
 #: faugus/launcher.py:3024
 msgid "{} days ago"
 msgstr ""
 
 #: faugus/launcher.py:3029
-#, fuzzy
-#| msgid "minute"
 msgid "A week ago"
-msgstr "minuto"
+msgstr "Hace una semana"
 
 #: faugus/launcher.py:3030
 msgid "{} weeks ago"
 msgstr ""
 
 #: faugus/launcher.py:3035
-#, fuzzy
-#| msgid "minute"
 msgid "A month ago"
-msgstr "minuto"
+msgstr "Hace un mes"
 
 #: faugus/launcher.py:3036
 #, fuzzy
@@ -459,10 +433,8 @@ msgid "{} months ago"
 msgstr "minuto"
 
 #: faugus/launcher.py:3040
-#, fuzzy
-#| msgid "minute"
 msgid "A year ago"
-msgstr "minuto"
+msgstr "Hace un año"
 
 #: faugus/launcher.py:3041
 msgid "{} years ago"
@@ -581,10 +553,8 @@ msgid "Carrousel"
 msgstr "Carrusel"
 
 #: faugus/launcher.py:5455
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Fondo"
+msgstr "Color de fondo"
 
 #: faugus/launcher.py:5458 faugus/launcher.py:5470 faugus/launcher.py:5484
 #: faugus/launcher.py:5493 faugus/launcher.py:5501 faugus/launcher.py:8177
@@ -682,17 +652,15 @@ msgstr "Abajo"
 
 #: faugus/launcher.py:5531
 msgid "Orientation"
-msgstr ""
+msgstr "Orientación"
 
 #: faugus/launcher.py:5534
-#, fuzzy
-#| msgid "Alphabetical"
 msgid "Vertical"
-msgstr "Alfabéticamente"
+msgstr "Vertical"
 
 #: faugus/launcher.py:5535
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontal"
 
 #: faugus/launcher.py:5537 faugus/launcher.py:5556
 msgid "Maximum Columns"
