@@ -83,8 +83,7 @@ def _apply_gamecontrollerdb_mapping(device):
 
 def init_gamepad(self):
     self.gamepad_monitor = Manette.Monitor.new()
-    self.gamepad_device = None
-    self.gamepad_signal_ids = []
+    self.gamepad_devices = {}
 
     self.axis_threshold = 0.7
     self.reset_threshold = 0.3
@@ -120,16 +119,12 @@ def init_gamepad(self):
 
 
 def _attach_device(self, device):
-    if self.gamepad_device:
-        _detach_device(self, self.gamepad_device)
-
-    self.gamepad_device = device
+    if device in self.gamepad_devices:
+        return
 
     _apply_gamecontrollerdb_mapping(device)
 
-    self.gamepad_signal_ids = [
-        device.connect("event", lambda dev, event: _on_device_event(self, event)),
-    ]
+    self.gamepad_devices[device] = device.connect("event", lambda dev, event: _on_device_event(self, event))
 
 
 def _on_device_event(self, event):
@@ -146,14 +141,11 @@ def _on_device_event(self, event):
 
 
 def _detach_device(self, device):
-    if self.gamepad_device is not device:
+    signal_id = self.gamepad_devices.pop(device, None)
+    if signal_id is None:
         return
 
-    for signal_id in self.gamepad_signal_ids:
-        device.disconnect(signal_id)
-
-    self.gamepad_signal_ids = []
-    self.gamepad_device = None
+    device.disconnect(signal_id)
     self.held_direction = None
 
 
