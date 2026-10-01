@@ -144,6 +144,9 @@ class FaugusRun(HiDpiMixin):
 
         self.extract_env_from_message()
 
+        if os.environ.get("FAUGUS_LOG") == "1":
+            self.logging_enabled = True
+
         if self.splash_window_enabled and self.automatic_updates and not os.environ.get("DISABLE_UMU"):
             GLib.idle_add(self.show_splash)
 
