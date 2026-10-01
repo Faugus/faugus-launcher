@@ -151,7 +151,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 padding: 0px;
             }
             entry.flowbox-entry:selected:not(.cover-container) .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
                 color: @theme_selected_fg_color;
             }
             entry.flowbox-entry:selected:not(.cover-container) .game-label {
@@ -161,7 +161,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: @theme_selected_bg_color;
             }
             entry.flowbox-entry:selected:backdrop:not(.cover-container) .game {
-                background-color: alpha(@theme_selected_bg_color, 0.25);
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container {
                 box-shadow: 0 6px 14px alpha(black, 0.65);
@@ -171,31 +171,47 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 border: none;
             }
             entry.flowbox-entry.cover-container:selected {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.25);
             }
-            entry.flowbox-entry.cover-container:selected .game {
-                background-color: alpha(@theme_selected_bg_color, 0.5);
+            entry.flowbox-entry.cover-container:selected .game,
+            entry.flowbox-entry.carrousel-current .game {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
                 color: @theme_selected_fg_color;
             }
-            entry.flowbox-entry.cover-container:selected .game-label {
+            entry.flowbox-entry.cover-container:selected .game-label,
+            entry.flowbox-entry.carrousel-current .game-label {
                 color: @theme_selected_fg_color;
             }
             entry.flowbox-entry.cover-container:selected:focus {
+                background-color: @theme_selected_bg_color;
                 transform: scale(1.05);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 1),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
             }
-            entry.flowbox-entry.cover-container:selected:focus .game {
+            entry.flowbox-entry.cover-container:selected:focus .game,
+            entry.flowbox-entry.carrousel-current.carrousel-focused .game {
                 background-color: @theme_selected_bg_color;
             }
             entry.flowbox-entry.cover-container:selected:backdrop {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
                 box-shadow: 0 6px 14px alpha(black, 0.65);
             }
-            entry.flowbox-entry.cover-container:selected:backdrop .game {
-                background-color: alpha(@theme_selected_bg_color, 0.25);
+            entry.flowbox-entry.cover-container:selected:backdrop .game,
+            entry.flowbox-entry.carrousel-current:backdrop .game {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
+            }
+            entry.flowbox-entry.carrousel-current {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
+            }
+            entry.flowbox-entry.carrousel-current.carrousel-focused {
+                background-color: @theme_selected_bg_color;
+            }
+            entry.flowbox-entry.carrousel-current:backdrop {
+                background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
             }
             .spinner-dim-overlay {
                 background-color: alpha(black, 0.3);
@@ -310,6 +326,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         placeholder_r, placeholder_g, placeholder_b = self.get_accent_rgb()
         self.update_placeholder_accent_css()
+        self.update_widget_color_css()
 
         if self.theme_engine != "adwaita":
             add_css_once(
@@ -502,6 +519,35 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         return self._overview_panel_dominant_rgb
 
+    def update_widget_color_css(self):
+        if self.widget_color_mode == "accent":
+            r, g, b = self.get_accent_rgb()
+            color = f"mix(@theme_bg_color, rgb({r}, {g}, {b}), 0.4)"
+        elif self.widget_color_mode == "solid":
+            color = "@theme_bg_color"
+        else:
+            return
+        add_css_once(
+            "widget_color",
+            f"""
+            entry.flowbox-entry:not(:selected):not(.carrousel-current) .game,
+            window.main-window .main-control:not(.flashing),
+            window.main-window > headerbar,
+            window.main-window scale slider,
+            popover.widget-color-popover > contents,
+            popover.widget-color-popover > arrow {{
+                background: {color};
+            }}
+            window.main-window .main-control:hover:not(.flashing) {{
+                background-image: linear-gradient(alpha(currentColor, 0.07), alpha(currentColor, 0.07));
+            }}
+            window.main-window .main-control:active:not(.flashing) {{
+                background-image: linear-gradient(alpha(currentColor, 0.15), alpha(currentColor, 0.15));
+            }}
+            """,
+            Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+        )
+
     def update_accent_background_css(self):
         fade_r, fade_g, fade_b = self.fade_rgb(self.get_background_rgb())
 
@@ -545,6 +591,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.set_carrousel_slot_content(slot, game)
 
     def apply_popover_background_mode(self, popover, game=None):
+        if self.widget_color_mode != "default":
+            popover.add_css_class("widget-color-popover")
+            return
+
         if self.theme_engine != "adwaita":
             return
 
@@ -1190,6 +1240,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def create_button(icon_name, callback, tooltip=None):
             btn = Gtk.Button()
             btn.add_css_class("flash-btn")
+            btn.add_css_class("main-control")
 
             def trigger_flash(widget):
                 widget.add_css_class("flashing")
@@ -1215,6 +1266,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_play = create_button("faugus-play-symbolic", self.on_button_play_clicked)
 
         self.entry_search = Gtk.Entry()
+        self.entry_search.add_css_class("main-control")
         self.entry_search.set_placeholder_text(_("Search..."))
         self.entry_search.connect("changed", self.on_search_changed)
         self.entry_search.connect("activate", self.on_search_activate)
@@ -1249,10 +1301,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.custom_order_data = {}
 
         self.button_category = Gtk.Button(label=self.current_category)
+        self.button_category.add_css_class("main-control")
         self.button_category.set_size_request(110, -1)
         self.button_category.connect("clicked", self.on_category_button_clicked)
 
         self.button_sort = Gtk.Button(label=self.sort_map[self.current_sort_id])
+        self.button_sort.add_css_class("main-control")
         self.button_sort.set_size_request(110, -1)
 
         def update_sort_data():
@@ -1969,6 +2023,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         is_focused = carrousel_fixed is not None and carrousel_fixed.get_property("has-focus")
         if not is_focused and d < 0.5:
             scale = 1.0
+
+        for css_class, active in (("carrousel-current", d < 0.5), ("carrousel-focused", is_focused)):
+            if active:
+                slot["box"].add_css_class(css_class)
+            else:
+                slot["box"].remove_css_class(css_class)
 
         glow_t = self.carrousel_glow_alpha(offset)
         if not is_focused:
@@ -3643,6 +3703,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.interface_mode = cfg.config.get('interface-mode', '').strip('"')
         self.background_mode = cfg.config.get('background-mode', 'default').strip('"')
         self.overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
+        self.widget_color_mode = cfg.config.get('widget-color-mode', 'default').strip('"')
         self.background_color = cfg.config.get('background-color', 'rgb(61,174,233)').strip('"')
         self.overview_color = cfg.config.get('overview-color', 'rgb(61,174,233)').strip('"')
         self.theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
@@ -4048,6 +4109,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             new_grid_max_children = int(settings_dialog.entry_grid_max_children.get_value()) if settings_dialog.checkbox_grid_max_children.get_active() else 20
             if (self.interface_mode != settings_dialog.combobox_interface.get_active_id()
                     or self.background_mode != settings_dialog.combobox_background.get_active_id()
+                    or self.widget_color_mode != settings_dialog.combobox_widget_color.get_active_id()
                     or self.theme_engine != settings_dialog.combobox_theme_engine.get_active_id()
                     or self.banner_enabled != settings_dialog.checkbox_banner.get_active()
                     or self.labels_enabled != settings_dialog.checkbox_labels.get_active()
@@ -5489,6 +5551,13 @@ class Settings(Gtk.Dialog):
             self.combobox_overview_color, self.on_overview_color_changed
         )
 
+        self.label_widget_color = Gtk.Label(label=_("Widget Color"))
+        self.label_widget_color.set_halign(Gtk.Align.START)
+        self.combobox_widget_color = IdComboBox()
+        self.combobox_widget_color.append("default", _("Default"))
+        self.combobox_widget_color.append("accent", _("Accent color"))
+        self.combobox_widget_color.append("solid", _("Solid color"))
+
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
         self.label_theme_engine = Gtk.Label(label=_("Theme"))
@@ -5874,12 +5943,16 @@ class Settings(Gtk.Dialog):
         grid_theme_colors.attach(self.box_accent, 0, 5, 2, 1)
         self.combobox_accent.set_hexpand(True)
 
-        grid_theme_colors.attach(self.label_background, 0, 6, 2, 1)
-        grid_theme_colors.attach(self.box_background, 0, 7, 2, 1)
+        grid_theme_colors.attach(self.label_widget_color, 0, 6, 2, 1)
+        grid_theme_colors.attach(self.combobox_widget_color, 0, 7, 2, 1)
+        self.combobox_widget_color.set_hexpand(True)
+
+        grid_theme_colors.attach(self.label_background, 0, 8, 2, 1)
+        grid_theme_colors.attach(self.box_background, 0, 9, 2, 1)
         self.combobox_background.set_hexpand(True)
 
-        grid_theme_colors.attach(self.label_overview_color, 0, 8, 2, 1)
-        grid_theme_colors.attach(self.box_overview_color, 0, 9, 2, 1)
+        grid_theme_colors.attach(self.label_overview_color, 0, 10, 2, 1)
+        grid_theme_colors.attach(self.box_overview_color, 0, 11, 2, 1)
         self.combobox_overview_color.set_hexpand(True)
 
         grid_interface_checkboxes.attach(self.label_display, 0, 0, 1, 1)
@@ -5940,9 +6013,9 @@ class Settings(Gtk.Dialog):
 
         box_interface_col1.append(grid_interface_mode)
         box_interface_col1.append(self.grid_big_interface)
+        box_interface_col1.append(grid_steamgriddb)
 
         box_interface_col2.append(grid_theme_colors)
-        box_interface_col2.append(grid_steamgriddb)
 
         box_interface_col3.append(grid_interface_checkboxes)
 
@@ -6204,6 +6277,7 @@ class Settings(Gtk.Dialog):
         self.parent.accent_color = self.accent_color
 
         self.parent.update_placeholder_accent_css()
+        self.parent.update_widget_color_css()
         self.parent.refresh_placeholder_covers()
         self.parent.apply_overview_panel_width()
         if self.parent.background_mode in ("accent", "custom"):
@@ -6259,6 +6333,7 @@ class Settings(Gtk.Dialog):
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("overview-color-mode", self.combobox_overview_color.get_active_id())
+        config.set_value("widget-color-mode", self.combobox_widget_color.get_active_id())
         config.set_value("background-color", self.background_color_button.get_rgba().to_string())
         config.set_value("overview-color", self.overview_color_button.get_rgba().to_string())
         config.set_value("grid-position", self.combobox_grid_position.get_active_id())
@@ -6575,6 +6650,7 @@ class Settings(Gtk.Dialog):
         interface_mode = cfg.config.get('interface-mode', '').strip('"')
         background_mode = cfg.config.get('background-mode', 'default').strip('"')
         overview_color_mode = cfg.config.get('overview-color-mode', 'default').strip('"')
+        widget_color_mode = cfg.config.get('widget-color-mode', 'default').strip('"')
         background_color = cfg.config.get('background-color', 'rgb(61,174,233)').strip('"')
         overview_color = cfg.config.get('overview-color', 'rgb(61,174,233)').strip('"')
         steamgriddb_api_key = cfg.config.get('steamgriddb-api-key', '').strip('"')
@@ -6605,6 +6681,7 @@ class Settings(Gtk.Dialog):
         self.set_button_color(self.overview_color_button, overview_color)
         self.combobox_background.set_active_id(background_mode)
         self.combobox_overview_color.set_active_id(overview_color_mode)
+        self.combobox_widget_color.set_active_id(widget_color_mode)
         self.combobox_grid_position.set_active_id(grid_position)
         self.combobox_grid_orientation.set_active_id(grid_orientation)
         self.entry_grid_max_children.set_value(grid_max_children_per_line)

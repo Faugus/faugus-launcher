@@ -49,6 +49,7 @@ class ConfigManager:
             'steamgriddb-enabled': 'False',
             'background-mode': 'default',
             'overview-color-mode': 'default',
+            'widget-color-mode': 'default',
             'background-color': 'rgb(61,174,233)',
             'overview-color': 'rgb(61,174,233)',
             'banner-enabled': 'True',
