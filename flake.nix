@@ -31,23 +31,29 @@
       buildInputs = [
         pkgs.gtk4
         pkgs.libadwaita
+        pkgs.libmanette
       ];
 
-      dependencies = [
-        pkgs.python3Packages.pygobject3
-        pkgs.python3Packages.vdf
+      dependencies = with pkgs.python3Packages; [
+        pygobject3
+        requests
+        pillow
+        vdf
+        psutil
+        dbus-python
+        icoextract
       ];
 
       postPatch = ''
         substituteInPlace faugus-launcher \
-        --replace-fail "/usr/bin/python3" \
-        "${pkgs.python3Packages.python.interpreter}"
+          --replace-fail "/usr/bin/python3" \
+            "${pkgs.python3Packages.python.interpreter}"
       '';
 
       preFixup = ''
         gappsWrapperArgs+=(
           --set PYTHONPATH \
-          "$out/${pkgs.python3Packages.python.sitePackages}:$PYTHONPATH"
+            "$out/${pkgs.python3Packages.python.sitePackages}:$PYTHONPATH"
         )
       '';
     };
