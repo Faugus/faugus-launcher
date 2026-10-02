@@ -3397,7 +3397,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def run_file_in_prefix(self, game, file_run):
         prefix = expand_path(game.prefix)
-        runner = game.runner
+        runner = resolve_game_runner(game.runner)
         title_formatted = game.gameid
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
@@ -4413,8 +4413,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if game_runner == "Steam" and game.path:
             edit_game_dialog.combobox_steam_title.set_active_id_silent(game.path)
 
-        if not edit_game_dialog.combobox_runner.set_active_id(game_runner):
-            edit_game_dialog.combobox_runner.set_active(0)
+        if game_runner != "Default":
+            edit_game_dialog.checkbox_custom_runner.set_active(True)
+            if not edit_game_dialog.combobox_runner.set_active_id(game_runner):
+                edit_game_dialog.combobox_runner.set_active(0)
         edit_game_dialog.set_title_silently(game.title)
         edit_game_dialog._steamgriddb_suggestion_id = getattr(game, "steamgriddb_id", "") or None
         edit_game_dialog._steamgriddb_steam_appid = game.path if game_runner == "Steam" else None
@@ -4653,7 +4655,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             launch_arguments = add_game_dialog.launch_arguments
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
             protonfix = add_game_dialog.entry_protonfix.get_text()
-            runner = add_game_dialog.combobox_runner.get_active_id()
+            runner = add_game_dialog.selected_runner()
             addapp = add_game_dialog.addapp
             addapp_delay = add_game_dialog.addapp_delay
             addapp_first = add_game_dialog.addapp_first
@@ -5048,7 +5050,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.sdl_enabled = edit_game_dialog.checkbox_sdl.get_active()
             game.protonfix = edit_game_dialog.entry_protonfix.get_text()
-            game.runner = edit_game_dialog.combobox_runner.get_active_id()
+            game.runner = edit_game_dialog.selected_runner()
             game.addapp_enabled = edit_game_dialog.addapp_enabled
             game.addapp = edit_game_dialog.addapp
             game.addapp_delay = edit_game_dialog.addapp_delay
@@ -7199,8 +7201,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_search_prefix.connect("clicked", self.on_button_search_prefix_clicked)
         self.button_search_prefix.set_size_request(50, -1)
 
-        self.label_runner = Gtk.Label(label=_("Proton"))
-        self.label_runner.set_halign(Gtk.Align.START)
+        self.checkbox_custom_runner = Gtk.CheckButton(label=_("Specific Proton"))
+        self.checkbox_custom_runner.connect("toggled", self.on_checkbox_custom_runner_toggled)
         self.combobox_runner = IdComboBox()
 
         self.label_protonfix = Gtk.Label(label="Protonfix")
@@ -7478,7 +7480,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.entry_prefix.set_hexpand(True)
         self.grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
-        self.grid_runner.attach(self.label_runner, 0, 0, 1, 1)
+        self.grid_runner.attach(self.checkbox_custom_runner, 0, 0, 1, 1)
         self.grid_runner.attach(self.combobox_runner, 0, 1, 1, 1)
         self.combobox_runner.set_hexpand(True)
 
@@ -7572,8 +7574,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.populate_combobox_with_runtimes()
         self.combobox_runtime.set_active_id("umu-steamrt4")
 
-        if not self.combobox_runner.set_active_id(self.default_runner):
-            self.combobox_runner.set_active(0)
+        self.on_checkbox_custom_runner_toggled(self.checkbox_custom_runner)
 
         self.checkbox_mangohud.set_active(self.default_mangohud)
         self.checkbox_gamemode.set_active(self.default_gamemode)
@@ -8272,6 +8273,15 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
     def populate_combobox_with_runners(self):
         populate_combobox_with_runners(self.combobox_runner)
+
+    def on_checkbox_custom_runner_toggled(self, checkbox):
+        custom = checkbox.get_active()
+        self.combobox_runner.set_sensitive(custom)
+        if not custom and not self.combobox_runner.set_active_id(self.default_runner):
+            self.combobox_runner.set_active(0)
+
+    def selected_runner(self):
+        return self.combobox_runner.get_active_id() if self.checkbox_custom_runner.get_active() else "Default"
 
     def load_config(self):
         cfg = ConfigManager()

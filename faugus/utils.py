@@ -1279,6 +1279,13 @@ def resolve_protonpath(runner):
     return PROTON_CACHYOS if runner == "Proton-CachyOS (System)" else runner
 
 
+def resolve_game_runner(runner):
+    if runner != "Default":
+        return runner
+    from faugus.config_manager import ConfigManager
+    return ConfigManager().config.get('default-runner', '').strip('"')
+
+
 def version_key(v):
     cleaned = re.sub(r'^[^\d]+', '', v)
     parts = re.split(r'(\d+)', cleaned)
