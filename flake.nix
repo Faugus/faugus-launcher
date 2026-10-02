@@ -54,6 +54,15 @@
         gappsWrapperArgs+=(
           --set PYTHONPATH \
             "$out/${pkgs.python3Packages.python.sitePackages}:$PYTHONPATH"
+
+          --suffix PATH : "${pkgs.lib.makeBinPath [
+            pkgs.coreutils
+            pkgs.gawk
+            pkgs.gnugrep
+            pkgs.which
+            pkgs.xdg-utils
+            pkgs.python3Packages.icoextract
+          ]}"
         )
       '';
     };
