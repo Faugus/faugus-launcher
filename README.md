@@ -36,6 +36,23 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
+## NixOS
+### Run directly
+```
+nix run github:Faugus/faugus-launcher
+```
+### Install
+Add the following to your NixOS flake.nix:
+```
+inputs.faugus-launcher.url = "github:Faugus/faugus-launcher";
+```
+Then add the package to environment.systemPackages:
+```
+environment.systemPackages = [
+  inputs.faugus-launcher.packages."${pkgs.stdenv.hostPlatform.system}".default
+];
+```
+
 ## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
 ### Installation:
 ```
