@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-10-02 00:51+0000\n"
+"PO-Revision-Date: 2026-10-02 21:16+0000\n"
 "Last-Translator: Михайло Щетінін <karnemorkon@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/uk/>\n"
@@ -952,10 +952,8 @@ msgid "Path to the prefix"
 msgstr "Шлях до префіксу"
 
 #: faugus/launcher.py:7204
-#, fuzzy
-#| msgid "Default Proton"
 msgid "Specific Proton"
-msgstr "Proton за замовчуванням"
+msgstr "Конкретний Proton"
 
 #: faugus/launcher.py:7218 faugus/shortcut.py:61
 msgid "Game Arguments"
