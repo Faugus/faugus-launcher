@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-10-02 21:16+0000\n"
+"PO-Revision-Date: 2026-10-02 21:27+0000\n"
 "Last-Translator: Luka Ogadze <lukaogadze@live.com>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ka/>\n"
@@ -1192,15 +1192,15 @@ msgstr "გაშვებამდე"
 
 #: faugus/utils.py:1629
 msgid "Command or script to run before the game"
-msgstr ""
+msgstr "თამაშის გაშვებამდე შესასრულებელი ბრძანება ან სკრიპტი"
 
 #: faugus/utils.py:1631
 msgid "Post-launch"
-msgstr ""
+msgstr "გაშვების შემდეგ"
 
 #: faugus/utils.py:1632
 msgid "Command or script to run after the game"
-msgstr ""
+msgstr "თამაშის შემდეგ გასაშვები ბრძანება ან სკრიპტი"
 
 #: faugus/utils.py:1697 faugus/utils.py:1872
 msgid "Enable"
