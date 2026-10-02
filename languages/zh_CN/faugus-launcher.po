@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-09-23 15:19+0000\n"
+"PO-Revision-Date: 2026-10-02 21:16+0000\n"
 "Last-Translator: EyKettle <eykettle@tutamail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 2026.10.dev0\n"
+"X-Generator: Weblate 2026.10\n"
 
 #: faugus/backup.py:141 faugus/backup.py:286
 msgid "Calculating..."
@@ -567,16 +567,12 @@ msgid "Overview Color"
 msgstr "概览颜色"
 
 #: faugus/launcher.py:5556
-#, fuzzy
-#| msgid "Accent Color"
 msgid "Widget Color"
-msgstr "强调色"
+msgstr "组件颜色"
 
 #: faugus/launcher.py:5561
-#, fuzzy
-#| msgid "Dominant color"
 msgid "Solid color"
-msgstr "主题色"
+msgstr "不透明色"
 
 #: faugus/launcher.py:5563
 msgid "Banner"
@@ -951,10 +947,8 @@ msgid "Path to the prefix"
 msgstr "Prefix 路径"
 
 #: faugus/launcher.py:7204
-#, fuzzy
-#| msgid "Default Proton"
 msgid "Specific Proton"
-msgstr "默认 Proton"
+msgstr "指定 Proton"
 
 #: faugus/launcher.py:7218 faugus/shortcut.py:61
 msgid "Game Arguments"
