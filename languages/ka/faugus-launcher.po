@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-10-02 21:27+0000\n"
+"PO-Revision-Date: 2026-10-03 21:51+0000\n"
 "Last-Translator: Luka Ogadze <lukaogadze@live.com>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ka/>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.10\n"
+"X-Generator: Weblate 2026.10.1.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:141 faugus/backup.py:286
@@ -79,7 +79,7 @@ msgstr "ბოლო სარეზერვო ასლი:"
 
 #: faugus/backup.py:634 faugus/backup.py:895
 msgid "Backup now"
-msgstr "სარეზერვო ასლის შექმნა"
+msgstr "სარეზერვო ასლის შექმნა ახლავე"
 
 #: faugus/backup.py:645
 msgid "Automatic Backup"
@@ -144,21 +144,16 @@ msgid "Monthly"
 msgstr "თვიურად"
 
 #: faugus/backup.py:813
-#, fuzzy
-#| msgid "Daily"
 msgid "Day"
-msgstr "დღიური"
+msgstr "დღე"
 
 #: faugus/backup.py:860
-#, fuzzy
 msgid "Select the backup destination"
-msgstr "აღსადგენად აირჩიეთ მარქაფის ფაილი"
+msgstr "აირჩიეთ სარეზერვო ასლის მდებარეობა"
 
 #: faugus/backup.py:901
-#, fuzzy
-#| msgid "Extracting %s..."
 msgid "Cancelling..."
-msgstr "%s-ის გაშლა..."
+msgstr "გაუქმება..."
 
 #: faugus/backup.py:914 faugus/backup_daemon.py:537
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
@@ -356,7 +351,6 @@ msgid "Show logs"
 msgstr "ლოგების ჩვენება"
 
 #: faugus/launcher.py:2877
-#, fuzzy
 msgid "Run file in the prefix"
 msgstr "ფაილის გაშვება პრეფიქსში"
 
@@ -533,7 +527,6 @@ msgid "Language"
 msgstr "ენა"
 
 #: faugus/launcher.py:5523
-#, fuzzy
 msgid "Interface Mode"
 msgstr "ინტერფეისის რეჟიმი"
 
@@ -716,9 +709,8 @@ msgid "Display"
 msgstr "ეკრანი"
 
 #: faugus/launcher.py:5687
-#, fuzzy
 msgid "Discrete GPU"
-msgstr "დისკრეტული GPU-ის გამოყენება"
+msgstr "დისკრეტული GPU"
 
 #: faugus/launcher.py:5689
 msgid "Auto-close on launch"
@@ -741,9 +733,8 @@ msgid "Monochrome icon"
 msgstr "მონოქრომული ხატულა"
 
 #: faugus/launcher.py:5702
-#, fuzzy
 msgid "Splash window"
-msgstr "გაშვების ეკრანის გამორთვა"
+msgstr "გაშვების ფანჯარა"
 
 #: faugus/launcher.py:5705
 msgid "Automatic updates"
@@ -802,7 +793,6 @@ msgid "Run"
 msgstr "გაშვება"
 
 #: faugus/launcher.py:5742 faugus/launcher.py:7251
-#, fuzzy
 msgid "Run a file in the prefix"
 msgstr "ფაილის გაშვება პრეფიქსში"
 
@@ -1207,9 +1197,8 @@ msgid "Enable"
 msgstr "ჩართვა"
 
 #: faugus/utils.py:1706
-#, fuzzy
 msgid "Path to the application"
-msgstr "ჯერ აპლიკაციის გაშვება"
+msgstr "ბილიკი აპლიკაციამდე"
 
 #: faugus/utils.py:1718
 msgid "Select an additional application"
@@ -1225,16 +1214,15 @@ msgstr "ჯერ აპლიკაციის გაშვება"
 
 #: faugus/utils.py:1823
 msgid "Lossless Scaling Location"
-msgstr "უდანაკარგო მასშტაბის მდებარეობა"
+msgstr "Lossless Scaling მდებარეობა"
 
 #: faugus/utils.py:1831
-#, fuzzy
 msgid "Lossless.dll location"
-msgstr "უდანაკარგო მასშტაბის მდებარეობა"
+msgstr "Lossless.dll მდებარეობა"
 
 #: faugus/utils.py:1843
 msgid "Select the Lossless.dll file"
-msgstr "აირჩიეთ ფაილი Lossless.dll"
+msgstr "აირჩიეთ Lossless.dll ფაილი"
 
 #: faugus/utils.py:1876
 msgid "Multiplier"
@@ -1278,30 +1266,27 @@ msgstr "პრეზენტაციის რეჟიმის გადა�
 
 #: faugus/utils.py:2244
 msgid "No SteamGridDB API key configured."
-msgstr ""
+msgstr "SteamGridDB-ის API-ის გასაღები არ არის კონფიგურირებული."
 
 #: faugus/utils.py:2245
 msgid "Add your API key in Settings first."
-msgstr ""
+msgstr "ჯერ „პარამეტრებში“ დაამატეთ თქვენი API გასაღები."
 
 #: faugus/utils.py:2258
-#, fuzzy
 msgid "Choose a cover"
-msgstr "სისტემური პანელის ხატულა"
+msgstr "აირჩიე ყდა"
 
 #: faugus/utils.py:2259
-#, fuzzy
 msgid "Choose a banner"
-msgstr "სისტემური პანელის ხატულა"
+msgstr "აირჩიე ბანერი"
 
 #: faugus/utils.py:2260
-#, fuzzy
 msgid "Choose an icon"
-msgstr "სისტემური პანელის ხატულა"
+msgstr "აირჩიეთ ხატულა"
 
 #: faugus/utils.py:2397
 msgid "No results found"
-msgstr ""
+msgstr "შედეგები ვერ მოიძებნა"
 
 #~ msgid "Internet connection error"
 #~ msgstr "ინტერნეტთან დაკავშირების შეცდომა"
