@@ -1479,7 +1479,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.set_valign(Gtk.Align.CENTER)
             if self.interface_mode in ("Grid", "Covers"):
                 max_children = self.grid_max_children_per_line
-                self.flowbox.set_min_children_per_line(min(2, max_children))
+                self.flowbox.set_min_children_per_line(1)
                 self.flowbox.set_max_children_per_line(max_children)
             else:
                 self.flowbox.set_min_children_per_line(2)
@@ -1491,6 +1491,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             )
             if horizontal_mode:
                 self.flowbox.set_orientation(Gtk.Orientation.VERTICAL)
+                self.flowbox.set_homogeneous(True)
                 scroll_box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
             else:
                 self.flowbox.set_orientation(Gtk.Orientation.HORIZONTAL)
