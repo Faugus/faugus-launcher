@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-09-24 19:41+0000\n"
+"PO-Revision-Date: 2026-10-06 13:20+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 <bittin@reimu.nl>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/sv/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.10.dev0\n"
+"X-Generator: Weblate 2026.10.1.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:286
 msgid "Calculating..."
@@ -569,16 +569,12 @@ msgid "Overview Color"
 msgstr "Översikt färg"
 
 #: faugus/launcher.py:5556
-#, fuzzy
-#| msgid "Accent Color"
 msgid "Widget Color"
-msgstr "Accentfärg"
+msgstr "Widgetfärg"
 
 #: faugus/launcher.py:5561
-#, fuzzy
-#| msgid "Dominant color"
 msgid "Solid color"
-msgstr "Dominerande färg"
+msgstr "Solid färg"
 
 #: faugus/launcher.py:5563
 msgid "Banner"
@@ -953,10 +949,8 @@ msgid "Path to the prefix"
 msgstr "Sökväg till prefixet"
 
 #: faugus/launcher.py:7204
-#, fuzzy
-#| msgid "Default Proton"
 msgid "Specific Proton"
-msgstr "Standardversion av Proton"
+msgstr "Specifik proton"
 
 #: faugus/launcher.py:7218 faugus/shortcut.py:61
 msgid "Game Arguments"
