@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-10-02 21:16+0000\n"
+"PO-Revision-Date: 2026-10-09 00:08+0000\n"
 "Last-Translator: Михайло Щетінін <karnemorkon@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/uk/>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 2026.10\n"
+"X-Generator: Weblate 2026.10.1.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:286
 msgid "Calculating..."
@@ -47,7 +47,7 @@ msgstr "Гра/Додаток"
 
 #: faugus/backup.py:339
 msgid "Shortcuts"
-msgstr "Скорочення"
+msgstr "Посилання"
 
 #: faugus/backup.py:518
 msgid "Backup Settings"
@@ -953,7 +953,7 @@ msgstr "Шлях до префіксу"
 
 #: faugus/launcher.py:7204
 msgid "Specific Proton"
-msgstr "Конкретний Proton"
+msgstr "Обрати Proton"
 
 #: faugus/launcher.py:7218 faugus/shortcut.py:61
 msgid "Game Arguments"
@@ -977,7 +977,7 @@ msgstr "Генерація кадрів масштабування без втр
 
 #: faugus/launcher.py:7253
 msgid "Shortcut"
-msgstr "Скорочення"
+msgstr "Посилання"
 
 #: faugus/launcher.py:7258
 msgid "Desktop"
