@@ -94,7 +94,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.4.3-1" date="2026-10-08">
+    <release version="2.4.4-1" date="2026-10-08">
       <description>
         <ul>
           <li>Now games will use the default Proton by default. Added an option to specify a Proton per game rather than use the default.</li>
