@@ -94,15 +94,21 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.4.2-1" date="2026-09-26">
+    <release version="2.4.3-1" date="2026-10-08">
       <description>
         <ul>
-          <li>Now disables automatic updates when disabling the runtime for Linux games.</li>
-          <li>Added an option to select a custom color for the Overview and the Background.</li>
-          <li>Fixed working directory missing when launching games through the system tray menu.</li>
-          <li>Updated the Flatpak build to GNOME 51.</li>
-          <li>Fixed a regression that caused the "Stop" button not to work on Flatpak.</li>
-          <li>Removed the Wine dependency from the Flatpak build as it's no longer needed. This significantly reduces the build size.</li>
+          <li>Now games will use the default Proton by default. Added an option to specify a Proton per game rather than use the default.</li>
+          <li>Added an option to change the widget color.</li>
+          <li>Changed the color of the "Remove" button in Proton Manager.</li>
+          <li>Now populates the flowbox vertically when orientation is horizontal.</li>
+          <li>Now the "Run file in the prefix" option honors the environment variables set for that prefix.</li>
+          <li>Some code refactoring.</li>
+          <li>Fixed gamepad bumpers not switching Settings tabs.</li>
+          <li>Fixed gameids being duplicated after adding a game with a name previously used.</li>
+          <li>Fixed gamepad navigation when multiple input devices are connected.</li>
+          <li>Fixed playtime and last played display not being updated when launching a game from the shortcut.</li>
+          <li>Fixed the "Backup now" button sometimes stuck as "Cancel backup".</li>
+          <li>Fixed underscores in the game name not showing in the system tray menu.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
