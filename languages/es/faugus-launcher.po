@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-09-29 08:51+0000\n"
+"PO-Revision-Date: 2026-10-08 13:49+0000\n"
 "Last-Translator: grego9 <gregolauty94@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.10.dev0\n"
+"X-Generator: Weblate 2026.10.1.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:141 faugus/backup.py:286
@@ -50,7 +50,7 @@ msgstr "Accesos directos"
 
 #: faugus/backup.py:518
 msgid "Backup Settings"
-msgstr "Ajustes de copia de seguridad"
+msgstr "Ajustes de backup"
 
 #: faugus/backup.py:569 faugus/backup.py:1129
 msgid "Proton"
@@ -63,27 +63,27 @@ msgstr "Ruta"
 
 #: faugus/backup.py:603
 msgid "Backup Destination"
-msgstr "Destino de la copia de seguridad"
+msgstr "Destino del backup"
 
 #: faugus/backup.py:616
 msgid "Backup destination path"
-msgstr "Ruta de destino de la copia de seguridad"
+msgstr "Ruta de destino del backup"
 
 #: faugus/backup.py:629
 msgid "No backup yet"
-msgstr "Aún no hay copia de seguridad"
+msgstr "Aún no hay backups"
 
 #: faugus/backup.py:630 faugus/backup.py:943
 msgid "Last backup:"
-msgstr "Última copia de seguridad:"
+msgstr "Último backup:"
 
 #: faugus/backup.py:634 faugus/backup.py:895
 msgid "Backup now"
-msgstr "Crear copia de seguridad ahora"
+msgstr "Crear backup ahora"
 
 #: faugus/backup.py:645
 msgid "Automatic Backup"
-msgstr "Copia de seguridad automática"
+msgstr "Backup automático"
 
 #: faugus/backup.py:651
 msgid "Monday"
@@ -149,7 +149,7 @@ msgstr "Día"
 
 #: faugus/backup.py:860
 msgid "Select the backup destination"
-msgstr "Seleccionar destino de la copia de seguridad"
+msgstr "Seleccione el destino del backup"
 
 #: faugus/backup.py:901
 msgid "Cancelling..."
@@ -158,28 +158,28 @@ msgstr "Cancelando..."
 #: faugus/backup.py:914 faugus/backup_daemon.py:537
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
-"Fallo al respaldar: no hay suficiente espacio en el disco ({} requerido, {} "
-"disponible)"
+"Falló el backup: no hay suficiente espacio en el disco ({} requerido, {} "
+"disponible)."
 
 #: faugus/backup.py:924 faugus/backup.py:951
 msgid "Cancel backup"
-msgstr "Cancelar copia de seguridad"
+msgstr "Cancelar backup"
 
 #: faugus/backup.py:995
 msgid "Restore Backup"
-msgstr "Restaurar copia de seguridad"
+msgstr "Restaurar backup"
 
 #: faugus/backup.py:1024
 msgid "Extracting backup..."
-msgstr "Extrayendo copia de seguridad..."
+msgstr "Extrayendo backup..."
 
 #: faugus/backup.py:1180
 msgid "Restoring backup..."
-msgstr "Restaurando copia de seguridad..."
+msgstr "Restaurando backup..."
 
 #: faugus/backup.py:1222
 msgid "Failed to restore backup:"
-msgstr "Fallo al restaurar copia de seguridad:"
+msgstr "Fallo al restaurar backup:"
 
 #: faugus/backup.py:1234 faugus/launcher.py:6610
 msgid "Are you sure you want to overwrite the settings?"
@@ -201,21 +201,19 @@ msgstr "Prefix predeterminado"
 
 #: faugus/backup_daemon.py:490
 msgid "Backup started"
-msgstr "Copia de seguridad iniciada"
+msgstr "Backup iniciado"
 
 #: faugus/backup_daemon.py:500
 msgid "Backup cancelled"
-msgstr "Copia de seguridad cancelada"
+msgstr "Backup cancelado"
 
 #: faugus/backup_daemon.py:502
 msgid "Backup completed"
-msgstr "Copia de seguridad completa"
+msgstr "Backup completado"
 
 #: faugus/backup_daemon.py:560 faugus/backup_daemon.py:743
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Copia de seguridad completa"
+msgstr "Falló el backup."
 
 #: faugus/launcher.py:1102 faugus/launcher.py:1293 faugus/launcher.py:1753
 #: faugus/launcher.py:2359 faugus/launcher.py:2494 faugus/launcher.py:2551
@@ -386,17 +384,15 @@ msgstr "Menos de un minuto"
 
 #: faugus/launcher.py:3066
 msgid "Just now"
-msgstr ""
+msgstr "Recién"
 
 #: faugus/launcher.py:3071
 msgid "A minute ago"
 msgstr "Hace un minuto"
 
 #: faugus/launcher.py:3072
-#, fuzzy
-#| msgid "minute"
 msgid "{} minutes ago"
-msgstr "minuto"
+msgstr "Hace {} minutos"
 
 #: faugus/launcher.py:3077
 msgid "An hour ago"
@@ -404,7 +400,7 @@ msgstr "Hace una hora"
 
 #: faugus/launcher.py:3078
 msgid "{} hours ago"
-msgstr ""
+msgstr "Hace {} horas"
 
 #: faugus/launcher.py:3083
 msgid "Yesterday"
@@ -412,7 +408,7 @@ msgstr "Ayer"
 
 #: faugus/launcher.py:3084
 msgid "{} days ago"
-msgstr ""
+msgstr "Hace {} días"
 
 #: faugus/launcher.py:3089
 msgid "A week ago"
@@ -420,17 +416,15 @@ msgstr "Hace una semana"
 
 #: faugus/launcher.py:3090
 msgid "{} weeks ago"
-msgstr ""
+msgstr "Hace {} semanas"
 
 #: faugus/launcher.py:3095
 msgid "A month ago"
 msgstr "Hace un mes"
 
 #: faugus/launcher.py:3096
-#, fuzzy
-#| msgid "minute"
 msgid "{} months ago"
-msgstr "minuto"
+msgstr "Hace {} meses"
 
 #: faugus/launcher.py:3100
 msgid "A year ago"
@@ -438,7 +432,7 @@ msgstr "Hace un año"
 
 #: faugus/launcher.py:3101
 msgid "{} years ago"
-msgstr ""
+msgstr "Hace {} años"
 
 #: faugus/launcher.py:3439 faugus/launcher.py:6473 faugus/launcher.py:8306
 msgid "Select a file to run in the prefix"
@@ -447,7 +441,7 @@ msgstr "Seleccionar un archivo para ejecutar dentro del prefix"
 #: faugus/launcher.py:3482
 #, python-format
 msgid "%s Logs"
-msgstr "Registros de %s"
+msgstr "Logs de %s"
 
 #: faugus/launcher.py:3532
 msgid "Copy to clipboard"
@@ -526,7 +520,7 @@ msgstr "Por favor, cierra Wargaming para finalizar la instalación."
 
 #: faugus/launcher.py:5399
 msgid "Settings"
-msgstr "Configuración"
+msgstr "Ajustes"
 
 #: faugus/launcher.py:5519
 msgid "Language"
@@ -534,7 +528,7 @@ msgstr "Idioma"
 
 #: faugus/launcher.py:5523
 msgid "Interface Mode"
-msgstr "Modo de visualización"
+msgstr "Modo de interfaz"
 
 #: faugus/launcher.py:5527
 msgid "List"
@@ -572,19 +566,15 @@ msgstr "Color dominante"
 
 #: faugus/launcher.py:5544
 msgid "Overview Color"
-msgstr ""
+msgstr "Color de encabezado"
 
 #: faugus/launcher.py:5556
-#, fuzzy
-#| msgid "Accent Color"
 msgid "Widget Color"
-msgstr "Color de selección"
+msgstr "Color del widget"
 
 #: faugus/launcher.py:5561
-#, fuzzy
-#| msgid "Dominant color"
 msgid "Solid color"
-msgstr "Color dominante"
+msgstr "Color sólido"
 
 #: faugus/launcher.py:5563
 msgid "Banner"
@@ -676,11 +666,11 @@ msgstr "Horizontal"
 
 #: faugus/launcher.py:5621 faugus/launcher.py:5640
 msgid "Maximum Columns"
-msgstr ""
+msgstr "Máximo de columnas"
 
 #: faugus/launcher.py:5638
 msgid "Maximum Rows"
-msgstr ""
+msgstr "Máximo de filas"
 
 #: faugus/launcher.py:5644
 msgid "SteamGridDB"
@@ -716,7 +706,7 @@ msgstr "Varios"
 
 #: faugus/launcher.py:5684
 msgid "Display"
-msgstr ""
+msgstr "Disposición"
 
 #: faugus/launcher.py:5687
 msgid "Discrete GPU"
@@ -724,7 +714,7 @@ msgstr "GPU dedicada"
 
 #: faugus/launcher.py:5689
 msgid "Auto-close on launch"
-msgstr "Cerrar automáticamente al ejecutar"
+msgstr "Cerrar automáticamente al lanzar"
 
 #: faugus/launcher.py:5691
 msgid "Autostart"
@@ -784,19 +774,19 @@ msgstr "Ctrl+H para mostrar/ocultar juegos"
 
 #: faugus/launcher.py:5722
 msgid "Overview"
-msgstr ""
+msgstr "Encabezado"
 
 #: faugus/launcher.py:5725
 msgid "Gamepad navigation"
-msgstr "Navegación con gamepad"
+msgstr "Navegación con mando"
 
 #: faugus/launcher.py:5727
 msgid "Wayland driver (experimental)"
-msgstr "Usar controlador Wayland (experimental)"
+msgstr "Driver Wayland (experimental)"
 
 #: faugus/launcher.py:5729
 msgid "WOW64 (experimental)"
-msgstr "Activar WOW64 (experimental)"
+msgstr "WOW64 (experimental)"
 
 #: faugus/launcher.py:5739 faugus/launcher.py:7248
 msgid "Run"
@@ -840,22 +830,20 @@ msgstr "Variables de entorno globales"
 
 #: faugus/launcher.py:6041
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: faugus/launcher.py:6042
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface"
-msgstr "Modo de visualización"
+msgstr "Interfaz"
 
 #: faugus/launcher.py:6149
 #, python-format
 msgid "Clear Logs (%s)"
-msgstr "Borrar registros (%s)"
+msgstr "Borrar logs (%s)"
 
 #: faugus/launcher.py:6152
 msgid "Clear Logs"
-msgstr "Borrar registros"
+msgstr "Limpiar logs"
 
 #: faugus/launcher.py:6199
 msgid "Covers or Carrousel mode"
@@ -863,17 +851,15 @@ msgstr "Portadas o modo carrusel"
 
 #: faugus/launcher.py:6208
 msgid "Grid, Covers or Carrousel mode"
-msgstr "Grilla, Portadas o modo Carrusel"
+msgstr "Grilla, portadas o modo carrusel"
 
 #: faugus/launcher.py:6217
-#, fuzzy
-#| msgid "Grid, Covers or Carrousel mode"
 msgid "Grid or Covers mode"
-msgstr "Grilla, Portadas o modo Carrusel"
+msgstr "Modo grilla o portadas"
 
 #: faugus/launcher.py:6245
 msgid "Covers or Carrousel mode with SteamGridDB"
-msgstr "Portadas o modo Carrusel con SteamGridDB"
+msgstr "Portadas o modo carrusel con SteamGridDB"
 
 #: faugus/launcher.py:6309
 msgid "Adwaita theme"
@@ -885,16 +871,15 @@ msgstr "¿Deseas guardar los cambios?"
 
 #: faugus/launcher.py:6525
 msgid "Select a backup file to restore"
-msgstr "Seleccionar un archivo de copia de seguridad para restaurar"
+msgstr "Seleccione un archivo de backup para restaurar"
 
 #: faugus/launcher.py:6531
 msgid "Faugus Backup files"
-msgstr "Archivos de copia de seguridad de Faugus"
+msgstr "Archivos de backup de Faugus"
 
 #: faugus/launcher.py:6547 faugus/launcher.py:6586
 msgid "This is not a valid Faugus backup file."
-msgstr ""
-"Este no es un archivo de copia de seguridad válido para Faugus Launcher."
+msgstr "Este no es un archivo de backup válido para Faugus."
 
 #: faugus/launcher.py:6630 faugus/launcher.py:8611
 msgid "Select a prefix location"
@@ -966,10 +951,8 @@ msgid "Path to the prefix"
 msgstr "Ruta al prefix"
 
 #: faugus/launcher.py:7204
-#, fuzzy
-#| msgid "Default Proton"
 msgid "Specific Proton"
-msgstr "Proton predeterminado"
+msgstr "Proton específico"
 
 #: faugus/launcher.py:7218 faugus/shortcut.py:61
 msgid "Game Arguments"
@@ -1099,7 +1082,7 @@ msgstr "Por favor, instálalo o usa otra versión de Proton."
 
 #: faugus/runner.py:589
 msgid "Components are up to date"
-msgstr "Los componentes están actualizados"
+msgstr "Componentes actualizados"
 
 #: faugus/runner.py:601
 msgid "Updating"
@@ -1210,7 +1193,7 @@ msgstr "Comando o script para ejecutar después del juego"
 
 #: faugus/utils.py:1697 faugus/utils.py:1872
 msgid "Enable"
-msgstr "Activar"
+msgstr "Habilitar"
 
 #: faugus/utils.py:1706
 msgid "Path to the application"
