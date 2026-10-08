@@ -4962,6 +4962,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return final if status == "ok" else None
 
     def download_launcher(self, launcher, title, title_formatted, runner, prefix, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user=None):
+            runner = resolve_game_runner(runner)
             urls = {"amazon": "https://download.amazongames.com/AmazonGamesSetup.exe",
                 "battle": "https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe",
                 "ea": "https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller.exe",
