@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 00:51+0000\n"
-"PO-Revision-Date: 2026-10-03 21:51+0000\n"
+"PO-Revision-Date: 2026-10-09 00:08+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -319,7 +319,6 @@ msgid "Stop"
 msgstr "Stoppen"
 
 #: faugus/launcher.py:2804
-#, fuzzy
 msgid "Play with logs"
 msgstr "Spielen mit Logs"
 
@@ -563,7 +562,7 @@ msgstr "Akzentfarbe"
 
 #: faugus/launcher.py:5537 faugus/launcher.py:5549
 msgid "Dominant color"
-msgstr "Hauptfarbe"
+msgstr "Dominante Farbe"
 
 #: faugus/launcher.py:5544
 msgid "Overview Color"
@@ -574,10 +573,8 @@ msgid "Widget Color"
 msgstr "Widgetfarbe"
 
 #: faugus/launcher.py:5561
-#, fuzzy
-#| msgid "Dominant color"
 msgid "Solid color"
-msgstr "Hauptfarbe"
+msgstr "Feste Farbe"
 
 #: faugus/launcher.py:5563
 msgid "Banner"
