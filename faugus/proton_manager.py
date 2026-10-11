@@ -1,5 +1,6 @@
 
 
+import re
 import requests
 import gi
 import tarfile
@@ -247,16 +248,14 @@ class ProtonDownloader(Gtk.Dialog):
                 if p.exists():
                     return p
 
-        tag_lower = tag_name.lower()
-        display_lower = display_name.lower()
+        pattern = re.compile(f"(?:{re.escape(tag_name)}|{re.escape(display_name)})(?!\\d)", re.IGNORECASE)
         for compat_dir in COMPATIBILITY_DIRS:
             if not compat_dir.exists():
                 continue
             for folder in compat_dir.iterdir():
                 if not folder.is_dir():
                     continue
-                fn_lower = folder.name.lower()
-                if tag_lower in fn_lower or display_lower in fn_lower:
+                if pattern.search(folder.name):
                     return folder
 
         return COMPATIBILITY_DIR / display_name
