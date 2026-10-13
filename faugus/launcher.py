@@ -4936,8 +4936,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.add_game_shortcuts(game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
                 self.show_new_game(game)
             else:
-                if os.path.exists(expand_path(game.prefix)):
-                    shutil.rmtree(expand_path(game.prefix))
+                prefix_path = expand_path(game.prefix)
+                if os.path.exists(prefix_path) and os.path.basename(prefix_path) != "default" and prefixes_count(game.prefix) == 0:
+                    shutil.rmtree(prefix_path)
                 self.remove_shortcut(game, "both")
                 self.remove_steam_shortcut(title)
                 self.remove_cover_icon(game)
