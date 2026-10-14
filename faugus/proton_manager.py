@@ -8,7 +8,9 @@ import shutil
 import threading
 import warnings
 
-from faugus.proton_downloader import select_asset, get_tar_mode
+from faugus.proton_downloader import (
+    CONFIGS, StreamProgress, select_asset, get_tar_mode, ensure_latest,
+)
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -67,24 +69,6 @@ VARIANTS = {
 
 class _DownloadCancelled(Exception):
     pass
-
-
-class _StreamProgress:
-    def __init__(self, raw, total_size, progress_callback):
-        self.raw = raw
-        self.total_size = total_size
-        self.progress_callback = progress_callback
-        self.bytes_read = 0
-
-    def read(self, size=-1):
-        chunk = self.raw.read(size)
-        self.bytes_read += len(chunk)
-        if self.total_size > 0:
-            self.progress_callback(self.bytes_read / self.total_size)
-        return chunk
-
-    def close(self):
-        self.raw.close()
 
 
 class ProtonDownloader(Gtk.Dialog):
@@ -153,6 +137,9 @@ class ProtonDownloader(Gtk.Dialog):
             self.tab_switcher.append(key, variant["tab_label"])
 
             self.grids[key] = grid
+
+        for key in self.grids:
+            self.add_latest_row(key)
 
         self.tab_switcher.set_active(0)
 
@@ -238,6 +225,63 @@ class ProtonDownloader(Gtk.Dialog):
         button.download_cancel_event = None
         button.progress_css_provider = None
         grid.attach(button, 1, row_index, 1, 1)
+
+    def add_latest_row(self, kind):
+        cfg = CONFIGS[kind]
+        grid = self.grids[kind]
+        proton_dir = COMPATIBILITY_DIR / cfg["dir"]
+
+        label = Gtk.Label(label=f"{cfg['label']} Latest", xalign=0)
+        label.set_halign(Gtk.Align.START)
+        label.set_hexpand(True)
+        grid.attach(label, 0, 0, 1, 1)
+
+        button = Gtk.Button()
+        self.set_button_label(button, _("Remove") if proton_dir.exists() else _("Download"))
+        button.connect("clicked", self.on_latest_clicked, kind)
+        button.set_size_request(120, -1)
+        button.download_cancel_event = None
+        button.progress_css_provider = None
+        grid.attach(button, 1, 0, 1, 1)
+
+    def on_latest_clicked(self, button, kind):
+        if button.download_cancel_event is not None:
+            button.download_cancel_event.set()
+            return
+
+        proton_dir = COMPATIBILITY_DIR / CONFIGS[kind]["dir"]
+        if proton_dir.exists():
+            shutil.rmtree(proton_dir, ignore_errors=True)
+            self.set_button_label(button, _("Download"))
+            return
+
+        closed_event = self.closed_event
+        cancel_event = threading.Event()
+        button.download_cancel_event = cancel_event
+
+        self.set_button_label(button, _("Cancel"))
+        self.set_button_progress(button, 0)
+
+        def finish(new_label):
+            self.clear_button_progress(button)
+            button.download_cancel_event = None
+            self.set_button_label(button, new_label)
+
+        def worker():
+            last_pct = [-1]
+
+            def _progress(frac):
+                if cancel_event.is_set() or closed_event.is_set():
+                    raise _DownloadCancelled()
+                pct = int(frac * 1000)
+                if pct != last_pct[0]:
+                    last_pct[0] = pct
+                    idle_add_while_open(closed_event, self.set_button_progress, button, frac)
+
+            ensure_latest(kind, _progress)
+            idle_add_while_open(closed_event, finish, _("Remove") if proton_dir.exists() else _("Download"))
+
+        run_in_background(worker)
 
     def get_installed_path(self, tag_name, variant):
         display_name = variant["tag_to_display"](tag_name)
@@ -345,7 +389,7 @@ class ProtonDownloader(Gtk.Dialog):
                         last_pct[0] = pct
                         idle_add_while_open(closed_event, self.set_button_progress, button, frac)
 
-                stream = _StreamProgress(response.raw, total_size, _progress)
+                stream = StreamProgress(response.raw, total_size, _progress)
 
                 with tarfile.open(fileobj=stream, mode=get_tar_mode(filename)) as tar:
                     tar.extractall(path=COMPATIBILITY_DIR, filter="fully_trusted")

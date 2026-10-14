@@ -75,6 +75,24 @@ def get_tar_mode(name):
 USER_AGENT = "faugus-launcher"
 
 
+class StreamProgress:
+    def __init__(self, raw, total_size, progress_callback):
+        self.raw = raw
+        self.total_size = total_size
+        self.progress_callback = progress_callback
+        self.bytes_read = 0
+
+    def read(self, size=-1):
+        chunk = self.raw.read(size)
+        self.bytes_read += len(chunk)
+        if self.total_size > 0:
+            self.progress_callback(self.bytes_read / self.total_size)
+        return chunk
+
+    def close(self):
+        self.raw.close()
+
+
 def get_latest_tag_and_url(api, archive_ext):
     try:
         req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT})
@@ -140,7 +158,7 @@ def rewrite_compatibilitytool_vdf(proton_dir, display_name):
     )
 
 
-def install_proton_latest(proton_dir, url, asset_name, label):
+def install_proton_latest(proton_dir, url, asset_name, label, progress=None):
     tmp = COMPATIBILITY_DIR / "__proton_tmp__"
 
     try:
@@ -148,6 +166,8 @@ def install_proton_latest(proton_dir, url, asset_name, label):
         tmp.mkdir(parents=True, exist_ok=True)
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         response = urllib.request.urlopen(req, timeout=30)
+        if progress:
+            response = StreamProgress(response, int(response.headers.get("Content-Length", 0)), progress)
 
         with tarfile.open(fileobj=response, mode=get_tar_mode(asset_name)) as tar:
             tar.extractall(tmp, filter="data")
@@ -167,7 +187,7 @@ def install_proton_latest(proton_dir, url, asset_name, label):
     return True
 
 
-def ensure_latest(kind):
+def ensure_latest(kind, progress=None):
     cfg = CONFIGS[kind]
 
     proton_dir = COMPATIBILITY_DIR / cfg["dir"]
@@ -184,7 +204,7 @@ def ensure_latest(kind):
         print(f"{cfg['label']} is up to date.", flush=True)
         return
 
-    if install_proton_latest(proton_dir, url, asset_name, cfg["label"]):
+    if install_proton_latest(proton_dir, url, asset_name, cfg["label"], progress):
         rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
 
