@@ -9,7 +9,7 @@ Source0:        https://github.com/Faugus/faugus-launcher/archive/refs/tags/%{ve
 
 BuildArch:      noarch
 BuildRequires:  meson gtk-update-icon-cache python3-devel gettext
-Requires:       python3-gobject python3-requests python3-pillow python3-vdf python3-psutil python3-dbus gtk4 libadwaita libmanette python3-icoextract
+Requires:       python3-gobject python3-requests python3-pillow python3-vdf python3-psutil gtk4 libadwaita libmanette python3-icoextract
 
 %description
 A simple and lightweight app for running Windows games using UMU-Launcher/UMU-Proton.
