@@ -287,7 +287,7 @@ jobs:
           set -e
           PACKAGE="faugus-launcher"
           PPA="ppa:faugus/faugus-launcher"
-          DISTROS=("noble" "resolute")
+          DISTROS=("noble" "resolute" "stonking")
           WORK_DIR=$(mktemp -d)
           cd "$WORK_DIR"
 
