@@ -4999,6 +4999,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 print(f"{title} installed.")
                 self.add_game_shortcuts(game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
                 self.show_new_game(game)
+                play_ui_sound("confirm")
             else:
                 prefix_path = expand_path(game.prefix)
                 if os.path.exists(prefix_path) and os.path.basename(prefix_path) != "default" and prefixes_count(game.prefix) == 0:
