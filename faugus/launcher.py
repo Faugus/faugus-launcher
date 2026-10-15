@@ -8513,6 +8513,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_shortcut_icon.set_visible(self.steamgriddb_enabled)
 
             self.set_title_silently(self.combobox_launcher.get_active_text())
+            self._steamgriddb_suggestion_id = None
+            self._steamgriddb_steam_appid = None
             if getattr(self, 'popover_suggestion', None) is not None:
                 self.popover_suggestion.popdown()
 
@@ -8525,7 +8527,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             if path:
                 self.entry_path.set_text(f"{self.entry_prefix.get_text()}/{path}")
 
-        if self.interface_mode in ("Covers", "Carrousel") and self.entry_title.get_text():
+        if (self.interface_mode in ("Covers", "Carrousel") or self.steamgriddb_enabled) and self.entry_title.get_text():
             self.get_artwork()
 
     def populate_combobox_with_launchers(self):
