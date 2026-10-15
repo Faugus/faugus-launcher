@@ -752,17 +752,23 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         banner_image_box, banner_fade_box = self.add_banner_layers(overlay, "launcher-screen-banner-image", "launcher-screen-banner-fade")
 
+        banner_picture = Gtk.Picture()
+        banner_picture.set_content_fit(Gtk.ContentFit.FILL)
+        banner_picture.set_can_shrink(True)
+        banner_picture.set_hexpand(True)
+        try:
+            banner_picture.set_paintable(Gdk.Texture.new_from_filename(banner_path))
+        except GLib.Error:
+            pass
+        banner_image_box.append(banner_picture)
+
         overlay.add_overlay(content_widget)
         overlay.set_measure_overlay(content_widget, True)
 
-        provider = Gtk.CssProvider()
-        banner_image_box.get_style_context().add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         fade_provider = Gtk.CssProvider()
         banner_fade_box.get_style_context().add_provider(fade_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
 
-        self.launcher_banner_provider = provider
         self.launcher_banner_fade_provider = fade_provider
-        self.launcher_banner_path = banner_path
         self.update_launcher_banner_css()
 
         return overlay
@@ -770,9 +776,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def wrap_launcher_no_banner(self, content_widget):
         base_box = self.setup_launcher_base_box(content_widget)
 
-        self.launcher_banner_provider = None
         self.launcher_banner_fade_provider = None
-        self.launcher_banner_path = None
         self.update_launcher_banner_css()
 
         return base_box
@@ -789,37 +793,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.launcher_banner_base_provider = base_provider
         return base_box
 
-    def cache_busted_uri(self, source_path, cache_key):
-        counter_attr = f"_{cache_key}_counter"
-        path_attr = f"_{cache_key}_path"
-
-        cache_path = source_path
-        if os.path.getsize(source_path) > 0:
-            counter = getattr(self, counter_attr, 0) + 1
-            setattr(self, counter_attr, counter)
-            candidate_path = f"{source_path}.cache{counter}"
-            try:
-                shutil.copyfile(source_path, candidate_path)
-                cache_path = candidate_path
-            except OSError:
-                pass
-
-        old_cache_path = getattr(self, path_attr, None)
-        setattr(self, path_attr, cache_path if cache_path != source_path else None)
-        if old_cache_path and old_cache_path != cache_path and os.path.isfile(old_cache_path):
-            try:
-                os.remove(old_cache_path)
-            except OSError:
-                pass
-
-        return Gio.File.new_for_path(cache_path).get_uri()
-
     def update_launcher_banner_css(self):
         base_provider = getattr(self, 'launcher_banner_base_provider', None)
         if base_provider is None:
             return
-
-        provider = self.launcher_banner_provider
 
         base_mode = self.background_mode
         fade_rgb = self.get_named_rgb("theme_bg_color")
@@ -846,20 +823,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         """
         base_provider.load_from_data(base_css.encode("utf-8"))
 
-        if provider is not None and os.path.isfile(self.launcher_banner_path):
-            banner_uri = self.cache_busted_uri(self.launcher_banner_path, 'launcher_banner_css_cache')
-            provider.load_from_data(self.banner_image_css("launcher-screen-banner-image", banner_uri).encode("utf-8"))
+        if self.launcher_banner_fade_provider is not None:
             self.launcher_banner_fade_provider.load_from_data(self.banner_fade_css("launcher-screen-banner-fade", fade_rgb).encode("utf-8"))
-
-    def banner_image_css(self, css_class, uri):
-        return f"""
-        .{css_class} {{
-            background-image: url("{uri}");
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 100% 100%;
-        }}
-        """
 
     def banner_fade_css(self, css_class, rgb):
         r, g, b = rgb
@@ -1002,10 +967,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     f".banner-bg-color {{ transition: background-color 150ms; {color_css} }}",
                 )
                 if texture is not None and self._banner_fade_provider is not None:
-                    self.load_css_if_changed(
-                        self._banner_fade_provider,
-                        fade_css + ".banner-bg-fade { transition: color 150ms; }",
-                    )
+                    transition = ""
+                    if getattr(self._banner_fade_provider, "loaded_css", None) is not None:
+                        transition = ".banner-bg-fade { transition: color 150ms; }"
+                    self.load_css_if_changed(self._banner_fade_provider, fade_css + transition)
                 stack_banner.set_visible_child(page)
                 self._banner_page_index = next_index
                 return False
@@ -1256,7 +1221,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.set_default_size(-1, 610)
             self.set_resizable(False)
 
-        self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.stack_main = Gtk.Stack()
+        self.stack_main.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+        self.stack_main.set_transition_duration(200)
 
         def create_button(icon_name, callback, tooltip=None):
             btn = Gtk.Button()
@@ -1568,7 +1535,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if is_big:
             self.main_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            self.box_main.append(self.main_hbox)
+            self.stack_main.add_child(self.main_hbox)
 
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.main_hbox.append(self.build_background_container(right_vbox))
@@ -1696,7 +1663,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             list_container.append(self.box_bottom)
 
             self.list_hbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            self.box_main.append(self.list_hbox)
+            self.stack_main.add_child(self.list_hbox)
             self.list_hbox.append(self.build_background_container(list_container))
 
         update_sort_data()
@@ -1707,7 +1674,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.load_games()
 
-        self.set_child(self.box_main)
+        self.set_child(self.stack_main)
 
         def on_first_map(*args):
             self.disconnect_by_func(on_first_map)
@@ -2007,6 +1974,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         def do_layout(_widget, _frame_clock):
+            if not self.carrousel_fixed.get_width():
+                return GLib.SOURCE_CONTINUE
             self._carrousel_layout_tick_id = None
             self.apply_carrousel_layout()
             return GLib.SOURCE_REMOVE
@@ -2023,6 +1992,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for slot in self.carrousel_slots:
             self.place_carrousel_slot_base(slot)
             self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
+        self.carrousel_fixed.set_opacity(1.0)
 
     def on_carrousel_focus_changed(self, widget, pspec):
         for slot in getattr(self, 'carrousel_slots', []):
@@ -2137,6 +2107,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.carrousel_fixed.set_size_request(self.carrousel_step * 3, cross_size)
 
         extent = self.carrousel_layout_extent() or self.carrousel_step * 3
+        if not self.carrousel_fixed.get_width():
+            self.carrousel_fixed.set_opacity(0.0)
+            self.update_carrousel_layout()
 
         games = self.carrousel_visible_games()
         n = len(games)
@@ -3832,13 +3805,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if getattr(self, '_flowbox_populate_generation', None) is not generation:
                 return False
 
+            done = False
             for _ in range(batch_size):
                 game = next(games_iter, None)
                 if game is None:
-                    return False
+                    done = True
+                    break
                 self.add_item_list(game)
 
-            return True
+            if not self.flowbox.get_selected_children():
+                self.select_first_visible_child()
+                self.update_overview_panel()
+
+            return not done
 
         GLib.idle_add(step)
 
@@ -4958,17 +4937,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         grid_labels.attach(self.bar_download, 0, 1, 1, 1)
         grid_labels.attach(self.label_download2, 0, 2, 1, 1)
 
-        if self.interface_mode != "List":
-            self.box_main.remove(self.main_hbox)
-        else:
-            self.box_main.remove(self.list_hbox)
-
         banner_path = f"{BANNERS_DIR}/{title_formatted}.png"
         if self.banner_overlay_enabled() and os.path.isfile(banner_path):
             self.box_launcher_display = self.wrap_with_static_banner(self.box_launcher, banner_path)
         else:
             self.box_launcher_display = self.wrap_launcher_no_banner(self.box_launcher)
-        self.box_main.append(self.box_launcher_display)
+        self.stack_main.add_child(self.box_launcher_display)
+        self.stack_main.set_visible_child(self.box_launcher_display)
 
     def monitor_process(self, processo, game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, title, steam_user=None):
         retcode = processo.poll()
@@ -4976,15 +4951,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if retcode is not None:
             if os.path.exists(FAUGUS_TEMP):
                 shutil.rmtree(FAUGUS_TEMP)
-            self.box_main.remove(self.box_launcher_display)
             self.launcher_banner_base_provider = None
-            self.launcher_banner_provider = None
-            self.launcher_banner_path = None
+            self.launcher_banner_fade_provider = None
             self.launcher_banner_dominant_rgb = None
-            if self.interface_mode != "List":
-                self.box_main.append(self.main_hbox)
+            launcher_display = self.box_launcher_display
+            self.stack_main.set_visible_child(self.main_hbox if self.interface_mode != "List" else self.list_hbox)
+            if self.stack_main.get_transition_running():
+                def remove_launcher_display(stack, _pspec):
+                    if not stack.get_transition_running():
+                        stack.disconnect(handler)
+                        stack.remove(launcher_display)
+                handler = self.stack_main.connect("notify::transition-running", remove_launcher_display)
             else:
-                self.box_main.append(self.list_hbox)
+                self.stack_main.remove(launcher_display)
 
             if game.gameid == "ea-app":
                 game.path = update_ea_path(game.prefix)
@@ -4999,6 +4978,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 print(f"{title} installed.")
                 self.add_game_shortcuts(game, desktop_shortcut_state, appmenu_shortcut_state, steam_shortcut_state, icon_temp, icon_final, steam_user)
                 self.show_new_game(game)
+                play_ui_sound("confirm")
             else:
                 prefix_path = expand_path(game.prefix)
                 if os.path.exists(prefix_path) and os.path.basename(prefix_path) != "default" and prefixes_count(game.prefix) == 0:
