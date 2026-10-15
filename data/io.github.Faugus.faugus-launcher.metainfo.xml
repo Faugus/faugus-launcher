@@ -94,21 +94,19 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.4.4-1" date="2026-10-08">
+    <release version="2.5.0-1" date="2026-10-15">
       <description>
         <ul>
-          <li>Now games will use the default Proton by default. Added an option to specify a Proton per game rather than use the default.</li>
-          <li>Added an option to change the widget color.</li>
-          <li>Changed the color of the "Remove" button in Proton Manager.</li>
-          <li>Now populates the flowbox vertically when orientation is horizontal.</li>
-          <li>Now the "Run file in the prefix" option honors the environment variables set for that prefix.</li>
-          <li>Some code refactoring.</li>
-          <li>Fixed gamepad bumpers not switching Settings tabs.</li>
-          <li>Fixed gameids being duplicated after adding a game with a name previously used.</li>
-          <li>Fixed gamepad navigation when multiple input devices are connected.</li>
-          <li>Fixed playtime and last played display not being updated when launching a game from the shortcut.</li>
-          <li>Fixed the "Backup now" button sometimes stuck as "Cancel backup".</li>
-          <li>Fixed underscores in the game name not showing in the system tray menu.</li>
+          <li>Added an option to enable interface navigation sounds. Users can choose from the provided samples or use their own audio files and control the volume.</li>
+          <li>Reworked the Prevent Sleep option. Now it should work on more systems. The python-dbus dependency was removed because it's no longer needed.</li>
+          <li>Improved banner transition performance. With this change, scrolling through games in Carousel mode should feel smoother when banners are displayed.</li>
+          <li>Now the Proton Manager also handles the "Latest" options.</li>
+          <li>Added an option to remove the icons/covers/banners. Thanks @Alexlee500</li>
+          <li>Now if a launcher installation fails, the prefix is kept if it's shared with other games/apps.</li>
+          <li>Added Ubuntu 26.10 PPA build.</li>
+          <li>Fixed Proton Manager showing versions that haven't been downloaded as if they had been.</li>
+          <li>Fixed a bug that caused Grid icons and the shortcut icon button to become larger on older GTK versions.</li>
+          <li>Fixed icons from launchers not being fetched from SteamGridDB on List/Grid modes.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
