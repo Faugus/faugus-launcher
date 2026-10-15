@@ -405,7 +405,7 @@ class FaugusRun(HiDpiMixin):
             box_top.set_margin_bottom(20)
 
             texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 75, 75)
-            image = new_picture(texture)
+            image = new_icon(texture)
 
             label = Gtk.Label(label=_("Are you enjoying Faugus?"))
             label.set_halign(Gtk.Align.CENTER)
@@ -547,7 +547,7 @@ class FaugusRun(HiDpiMixin):
         else:
             image_path = FAUGUS_PNG_RASTER
         texture = self.new_texture_from_image(image_path, 75, 75)
-        image = new_picture(texture)
+        image = new_icon(texture)
         image.set_margin_top(20)
         image.set_margin_start(20)
         image.set_margin_end(20)

@@ -176,7 +176,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         status = extract_ico(self.file_path, self.icon_temp)
         if status == "ok":
             texture = self.new_texture_from_image(self.icon_temp, 50, 50)
-            self.button_shortcut_icon.set_child(new_picture(texture))
+            self.button_shortcut_icon.set_child(new_icon(texture))
         elif status == "no_icons":
             self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
@@ -331,7 +331,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
     def set_image_shortcut_icon(self):
         texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 50, 50)
-        return new_picture(texture)
+        return new_icon(texture)
 
     def on_button_shortcut_icon_clicked(self, widget):
         self.set_sensitive(False)
