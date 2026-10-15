@@ -306,6 +306,7 @@ class FaugusRun(HiDpiMixin):
                     log_file.close()
 
         self.inhibit_handle = None
+        self.inhibit_fd = None
         if os.environ.get("NO_SLEEP"):
             try:
                 result = Gio.bus_get_sync(Gio.BusType.SESSION, None).call_sync(
@@ -316,7 +317,17 @@ class FaugusRun(HiDpiMixin):
                 )
                 self.inhibit_handle = result.unpack()[0]
             except GLib.Error as e:
-                print(f"Failed to inhibit sleep: {e}")
+                print(f"Failed to inhibit sleep via portal: {e}")
+                try:
+                    result, fd_list = Gio.bus_get_sync(Gio.BusType.SYSTEM, None).call_with_unix_fd_list_sync(
+                        "org.freedesktop.login1", "/org/freedesktop/login1",
+                        "org.freedesktop.login1.Manager", "Inhibit",
+                        GLib.Variant("(ssss)", ("sleep:idle", "Faugus Launcher", "Game is running", "block")),
+                        GLib.VariantType("(h)"), Gio.DBusCallFlags.NONE, -1, None, None,
+                    )
+                    self.inhibit_fd = fd_list.steal_fds()[result.unpack()[0]]
+                except GLib.Error as e:
+                    print(f"Failed to inhibit sleep via logind: {e}")
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
@@ -748,6 +759,10 @@ class FaugusRun(HiDpiMixin):
             except GLib.Error as e:
                 print(f"Failed to release sleep inhibitor: {e}")
             self.inhibit_handle = None
+
+        if getattr(self, "inhibit_fd", None) is not None:
+            os.close(self.inhibit_fd)
+            self.inhibit_fd = None
 
         if self.post_launch:
             try:
