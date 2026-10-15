@@ -5,7 +5,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Manette
 from faugus.keyboard import VirtualKeyboard
 from faugus.path_manager import PathManager
-from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker
+from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker, play_ui_sound
 from faugus.main_screen_nav import (
     navigate_focus,
     get_active_window,
@@ -347,6 +347,7 @@ def _handle_button_down(self, button, win):
             focused_row = win.get_focus() if win else None
             if isinstance(focused_row, Gtk.ListBoxRow):
                 active_combo.set_selected(focused_row.get_index())
+                play_ui_sound("navigate")
             _close_combo(self)
             return
 
@@ -548,6 +549,7 @@ def open_combobox(self, combo):
 
     popover.connect("closed", lambda p: _on_combo_popover_closed(self, combo))
     popover.popup()
+    play_ui_sound("navigate")
 
     row = list_box.get_row_at_index(current)
     if row:
@@ -560,6 +562,7 @@ def _on_combo_popover_closed(self, combo):
         self.gamepad_active_combo = None
         self.gamepad_combo_popover = None
         combo.grab_focus()
+        play_ui_sound("navigate")
         if popover:
             popover.unparent()
 
@@ -688,6 +691,7 @@ def _handle_menu_button(self, button):
         if stack and stack.get_visible_child_name() not in (None, "main"):
             page_name = stack.get_visible_child_name()
             stack.set_visible_child_name("main")
+            play_ui_sound("navigate")
             root = popover.get_root()
             if root:
                 root.set_focus_visible(True)

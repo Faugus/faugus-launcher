@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib, Gio, Gdk
 from faugus.language_config import *
-from faugus.utils import on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog, widget_children
+from faugus.utils import mark_invalid_widget, play_navigate_if_window_active, play_ui_sound, on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog, widget_children
 
 
 from faugus.backup_daemon import (
@@ -141,6 +141,7 @@ class PrefixSelectionList(_RowCapMixin):
             self.liststore.append([False, item["title"], item["path"], _("Calculating..."), item["gameid"]])
 
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.connect("cursor-changed", play_navigate_if_window_active)
         self.treeview.set_headers_visible(True)
         self.treeview.get_selection().set_mode(Gtk.SelectionMode.NONE)
 
@@ -286,6 +287,7 @@ class PrefixShortcutList(_RowCapMixin):
             self.liststore.append([False, False, False, has_shortcut, has_prefix, item["title"], item["path"], _("Calculating..."), item["gameid"]])
 
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.connect("cursor-changed", play_navigate_if_window_active)
         self.treeview.set_headers_visible(True)
         self.treeview.get_selection().set_mode(Gtk.SelectionMode.NONE)
 
@@ -682,6 +684,7 @@ class BackupWindow(Gtk.Dialog):
         def make_time_spin(upper, page_increment):
             adjustment = Gtk.Adjustment(value=0, lower=0, upper=upper, step_increment=1, page_increment=page_increment, page_size=0)
             spin = Gtk.SpinButton(adjustment=adjustment, numeric=True)
+            spin.connect("value-changed", play_navigate_if_window_active)
             spin.set_wrap(True)
             spin.set_width_chars(2)
             spin.set_max_width_chars(2)
@@ -703,6 +706,7 @@ class BackupWindow(Gtk.Dialog):
         self.box_time.append(self.spin_minute)
 
         self.button_backup_frequency = Gtk.MenuButton()
+        self.button_backup_frequency.connect("notify::active", lambda *_args: play_ui_sound("navigate"))
         self.button_backup_frequency.set_hexpand(True)
         self.label_backup_frequency = Gtk.Label()
         self.button_backup_frequency.set_child(self.label_backup_frequency)
@@ -772,6 +776,7 @@ class BackupWindow(Gtk.Dialog):
 
         self.button_backup_frequency.set_menu_model(self.build_backup_frequency_menu())
         self.button_backup_frequency.get_popover().add_child(self.monthday_grid, "monthdays")
+        self.button_backup_frequency.get_popover().connect("notify::visible-submenu", lambda *_args: play_ui_sound("navigate"))
 
         self.update_monthday_grid_selection()
         self.update_backup_frequency_label()
@@ -902,7 +907,7 @@ class BackupWindow(Gtk.Dialog):
             return
 
         if not self.entry_dest.get_text():
-            self.entry_dest.add_css_class("entry")
+            mark_invalid_widget(self.entry_dest)
             return
         dest_dir = self.entry_dest.get_text()
 

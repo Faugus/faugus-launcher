@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FAUGUS_NOTIFICATION, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -301,6 +301,7 @@ class IdComboBox(Gtk.DropDown):
         self.set_list_factory(list_factory)
         self._list_factory_bind_func = self._on_full_text_list_factory_bind
         self.connect("notify::selected", self._on_notify_selected)
+        self.get_first_child().connect("toggled", play_navigate_if_window_active)
 
     def _on_factory_setup(self, factory, list_item):
         label = Gtk.Label(xalign=0)
@@ -872,8 +873,27 @@ def add_image_file_filters(filechooser, include_ico=True):
 _active_media_streams = []
 
 
-def play_notification_sound():
-    media = Gtk.MediaFile.new_for_filename(FAUGUS_NOTIFICATION)
+UI_SOUND_KINDS = ("navigate", "confirm", "cancel", "warning")
+UI_SOUND_CONFIG_KEYS = (
+    "interface-sounds-enabled",
+    "interface-sounds-theme",
+    "interface-sounds-volume",
+    *(f"interface-sounds-custom-{kind}" for kind in UI_SOUND_KINDS),
+)
+
+
+def get_ui_sound_path(theme, kind, custom_path=""):
+    if theme == "custom":
+        return expand_path(custom_path)
+    return PathManager.get_asset(os.path.join("sounds", f"{theme}-{kind}.ogg"))
+
+
+def play_sound_file(path, volume=1.0):
+    if not path or not os.path.isfile(path):
+        return
+    media = Gtk.MediaFile.new_for_filename(path)
+    media.set_volume(0)
+    media.set_volume(volume ** (1 / 3))
     _active_media_streams.append(media)
 
     def on_notify_ended(stream, _pspec):
@@ -882,6 +902,196 @@ def play_notification_sound():
 
     media.connect("notify::ended", on_notify_ended)
     media.play()
+
+
+_ui_sound_config = None
+_queued_ui_sound = None
+_last_navigate_sound = 0
+_warm_up_media = None
+_ui_sound_requests = 0
+
+
+def reload_ui_sound_config():
+    global _ui_sound_config
+    _ui_sound_config = None
+
+
+def _get_ui_sound_config():
+    global _ui_sound_config
+    if _ui_sound_config is None:
+        _ui_sound_config = load_json_file(CONFIG_FILE_DIR, default={})
+    return _ui_sound_config
+
+
+def preview_ui_sound_config(values):
+    global _ui_sound_config
+    _ui_sound_config = {**_get_ui_sound_config(), **values}
+
+
+def ui_sounds_enabled():
+    return _get_ui_sound_config().get("interface-sounds-enabled", "False") == "True"
+
+
+def play_ui_sound(kind):
+    global _queued_ui_sound, _ui_sound_requests
+    _ui_sound_requests += 1
+    if _queued_ui_sound is None:
+        GLib.idle_add(_flush_ui_sound)
+    if _queued_ui_sound is None or UI_SOUND_KINDS.index(kind) > UI_SOUND_KINDS.index(_queued_ui_sound):
+        _queued_ui_sound = kind
+
+
+def clear_queued_ui_sound():
+    global _queued_ui_sound
+    _queued_ui_sound = None
+
+
+def _flush_ui_sound():
+    global _queued_ui_sound, _last_navigate_sound
+    kind, _queued_ui_sound = _queued_ui_sound, None
+    if kind == "navigate":
+        now = GLib.get_monotonic_time()
+        if now - _last_navigate_sound < 50000:
+            return False
+        _last_navigate_sound = now
+    if kind and ui_sounds_enabled():
+        config = _get_ui_sound_config()
+        path = get_ui_sound_path(
+            config.get("interface-sounds-theme", "cloud"),
+            kind,
+            config.get(f"interface-sounds-custom-{kind}", ""),
+        )
+        play_sound_file(path, int(config.get("interface-sounds-volume", 50)) / 100)
+    return False
+
+
+def _on_window_focus_changed(window, _pspec):
+    focus = window.get_focus()
+    popover = focus.get_ancestor(Gtk.Popover) if focus else None
+    had_focus = getattr(window, "_ui_sound_had_focus", False)
+    same_popover = getattr(window, "_ui_sound_popover", None) is popover
+    window._ui_sound_had_focus = focus is not None
+    window._ui_sound_popover = popover
+    if not (had_focus and focus is not None and same_popover):
+        return
+    if getattr(window, "_ui_sound_pointer_press", False):
+        window._ui_sound_pointer_focus = True
+    else:
+        GLib.idle_add(_play_navigate_if_focus_visible, window, priority=GLib.PRIORITY_HIGH_IDLE)
+
+
+def _play_navigate_if_focus_visible(window):
+    if window.get_focus_visible() and window.is_active():
+        play_ui_sound("navigate")
+    return False
+
+
+def _on_pointer_pressed(gesture, _n_press, x, y):
+    window = gesture.get_widget()
+    target = window.pick(x, y, Gtk.PickFlags.DEFAULT)
+    window._ui_sound_pointer_press = True
+    window._ui_sound_pointer_focus = False
+    window._ui_sound_press_requests = _ui_sound_requests
+    window._ui_sound_press_on_button = target is not None and any(target.get_ancestor(gtype) for gtype in (Gtk.Button, Gtk.CheckButton))
+
+
+def _on_pointer_end(gesture, *_args):
+    window = gesture.get_widget()
+    window._ui_sound_pointer_press = False
+    if getattr(window, "_ui_sound_pointer_focus", False):
+        window._ui_sound_pointer_focus = False
+        if window._ui_sound_press_requests == _ui_sound_requests and not window._ui_sound_press_on_button:
+            play_ui_sound("navigate")
+
+
+def _on_toplevels_changed(_toplevels, _position, _removed, added):
+    if added:
+        GLib.idle_add(_setup_new_toplevels, priority=GLib.PRIORITY_HIGH_IDLE)
+
+
+def _setup_new_toplevels():
+    toplevels = Gtk.Window.get_toplevels()
+    windows = [toplevels.get_item(i) for i in range(toplevels.get_n_items())]
+    new_windows = [window for window in windows if not getattr(window, "_ui_sound_ready", False)]
+    for window in new_windows:
+        window._ui_sound_ready = True
+        focus = window.get_focus()
+        window._ui_sound_had_focus = focus is not None
+        window._ui_sound_popover = focus.get_ancestor(Gtk.Popover) if focus else None
+        window.connect("notify::focus-widget", _on_window_focus_changed)
+        window.connect("notify::visible", _on_window_visible_changed)
+        pointer_press = Gtk.GestureClick(button=0, propagation_phase=Gtk.PropagationPhase.CAPTURE)
+        pointer_press.connect("pressed", _on_pointer_pressed)
+        pointer_press.connect("end", _on_pointer_end)
+        window.add_controller(pointer_press)
+    if any(window.get_visible() for window in new_windows) and any(window.get_visible() for window in windows if window not in new_windows):
+        play_ui_sound("confirm")
+    return False
+
+
+def _on_window_visible_changed(window, _pspec):
+    toplevels = Gtk.Window.get_toplevels()
+    others = (toplevels.get_item(i) for i in range(toplevels.get_n_items()))
+    if window.get_visible() and any(other is not window and other.get_visible() for other in others):
+        play_ui_sound("confirm")
+
+
+def _on_button_clicked(button):
+    if not button.get_ancestor(Gtk.SpinButton):
+        play_ui_sound("navigate")
+    return True
+
+
+def _on_toggled(button):
+    play_navigate_if_window_active(button)
+    return True
+
+
+def play_navigate_if_window_active(widget, *_args):
+    root = widget.get_root()
+    if isinstance(root, Gtk.Window) and root.is_active():
+        play_ui_sound("navigate")
+
+
+def _on_activated(*_args):
+    play_ui_sound("navigate")
+    return True
+
+
+def _on_dialog_response(dialog, response_id):
+    if response_id in (Gtk.ResponseType.OK, Gtk.ResponseType.ACCEPT, Gtk.ResponseType.YES, Gtk.ResponseType.APPLY):
+        play_ui_sound("confirm")
+    elif response_id in (Gtk.ResponseType.CANCEL, Gtk.ResponseType.DELETE_EVENT, Gtk.ResponseType.CLOSE, Gtk.ResponseType.NO):
+        play_ui_sound("cancel")
+    return True
+
+
+def mark_invalid_widget(widget, css_class="entry"):
+    widget.add_css_class(css_class)
+    play_ui_sound("warning")
+
+
+def warm_up_sound_playback():
+    global _warm_up_media
+    if ui_sounds_enabled():
+        _warm_up_media = Gtk.MediaFile.new_for_filename(get_ui_sound_path("cloud", "navigate"))
+    return False
+
+
+def install_ui_sound_hooks():
+    Gtk.Window.get_toplevels().connect("items-changed", _on_toplevels_changed)
+    GLib.idle_add(warm_up_sound_playback)
+    for gtype in (Gtk.Button, Gtk.CheckButton, Gtk.CellRendererToggle, Gtk.ListBox, Gtk.ListView, Gtk.ColumnView, Gtk.GridView, Gio.SimpleAction, Gtk.Dialog):
+        GObject.type_class_ref(gtype)
+    GObject.add_emission_hook(Gtk.Button, "clicked", _on_button_clicked)
+    GObject.add_emission_hook(Gtk.CheckButton, "toggled", _on_toggled)
+    GObject.add_emission_hook(Gtk.CellRendererToggle, "toggled", _on_activated)
+    GObject.add_emission_hook(Gtk.ListBox, "row-activated", _on_activated)
+    GObject.add_emission_hook(Gtk.ListView, "activate", _on_activated)
+    GObject.add_emission_hook(Gtk.ColumnView, "activate", _on_activated)
+    GObject.add_emission_hook(Gtk.GridView, "activate", _on_activated)
+    GObject.add_emission_hook(Gio.SimpleAction, "activate", _on_activated)
+    GObject.add_emission_hook(Gtk.Dialog, "response", _on_dialog_response)
 
 
 def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
@@ -934,7 +1144,7 @@ def show_message_dialog(text1, text2="", parent=None, confirm_label=None, cancel
     hide_dialog_action_area(dialog)
     dialog.set_modal(modal)
     dialog.set_resizable(False)
-    play_notification_sound()
+    play_ui_sound("warning")
 
     content_area = dialog.get_content_area()
     content_area.set_halign(Gtk.Align.CENTER)
@@ -1204,19 +1414,28 @@ def make_donate_buttons():
     return button_kofi, button_paypal
 
 
+def open_uri(widget, uri):
+    def on_launched(launcher, result):
+        try:
+            launcher.launch_finish(result)
+        except GLib.Error as e:
+            print(e.message)
+
+    Gtk.UriLauncher.new(uri).launch(widget.get_root(), None, on_launched)
+
+
 def on_button_search_protonfix_clicked(widget):
-    import webbrowser
-    webbrowser.open("https://umu.openwinecomponents.org/")
+    open_uri(widget, "https://umu.openwinecomponents.org/")
 
 
 def on_button_kofi_clicked(widget):
-    import webbrowser
-    webbrowser.open("https://ko-fi.com/K3K210EMDU")
+    play_ui_sound("confirm")
+    open_uri(widget, "https://ko-fi.com/K3K210EMDU")
 
 
 def on_button_paypal_clicked(widget):
-    import webbrowser
-    webbrowser.open("https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
+    play_ui_sound("confirm")
+    open_uri(widget, "https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
 
 def expand_path(value):
@@ -1413,6 +1632,7 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
 
     def build_editable_list(store, header):
         tree = Gtk.TreeView(model=store)
+        tree.connect("cursor-changed", play_navigate_if_window_active)
         tree.add_css_class("selected-list")
         tree.set_hexpand(True)
         tree.set_vexpand(True)
@@ -1744,6 +1964,7 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     entry_delay = Gtk.SpinButton()
     entry_delay.set_adjustment(adjustment)
     entry_delay.set_numeric(True)
+    entry_delay.connect("value-changed", play_navigate_if_window_active)
     entry_delay.set_hexpand(True)
 
     checkbox_addapp_first = Gtk.CheckButton(label=_("Run the application first"))
@@ -1878,6 +2099,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     spin_multiplier = Gtk.SpinButton()
     spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
     spin_multiplier.set_numeric(True)
+    spin_multiplier.connect("value-changed", play_navigate_if_window_active)
     spin_multiplier.set_tooltip_text(_("Multiply the FPS"))
 
     label_flow = Gtk.Label(label=_("Flow Scale"))
@@ -1944,7 +2166,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
                   lossless_performance, lossless_hdr, lossless_present)
         if response == Gtk.ResponseType.OK:
             if checkbox_enable.get_active() and not entry_location.get_text():
-                entry_location.add_css_class("entry")
+                mark_invalid_widget(entry_location)
                 return
 
             result = (
@@ -2249,7 +2471,7 @@ def show_steamgriddb_picker(obj, category):
 
     if not game_name:
         load_red_entry_css()
-        obj.entry_title.add_css_class("entry")
+        mark_invalid_widget(obj.entry_title)
         if hasattr(obj, "tab_button_widgets") and hasattr(obj, "tab_names"):
             obj.tab_button_widgets[obj.tab_names.index("page1")].set_active(True)
         return

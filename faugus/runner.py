@@ -361,7 +361,7 @@ class FaugusRun(HiDpiMixin):
             hide_dialog_action_area(dialog)
             dialog.set_decorated(False)
             dialog.set_resizable(False)
-            play_notification_sound()
+            play_ui_sound("confirm")
 
             add_css_once("donate_dialog", """
             .paypal {

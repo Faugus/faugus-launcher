@@ -1,7 +1,11 @@
 install_data(
   'faugus-launcher-raster.png',
-  'faugus-notification.ogg',
   'gamecontrollerdb.txt',
+)
+
+install_subdir(
+  'sounds',
+  install_dir: get_option('datadir') / 'faugus-launcher',
 )
 
 install_data(

@@ -352,7 +352,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_title.remove_css_class("entry")
 
         if not title:
-            self.entry_title.add_css_class("entry")
+            mark_invalid_widget(self.entry_title)
             return False
 
         return True
