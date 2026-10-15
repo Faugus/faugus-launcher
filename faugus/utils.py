@@ -1302,6 +1302,7 @@ def choose_shortcut_icon(obj):
 
 
 _css_providers = {}
+_css_data = {}
 
 
 def add_css_once(key, css, priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION):
@@ -1311,7 +1312,11 @@ def add_css_once(key, css, priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION):
         Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), css_provider, priority)
         _css_providers[key] = css_provider
 
-    css_provider.load_from_data(css.encode('utf-8') if isinstance(css, str) else css)
+    data = css.encode('utf-8') if isinstance(css, str) else css
+    if _css_data.get(key) == data:
+        return
+    _css_data[key] = data
+    css_provider.load_from_data(data)
 
 
 def load_red_entry_css():
@@ -2713,7 +2718,22 @@ def get_average_color(image_path):
     return r_total // count, g_total // count, b_total // count
 
 
+_dominant_color_cache = {}
+
+
 def get_dominant_color(image_path):
+    try:
+        key = (image_path, os.path.getmtime(image_path))
+    except OSError:
+        return compute_dominant_color(image_path)
+    rgb = _dominant_color_cache.get(key)
+    if rgb is None:
+        rgb = compute_dominant_color(image_path)
+        _dominant_color_cache[key] = rgb
+    return rgb
+
+
+def compute_dominant_color(image_path):
     import colorsys
 
     pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_path)
