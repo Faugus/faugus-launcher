@@ -669,71 +669,65 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.stack_banner.set_vexpand(True)
 
         self._banner_pages = []
-        self._banner_color_providers = []
-        self._banner_image_providers = []
-        self._banner_fade_providers = []
 
         for i in range(2):
             page = Gtk.Overlay()
 
-            color_box = Gtk.Box()
-            color_box.set_hexpand(True)
-            color_box.set_vexpand(True)
-            color_box.add_css_class(f"banner-bg-color-{i}")
-            page.set_child(color_box)
-
-            banner_image_box = None
-            banner_fade_box = None
+            banner_picture = None
             if show_banner:
-                banner_image_box, banner_fade_box = self.add_banner_layers(page, f"banner-bg-image-{i}", f"banner-bg-fade-{i}")
+                banner_image_box = self.add_banner_box(page, f"banner-bg-image-{i}")
+                banner_picture = Gtk.Picture()
+                banner_picture.set_content_fit(Gtk.ContentFit.FILL)
+                banner_picture.set_can_shrink(True)
+                banner_picture.set_hexpand(True)
+                banner_image_box.append(banner_picture)
 
-            color_provider = Gtk.CssProvider()
-            color_box.get_style_context().add_provider(color_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
-            image_provider = Gtk.CssProvider()
-            if banner_image_box is not None:
-                banner_image_box.get_style_context().add_provider(image_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
-            fade_provider = Gtk.CssProvider()
-            if banner_fade_box is not None:
-                banner_fade_box.get_style_context().add_provider(fade_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
-
-            page.banner_image_box = banner_image_box
-
+            page.banner_picture = banner_picture
             self._banner_pages.append(page)
-            self._banner_color_providers.append(color_provider)
-            self._banner_image_providers.append(image_provider)
-            self._banner_fade_providers.append(fade_provider)
-
             self.stack_banner.add_named(page, f"banner-{i}")
 
         self._banner_page_index = 0
         self.stack_banner.set_visible_child(self._banner_pages[0])
 
+        color_box = Gtk.Box()
+        color_box.set_hexpand(True)
+        color_box.set_vexpand(True)
+        color_box.set_can_target(False)
+        color_box.add_css_class("banner-bg-color")
+        self._banner_color_provider = Gtk.CssProvider()
+        color_box.get_style_context().add_provider(self._banner_color_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+        overlay.add_overlay(color_box)
+        overlay.set_measure_overlay(color_box, False)
+
         overlay.add_overlay(self.stack_banner)
         overlay.set_measure_overlay(self.stack_banner, False)
+
+        self._banner_fade_provider = None
+        if show_banner:
+            banner_fade_box = self.add_banner_box(overlay, "banner-bg-fade")
+            banner_fade_box.set_can_target(False)
+            self._banner_fade_provider = Gtk.CssProvider()
+            banner_fade_box.get_style_context().add_provider(self._banner_fade_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
 
         overlay.add_overlay(content_widget)
         overlay.set_measure_overlay(content_widget, True)
         return overlay
 
     def add_banner_layers(self, overlay, image_class, fade_class):
-        image_box = Gtk.Box()
-        image_box.set_hexpand(True)
-        image_box.set_vexpand(False)
-        image_box.set_halign(Gtk.Align.FILL)
-        image_box.set_valign(Gtk.Align.START)
-        image_box.add_css_class(image_class)
-        overlay.add_overlay(image_box)
-        overlay.set_measure_overlay(image_box, False)
-
-        fade_box = Gtk.Box()
-        fade_box.set_hexpand(True)
-        fade_box.set_vexpand(False)
-        fade_box.set_halign(Gtk.Align.FILL)
-        fade_box.set_valign(Gtk.Align.START)
+        image_box = self.add_banner_box(overlay, image_class)
+        fade_box = self.add_banner_box(overlay, fade_class)
         fade_box.set_can_target(False)
-        fade_box.add_css_class(fade_class)
-        overlay.add_overlay(fade_box)
-        overlay.set_measure_overlay(fade_box, False)
+        return image_box, fade_box
+
+    def add_banner_box(self, overlay, css_class):
+        box = Gtk.Box()
+        box.set_hexpand(True)
+        box.set_vexpand(False)
+        box.set_halign(Gtk.Align.FILL)
+        box.set_valign(Gtk.Align.START)
+        box.add_css_class(css_class)
+        overlay.add_overlay(box)
+        overlay.set_measure_overlay(box, False)
 
         banner_ratio = 1920 / 620
         state = {"width": -1}
@@ -742,13 +736,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             width = widget.get_width()
             if width > 0 and width != state["width"]:
                 state["width"] = width
-                height = int(width / banner_ratio)
-                image_box.set_size_request(-1, height)
-                fade_box.set_size_request(-1, height)
+                box.set_size_request(-1, int(width / banner_ratio))
             return True
 
         overlay.add_tick_callback(on_banner_tick)
-        return image_box, fade_box
+        return box
 
     def wrap_with_static_banner(self, content_widget, banner_path):
         overlay = Gtk.Overlay()
@@ -873,7 +865,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         r, g, b = rgb
         return f"""
         .{css_class} {{
-            background-image: linear-gradient(to bottom, rgba({r}, {g}, {b}, 0) 0%, rgba({r}, {g}, {b}, 1) 100%);
+            color: rgb({r}, {g}, {b});
+            background-image: linear-gradient(to bottom, alpha(currentColor, 0) 0%, currentColor 100%);
             background-repeat: no-repeat;
             background-position: center;
             background-size: 100% 100%;
@@ -952,6 +945,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self._banner_update_source = GLib.timeout_add(120, fire)
 
+    def load_css_if_changed(self, provider, css):
+        if getattr(provider, "loaded_css", None) == css:
+            return
+        provider.loaded_css = css
+        provider.load_from_data(css.encode("utf-8"))
+
     def update_background(self):
         stack_banner = getattr(self, 'stack_banner', None)
         base_mode = self.background_mode
@@ -962,15 +961,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def apply():
             game = self.selected()
             color_css = ""
-            banner_css = ""
             fade_css = ""
+            banner_path = None
 
             next_index = 1 - self._banner_page_index
             page = self._banner_pages[next_index]
-            banner_image_box = page.banner_image_box
-            color_class = f"banner-bg-color-{next_index}"
-            image_class = f"banner-bg-image-{next_index}"
-            fade_class = f"banner-bg-fade-{next_index}"
 
             if game:
                 if base_mode == "dominant_color":
@@ -978,12 +973,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if os.path.isfile(color_source):
                         dominant = get_dominant_color(color_source)
                         r, g, b = dominant
-                        color_css = f".{color_class} {{ background-color: rgba({r}, {g}, {b}, 0.2); }}"
+                        color_css = f"background-color: rgba({r}, {g}, {b}, 0.2);"
 
-                if show_banner and banner_image_box is not None:
+                if show_banner and page.banner_picture is not None:
                     candidate = f"{BANNERS_DIR}/{game.gameid}.png"
                     if os.path.isfile(candidate):
-                        banner_uri = self.cache_busted_uri(candidate, 'background_banner_cache')
+                        banner_path = candidate
 
                         if base_mode == "dominant_color" and color_css:
                             fade_rgb = self.fade_rgb(dominant)
@@ -992,15 +987,40 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                         else:
                             fade_rgb = self.get_named_rgb("theme_bg_color")
 
-                        banner_css = self.banner_image_css(image_class, banner_uri)
-                        fade_css = self.banner_fade_css(fade_class, fade_rgb)
+                        fade_css = self.banner_fade_css("banner-bg-fade", fade_rgb)
 
-            self._banner_color_providers[next_index].load_from_data(color_css.encode("utf-8"))
-            self._banner_image_providers[next_index].load_from_data(banner_css.encode("utf-8"))
-            self._banner_fade_providers[next_index].load_from_data(fade_css.encode("utf-8"))
+            self._banner_request = getattr(self, '_banner_request', 0) + 1
+            request = self._banner_request
 
-            stack_banner.set_visible_child(page)
-            self._banner_page_index = next_index
+            def show(texture):
+                if request != self._banner_request:
+                    return False
+                if page.banner_picture is not None:
+                    page.banner_picture.set_paintable(texture)
+                self.load_css_if_changed(
+                    self._banner_color_provider,
+                    f".banner-bg-color {{ transition: background-color 150ms; {color_css} }}",
+                )
+                if texture is not None and self._banner_fade_provider is not None:
+                    self.load_css_if_changed(
+                        self._banner_fade_provider,
+                        fade_css + ".banner-bg-fade { transition: color 150ms; }",
+                    )
+                stack_banner.set_visible_child(page)
+                self._banner_page_index = next_index
+                return False
+
+            if banner_path is None:
+                return show(None)
+
+            def load():
+                try:
+                    texture = Gdk.Texture.new_from_filename(banner_path)
+                except GLib.Error:
+                    texture = None
+                GLib.idle_add(show, texture)
+
+            threading.Thread(target=load, daemon=True).start()
             return False
 
         GLib.idle_add(apply)
@@ -2047,7 +2067,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
-            f"transform: translate({translate_x:.2f}px, 0.00px) scale({scale:.4f}); "
+            f"transform: translate({translate_x:.2f}px, 0.00px) scale({scale:.2f}); "
             f"box-shadow: {box_shadow}; }}"
         )
         slot["style_provider"].load_from_data(css.encode("utf-8"))
@@ -2189,7 +2209,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             slot["offset"] = new_offset
 
         self.carrousel_start_animation()
-        self.schedule_background_update()
         self.update_icon()
 
     def apply_pending_carrousel_reorder(self):
@@ -2248,6 +2267,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     if settle_offset is not None:
                         self.layout_carrousel_slot(slot, settle_offset)
                 self._carrousel_anim_id = None
+                self.apply_background_update_now()
                 return False
             return True
 
