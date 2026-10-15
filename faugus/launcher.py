@@ -7865,7 +7865,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         return False
 
     def refresh_icon_preview(self):
-        surface = self.new_texture_from_image(self.icon_temp, 50, 50)
+        if not os.path.isfile(self.icon_temp):
+            self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
+            return
+        surface =self.new_texture_from_image(self.icon_temp, 50, 50)
         self.button_shortcut_icon.set_child(new_picture(surface))
 
     def refresh_banner_preview(self):
