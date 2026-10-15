@@ -7438,6 +7438,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         load_url = menu_button(_("Load from URL"))
         load_url.connect("clicked", self.on_load_url)
 
+        remove_item = menu_button(_("Remove"))
+        remove_item.connect("clicked", self.on_remove_image)
+
         page1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         self.grid_page1.attach(page1, 0, 1, 1, 1)
@@ -7840,6 +7843,14 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         dialog.connect("response", on_response)
         dialog.present()
+
+    def on_remove_image(self, widget):
+        self.menu.popdown()
+        category = self._menu_category
+        dest_path, refresh = self.artwork_target(category)
+        if os.path.isfile(dest_path):
+            os.remove(dest_path)
+            refresh()
 
     def set_cover_loading(self, loading):
         set_spinner_loading((self.spinner_cover1, self.spinner_cover2), loading)
