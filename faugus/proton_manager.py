@@ -18,7 +18,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.utils import widget_children, hide_dialog_action_area, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
+from faugus.utils import play_ui_sound, widget_children, hide_dialog_action_area, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
 if IS_FLATPAK:
     GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -247,12 +247,14 @@ class ProtonDownloader(Gtk.Dialog):
     def on_latest_clicked(self, button, kind):
         if button.download_cancel_event is not None:
             button.download_cancel_event.set()
+            play_ui_sound("cancel")
             return
 
         proton_dir = COMPATIBILITY_DIR / CONFIGS[kind]["dir"]
         if proton_dir.exists():
             shutil.rmtree(proton_dir, ignore_errors=True)
             self.set_button_label(button, _("Download"))
+            play_ui_sound("cancel")
             return
 
         closed_event = self.closed_event
@@ -280,6 +282,8 @@ class ProtonDownloader(Gtk.Dialog):
 
             ensure_latest(kind, _progress)
             idle_add_while_open(closed_event, finish, _("Remove") if proton_dir.exists() else _("Download"))
+            if proton_dir.exists():
+                idle_add_while_open(closed_event, play_ui_sound, "confirm")
 
         run_in_background(worker)
 
@@ -334,6 +338,7 @@ class ProtonDownloader(Gtk.Dialog):
     def on_button_clicked(self, widget, release, variant):
         if widget.download_cancel_event is not None:
             widget.download_cancel_event.set()
+            play_ui_sound("cancel")
             return
 
         tag_name = release["tag_name"]
@@ -395,6 +400,7 @@ class ProtonDownloader(Gtk.Dialog):
                     tar.extractall(path=COMPATIBILITY_DIR, filter="fully_trusted")
 
                 idle_add_while_open(closed_event, finish, _("Remove"))
+                idle_add_while_open(closed_event, play_ui_sound, "confirm")
 
             except _DownloadCancelled:
                 version_path = self.get_installed_path(tag_name, variant)
@@ -415,5 +421,6 @@ class ProtonDownloader(Gtk.Dialog):
             try:
                 shutil.rmtree(version_path)
                 self.set_button_label(widget, _("Download"))
+                play_ui_sound("cancel")
             except Exception:
                 pass

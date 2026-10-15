@@ -353,7 +353,7 @@ def _prompt_backup_destination():
     from faugus.utils import (
         on_entry_changed, load_red_entry_css, load_frame_css, hide_dialog_action_area,
         new_file_chooser, set_file_chooser_start_folder, destroy_and_release,
-        build_bottom_button_box, expand_path,
+        build_bottom_button_box, expand_path, mark_invalid_widget,
     )
 
     result = {"path": None}
@@ -439,12 +439,12 @@ def _prompt_backup_destination():
     def on_ok_clicked(widget):
         dest = expand_path(entry_dest.get_text().strip())
         if not dest:
-            entry_dest.add_css_class("entry")
+            mark_invalid_widget(entry_dest)
             return
         try:
             os.makedirs(dest, exist_ok=True)
         except OSError:
-            entry_dest.add_css_class("entry")
+            mark_invalid_widget(entry_dest)
             return
         finish(dest)
 

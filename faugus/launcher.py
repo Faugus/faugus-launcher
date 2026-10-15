@@ -71,6 +71,7 @@ class FaugusApp(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+        install_ui_sound_hooks()
 
         app_icon_dir = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "..", "assets"
@@ -1464,6 +1465,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
                 if self.move_custom_order(ordered, source_id, target_id):
                     self.flowbox.invalidate_sort()
+                    play_ui_sound("navigate")
 
                 return Gdk.DragAction.MOVE
 
@@ -2162,6 +2164,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.carrousel_radius = self.carrousel_fit_radius(n, self.carrousel_layout_extent())
         self.carrousel_index = (self.carrousel_index + delta) % n
+        play_ui_sound("navigate")
 
         span = self.carrousel_max_offset - self.carrousel_min_offset + 1
 
@@ -2201,6 +2204,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.move_custom_order(ordered, source_id, target_id):
             self.carrousel_resync_after_reorder(source_id)
+            play_ui_sound("navigate")
 
         return False
 
@@ -2383,6 +2387,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         btn_manage.set_has_frame(False)
 
         def manage_categories(btn_widget):
+            clear_queued_ui_sound()
             popover.popdown()
             GLib.idle_add(self.on_manage_categories_clicked, btn_widget)
 
@@ -2898,6 +2903,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             root.append_section(None, run_section)
 
         popover = Gtk.PopoverMenu.new_from_model(root)
+        popover.connect("notify::visible-submenu", lambda *_args: play_ui_sound("navigate"))
         popover.set_has_arrow(False)
         popover.add_child(header_box, "header")
         self.apply_popover_background_mode(popover, game)
@@ -2986,6 +2992,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu.set_parent(parent)
         if rect is not None:
             self.context_menu.set_pointing_to(rect)
+        self.context_menu.connect("closed", lambda popover: play_ui_sound("navigate"))
+        play_ui_sound("navigate")
 
     def format_playtime(self, seconds):
         if not seconds:
@@ -3390,10 +3398,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_context_menu_game_location(self, action, param):
         self.context_menu.popdown()
+        play_ui_sound("confirm")
         subprocess.Popen(["xdg-open", self.current_game])
 
     def on_context_menu_prefix_location(self, action, param):
         self.context_menu.popdown()
+        play_ui_sound("confirm")
         subprocess.Popen(["xdg-open", self.current_prefix])
 
     def run_file_in_prefix(self, game, file_run):
@@ -3464,6 +3474,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
         file_run = param.get_string()
         if os.path.isfile(file_run):
+            play_ui_sound("confirm")
             self.run_file_in_prefix(game, file_run)
 
     def on_context_menu_clear_recent(self, action, param):
@@ -3489,48 +3500,74 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         dialog.set_modal(True)
         dialog.set_default_size(1280, 720)
 
-        notebook = Gtk.Notebook()
-        notebook.set_margin_start(10)
-        notebook.set_margin_end(10)
-        notebook.set_margin_top(10)
-        notebook.set_margin_bottom(10)
-        notebook.set_halign(Gtk.Align.FILL)
-        notebook.set_valign(Gtk.Align.FILL)
-        notebook.set_vexpand(True)
-        notebook.set_hexpand(True)
+        view_stack = Gtk.Stack()
+        view_stack.set_vexpand(True)
+        view_stack.set_hexpand(True)
 
-        def add_log_page(log_path, tab_title):
-            scrolled_window = Gtk.ScrolledWindow()
-            scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        tab_switcher = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        tab_switcher.add_css_class("linked")
+        tab_switcher.set_homogeneous(True)
+        tab_switcher.set_hexpand(True)
+        tab_switcher.set_margin_top(10)
+        tab_switcher.set_margin_start(10)
+        tab_switcher.set_margin_end(10)
+
+        text_buffers = {}
+        tab_pages = [
+            ("proton", "Proton", self.proton_log),
+            ("umu", "UMU-Launcher", self.umu_log),
+        ]
+        first_button = None
+        tab_button_widgets = []
+        for name, label, log_path in tab_pages:
             text_view = Gtk.TextView()
             text_view.set_editable(False)
-            text_buffer = text_view.get_buffer()
             with open(log_path, "r") as log_file:
-                text_buffer.set_text(log_file.read())
+                text_view.get_buffer().set_text(log_file.read())
+            text_buffers[name] = text_view.get_buffer()
+
+            scrolled_window = Gtk.ScrolledWindow()
+            scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+            scrolled_window.set_margin_start(10)
+            scrolled_window.set_margin_end(10)
+            scrolled_window.set_margin_top(10)
+            scrolled_window.set_margin_bottom(10)
             scrolled_window.set_child(text_view)
+            view_stack.add_titled(scrolled_window, name, label)
 
-            tab_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-            tab_label = Gtk.Label(label=tab_title)
-            tab_label.set_width_chars(15)
-            tab_label.set_xalign(0.5)
-            tab_label.set_hexpand(True)
-            tab_box.append(tab_label)
-            tab_box.set_hexpand(True)
+            button = Gtk.ToggleButton(label=label)
+            button.set_focusable(False)
+            if first_button is None:
+                first_button = button
+                button.set_active(True)
+            else:
+                button.set_group(first_button)
+            button.connect("toggled", lambda btn, n=name: btn.get_active() and (view_stack.set_visible_child_name(n), play_navigate_if_window_active(btn)))
+            tab_switcher.append(button)
+            tab_button_widgets.append(button)
 
-            notebook.append_page(scrolled_window, tab_box)
-            return text_buffer
+        dialog.view_stack = view_stack
+        dialog.tab_names = [name for name, _label, _path in tab_pages]
+        dialog.tab_button_widgets = tab_button_widgets
 
-        text_buffers = (
-            add_log_page(self.proton_log, "Proton"),
-            add_log_page(self.umu_log, "UMU-Launcher"),
-        )
+        box_tabs = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_tabs.append(tab_switcher)
+        box_tabs.append(view_stack)
+
+        frame = Gtk.Frame()
+        frame.set_margin_top(10)
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_margin_bottom(10)
+        frame.set_child(box_tabs)
 
         def copy_to_clipboard(button):
-            text_buffer = text_buffers[notebook.get_current_page()]
+            text_buffer = text_buffers[view_stack.get_visible_child_name()]
             start_iter, end_iter = text_buffer.get_bounds()
             dialog.get_clipboard().set(text_buffer.get_text(start_iter, end_iter, False))
 
         def open_location(button):
+            play_ui_sound("confirm")
             subprocess.run(["xdg-open", os.path.dirname(self.proton_log)], check=True)
 
         button_copy_clipboard = Gtk.Button(label=_("Copy to clipboard"))
@@ -3550,7 +3587,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         box_bottom.append(button_copy_clipboard)
         box_bottom.append(button_open_location)
 
-        content_area.append(notebook)
+        content_area.append(frame)
         content_area.append(box_bottom)
 
         dialog.connect("response", lambda d, r: destroy_and_release(d))
@@ -3578,7 +3615,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         title_formatted = format_title(new_title)
 
         if not new_title or not title_formatted:
-            dialog.entry_title.add_css_class("entry")
+            mark_invalid_widget(dialog.entry_title)
             return
 
         if any(new_title.casefold() == g.title.casefold() for g in self.games):
@@ -3638,6 +3675,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return
 
         self.flowbox.select_child(current_item)
+        if n_press == 1:
+            play_ui_sound("navigate")
         if n_press == 2:
             self.on_item_double_click(current_item)
 
@@ -4139,6 +4178,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             destroy_and_release(settings_dialog)
 
         else:
+            reload_ui_sound_config()
             apply_interface_customization(
                 settings_dialog.original_interface_theme,
                 settings_dialog.original_accent_color,
@@ -4158,12 +4198,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         valid = True
 
         if not default_prefix:
-            settings_dialog.entry_default_prefix.add_css_class("entry")
+            mark_invalid_widget(settings_dialog.entry_default_prefix)
             valid = False
 
         if (settings_dialog.checkbox_steamgriddb.get_active()
                 and not settings_dialog.entry_steamgriddb_key.get_text().strip()):
-            settings_dialog.entry_steamgriddb_key.add_css_class("entry")
+            mark_invalid_widget(settings_dialog.entry_steamgriddb_key)
             valid = False
 
         return valid
@@ -4208,6 +4248,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if not game:
             return
+
+        play_ui_sound("confirm")
 
         if self.carrousel_active():
             center_slot = self.get_carrousel_center_slot() if hasattr(self, 'carrousel_slots') else None
@@ -4279,6 +4321,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.update_last_played(gameid, playtime=session[1] + int(elapsed))
 
     def on_exit(self, pid, status, game):
+        play_ui_sound("cancel")
         self.running.pop(game, None)
         self.processes.pop(game, None)
         self.play_sessions.pop(game, None)
@@ -4346,6 +4389,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.carrousel_resync_after_reorder(gameid)
 
     def on_button_kill_clicked(self, widget):
+        play_ui_sound("cancel")
         for gameid in list(self.running):
             self.stop_running_game(gameid)
 
@@ -5631,6 +5675,7 @@ class Settings(Gtk.Dialog):
             lower=1, upper=50, step_increment=1, page_increment=5, page_size=0
         )
         self.entry_grid_max_children = Gtk.SpinButton(adjustment=adjustment_grid_max_children, climb_rate=1, digits=0)
+        self.entry_grid_max_children.connect("value-changed", play_navigate_if_window_active)
         self.entry_grid_max_children.set_hexpand(True)
         self.entry_grid_max_children.set_sensitive(False)
 
@@ -5753,6 +5798,9 @@ class Settings(Gtk.Dialog):
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
         self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
 
+        self.button_interface_sounds = Gtk.Button(label=_("Interface Sounds"))
+        self.button_interface_sounds.connect("clicked", self.on_button_interface_sounds_clicked)
+
         self.label_support = Gtk.Label(label=_("Support the Project"))
         self.label_support.set_halign(Gtk.Align.START)
         self.label_support.set_margin_end(10)
@@ -5789,6 +5837,7 @@ class Settings(Gtk.Dialog):
         self.liststore.append([""])
 
         treeview = Gtk.TreeView(model=self.liststore)
+        treeview.connect("cursor-changed", play_navigate_if_window_active)
         treeview.add_css_class("envar-list")
         treeview.set_has_tooltip(True)
         treeview.connect("query-tooltip", on_treeview_query_tooltip, self.liststore)
@@ -5834,6 +5883,7 @@ class Settings(Gtk.Dialog):
             '<a href="https://github.com/Faugus/faugus-launcher/releases/tag/{0}">Faugus {0}</a>'.format(VERSION)
         )
         label_version.set_use_markup(True)
+        label_version.connect("activate-link", lambda *_args: play_ui_sound("confirm") or False)
         label_version.set_halign(Gtk.Align.START)
 
         grid_page_general = Gtk.Grid()
@@ -5879,6 +5929,8 @@ class Settings(Gtk.Dialog):
         grid_theme_colors = build_grid()
 
         grid_interface_checkboxes = build_grid()
+
+        grid_interface_sounds = build_grid()
 
         grid_support = build_grid(column_homogeneous=True)
         grid_support.set_vexpand(True)
@@ -5973,6 +6025,9 @@ class Settings(Gtk.Dialog):
         grid_interface_checkboxes.attach(self.checkbox_header_bar, 0, 7, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_hidden_games, 0, 8, 1, 1)
 
+        grid_interface_sounds.attach(self.button_interface_sounds, 0, 0, 1, 1)
+        self.button_interface_sounds.set_hexpand(True)
+
         grid_envar.attach(self.label_envar, 0, 0, 1, 1)
         grid_envar.attach(scrolled_window, 0, 1, 1, 1)
         scrolled_window.set_hexpand(True)
@@ -6026,6 +6081,7 @@ class Settings(Gtk.Dialog):
         box_interface_col2.append(grid_theme_colors)
 
         box_interface_col3.append(grid_interface_checkboxes)
+        box_interface_col3.append(grid_interface_sounds)
 
         grid_page_interface.attach(box_interface_col1, 0, 0, 1, 1)
         grid_page_interface.attach(box_interface_col2, 1, 0, 1, 1)
@@ -6060,7 +6116,7 @@ class Settings(Gtk.Dialog):
                 button.set_group(first_settings_tab_button)
             button.connect(
                 "toggled",
-                lambda btn, n=name: self.view_stack.set_visible_child_name(n) if btn.get_active() else None,
+                lambda btn, n=name: btn.get_active() and (self.view_stack.set_visible_child_name(n), play_navigate_if_window_active(btn)),
             )
             settings_tab_switcher.append(button)
             self.tab_button_widgets.append(button)
@@ -6159,6 +6215,7 @@ class Settings(Gtk.Dialog):
             self.button_clearlogs.set_sensitive(False)
 
     def on_clear_logs_clicked(self, button):
+        play_ui_sound("confirm")
         if os.path.exists(LOGS_DIR):
             shutil.rmtree(LOGS_DIR)
         self.update_button_label()
@@ -6235,13 +6292,28 @@ class Settings(Gtk.Dialog):
             _("Alt+Enter toggles fullscreen") if not_list else covers_carrousel_grid_tip
         )
 
+    def on_button_interface_sounds_clicked(self, widget):
+        dialog = InterfaceSoundsDialog(self, self.interface_sounds)
+
+        def on_response(dialog, response_id):
+            if response_id == Gtk.ResponseType.OK:
+                values = dialog.get_values()
+                if values != self.interface_sounds:
+                    self.interface_sounds = values
+                    self.modified = True
+            preview_ui_sound_config(self.interface_sounds)
+            destroy_and_release(dialog)
+
+        dialog.connect("response", on_response)
+        dialog.present()
+
     def on_checkbox_steamgriddb_toggled(self, checkbox):
         self.entry_steamgriddb_key.set_sensitive(checkbox.get_active())
         self._refresh_banner_checkbox_sensitivity()
 
     def on_button_steamgriddb_key_clicked(self, widget):
-        import webbrowser
-        webbrowser.open("https://www.steamgriddb.com/profile/preferences/api")
+        play_ui_sound("confirm")
+        open_uri(widget, "https://www.steamgriddb.com/profile/preferences/api")
 
     def _refresh_banner_checkbox_sensitivity(self):
         covers_or_carrousel = self.combobox_interface.get_active_id() in ("Covers", "Carrousel")
@@ -6269,6 +6341,13 @@ class Settings(Gtk.Dialog):
         for window in Gtk.Window.get_toplevels():
             if isinstance(window, Gtk.ColorChooserDialog):
                 window.get_content_area().get_first_child().set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
+                if not getattr(window, "_navigate_on_color_change", False):
+                    window._navigate_on_color_change = True
+                    window.connect("notify::rgba", self.on_color_chooser_rgba_changed)
+
+    def on_color_chooser_rgba_changed(self, dialog, _pspec):
+        if dialog.is_active() and not dialog.get_property("show-editor"):
+            play_ui_sound("navigate")
 
     def on_theme_accent_changed(self, widget):
         self.color_button.set_sensitive(self.combobox_accent.get_active_id() == "custom")
@@ -6353,7 +6432,10 @@ class Settings(Gtk.Dialog):
         config.set_value("accent-mode", self.combobox_accent.get_active_id())
         config.set_value("accent-color", self.color_button.get_rgba().to_string())
         config.set_value("theme-engine", self.combobox_theme_engine.get_active_id())
+        for key, value in self.interface_sounds.items():
+            config.set_value(key, value)
         config.save_config()
+        reload_ui_sound_config()
 
         self.set_sensitive(False)
 
@@ -6390,6 +6472,8 @@ class Settings(Gtk.Dialog):
                 child.connect("changed", lambda w: setattr(self, "modified", True))
             elif isinstance(child, Gtk.CheckButton):
                 child.connect("toggled", lambda w: setattr(self, "modified", True))
+            elif isinstance(child, Gtk.Range):
+                child.connect("value-changed", lambda w: setattr(self, "modified", True))
             elif isinstance(child, Gtk.TreeView):
                 selection = child.get_selection()
                 selection.connect("changed", lambda sel: setattr(self, "modified", True))
@@ -6405,7 +6489,7 @@ class Settings(Gtk.Dialog):
         def on_proceed(proceed):
             if proceed:
                 if self.entry_default_prefix.get_text() == "":
-                    self.entry_default_prefix.add_css_class("entry")
+                    mark_invalid_widget(self.entry_default_prefix)
                     return
                 apply_interface_customization(self.interface_theme, self.accent_color, self.combobox_theme_engine.get_active_id())
                 self.update_envar_file()
@@ -6424,6 +6508,7 @@ class Settings(Gtk.Dialog):
 
     def on_button_winetricks_default_clicked(self, widget):
         def proceed():
+            play_ui_sound("confirm")
             self.set_sensitive(False)
 
             default_runner = self.get_default_runner()
@@ -6449,6 +6534,7 @@ class Settings(Gtk.Dialog):
 
     def on_button_winecfg_default_clicked(self, widget):
         def proceed():
+            play_ui_sound("confirm")
             self.set_sensitive(False)
 
             default_runner = self.get_default_runner()
@@ -6717,6 +6803,9 @@ class Settings(Gtk.Dialog):
         self.on_checkbox_overview_toggled(self.checkbox_overview)
         self.combobox_startup_window_size.set_active_id(startup_window_size)
 
+        self.interface_sounds = {key: str(cfg.config.get(key, cfg.default_config[key])) for key in UI_SOUND_CONFIG_KEYS}
+        preview_ui_sound_config(self.interface_sounds)
+
         index_language = 0
         for i, lang_code in enumerate(self.combobox_language.get_ids()):
             if lang_code == "en_US":
@@ -6820,6 +6909,171 @@ class Game:
         self.last_played = last_played
 
 
+class InterfaceSoundsDialog(Gtk.Dialog):
+    def __init__(self, parent, values):
+        super().__init__(title=_("Interface Sounds"), transient_for=parent)
+        apply_titlebar_preference(self)
+        hide_dialog_action_area(self)
+        self.set_modal(True)
+        self.set_resizable(False)
+
+        self.checkbox_enabled = Gtk.CheckButton(label=_("Enable"))
+        self.checkbox_enabled.set_active(values["interface-sounds-enabled"] == "True")
+
+        self.label_theme = Gtk.Label(label=_("Sound"))
+        self.label_theme.set_halign(Gtk.Align.START)
+        self.combobox_theme = IdComboBox()
+        self.combobox_theme.append("cloud", "Cloud ({})".format(_("Default")))
+        for theme_id in ("glass", "wood", "breeze", "kalimba", "glow", "hush"):
+            self.combobox_theme.append(theme_id, theme_id.capitalize())
+        self.combobox_theme.append("custom", _("Custom"))
+        if not self.combobox_theme.set_active_id(values["interface-sounds-theme"]):
+            self.combobox_theme.set_active_id("cloud")
+        self.combobox_theme.set_hexpand(True)
+
+        self.label_volume = Gtk.Label(label=_("Volume"))
+        self.label_volume.set_halign(Gtk.Align.START)
+        self.scale_volume = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1)
+        self.scale_volume.set_digits(0)
+        self.scale_volume.set_draw_value(True)
+        self.scale_volume.set_value_pos(Gtk.PositionType.RIGHT)
+        self.scale_volume.set_value(int(values["interface-sounds-volume"]))
+        self.scale_volume.set_hexpand(True)
+
+        grid_general = build_grid()
+        grid_general.attach(self.checkbox_enabled, 0, 0, 1, 1)
+        grid_general.attach(self.label_theme, 0, 1, 1, 1)
+        grid_general.attach(self.combobox_theme, 0, 2, 1, 1)
+        grid_general.attach(self.label_volume, 0, 3, 1, 1)
+        grid_general.attach(self.scale_volume, 0, 4, 1, 1)
+
+        self.labels = {}
+        self.entries = {}
+        self.search_buttons = {}
+        self.preview_buttons = {}
+        grid_files = build_grid()
+        for row, (kind, label) in enumerate(zip(UI_SOUND_KINDS, (_("Navigate"), _("Confirm"), _("Cancel"), _("Warning")))):
+            label_kind = Gtk.Label(label=label)
+            label_kind.set_halign(Gtk.Align.START)
+
+            entry = Gtk.Entry()
+            entry.set_placeholder_text(_("Sound file"))
+            entry.set_text(values[f"interface-sounds-custom-{kind}"])
+            entry.set_width_chars(40)
+            entry.set_hexpand(True)
+
+            button_search = Gtk.Button()
+            button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+            button_search.connect("clicked", lambda widget, k=kind: self.on_button_search_clicked(k))
+            button_search.set_size_request(50, -1)
+
+            button_preview = Gtk.Button()
+            button_preview.set_child(Gtk.Image.new_from_icon_name("media-playback-start-symbolic"))
+            button_preview.set_tooltip_text(_("Preview"))
+            button_preview.connect("clicked", lambda widget, k=kind: self.on_button_preview_clicked(k))
+            button_preview.set_size_request(50, -1)
+
+            grid_files.attach(label_kind, 0, row * 2, 3, 1)
+            grid_files.attach(entry, 0, row * 2 + 1, 1, 1)
+            grid_files.attach(button_search, 1, row * 2 + 1, 1, 1)
+            grid_files.attach(button_preview, 2, row * 2 + 1, 1, 1)
+
+            self.labels[kind] = label_kind
+            self.entries[kind] = entry
+            self.search_buttons[kind] = button_search
+            self.preview_buttons[kind] = button_preview
+
+        self.checkbox_enabled.connect("toggled", self.on_changed)
+        self.combobox_theme.connect("changed", self.on_changed)
+        self.scale_volume.connect("value-changed", self.on_changed)
+        self.scale_volume.connect("value-changed", self.on_volume_changed)
+        for entry in self.entries.values():
+            entry.connect("changed", self.on_changed)
+
+        grid_content = Gtk.Grid()
+        grid_content.set_column_homogeneous(True)
+        grid_content.set_column_spacing(10)
+        grid_content.attach(grid_general, 0, 0, 1, 1)
+        grid_content.attach(grid_files, 1, 0, 2, 1)
+
+        frame = Gtk.Frame()
+        frame.set_margin_top(10)
+        frame.set_margin_start(10)
+        frame.set_margin_end(10)
+        frame.set_child(grid_content)
+
+        button_cancel = Gtk.Button(label=_("Cancel"))
+        button_cancel.connect("clicked", lambda widget: self.response(Gtk.ResponseType.CANCEL))
+        button_cancel.set_hexpand(True)
+
+        button_ok = Gtk.Button(label=_("Ok"))
+        button_ok.connect("clicked", lambda widget: self.response(Gtk.ResponseType.OK))
+        button_ok.set_hexpand(True)
+
+        box_bottom = build_bottom_button_box(button_cancel, button_ok)
+        box_bottom.set_margin_top(10)
+
+        content_area = self.get_content_area()
+        content_area.append(frame)
+        content_area.append(box_bottom)
+
+        self.on_changed(None)
+
+    def get_values(self):
+        return {
+            "interface-sounds-enabled": str(self.checkbox_enabled.get_active()),
+            "interface-sounds-theme": self.combobox_theme.get_active_id(),
+            "interface-sounds-volume": str(int(self.scale_volume.get_value())),
+            **{f"interface-sounds-custom-{kind}": entry.get_text().strip() for kind, entry in self.entries.items()},
+        }
+
+    def on_changed(self, widget):
+        enabled = self.checkbox_enabled.get_active()
+        custom = self.combobox_theme.get_active_id() == "custom"
+        for widget in (self.label_theme, self.combobox_theme, self.label_volume, self.scale_volume):
+            widget.set_sensitive(enabled)
+        for kind in UI_SOUND_KINDS:
+            self.labels[kind].set_sensitive(enabled)
+            self.entries[kind].set_sensitive(enabled and custom)
+            self.search_buttons[kind].set_sensitive(enabled and custom)
+            self.preview_buttons[kind].set_sensitive(enabled)
+        preview_ui_sound_config(self.get_values())
+
+    def on_volume_changed(self, scale):
+        if self.is_active():
+            play_ui_sound("navigate")
+
+    def on_button_preview_clicked(self, kind):
+        clear_queued_ui_sound()
+        path = get_ui_sound_path(self.combobox_theme.get_active_id(), kind, self.entries[kind].get_text())
+        play_sound_file(path, self.scale_volume.get_value() / 100)
+
+    def on_button_search_clicked(self, kind):
+        entry = self.entries[kind]
+        filechooser = new_file_chooser(
+            self,
+            _("Select a sound file"),
+            Gtk.FileChooserAction.OPEN,
+        )
+        audio_filter = Gtk.FileFilter()
+        audio_filter.set_name(_("Audio files"))
+        audio_filter.add_mime_type("audio/*")
+        filechooser.add_filter(audio_filter)
+        entry_value = entry.get_text()
+        preferred_path = expand_path(entry_value) if entry_value else None
+        set_file_chooser_start_folder(filechooser, "settings_interface_sound", preferred_path)
+
+        def on_response(dialog_fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                path = dialog_fc.get_file().get_path()
+                if path:
+                    entry.set_text(path)
+            destroy_and_release(dialog_fc)
+
+        filechooser.connect("response", on_response)
+        filechooser.present()
+
+
 class DuplicateDialog(Gtk.Dialog):
     def __init__(self, parent, title):
         super().__init__(title=_("Duplicate %s") % title, transient_for=parent)
@@ -6882,7 +7136,7 @@ class DeleteDialog(Gtk.Dialog):
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
-        play_notification_sound()
+        play_ui_sound("warning")
 
         label = Gtk.Label()
         label.set_label(_("Are you sure you want to delete %s?") % title)
@@ -7175,6 +7429,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         path_action_menu.append(_("Run an installer"), "pathaction.installer")
 
         self.button_path_action = Gtk.MenuButton()
+        self.button_path_action.connect("notify::active", lambda *_args: play_ui_sound("navigate"))
         self.button_path_action.set_icon_name("system-search-symbolic")
         self.button_path_action.set_size_request(50, -1)
         self.button_path_action.set_menu_model(path_action_menu)
@@ -7323,7 +7578,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 button.set_active(True)
             else:
                 button.set_group(first_button)
-            button.connect("toggled", lambda btn, n=name: self.view_stack.set_visible_child_name(n) if btn.get_active() else None)
+            button.connect("toggled", lambda btn, n=name: btn.get_active() and (self.view_stack.set_visible_child_name(n), play_navigate_if_window_active(btn)))
             self.tab_switcher.append(button)
             tab_button_widgets.append(button)
 
@@ -7414,6 +7669,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.banner_preview1_overlay, self.spinner_banner1 = wrap_with_spinner(self.banner_preview1)
 
         self.menu = Gtk.Popover()
+        self.menu.connect("closed", lambda popover: play_ui_sound("navigate"))
         self.menu.set_has_arrow(False)
         menu_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         menu_box.set_margin_start(6)
@@ -7675,6 +7931,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
         self.menu.set_pointing_to(rect)
         self.menu.popup()
+        play_ui_sound("navigate")
 
     def artwork_target(self, category):
         if category == "banner":
@@ -8529,6 +8786,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.set_sensitive(True)
             return
 
+        play_ui_sound("confirm")
         title = self.entry_title.get_text()
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
@@ -8565,6 +8823,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.set_sensitive(True)
             return
 
+        play_ui_sound("confirm")
         title = self.entry_title.get_text()
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
@@ -8658,7 +8917,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page1_button = self.tab_button_widgets[self.tab_names.index("page1")]
 
         if self.grid_steam_title.get_visible() and not self.combobox_steam_title.get_active_text():
-            self.combobox_steam_title.add_css_class("combobox")
+            mark_invalid_widget(self.combobox_steam_title, "combobox")
             page1_button.set_active(True)
 
         required = {
@@ -8668,7 +8927,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         }.get(entry, [])
         invalid = [widget for widget, value in required if not value]
         for widget in invalid:
-            widget.add_css_class("entry")
+            mark_invalid_widget(widget)
         if invalid:
             page1_button.set_active(True)
             return False

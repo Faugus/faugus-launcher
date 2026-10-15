@@ -64,6 +64,13 @@ class ConfigManager:
             'sort': 'alpha',
             'category': 'all',
             'steam-user': 'all',
+            'interface-sounds-enabled': 'False',
+            'interface-sounds-theme': 'cloud',
+            'interface-sounds-volume': '50',
+            'interface-sounds-custom-navigate': '',
+            'interface-sounds-custom-confirm': '',
+            'interface-sounds-custom-cancel': '',
+            'interface-sounds-custom-warning': '',
         }
 
         self.config = {}

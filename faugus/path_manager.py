@@ -157,7 +157,6 @@ LSFGVK_PATH = next((p for p in _LSFGVK_CANDIDATES if p.exists()), _LSFGVK_CANDID
 
 FAUGUS_PNG = PathManager.get_icon('io.github.Faugus.faugus-launcher.svg') if IS_FLATPAK else PathManager.get_icon('faugus-launcher.svg')
 
-FAUGUS_NOTIFICATION = PathManager.get_asset('faugus-notification.ogg')
 FAUGUS_PNG_RASTER = PathManager.get_asset('faugus-launcher-raster.png')
 COVERS_DIR = PathManager.user_data('faugus-launcher/covers')
 BANNERS_DIR = PathManager.user_data('faugus-launcher/banners')
