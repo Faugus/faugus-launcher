@@ -3903,7 +3903,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode == "List":
             surface = self.get_game_artwork(game, 40, 40)
-            image = new_picture(surface)
+            image = new_icon(surface)
 
             child.image = image
 
@@ -3932,7 +3932,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             block_size = 100
 
             surface = self.get_game_artwork(game, block_size, block_size)
-            image = new_picture(surface)
+            image = new_icon(surface)
 
             child.image = image
 
@@ -4010,7 +4010,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if hasattr(flowbox_child, "image"):
             size = 40 if self.interface_mode == "List" else 100
-            flowbox_child.image.set_paintable(self.get_game_artwork(game, size, size))
+            flowbox_child.image.set_from_paintable(self.get_game_artwork(game, size, size))
 
         if hasattr(flowbox_child, "cover"):
             zoom_width, zoom_height = self.cover_dimensions(getattr(self, "cover_size", 100))
@@ -4508,7 +4508,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         shutil.copyfile(icon_path, edit_game_dialog.icon_temp)
         surface = self.new_texture_from_image(icon_path, 50, 50)
-        image = new_picture(surface)
+        image = new_icon(surface)
         edit_game_dialog.button_shortcut_icon.set_child(image)
 
         if os.path.exists(MANGOHUD_DIR):
@@ -4927,7 +4927,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.steamgriddb_enabled and os.path.isfile(icon_temp):
             icon_surface = self.new_texture_from_image(icon_temp, 256, 256)
-            icon_picture = new_picture(icon_surface)
+            icon_picture = new_icon(icon_surface)
             icon_picture.set_margin_bottom(20)
             grid_launcher.attach(icon_picture, 0, 0, 1, 1)
 
@@ -8126,7 +8126,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
             return
         surface =self.new_texture_from_image(self.icon_temp, 50, 50)
-        self.button_shortcut_icon.set_child(new_picture(surface))
+        self.button_shortcut_icon.set_child(new_icon(surface))
 
     def refresh_banner_preview(self):
         self.update_banner_preview(self.banner_path_temp)
@@ -8693,7 +8693,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         shutil.copyfile(FAUGUS_PNG_RASTER, self.icon_temp)
 
         surface = self.new_texture_from_image(self.icon_temp, 50, 50)
-        image = new_picture(surface)
+        image = new_icon(surface)
 
         return image
 

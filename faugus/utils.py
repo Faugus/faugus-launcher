@@ -224,6 +224,12 @@ def new_picture(paintable=None):
     return picture
 
 
+def new_icon(paintable):
+    image = Gtk.Image.new_from_paintable(paintable)
+    image.set_pixel_size(paintable.get_intrinsic_width())
+    return image
+
+
 def wrap_with_spinner(widget, dim_shape="none"):
     dim = Gtk.Box()
     dim.add_css_class("spinner-dim-overlay")
