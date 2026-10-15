@@ -305,16 +305,18 @@ class FaugusRun(HiDpiMixin):
                 if log_file:
                     log_file.close()
 
-        popen_prefix = []
+        self.inhibit_handle = None
         if os.environ.get("NO_SLEEP"):
             try:
-                import dbus
-                iface = dbus.Interface(dbus.SessionBus().get_object("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop"), "org.freedesktop.portal.Inhibit")
-                iface.Inhibit("", 8, {"reason": "Game is running"})
-            except:
-                systemd_inhibit = PathManager.find_binary("systemd-inhibit")
-                if not IS_FLATPAK and os.path.exists("/run/dbus/system_bus_socket") and systemd_inhibit:
-                    popen_prefix = [systemd_inhibit, "--what=sleep", "--why=Game is running", "--mode=block"]
+                result = Gio.bus_get_sync(Gio.BusType.SESSION, None).call_sync(
+                    "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
+                    "org.freedesktop.portal.Inhibit", "Inhibit",
+                    GLib.Variant("(sua{sv})", ("", 4 | 8, {"reason": GLib.Variant("s", "Game is running")})),
+                    GLib.VariantType("(o)"), Gio.DBusCallFlags.NONE, -1, None,
+                )
+                self.inhibit_handle = result.unpack()[0]
+            except GLib.Error as e:
+                print(f"Failed to inhibit sleep: {e}")
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
@@ -336,7 +338,7 @@ class FaugusRun(HiDpiMixin):
             except Exception as e:
                 print(f"Error running pre-launch command: {e}")
 
-        game_cmd = popen_prefix + shlex.split(self.message)
+        game_cmd = shlex.split(self.message)
         self.start_time = time.time()
 
         self.cfg_playtime_baseline = self.playtime
@@ -735,6 +737,17 @@ class FaugusRun(HiDpiMixin):
                     parent.kill()
                 except psutil.NoSuchProcess:
                     pass
+
+        if getattr(self, "inhibit_handle", None):
+            try:
+                Gio.bus_get_sync(Gio.BusType.SESSION, None).call_sync(
+                    "org.freedesktop.portal.Desktop", self.inhibit_handle,
+                    "org.freedesktop.portal.Request", "Close",
+                    None, None, Gio.DBusCallFlags.NONE, -1, None,
+                )
+            except GLib.Error as e:
+                print(f"Failed to release sleep inhibitor: {e}")
+            self.inhibit_handle = None
 
         if self.post_launch:
             try:

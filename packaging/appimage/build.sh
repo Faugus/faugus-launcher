@@ -41,7 +41,7 @@ fi
 
 echo "This AppImage bundles Faugus's own Python code and its pure-Python"
 echo "pip dependencies. It relies on the host system for Python 3, GTK4,"
-echo "libadwaita, libmanette, PyGObject, Pillow, psutil and dbus-python,"
+echo "libadwaita, libmanette, PyGObject, Pillow and psutil,"
 echo "since anything with a compiled extension is tied to the host's"
 echo "Python ABI and can't be safely bundled without shipping Python"
 echo "itself. Target systems need those installed."
