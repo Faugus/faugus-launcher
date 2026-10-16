@@ -25,7 +25,7 @@ from faugus.tray_only import spawn as tray_only_spawn
 
 VERSION = "2.5.0"
 
-GLib.set_prgname(APP_ID if IS_FLATPAK else "faugus-launcher")
+GLib.set_prgname(APP_ID)
 
 
 os.makedirs(COMPATIBILITY_DIR, exist_ok=True)

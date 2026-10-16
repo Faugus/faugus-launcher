@@ -14,10 +14,7 @@ from faugus.utils import *
 from faugus.config_manager import *
 from faugus.migration import fix_legacy_shortcut_icons
 
-if IS_FLATPAK:
-    GLib.set_prgname("io.github.Faugus.faugus-launcher")
-else:
-    GLib.set_prgname("faugus-launcher")
+GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
 _ = setup_gettext('faugus-launcher')
 

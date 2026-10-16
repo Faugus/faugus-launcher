@@ -23,10 +23,7 @@ from faugus.ea_fix import *
 from faugus.steam_setup import IS_STEAM_FLATPAK
 from faugus.migration import fix_legacy_shortcut_icons
 
-if IS_FLATPAK:
-    GLib.set_prgname("io.github.Faugus.faugus-launcher")
-else:
-    GLib.set_prgname("faugus-launcher")
+GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
 os.makedirs(COMPATIBILITY_DIR, exist_ok=True)
 fix_legacy_shortcut_icons()

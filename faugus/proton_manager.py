@@ -20,10 +20,7 @@ from gi.repository import Gtk, GLib
 from faugus.language_config import *
 from faugus.utils import play_ui_sound, widget_children, hide_dialog_action_area, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
-if IS_FLATPAK:
-    GLib.set_prgname("io.github.Faugus.faugus-launcher")
-else:
-    GLib.set_prgname("faugus-launcher")
+GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
 _ = setup_gettext('faugus-launcher')
 
