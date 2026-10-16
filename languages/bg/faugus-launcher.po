@@ -8,8 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-15 15:06+0000\n"
-"PO-Revision-Date: 2026-10-02 21:16+0000\n"
-"Last-Translator: Любомир Василев <lyubomirv@gmx.com>\n"
+"PO-Revision-Date: 2026-10-17 00:51+0000\n"
+"Last-Translator: Любомир Василев <lyubomirv@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
 "Language: bg\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.10\n"
+"X-Generator: Weblate 2026.11.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:287
 msgid "Calculating..."
@@ -812,10 +813,8 @@ msgid "Prevents the system from suspending while gaming"
 msgstr "Не позволява на системата да заспива по време на игра"
 
 #: faugus/launcher.py:5801 faugus/launcher.py:6914
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface Sounds"
-msgstr "Режим на интерфейса"
+msgstr "Звуци на интерфейса"
 
 #: faugus/launcher.py:5804
 msgid "Support the Project"
@@ -900,47 +899,39 @@ msgstr "Включване"
 
 #: faugus/launcher.py:6923
 msgid "Sound"
-msgstr ""
+msgstr "Звук"
 
 #: faugus/launcher.py:6934
 msgid "Volume"
-msgstr ""
+msgstr "Сила на звука"
 
 #: faugus/launcher.py:6955
 msgid "Navigate"
-msgstr ""
+msgstr "Навигация"
 
 #: faugus/launcher.py:6955
 msgid "Confirm"
-msgstr ""
+msgstr "Потвърждаване"
 
 #: faugus/launcher.py:6955
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: faugus/launcher.py:6960
-#, fuzzy
-#| msgid "Windows files"
 msgid "Sound file"
-msgstr "Файлове на Уиндоус"
+msgstr "Звуков файл"
 
 #: faugus/launcher.py:6972
-#, fuzzy
-#| msgid "Overview"
 msgid "Preview"
-msgstr "Преглед"
+msgstr "Предварителен преглед"
 
 #: faugus/launcher.py:7055
-#, fuzzy
-#| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
-msgstr "Изберете файла Lossless.dll"
+msgstr "Изберете звуков файл"
 
 #: faugus/launcher.py:7059
-#, fuzzy
-#| msgid "All files"
 msgid "Audio files"
-msgstr "Всички файлове"
+msgstr "Звукови файлове"
 
 #: faugus/launcher.py:7079
 #, python-format
