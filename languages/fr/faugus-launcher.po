@@ -8,8 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-15 15:06+0000\n"
-"PO-Revision-Date: 2026-10-05 14:51+0000\n"
-"Last-Translator: Loïc <weblate.truth403@passmail.net>\n"
+"PO-Revision-Date: 2026-10-17 00:51+0000\n"
+"Last-Translator: Loïc <loc637d4b91fab64b58@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.10.1.dev0\n"
+"X-Generator: Weblate 2026.11.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:287
 msgid "Calculating..."
@@ -813,10 +814,8 @@ msgstr ""
 "Empêcher le système d'entrer en veille quand un jeu est en cours d'éxécution"
 
 #: faugus/launcher.py:5801 faugus/launcher.py:6914
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface Sounds"
-msgstr "Mode d'interface"
+msgstr "Sons de l'interface"
 
 #: faugus/launcher.py:5804
 msgid "Support the Project"
@@ -901,47 +900,39 @@ msgstr "Activer"
 
 #: faugus/launcher.py:6923
 msgid "Sound"
-msgstr ""
+msgstr "Son"
 
 #: faugus/launcher.py:6934
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 #: faugus/launcher.py:6955
 msgid "Navigate"
-msgstr ""
+msgstr "Naviguer"
 
 #: faugus/launcher.py:6955
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmer"
 
 #: faugus/launcher.py:6955
 msgid "Warning"
-msgstr ""
+msgstr "Avertissement"
 
 #: faugus/launcher.py:6960
-#, fuzzy
-#| msgid "Windows files"
 msgid "Sound file"
-msgstr "Fichiers Windows"
+msgstr "Fichier son"
 
 #: faugus/launcher.py:6972
-#, fuzzy
-#| msgid "Overview"
 msgid "Preview"
 msgstr "Aperçu"
 
 #: faugus/launcher.py:7055
-#, fuzzy
-#| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
-msgstr "Sélectionner le fichier Lossless.dll"
+msgstr "Sélectionner un fichier audio"
 
 #: faugus/launcher.py:7059
-#, fuzzy
-#| msgid "All files"
 msgid "Audio files"
-msgstr "Tous les fichiers"
+msgstr "Fichiers audio"
 
 #: faugus/launcher.py:7079
 #, python-format

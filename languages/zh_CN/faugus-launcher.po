@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-15 15:06+0000\n"
-"PO-Revision-Date: 2026-10-02 21:16+0000\n"
-"Last-Translator: EyKettle <eykettle@tutamail.com>\n"
+"PO-Revision-Date: 2026-10-17 00:51+0000\n"
+"Last-Translator: EyKettle <eykettle@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 2026.10\n"
+"X-Generator: Weblate 2026.11.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:287
 msgid "Calculating..."
@@ -808,10 +808,8 @@ msgid "Prevents the system from suspending while gaming"
 msgstr "防止系统在游玩过程中挂起"
 
 #: faugus/launcher.py:5801 faugus/launcher.py:6914
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface Sounds"
-msgstr "界面样式"
+msgstr "界面音效"
 
 #: faugus/launcher.py:5804
 msgid "Support the Project"
@@ -896,47 +894,39 @@ msgstr "启用"
 
 #: faugus/launcher.py:6923
 msgid "Sound"
-msgstr ""
+msgstr "音效"
 
 #: faugus/launcher.py:6934
 msgid "Volume"
-msgstr ""
+msgstr "音量"
 
 #: faugus/launcher.py:6955
 msgid "Navigate"
-msgstr ""
+msgstr "浏览"
 
 #: faugus/launcher.py:6955
 msgid "Confirm"
-msgstr ""
+msgstr "确认"
 
 #: faugus/launcher.py:6955
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: faugus/launcher.py:6960
-#, fuzzy
-#| msgid "Windows files"
 msgid "Sound file"
-msgstr "Windows 文件"
+msgstr "音效文件"
 
 #: faugus/launcher.py:6972
-#, fuzzy
-#| msgid "Overview"
 msgid "Preview"
-msgstr "概览"
+msgstr "预览"
 
 #: faugus/launcher.py:7055
-#, fuzzy
-#| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
-msgstr "选择 Lossless.dll 文件"
+msgstr "选择一个音效文件"
 
 #: faugus/launcher.py:7059
-#, fuzzy
-#| msgid "All files"
 msgid "Audio files"
-msgstr "所有文件"
+msgstr "音频文件"
 
 #: faugus/launcher.py:7079
 #, python-format
