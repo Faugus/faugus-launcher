@@ -1547,7 +1547,9 @@ def get_gpus():
         try:
             out = subprocess.check_output(["lspci", "-s", slot, "-mm"], text=True, timeout=5)
             parts = shlex.split(out.strip())
-            name = "{} {}".format(parts[2], parts[3])
+            vendor_name = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}.get(vendor, parts[2])
+            model = re.search(r"\[(.+)\]", parts[3])
+            name = "{} {}".format(vendor_name, model.group(1) if model else parts[3])
         except (OSError, subprocess.SubprocessError, ValueError, IndexError):
             pass
 
