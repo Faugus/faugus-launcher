@@ -2,6 +2,7 @@ import os
 import functools
 import json
 import re
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -1520,6 +1521,38 @@ def version_key(v):
     cleaned = re.sub(r'^[^\d]+', '', v)
     parts = re.split(r'(\d+)', cleaned)
     return [int(p) if p.isdigit() else p for p in parts]
+
+
+def get_gpus():
+    gpus = []
+    drm = "/sys/class/drm"
+    try:
+        cards = sorted(c for c in os.listdir(drm) if re.fullmatch(r"card\d+", c))
+    except OSError:
+        return gpus
+
+    for card in cards:
+        device = os.path.join(drm, card, "device")
+        try:
+            with open(os.path.join(device, "uevent")) as f:
+                slot = next(l.split("=", 1)[1].strip() for l in f if l.startswith("PCI_SLOT_NAME="))
+            with open(os.path.join(device, "vendor")) as f:
+                vendor = f.read().strip()[2:]
+            with open(os.path.join(device, "device")) as f:
+                device_id = f.read().strip()[2:]
+        except (OSError, StopIteration):
+            continue
+
+        name = slot
+        try:
+            out = subprocess.check_output(["lspci", "-s", slot, "-mm"], text=True, timeout=5)
+            parts = shlex.split(out.strip())
+            name = "{} {}".format(parts[2], parts[3])
+        except (OSError, subprocess.SubprocessError, ValueError, IndexError):
+            pass
+
+        gpus.append({"slot": slot, "vendor": vendor, "device": device_id, "name": name})
+    return gpus
 
 
 def populate_combobox_with_runners(combobox):

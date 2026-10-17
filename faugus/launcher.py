@@ -5422,7 +5422,6 @@ class Settings(Gtk.Dialog):
         ("gamemode", "checkbox_gamemode", False),
         ("sdl-enabled", "checkbox_sdl", False),
         ("no-sleep-enabled", "checkbox_no_sleep", False),
-        ("discrete-gpu", "checkbox_discrete_gpu", False),
         ("splash-window-enabled", "checkbox_splash_window", True),
         ("automatic-updates", "checkbox_automatic_updates", True),
         ("system-tray", "checkbox_system_tray", False),
@@ -5735,7 +5734,17 @@ class Settings(Gtk.Dialog):
         self.label_display = Gtk.Label(label=_("Display"))
         self.label_display.set_halign(Gtk.Align.START)
 
-        self.checkbox_discrete_gpu = Gtk.CheckButton(label=_("Discrete GPU"))
+        self.label_gpu = Gtk.Label(label=_("GPU"))
+        self.label_gpu.set_halign(Gtk.Align.START)
+        self.combobox_gpu = IdComboBox()
+        self.combobox_gpu.append("", _("Default"))
+        for gpu in get_gpus():
+            self.combobox_gpu.append(gpu["slot"], gpu["name"])
+        self.combobox_gpu.set_hexpand(True)
+
+        box_gpu = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+        box_gpu.append(self.label_gpu)
+        box_gpu.append(self.combobox_gpu)
 
         self.checkbox_auto_close_on_launch = Gtk.CheckButton(label=_("Auto-close on launch"))
 
@@ -5975,7 +5984,7 @@ class Settings(Gtk.Dialog):
         grid_version.attach(label_version, 0, 0, 1, 1)
 
         grid_miscellaneous.attach(self.label_miscellaneous, 0, 0, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_discrete_gpu, 0, 1, 1, 1)
+        grid_miscellaneous.attach(box_gpu, 0, 1, 1, 1)
         grid_miscellaneous.attach(self.checkbox_splash_window, 0, 2, 1, 1)
         grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 3, 1, 1)
         grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 4, 1, 1)
@@ -6417,6 +6426,7 @@ class Settings(Gtk.Dialog):
         config.set_value("language", self.combobox_language.get_active_id())
         config.set_value("default-prefix", self.entry_default_prefix.get_text())
         config.set_value("default-runner", self.get_default_runner())
+        config.set_value("gpu", self.combobox_gpu.get_active_id())
         config.set_value("interface-mode", self.combobox_interface.get_active_id())
         config.set_value("background-mode", self.combobox_background.get_active_id())
         config.set_value("overview-color-mode", self.combobox_overview_color.get_active_id())
@@ -6769,6 +6779,8 @@ class Settings(Gtk.Dialog):
 
         if not self.combobox_runner.set_active_id(default_runner):
             self.combobox_runner.set_active(0)
+        if not self.combobox_gpu.set_active_id(cfg.config.get('gpu', '').strip('"')):
+            self.combobox_gpu.set_active(0)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.combobox_interface.set_active_id(interface_mode)
         self.set_button_color(self.background_color_button, background_color)
