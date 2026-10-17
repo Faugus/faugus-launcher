@@ -5742,9 +5742,6 @@ class Settings(Gtk.Dialog):
             self.combobox_gpu.append(gpu["slot"], gpu["name"])
         self.combobox_gpu.set_hexpand(True)
 
-        box_gpu = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
-        box_gpu.append(self.label_gpu)
-        box_gpu.append(self.combobox_gpu)
 
         self.checkbox_auto_close_on_launch = Gtk.CheckButton(label=_("Auto-close on launch"))
 
@@ -5927,6 +5924,8 @@ class Settings(Gtk.Dialog):
         grid_version.set_vexpand(True)
         grid_version.set_valign(Gtk.Align.END)
 
+        grid_gpu = build_grid()
+
         grid_miscellaneous = build_grid()
 
         grid_envar = build_grid()
@@ -5984,18 +5983,20 @@ class Settings(Gtk.Dialog):
         grid_version.attach(label_version, 0, 0, 1, 1)
 
         grid_miscellaneous.attach(self.label_miscellaneous, 0, 0, 1, 1)
-        grid_miscellaneous.attach(box_gpu, 0, 1, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_splash_window, 0, 2, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 3, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 4, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 5, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_autostart, 0, 6, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 7, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 8, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 9, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_auto_create_shortcuts, 0, 10, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 11, 1, 1)
-        grid_miscellaneous.attach(self.checkbox_wow64, 0, 12, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_splash_window, 0, 1, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_automatic_updates, 0, 2, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_auto_close_on_launch, 0, 3, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_gamepad_navigation, 0, 4, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_autostart, 0, 5, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_system_tray, 0, 6, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_minimized_startup, 0, 7, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_mono_icon, 0, 8, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_auto_create_shortcuts, 0, 9, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wayland_driver, 0, 10, 1, 1)
+        grid_miscellaneous.attach(self.checkbox_wow64, 0, 11, 1, 1)
+
+        grid_gpu.attach(self.label_gpu, 0, 0, 1, 1)
+        grid_gpu.attach(self.combobox_gpu, 0, 1, 1, 1)
 
         grid_interface_mode.attach(self.label_interface, 0, 0, 1, 1)
         grid_interface_mode.attach(self.combobox_interface, 0, 1, 1, 1)
@@ -6072,6 +6073,7 @@ class Settings(Gtk.Dialog):
         box_general_col1.append(grid_tools)
         box_general_col1.append(grid_version)
 
+        box_general_col2.append(grid_gpu)
         box_general_col2.append(grid_miscellaneous)
 
         box_general_col3.append(grid_envar)
