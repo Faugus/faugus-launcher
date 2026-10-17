@@ -8,8 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-15 15:06+0000\n"
-"PO-Revision-Date: 2026-10-09 00:08+0000\n"
-"Last-Translator: Михайло Щетінін <karnemorkon@gmail.com>\n"
+"PO-Revision-Date: 2026-10-18 10:35+0000\n"
+"Last-Translator: Михайло Щетінін "
+"<karnemorkon@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/uk/>\n"
 "Language: uk\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 2026.10.1.dev0\n"
+"X-Generator: Weblate 2026.11.dev0\n"
 
 #: faugus/backup.py:141 faugus/backup.py:287
 msgid "Calculating..."
@@ -813,10 +814,8 @@ msgid "Prevents the system from suspending while gaming"
 msgstr "Запобігає зависанню системи під час гри"
 
 #: faugus/launcher.py:5801 faugus/launcher.py:6914
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface Sounds"
-msgstr "Режим інтерфейсу"
+msgstr "Звуки інтерфейсу"
 
 #: faugus/launcher.py:5804
 msgid "Support the Project"
@@ -901,29 +900,28 @@ msgstr "Увімкнути"
 
 #: faugus/launcher.py:6923
 msgid "Sound"
-msgstr ""
+msgstr "Звук"
 
 #: faugus/launcher.py:6934
+#, fuzzy
 msgid "Volume"
-msgstr ""
+msgstr "Гучність"
 
 #: faugus/launcher.py:6955
 msgid "Navigate"
-msgstr ""
+msgstr "Навігація"
 
 #: faugus/launcher.py:6955
 msgid "Confirm"
-msgstr ""
+msgstr "Підтвердити"
 
 #: faugus/launcher.py:6955
 msgid "Warning"
-msgstr ""
+msgstr "Попередження"
 
 #: faugus/launcher.py:6960
-#, fuzzy
-#| msgid "Windows files"
 msgid "Sound file"
-msgstr "Файли Windows"
+msgstr "Звуковий файл"
 
 #: faugus/launcher.py:6972
 #, fuzzy
