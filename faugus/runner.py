@@ -130,6 +130,7 @@ class FaugusRun(HiDpiMixin):
 
         if self.discrete_gpu:
             set_child_env("DRI_PRIME", "1")
+            set_child_env("CARDWIRE_FORCE_DGPU", "1")
             GLib.idle_add(warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
