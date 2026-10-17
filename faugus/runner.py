@@ -132,10 +132,13 @@ class FaugusRun(HiDpiMixin):
         if gpu:
             set_child_env("DRI_PRIME", "pci-" + gpu["slot"].replace(":", "_").replace(".", "_"))
             set_child_env("MESA_VK_DEVICE_SELECT", "{}:{}".format(gpu["vendor"], gpu["device"]))
+            set_child_env("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1")
             if gpu["vendor"] == "10de":
                 set_child_env("__NV_PRIME_RENDER_OFFLOAD", "1")
                 set_child_env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
                 set_child_env("__VK_LAYER_NV_optimus", "NVIDIA_only")
+            else:
+                set_child_env("__GLX_VENDOR_LIBRARY_NAME", "mesa")
             GLib.idle_add(warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")

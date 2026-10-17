@@ -6073,9 +6073,9 @@ class Settings(Gtk.Dialog):
         box_general_col1.append(grid_tools)
         box_general_col1.append(grid_version)
 
-        box_general_col2.append(grid_gpu)
         box_general_col2.append(grid_miscellaneous)
 
+        box_general_col3.append(grid_gpu)
         box_general_col3.append(grid_envar)
         box_general_col3.append(grid_logs)
 
