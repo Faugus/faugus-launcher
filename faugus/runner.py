@@ -289,6 +289,11 @@ class FaugusRun(HiDpiMixin):
                 self.progress_save_source = GLib.timeout_add_seconds(30, self._save_progress_tick)
                 if self.gameid:
                     self._mark_running(True)
+                    try:
+                        os.remove(stop_request_path(self.gameid))
+                    except FileNotFoundError:
+                        pass
+                    GLib.timeout_add_seconds(1, self._check_stop_request)
                 if log_file:
                     def close_log_later():
                         for t in threads:
@@ -698,6 +703,14 @@ class FaugusRun(HiDpiMixin):
         else:
             games.pop(self.gameid, None)
         save_json_file(games, RUNNING_GAMES)
+
+    def _check_stop_request(self):
+        path = stop_request_path(self.gameid)
+        if not os.path.exists(path):
+            return True
+        os.remove(path)
+        self.on_process_exit(None, None)
+        return False
 
     def _save_progress_tick(self):
         self._save_progress()
