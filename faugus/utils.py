@@ -4,13 +4,14 @@ import json
 import re
 import shlex
 import shutil
+import signal
 import subprocess
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
+from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
@@ -52,24 +53,39 @@ def idle_add_while_open(closed_event, fn, *args):
     GLib.idle_add(run)
 
 
+def stop_request_path(gameid):
+    return os.path.join(FAUGUS_LAUNCHER_STATE_DIR, f"stop-{gameid}")
+
+
+def request_game_stop(gameid):
+    if not gameid:
+        return
+    try:
+        open(stop_request_path(gameid), "w").close()
+    except OSError:
+        pass
+
+
 def kill_by_faugusid(gameid):
     if not gameid:
         return
 
-    script = r'''
-MARKER="FAUGUSID=$1"
-for d in /proc/[0-9]*; do
-    pid=${d#/proc/}
-    if cat "$d"/task/*/environ 2>/dev/null | tr "\0" "\n" | grep -qxF "$MARKER"; then
-        kill -9 "$pid" 2>/dev/null
-    fi
-done
-'''
-    cmd = ["sh", "-c", script, "_", gameid]
-    try:
-        subprocess.run(cmd, capture_output=True, timeout=5)
-    except (OSError, subprocess.SubprocessError):
-        pass
+    marker = f"FAUGUSID={gameid}".encode()
+    own_pid = os.getpid()
+
+    for entry in os.scandir("/proc"):
+        if not entry.name.isdigit() or int(entry.name) == own_pid:
+            continue
+        try:
+            with open(f"/proc/{entry.name}/environ", "rb") as f:
+                environ = f.read()
+        except OSError:
+            continue
+        if marker in environ.split(b"\0"):
+            try:
+                os.kill(int(entry.name), signal.SIGKILL)
+            except OSError:
+                pass
 
 
 HIDPI_SCALE = 2

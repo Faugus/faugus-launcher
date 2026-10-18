@@ -7,7 +7,6 @@ import threading
 import warnings
 import gi
 import vdf
-import signal
 from datetime import datetime
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -993,7 +992,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def check_running(self):
         changed = False
 
-        for gameid, pid in load_json_file(RUNNING_GAMES, {}).items():
+        running_file = load_json_file(RUNNING_GAMES, {})
+        for gameid, pid in running_file.items():
             if gameid not in self.running:
                 self.running[gameid] = pid
                 changed = True
@@ -1006,14 +1006,28 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     changed = True
                 continue
 
+            if isinstance(pid, dict):
+                pid = next(iter(pid.values()))
+
+            if gameid not in running_file:
+                self.on_exit(pid, None, gameid)
+                changed = True
+                continue
+
             try:
-                if isinstance(pid, dict):
-                    pid = next(iter(pid.values()))
-                os.kill(pid, 0)
-            except OSError:
-                if not IS_FLATPAK:
-                    self.on_exit(pid, None, gameid)
-                    changed = True
+                gone = os.waitpid(pid, os.WNOHANG)[0] == pid
+            except ChildProcessError:
+                gone = False
+
+            if not gone and not IS_FLATPAK:
+                try:
+                    os.kill(pid, 0)
+                except OSError:
+                    gone = True
+
+            if gone:
+                self.on_exit(pid, None, gameid)
+                changed = True
 
         if changed:
             self.save_running()
@@ -4307,10 +4321,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.update_icon()
 
     def stop_running_game(self, gameid):
-        try:
-            os.kill(self.running[gameid], signal.SIGUSR1)
-        except ProcessLookupError:
-            pass
+        request_game_stop(gameid)
         kill_by_faugusid(gameid)
 
         session = self.play_sessions.get(gameid)
@@ -4573,10 +4584,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             title = game.title
 
             if gameid in self.running:
-                try:
-                    os.kill(self.running[gameid], signal.SIGUSR1)
-                except ProcessLookupError:
-                    pass
+                request_game_stop(gameid)
 
                 self.running.pop(gameid, None)
                 self.processes.pop(gameid, None)
