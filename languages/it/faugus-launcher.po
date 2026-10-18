@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-15 15:06+0000\n"
-"PO-Revision-Date: 2026-10-17 00:51+0000\n"
-"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-10-18 10:35+0000\n"
+"Last-Translator: nixxo <nixxo@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -902,7 +902,6 @@ msgid "Sound"
 msgstr "Suono"
 
 #: faugus/launcher.py:6934
-#, fuzzy
 msgid "Volume"
 msgstr "Volume"
 
