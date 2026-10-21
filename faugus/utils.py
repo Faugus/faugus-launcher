@@ -315,7 +315,7 @@ class IdComboBox(Gtk.DropDown):
         self.set_model(self._store)
         factory = Gtk.SignalListItemFactory()
         factory.connect("setup", self._on_factory_setup)
-        factory.connect("bind", self._on_factory_bind)
+        factory.connect("bind", self._on_button_factory_bind)
         self.set_factory(factory)
         list_factory = Gtk.SignalListItemFactory()
         list_factory.connect("setup", self._on_factory_setup)
@@ -340,6 +340,12 @@ class IdComboBox(Gtk.DropDown):
         text = item.get_string() if item else ""
         self._bind_label(list_item.get_child(), self._short_label_map.get(text, text))
 
+    def _on_button_factory_bind(self, factory, list_item):
+        self._on_factory_bind(factory, list_item)
+        label = list_item.get_child()
+        label.set_ellipsize(Pango.EllipsizeMode.END)
+        label.set_max_width_chars(self._max_width_chars)
+
     def _on_full_text_list_factory_bind(self, factory, list_item):
         item = list_item.get_item()
         self._bind_label(list_item.get_child(), item.get_string() if item else "")
@@ -353,7 +359,7 @@ class IdComboBox(Gtk.DropDown):
         if factory:
             try:
                 factory.disconnect_by_func(self._on_factory_setup)
-                factory.disconnect_by_func(self._on_factory_bind)
+                factory.disconnect_by_func(self._on_button_factory_bind)
             except TypeError:
                 pass
         list_factory = self.get_list_factory()
@@ -1539,7 +1545,7 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")))
+    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")), "Proton-CachyOS {}".format(_("Latest")))
     combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
     combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
     combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
@@ -2152,7 +2158,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode"))
 
-    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")))
+    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")), "VSync/FIFO")
     combobox_present.append("mailbox", "Mailbox")
     combobox_present.append("immediate", "Immediate")
 

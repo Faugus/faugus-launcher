@@ -5621,7 +5621,7 @@ class Settings(Gtk.Dialog):
         self.label_theme_engine = Gtk.Label(label=_("Theme"))
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
-        self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")))
+        self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")), "Adwaita")
         self.combobox_theme_engine.append("system", _("System Theme"))
         for theme_name in list_gtk4_themes():
             self.combobox_theme_engine.append(theme_name, theme_name)
@@ -6929,7 +6929,7 @@ class InterfaceSoundsDialog(Gtk.Dialog):
         self.label_theme = Gtk.Label(label=_("Sound"))
         self.label_theme.set_halign(Gtk.Align.START)
         self.combobox_theme = IdComboBox()
-        self.combobox_theme.append("cloud", "Cloud ({})".format(_("Default")))
+        self.combobox_theme.append("cloud", "Cloud ({})".format(_("Default")), "Cloud")
         for theme_id in ("glass", "wood", "breeze", "kalimba", "glow", "hush"):
             self.combobox_theme.append(theme_id, theme_id.capitalize())
         self.combobox_theme.append("custom", _("Custom"))
@@ -8550,7 +8550,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runtimes(self):
-        self.combobox_runtime.append("umu-steamrt4", "SteamRT4 ({})".format(_("Default")))
+        self.combobox_runtime.append("umu-steamrt4", "SteamRT4 ({})".format(_("Default")), "SteamRT4")
         self.combobox_runtime.append("umu-sniper", "Sniper")
         self.combobox_runtime.append("umu-soldier", "Soldier")
         self.combobox_runtime.append("umu-scout", "Scout")
