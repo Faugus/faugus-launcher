@@ -1547,7 +1547,6 @@ def version_key(v):
 def populate_combobox_with_runners(combobox):
     combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")), "Proton-CachyOS {}".format(_("Latest")))
     combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
-    combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
     combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
     combobox.append("Proton-Wineland Latest", "Proton-Wineland {}".format(_("Latest")))
     combobox.append("", "UMU-Proton {}".format(_("Latest")))
@@ -1557,7 +1556,7 @@ def populate_combobox_with_runners(combobox):
 
     reserved_names = (
         "UMU-Latest", "LegacyRuntime",
-        "Proton-GE Latest", "Proton-EM Latest",
+        "Proton-GE Latest",
         "DW-Proton Latest", "Proton-CachyOS Latest",
         "Proton-Wineland Latest",
     )
