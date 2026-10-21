@@ -172,6 +172,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected {
                 background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
+                transform: scale(1.05);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.25);
@@ -187,7 +188,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected:focus {
                 background-color: @theme_selected_bg_color;
-                transform: scale(1.05);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 1),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
@@ -2028,8 +2028,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         carrousel_fixed = getattr(self, 'carrousel_fixed', None)
         is_focused = carrousel_fixed is not None and carrousel_fixed.get_property("has-focus")
-        if not is_focused and d < 0.5:
-            scale = 1.0
 
         for css_class, active in (("carrousel-current", d < 0.5), ("carrousel-focused", is_focused)):
             if active:
