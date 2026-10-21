@@ -4554,7 +4554,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        shortcuts = vdf.binary_load(f)
+                        shortcuts = normalize_shortcuts(vdf.binary_load(f))
                     if "shortcuts" in shortcuts:
                         for game in shortcuts["shortcuts"].values():
                             if isinstance(game, dict) and game.get("AppName") == title:
@@ -4647,7 +4647,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        shortcuts = vdf.binary_load(f)
+                        shortcuts = normalize_shortcuts(vdf.binary_load(f))
 
                     if "shortcuts" not in shortcuts:
                         continue
@@ -5313,7 +5313,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        return vdf.binary_load(f)
+                        return normalize_shortcuts(vdf.binary_load(f))
                 except SyntaxError:
                     return {"shortcuts": {}}
             return {"shortcuts": {}}
