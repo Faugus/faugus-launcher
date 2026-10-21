@@ -203,7 +203,7 @@ class FaugusRun(HiDpiMixin):
                 set_env("PROTONPATH", f"{resolve_protonpath(self.default_runner)}")
 
         protonpath = os.environ.get("PROTONPATH")
-        if protonpath and protonpath not in ["Proton-GE Latest", "Proton-EM Latest", "Proton-CachyOS Latest", "DW-Proton Latest", "Proton-Wineland Latest", "umu-steamrt4", "umu-sniper", "umu-soldier", "umu-scout", "umu-host"]:
+        if protonpath and protonpath not in ["Proton-GE Latest", "Proton-CachyOS Latest", "DW-Proton Latest", "Proton-Wineland Latest", "umu-steamrt4", "umu-sniper", "umu-soldier", "umu-scout", "umu-host"]:
             if protonpath == "Proton-CachyOS (System)" and not os.path.exists(PROTON_CACHYOS):
                 self.close_splash_window()
                 self.show_error_dialog(protonpath)
@@ -217,7 +217,6 @@ class FaugusRun(HiDpiMixin):
                     self.close_splash_window()
                     self.show_error_dialog(protonpath)
         latest_flags = {
-            "Proton-EM Latest": "--em",
             "Proton-GE Latest": "--ge",
             "Proton-CachyOS Latest": "--cachyos",
             "DW-Proton Latest": "--dw",
@@ -614,8 +613,8 @@ class FaugusRun(HiDpiMixin):
                 return False
 
             component = next((c for c in (
-                "UMU-Launcher", "BattlEye", "Easy Anti-Cheat", "UMU-Proton", "GE-Proton",
-                "Proton-EM", "Proton-CachyOS", "DW-Proton", "Proton-Wineland",
+                "UMU-Launcher", "BattlEye", "Easy Anti-Cheat", "GE-Proton",
+                "Proton-CachyOS", "DW-Proton", "Proton-Wineland",
             ) if c in clean_line), None)
             if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
                 component = "Steam Runtime"
@@ -883,7 +882,7 @@ def build_launch_command(game):
         else:
             command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
             reserved_names = (
-                "Proton-GE Latest", "Proton-EM Latest",
+                "Proton-GE Latest",
                 "DW-Proton Latest", "Proton-CachyOS Latest",
                 "Proton-Wineland Latest",
             )

@@ -16,12 +16,6 @@ CONFIGS = {
         "api": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest",
         "archive_ext": ".tar.gz",
     },
-    "em": {
-        "label": "Proton-EM",
-        "dir": "Proton-EM Latest",
-        "api": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases/latest",
-        "archive_ext": ".tar.xz",
-    },
     "cachyos": {
         "label": "Proton-CachyOS",
         "dir": "Proton-CachyOS Latest",
@@ -127,8 +121,6 @@ def normalize_version(v):
     return (
         v.lstrip("v")
          .replace("GE-Proton", "")
-         .replace("Proton-EM-", "")
-         .replace("EM-", "")
          .replace("cachyos-wineland-", "")
          .replace("wineland-", "")
          .replace("cachyos-", "")

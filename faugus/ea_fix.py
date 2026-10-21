@@ -4,7 +4,7 @@ import shutil
 import vdf
 
 from faugus.path_manager import *
-from faugus.steam_setup import get_all_shortcut_paths
+from faugus.steam_setup import get_all_shortcut_paths, normalize_shortcuts
 from faugus.utils import load_json_file, save_json_file, expand_path
 
 
@@ -31,7 +31,7 @@ def update_steam_shortcut(game_title, new_start_dir, new_exe):
 
         try:
             with open(shortcut_path, 'rb') as f:
-                shortcuts = vdf.binary_load(f)
+                shortcuts = normalize_shortcuts(vdf.binary_load(f))
         except SyntaxError:
             continue
 

@@ -68,6 +68,22 @@ def to_signed_int32(value):
     return value
 
 
+SHORTCUT_KEYS = {k.lower(): k for k in (
+    "appid", "AppName", "Exe", "StartDir", "icon", "ShortcutPath", "LaunchOptions", "IsHidden",
+    "AllowDesktopConfig", "AllowOverlay", "OpenVR", "Devkit", "DevkitGameID", "DevkitOverrideAppID",
+    "LastPlayTime", "FlatpakAppID", "sortas", "tags")}
+
+
+def normalize_shortcuts(shortcuts):
+    entries = shortcuts.get("shortcuts") if isinstance(shortcuts, dict) else None
+    if not isinstance(entries, dict):
+        return shortcuts
+    for key, info in entries.items():
+        if isinstance(info, dict):
+            entries[key] = {SHORTCUT_KEYS.get(k.lower(), k): v for k, v in info.items()}
+    return shortcuts
+
+
 def renumber_shortcuts(shortcuts):
     entries = shortcuts.get("shortcuts")
     if not entries:

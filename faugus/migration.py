@@ -159,7 +159,7 @@ def _migrate_games_json_fields():
 
 
 def _migrate_config_json_values():
-    from faugus.utils import load_json_file_or_none, save_json_file
+    from faugus.utils import latest_installed_umu_proton, load_json_file_or_none, save_json_file
 
     config = load_json_file_or_none(CONFIG_FILE_DIR)
     if not config:
@@ -224,6 +224,10 @@ def _migrate_config_json_values():
             old_value = config.pop(old_key)
             config[new_key] = 'False' if old_value == 'True' else 'True'
             changed = True
+
+    if 'default-runner' in config and not config['default-runner'].strip('"'):
+        config['default-runner'] = latest_installed_umu_proton() or 'Proton-CachyOS Latest'
+        changed = True
 
     if changed:
         save_json_file(config, CONFIG_FILE_DIR)
