@@ -172,6 +172,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected {
                 background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
+                transform: scale(1.05);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 0.5),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.25);
@@ -187,7 +188,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected:focus {
                 background-color: @theme_selected_bg_color;
-                transform: scale(1.05);
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 1),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0.5);
@@ -2028,8 +2028,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         carrousel_fixed = getattr(self, 'carrousel_fixed', None)
         is_focused = carrousel_fixed is not None and carrousel_fixed.get_property("has-focus")
-        if not is_focused and d < 0.5:
-            scale = 1.0
 
         for css_class, active in (("carrousel-current", d < 0.5), ("carrousel-focused", is_focused)):
             if active:
@@ -4554,7 +4552,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        shortcuts = vdf.binary_load(f)
+                        shortcuts = normalize_shortcuts(vdf.binary_load(f))
                     if "shortcuts" in shortcuts:
                         for game in shortcuts["shortcuts"].values():
                             if isinstance(game, dict) and game.get("AppName") == title:
@@ -4647,7 +4645,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        shortcuts = vdf.binary_load(f)
+                        shortcuts = normalize_shortcuts(vdf.binary_load(f))
 
                     if "shortcuts" not in shortcuts:
                         continue
@@ -5313,7 +5311,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if os.path.exists(path):
                 try:
                     with open(path, 'rb') as f:
-                        return vdf.binary_load(f)
+                        return normalize_shortcuts(vdf.binary_load(f))
                 except SyntaxError:
                     return {"shortcuts": {}}
             return {"shortcuts": {}}
@@ -5623,7 +5621,7 @@ class Settings(Gtk.Dialog):
         self.label_theme_engine = Gtk.Label(label=_("Theme"))
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
-        self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")))
+        self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")), "Adwaita")
         self.combobox_theme_engine.append("system", _("System Theme"))
         for theme_name in list_gtk4_themes():
             self.combobox_theme_engine.append(theme_name, theme_name)
@@ -6931,7 +6929,7 @@ class InterfaceSoundsDialog(Gtk.Dialog):
         self.label_theme = Gtk.Label(label=_("Sound"))
         self.label_theme.set_halign(Gtk.Align.START)
         self.combobox_theme = IdComboBox()
-        self.combobox_theme.append("cloud", "Cloud ({})".format(_("Default")))
+        self.combobox_theme.append("cloud", "Cloud ({})".format(_("Default")), "Cloud")
         for theme_id in ("glass", "wood", "breeze", "kalimba", "glow", "hush"):
             self.combobox_theme.append(theme_id, theme_id.capitalize())
         self.combobox_theme.append("custom", _("Custom"))
@@ -8552,7 +8550,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.combobox_launcher.append("wargaming", "Wargaming Game Center")
 
     def populate_combobox_with_runtimes(self):
-        self.combobox_runtime.append("umu-steamrt4", "SteamRT4 ({})".format(_("Default")))
+        self.combobox_runtime.append("umu-steamrt4", "SteamRT4 ({})".format(_("Default")), "SteamRT4")
         self.combobox_runtime.append("umu-sniper", "Sniper")
         self.combobox_runtime.append("umu-soldier", "Soldier")
         self.combobox_runtime.append("umu-scout", "Scout")

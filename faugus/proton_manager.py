@@ -40,13 +40,6 @@ VARIANTS = {
         "min_version": (9, 1),
         "tag_to_display": lambda tag: tag,
     },
-    "em": {
-        "tab_label": "Proton-EM",
-        "api_url": "https://api.github.com/repos/Etaash-mathamsetty/Proton/releases",
-        "tag_prefix": "EM-",
-        "archive_ext": (".tar.xz",),
-        "tag_to_display": lambda tag: f"proton-{tag}",
-    },
     "dw": {
         "tab_label": "DW-Proton",
         "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",

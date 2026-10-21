@@ -315,7 +315,7 @@ class IdComboBox(Gtk.DropDown):
         self.set_model(self._store)
         factory = Gtk.SignalListItemFactory()
         factory.connect("setup", self._on_factory_setup)
-        factory.connect("bind", self._on_factory_bind)
+        factory.connect("bind", self._on_button_factory_bind)
         self.set_factory(factory)
         list_factory = Gtk.SignalListItemFactory()
         list_factory.connect("setup", self._on_factory_setup)
@@ -340,6 +340,12 @@ class IdComboBox(Gtk.DropDown):
         text = item.get_string() if item else ""
         self._bind_label(list_item.get_child(), self._short_label_map.get(text, text))
 
+    def _on_button_factory_bind(self, factory, list_item):
+        self._on_factory_bind(factory, list_item)
+        label = list_item.get_child()
+        label.set_ellipsize(Pango.EllipsizeMode.END)
+        label.set_max_width_chars(self._max_width_chars)
+
     def _on_full_text_list_factory_bind(self, factory, list_item):
         item = list_item.get_item()
         self._bind_label(list_item.get_child(), item.get_string() if item else "")
@@ -353,7 +359,7 @@ class IdComboBox(Gtk.DropDown):
         if factory:
             try:
                 factory.disconnect_by_func(self._on_factory_setup)
-                factory.disconnect_by_func(self._on_factory_bind)
+                factory.disconnect_by_func(self._on_button_factory_bind)
             except TypeError:
                 pass
         list_factory = self.get_list_factory()
@@ -1471,6 +1477,17 @@ def expand_path(value):
     return os.path.expandvars(os.path.expanduser(value))
 
 
+def latest_installed_umu_proton():
+    names = set()
+    for compat_dir in COMPATIBILITY_DIRS:
+        if not os.path.isdir(compat_dir):
+            continue
+        for entry in os.listdir(compat_dir):
+            if entry.startswith("UMU-Proton-") and os.path.isdir(os.path.join(compat_dir, entry)):
+                names.add(entry)
+    return max(names, key=version_key) if names else None
+
+
 def update_games_json():
     games = load_json_file_or_none(GAMES_JSON)
     if not games:
@@ -1481,6 +1498,10 @@ def update_games_json():
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+        if game.get("runner") == "":
+            game["runner"] = latest_installed_umu_proton() or "Default"
             changed = True
 
         if game.get("disable_umu") and game.get("runtime") != "disable-runtime":
@@ -1539,19 +1560,17 @@ def version_key(v):
 
 
 def populate_combobox_with_runners(combobox):
-    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")))
+    combobox.append("Proton-CachyOS Latest", "Proton-CachyOS {} ({})".format(_("Latest"), _("Default")), "Proton-CachyOS {}".format(_("Latest")))
     combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
-    combobox.append("Proton-EM Latest", "Proton-EM {}".format(_("Latest")))
     combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
     combobox.append("Proton-Wineland Latest", "Proton-Wineland {}".format(_("Latest")))
-    combobox.append("", "UMU-Proton {}".format(_("Latest")))
 
     if os.path.exists(PROTON_CACHYOS):
         combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))
 
     reserved_names = (
         "UMU-Latest", "LegacyRuntime",
-        "Proton-GE Latest", "Proton-EM Latest",
+        "Proton-GE Latest",
         "DW-Proton Latest", "Proton-CachyOS Latest",
         "Proton-Wineland Latest",
     )
@@ -2152,7 +2171,7 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     combobox_present = IdComboBox()
     combobox_present.set_tooltip_text(_("Override the present mode"))
 
-    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")))
+    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")), "VSync/FIFO")
     combobox_present.append("mailbox", "Mailbox")
     combobox_present.append("immediate", "Immediate")
 
