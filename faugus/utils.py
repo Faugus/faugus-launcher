@@ -1477,6 +1477,17 @@ def expand_path(value):
     return os.path.expandvars(os.path.expanduser(value))
 
 
+def latest_installed_umu_proton():
+    names = set()
+    for compat_dir in COMPATIBILITY_DIRS:
+        if not os.path.isdir(compat_dir):
+            continue
+        for entry in os.listdir(compat_dir):
+            if entry.startswith("UMU-Proton-") and os.path.isdir(os.path.join(compat_dir, entry)):
+                names.add(entry)
+    return max(names, key=version_key) if names else None
+
+
 def update_games_json():
     games = load_json_file_or_none(GAMES_JSON)
     if not games:
@@ -1487,6 +1498,10 @@ def update_games_json():
     for game in games:
         if game.get("runner") == "Proton-CachyOS":
             game["runner"] = "Proton-CachyOS (System)"
+            changed = True
+
+        if game.get("runner") == "":
+            game["runner"] = latest_installed_umu_proton() or "Default"
             changed = True
 
         if game.get("disable_umu") and game.get("runtime") != "disable-runtime":
@@ -1549,7 +1564,6 @@ def populate_combobox_with_runners(combobox):
     combobox.append("Proton-GE Latest", "GE-Proton {}".format(_("Latest")))
     combobox.append("DW-Proton Latest", "DW-Proton {}".format(_("Latest")))
     combobox.append("Proton-Wineland Latest", "Proton-Wineland {}".format(_("Latest")))
-    combobox.append("", "UMU-Proton {}".format(_("Latest")))
 
     if os.path.exists(PROTON_CACHYOS):
         combobox.append("Proton-CachyOS (System)", "Proton-CachyOS ({})".format(_("System")))

@@ -604,7 +604,7 @@ class FaugusRun(HiDpiMixin):
                 return False
 
             component = next((c for c in (
-                "UMU-Launcher", "BattlEye", "Easy Anti-Cheat", "UMU-Proton", "GE-Proton",
+                "UMU-Launcher", "BattlEye", "Easy Anti-Cheat", "GE-Proton",
                 "Proton-CachyOS", "DW-Proton", "Proton-Wineland",
             ) if c in clean_line), None)
             if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
