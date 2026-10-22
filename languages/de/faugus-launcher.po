@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-22 11:39+0000\n"
-"PO-Revision-Date: 2026-10-17 00:51+0000\n"
+"PO-Revision-Date: 2026-10-23 01:47+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -713,7 +713,7 @@ msgstr "Anzeige"
 
 #: faugus/launcher.py:5743
 msgid "GPU"
-msgstr ""
+msgstr "GPU"
 
 #: faugus/launcher.py:5752
 msgid "Auto-close on launch"
