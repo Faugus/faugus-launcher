@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-22 11:39+0000\n"
-"PO-Revision-Date: 2026-10-18 10:35+0000\n"
+"PO-Revision-Date: 2026-10-22 22:09+0000\n"
 "Last-Translator: nixxo <nixxo@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -709,11 +709,11 @@ msgstr "Varie"
 
 #: faugus/launcher.py:5740
 msgid "Display"
-msgstr "Schermo"
+msgstr "Mostra"
 
 #: faugus/launcher.py:5743
 msgid "GPU"
-msgstr ""
+msgstr "GPU"
 
 #: faugus/launcher.py:5752
 msgid "Auto-close on launch"
@@ -1208,7 +1208,7 @@ msgstr "Seleziona un'icona per la scorciatoia"
 #: faugus/utils.py:1598 faugus/utils.py:1599 faugus/utils.py:1600
 #: faugus/utils.py:1601
 msgid "Latest"
-msgstr "Recente"
+msgstr "Più Recente"
 
 #: faugus/utils.py:1604
 msgid "System"
