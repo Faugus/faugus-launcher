@@ -13,7 +13,7 @@ class ConfigManager:
             'no-sleep-enabled': 'False',
             'default-runner': 'Proton-CachyOS Latest',
             'lossless-location': '',
-            'discrete-gpu': 'False',
+            'gpu': '',
             'splash-window-enabled': 'True',
             'system-tray': 'False',
             'autostart-enabled': 'False',

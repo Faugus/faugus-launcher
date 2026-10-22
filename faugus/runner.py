@@ -128,8 +128,17 @@ class FaugusRun(HiDpiMixin):
         set_env("PROTON_EAC_RUNTIME", EAC_DIR)
         set_env("PROTON_BATTLEYE_RUNTIME", BE_DIR)
 
-        if self.discrete_gpu:
-            set_child_env("DRI_PRIME", "1")
+        gpu = next((g for g in get_gpus() if g["slot"] == self.gpu), None)
+        if gpu:
+            set_child_env("DRI_PRIME", "pci-" + gpu["slot"].replace(":", "_").replace(".", "_"))
+            set_child_env("MESA_VK_DEVICE_SELECT", "{}:{}".format(gpu["vendor"], gpu["device"]))
+            set_child_env("MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE", "1")
+            if gpu["vendor"] == "10de":
+                set_child_env("__NV_PRIME_RENDER_OFFLOAD", "1")
+                set_child_env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+                set_child_env("__VK_LAYER_NV_optimus", "NVIDIA_only")
+            else:
+                set_child_env("__GLX_VENDOR_LIBRARY_NAME", "mesa")
             GLib.idle_add(warm_up_gpu)
         if self.wayland_driver:
             set_env("PROTON_ENABLE_WAYLAND", "1")
@@ -509,7 +518,7 @@ class FaugusRun(HiDpiMixin):
     def load_config(self):
         self.cfg = ConfigManager()
 
-        self.discrete_gpu = self.cfg.config.get('discrete-gpu', 'False') == 'True'
+        self.gpu = self.cfg.config.get('gpu', '').strip('"')
         self.splash_window_enabled = self.cfg.config.get('splash-window-enabled', 'True') == 'True'
         self.default_runner = self.cfg.config.get('default-runner', '')
         self.lossless_location = expand_path(self.cfg.config.get('lossless-location', ''))
