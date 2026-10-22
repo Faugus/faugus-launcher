@@ -115,7 +115,7 @@ def init_gamepad(self):
             break
         _attach_device(self, device)
 
-    GLib.timeout_add(50, lambda: _tick_repeat(self))
+    self._gamepad_tick_source = None
 
 
 def _attach_device(self, device):
@@ -161,6 +161,11 @@ def _is_usable(self):
     return True, active_win
 
 
+def _ensure_tick(self):
+    if self._gamepad_tick_source is None:
+        self._gamepad_tick_source = GLib.timeout_add(50, lambda: _tick_repeat(self))
+
+
 def _tick_repeat(self):
     usable, _ = _is_usable(self)
 
@@ -174,6 +179,10 @@ def _tick_repeat(self):
     if usable:
         _scroll_active_window(self)
 
+    if self.held_direction is None and not (self.right_stick_x or self.right_stick_y):
+        self._gamepad_tick_source = None
+        return False
+
     return True
 
 
@@ -183,6 +192,7 @@ def _set_held_direction(self, direction):
             self.held_direction = direction
             self.hold_start_time = time.time()
             self.last_repeat_time = time.time()
+            _ensure_tick(self)
             _dispatch_navigation(self, direction)
     else:
         self.held_direction = None
@@ -231,7 +241,7 @@ def _on_hat_axis(self, event):
 
 def _on_absolute_axis(self, event):
     ok, axis, value = event.get_absolute()
-    if not ok or not _is_usable(self)[0]:
+    if not ok or axis not in (0, 1, 3, 4) or not _is_usable(self)[0]:
         return
 
     if axis == 1:
@@ -262,9 +272,11 @@ def _on_absolute_axis(self, event):
 
     elif axis == 3:
         self.right_stick_x = value if abs(value) > self.scroll_deadzone else 0.0
+        _ensure_tick(self)
 
     elif axis == 4:
         self.right_stick_y = value if abs(value) > self.scroll_deadzone else 0.0
+        _ensure_tick(self)
 
 
 def _scroll_active_window(self):

@@ -1560,7 +1560,17 @@ def version_key(v):
     return [int(p) if p.isdigit() else p for p in parts]
 
 
+_gpus_cache = None
+
+
 def get_gpus():
+    global _gpus_cache
+    if _gpus_cache is None:
+        _gpus_cache = scan_gpus()
+    return [dict(gpu) for gpu in _gpus_cache]
+
+
+def scan_gpus():
     gpus = []
     drm = "/sys/class/drm"
     try:

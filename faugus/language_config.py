@@ -63,7 +63,17 @@ def count_mo_entries(mo_path):
     return len([k for k in translation._catalog if k != ''])
 
 
+_completions_cache = {}
+
+
 def get_translation_completions(locale_dir, domain):
+    key = (locale_dir, domain)
+    if key not in _completions_cache:
+        _completions_cache[key] = scan_translation_completions(locale_dir, domain)
+    return dict(_completions_cache[key])
+
+
+def scan_translation_completions(locale_dir, domain):
     counts = {}
     for lang_code in os.listdir(locale_dir):
         mo_path = find_mo_file(locale_dir, lang_code, domain)

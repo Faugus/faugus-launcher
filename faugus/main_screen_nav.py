@@ -39,6 +39,8 @@ def _collect_focusable(widget, out):
         return
     if widget.get_sensitive() and widget.get_focusable() and not isinstance(widget, (Gtk.Label, Gtk.ScrolledWindow)):
         out.append(widget)
+    if isinstance(widget, Gtk.FlowBoxChild):
+        return
     child = widget.get_first_child()
     while child:
         _collect_focusable(child, out)

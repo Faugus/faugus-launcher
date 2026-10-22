@@ -265,7 +265,7 @@ class ProtonDownloader(Gtk.Dialog):
             def _progress(frac):
                 if cancel_event.is_set() or closed_event.is_set():
                     raise _DownloadCancelled()
-                pct = int(frac * 1000)
+                pct = int(frac * 100)
                 if pct != last_pct[0]:
                     last_pct[0] = pct
                     idle_add_while_open(closed_event, self.set_button_progress, button, frac)
@@ -379,7 +379,7 @@ class ProtonDownloader(Gtk.Dialog):
                 def _progress(frac):
                     if cancel_event.is_set() or closed_event.is_set():
                         raise _DownloadCancelled()
-                    pct = int(frac * 1000)
+                    pct = int(frac * 100)
                     if pct != last_pct[0]:
                         last_pct[0] = pct
                         idle_add_while_open(closed_event, self.set_button_progress, button, frac)

@@ -5,6 +5,7 @@ import subprocess
 import sys
 import threading
 import warnings
+import weakref
 import gi
 import vdf
 from datetime import datetime
@@ -49,6 +50,9 @@ if fix_legacy_shortcut_icons():
     os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
 _ = setup_gettext('faugus-launcher')
+
+
+_cover_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="faugus-cover")
 
 
 class FaugusApp(Gtk.Application):
@@ -820,10 +824,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             background-color: rgb({fade_r}, {fade_g}, {fade_b});
         }}
         """
-        base_provider.load_from_data(base_css.encode("utf-8"))
+        self.load_css_if_changed(base_provider, base_css)
 
         if self.launcher_banner_fade_provider is not None:
-            self.launcher_banner_fade_provider.load_from_data(self.banner_fade_css("launcher-screen-banner-fade", fade_rgb).encode("utf-8"))
+            self.load_css_if_changed(self.launcher_banner_fade_provider, self.banner_fade_css("launcher-screen-banner-fade", fade_rgb))
 
     def banner_fade_css(self, css_class, rgb):
         r, g, b = rgb
@@ -992,7 +996,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def check_running(self):
         changed = False
 
-        running_file = load_json_file(RUNNING_GAMES, {})
+        try:
+            running_mtime = os.stat(RUNNING_GAMES).st_mtime_ns
+        except OSError:
+            running_mtime = None
+        if running_mtime != getattr(self, '_running_file_mtime', 0) or not hasattr(self, '_running_file'):
+            self._running_file_mtime = running_mtime
+            self._running_file = load_json_file(RUNNING_GAMES, {})
+        running_file = self._running_file
         for gameid, pid in running_file.items():
             if gameid not in self.running:
                 self.running[gameid] = pid
@@ -1035,7 +1046,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.running or changed:
             self.update_icon()
 
-        if self.selected():
+        if (self.running or changed) and self.selected():
             self.update_overview_panel()
 
         return True
@@ -2029,11 +2040,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         carrousel_fixed = getattr(self, 'carrousel_fixed', None)
         is_focused = carrousel_fixed is not None and carrousel_fixed.get_property("has-focus")
 
-        for css_class, active in (("carrousel-current", d < 0.5), ("carrousel-focused", is_focused)):
-            if active:
-                slot["box"].add_css_class(css_class)
-            else:
-                slot["box"].remove_css_class(css_class)
+        classes = (d < 0.5, is_focused)
+        if slot.get("_classes") != classes:
+            slot["_classes"] = classes
+            for css_class, active in zip(("carrousel-current", "carrousel-focused"), classes):
+                if active:
+                    slot["box"].add_css_class(css_class)
+                else:
+                    slot["box"].remove_css_class(css_class)
 
         glow_t = self.carrousel_glow_alpha(offset)
         if not is_focused:
@@ -2052,7 +2066,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             f"transform: translate({translate_x:.2f}px, 0.00px) scale({scale:.2f}); "
             f"box-shadow: {box_shadow}; }}"
         )
-        slot["style_provider"].load_from_data(css.encode("utf-8"))
+        if slot.get("_css") != css:
+            slot["_css"] = css
+            slot["style_provider"].load_from_data(css.encode("utf-8"))
 
         slot["visual_offset"] = offset
 
@@ -2139,6 +2155,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot["box"].set_opacity(0.0)
                 slot["box"].set_can_target(False)
                 slot["_can_target"] = False
+                slot["_css"] = None
                 slot["style_provider"].load_from_data(
                     b"entry.flowbox-entry.cover-container.carrousel-cover-box { transition: none; box-shadow: none; }"
                 )
@@ -2150,6 +2167,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.set_carrousel_slot_content(slot, games[idx])
             self.place_carrousel_slot_base(slot)
             self.layout_carrousel_slot(slot, slot["offset"])
+        self.prefetch_carrousel_covers(games)
 
         self.schedule_background_update()
         self.update_icon()
@@ -2195,6 +2213,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.carrousel_start_animation()
         self.update_icon()
+        self.prefetch_carrousel_covers(games)
 
     def apply_pending_carrousel_reorder(self):
         self._carrousel_dnd_timeout_id = None
@@ -3984,8 +4003,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             zoom_width, zoom_height = self.cover_dimensions(zoom_pct)
 
-            surface = self.get_cover_paintable(game, zoom_width, zoom_height)
-            image2.set_paintable(surface)
+            self.set_cover_async(image2, game, zoom_width, zoom_height)
 
             hbox.append(image2)
 
@@ -4036,41 +4054,140 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def get_game_artwork(self, game, width, height):
         path = game.icon if os.path.isfile(game.icon) else FAUGUS_PNG
-        pixbuf = safe_load_pixbuf(path, width * HIDPI_SCALE, height * HIDPI_SCALE, False)
+        installed = self.is_game_installed(game)
 
-        if not self.is_game_installed(game):
-            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-
-        return HiDpiPaintable(Gdk.Texture.new_for_pixbuf(pixbuf), width, height)
-
-    def get_cover_texture(self, path, installed):
-        if not hasattr(self, '_cover_texture_cache'):
-            self._cover_texture_cache = {}
+        if not hasattr(self, '_icon_texture_cache'):
+            self._icon_texture_cache = {}
 
         try:
             mtime = os.path.getmtime(path)
         except OSError:
             mtime = None
 
-        cache_key = (path, mtime, installed)
+        cache_key = (path, mtime, width, height, installed)
+        texture = self._icon_texture_cache.get(cache_key)
+        if texture is None:
+            for key in [k for k in self._icon_texture_cache if k[0] == path and k[2:4] == (width, height)]:
+                del self._icon_texture_cache[key]
+
+            pixbuf = safe_load_pixbuf(path, width * HIDPI_SCALE, height * HIDPI_SCALE, False)
+            if not installed:
+                pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+
+            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+            self._icon_texture_cache[cache_key] = texture
+
+        return HiDpiPaintable(texture, width, height)
+
+    def cover_cache_key(self, path, installed):
+        try:
+            mtime = os.path.getmtime(path)
+        except OSError:
+            mtime = None
+        return (path, mtime, installed)
+
+    def build_cover_texture(self, path, installed):
+        max_width, max_height = self.cover_dimensions(100)
+        max_width *= HIDPI_SCALE
+        max_height *= HIDPI_SCALE
+        pixbuf = safe_load_pixbuf(path, None, None, False)
+        width, height = pixbuf.get_width(), pixbuf.get_height()
+        if width > max_width or height > max_height:
+            ratio = min(max_width / width, max_height / height)
+            pixbuf = pixbuf.scale_simple(max(1, int(width * ratio)), max(1, int(height * ratio)), GdkPixbuf.InterpType.BILINEAR)
+        if not installed:
+            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+
+        return Gdk.Texture.new_for_pixbuf(pixbuf)
+
+    def store_cover_texture(self, cache_key, texture):
+        for key in [k for k in self._cover_texture_cache if k[0] == cache_key[0]]:
+            del self._cover_texture_cache[key]
+        self._cover_texture_cache[cache_key] = texture
+
+    def get_cover_texture(self, path, installed):
+        if not hasattr(self, '_cover_texture_cache'):
+            self._cover_texture_cache = {}
+
+        cache_key = self.cover_cache_key(path, installed)
         texture = self._cover_texture_cache.get(cache_key)
         if texture is not None:
             return texture
 
-        for key in [k for k in self._cover_texture_cache if k[0] == path]:
-            del self._cover_texture_cache[key]
-
-        pixbuf = safe_load_pixbuf(path, None, None, False)
-        if not installed:
-            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-
-        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
-        self._cover_texture_cache[cache_key] = texture
+        texture = self.build_cover_texture(path, installed)
+        self.store_cover_texture(cache_key, texture)
         return texture
+
+    def load_cover_texture_async(self, path, installed, callback):
+        if not hasattr(self, '_cover_texture_cache'):
+            self._cover_texture_cache = {}
+        if not hasattr(self, '_cover_pending'):
+            self._cover_pending = {}
+
+        cache_key = self.cover_cache_key(path, installed)
+        texture = self._cover_texture_cache.get(cache_key)
+        if texture is not None:
+            callback(texture)
+            return
+
+        waiting = self._cover_pending.get(cache_key)
+        if waiting is not None:
+            waiting.append(callback)
+            return
+        self._cover_pending[cache_key] = [callback]
+
+        def finish(texture):
+            callbacks = self._cover_pending.pop(cache_key, [])
+            if texture is not None and self.cover_cache_key(path, installed) == cache_key:
+                self.store_cover_texture(cache_key, texture)
+                for callback in callbacks:
+                    callback(texture)
+            return False
+
+        def work():
+            try:
+                texture = self.build_cover_texture(path, installed)
+            except GLib.Error:
+                texture = None
+            GLib.idle_add(finish, texture)
+
+        _cover_executor.submit(work)
+
+    def prefetch_carrousel_covers(self, games):
+        n = len(games)
+        if not n:
+            return
+        for offset in range(-7, 8):
+            game = games[(self.carrousel_index + offset) % n]
+            if os.path.isfile(game.cover):
+                self.load_cover_texture_async(game.cover, self.is_game_installed(game), lambda texture: None)
+
+    def set_cover_async(self, picture, game, width, height):
+        picture.set_paintable(self.get_cover_placeholder(width, height))
+        if not os.path.isfile(game.cover):
+            return
+
+        def apply(texture):
+            width, height = self.cover_dimensions(self.cover_size)
+            picture.set_paintable(HiDpiPaintable(texture, width, height))
+
+        self.load_cover_texture_async(game.cover, self.is_game_installed(game), apply)
+
+    def get_cover_placeholder(self, width, height):
+        rgb = self.get_accent_rgb()
+        if not hasattr(self, '_cover_placeholders'):
+            self._cover_placeholders = {}
+        key = (width, height, tuple(rgb))
+        placeholder = self._cover_placeholders.get(key)
+        if placeholder is None:
+            self._cover_placeholders.clear()
+            placeholder = create_accent_placeholder_paintable(width, height, rgb=rgb)
+            self._cover_placeholders[key] = placeholder
+        return placeholder
 
     def get_cover_paintable(self, game, width, height):
         if not os.path.isfile(game.cover):
-            return create_accent_placeholder_paintable(width, height, rgb=self.get_accent_rgb())
+            return self.get_cover_placeholder(width, height)
 
         texture = self.get_cover_texture(game.cover, self.is_game_installed(game))
         return HiDpiPaintable(texture, width, height)
@@ -4086,20 +4203,26 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             now = GLib.get_monotonic_time()
             entry = cache.get(steam_user)
             if entry is None or (now - entry[0]) > 3_000_000:
-                entry = (now, read_installed_games(steam_user))
+                installed = read_installed_games(steam_user)
+                entry = (now, {str(appid) for appid, _ in installed}, {name.lower() for _, name in installed})
                 cache[steam_user] = entry
 
-            for appid, name in entry[1]:
-                if str(game.path) == str(appid) or game.title.lower() == name.lower():
-                    return True
-            return False
+            return str(game.path) in entry[1] or game.title.lower() in entry[2]
 
         return os.path.exists(expand_path(game.path))
 
     def on_search_changed(self, entry):
         if self.carrousel_active():
-            self.carrousel_index = 0
-            self.render_carrousel()
+            if getattr(self, '_carrousel_search_source', None):
+                GLib.source_remove(self._carrousel_search_source)
+
+            def fire():
+                self._carrousel_search_source = None
+                self.carrousel_index = 0
+                self.render_carrousel()
+                return False
+
+            self._carrousel_search_source = GLib.timeout_add(150, fire)
             return
 
         self.flowbox.invalidate_filter()
@@ -5031,10 +5154,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             os.makedirs(FAUGUS_TEMP, exist_ok=True)
             file_path = os.path.join(FAUGUS_TEMP, file_name[launcher])
 
+            last_percent = {"value": -1}
+
             def report_progress(block_num, block_size, total_size):
                 if total_size > 0:
                     downloaded = block_num * block_size
                     percent = min(downloaded / total_size, 1.0)
+                    if int(percent * 100) == last_percent["value"]:
+                        return
+                    last_percent["value"] = int(percent * 100)
                     GLib.idle_add(self.bar_download.set_fraction, percent)
                     GLib.idle_add(self.bar_download.set_text, f"{int(percent * 100)}%")
 
@@ -7435,11 +7563,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         path_action_group = Gio.SimpleActionGroup()
 
         action_path_executable = Gio.SimpleAction.new("executable", None)
-        action_path_executable.connect("activate", lambda action, param: self.on_button_search_clicked(None))
+        weak_self = weakref.ref(self)
+        action_path_executable.connect("activate", lambda action, param: weak_self().on_button_search_clicked(None))
         path_action_group.add_action(action_path_executable)
 
         action_path_installer = Gio.SimpleAction.new("installer", None)
-        action_path_installer.connect("activate", lambda action, param: self.on_button_installer_clicked(None))
+        action_path_installer.connect("activate", lambda action, param: weak_self().on_button_installer_clicked(None))
         path_action_group.add_action(action_path_installer)
 
         self.insert_action_group("pathaction", path_action_group)

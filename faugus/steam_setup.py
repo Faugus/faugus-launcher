@@ -166,12 +166,36 @@ def _read_family_group_members(account_id):
         return set()
 
 
+_installed_games_cache = {}
+
+
+def _path_mtime(path):
+    try:
+        return os.stat(path).st_mtime_ns
+    except OSError:
+        return None
+
+
 def read_installed_games(account_id=None):
     if not steam_folder:
         return []
 
-    games = []
     libraries = read_library_folders()
+    signature = (
+        tuple((str(lib), _path_mtime(lib / "steamapps")) for lib in libraries),
+        _path_mtime(USERDATA / account_id / "config/localconfig.vdf") if account_id and account_id != "all" else None,
+    )
+    cached = _installed_games_cache.get(account_id)
+    if cached and cached[0] == signature:
+        return cached[1]
+
+    games = _scan_installed_games(libraries, account_id)
+    _installed_games_cache[account_id] = (signature, games)
+    return games
+
+
+def _scan_installed_games(libraries, account_id):
+    games = []
 
     family_members = _read_family_group_members(account_id) if account_id and account_id != "all" else None
 
@@ -231,28 +255,44 @@ def get_steam_app_paths(appid):
     return None, None
 
 
+_playtime_cache = {}
+
+
+def _read_steam_playtimes(path):
+    try:
+        mtime = os.stat(path).st_mtime_ns
+    except OSError:
+        return {}
+
+    cached = _playtime_cache.get(path)
+    if cached and cached[0] == mtime:
+        return cached[1]
+
+    playtimes = {}
+    try:
+        with open(path, "r", errors="ignore") as f:
+            data = vdf.load(f)
+        apps = data.get("UserLocalConfigStore", {}).get("Software", {}).get("Valve", {}).get("Steam", {}).get("apps", {})
+        for appid, entry in apps.items():
+            if entry:
+                playtimes[str(appid)] = int(entry.get("Playtime", 0))
+    except Exception:
+        pass
+
+    _playtime_cache[path] = (mtime, playtimes)
+    return playtimes
+
+
 def get_steam_app_playtime_minutes(appid, account_id=None):
     if not steam_folder:
         return 0
 
     account_ids = [account_id] if account_id and account_id != "all" else list_steam_account_ids()
 
-    total = 0
-    for aid in account_ids:
-        path = USERDATA / aid / "config" / "localconfig.vdf"
-        if not path.exists():
-            continue
-        try:
-            with open(path, "r", errors="ignore") as f:
-                data = vdf.load(f)
-            apps = data.get("UserLocalConfigStore", {}).get("Software", {}).get("Valve", {}).get("Steam", {}).get("apps", {})
-            entry = apps.get(str(appid))
-            if entry:
-                total += int(entry.get("Playtime", 0))
-        except Exception:
-            pass
-
-    return total
+    return sum(
+        _read_steam_playtimes(USERDATA / aid / "config" / "localconfig.vdf").get(str(appid), 0)
+        for aid in account_ids
+    )
 
 
 def get_steam_icon_path(appid):
