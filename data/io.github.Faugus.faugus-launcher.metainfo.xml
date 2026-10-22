@@ -94,19 +94,16 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.0-1" date="2026-10-15">
+    <release version="2.5.1-1" date="2026-10-22">
       <description>
         <ul>
-          <li>Added an option to enable interface navigation sounds. Users can choose from the provided samples or use their own audio files and control the volume.</li>
-          <li>Reworked the Prevent Sleep option. Now it should work on more systems. The python-dbus dependency was removed because it's no longer needed.</li>
-          <li>Improved banner transition performance. With this change, scrolling through games in Carousel mode should feel smoother when banners are displayed.</li>
-          <li>Now the Proton Manager also handles the "Latest" options.</li>
-          <li>Added an option to remove the icons/covers/banners. Thanks @Alexlee500</li>
-          <li>Now if a launcher installation fails, the prefix is kept if it's shared with other games/apps.</li>
-          <li>Added Ubuntu 26.10 PPA build.</li>
-          <li>Fixed Proton Manager showing versions that haven't been downloaded as if they had been.</li>
-          <li>Fixed a bug that caused Grid icons and the shortcut icon button to become larger on older GTK versions.</li>
-          <li>Fixed icons from launchers not being fetched from SteamGridDB on List/Grid modes.</li>
+          <li>Added an option to select the GPU to run games.</li>
+          <li>Removed the "Discrete GPU" option.</li>
+          <li>Removed Proton-EM support because the last version was released 6 months ago.</li>
+          <li>Removed UMU-Proton support because it is no longer being updated.</li>
+          <li>Fixed Splash Windows icon missing on the task bar.</li>
+          <li>Fixed an issue on Flatpak that caused games to remain stuck as "already running" even when they weren't.</li>
+          <li>Fixed Steam shortcut not being detected after the game being moved to a game collection.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
