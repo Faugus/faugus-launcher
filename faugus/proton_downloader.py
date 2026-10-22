@@ -56,6 +56,13 @@ def select_asset(assets, archive_exts):
     )
 
 
+def extraction_filter(member, path):
+    try:
+        return tarfile.data_filter(member, path)
+    except tarfile.AbsoluteLinkError:
+        return tarfile.tar_filter(member, path)
+
+
 def get_tar_mode(name):
     if name.endswith(('.tar.gz', '.tgz')):
         return 'r|gz'
@@ -162,7 +169,7 @@ def install_proton_latest(proton_dir, url, asset_name, label, progress=None):
             response = StreamProgress(response, int(response.headers.get("Content-Length", 0)), progress)
 
         with tarfile.open(fileobj=response, mode=get_tar_mode(asset_name)) as tar:
-            tar.extractall(tmp, filter="data")
+            tar.extractall(tmp, filter=extraction_filter)
     except Exception as e:
         print(f"Error downloading/extracting {label}: {e}", flush=True)
         if tmp.exists():
