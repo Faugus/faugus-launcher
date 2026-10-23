@@ -6656,7 +6656,6 @@ class Settings(Gtk.Dialog):
         self.label_accent.set_sensitive(is_adwaita)
         self.box_accent.set_sensitive(is_adwaita)
         self.box_accent.set_tooltip_text(adwaita_tip)
-        apply_interface_customization(self.interface_theme, self.accent_color, self.theme_engine)
 
     def on_checkbox_system_tray_toggled(self, widget):
         active = widget.get_active()
