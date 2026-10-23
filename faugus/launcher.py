@@ -531,6 +531,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         elif self.widget_color_mode == "solid":
             color = "@theme_bg_color"
         else:
+            add_css_once("widget_color", "")
             return
         add_css_once(
             "widget_color",
@@ -4326,6 +4327,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.apply_background_mode_live(settings_dialog.original_background_mode)
             self.overview_color_mode = settings_dialog.original_overview_color_mode
             self.apply_overview_panel_width()
+            self.widget_color_mode = settings_dialog.original_widget_color_mode
+            self.update_widget_color_css()
             destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
@@ -5745,6 +5748,7 @@ class Settings(Gtk.Dialog):
         self.combobox_widget_color.append("default", _("Default"))
         self.combobox_widget_color.append("accent", _("Accent color"))
         self.combobox_widget_color.append("solid", _("Solid color"))
+        self.combobox_widget_color.connect("changed", self.on_widget_color_changed)
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
@@ -6531,6 +6535,10 @@ class Settings(Gtk.Dialog):
         self.parent.overview_color = self.overview_color_button.get_rgba().to_string()
         self.parent.apply_overview_panel_width()
 
+    def on_widget_color_changed(self, widget):
+        self.parent.widget_color_mode = self.combobox_widget_color.get_active_id()
+        self.parent.update_widget_color_css()
+
     def on_checkbox_overview_toggled(self, widget):
         enabled = widget.get_active()
         self.label_overview_color.set_sensitive(enabled)
@@ -6910,6 +6918,7 @@ class Settings(Gtk.Dialog):
         self.original_accent_color = self.accent_color
         self.original_background_mode = background_mode
         self.original_overview_color_mode = overview_color_mode
+        self.original_widget_color_mode = widget_color_mode
         self.original_background_color = background_color
         self.original_overview_color = overview_color
         self.original_theme_engine = self.theme_engine
@@ -6923,7 +6932,9 @@ class Settings(Gtk.Dialog):
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
         self.combobox_interface.set_active_id(interface_mode)
         self.set_button_color(self.background_color_button, background_color)
+        self.background_color_button.set_sensitive(background_mode == "custom")
         self.set_button_color(self.overview_color_button, overview_color)
+        self.overview_color_button.set_sensitive(overview_color_mode == "custom")
         self.combobox_background.set_active_id(background_mode)
         self.combobox_overview_color.set_active_id(overview_color_mode)
         self.combobox_widget_color.set_active_id(widget_color_mode)
