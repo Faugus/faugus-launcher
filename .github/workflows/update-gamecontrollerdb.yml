@@ -1,0 +1,39 @@
+name: Update gamecontrollerdb
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-gamecontrollerdb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download latest gamecontrollerdb.txt
+        run: |
+          curl -fsSL --retry 3 \
+            -o /tmp/gamecontrollerdb.txt \
+            https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt
+          if [ "$(grep -cvE '^(#|$)' /tmp/gamecontrollerdb.txt)" -lt 1000 ]; then
+            echo "Downloaded file looks invalid." >&2
+            exit 1
+          fi
+          cp /tmp/gamecontrollerdb.txt assets/gamecontrollerdb.txt
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- assets/gamecontrollerdb.txt; then
+            echo "gamecontrollerdb.txt is up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/gamecontrollerdb.txt
+          git commit -m "Update gamecontrollerdb.txt"
+          git push origin HEAD:main
