@@ -1418,6 +1418,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.scale_zoom.add_controller(zoom_key_controller)
 
         scroll_box = Gtk.ScrolledWindow()
+        self.scroll_box = scroll_box
         scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll_box.set_margin_top(10)
         scroll_box.set_margin_bottom(10)
@@ -1495,25 +1496,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if is_big:
             self.flowbox.set_halign(Gtk.Align.CENTER)
             self.flowbox.set_valign(Gtk.Align.CENTER)
-            if self.interface_mode in ("Grid", "Covers"):
-                max_children = self.grid_max_children_per_line
-                self.flowbox.set_min_children_per_line(min(2, max_children))
-                self.flowbox.set_max_children_per_line(max_children)
-            else:
-                self.flowbox.set_min_children_per_line(2)
-                self.flowbox.set_max_children_per_line(20)
-
-            horizontal_mode = (
-                self.interface_mode in ("Grid", "Covers")
-                and self.grid_orientation == 'Horizontal'
-            )
-            if horizontal_mode:
-                self.flowbox.set_orientation(Gtk.Orientation.VERTICAL)
-                self.flowbox.set_homogeneous(True)
-                scroll_box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
-            else:
-                self.flowbox.set_orientation(Gtk.Orientation.HORIZONTAL)
-                scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         else:
             self.flowbox.set_halign(Gtk.Align.FILL)
             self.flowbox.set_valign(Gtk.Align.START)
@@ -1569,6 +1551,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             right_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             self.main_hbox.append(self.build_background_container(right_vbox))
 
+            self.right_vbox = right_vbox
             self.scale_zoom.set_visible(self.interface_mode in ("Covers", "Carrousel") and self.zoom_enabled)
 
             bottom_bar = Gtk.CenterBox(orientation=Gtk.Orientation.HORIZONTAL)
@@ -1581,21 +1564,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             bottom_bar.add_controller(bottom_bar_key_controller)
 
             bottom_bar.set_start_widget(self.scale_zoom)
-
-            if self.sort_enabled or self.categories_enabled:
-                box_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                box_actions.set_margin_start(10)
-                if self.sort_enabled:
-                    self.button_sort.set_size_request(50, 50)
-                    box_actions.append(self.button_sort)
-                if self.categories_enabled:
-                    self.button_category.set_size_request(50, 50)
-                    box_actions.append(self.button_category)
-                box_actions.set_halign(Gtk.Align.END)
-                box_actions.set_valign(Gtk.Align.CENTER)
-                box_actions.set_hexpand(True)
-                box_actions.set_vexpand(False)
-                bottom_bar.set_end_widget(box_actions)
 
             center_grid = Gtk.Grid()
             center_grid.set_column_spacing(10)
@@ -1611,41 +1579,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.scale_zoom.set_valign(Gtk.Align.CENTER)
             self.scale_zoom.set_vexpand(False)
 
-            overview_panel = None
-            if self.overview_enabled and self.interface_mode in ("Grid", "Covers", "Carrousel"):
-                overview_panel = self.build_overview_panel()
-
-            if self.carrousel_active():
-                carrousel_box = self.build_carrousel_widget()
-                carrousel_box.set_vexpand(False)
-                right_vbox.append(self.wrap_content_with_position(carrousel_box, overview_panel))
-            elif self.interface_mode in ("Covers", "Grid"):
-                scroll_box.set_vexpand(False)
-                scroll_box.set_propagate_natural_height(True)
-
-                position_halign = self.grid_position_halign()
-                self.flowbox.set_halign(Gtk.Align.CENTER)
-                if horizontal_mode or position_halign != Gtk.Align.CENTER:
-                    self.flowbox.set_hexpand(False)
-                    scroll_box.set_hexpand(False)
-                    scroll_box.set_halign(position_halign)
-                    scroll_box.set_propagate_natural_width(True)
-                else:
-                    self.flowbox.set_hexpand(True)
-                    scroll_box.set_hexpand(True)
-                    scroll_box.set_halign(Gtk.Align.FILL)
-                    scroll_box.set_propagate_natural_width(False)
-                if self.interface_mode == "Covers":
-                    self.flowbox.set_margin_top(40)
-                    self.flowbox.set_margin_bottom(40)
-                    self.flowbox.set_margin_start(40)
-                    self.flowbox.set_margin_end(40)
-
-                right_vbox.append(self.wrap_content_with_position(scroll_box, overview_panel))
-            else:
-                right_vbox.append(scroll_box)
-                scroll_box.set_vexpand(True)
-            right_vbox.append(bottom_bar)
+            self.arrange_main_content()
 
         else:
             box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -1653,24 +1587,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             self.box_bottom.add_controller(bottom_bar_key_controller)
 
-            if self.sort_enabled or self.categories_enabled:
-                top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-                self.top_bar = top_bar
-                top_bar.set_margin_top(10)
-                top_bar.set_margin_start(10)
-                top_bar.set_margin_end(10)
-                if self.sort_enabled:
-                    self.button_sort.set_size_request(110, -1)
-                    self.button_sort.set_hexpand(True)
-                    top_bar.append(self.button_sort)
-                if self.categories_enabled:
-                    self.button_category.set_size_request(110, -1)
-                    self.button_category.set_hexpand(True)
-                    top_bar.append(self.button_category)
-                box_top.append(top_bar)
-
+            self.box_top = box_top
             box_top.append(scroll_box)
             scroll_box.set_vexpand(True)
+            self.arrange_action_buttons()
 
             grid_controls = Gtk.Grid()
             grid_controls.set_column_spacing(10)
@@ -3188,8 +3108,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return box
 
     def connect_overview_panel_resize(self):
+        if getattr(self, "_overview_resize_connected", False):
+            return
         surface = self.get_surface()
         if surface is not None:
+            self._overview_resize_connected = True
             surface.connect("notify::width", lambda s, p: self.update_overview_panel_width())
             surface.connect("notify::height", lambda s, p: self.update_overview_panel_width())
         else:
@@ -3205,6 +3128,169 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return GLib.SOURCE_REMOVE
 
         self._overview_width_tick_id = self.add_tick_callback(do_resize)
+
+    def apply_flowbox_layout(self):
+        if self.interface_mode in ("Grid", "Covers"):
+            max_children = self.grid_max_children_per_line
+            self.flowbox.set_min_children_per_line(min(2, max_children))
+            self.flowbox.set_max_children_per_line(max_children)
+        else:
+            self.flowbox.set_min_children_per_line(2)
+            self.flowbox.set_max_children_per_line(20)
+
+        horizontal_mode = (
+            self.interface_mode in ("Grid", "Covers")
+            and self.grid_orientation == 'Horizontal'
+        )
+        if horizontal_mode:
+            self.flowbox.set_orientation(Gtk.Orientation.VERTICAL)
+            self.flowbox.set_homogeneous(True)
+            self.scroll_box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+        else:
+            self.flowbox.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        return horizontal_mode
+
+    def arrange_action_buttons(self):
+        for button in (self.button_sort, self.button_category):
+            parent = button.get_parent()
+            if parent is not None:
+                parent.remove(button)
+
+        buttons = []
+        if self.sort_enabled:
+            buttons.append(self.button_sort)
+        if self.categories_enabled:
+            buttons.append(self.button_category)
+
+        if self.interface_mode != "List":
+            box_actions = None
+            if buttons:
+                box_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+                box_actions.set_margin_start(10)
+                for button in buttons:
+                    button.set_size_request(50, 50)
+                    box_actions.append(button)
+                box_actions.set_halign(Gtk.Align.END)
+                box_actions.set_valign(Gtk.Align.CENTER)
+                box_actions.set_hexpand(True)
+                box_actions.set_vexpand(False)
+            self.bottom_bar.set_end_widget(box_actions)
+            return
+
+        old_top_bar = getattr(self, "top_bar", None)
+        if old_top_bar is not None:
+            self.box_top.remove(old_top_bar)
+            self.top_bar = None
+        if buttons:
+            top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+            self.top_bar = top_bar
+            top_bar.set_margin_top(10)
+            top_bar.set_margin_start(10)
+            top_bar.set_margin_end(10)
+            for button in buttons:
+                button.set_size_request(110, -1)
+                button.set_hexpand(True)
+                top_bar.append(button)
+            self.box_top.prepend(top_bar)
+
+    def arrange_main_content(self):
+        if not hasattr(self, "carrousel_box") and self.carrousel_active():
+            self.carrousel_box = self.build_carrousel_widget()
+            self.carrousel_box.set_vexpand(False)
+
+        overview_panel = getattr(self, "overview_panel", None)
+        for widget in (self.scroll_box, getattr(self, "carrousel_box", None), overview_panel):
+            parent = widget.get_parent() if widget is not None else None
+            if parent is not None:
+                parent.remove(widget)
+        for child in widget_children(self.right_vbox):
+            self.right_vbox.remove(child)
+
+        horizontal_mode = self.apply_flowbox_layout()
+        self.arrange_action_buttons()
+
+        if self.overview_enabled and self.interface_mode in ("Grid", "Covers", "Carrousel"):
+            if overview_panel is None:
+                overview_panel = self.build_overview_panel()
+        else:
+            overview_panel = None
+            self.overview_panel = None
+
+        scroll_box = self.scroll_box
+        if self.carrousel_active():
+            self.right_vbox.append(self.wrap_content_with_position(self.carrousel_box, overview_panel))
+        elif self.interface_mode in ("Covers", "Grid"):
+            scroll_box.set_vexpand(False)
+            scroll_box.set_propagate_natural_height(True)
+
+            position_halign = self.grid_position_halign()
+            self.flowbox.set_halign(Gtk.Align.CENTER)
+            if horizontal_mode or position_halign != Gtk.Align.CENTER:
+                self.flowbox.set_hexpand(False)
+                scroll_box.set_hexpand(False)
+                scroll_box.set_halign(position_halign)
+                scroll_box.set_propagate_natural_width(True)
+            else:
+                self.flowbox.set_hexpand(True)
+                scroll_box.set_hexpand(True)
+                scroll_box.set_halign(Gtk.Align.FILL)
+                scroll_box.set_propagate_natural_width(False)
+            if self.interface_mode == "Covers":
+                self.flowbox.set_margin_top(40)
+                self.flowbox.set_margin_bottom(40)
+                self.flowbox.set_margin_start(40)
+                self.flowbox.set_margin_end(40)
+
+            self.right_vbox.append(self.wrap_content_with_position(scroll_box, overview_panel))
+        else:
+            self.right_vbox.append(scroll_box)
+            scroll_box.set_vexpand(True)
+        self.right_vbox.append(self.bottom_bar)
+
+    def apply_interface_options(self, **new_options):
+        changed = {key for key, value in new_options.items() if getattr(self, key) != value}
+        for key in changed:
+            setattr(self, key, new_options[key])
+
+        if changed & {"categories_enabled", "sort_enabled"}:
+            self.arrange_action_buttons()
+
+        if self.interface_mode != "List" and changed & {"grid_position", "grid_orientation",
+                                                        "grid_max_children_per_line", "overview_enabled"}:
+            self.arrange_main_content()
+
+        if changed & {"labels_enabled", "zoom_enabled"}:
+            self.apply_labels_and_zoom_visibility()
+
+        if "show_hidden" in changed:
+            self.apply_show_hidden_change()
+
+        if "banner_enabled" in changed:
+            self.rebuild_background_container()
+
+        if changed & {"categories_enabled", "sort_enabled"}:
+            if self.carrousel_active():
+                self.render_carrousel()
+            else:
+                self.flowbox.invalidate_filter()
+                self.flowbox.invalidate_sort()
+
+        if "gamepad_navigation" in changed:
+            import faugus.gamepad as gamepad
+            if self.gamepad_navigation:
+                gamepad.init_gamepad(self)
+            else:
+                gamepad.shutdown_gamepad(self)
+
+    def apply_labels_and_zoom_visibility(self):
+        if self.interface_mode in ("Covers", "Carrousel"):
+            for child in self.flowbox:
+                child.label.set_visible(self.labels_enabled)
+            for slot in getattr(self, "carrousel_slots", []):
+                if slot["gameid"] is not None:
+                    slot["label"].set_visible(self.labels_enabled)
+            self.scale_zoom.set_visible(self.zoom_enabled)
 
     def apply_overview_panel_width(self):
         panel = getattr(self, 'overview_panel', None)
@@ -4287,31 +4373,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if self.apply_tray_settings(settings_dialog.checkbox_system_tray.get_active(), settings_dialog.checkbox_mono_icon.get_active()):
                 return
 
-            new_grid_max_children = int(settings_dialog.entry_grid_max_children.get_value()) if settings_dialog.checkbox_grid_max_children.get_active() else 20
             if (self.interface_mode != settings_dialog.combobox_interface.get_active_id()
                     or self.background_mode != settings_dialog.combobox_background.get_active_id()
                     or self.widget_color_mode != settings_dialog.combobox_widget_color.get_active_id()
                     or self.theme_engine != settings_dialog.combobox_theme_engine.get_active_id()
-                    or self.banner_enabled != settings_dialog.checkbox_banner.get_active()
-                    or self.labels_enabled != settings_dialog.checkbox_labels.get_active()
-                    or self.zoom_enabled != settings_dialog.checkbox_zoom.get_active()
-                    or self.grid_position != settings_dialog.combobox_grid_position.get_active_id()
-                    or self.grid_orientation != settings_dialog.combobox_grid_orientation.get_active_id()
-                    or self.grid_max_children_per_line != new_grid_max_children
-                    or self.overview_enabled != settings_dialog.checkbox_overview.get_active()
                     or self.language != settings_dialog.combobox_language.get_active_id()
-                    or self.gamepad_navigation != settings_dialog.checkbox_gamepad_navigation.get_active()
-                    or self.categories_enabled != settings_dialog.checkbox_categories.get_active()
-                    or self.sort_enabled != settings_dialog.checkbox_sort.get_active()
                     or self.header_bar != settings_dialog.checkbox_header_bar.get_active()):
                 os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
             settings_dialog.update_envar_file()
 
-            hidden_changed = self.show_hidden != settings_dialog.checkbox_hidden_games.get_active()
             self.load_config()
-            if hidden_changed:
-                self.apply_show_hidden_change()
 
             destroy_and_release(settings_dialog)
 
@@ -4329,6 +4401,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.apply_overview_panel_width()
             self.widget_color_mode = settings_dialog.original_widget_color_mode
             self.update_widget_color_css()
+            self.apply_interface_options(**settings_dialog.original_interface_options)
             destroy_and_release(settings_dialog)
 
     def validate_settings_fields(self, settings_dialog, default_prefix):
@@ -6321,6 +6394,14 @@ class Settings(Gtk.Dialog):
 
         self.on_combobox_interface_changed(self.combobox_interface)
 
+        for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_banner,
+                         self.checkbox_gamepad_navigation, self.checkbox_categories, self.checkbox_sort,
+                         self.checkbox_overview, self.checkbox_grid_max_children, self.checkbox_hidden_games):
+            checkbox.connect("toggled", self.on_interface_option_changed)
+        for combobox in (self.combobox_grid_position, self.combobox_grid_orientation):
+            combobox.connect("changed", self.on_interface_option_changed)
+        self.entry_grid_max_children.connect("value-changed", self.on_interface_option_changed)
+
         disable_mangohud_gamemode_if_missing(self)
         self.track_modifications(self.box)
 
@@ -6534,6 +6615,28 @@ class Settings(Gtk.Dialog):
         self.overview_color_button.set_sensitive(self.parent.overview_color_mode == "custom")
         self.parent.overview_color = self.overview_color_button.get_rgba().to_string()
         self.parent.apply_overview_panel_width()
+
+    def get_interface_options(self):
+        if self.checkbox_grid_max_children.get_active():
+            max_children = int(self.entry_grid_max_children.get_value())
+        else:
+            max_children = 20
+        return {
+            "labels_enabled": self.checkbox_labels.get_active(),
+            "zoom_enabled": self.checkbox_zoom.get_active(),
+            "banner_enabled": self.checkbox_banner.get_active(),
+            "gamepad_navigation": self.checkbox_gamepad_navigation.get_active(),
+            "categories_enabled": self.checkbox_categories.get_active(),
+            "sort_enabled": self.checkbox_sort.get_active(),
+            "overview_enabled": self.checkbox_overview.get_active(),
+            "show_hidden": self.checkbox_hidden_games.get_active(),
+            "grid_position": self.combobox_grid_position.get_active_id(),
+            "grid_orientation": self.combobox_grid_orientation.get_active_id(),
+            "grid_max_children_per_line": max_children,
+        }
+
+    def on_interface_option_changed(self, widget):
+        self.parent.apply_interface_options(**self.get_interface_options())
 
     def on_widget_color_changed(self, widget):
         self.parent.widget_color_mode = self.combobox_widget_color.get_active_id()
@@ -6982,6 +7085,7 @@ class Settings(Gtk.Dialog):
                     break
 
         self.combobox_language.set_active(index_language)
+        self.original_interface_options = self.get_interface_options()
         self.load_liststore_from_file(ENVAR_DIR)
 
     def load_liststore_from_file(self, filename=ENVAR_DIR):

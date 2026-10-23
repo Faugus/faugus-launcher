@@ -118,6 +118,17 @@ def init_gamepad(self):
     self._gamepad_tick_source = None
 
 
+def shutdown_gamepad(self):
+    for device, signal_id in self.gamepad_devices.items():
+        device.disconnect(signal_id)
+    self.gamepad_devices.clear()
+    self.gamepad_monitor = None
+    self.held_direction = None
+    if self._gamepad_tick_source is not None:
+        GLib.source_remove(self._gamepad_tick_source)
+        self._gamepad_tick_source = None
+
+
 def _attach_device(self, device):
     if device in self.gamepad_devices:
         return
