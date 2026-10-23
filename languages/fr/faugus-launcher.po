@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-23 15:10+0000\n"
-"PO-Revision-Date: 2026-10-23 12:56+0000\n"
-"Last-Translator: Loïc "
-"<loc637d4b91fab64b58@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-10-23 17:02+0000\n"
+"Last-Translator: Loïc <loc637d4b91fab64b58@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -1144,10 +1144,8 @@ msgid "Updating"
 msgstr "Mise à jour"
 
 #: faugus/runner.py:685 faugus/runner.py:692
-#, fuzzy
-#| msgid "Installing %s..."
 msgid "Installing"
-msgstr "Installation de %s..."
+msgstr "Installation"
 
 #: faugus/runner.py:768
 msgid "The keys and values were successfully added to the registry."
