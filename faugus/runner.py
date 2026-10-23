@@ -93,9 +93,13 @@ class FaugusRun(HiDpiMixin):
         self.logging_enabled = with_logs
         self.process = None
         self.splash_window = None
+        self.progress_bar = None
+        self.pulse_source = None
+        self.steam_runtime_installed = False
         self.log_window = None
         self.text_view = None
         self.proton_latest = None
+        self.proton_exists = False
 
         self.load_config()
         load_frame_css()
@@ -278,6 +282,9 @@ class FaugusRun(HiDpiMixin):
 
                     self.check_game_output(clean_line)
 
+                    if clean_line.startswith("PROGRESS "):
+                        continue
+
                     if os.environ.get("GAMEID") == "winetricks-gui":
                         GLib.idle_add(self.append_to_text_view, clean_line)
                     else:
@@ -338,6 +345,10 @@ class FaugusRun(HiDpiMixin):
                     self.inhibit_fd = fd_list.steal_fds()[result.unpack()[0]]
                 except GLib.Error as e:
                     print(f"Failed to inhibit sleep via logind: {e}")
+
+        self.steam_runtime_installed = any(
+            os.path.isdir(PathManager.user_data("umu", name)) for name in ("steamrt3", "steamrt4")
+        )
 
         cmds_to_run = []
         is_sniper = os.environ.get("PROTONPATH") == "umu-sniper"
@@ -564,12 +575,20 @@ class FaugusRun(HiDpiMixin):
         image.set_margin_bottom(20)
         box.append(image)
 
-        self.label = Gtk.Label()
-        self.label.set_margin_start(20)
-        self.label.set_margin_end(20)
-        self.label.set_margin_bottom(20)
+        status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        status_box.set_margin_start(20)
+        status_box.set_margin_end(20)
+        status_box.set_margin_bottom(20)
 
-        box.append(self.label)
+        self.label = Gtk.Label()
+        status_box.append(self.label)
+
+        self.progress_bar = Gtk.ProgressBar()
+        self.progress_bar.set_size_request(240, -1)
+        self.progress_bar.set_visible(False)
+        status_box.append(self.progress_bar)
+
+        box.append(status_box)
 
         self.splash_window.set_child(frame)
         self.splash_window.present()
@@ -577,6 +596,34 @@ class FaugusRun(HiDpiMixin):
         main_context = GLib.MainContext.default()
         while main_context.pending():
             main_context.iteration(False)
+
+    def show_progress(self, fraction=None):
+        if not self.progress_bar:
+            return
+        self.progress_bar.set_visible(True)
+        if fraction is None:
+            if self.pulse_source is None:
+                self.pulse_source = GLib.timeout_add(100, self.pulse_progress)
+        else:
+            self.stop_pulse()
+            self.progress_bar.set_fraction(fraction)
+
+    def pulse_progress(self):
+        if not self.progress_bar:
+            self.pulse_source = None
+            return False
+        self.progress_bar.pulse()
+        return True
+
+    def stop_pulse(self):
+        if self.pulse_source is not None:
+            GLib.source_remove(self.pulse_source)
+            self.pulse_source = None
+
+    def hide_progress(self):
+        self.stop_pulse()
+        if self.progress_bar:
+            self.progress_bar.set_visible(False)
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
@@ -597,6 +644,16 @@ class FaugusRun(HiDpiMixin):
         if "Downloading upscaler file" in clean_line:
             return False
 
+        if clean_line.startswith("PROGRESS "):
+            fraction = float(clean_line.split()[1])
+
+            def update_progress():
+                self.show_progress(fraction)
+                return False
+
+            GLib.idle_add(update_progress)
+            return False
+
         def update_ui():
             if (
                 "Downloading" in clean_line
@@ -610,6 +667,7 @@ class FaugusRun(HiDpiMixin):
             if "Components are up to date" in clean_line:
                 if self.splash_window:
                     self.label.set_text(_("Components are up to date"))
+                    self.hide_progress()
                 return False
 
             component = next((c for c in (
@@ -619,19 +677,27 @@ class FaugusRun(HiDpiMixin):
             if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
                 component = "Steam Runtime"
 
-            if component and self.splash_window:
+            if component == "Steam Runtime" and self.splash_window:
+                if "is up to date" in clean_line or "mtree is OK" in clean_line:
+                    self.label.set_text(f"{component} " + _("is up to date"))
+                    self.hide_progress()
+                elif "Downloading" in clean_line or "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
+                    action = _("Updating") if self.steam_runtime_installed else _("Installing")
+                    self.label.set_text(f"{action} {component}...")
+                    self.show_progress()
+            elif component and self.splash_window:
                 if "Updating" in clean_line:
                     self.label.set_text(_("Updating") + f" {component}...")
-                elif "Downloading" in clean_line:
-                    self.label.set_text(_("Downloading") + f" {component}...")
-                elif "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-                    self.label.set_text(_("Extracting") + f" {component}...")
+                elif "Downloading" in clean_line or "Extracting" in clean_line:
+                    action = _("Updating") if self.proton_exists else _("Installing")
+                    self.label.set_text(f"{action} {component}...")
                 elif (
                     "is up to date" in clean_line
                     or "mtree is OK" in clean_line
                     or ("->" in clean_line and component in clean_line)
                 ):
                     self.label.set_text(f"{component} " + _("is up to date"))
+                    self.hide_progress()
             return False
 
         GLib.idle_add(update_ui)
@@ -675,6 +741,8 @@ class FaugusRun(HiDpiMixin):
 
     def close_splash_window(self):
         if self.splash_window:
+            self.stop_pulse()
+            self.progress_bar = None
             destroy_and_release(self.splash_window)
             self.splash_window = None
 

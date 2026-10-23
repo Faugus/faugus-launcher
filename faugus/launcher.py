@@ -53,6 +53,7 @@ _ = setup_gettext('faugus-launcher')
 
 
 _cover_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="faugus-cover")
+_banner_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="faugus-banner")
 
 
 class FaugusApp(Gtk.Application):
@@ -982,13 +983,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 return show(None)
 
             def load():
+                if request != self._banner_request:
+                    return
                 try:
                     texture = Gdk.Texture.new_from_filename(banner_path)
                 except GLib.Error:
                     texture = None
                 GLib.idle_add(show, texture)
 
-            threading.Thread(target=load, daemon=True).start()
+            _banner_executor.submit(load)
             return False
 
         GLib.idle_add(apply)

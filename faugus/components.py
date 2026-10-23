@@ -5,6 +5,7 @@ import requests
 import tarfile
 import shutil
 
+from faugus.proton_downloader import ProgressPrinter
 from faugus.path_manager import FAUGUS_LAUNCHER_SHARE_DIR, DOWNLOAD_DIR, UMU_RUN
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
@@ -30,24 +31,37 @@ def get_installed_umu_version():
     return None
 
 
+def download_file(url, path, timeout):
+    response = requests.get(url, stream=True, timeout=timeout)
+    if response.status_code != 200:
+        return False
+
+    total = int(response.headers.get("Content-Length", 0))
+    progress = ProgressPrinter()
+    downloaded = 0
+
+    with open(path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=65536):
+            f.write(chunk)
+            downloaded += len(chunk)
+            if total:
+                progress(downloaded / total)
+    return True
+
+
 def download_umu_run(version):
     try:
         os.makedirs(FAUGUS_LAUNCHER_SHARE_DIR, exist_ok=True)
         url = UMU_URL_TEMPLATE.format(version)
-        r = requests.get(url, timeout=10)
 
-        if r.status_code != 200:
+        print("Updating UMU-Launcher...", version, flush=True)
+        if not download_file(url, UMU_RUN, 10):
             return
-
-        with open(UMU_RUN, "wb") as f:
-            f.write(r.content)
 
         os.chmod(UMU_RUN, 0o755)
 
         with open(UMU_VERSION_FILE, "w") as f:
             f.write(version)
-
-        print("Updating UMU-Launcher...", version, flush=True)
     except Exception:
         return
 
@@ -93,12 +107,8 @@ def download_and_extract(url, download_dir):
         file_name = url.split('/')[-1]
         download_path = os.path.join(download_dir, file_name)
 
-        response = requests.get(url, stream=True, timeout=15)
-        if response.status_code != 200:
+        if not download_file(url, download_path, 15):
             return
-
-        with open(download_path, "wb") as f:
-            f.write(response.content)
 
         with tarfile.open(download_path, "r:gz") as tar:
             tar.extractall(path=download_dir, filter=lambda tarinfo, path: tarinfo)
