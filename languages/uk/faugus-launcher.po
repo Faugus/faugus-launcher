@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-22 11:39+0000\n"
-"PO-Revision-Date: 2026-10-18 10:35+0000\n"
+"PO-Revision-Date: 2026-10-23 12:56+0000\n"
 "Last-Translator: Михайло Щетінін "
 "<karnemorkon@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/faugus-"
@@ -715,7 +715,7 @@ msgstr "Показати"
 
 #: faugus/launcher.py:5743
 msgid "GPU"
-msgstr ""
+msgstr "GPU"
 
 #: faugus/launcher.py:5752
 msgid "Auto-close on launch"
@@ -903,7 +903,6 @@ msgid "Sound"
 msgstr "Звук"
 
 #: faugus/launcher.py:6954
-#, fuzzy
 msgid "Volume"
 msgstr "Гучність"
 
@@ -924,22 +923,16 @@ msgid "Sound file"
 msgstr "Звуковий файл"
 
 #: faugus/launcher.py:6992
-#, fuzzy
-#| msgid "Overview"
 msgid "Preview"
-msgstr "Огляд"
+msgstr "Попередній перегляд"
 
 #: faugus/launcher.py:7075
-#, fuzzy
-#| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
-msgstr "Виберіть файл Lossless.dll"
+msgstr "Виберіть звуковий файл"
 
 #: faugus/launcher.py:7079
-#, fuzzy
-#| msgid "All files"
 msgid "Audio files"
-msgstr "Всі файли"
+msgstr "Аудіофайли"
 
 #: faugus/launcher.py:7099
 #, python-format
