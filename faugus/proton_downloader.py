@@ -76,6 +76,17 @@ def get_tar_mode(name):
 USER_AGENT = "faugus-launcher"
 
 
+class ProgressPrinter:
+    def __init__(self):
+        self.last_percent = -1
+
+    def __call__(self, fraction):
+        percent = int(fraction * 100)
+        if percent != self.last_percent:
+            self.last_percent = percent
+            print(f"PROGRESS {fraction:.2f}", flush=True)
+
+
 class StreamProgress:
     def __init__(self, raw, total_size, progress_callback):
         self.raw = raw
@@ -216,7 +227,7 @@ def main():
 
     for key in vars(args):
         if getattr(args, key):
-            ensure_latest(key)
+            ensure_latest(key, ProgressPrinter())
 
 
 if __name__ == "__main__":
