@@ -1504,9 +1504,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if self.interface_mode == "List":
             self.flowbox.set_row_spacing(5)
-        elif self.interface_mode == "Grid":
-            self.flowbox.set_row_spacing(5)
-            self.flowbox.set_column_spacing(5)
 
         def sort_games(child1, child2, user_data):
             g1 = child1.game
@@ -3144,10 +3141,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         )
         if horizontal_mode:
             self.flowbox.set_orientation(Gtk.Orientation.VERTICAL)
-            self.flowbox.set_homogeneous(True)
             self.scroll_box.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         else:
             self.flowbox.set_orientation(Gtk.Orientation.HORIZONTAL)
+            self.flowbox.set_homogeneous(False)
             self.scroll_box.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         return horizontal_mode
 
@@ -4049,6 +4046,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if self.interface_mode == "Grid":
             child.set_hexpand(True)
             child.set_vexpand(True)
+            child.set_margin_end(5)
+            child.set_margin_bottom(5)
 
             block_size = 100
 
@@ -5778,11 +5777,11 @@ class Settings(Gtk.Dialog):
             "zu": "Zulu",
         }
 
-        self.label_language = Gtk.Label(label=_("Language"))
+        self.label_language = Gtk.Label(label=_("Language") + " *")
         self.label_language.set_halign(Gtk.Align.START)
         self.combobox_language = IdComboBox()
 
-        self.label_interface = Gtk.Label(label=_("Interface Mode"))
+        self.label_interface = Gtk.Label(label=_("Interface Mode") + " *")
         self.label_interface.set_halign(Gtk.Align.START)
         self.combobox_interface = IdComboBox()
         self.combobox_interface.connect("changed", self.on_combobox_interface_changed)
@@ -5825,7 +5824,7 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
 
-        self.label_theme_engine = Gtk.Label(label=_("Theme"))
+        self.label_theme_engine = Gtk.Label(label=_("Theme") + " *")
         self.label_theme_engine.set_halign(Gtk.Align.START)
         self.combobox_theme_engine = IdComboBox()
         self.combobox_theme_engine.append("adwaita", "Adwaita ({})".format(_("Default")), "Adwaita")
@@ -5985,7 +5984,7 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_sort = Gtk.CheckButton(label=_("Sort"))
 
-        self.checkbox_header_bar = Gtk.CheckButton(label=_("Header bar"))
+        self.checkbox_header_bar = Gtk.CheckButton(label=_("Header bar") + " *")
 
         self.checkbox_hidden_games = Gtk.CheckButton(label=_("Hidden games"))
         self.checkbox_hidden_games.set_tooltip_text(_("Ctrl+H toggles hidden games"))
