@@ -4351,6 +4351,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def on_settings_dialog_response(self, dialog, response_id, settings_dialog):
         if faugus_backup:
+            fix_legacy_shortcut_icons()
+            cfg = ConfigManager()
+            if self.apply_tray_settings(
+                cfg.config.get('system-tray', 'False') == 'True',
+                cfg.config.get('mono-icon', 'False') == 'True',
+            ):
+                return
             os.execv(sys.executable, [sys.executable, '-m', 'faugus.launcher'] + sys.argv[1:])
 
         if response_id == Gtk.ResponseType.OK:
