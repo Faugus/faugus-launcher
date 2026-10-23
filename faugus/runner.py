@@ -682,14 +682,14 @@ class FaugusRun(HiDpiMixin):
                     self.label.set_text(f"{component} " + _("is up to date"))
                     self.hide_progress()
                 elif "Downloading" in clean_line or "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
-                    action = _("Updating") if self.steam_runtime_installed else _("Installing")
+                    action = _("Updating") if self.steam_runtime_installed else _("Downloading")
                     self.label.set_text(f"{action} {component}...")
                     self.show_progress()
             elif component and self.splash_window:
                 if "Updating" in clean_line:
                     self.label.set_text(_("Updating") + f" {component}...")
                 elif "Downloading" in clean_line or "Extracting" in clean_line:
-                    action = _("Updating") if self.proton_exists else _("Installing")
+                    action = _("Updating") if self.proton_exists else _("Downloading")
                     self.label.set_text(f"{action} {component}...")
                 elif (
                     "is up to date" in clean_line
