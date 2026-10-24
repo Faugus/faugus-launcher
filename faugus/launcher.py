@@ -5945,7 +5945,6 @@ class Settings(Gtk.Dialog):
         self.checkbox_zoom.set_active(True)
 
         self.checkbox_auto_hide = Gtk.CheckButton(label=_("Auto-hide"))
-        self.checkbox_auto_hide.set_tooltip_text(_("Hide the controls until the mouse hovers over them"))
 
         self.label_grid_position = Gtk.Label(label=_("Position"))
         self.label_grid_position.set_halign(Gtk.Align.START)
