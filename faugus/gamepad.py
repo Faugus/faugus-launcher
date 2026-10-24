@@ -91,7 +91,8 @@ def init_gamepad(self):
     self.can_move_y = True
 
     self.scroll_deadzone = 0.2
-    self.scroll_speed = 24
+    self.scroll_speed = 1600
+    self._gamepad_scroll_tick = None
     self.right_stick_x = 0.0
     self.right_stick_y = 0.0
 
@@ -193,10 +194,7 @@ def _tick_repeat(self):
                 _dispatch_navigation(self, self.held_direction)
                 self.last_repeat_time = now
 
-    if usable:
-        _scroll_active_window(self)
-
-    if self.held_direction is None and not (self.right_stick_x or self.right_stick_y):
+    if self.held_direction is None:
         self._gamepad_tick_source = None
         return False
 
@@ -289,17 +287,37 @@ def _on_absolute_axis(self, event):
 
     elif axis == 3:
         self.right_stick_x = value if abs(value) > self.scroll_deadzone else 0.0
-        _ensure_tick(self)
+        _ensure_scroll_tick(self)
 
     elif axis == 4:
         self.right_stick_y = value if abs(value) > self.scroll_deadzone else 0.0
-        _ensure_tick(self)
+        _ensure_scroll_tick(self)
 
 
-def _scroll_active_window(self):
-    if not (self.right_stick_x or self.right_stick_y):
+def _ensure_scroll_tick(self):
+    if self._gamepad_scroll_tick is not None or not (self.right_stick_x or self.right_stick_y):
         return
 
+    usable, win = _is_usable(self)
+    if not usable or not win:
+        return
+
+    state = {"time": win.get_frame_clock().get_frame_time()}
+
+    def tick(widget, clock):
+        now = clock.get_frame_time()
+        elapsed = (now - state["time"]) / 1000000
+        state["time"] = now
+        if not (self.right_stick_x or self.right_stick_y) or not _is_usable(self)[0]:
+            self._gamepad_scroll_tick = None
+            return GLib.SOURCE_REMOVE
+        _scroll_active_window(self, elapsed)
+        return GLib.SOURCE_CONTINUE
+
+    self._gamepad_scroll_tick = win.add_tick_callback(tick)
+
+
+def _scroll_active_window(self, elapsed):
     usable, win = _is_usable(self)
     if not usable or not win:
         return
@@ -313,7 +331,7 @@ def _scroll_active_window(self):
 
     for delta, adj in ((self.right_stick_y, scrolled.get_vadjustment()), (self.right_stick_x, scrolled.get_hadjustment())):
         if delta and adj:
-            adj.set_value(adj.get_value() + delta * self.scroll_speed)
+            adj.set_value(adj.get_value() + delta * abs(delta) * self.scroll_speed * elapsed)
 
 
 def _find_parent_scrolled_window(widget):

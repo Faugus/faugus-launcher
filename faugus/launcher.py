@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import math
 import shutil
 import subprocess
 import sys
@@ -20,7 +21,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
-from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
+from faugus.main_screen_nav import _flowbox_has_row_above, _flowbox_has_row_below, adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 from faugus.tray_only import spawn as tray_only_spawn
 
 VERSION = "2.5.1"
@@ -1423,6 +1424,107 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         vadjustment.connect("notify::page-size", on_scroll_page_size_changed)
 
+        smooth_scroll = {"adjustment": None, "target": 0.0, "last": 0.0, "time": None, "tick": None}
+
+        def stop_smooth_scroll():
+            if smooth_scroll["tick"] is not None:
+                scroll_box.remove_tick_callback(smooth_scroll["tick"])
+                smooth_scroll["tick"] = None
+            smooth_scroll["adjustment"] = None
+
+        def smooth_scroll_tick(widget, clock):
+            adjustment = smooth_scroll["adjustment"]
+            current = adjustment.get_value()
+            if abs(current - smooth_scroll["last"]) > 0.5:
+                stop_smooth_scroll()
+                return GLib.SOURCE_REMOVE
+
+            now = clock.get_frame_time()
+            elapsed = (now - smooth_scroll["time"]) / 1000000
+            smooth_scroll["time"] = now
+            target = smooth_scroll["target"]
+            new_value = current + (target - current) * (1 - math.exp(-elapsed * 18))
+            if abs(target - new_value) < 0.5:
+                new_value = target
+            adjustment.set_value(new_value)
+            smooth_scroll["last"] = adjustment.get_value()
+            if new_value == target:
+                stop_smooth_scroll()
+                return GLib.SOURCE_REMOVE
+            return GLib.SOURCE_CONTINUE
+
+        def animate_scroll_to(adjustment, target):
+            maximum = adjustment.get_upper() - adjustment.get_page_size()
+            target = max(adjustment.get_lower(), min(target, maximum))
+            frame_clock = scroll_box.get_frame_clock()
+            if frame_clock is None:
+                adjustment.set_value(target)
+                return
+            smooth_scroll["target"] = target
+            smooth_scroll["adjustment"] = adjustment
+            smooth_scroll["last"] = adjustment.get_value()
+            if smooth_scroll["tick"] is None:
+                smooth_scroll["time"] = frame_clock.get_frame_time()
+                smooth_scroll["tick"] = scroll_box.add_tick_callback(smooth_scroll_tick)
+
+        def on_scroll_wheel(controller, dx, dy):
+            if controller.get_unit() != Gdk.ScrollUnit.WHEEL:
+                return False
+            vertical_policy = scroll_box.get_policy()[1]
+            if vertical_policy == Gtk.PolicyType.NEVER:
+                adjustment = scroll_box.get_hadjustment()
+                delta = dx + dy
+            else:
+                adjustment = vadjustment
+                delta = dy
+            if adjustment.get_upper() <= adjustment.get_page_size():
+                return False
+
+            base = smooth_scroll["target"] if smooth_scroll["adjustment"] is adjustment else adjustment.get_value()
+            step = adjustment.get_page_size() ** (2 / 3)
+            animate_scroll_to(adjustment, base + delta * step)
+            return True
+
+        def scroll_to_show_focus(child):
+            horizontal = scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
+            adjustment = scroll_box.get_hadjustment() if horizontal else vadjustment
+            ok, bounds = child.compute_bounds(scroll_box)
+            if not ok:
+                return
+            if horizontal:
+                start, size, view = bounds.origin.x, bounds.size.width, scroll_box.get_width()
+            else:
+                start, size, view = bounds.origin.y, bounds.size.height, scroll_box.get_height()
+            padding = max(self.flowbox.get_margin_top(), 10)
+
+            base = smooth_scroll["target"] if smooth_scroll["adjustment"] is adjustment else adjustment.get_value()
+            current = adjustment.get_value()
+            start -= base - current
+            target = base
+            if not horizontal and not _flowbox_has_row_below(self.flowbox, child):
+                target = adjustment.get_upper()
+            elif not horizontal and not _flowbox_has_row_above(self.flowbox, child):
+                target = adjustment.get_lower()
+            elif start + size > view - padding:
+                target = base + start + size - (view - padding)
+            elif start < padding:
+                target = base - (padding - start)
+            if target != base:
+                animate_scroll_to(adjustment, target)
+
+        def on_focus_widget_changed(window, pspec):
+            focused = window.get_focus()
+            if isinstance(focused, Gtk.FlowBoxChild) and focused.get_parent() is self.flowbox:
+                scroll_to_show_focus(focused)
+
+        self.connect("notify::focus-widget", on_focus_widget_changed)
+
+        scroll_controller = Gtk.EventControllerScroll()
+        scroll_controller.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES)
+        scroll_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        scroll_controller.connect("scroll", on_scroll_wheel)
+        scroll_box.add_controller(scroll_controller)
+
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.connect("keynav-failed", self.on_flowbox_keynav_failed)
@@ -1533,6 +1635,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox.set_sort_func(sort_games, None)
         self.flowbox.set_filter_func(filter_games, None)
         scroll_box.set_child(self.flowbox)
+        scroll_box.get_child().set_scroll_to_focus(False)
 
         bottom_bar_key_controller = Gtk.EventControllerKey()
         bottom_bar_key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
