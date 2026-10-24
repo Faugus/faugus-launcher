@@ -21,7 +21,7 @@ from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
 from faugus.migration import fix_legacy_shortcut_icons
-from faugus.main_screen_nav import _flowbox_has_row_above, _flowbox_has_row_below, adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
+from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 from faugus.tray_only import spawn as tray_only_spawn
 
 VERSION = "2.5.1"
@@ -1415,11 +1415,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             page_size = adjustment.get_page_size()
             delta = last_page_size[0] - page_size
             last_page_size[0] = page_size
+            if not delta or not self.auto_hide_enabled:
+                return
             animating = {
                 wrapper.auto_hide[2] for wrapper in getattr(self, "auto_hide_wrappers", [])
                 if wrapper.auto_hide[0].get_reveal_child() != wrapper.auto_hide[0].get_child_revealed()
             }
-            if self.auto_hide_enabled and animating == {"bottom"}:
+            if animating == {"bottom"}:
                 adjustment.set_value(adjustment.get_value() + delta)
 
         vadjustment.connect("notify::page-size", on_scroll_page_size_changed)
@@ -1501,9 +1503,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             current = adjustment.get_value()
             start -= base - current
             target = base
-            if not horizontal and not _flowbox_has_row_below(self.flowbox, child):
+            ok, in_flowbox = child.compute_bounds(self.flowbox)
+            if horizontal or not ok:
+                at_end = at_start = False
+            else:
+                at_end = self.flowbox.get_height() - (in_flowbox.origin.y + in_flowbox.size.height) < 20
+                at_start = in_flowbox.origin.y < 20
+            if at_end:
                 target = adjustment.get_upper()
-            elif not horizontal and not _flowbox_has_row_above(self.flowbox, child):
+            elif at_start:
                 target = adjustment.get_lower()
             elif start + size > view - padding:
                 target = base + start + size - (view - padding)
@@ -3307,7 +3315,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if not getattr(self, "_auto_hide_focus_hooked", False):
             self._auto_hide_focus_hooked = True
-            self.connect("notify::focus-widget", lambda w, p: self.apply_auto_hide())
+            self.connect("notify::focus-widget", lambda w, p: self.auto_hide_enabled and self.apply_auto_hide())
 
             window_motion = Gtk.EventControllerMotion()
             window_motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
@@ -3322,6 +3330,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return wrapper
 
     def on_auto_hide_pointer_motion(self, controller, x, y):
+        if not self.auto_hide_enabled:
+            return
         if y is None:
             self._auto_hide_pointer_y = None
             self._auto_hide_held = {
