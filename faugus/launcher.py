@@ -5900,6 +5900,7 @@ class Settings(Gtk.Dialog):
         self.combobox_widget_color.connect("changed", self.on_widget_color_changed)
 
         self.checkbox_banner = Gtk.CheckButton(label=_("Banner"))
+        self.checkbox_banner.set_tooltip_text(_("Displays a banner for the currently selected game"))
 
         self.label_theme_engine = Gtk.Label(label=_("Theme") + " *")
         self.label_theme_engine.set_halign(Gtk.Align.START)
@@ -5940,15 +5941,19 @@ class Settings(Gtk.Dialog):
         self.combobox_startup_window_size.set_tooltip_text(_("Alt+Enter toggles fullscreen"))
 
         self.checkbox_labels = Gtk.CheckButton(label=_("Labels"))
+        self.checkbox_labels.set_tooltip_text(_("Displays the game title below the cover"))
 
         self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
+        self.checkbox_zoom.set_tooltip_text(_("Displays a zoom slider to adjust the size of games"))
         self.checkbox_zoom.set_active(True)
 
         self.checkbox_auto_hide = Gtk.CheckButton(label=_("Auto-hide"))
+        self.checkbox_auto_hide.set_tooltip_text(_("Automatically hides widgets"))
 
         self.label_grid_position = Gtk.Label(label=_("Position"))
         self.label_grid_position.set_halign(Gtk.Align.START)
         self.combobox_grid_position = IdComboBox()
+        self.combobox_grid_position.set_tooltip_text(_("Sets how games are positioned on the screen"))
         self.combobox_grid_position.append("Top", _("Top"))
         self.combobox_grid_position.append("Middle", _("Middle"))
         self.combobox_grid_position.append("Bottom", _("Bottom"))
@@ -5956,6 +5961,7 @@ class Settings(Gtk.Dialog):
         self.label_grid_orientation = Gtk.Label(label=_("Orientation"))
         self.label_grid_orientation.set_halign(Gtk.Align.START)
         self.combobox_grid_orientation = IdComboBox()
+        self.combobox_grid_orientation.set_tooltip_text(_("Sets how games are scrolled through"))
         self.combobox_grid_orientation.append("Vertical", _("Vertical"))
         self.combobox_grid_orientation.append("Horizontal", _("Horizontal"))
 
@@ -5984,6 +5990,7 @@ class Settings(Gtk.Dialog):
         self.combobox_grid_orientation.connect("changed", on_grid_orientation_changed)
 
         self.checkbox_steamgriddb = Gtk.CheckButton(label=_("SteamGridDB"))
+        self.checkbox_steamgriddb.set_tooltip_text(_("Automatically fetches game icons, covers, and banners from SteamGridDB"))
         self.checkbox_steamgriddb.connect("toggled", self.on_checkbox_steamgriddb_toggled)
 
         self.entry_steamgriddb_key = Gtk.Entry()
@@ -6035,23 +6042,30 @@ class Settings(Gtk.Dialog):
         self.combobox_gpu.set_hexpand(True)
 
 
-        self.checkbox_auto_close_on_launch = Gtk.CheckButton(label=_("Auto-close on launch"))
+        self.checkbox_auto_close_on_launch = Gtk.CheckButton(label=_("Auto-close"))
+        self.checkbox_auto_close_on_launch.set_tooltip_text(_("Automatically closes the application when launching a game"))
 
         self.checkbox_autostart = Gtk.CheckButton(label=_("Autostart"))
+        self.checkbox_autostart.set_tooltip_text(_("Automatically starts the application with the system"))
 
         self.checkbox_system_tray = Gtk.CheckButton(label=_("System tray icon"))
+        self.checkbox_system_tray.set_tooltip_text(_("Displays the application icon in the system tray"))
         self.checkbox_system_tray.connect("toggled", self.on_checkbox_system_tray_toggled)
 
         self.checkbox_minimized_startup = Gtk.CheckButton(label=_("Minimized startup"))
+        self.checkbox_minimized_startup.set_tooltip_text(_("Starts the application minimized to the system tray"))
         self.checkbox_minimized_startup.set_sensitive(False)
 
         self.checkbox_mono_icon = Gtk.CheckButton(label=_("Monochrome icon"))
+        self.checkbox_mono_icon.set_tooltip_text(_("Displays a monochrome application icon in the system tray"))
         self.checkbox_mono_icon.set_sensitive(False)
 
         self.checkbox_splash_window = Gtk.CheckButton(label=_("Splash window"))
+        self.checkbox_splash_window.set_tooltip_text(_("Displays a splash window with information about Proton, Steam Linux Runtime, and other required components when launching a game"))
         self.checkbox_splash_window.set_active(True)
 
         self.checkbox_automatic_updates = Gtk.CheckButton(label=_("Automatic updates"))
+        self.checkbox_automatic_updates.set_tooltip_text(_("Checks for and updates Proton, Steam Linux Runtime, and other required components when launching a game"))
         self.checkbox_automatic_updates.set_active(True)
 
         self.checkbox_auto_create_shortcuts = Gtk.CheckButton(label=_("Auto-create shortcuts"))
@@ -6060,22 +6074,29 @@ class Settings(Gtk.Dialog):
         )
 
         self.checkbox_categories = Gtk.CheckButton(label=_("Categories"))
+        self.checkbox_categories.set_tooltip_text(_("Displays a button to manage game categories"))
 
         self.checkbox_sort = Gtk.CheckButton(label=_("Sort"))
+        self.checkbox_sort.set_tooltip_text(_("Displays a button to change the game sorting order"))
 
         self.checkbox_header_bar = Gtk.CheckButton(label=_("Header bar") + " *")
+        self.checkbox_header_bar.set_tooltip_text(_("Displays the default GTK header bar"))
 
         self.checkbox_hidden_games = Gtk.CheckButton(label=_("Hidden games"))
-        self.checkbox_hidden_games.set_tooltip_text(_("Ctrl+H toggles hidden games"))
+        self.checkbox_hidden_games.set_tooltip_text(_("Displays hidden games") + "\n" + _("Ctrl+H toggles hidden games"))
 
         self.checkbox_overview = Gtk.CheckButton(label=_("Overview"))
+        self.checkbox_overview.set_tooltip_text(_("Displays a panel with the game title, categories, playtime, and last played date"))
         self.checkbox_overview.connect("toggled", self.on_checkbox_overview_toggled)
 
         self.checkbox_gamepad_navigation = Gtk.CheckButton(label=_("Gamepad navigation"))
+        self.checkbox_gamepad_navigation.set_tooltip_text(_("Allows navigation through the application using a gamepad"))
 
         self.checkbox_wayland_driver = Gtk.CheckButton(label=_("Wayland driver (experimental)"))
+        self.checkbox_wayland_driver.set_tooltip_text(_("Runs games using the Wine Wayland driver"))
 
         self.checkbox_wow64 = Gtk.CheckButton(label=_("WOW64 (experimental)"))
+        self.checkbox_wow64.set_tooltip_text(_("Runs 32-bit games using the 64-bit driver"))
 
         self.button_winetricks_default = Gtk.Button(label="Winetricks")
         self.button_winetricks_default.connect("clicked", self.on_button_winetricks_default_clicked)
@@ -6573,9 +6594,15 @@ class Settings(Gtk.Dialog):
 
         covers_carrousel_tip = _("Covers or Carrousel mode")
 
+        labels_zoom_tips = {
+            self.checkbox_labels: _("Displays the game title below the cover"),
+            self.checkbox_zoom: _("Displays a zoom slider to adjust the size of games"),
+        }
         for checkbox in (self.checkbox_labels, self.checkbox_zoom):
             checkbox.set_sensitive(covers_or_carrousel)
-            checkbox.set_tooltip_text(None if covers_or_carrousel else covers_carrousel_tip)
+            checkbox.set_tooltip_text(
+                labels_zoom_tips[checkbox] if covers_or_carrousel else covers_carrousel_tip
+            )
 
         self._refresh_banner_checkbox_sensitivity()
 
@@ -6583,16 +6610,23 @@ class Settings(Gtk.Dialog):
         covers_carrousel_grid_tip = _("Grid, Covers or Carrousel mode")
         self.label_grid_position.set_sensitive(covers_carrousel_or_grid)
         self.combobox_grid_position.set_sensitive(covers_carrousel_or_grid)
-        self.combobox_grid_position.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
+        self.combobox_grid_position.set_tooltip_text(
+            _("Sets how games are positioned on the screen") if covers_carrousel_or_grid else covers_carrousel_grid_tip
+        )
 
         self.checkbox_overview.set_sensitive(covers_carrousel_or_grid)
-        self.checkbox_overview.set_tooltip_text(None if covers_carrousel_or_grid else covers_carrousel_grid_tip)
+        self.checkbox_overview.set_tooltip_text(
+            _("Displays a panel with the game title, categories, playtime, and last played date")
+            if covers_carrousel_or_grid else covers_carrousel_grid_tip
+        )
 
         grid_or_covers = active_id in ("Grid", "Covers")
         grid_covers_tip = _("Grid or Covers mode")
         self.label_grid_orientation.set_sensitive(grid_or_covers)
         self.combobox_grid_orientation.set_sensitive(grid_or_covers)
-        self.combobox_grid_orientation.set_tooltip_text(None if grid_or_covers else grid_covers_tip)
+        self.combobox_grid_orientation.set_tooltip_text(
+            _("Sets how games are scrolled through") if grid_or_covers else grid_covers_tip
+        )
 
         self.checkbox_grid_max_children.set_sensitive(grid_or_covers)
         self.entry_grid_max_children.set_sensitive(grid_or_covers and self.checkbox_grid_max_children.get_active())
@@ -6632,7 +6666,8 @@ class Settings(Gtk.Dialog):
         enabled = covers_or_carrousel and self.checkbox_steamgriddb.get_active()
         self.checkbox_banner.set_sensitive(enabled)
         self.checkbox_banner.set_tooltip_text(
-            None if enabled else _("Covers or Carrousel mode with SteamGridDB")
+            _("Displays a banner for the currently selected game") if enabled
+            else _("Covers or Carrousel mode with SteamGridDB")
         )
 
     def create_color_picker(self, combobox, on_changed):
