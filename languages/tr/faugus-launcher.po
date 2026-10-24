@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 15:10+0000\n"
+"POT-Creation-Date: 2026-10-23 17:02+0000\n"
 "PO-Revision-Date: 2026-09-22 12:31+0000\n"
 "Last-Translator: howoz <howoz@proton.me>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -492,7 +492,7 @@ msgstr "Bu yürütme ortamlarını silmek istiyor musunuz?"
 msgid "Do you want to discard this prefix?"
 msgstr "Bu yürütme ortamını silmek istiyor musunuz?"
 
-#: faugus/launcher.py:5057
+#: faugus/launcher.py:5057 faugus/runner.py:685 faugus/runner.py:692
 msgid "Downloading"
 msgstr "İndiriliyor"
 
@@ -1163,12 +1163,6 @@ msgstr "güncel"
 msgid "Updating"
 msgstr "Güncelleniyor"
 
-#: faugus/runner.py:685 faugus/runner.py:692
-#, fuzzy
-#| msgid "Installing %s..."
-msgid "Installing"
-msgstr "%s yükleniyor..."
-
 #: faugus/runner.py:768
 msgid "The keys and values were successfully added to the registry."
 msgstr "Anahtarlar ve değerler başarıyla kayıt defterine eklendi."
@@ -1355,6 +1349,11 @@ msgstr "Bir simge seç"
 #: faugus/utils.py:2710
 msgid "No results found"
 msgstr "Herhangi bir sonuç bulunamadı"
+
+#, fuzzy
+#~| msgid "Installing %s..."
+#~ msgid "Installing"
+#~ msgstr "%s yükleniyor..."
 
 #~ msgid "Extracting"
 #~ msgstr "Ayıklanıyor"

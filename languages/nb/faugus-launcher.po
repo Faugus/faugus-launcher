@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 15:10+0000\n"
+"POT-Creation-Date: 2026-10-23 17:02+0000\n"
 "PO-Revision-Date: 2026-09-01 13:48+0000\n"
 "Last-Translator: Han Andre <darahzmail@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/faugus-"
@@ -544,7 +544,7 @@ msgstr "Vil du lagre endringene?"
 msgid "Do you want to discard this prefix?"
 msgstr "Vil du lagre endringene?"
 
-#: faugus/launcher.py:5057
+#: faugus/launcher.py:5057 faugus/runner.py:685 faugus/runner.py:692
 msgid "Downloading"
 msgstr "Laster ned"
 
@@ -1227,12 +1227,6 @@ msgstr "er oppdatert"
 msgid "Updating"
 msgstr "Oppdaterer"
 
-#: faugus/runner.py:685 faugus/runner.py:692
-#, fuzzy
-#| msgid "Installing %s..."
-msgid "Installing"
-msgstr "Installerer %s..."
-
 #: faugus/runner.py:768
 msgid "The keys and values were successfully added to the registry."
 msgstr "Nøkler og verdier ble lagt til i registeret."
@@ -1418,6 +1412,11 @@ msgstr "Velg ett ikon"
 #: faugus/utils.py:2710
 msgid "No results found"
 msgstr "Ingen treff funnet"
+
+#, fuzzy
+#~| msgid "Installing %s..."
+#~ msgid "Installing"
+#~ msgstr "Installerer %s..."
 
 #~ msgid "Extracting"
 #~ msgstr "Pakker ut"
