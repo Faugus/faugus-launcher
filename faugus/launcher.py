@@ -171,7 +171,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container {
                 box-shadow: 0 6px 14px alpha(black, 0.65);
-                transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                transition: transform 150ms steps(32, end);
             }
             entry.flowbox-entry.cover-container .game {
                 border: none;
