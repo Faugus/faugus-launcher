@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 11:39+0000\n"
+"POT-Creation-Date: 2026-10-24 16:35+0000\n"
 "PO-Revision-Date: 2026-08-29 01:19+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -32,7 +32,7 @@ msgstr "Bezig met uitpakken…"
 msgid "Game"
 msgstr "Game/Programma"
 
-#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7473
+#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7832
 msgid "Prefix"
 msgstr "Profielmap"
 
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Total:"
 msgstr ""
 
-#: faugus/backup.py:309 faugus/launcher.py:7588 faugus/launcher.py:7727
+#: faugus/backup.py:309 faugus/launcher.py:7947 faugus/launcher.py:8086
 msgid "Game/App"
 msgstr "Game/Programma"
 
@@ -63,8 +63,8 @@ msgstr "Reservekopie-instellingen"
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7428
-#: faugus/utils.py:2002
+#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7786
+#: faugus/utils.py:2028
 msgid "Path"
 msgstr "Locatie"
 
@@ -120,22 +120,22 @@ msgstr "Zaterdag"
 msgid "Sunday"
 msgstr "Zondag"
 
-#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:5822
-#: faugus/launcher.py:6975 faugus/launcher.py:7025 faugus/launcher.py:7112
-#: faugus/launcher.py:7565 faugus/launcher.py:8073 faugus/proton_manager.py:254
-#: faugus/proton_manager.py:361 faugus/shortcut.py:84 faugus/utils.py:526
+#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:6129
+#: faugus/launcher.py:7333 faugus/launcher.py:7383 faugus/launcher.py:7470
+#: faugus/launcher.py:7924 faugus/launcher.py:8422 faugus/proton_manager.py:254
+#: faugus/proton_manager.py:361 faugus/shortcut.py:83 faugus/utils.py:526
 #: faugus/utils.py:640 faugus/utils.py:651
 msgid "Cancel"
 msgstr "Annuleren"
 
 #: faugus/backup.py:748 faugus/backup.py:1043 faugus/backup.py:1229
-#: faugus/launcher.py:5826 faugus/launcher.py:6732 faugus/launcher.py:7029
-#: faugus/launcher.py:7116 faugus/launcher.py:7569 faugus/launcher.py:8069
-#: faugus/shortcut.py:88 faugus/utils.py:530 faugus/utils.py:1217
+#: faugus/launcher.py:6133 faugus/launcher.py:7086 faugus/launcher.py:7387
+#: faugus/launcher.py:7474 faugus/launcher.py:7928 faugus/launcher.py:8418
+#: faugus/shortcut.py:87 faugus/utils.py:530 faugus/utils.py:1217
 msgid "Ok"
 msgstr "Oké"
 
-#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8571
+#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8920
 #, fuzzy
 #| msgid "Disable Hidraw"
 msgid "Disabled"
@@ -201,17 +201,17 @@ msgstr ""
 msgid "Failed to restore backup:"
 msgstr "De profielmap kan niet worden verwijderd"
 
-#: faugus/backup.py:1239 faugus/launcher.py:6720
+#: faugus/backup.py:1239 faugus/launcher.py:7074
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Weet je zeker dat je de instellingen wilt overschrijven?"
 
-#: faugus/backup.py:1241 faugus/launcher.py:4873 faugus/launcher.py:6732
-#: faugus/launcher.py:7183
+#: faugus/backup.py:1241 faugus/launcher.py:5150 faugus/launcher.py:7086
+#: faugus/launcher.py:7541
 msgid "Yes"
 msgstr "Ja"
 
-#: faugus/backup.py:1242 faugus/launcher.py:4874 faugus/launcher.py:6733
-#: faugus/launcher.py:7179
+#: faugus/backup.py:1242 faugus/launcher.py:5151 faugus/launcher.py:7087
+#: faugus/launcher.py:7537
 msgid "No"
 msgstr "Nee"
 
@@ -245,944 +245,1048 @@ msgstr "Uitpakken voltooid"
 msgid "Backup failed."
 msgstr "Uitpakken voltooid"
 
-#: faugus/launcher.py:1102 faugus/launcher.py:1295 faugus/launcher.py:1757
-#: faugus/launcher.py:2369 faugus/launcher.py:2505 faugus/launcher.py:2562
-#: faugus/launcher.py:2609 faugus/launcher.py:2631
+#: faugus/launcher.py:1098 faugus/launcher.py:1291 faugus/launcher.py:1671
+#: faugus/launcher.py:2288 faugus/launcher.py:2424 faugus/launcher.py:2481
+#: faugus/launcher.py:2528 faugus/launcher.py:2550
 msgid "All"
 msgstr "Alles"
 
-#: faugus/launcher.py:1104 faugus/launcher.py:1297 faugus/launcher.py:1750
-#: faugus/launcher.py:2369 faugus/launcher.py:2505 faugus/launcher.py:2562
+#: faugus/launcher.py:1100 faugus/launcher.py:1293 faugus/launcher.py:1664
+#: faugus/launcher.py:2288 faugus/launcher.py:2424 faugus/launcher.py:2481
 msgid "Uncategorized"
 msgstr "Ongecategoriseerd"
 
-#: faugus/launcher.py:1267
+#: faugus/launcher.py:1263
 msgid "Kill all running games"
 msgstr "Alle games gedwongen afsluiten"
 
-#: faugus/launcher.py:1272
+#: faugus/launcher.py:1268
 msgid "Search..."
 msgstr "Zoeken…"
 
-#: faugus/launcher.py:1282
+#: faugus/launcher.py:1278
 msgid "Alphabetical"
 msgstr "Alfabetische volgorde"
 
-#: faugus/launcher.py:1283
+#: faugus/launcher.py:1279
 msgid "Playtime"
 msgstr "Speelduur"
 
-#: faugus/launcher.py:1284
+#: faugus/launcher.py:1280
 msgid "Last played"
 msgstr "Laatst gespeeld"
 
-#: faugus/launcher.py:1285 faugus/launcher.py:5593 faugus/launcher.py:5605
-#: faugus/launcher.py:5641 faugus/launcher.py:6949
+#: faugus/launcher.py:1281 faugus/launcher.py:5876 faugus/launcher.py:5888
+#: faugus/launcher.py:5926 faugus/launcher.py:7307
 msgid "Custom"
 msgstr "Aangepast"
 
-#: faugus/launcher.py:1751 faugus/launcher.py:1752 faugus/launcher.py:2505
-#: faugus/launcher.py:2562 faugus/launcher.py:2608 faugus/launcher.py:2821
-#: faugus/launcher.py:2832 faugus/launcher.py:3361
+#: faugus/launcher.py:1665 faugus/launcher.py:1666 faugus/launcher.py:2424
+#: faugus/launcher.py:2481 faugus/launcher.py:2527 faugus/launcher.py:2740
+#: faugus/launcher.py:2751 faugus/launcher.py:3538
 msgid "None"
 msgstr "Geen"
 
-#: faugus/launcher.py:2391
+#: faugus/launcher.py:2310
 msgid "Manage categories..."
 msgstr "Categorieën beheren…"
 
-#: faugus/launcher.py:2423
+#: faugus/launcher.py:2342
 msgid "Manage Categories"
 msgstr "Categorieën beheren"
 
-#: faugus/launcher.py:2469
+#: faugus/launcher.py:2388
 msgid "Add"
 msgstr "Toevoegen"
 
-#: faugus/launcher.py:2470 faugus/launcher.py:2866
+#: faugus/launcher.py:2389 faugus/launcher.py:2785
 msgid "Edit"
 msgstr "Bewerken"
 
-#: faugus/launcher.py:2471 faugus/launcher.py:7717 faugus/proton_manager.py:212
+#: faugus/launcher.py:2390 faugus/launcher.py:8076 faugus/proton_manager.py:212
 #: faugus/proton_manager.py:230 faugus/proton_manager.py:274
 #: faugus/proton_manager.py:303 faugus/proton_manager.py:392
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: faugus/launcher.py:2709
+#: faugus/launcher.py:2628
 msgid "Shut down"
 msgstr "Afsluiten"
 
-#: faugus/launcher.py:2712
+#: faugus/launcher.py:2631
 msgid "Reboot"
 msgstr "Herstarten"
 
-#: faugus/launcher.py:2715
+#: faugus/launcher.py:2634
 msgid "Close"
 msgstr "Sluiten"
 
-#: faugus/launcher.py:2768 faugus/launcher.py:3248
+#: faugus/launcher.py:2687 faugus/launcher.py:3425
 #, fuzzy
 #| msgid "Playtime"
 msgid "Playtime: {}"
 msgstr "Speelduur"
 
-#: faugus/launcher.py:2776 faugus/launcher.py:3261
+#: faugus/launcher.py:2695 faugus/launcher.py:3438
 #, fuzzy
 #| msgid "Playtime"
 msgid "Playing for: {}"
 msgstr "Speelduur"
 
-#: faugus/launcher.py:2781 faugus/launcher.py:3269
+#: faugus/launcher.py:2700 faugus/launcher.py:3446
 #, fuzzy
 #| msgid "Last played"
 msgid "Last played: {}"
 msgstr "Laatst gespeeld"
 
-#: faugus/launcher.py:2782 faugus/launcher.py:3270
+#: faugus/launcher.py:2701 faugus/launcher.py:3447
 #, fuzzy
 #| msgid "Last played"
 msgid "Never played"
 msgstr "Laatst gespeeld"
 
-#: faugus/launcher.py:2810
+#: faugus/launcher.py:2729
 msgid "Remove from hidden"
 msgstr "Verwijderen uit verborgen games"
 
-#: faugus/launcher.py:2810
+#: faugus/launcher.py:2729
 msgid "Hide"
 msgstr "Verbergen"
 
-#: faugus/launcher.py:2813
+#: faugus/launcher.py:2732
 msgid "Stop"
 msgstr "Stoppen"
 
-#: faugus/launcher.py:2815
+#: faugus/launcher.py:2734
 msgid "Play with logs"
 msgstr ""
 
-#: faugus/launcher.py:2817
+#: faugus/launcher.py:2736
 msgid "Play"
 msgstr "Spelen"
 
-#: faugus/launcher.py:2867
+#: faugus/launcher.py:2786
 msgid "Delete"
 msgstr "Verwĳderen"
 
-#: faugus/launcher.py:2870
+#: faugus/launcher.py:2789
 msgid "Duplicate"
 msgstr "Klonen"
 
-#: faugus/launcher.py:2873
+#: faugus/launcher.py:2792
 msgid "Category"
 msgstr "Categorie"
 
-#: faugus/launcher.py:2875
+#: faugus/launcher.py:2794
 msgid "Open game location"
 msgstr "Gamelocatie openen"
 
-#: faugus/launcher.py:2878
+#: faugus/launcher.py:2797
 msgid "Open prefix location"
 msgstr "Profielmap openen"
 
-#: faugus/launcher.py:2881
+#: faugus/launcher.py:2800
 msgid "Show logs"
 msgstr "Logboek tonen"
 
-#: faugus/launcher.py:2888
+#: faugus/launcher.py:2807
 msgid "Run file in the prefix"
 msgstr "Voer een bestand in de profielmap uit"
 
-#: faugus/launcher.py:2902
+#: faugus/launcher.py:2821
 msgid "Clear recent"
 msgstr ""
 
-#: faugus/launcher.py:2905 faugus/launcher.py:2954
+#: faugus/launcher.py:2824 faugus/launcher.py:2873
 msgid "Recent"
 msgstr ""
 
-#: faugus/launcher.py:3021
+#: faugus/launcher.py:2940
 #, fuzzy
 #| msgid "hour"
 msgid "{} hour"
 msgstr "uur"
 
-#: faugus/launcher.py:3021
+#: faugus/launcher.py:2940
 #, fuzzy
 #| msgid "hours"
 msgid "{} hours"
 msgstr "uur"
 
-#: faugus/launcher.py:3024
+#: faugus/launcher.py:2943
 #, fuzzy
 #| msgid "minute"
 msgid "{} minute"
 msgstr "minuut"
 
-#: faugus/launcher.py:3024
+#: faugus/launcher.py:2943
 #, fuzzy
 #| msgid "minutes"
 msgid "{} minutes"
 msgstr "minuten"
 
-#: faugus/launcher.py:3031 faugus/launcher.py:3048
+#: faugus/launcher.py:2950 faugus/launcher.py:2967
 msgid "Less than a minute"
 msgstr ""
 
-#: faugus/launcher.py:3080
+#: faugus/launcher.py:2999
 msgid "Just now"
 msgstr ""
 
-#: faugus/launcher.py:3085
+#: faugus/launcher.py:3004
 #, fuzzy
 #| msgid "minute"
 msgid "A minute ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3086
+#: faugus/launcher.py:3005
 #, fuzzy
 #| msgid "minute"
 msgid "{} minutes ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3091
+#: faugus/launcher.py:3010
 msgid "An hour ago"
 msgstr ""
 
-#: faugus/launcher.py:3092
+#: faugus/launcher.py:3011
 msgid "{} hours ago"
 msgstr ""
 
-#: faugus/launcher.py:3097
+#: faugus/launcher.py:3016
 msgid "Yesterday"
 msgstr ""
 
-#: faugus/launcher.py:3098
+#: faugus/launcher.py:3017
 msgid "{} days ago"
 msgstr ""
 
-#: faugus/launcher.py:3103
+#: faugus/launcher.py:3022
 #, fuzzy
 #| msgid "minute"
 msgid "A week ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3104
+#: faugus/launcher.py:3023
 msgid "{} weeks ago"
 msgstr ""
 
-#: faugus/launcher.py:3109
+#: faugus/launcher.py:3028
 #, fuzzy
 #| msgid "minute"
 msgid "A month ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3110
+#: faugus/launcher.py:3029
 #, fuzzy
 #| msgid "minute"
 msgid "{} months ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3114
+#: faugus/launcher.py:3033
 #, fuzzy
 #| msgid "minute"
 msgid "A year ago"
 msgstr "minuut"
 
-#: faugus/launcher.py:3115
+#: faugus/launcher.py:3034
 msgid "{} years ago"
 msgstr ""
 
-#: faugus/launcher.py:3458 faugus/launcher.py:6583 faugus/launcher.py:8605
+#: faugus/launcher.py:3635 faugus/launcher.py:6937 faugus/launcher.py:8954
 msgid "Select a file to run in the prefix"
 msgstr "Kies een bestand om in de profielmap uit te voeren"
 
-#: faugus/launcher.py:3502
+#: faugus/launcher.py:3679
 #, python-format
 msgid "%s Logs"
 msgstr "%s-logboek"
 
-#: faugus/launcher.py:3578
+#: faugus/launcher.py:3755
 msgid "Copy to clipboard"
 msgstr "Kopiëren naar klembord"
 
-#: faugus/launcher.py:3582
+#: faugus/launcher.py:3759
 msgid "Open file location"
 msgstr "Bestandslocatie openen"
 
-#: faugus/launcher.py:3629 faugus/launcher.py:4702
+#: faugus/launcher.py:3806 faugus/launcher.py:4979
 #, python-format
 msgid "%s already exists"
 msgstr "“%s” bestaat al"
 
-#: faugus/launcher.py:3737 faugus/launcher.py:4548
+#: faugus/launcher.py:3914 faugus/launcher.py:4825
 #, python-format
 msgid "%s is running"
 msgstr "‘%s’ is actief"
 
-#: faugus/launcher.py:4485
+#: faugus/launcher.py:4762
 #, python-format
 msgid "Edit %s"
 msgstr "%s bewerken"
 
-#: faugus/launcher.py:4604
+#: faugus/launcher.py:4881
 msgid "Failed to remove prefix"
 msgstr "De profielmap kan niet worden verwijderd"
 
-#: faugus/launcher.py:4825
+#: faugus/launcher.py:5102
 msgid "No internet connection"
 msgstr "Er is geen internetverbinding"
 
-#: faugus/launcher.py:4859
+#: faugus/launcher.py:5136
 #, fuzzy
 #| msgid "Do you want to save the changes?"
 msgid "Do you want to discard these prefixes?"
 msgstr "Wil je de wijzigingen opslaan?"
 
-#: faugus/launcher.py:4860
+#: faugus/launcher.py:5137
 #, fuzzy
 #| msgid "Do you want to save the changes?"
 msgid "Do you want to discard this prefix?"
 msgstr "Wil je de wijzigingen opslaan?"
 
-#: faugus/launcher.py:4931 faugus/runner.py:626
+#: faugus/launcher.py:5208 faugus/runner.py:685 faugus/runner.py:692
 msgid "Downloading"
 msgstr "Bezig met downloaden…"
 
-#: faugus/launcher.py:5003
+#: faugus/launcher.py:5280
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s is niet geïnstalleerd!"
 
-#: faugus/launcher.py:5046
+#: faugus/launcher.py:5328
 msgid "Download complete"
 msgstr "Downloaden voltooid"
 
-#: faugus/launcher.py:5049
+#: faugus/launcher.py:5331
 #, python-format
 msgid "Error during download: %s"
 msgstr "Er is een fout opgetreden tijdens het downloaden: %s"
 
-#: faugus/launcher.py:5052
+#: faugus/launcher.py:5334
 #, python-format
 msgid "Installing %s..."
 msgstr "Bezig met installeren van ‘%s’…"
 
-#: faugus/launcher.py:5054 faugus/launcher.py:5057 faugus/launcher.py:5060
-#: faugus/launcher.py:5075
+#: faugus/launcher.py:5336 faugus/launcher.py:5339 faugus/launcher.py:5342
+#: faugus/launcher.py:5357
 msgid "Please close the login window and wait."
 msgstr "Sluit het inlogvenster en wacht."
 
-#: faugus/launcher.py:5074
+#: faugus/launcher.py:5356
 msgid "Please don't change the installation path."
 msgstr "Let op: wijzig de installatielocatie niet."
 
-#: faugus/launcher.py:5081
+#: faugus/launcher.py:5363
 msgid "Please close Wargaming to finish the installation."
 msgstr "Sluit Wargaming af om de installatie af te ronden."
 
-#: faugus/launcher.py:5454
+#: faugus/launcher.py:5737
 msgid "Settings"
 msgstr "Instellingen"
 
-#: faugus/launcher.py:5574
+#: faugus/launcher.py:5857
 msgid "Language"
 msgstr "Taal"
 
-#: faugus/launcher.py:5578
+#: faugus/launcher.py:5861
 #, fuzzy
 msgid "Interface Mode"
 msgstr "Venstermodus"
 
-#: faugus/launcher.py:5582
+#: faugus/launcher.py:5865
 msgid "List"
 msgstr "Lijst"
 
-#: faugus/launcher.py:5583
+#: faugus/launcher.py:5866
 msgid "Grid"
 msgstr "Rooster"
 
-#: faugus/launcher.py:5584
+#: faugus/launcher.py:5867
 msgid "Covers"
 msgstr "Hoezen"
 
-#: faugus/launcher.py:5585
+#: faugus/launcher.py:5868
 msgid "Carrousel"
 msgstr ""
 
-#: faugus/launcher.py:5587
+#: faugus/launcher.py:5870
 #, fuzzy
 #| msgid "Background"
 msgid "Background Color"
 msgstr "Achtergrond"
 
-#: faugus/launcher.py:5590 faugus/launcher.py:5602 faugus/launcher.py:5614
-#: faugus/launcher.py:5623 faugus/launcher.py:5632 faugus/launcher.py:5640
-#: faugus/launcher.py:5746 faugus/launcher.py:6946 faugus/launcher.py:8567
-#: faugus/utils.py:1598 faugus/utils.py:2209
+#: faugus/launcher.py:5873 faugus/launcher.py:5885 faugus/launcher.py:5897
+#: faugus/launcher.py:5908 faugus/launcher.py:5917 faugus/launcher.py:5925
+#: faugus/launcher.py:6039 faugus/launcher.py:7304 faugus/launcher.py:8916
+#: faugus/utils.py:1624 faugus/utils.py:2235
 msgid "Default"
 msgstr "Standaard"
 
-#: faugus/launcher.py:5591 faugus/launcher.py:5603 faugus/launcher.py:5615
+#: faugus/launcher.py:5874 faugus/launcher.py:5886 faugus/launcher.py:5898
 msgid "Accent color"
 msgstr "Accentkleur"
 
-#: faugus/launcher.py:5592 faugus/launcher.py:5604
+#: faugus/launcher.py:5875 faugus/launcher.py:5887
 msgid "Dominant color"
 msgstr "Dominante kleur"
 
-#: faugus/launcher.py:5599
+#: faugus/launcher.py:5882
 msgid "Overview Color"
 msgstr ""
 
-#: faugus/launcher.py:5611
+#: faugus/launcher.py:5894
 #, fuzzy
 #| msgid "Accent Color"
 msgid "Widget Color"
 msgstr "Accentkleur"
 
-#: faugus/launcher.py:5616
+#: faugus/launcher.py:5899
 #, fuzzy
 #| msgid "Dominant color"
 msgid "Solid color"
 msgstr "Dominante kleur"
 
-#: faugus/launcher.py:5618
+#: faugus/launcher.py:5902
 msgid "Banner"
 msgstr "Banier"
 
-#: faugus/launcher.py:5620
+#: faugus/launcher.py:5903 faugus/launcher.py:6669
+msgid "Displays a banner for the currently selected game"
+msgstr ""
+
+#: faugus/launcher.py:5905
 msgid "Theme"
 msgstr "Thema"
 
-#: faugus/launcher.py:5624
+#: faugus/launcher.py:5909
 msgid "System Theme"
 msgstr ""
 
-#: faugus/launcher.py:5629
+#: faugus/launcher.py:5914
 msgid "Color Scheme"
 msgstr ""
 
-#: faugus/launcher.py:5633
+#: faugus/launcher.py:5918
 msgid "Light"
 msgstr "Licht thema"
 
-#: faugus/launcher.py:5634
+#: faugus/launcher.py:5919
 msgid "Dark"
 msgstr "Donker thema"
 
-#: faugus/launcher.py:5637
+#: faugus/launcher.py:5922
 msgid "Accent Color"
 msgstr "Accentkleur"
 
-#: faugus/launcher.py:5648
+#: faugus/launcher.py:5933
 msgid "Startup Window Size"
 msgstr "Vensterafmetingen na opstarten"
 
-#: faugus/launcher.py:5652
+#: faugus/launcher.py:5937
 msgid "Default size"
 msgstr "Standaardafmetingen"
 
-#: faugus/launcher.py:5653
+#: faugus/launcher.py:5938
 msgid "Remember size"
 msgstr "Afmetingen onthouden"
 
-#: faugus/launcher.py:5654
+#: faugus/launcher.py:5939
 msgid "Maximized"
 msgstr "Gemaximaliseerd"
 
-#: faugus/launcher.py:5655
+#: faugus/launcher.py:5940
 msgid "Fullscreen"
 msgstr "Schermvullend"
 
-#: faugus/launcher.py:5656 faugus/launcher.py:6309
+#: faugus/launcher.py:5941 faugus/launcher.py:6638
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter: schermvullende weergave aan/uit"
 
-#: faugus/launcher.py:5658
+#: faugus/launcher.py:5943
 msgid "Labels"
 msgstr "Labels"
 
-#: faugus/launcher.py:5660
+#: faugus/launcher.py:5944 faugus/launcher.py:6598
+msgid "Displays the game title below the cover"
+msgstr ""
+
+#: faugus/launcher.py:5946
 msgid "Zoom"
 msgstr ""
 
-#: faugus/launcher.py:5663
+#: faugus/launcher.py:5947 faugus/launcher.py:6599
+msgid "Displays a zoom slider to adjust the size of games"
+msgstr ""
+
+#: faugus/launcher.py:5950
+msgid "Auto-hide"
+msgstr ""
+
+#: faugus/launcher.py:5951
+msgid "Automatically hides widgets"
+msgstr ""
+
+#: faugus/launcher.py:5953
 msgid "Position"
 msgstr ""
 
-#: faugus/launcher.py:5666
+#: faugus/launcher.py:5956 faugus/launcher.py:6614
+msgid "Sets how games are positioned on the screen"
+msgstr ""
+
+#: faugus/launcher.py:5957
 msgid "Top"
 msgstr ""
 
-#: faugus/launcher.py:5667
+#: faugus/launcher.py:5958
 msgid "Middle"
 msgstr ""
 
-#: faugus/launcher.py:5668
+#: faugus/launcher.py:5959
 msgid "Bottom"
 msgstr ""
 
-#: faugus/launcher.py:5670
+#: faugus/launcher.py:5961
 msgid "Orientation"
 msgstr ""
 
-#: faugus/launcher.py:5673
+#: faugus/launcher.py:5964 faugus/launcher.py:6628
+msgid "Sets how games are scrolled through"
+msgstr ""
+
+#: faugus/launcher.py:5965
 #, fuzzy
 #| msgid "Alphabetical"
 msgid "Vertical"
 msgstr "Alfabetische volgorde"
 
-#: faugus/launcher.py:5674
+#: faugus/launcher.py:5966
 msgid "Horizontal"
 msgstr ""
 
-#: faugus/launcher.py:5676 faugus/launcher.py:5696
+#: faugus/launcher.py:5968 faugus/launcher.py:5988
 msgid "Maximum Columns"
 msgstr ""
 
-#: faugus/launcher.py:5694
+#: faugus/launcher.py:5986
 msgid "Maximum Rows"
 msgstr ""
 
-#: faugus/launcher.py:5700
+#: faugus/launcher.py:5992
 #, fuzzy
 msgid "SteamGridDB"
 msgstr "Steam"
 
-#: faugus/launcher.py:5704
+#: faugus/launcher.py:5993
+msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
+msgstr ""
+
+#: faugus/launcher.py:5997
 msgid "API Key"
 msgstr ""
 
-#: faugus/launcher.py:5711
+#: faugus/launcher.py:6004
 msgid "Default Prefixes Location"
 msgstr "Standaard profielmap"
 
-#: faugus/launcher.py:5715
+#: faugus/launcher.py:6008
 msgid "The location where prefixes are created"
 msgstr "De locatie waarin profielen worden aangemaakt"
 
-#: faugus/launcher.py:5724
+#: faugus/launcher.py:6017
 msgid "Default Prefix Tools"
 msgstr "Standaard profielhulpmiddelen"
 
-#: faugus/launcher.py:5730
+#: faugus/launcher.py:6023
 msgid "Default Proton"
 msgstr "Standaardproton"
 
-#: faugus/launcher.py:5734 faugus/proton_manager.py:66
+#: faugus/launcher.py:6027 faugus/proton_manager.py:66
 msgid "Proton Manager"
 msgstr "Proton-beheer"
 
-#: faugus/launcher.py:5737
+#: faugus/launcher.py:6030
 msgid "Miscellaneous"
 msgstr "Overig"
 
-#: faugus/launcher.py:5740
+#: faugus/launcher.py:6033
 msgid "Display"
 msgstr ""
 
-#: faugus/launcher.py:5743
+#: faugus/launcher.py:6036
 msgid "GPU"
 msgstr ""
 
-#: faugus/launcher.py:5752
-msgid "Auto-close on launch"
+#: faugus/launcher.py:6045
+#, fuzzy
+#| msgid "Auto-close on launch"
+msgid "Auto-close"
 msgstr "Automatisch sluiten na opstarten"
 
-#: faugus/launcher.py:5754
+#: faugus/launcher.py:6046
+msgid "Automatically closes the application when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6048
 msgid "Autostart"
 msgstr "Automatisch opstarten"
 
-#: faugus/launcher.py:5756
+#: faugus/launcher.py:6049
+msgid "Automatically starts the application with the system"
+msgstr ""
+
+#: faugus/launcher.py:6051
 msgid "System tray icon"
 msgstr "Systeemvakpictogram"
 
-#: faugus/launcher.py:5759
+#: faugus/launcher.py:6052
+msgid "Displays the application icon in the system tray"
+msgstr ""
+
+#: faugus/launcher.py:6055
 msgid "Minimized startup"
 msgstr "Geminimaliseerd opstarten"
 
-#: faugus/launcher.py:5762
+#: faugus/launcher.py:6056
+#, fuzzy
+#| msgid "Start minimized to tray"
+msgid "Starts the application minimized to the system tray"
+msgstr "Geminimaliseerd is systeemvak starten"
+
+#: faugus/launcher.py:6059
 msgid "Monochrome icon"
 msgstr "Monochroom pictogram"
 
-#: faugus/launcher.py:5765
+#: faugus/launcher.py:6060
+msgid "Displays a monochrome application icon in the system tray"
+msgstr ""
+
+#: faugus/launcher.py:6063
 msgid "Splash window"
 msgstr "Opstartvenster"
 
-#: faugus/launcher.py:5768
+#: faugus/launcher.py:6064
+msgid ""
+"Displays a splash window with information about Proton, Steam Linux Runtime, "
+"and other required components when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6067
 msgid "Automatic updates"
 msgstr "Automatische updates"
 
-#: faugus/launcher.py:5771
+#: faugus/launcher.py:6068
+msgid ""
+"Checks for and updates Proton, Steam Linux Runtime, and other required "
+"components when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6071
 #, fuzzy
 #| msgid "Steam Shortcut"
 msgid "Auto-create shortcuts"
 msgstr "Steam-snelkoppeling"
 
-#: faugus/launcher.py:5773
+#: faugus/launcher.py:6073
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
 msgstr ""
 
-#: faugus/launcher.py:5776
+#: faugus/launcher.py:6076
 #, fuzzy
 #| msgid "Category"
 msgid "Categories"
 msgstr "Categorie"
 
-#: faugus/launcher.py:5778
+#: faugus/launcher.py:6077
+msgid "Displays a button to manage game categories"
+msgstr ""
+
+#: faugus/launcher.py:6079
 msgid "Sort"
 msgstr ""
 
-#: faugus/launcher.py:5780
+#: faugus/launcher.py:6080
+msgid "Displays a button to change the game sorting order"
+msgstr ""
+
+#: faugus/launcher.py:6082
 msgid "Header bar"
 msgstr ""
 
-#: faugus/launcher.py:5782
+#: faugus/launcher.py:6083
+msgid "Displays the default GTK header bar"
+msgstr ""
+
+#: faugus/launcher.py:6085
 msgid "Hidden games"
 msgstr "Verborgen games"
 
-#: faugus/launcher.py:5783
+#: faugus/launcher.py:6086
+#, fuzzy
+#| msgid "Hidden games"
+msgid "Displays hidden games"
+msgstr "Verborgen games"
+
+#: faugus/launcher.py:6086
 msgid "Ctrl+H toggles hidden games"
 msgstr "Druk op Ctrl+H om games te tonen/verbergen"
 
-#: faugus/launcher.py:5785
+#: faugus/launcher.py:6088
 msgid "Overview"
 msgstr ""
 
-#: faugus/launcher.py:5788
+#: faugus/launcher.py:6089 faugus/launcher.py:6619
+msgid ""
+"Displays a panel with the game title, categories, playtime, and last played "
+"date"
+msgstr ""
+
+#: faugus/launcher.py:6092
 msgid "Gamepad navigation"
 msgstr "Gamepadnavigatie"
 
-#: faugus/launcher.py:5790
+#: faugus/launcher.py:6093
+msgid "Allows navigation through the application using a gamepad"
+msgstr ""
+
+#: faugus/launcher.py:6095
 msgid "Wayland driver (experimental)"
 msgstr "Wayland-stuurprogramma (experimenteel)"
 
-#: faugus/launcher.py:5792
+#: faugus/launcher.py:6096
+msgid "Runs games using the Wine Wayland driver"
+msgstr ""
+
+#: faugus/launcher.py:6098
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (experimenteel)"
 
-#: faugus/launcher.py:5802 faugus/launcher.py:7529
+#: faugus/launcher.py:6099
+msgid "Runs 32-bit games using the 64-bit driver"
+msgstr ""
+
+#: faugus/launcher.py:6109 faugus/launcher.py:7888
 msgid "Run"
 msgstr "Uitvoeren"
 
-#: faugus/launcher.py:5805 faugus/launcher.py:7532
+#: faugus/launcher.py:6112 faugus/launcher.py:7891
 msgid "Run a file in the prefix"
 msgstr "Voer een bestand in de profielmap uit"
 
-#: faugus/launcher.py:5809 faugus/launcher.py:7517 faugus/shortcut.py:80
+#: faugus/launcher.py:6116 faugus/launcher.py:7876 faugus/shortcut.py:79
 msgid "May fix gamepad issues with some games"
 msgstr "Dit kan gamepadproblemen in sommige games oplossen"
 
-#: faugus/launcher.py:5810 faugus/launcher.py:7518 faugus/shortcut.py:81
+#: faugus/launcher.py:6117 faugus/launcher.py:7877 faugus/shortcut.py:80
 msgid "No Sleep"
 msgstr "Slaapstand onderdrukken"
 
-#: faugus/launcher.py:5811 faugus/launcher.py:7519 faugus/shortcut.py:82
+#: faugus/launcher.py:6118 faugus/launcher.py:7878 faugus/shortcut.py:81
 msgid "Prevents the system from suspending while gaming"
 msgstr "Voorkom dat het systeem tijdens het gamen in de slaapstand gaat"
 
-#: faugus/launcher.py:5813 faugus/launcher.py:6934
+#: faugus/launcher.py:6120 faugus/launcher.py:7292
 #, fuzzy
 msgid "Interface Sounds"
 msgstr "Venstermodus"
 
-#: faugus/launcher.py:5816
+#: faugus/launcher.py:6123
 msgid "Support the Project"
 msgstr "Project ondersteunen"
 
-#: faugus/launcher.py:5831
+#: faugus/launcher.py:6138
 msgid "Backup/Restore Settings"
 msgstr "Reservekopieën en herstel"
 
-#: faugus/launcher.py:5835
+#: faugus/launcher.py:6142
 msgid "Backup"
 msgstr "Reservekopie maken"
 
-#: faugus/launcher.py:5838
+#: faugus/launcher.py:6145
 msgid "Restore"
 msgstr "Herstellen"
 
-#: faugus/launcher.py:5845
+#: faugus/launcher.py:6152
 msgid "Global Environment Variables"
 msgstr "Omgevingsvariabelen"
 
-#: faugus/launcher.py:6120
+#: faugus/launcher.py:6428
 msgid "General"
 msgstr ""
 
-#: faugus/launcher.py:6121
+#: faugus/launcher.py:6429
 #, fuzzy
 msgid "Interface"
 msgstr "Venstermodus"
 
-#: faugus/launcher.py:6228
+#: faugus/launcher.py:6544
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Logboeken wissen (%s)"
 
-#: faugus/launcher.py:6231
+#: faugus/launcher.py:6547
 msgid "Clear Logs"
 msgstr "Logboeken wissen"
 
-#: faugus/launcher.py:6279
+#: faugus/launcher.py:6595
 #, fuzzy
 msgid "Covers or Carrousel mode"
 msgstr "Steam"
 
-#: faugus/launcher.py:6288
+#: faugus/launcher.py:6610
 #, fuzzy
 msgid "Grid, Covers or Carrousel mode"
 msgstr "Steam"
 
-#: faugus/launcher.py:6297
+#: faugus/launcher.py:6624
 #, fuzzy
 msgid "Grid or Covers mode"
 msgstr "Steam"
 
-#: faugus/launcher.py:6340
+#: faugus/launcher.py:6670
 #, fuzzy
 msgid "Covers or Carrousel mode with SteamGridDB"
 msgstr "Steam"
 
-#: faugus/launcher.py:6411
+#: faugus/launcher.py:6768
 msgid "Adwaita theme"
 msgstr ""
 
-#: faugus/launcher.py:6525
+#: faugus/launcher.py:6879
 msgid "Do you want to save the changes?"
 msgstr "Wil je de wijzigingen opslaan?"
 
-#: faugus/launcher.py:6635
+#: faugus/launcher.py:6989
 msgid "Select a backup file to restore"
 msgstr "Kies een reservekopiebestand"
 
-#: faugus/launcher.py:6641
+#: faugus/launcher.py:6995
 msgid "Faugus Backup files"
 msgstr ""
 
-#: faugus/launcher.py:6657 faugus/launcher.py:6696
+#: faugus/launcher.py:7011 faugus/launcher.py:7050
 msgid "This is not a valid Faugus backup file."
 msgstr "Het gekozen bestand is geen geldig Faugus-reservekopiebestand."
 
-#: faugus/launcher.py:6740 faugus/launcher.py:8912
+#: faugus/launcher.py:7094 faugus/launcher.py:9261
 msgid "Select a prefix location"
 msgstr "Kies een profielmap"
 
-#: faugus/launcher.py:6940 faugus/utils.py:1998 faugus/utils.py:2174
+#: faugus/launcher.py:7298 faugus/utils.py:2024 faugus/utils.py:2200
 msgid "Enable"
 msgstr "Inschakelen"
 
-#: faugus/launcher.py:6943
+#: faugus/launcher.py:7301
 msgid "Sound"
 msgstr ""
 
-#: faugus/launcher.py:6954
+#: faugus/launcher.py:7312
 msgid "Volume"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7333
 msgid "Navigate"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7333
 msgid "Confirm"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7333
 msgid "Warning"
 msgstr ""
 
-#: faugus/launcher.py:6980
+#: faugus/launcher.py:7338
 #, fuzzy
 #| msgid "Windows files"
 msgid "Sound file"
 msgstr "Windowsbestanden"
 
-#: faugus/launcher.py:6992
+#: faugus/launcher.py:7350
 msgid "Preview"
 msgstr ""
 
-#: faugus/launcher.py:7075
+#: faugus/launcher.py:7433
 #, fuzzy
 #| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
 msgstr "Kies het Lossless.dll-bestand"
 
-#: faugus/launcher.py:7079
+#: faugus/launcher.py:7437
 #, fuzzy
 #| msgid "All files"
 msgid "Audio files"
 msgstr "Alle bestanden"
 
-#: faugus/launcher.py:7099
+#: faugus/launcher.py:7457
 #, python-format
 msgid "Duplicate %s"
 msgstr "‘%s’ klonen"
 
-#: faugus/launcher.py:7105 faugus/launcher.py:7363 faugus/launcher.py:7376
-#: faugus/shortcut.py:41
+#: faugus/launcher.py:7463 faugus/launcher.py:7721 faugus/launcher.py:7734
+#: faugus/shortcut.py:40
 msgid "Title"
 msgstr "Titel"
 
-#: faugus/launcher.py:7154
+#: faugus/launcher.py:7512
 #, python-format
 msgid "Delete %s"
 msgstr "‘%s’ verwĳderen"
 
-#: faugus/launcher.py:7162
+#: faugus/launcher.py:7520
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Weet je zeker dat je ‘%s’ wilt verwijderen?"
 
-#: faugus/launcher.py:7171
+#: faugus/launcher.py:7529
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "WAARSCHUWING: dit profiel wordt door %d andere games gebruikt."
 
-#: faugus/launcher.py:7173
+#: faugus/launcher.py:7531
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "WAARSCHUWING: dit profiel wordt door 1 andere game gebruikt."
 
-#: faugus/launcher.py:7187
+#: faugus/launcher.py:7545
 msgid "Also remove the prefix:"
 msgstr "Profielmap eveneens verwijderen:"
 
-#: faugus/launcher.py:7225
+#: faugus/launcher.py:7583
 msgid "New Game/App"
 msgstr "Nieuwe game/programma"
 
-#: faugus/launcher.py:7343
+#: faugus/launcher.py:7701
 msgid "Steam User"
 msgstr "Steam-gebruiker"
 
-#: faugus/launcher.py:7360 faugus/launcher.py:7873 faugus/launcher.py:7875
+#: faugus/launcher.py:7718 faugus/launcher.py:8222 faugus/launcher.py:8224
 msgid "No Steam users found"
 msgstr "Er zijn geen Steam-gebruikers"
 
-#: faugus/launcher.py:7432
+#: faugus/launcher.py:7790
 msgid "Path to the game executable"
 msgstr "De locatie van het uitvoerbare gamebestand"
 
-#: faugus/launcher.py:7448
+#: faugus/launcher.py:7807
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select an executable"
 msgstr "Kies het uitvoerbare bestand van de game"
 
-#: faugus/launcher.py:7449
+#: faugus/launcher.py:7808
 #, fuzzy
 #| msgid "%s was not installed!"
 msgid "Run an installer"
 msgstr "%s is niet geïnstalleerd!"
 
-#: faugus/launcher.py:7467
+#: faugus/launcher.py:7826
 msgid "Runtime"
 msgstr ""
 
-#: faugus/launcher.py:7477
+#: faugus/launcher.py:7836
 msgid "Path to the prefix"
 msgstr "Locatie van bestand"
 
-#: faugus/launcher.py:7485
+#: faugus/launcher.py:7844
 #, fuzzy
 #| msgid "Default Proton"
 msgid "Specific Proton"
 msgstr "Standaardproton"
 
-#: faugus/launcher.py:7499 faugus/shortcut.py:58
+#: faugus/launcher.py:7858 faugus/shortcut.py:57
 msgid "Game Arguments"
 msgstr "Gameopties"
 
-#: faugus/launcher.py:7504 faugus/shortcut.py:63 faugus/utils.py:1695
+#: faugus/launcher.py:7863 faugus/shortcut.py:62 faugus/utils.py:1721
 msgid "Launch Settings"
 msgstr "Opstartinstellingen"
 
-#: faugus/launcher.py:7507 faugus/shortcut.py:66 faugus/utils.py:1979
+#: faugus/launcher.py:7866 faugus/shortcut.py:65 faugus/utils.py:2005
 msgid "Additional Application"
 msgstr "Aanvullend programma"
 
-#: faugus/launcher.py:7510 faugus/shortcut.py:69
+#: faugus/launcher.py:7869 faugus/shortcut.py:68
 msgid "Additional application to run with the game"
 msgstr "Een programma dat tegelijk met de game moet worden gestart"
 
-#: faugus/launcher.py:7512 faugus/shortcut.py:71 faugus/utils.py:2098
+#: faugus/launcher.py:7871 faugus/shortcut.py:70 faugus/utils.py:2124
 msgid "Lossless Scaling Frame Generation"
 msgstr "Frames genereren zonder kwaliteitsverlies"
 
-#: faugus/launcher.py:7534
+#: faugus/launcher.py:7893
 msgid "Shortcut"
 msgstr "Snelkoppeling"
 
-#: faugus/launcher.py:7539
+#: faugus/launcher.py:7898
 msgid "Desktop"
 msgstr "Bureaublad"
 
-#: faugus/launcher.py:7540
+#: faugus/launcher.py:7899
 msgid "App Menu"
 msgstr "Programmastarter"
 
-#: faugus/launcher.py:7541
+#: faugus/launcher.py:7900
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:7589 faugus/launcher.py:7736
+#: faugus/launcher.py:7948 faugus/launcher.py:8095
 msgid "Tools"
 msgstr "Hulpmiddelen"
 
-#: faugus/launcher.py:7708
+#: faugus/launcher.py:8067
 msgid "Refresh"
 msgstr "Herladen"
 
-#: faugus/launcher.py:7711
+#: faugus/launcher.py:8070
 msgid "Load from file"
 msgstr "Laden uit bestand"
 
-#: faugus/launcher.py:7714
+#: faugus/launcher.py:8073
 msgid "Load from URL"
 msgstr "Laden van url"
 
-#: faugus/launcher.py:7879 faugus/shortcut.py:164
+#: faugus/launcher.py:8228 faugus/shortcut.py:163
 msgid "Vulkan Layer not found"
 msgstr "Vulkan is niet aangetroffen"
 
-#: faugus/launcher.py:8029
+#: faugus/launcher.py:8378
 msgid "Select an image for the cover"
 msgstr "Kies een hoesbestand"
 
-#: faugus/launcher.py:8030
+#: faugus/launcher.py:8379
 msgid "Select an image for the banner"
 msgstr "Kies een banierbestand"
 
-#: faugus/launcher.py:8031
+#: faugus/launcher.py:8380
 msgid "Select an image for the icon"
 msgstr "Kies een pictogrambestand"
 
-#: faugus/launcher.py:8061
+#: faugus/launcher.py:8410
 msgid "Enter the image URL"
 msgstr "Voer de afbeeldingsurl in"
 
-#: faugus/launcher.py:8554
+#: faugus/launcher.py:8903
 msgid "Windows Game"
 msgstr "Windowsgame"
 
-#: faugus/launcher.py:8555
+#: faugus/launcher.py:8904
 msgid "Linux Game"
 msgstr "Linuxgame"
 
-#: faugus/launcher.py:8556
+#: faugus/launcher.py:8905
 msgid "Steam Game"
 msgstr "Steam-game"
 
-#: faugus/launcher.py:8656
+#: faugus/launcher.py:9005
 #, fuzzy
 #| msgid "Select the game executable"
 msgid "Select the game installer"
 msgstr "Kies het uitvoerbare bestand van de game"
 
-#: faugus/launcher.py:8886
+#: faugus/launcher.py:9235
 msgid "Select the game executable"
 msgstr "Kies het uitvoerbare bestand van de game"
 
@@ -1193,52 +1297,48 @@ msgstr "Kies het uitvoerbare bestand van de game"
 msgid "Download"
 msgstr "Downloaden"
 
-#: faugus/runner.py:167
+#: faugus/runner.py:171
 msgid "Starting Steam game..."
 msgstr "Bezig met starten van Steam-game…"
 
-#: faugus/runner.py:420
+#: faugus/runner.py:431
 msgid "Are you enjoying Faugus?"
 msgstr "Gebruik je Faugus graag?"
 
-#: faugus/runner.py:424
+#: faugus/runner.py:435
 msgid "Please consider donating"
 msgstr "Overweeg een donatie"
 
-#: faugus/runner.py:430
+#: faugus/runner.py:441
 msgid "Never show this message again"
 msgstr "Bericht niet meer tonen"
 
-#: faugus/runner.py:440
+#: faugus/runner.py:451
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: faugus/runner.py:474
+#: faugus/runner.py:485
 #, python-format
 msgid "%s was not found"
 msgstr "‘%s’ is niet aangetroffen"
 
-#: faugus/runner.py:475
+#: faugus/runner.py:486
 msgid "Please install it or use another Proton version."
 msgstr "Installeer dit of maak gebruik van een andere Proton-versie."
 
-#: faugus/runner.py:612
+#: faugus/runner.py:669
 msgid "Components are up to date"
 msgstr "Je beschikt over de nieuwste onderdelen"
 
-#: faugus/runner.py:624
-msgid "Updating"
-msgstr "Bezig met bijwerken…"
-
-#: faugus/runner.py:628
-msgid "Extracting"
-msgstr "Bezig met uitpakken…"
-
-#: faugus/runner.py:634
+#: faugus/runner.py:682 faugus/runner.py:699
 msgid "is up to date"
 msgstr "is bijgewerkt"
 
-#: faugus/runner.py:700
+#: faugus/runner.py:685 faugus/runner.py:690 faugus/runner.py:692
+msgid "Updating"
+msgstr "Bezig met bijwerken…"
+
+#: faugus/runner.py:768
 msgid "The keys and values were successfully added to the registry."
 msgstr "De sleutels en waarden zijn toegevoegd aan het register."
 
@@ -1297,135 +1397,143 @@ msgstr "GameMode is niet aangetroffen"
 msgid "Select an icon for the shortcut"
 msgstr "Kies een snelkoppelingspictogram"
 
-#: faugus/utils.py:1598 faugus/utils.py:1599 faugus/utils.py:1600
-#: faugus/utils.py:1601
+#: faugus/utils.py:1624 faugus/utils.py:1625 faugus/utils.py:1626
+#: faugus/utils.py:1627
 msgid "Latest"
 msgstr ""
 
-#: faugus/utils.py:1604
+#: faugus/utils.py:1630
 msgid "System"
 msgstr ""
 
-#: faugus/utils.py:1784
+#: faugus/utils.py:1810
 msgid "Presets"
 msgstr "Voorinstellingen"
 
-#: faugus/utils.py:1805
+#: faugus/utils.py:1831
 msgid "Launch Arguments"
 msgstr "Opstartopties"
 
-#: faugus/utils.py:1904
+#: faugus/utils.py:1930
 msgid "Select a command or script"
 msgstr "Kies een opdracht of script"
 
-#: faugus/utils.py:1929
+#: faugus/utils.py:1955
 msgid "Pre-launch"
 msgstr "Vooraf opstarten"
 
-#: faugus/utils.py:1930
+#: faugus/utils.py:1956
 msgid "Command or script to run before the game"
 msgstr "Een opdracht of script dat voorafgaand aan de game moet worden gestart"
 
-#: faugus/utils.py:1932
+#: faugus/utils.py:1958
 msgid "Post-launch"
 msgstr "Nadien opstarten"
 
-#: faugus/utils.py:1933
+#: faugus/utils.py:1959
 msgid "Command or script to run after the game"
 msgstr ""
 "Een opdracht of script dat na het sluiten van de game moet worden gestart"
 
-#: faugus/utils.py:2007
+#: faugus/utils.py:2033
 msgid "Path to the application"
 msgstr "Programmalocatie"
 
-#: faugus/utils.py:2019
+#: faugus/utils.py:2045
 msgid "Select an additional application"
 msgstr "Kies een aanvullend programma"
 
-#: faugus/utils.py:2037
+#: faugus/utils.py:2063
 msgid "Delay (seconds)"
 msgstr "Wachttijd (in seconden)"
 
-#: faugus/utils.py:2051
+#: faugus/utils.py:2077
 msgid "Run the application first"
 msgstr "Start eerst het programma"
 
-#: faugus/utils.py:2125
+#: faugus/utils.py:2151
 msgid "Lossless Scaling Location"
 msgstr "Locatie van schalen zonder kwaliteitsverlies"
 
-#: faugus/utils.py:2133
+#: faugus/utils.py:2159
 msgid "Lossless.dll location"
 msgstr "Lossless.dll-locatie"
 
-#: faugus/utils.py:2145
+#: faugus/utils.py:2171
 msgid "Select the Lossless.dll file"
 msgstr "Kies het Lossless.dll-bestand"
 
-#: faugus/utils.py:2178
+#: faugus/utils.py:2204
 msgid "Multiplier"
 msgstr "Vermenigvuldiging"
 
-#: faugus/utils.py:2184
+#: faugus/utils.py:2210
 msgid "Multiply the FPS"
 msgstr "Vermenigvuldig het aantal fps"
 
-#: faugus/utils.py:2186
+#: faugus/utils.py:2212
 msgid "Flow Scale"
 msgstr "Vloeiendheidsschaal"
 
-#: faugus/utils.py:2193
+#: faugus/utils.py:2219
 msgid "Lower the internal motion estimation resolution"
 msgstr "Verlaag de resolutie van bewegingen"
 
-#: faugus/utils.py:2195
+#: faugus/utils.py:2221
 msgid "Performance Mode"
 msgstr "Prestatiemodus"
 
-#: faugus/utils.py:2196
+#: faugus/utils.py:2222
 msgid "Massively improve performance at the cost of quality"
 msgstr "Verbeter de prestaties, ten koste van de kwaliteit"
 
-#: faugus/utils.py:2199
+#: faugus/utils.py:2225
 msgid "HDR Mode"
 msgstr "Hdr-modus"
 
-#: faugus/utils.py:2200
+#: faugus/utils.py:2226
 msgid "Enable special HDR-only behavior"
 msgstr "Schakel hdr-functies in"
 
-#: faugus/utils.py:2203
+#: faugus/utils.py:2229
 msgid "Present Mode (Experimental)"
 msgstr "Presenteermodus (experimenteel)"
 
-#: faugus/utils.py:2207
+#: faugus/utils.py:2233
 msgid "Override the present mode"
 msgstr "Dwing de presenteermodus af"
 
-#: faugus/utils.py:2547
+#: faugus/utils.py:2573
 msgid "No SteamGridDB API key configured."
 msgstr "Er is geen SteamGridDB-api-sleutel ingesteld."
 
-#: faugus/utils.py:2548
+#: faugus/utils.py:2574
 msgid "Add your API key in Settings first."
 msgstr "Voeg je api-sleutel toe in de instellingen."
 
-#: faugus/utils.py:2561
+#: faugus/utils.py:2587
 msgid "Choose a cover"
 msgstr "Kies een hoes"
 
-#: faugus/utils.py:2562
+#: faugus/utils.py:2588
 msgid "Choose a banner"
 msgstr "Kies een banier"
 
-#: faugus/utils.py:2563
+#: faugus/utils.py:2589
 msgid "Choose an icon"
 msgstr "Kies een pictogram"
 
-#: faugus/utils.py:2700
+#: faugus/utils.py:2726
 msgid "No results found"
 msgstr "Er zijn geen zoekresultaten"
+
+#, fuzzy
+#~| msgid "Installing %s..."
+#~ msgid "Installing"
+#~ msgstr "Bezig met installeren van ‘%s’…"
+
+#~ msgid "Extracting"
+#~ msgstr "Bezig met uitpakken…"
 
 #~ msgid "Discrete GPU"
 #~ msgstr "Losse gpu"
@@ -1587,9 +1695,6 @@ msgstr "Er zijn geen zoekresultaten"
 
 #~ msgid "Start on boot"
 #~ msgstr "Automatisch opstarten"
-
-#~ msgid "Start minimized to tray"
-#~ msgstr "Geminimaliseerd is systeemvak starten"
 
 #~ msgid "Enable logging"
 #~ msgstr "Logboek bijhouden"
