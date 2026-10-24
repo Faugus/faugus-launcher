@@ -33,6 +33,7 @@ class ConfigManager:
             'gamepad-navigation': 'False',
             'minimized-startup-enabled': 'False',
             'categories-enabled': 'False',
+            'auto-hide-enabled': 'False',
             'sort-enabled': 'False',
             'header-bar': 'False',
             'backup-auto-enabled': 'False',

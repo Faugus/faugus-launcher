@@ -285,11 +285,38 @@ def _focus_first_focusable(widget):
     if not candidates:
         return False
 
-    candidates[0].grab_focus()
+    return candidates[0].grab_focus()
+
+
+def _focus_after_reveal(window, edge, focus_fn):
+    if not window.reveal_auto_hide(edge):
+        result = focus_fn()
+        window.unpin_auto_hide(edge)
+        return result
+
+    attempts = 0
+
+    def tick(widget, clock):
+        nonlocal attempts
+        attempts += 1
+        if focus_fn() or attempts >= 10:
+            window.unpin_auto_hide(edge)
+            return GLib.SOURCE_REMOVE
+        return GLib.SOURCE_CONTINUE
+
+    window.add_tick_callback(tick)
     return True
 
 
 def focus_top_bar(window):
+    return _focus_after_reveal(window, "top", lambda: _focus_top_bar(window))
+
+
+def focus_bottom_bar_by_column(window, focused_flowbox_child):
+    return _focus_after_reveal(window, "bottom", lambda: _focus_bottom_bar_by_column(window, focused_flowbox_child))
+
+
+def _focus_top_bar(window):
     top_bar = getattr(window, "top_bar", None)
     if top_bar is None:
         return False
@@ -297,7 +324,7 @@ def focus_top_bar(window):
     return _focus_first_focusable(top_bar)
 
 
-def focus_bottom_bar_by_column(window, focused_flowbox_child):
+def _focus_bottom_bar_by_column(window, focused_flowbox_child):
     scale_zoom = getattr(window, "scale_zoom", None)
     bottom_bar = scale_zoom.get_parent() if scale_zoom is not None else None
     if not isinstance(bottom_bar, Gtk.CenterBox):
@@ -323,12 +350,11 @@ def focus_bottom_bar_by_column(window, focused_flowbox_child):
             else:
                 target_widget = bottom_bar.get_end_widget()
 
-    if target_widget is None:
-        target_widget = bottom_bar.get_center_widget() or bottom_bar.get_start_widget() or bottom_bar.get_end_widget()
-    if target_widget is None:
-        return False
-
-    return _focus_first_focusable(target_widget)
+    fallbacks = (bottom_bar.get_center_widget(), bottom_bar.get_start_widget(), bottom_bar.get_end_widget())
+    for widget in (target_widget, *fallbacks):
+        if widget is not None and _focus_first_focusable(widget):
+            return True
+    return False
 
 
 def focus_flowbox_child(flowbox, child):
@@ -403,6 +429,8 @@ def navigate_main_screen(window, focused, direction):
             carrousel_move_coalesced(window, 1)
             return True
         if direction in (Gtk.DirectionType.UP, Gtk.DirectionType.DOWN):
+            if direction == Gtk.DirectionType.DOWN and window.auto_hide_enabled:
+                return focus_bottom_bar_by_column(window, None)
             result = escape_focus(window, carrousel_fixed, direction)
             refresh = getattr(window, "on_carrousel_focus_changed", None)
             if refresh:

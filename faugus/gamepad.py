@@ -124,6 +124,8 @@ def shutdown_gamepad(self):
     self.gamepad_devices.clear()
     self.gamepad_monitor = None
     self.held_direction = None
+    self.right_stick_x = 0.0
+    self.right_stick_y = 0.0
     if self._gamepad_tick_source is not None:
         GLib.source_remove(self._gamepad_tick_source)
         self._gamepad_tick_source = None
@@ -158,6 +160,10 @@ def _detach_device(self, device):
 
     device.disconnect(signal_id)
     self.held_direction = None
+    self.right_stick_x = 0.0
+    self.right_stick_y = 0.0
+    self.can_move_x = True
+    self.can_move_y = True
 
 
 def _is_usable(self):

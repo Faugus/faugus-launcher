@@ -1554,6 +1554,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             center_grid.set_vexpand(False)
 
             bottom_bar.set_center_widget(center_grid)
+            self.bottom_bar_wrapper = self.auto_hide_wrapper(bottom_bar, "bottom")
             self.scale_zoom.set_valign(Gtk.Align.CENTER)
             self.scale_zoom.set_vexpand(False)
 
@@ -1583,7 +1584,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             grid_controls.attach(self.button_kill,       3, 0, 1, 1)
             grid_controls.attach(self.button_play,  4, 0, 1, 1)
 
-            self.box_bottom.append(grid_controls)
+            self.box_bottom.append(self.auto_hide_wrapper(grid_controls, "bottom"))
 
             list_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             list_container.append(box_top)
@@ -3155,7 +3156,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         old_top_bar = getattr(self, "top_bar", None)
         if old_top_bar is not None:
-            self.box_top.remove(old_top_bar)
+            self.box_top.remove(self.top_bar_wrapper)
             self.top_bar = None
         if buttons:
             top_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
@@ -3167,7 +3168,96 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 button.set_size_request(110, -1)
                 button.set_hexpand(True)
                 top_bar.append(button)
-            self.box_top.prepend(top_bar)
+            self.top_bar_wrapper = self.auto_hide_wrapper(top_bar, "top")
+            self.box_top.prepend(self.top_bar_wrapper)
+
+    def auto_hide_wrapper(self, bar, edge):
+        revealer = Gtk.Revealer()
+        revealer.set_transition_type(
+            Gtk.RevealerTransitionType.SLIDE_UP if edge == "bottom" else Gtk.RevealerTransitionType.SLIDE_DOWN
+        )
+        revealer.set_reveal_child(True)
+        revealer.set_child(bar)
+
+        wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        wrapper.append(revealer)
+
+        motion = Gtk.EventControllerMotion()
+        motion.connect("notify::contains-pointer", lambda c, p: self.refresh_auto_hide(wrapper))
+        wrapper.add_controller(motion)
+
+        if not getattr(self, "_auto_hide_focus_hooked", False):
+            self._auto_hide_focus_hooked = True
+            self.connect("notify::focus-widget", lambda w, p: self.apply_auto_hide())
+
+            window_motion = Gtk.EventControllerMotion()
+            window_motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+            window_motion.connect("motion", self.on_auto_hide_pointer_motion)
+            window_motion.connect("leave", lambda c: self.on_auto_hide_pointer_motion(c, None, None))
+            self.add_controller(window_motion)
+
+        wrapper.auto_hide = (revealer, motion, edge)
+        self.auto_hide_wrappers = [w for w in getattr(self, "auto_hide_wrappers", []) if w.get_parent() is not None]
+        self.auto_hide_wrappers.append(wrapper)
+        self.refresh_auto_hide(wrapper)
+        return wrapper
+
+    def on_auto_hide_pointer_motion(self, controller, x, y):
+        if y is None:
+            self._auto_hide_pointer_y = None
+            self._auto_hide_held = {
+                wrapper.auto_hide[2] for wrapper in getattr(self, "auto_hide_wrappers", [])
+                if getattr(wrapper, "pointer_inside", False)
+            }
+            return
+        self._auto_hide_pointer_y = y
+        self._auto_hide_held = set()
+        for wrapper in getattr(self, "auto_hide_wrappers", []):
+            motion, edge = wrapper.auto_hide[1:]
+            wrapper.pointer_inside = motion.props.contains_pointer or self.auto_hide_pointer_in_zone(wrapper, edge)
+        self.apply_auto_hide()
+
+    def auto_hide_pointer_in_zone(self, wrapper, edge):
+        pointer_y = getattr(self, "_auto_hide_pointer_y", None)
+        if pointer_y is None:
+            return False
+        ok, bounds = wrapper.compute_bounds(self)
+        if not ok:
+            return False
+        if edge == "bottom":
+            return pointer_y >= bounds.origin.y + bounds.size.height - 24
+        return pointer_y <= bounds.origin.y + 24
+
+    def refresh_auto_hide(self, wrapper):
+        revealer, motion, edge = wrapper.auto_hide
+        focused = self.get_focus()
+        focus_inside = focused is not None and focused.is_ancestor(wrapper)
+        in_zone = (motion.props.contains_pointer or self.auto_hide_pointer_in_zone(wrapper, edge)
+                   or edge in getattr(self, "_auto_hide_held", ()))
+        pinned = edge in getattr(self, "_auto_hide_pinned", ())
+        hidden = self.auto_hide_enabled and not in_zone and not focus_inside and not pinned
+        revealer.set_transition_duration(400 if hidden else 150)
+        revealer.set_reveal_child(not hidden)
+
+    def apply_auto_hide(self):
+        for wrapper in getattr(self, "auto_hide_wrappers", []):
+            self.refresh_auto_hide(wrapper)
+
+    def unpin_auto_hide(self, edge):
+        getattr(self, "_auto_hide_pinned", set()).discard(edge)
+        self.apply_auto_hide()
+
+    def reveal_auto_hide(self, edge):
+        self._auto_hide_pinned = getattr(self, "_auto_hide_pinned", set()) | {edge}
+        was_hidden = False
+        for wrapper in getattr(self, "auto_hide_wrappers", []):
+            revealer, motion, wrapper_edge = wrapper.auto_hide
+            if wrapper_edge != edge or wrapper.get_parent() is None:
+                continue
+            was_hidden = was_hidden or not revealer.get_reveal_child()
+            revealer.set_transition_duration(150)
+            revealer.set_reveal_child(True)
+        return was_hidden
 
     def arrange_main_content(self):
         if not hasattr(self, "carrousel_box") and self.carrousel_active():
@@ -3221,7 +3311,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         else:
             self.right_vbox.append(scroll_box)
             scroll_box.set_vexpand(True)
-        self.right_vbox.append(self.bottom_bar)
+        self.right_vbox.append(self.bottom_bar_wrapper)
 
     def apply_interface_options(self, **new_options):
         changed = {key for key, value in new_options.items() if getattr(self, key) != value}
@@ -3237,6 +3327,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         if changed & {"labels_enabled", "zoom_enabled"}:
             self.apply_labels_and_zoom_visibility()
+
+        if "auto_hide_enabled" in changed:
+            self.apply_auto_hide()
 
         if "show_hidden" in changed:
             self.apply_show_hidden_change()
@@ -3335,7 +3428,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         categories = game.category if isinstance(game.category, list) else ([game.category] if game.category else [])
         categories_visible = bool(categories)
-        self.label_overview_categories.set_text(", ".join(categories) if categories else "")
+        self.label_overview_categories.set_text(", ".join(sorted(categories, key=str.lower)) if categories else "")
         self.label_overview_categories.set_visible(categories_visible)
 
         if is_running:
@@ -3844,6 +3937,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.steamgriddb_enabled = cfg.config.get('steamgriddb-enabled', 'False') == 'True'
         self.labels_enabled = cfg.config.get('labels-enabled', 'False') == 'True'
         self.zoom_enabled = cfg.config.get('zoom-enabled', 'True') == 'True'
+        self.auto_hide_enabled = cfg.config.get('auto-hide-enabled', 'False') == 'True'
         self.gamepad_navigation = cfg.config.get('gamepad-navigation', 'False') == 'True'
         self.language = cfg.config.get('language', '')
         self.show_hidden = cfg.config.get('show-hidden', 'False') == 'True'
@@ -5623,6 +5717,7 @@ class Settings(Gtk.Dialog):
         ("mono-icon", "checkbox_mono_icon", False),
         ("labels-enabled", "checkbox_labels", False),
         ("zoom-enabled", "checkbox_zoom", True),
+        ("auto-hide-enabled", "checkbox_auto_hide", False),
         ("steamgriddb-enabled", "checkbox_steamgriddb", False),
         ("auto-create-shortcuts", "checkbox_auto_create_shortcuts", False),
         ("show-hidden", "checkbox_hidden_games", False),
@@ -5848,6 +5943,8 @@ class Settings(Gtk.Dialog):
 
         self.checkbox_zoom = Gtk.CheckButton(label=_("Zoom"))
         self.checkbox_zoom.set_active(True)
+
+        self.checkbox_auto_hide = Gtk.CheckButton(label=_("Auto-hide"))
 
         self.label_grid_position = Gtk.Label(label=_("Position"))
         self.label_grid_position.set_halign(Gtk.Align.START)
@@ -6229,6 +6326,7 @@ class Settings(Gtk.Dialog):
         grid_interface_checkboxes.attach(self.checkbox_overview, 0, 6, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_header_bar, 0, 7, 1, 1)
         grid_interface_checkboxes.attach(self.checkbox_hidden_games, 0, 8, 1, 1)
+        grid_interface_checkboxes.attach(self.checkbox_auto_hide, 0, 9, 1, 1)
 
         grid_interface_sounds.attach(self.button_interface_sounds, 0, 0, 1, 1)
         self.button_interface_sounds.set_hexpand(True)
@@ -6375,7 +6473,7 @@ class Settings(Gtk.Dialog):
 
         self.on_combobox_interface_changed(self.combobox_interface)
 
-        for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_banner,
+        for checkbox in (self.checkbox_labels, self.checkbox_zoom, self.checkbox_auto_hide, self.checkbox_banner,
                          self.checkbox_gamepad_navigation, self.checkbox_categories, self.checkbox_sort,
                          self.checkbox_overview, self.checkbox_grid_max_children, self.checkbox_hidden_games):
             checkbox.connect("toggled", self.on_interface_option_changed)
@@ -6605,6 +6703,7 @@ class Settings(Gtk.Dialog):
         return {
             "labels_enabled": self.checkbox_labels.get_active(),
             "zoom_enabled": self.checkbox_zoom.get_active(),
+            "auto_hide_enabled": self.checkbox_auto_hide.get_active(),
             "banner_enabled": self.checkbox_banner.get_active(),
             "gamepad_navigation": self.checkbox_gamepad_navigation.get_active(),
             "categories_enabled": self.checkbox_categories.get_active(),
