@@ -170,11 +170,17 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
             }
             entry.flowbox-entry.cover-container {
-                box-shadow: 0 6px 14px alpha(black, 0.65);
-                transition: transform 150ms steps(32, end);
+                box-shadow: 0 6px 14px alpha(black, 0.65),
+                            0 0 8px 2px alpha(@theme_selected_bg_color, 0),
+                            0 0 30px 10px alpha(@theme_selected_bg_color, 0);
+                transition: transform 150ms steps(32, end), box-shadow 150ms, background-color 150ms;
             }
             entry.flowbox-entry.cover-container .game {
                 border: none;
+                transition: background-color 150ms, color 150ms;
+            }
+            entry.flowbox-entry.cover-container .game-label {
+                transition: color 150ms;
             }
             entry.flowbox-entry.cover-container:selected {
                 background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.5);
@@ -204,7 +210,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             }
             entry.flowbox-entry.cover-container:selected:backdrop {
                 background-color: mix(@theme_bg_color, @theme_selected_bg_color, 0.25);
-                box-shadow: 0 6px 14px alpha(black, 0.65);
+                box-shadow: 0 6px 14px alpha(black, 0.65),
+                            0 0 8px 2px alpha(@theme_selected_bg_color, 0),
+                            0 0 30px 10px alpha(@theme_selected_bg_color, 0);
             }
             entry.flowbox-entry.cover-container:selected:backdrop .game,
             entry.flowbox-entry.carrousel-current:backdrop .game {
@@ -2089,7 +2097,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 f"0 0 30px 10px alpha(@theme_selected_bg_color, {glow_t * 0.5:.3f})"
             )
         sliding = self._carrousel_anim_id is not None
-        transition = "none" if sliding else "transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+        transition = "background-color 150ms" if sliding else "transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 150ms"
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
