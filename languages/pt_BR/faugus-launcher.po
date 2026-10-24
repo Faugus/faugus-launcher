@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-24 16:35+0000\n"
-"PO-Revision-Date: 2026-10-22 11:58+0000\n"
+"PO-Revision-Date: 2026-10-24 16:58+0000\n"
 "Last-Translator: Faugus <faugus@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "faugus-launcher/faugus-launcher/pt_BR/>\n"
@@ -585,7 +585,7 @@ msgstr "Banner"
 
 #: faugus/launcher.py:5903 faugus/launcher.py:6669
 msgid "Displays a banner for the currently selected game"
-msgstr ""
+msgstr "Exibe um banner do jogo selecionado"
 
 #: faugus/launcher.py:5905
 msgid "Theme"
@@ -641,7 +641,7 @@ msgstr "Rótulos"
 
 #: faugus/launcher.py:5944 faugus/launcher.py:6598
 msgid "Displays the game title below the cover"
-msgstr ""
+msgstr "Exibe o título do jogo abaixo da capa"
 
 #: faugus/launcher.py:5946
 msgid "Zoom"
@@ -649,15 +649,15 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5947 faugus/launcher.py:6599
 msgid "Displays a zoom slider to adjust the size of games"
-msgstr ""
+msgstr "Exibe um controle de zoom para ajustar o tamanho dos jogos"
 
 #: faugus/launcher.py:5950
 msgid "Auto-hide"
-msgstr ""
+msgstr "Ocultar automaticamente"
 
 #: faugus/launcher.py:5951
 msgid "Automatically hides widgets"
-msgstr ""
+msgstr "Oculta os widgets automaticamente"
 
 #: faugus/launcher.py:5953
 msgid "Position"
@@ -665,7 +665,7 @@ msgstr "Posição"
 
 #: faugus/launcher.py:5956 faugus/launcher.py:6614
 msgid "Sets how games are positioned on the screen"
-msgstr ""
+msgstr "Define como os jogos são posicionados na tela"
 
 #: faugus/launcher.py:5957
 msgid "Top"
@@ -685,7 +685,7 @@ msgstr "Orientação"
 
 #: faugus/launcher.py:5964 faugus/launcher.py:6628
 msgid "Sets how games are scrolled through"
-msgstr ""
+msgstr "Define como os jogos são percorridos"
 
 #: faugus/launcher.py:5965
 msgid "Vertical"
@@ -709,7 +709,7 @@ msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5993
 msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
-msgstr ""
+msgstr "Busca automaticamente ícones, capas e banners no SteamGridDB"
 
 #: faugus/launcher.py:5997
 msgid "API Key"
@@ -748,14 +748,12 @@ msgid "GPU"
 msgstr "GPU"
 
 #: faugus/launcher.py:6045
-#, fuzzy
-#| msgid "Auto-close on launch"
 msgid "Auto-close"
-msgstr "Fechar automaticamente ao executar"
+msgstr "Fechar automaticamente"
 
 #: faugus/launcher.py:6046
 msgid "Automatically closes the application when launching a game"
-msgstr ""
+msgstr "Fecha o aplicativo automaticamente ao executar um jogo"
 
 #: faugus/launcher.py:6048
 msgid "Autostart"
@@ -763,7 +761,7 @@ msgstr "Inicio automático"
 
 #: faugus/launcher.py:6049
 msgid "Automatically starts the application with the system"
-msgstr ""
+msgstr "Inicia o aplicativo automaticamente com o sistema"
 
 #: faugus/launcher.py:6051
 msgid "System tray icon"
@@ -771,17 +769,15 @@ msgstr "Ícone na bandeja do sistema"
 
 #: faugus/launcher.py:6052
 msgid "Displays the application icon in the system tray"
-msgstr ""
+msgstr "Exibe o ícone do aplicativo na bandeja do sistema"
 
 #: faugus/launcher.py:6055
 msgid "Minimized startup"
 msgstr "Iniciar minimizado"
 
 #: faugus/launcher.py:6056
-#, fuzzy
-#| msgid "Start minimized to tray"
 msgid "Starts the application minimized to the system tray"
-msgstr "Iniciar minimizado na bandeja"
+msgstr "Inicia o aplicativo minimizado na bandeja do sistema"
 
 #: faugus/launcher.py:6059
 msgid "Monochrome icon"
@@ -789,7 +785,7 @@ msgstr "Ícone monocromático"
 
 #: faugus/launcher.py:6060
 msgid "Displays a monochrome application icon in the system tray"
-msgstr ""
+msgstr "Exibe um ícone monocromático do aplicativo na bandeja do sistema"
 
 #: faugus/launcher.py:6063
 msgid "Splash window"
@@ -800,6 +796,8 @@ msgid ""
 "Displays a splash window with information about Proton, Steam Linux Runtime, "
 "and other required components when launching a game"
 msgstr ""
+"Exibe uma janela de respingo com informações sobre o Proton, Steam Linux "
+"Runtime e outros componentes necessários ao executar um jogo"
 
 #: faugus/launcher.py:6067
 msgid "Automatic updates"
@@ -810,6 +808,8 @@ msgid ""
 "Checks for and updates Proton, Steam Linux Runtime, and other required "
 "components when launching a game"
 msgstr ""
+"Verifica e atualiza o Proton, Steam Linux Runtime e outros componentes "
+"necessários ao executar um jogo"
 
 #: faugus/launcher.py:6071
 msgid "Auto-create shortcuts"
@@ -828,7 +828,7 @@ msgstr "Categorias"
 
 #: faugus/launcher.py:6077
 msgid "Displays a button to manage game categories"
-msgstr ""
+msgstr "Exibe um botão para gerenciar as categorias dos jogos"
 
 #: faugus/launcher.py:6079
 msgid "Sort"
@@ -836,7 +836,7 @@ msgstr "Ordenação"
 
 #: faugus/launcher.py:6080
 msgid "Displays a button to change the game sorting order"
-msgstr ""
+msgstr "Exibe um botão para alterar a ordenação dos jogos"
 
 #: faugus/launcher.py:6082
 msgid "Header bar"
@@ -844,17 +844,15 @@ msgstr "Barra de cabeçalho"
 
 #: faugus/launcher.py:6083
 msgid "Displays the default GTK header bar"
-msgstr ""
+msgstr "Exibe a barra de cabeçalho padrão do GTK"
 
 #: faugus/launcher.py:6085
 msgid "Hidden games"
 msgstr "Jogos ocultos"
 
 #: faugus/launcher.py:6086
-#, fuzzy
-#| msgid "Hidden games"
 msgid "Displays hidden games"
-msgstr "Jogos ocultos"
+msgstr "Exibe os jogos ocultos"
 
 #: faugus/launcher.py:6086
 msgid "Ctrl+H toggles hidden games"
@@ -869,6 +867,8 @@ msgid ""
 "Displays a panel with the game title, categories, playtime, and last played "
 "date"
 msgstr ""
+"Exibe um painel com o título do jogo, as categorias, o tempo de jogo e a "
+"última vez que foi jogado"
 
 #: faugus/launcher.py:6092
 msgid "Gamepad navigation"
@@ -876,7 +876,7 @@ msgstr "Navegação com controle"
 
 #: faugus/launcher.py:6093
 msgid "Allows navigation through the application using a gamepad"
-msgstr ""
+msgstr "Permite a navegação pelo aplicativo usando um gamepad"
 
 #: faugus/launcher.py:6095
 msgid "Wayland driver (experimental)"
@@ -884,7 +884,7 @@ msgstr "Driver do Wayland (experimental)"
 
 #: faugus/launcher.py:6096
 msgid "Runs games using the Wine Wayland driver"
-msgstr ""
+msgstr "Executa os jogos usando o driver Wine Wayland"
 
 #: faugus/launcher.py:6098
 msgid "WOW64 (experimental)"
@@ -892,7 +892,7 @@ msgstr "WOW64 (experimental)"
 
 #: faugus/launcher.py:6099
 msgid "Runs 32-bit games using the 64-bit driver"
-msgstr ""
+msgstr "Executa os jogos 32-bit usando o driver 64-bit"
 
 #: faugus/launcher.py:6109 faugus/launcher.py:7888
 msgid "Run"
