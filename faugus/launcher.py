@@ -115,6 +115,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         apply_titlebar_preference(self)
         self.add_css_class("main-window")
         self.connect("close-request", self.on_close)
+        self.cover_refresh_source = None
+        self.cover_refresh_started = 0
+        self.loaded_covers = set()
+        self.connect("notify::scale-factor", self.on_cover_scale_changed)
         print(f"Faugus {VERSION}")
 
         self.fullscreen_activated = False
@@ -1431,6 +1435,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 adjustment.set_value(adjustment.get_value() + delta)
 
         vadjustment.connect("notify::page-size", on_scroll_page_size_changed)
+        for adjustment in (vadjustment, scroll_box.get_hadjustment()):
+            adjustment.connect("value-changed", lambda adjustment: self.schedule_cover_refresh())
+            adjustment.connect("notify::page-size", lambda adjustment, pspec: self.schedule_cover_refresh())
+            adjustment.connect("notify::upper", lambda adjustment, pspec: self.schedule_cover_refresh())
 
         smooth_scroll = {"adjustment": None, "target": 0.0, "last": 0.0, "time": None, "tick": None}
 
@@ -1619,6 +1627,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.set_row_spacing(5)
 
         def sort_games(child1, child2, user_data):
+            self.schedule_cover_refresh(restart=False)
             g1 = child1.game
             g2 = child2.game
 
@@ -1644,6 +1653,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return (t1 > t2) - (t1 < t2)
 
         def filter_games(child, user_data):
+            self.schedule_cover_refresh(restart=False)
             return self.game_matches_filter(child.game, self.entry_search.get_text().lower())
 
         self.flowbox.set_sort_func(sort_games, None)
@@ -4138,6 +4148,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     break
                 self.add_item_list(game)
 
+            self.schedule_cover_refresh()
             if not self.flowbox.get_selected_children():
                 self.select_first_visible_child()
                 self.update_overview_panel()
@@ -4179,14 +4190,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             for _ in range(batch_size):
                 child = next(children_iter, None)
                 if child is None:
+                    self.schedule_cover_refresh()
                     return False
 
                 if not hasattr(child, 'game') or not child.game or not hasattr(child, 'cover'):
                     continue
 
-                game = child.game
-                surface = self.get_cover_paintable(game, zoom_width, zoom_height)
-                child.cover.set_paintable(surface)
+                if getattr(child, "cover_loaded", False):
+                    child.cover.set_paintable(self.get_cover_paintable(child.game, zoom_width, zoom_height))
+                else:
+                    child.cover.set_paintable(self.get_cover_placeholder(zoom_width, zoom_height))
 
             return True
 
@@ -4227,10 +4240,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         child.anim_box = anim_box
 
         if self.interface_mode == "List":
-            surface = self.get_game_artwork(game, 40, 40)
-            image = new_icon(surface)
+            image = Gtk.Image()
+            image.set_pixel_size(40)
+            image.set_size_request(40, 40)
 
             child.image = image
+            child.cover_loaded = False
 
             image.set_margin_start(10)
             image.set_margin_end(10)
@@ -4258,10 +4273,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             block_size = 100
 
-            surface = self.get_game_artwork(game, block_size, block_size)
-            image = new_icon(surface)
+            image = Gtk.Image()
+            image.set_pixel_size(block_size)
+            image.set_size_request(block_size, block_size)
 
             child.image = image
+            child.cover_loaded = False
 
             image.set_margin_top(10)
             game_label.set_margin_top(10)
@@ -4299,7 +4316,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             zoom_width, zoom_height = self.cover_dimensions(zoom_pct)
 
-            self.set_cover_async(image2, game, zoom_width, zoom_height)
+            image2.set_paintable(self.get_cover_placeholder(zoom_width, zoom_height))
+            child.cover_loaded = False
 
             hbox.append(image2)
 
@@ -4334,6 +4352,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def update_game_visual(self, flowbox_child):
         game = flowbox_child.game
 
+        flowbox_child.cover_loaded = True
+        self.loaded_covers.add(flowbox_child)
+
         if hasattr(flowbox_child, "image"):
             size = 40 if self.interface_mode == "List" else 100
             flowbox_child.image.set_from_paintable(self.get_game_artwork(game, size, size))
@@ -4343,54 +4364,178 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             surface = self.get_cover_paintable(game, zoom_width, zoom_height)
             flowbox_child.cover.set_paintable(surface)
+            self.schedule_cover_refresh()
 
     def cover_dimensions(self, zoom_pct):
         zoom_width = int(230 * (zoom_pct / 100.0))
         return zoom_width, int(zoom_width * 1.5)
 
-    def get_game_artwork(self, game, width, height):
+    def icon_cache_key(self, game, width, height):
         path = game.icon if os.path.isfile(game.icon) else FAUGUS_PNG
-        installed = self.is_game_installed(game)
-
-        if not hasattr(self, '_icon_texture_cache'):
-            self._icon_texture_cache = {}
-
         try:
             mtime = os.path.getmtime(path)
         except OSError:
             mtime = None
+        return (path, mtime, width, height, self.is_game_installed(game), self.cover_scale())
 
-        cache_key = (path, mtime, width, height, installed)
+    def build_icon_texture(self, cache_key):
+        path, mtime, width, height, installed, scale = cache_key
+        pixbuf = load_downscaled_pixbuf(path, width * scale, height * scale) or safe_load_pixbuf(path, width * scale, height * scale, False)
+        if not installed:
+            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+        return Gdk.Texture.new_for_pixbuf(pixbuf)
+
+    def store_icon_texture(self, cache_key, texture):
+        for key in [k for k in self._icon_texture_cache if k[0] == cache_key[0] and k[2:4] == cache_key[2:4] and k[5] == cache_key[5]]:
+            del self._icon_texture_cache[key]
+        self._icon_texture_cache[cache_key] = texture
+
+    def get_game_artwork(self, game, width, height):
+        if not hasattr(self, '_icon_texture_cache'):
+            self._icon_texture_cache = {}
+
+        cache_key = self.icon_cache_key(game, width, height)
         texture = self._icon_texture_cache.get(cache_key)
         if texture is None:
-            for key in [k for k in self._icon_texture_cache if k[0] == path and k[2:4] == (width, height)]:
-                del self._icon_texture_cache[key]
-
-            pixbuf = safe_load_pixbuf(path, width * HIDPI_SCALE, height * HIDPI_SCALE, False)
-            if not installed:
-                pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-
-            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
-            self._icon_texture_cache[cache_key] = texture
+            texture = self.build_icon_texture(cache_key)
+            self.store_icon_texture(cache_key, texture)
 
         return HiDpiPaintable(texture, width, height)
+
+    def set_icon_async(self, child, size):
+        if not hasattr(self, '_icon_texture_cache'):
+            self._icon_texture_cache = {}
+
+        cache_key = self.icon_cache_key(child.game, size, size)
+
+        def apply(texture):
+            if getattr(child, "cover_loaded", False) and child.get_parent() is not None:
+                child.image.set_from_paintable(HiDpiPaintable(texture, size, size))
+
+        texture = self._icon_texture_cache.get(cache_key)
+        if texture is not None:
+            apply(texture)
+            return
+
+        def finish(texture):
+            if texture is not None:
+                self.store_icon_texture(cache_key, texture)
+                apply(texture)
+                self.schedule_cover_refresh()
+            return False
+
+        def work():
+            try:
+                texture = self.build_icon_texture(cache_key)
+            except GLib.Error:
+                texture = None
+            GLib.idle_add(finish, texture)
+
+        _cover_executor.submit(work)
+
+    def cover_scale(self):
+        return max(1, self.get_scale_factor())
+
+    def on_cover_scale_changed(self, widget, pspec):
+        if getattr(self, "flowbox", None) is None:
+            return
+        for child in list(self.loaded_covers):
+            self.unload_cover(child)
+        self.schedule_cover_refresh()
+
+    def schedule_cover_refresh(self, restart=True):
+        now = GLib.get_monotonic_time()
+        if self.cover_refresh_source is not None:
+            if not restart or now - self.cover_refresh_started > 400000:
+                return
+            GLib.source_remove(self.cover_refresh_source)
+        else:
+            self.cover_refresh_started = now
+        self.cover_refresh_source = GLib.timeout_add(100, self.refresh_visible_covers)
+
+    def unload_cover(self, child):
+        self.loaded_covers.discard(child)
+        child.cover_loaded = False
+        if getattr(child, "cover", None) is not None:
+            width, height = self.cover_dimensions(self.cover_size)
+            child.cover.set_paintable(self.get_cover_placeholder(width, height))
+        elif getattr(child, "image", None) is not None:
+            child.image.set_from_paintable(None)
+
+    def children_near_viewport(self, scroll_box, horizontal, view):
+        near = set()
+        for child in self.flowbox:
+            if not child.get_child_visible() or child.get_height() <= 0:
+                continue
+            ok, bounds = child.compute_bounds(scroll_box)
+            if not ok:
+                continue
+            start, size = (bounds.origin.x, bounds.size.width) if horizontal else (bounds.origin.y, bounds.size.height)
+            if start + size >= -view and start <= 2 * view:
+                near.add(child)
+        return near
+
+    def refresh_visible_covers(self):
+        self.cover_refresh_source = None
+        scroll_box = getattr(self, "scroll_box", None)
+        mode = self.interface_mode
+        if mode not in ("Covers", "Grid", "List") or scroll_box is None or not self.get_realized():
+            return False
+
+        horizontal = scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
+        view = scroll_box.get_width() if horizontal else scroll_box.get_height()
+        if view <= 0:
+            return False
+
+        near = self.children_near_viewport(scroll_box, horizontal, view)
+
+        icon_size = 40 if mode == "List" else 100
+        width, height = self.cover_dimensions(self.cover_size)
+        near_paths = set()
+        for child in near:
+            if getattr(child, "game", None) is None or getattr(child, "cover_loaded", None) is None:
+                continue
+            game = child.game
+            near_paths.add(game.cover if mode == "Covers" else (game.icon if os.path.isfile(game.icon) else FAUGUS_PNG))
+            if child.cover_loaded:
+                continue
+            child.cover_loaded = True
+            self.loaded_covers.add(child)
+            if mode == "Covers":
+                self.set_cover_async(child.cover, game, width, height)
+            else:
+                self.set_icon_async(child, icon_size)
+
+        for child in [c for c in self.loaded_covers if c not in near or c.get_parent() is None]:
+            self.unload_cover(child)
+
+        cache = getattr(self, "_cover_texture_cache" if mode == "Covers" else "_icon_texture_cache", {})
+        limit = len(near_paths) * 2 + 64
+        for key in [key for key in cache if key[0] not in near_paths]:
+            if len(cache) <= limit:
+                break
+            del cache[key]
+        return False
 
     def cover_cache_key(self, path, installed):
         try:
             mtime = os.path.getmtime(path)
         except OSError:
             mtime = None
-        return (path, mtime, installed)
+        return (path, mtime, installed, self.cover_scale())
 
-    def build_cover_texture(self, path, installed):
+    def build_cover_texture(self, path, installed, scale):
         max_width, max_height = self.cover_dimensions(100)
-        max_width *= HIDPI_SCALE
-        max_height *= HIDPI_SCALE
-        pixbuf = safe_load_pixbuf(path, None, None, False)
-        width, height = pixbuf.get_width(), pixbuf.get_height()
+        max_width *= scale
+        max_height *= scale
+        info = GdkPixbuf.Pixbuf.get_file_info(path)
+        width, height = (info[1], info[2]) if info and info[0] is not None else (0, 0)
         if width > max_width or height > max_height:
             ratio = min(max_width / width, max_height / height)
-            pixbuf = pixbuf.scale_simple(max(1, int(width * ratio)), max(1, int(height * ratio)), GdkPixbuf.InterpType.BILINEAR)
+            target = (max(1, int(width * ratio)), max(1, int(height * ratio)))
+            pixbuf = load_downscaled_pixbuf(path, *target) or safe_load_pixbuf(path, *target, False)
+        else:
+            pixbuf = safe_load_pixbuf(path, None, None, False)
         if not installed:
             pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
 
@@ -4410,7 +4555,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if texture is not None:
             return texture
 
-        texture = self.build_cover_texture(path, installed)
+        texture = self.build_cover_texture(path, installed, cache_key[3])
         self.store_cover_texture(cache_key, texture)
         return texture
 
@@ -4438,11 +4583,12 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 self.store_cover_texture(cache_key, texture)
                 for callback in callbacks:
                     callback(texture)
+                self.schedule_cover_refresh()
             return False
 
         def work():
             try:
-                texture = self.build_cover_texture(path, installed)
+                texture = self.build_cover_texture(path, installed, cache_key[3])
             except GLib.Error:
                 texture = None
             GLib.idle_add(finish, texture)
@@ -4453,10 +4599,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         n = len(games)
         if not n:
             return
+        window_paths = set()
         for offset in range(-7, 8):
             game = games[(self.carrousel_index + offset) % n]
+            window_paths.add(game.cover)
             if os.path.isfile(game.cover):
                 self.load_cover_texture_async(game.cover, self.is_game_installed(game), lambda texture: None)
+
+        cache = getattr(self, "_cover_texture_cache", {})
+        for key in [key for key in cache if key[0] not in window_paths]:
+            if len(cache) <= 40:
+                break
+            del cache[key]
 
     def set_cover_async(self, picture, game, width, height):
         picture.set_paintable(self.get_cover_placeholder(width, height))
@@ -4473,11 +4627,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         rgb = self.get_accent_rgb()
         if not hasattr(self, '_cover_placeholders'):
             self._cover_placeholders = {}
-        key = (width, height, tuple(rgb))
+        key = (width, height, tuple(rgb), self.cover_scale())
         placeholder = self._cover_placeholders.get(key)
         if placeholder is None:
             self._cover_placeholders.clear()
-            placeholder = create_accent_placeholder_paintable(width, height, rgb=rgb)
+            placeholder = create_accent_placeholder_paintable(width, height, rgb=rgb, scale=self.cover_scale())
             self._cover_placeholders[key] = placeholder
         return placeholder
 
