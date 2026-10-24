@@ -1407,6 +1407,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         scroll_box.set_margin_end(10)
         scroll_box.set_hexpand(True)
 
+        vadjustment = scroll_box.get_vadjustment()
+        last_page_size = [vadjustment.get_page_size()]
+
+        def on_scroll_page_size_changed(adjustment, pspec):
+            page_size = adjustment.get_page_size()
+            delta = last_page_size[0] - page_size
+            last_page_size[0] = page_size
+            animating = {
+                wrapper.auto_hide[2] for wrapper in getattr(self, "auto_hide_wrappers", [])
+                if wrapper.auto_hide[0].get_reveal_child() != wrapper.auto_hide[0].get_child_revealed()
+            }
+            if self.auto_hide_enabled and animating == {"bottom"}:
+                adjustment.set_value(adjustment.get_value() + delta)
+
+        vadjustment.connect("notify::page-size", on_scroll_page_size_changed)
+
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.flowbox.connect("keynav-failed", self.on_flowbox_keynav_failed)
