@@ -173,7 +173,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 box-shadow: 0 6px 14px alpha(black, 0.65),
                             0 0 8px 2px alpha(@theme_selected_bg_color, 0),
                             0 0 30px 10px alpha(@theme_selected_bg_color, 0);
-                transition: transform 150ms steps(32, end), box-shadow 150ms, background-color 150ms;
+                transition: transform 150ms steps(30, end), box-shadow 150ms, background-color 150ms;
             }
             entry.flowbox-entry.cover-container .game {
                 border: none;
@@ -2097,7 +2097,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 f"0 0 30px 10px alpha(@theme_selected_bg_color, {glow_t * 0.5:.3f})"
             )
         sliding = self._carrousel_anim_id is not None
-        transition = "background-color 150ms" if sliding else "transform 150ms steps(32, end), background-color 150ms"
+        transition = "background-color 150ms" if sliding else "transform 150ms steps(30, end), background-color 150ms"
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
