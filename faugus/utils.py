@@ -1330,6 +1330,22 @@ def choose_shortcut_icon(obj):
     filechooser.present()
 
 
+BANNER_RATIO = 1920 / 620
+
+
+def keep_banner_ratio(source, target):
+    state = {"width": -1}
+
+    def on_tick(widget, frame_clock):
+        width = widget.get_width()
+        if width > 0 and width != state["width"]:
+            state["width"] = width
+            target.set_size_request(-1, int(width / BANNER_RATIO))
+        return True
+
+    source.add_tick_callback(on_tick)
+
+
 _css_providers = {}
 _css_data = {}
 
@@ -2572,7 +2588,7 @@ def show_steamgriddb_picker(obj, category):
         "banner": _("Choose a banner"),
         "icon": _("Choose an icon"),
     }
-    ratios = {"cover": 600 / 900, "banner": 1920 / 620, "icon": 1.0}
+    ratios = {"cover": 600 / 900, "banner": BANNER_RATIO, "icon": 1.0}
     keys = {"cover": "grids", "banner": "heroes", "icon": "icons"}
 
     dialog = Gtk.Dialog(title=titles.get(category), transient_for=obj)
