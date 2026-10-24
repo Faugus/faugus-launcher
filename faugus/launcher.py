@@ -2097,7 +2097,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 f"0 0 30px 10px alpha(@theme_selected_bg_color, {glow_t * 0.5:.3f})"
             )
         sliding = self._carrousel_anim_id is not None
-        transition = "background-color 150ms" if sliding else "transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 150ms"
+        transition = "background-color 150ms" if sliding else "transform 150ms steps(32, end), background-color 150ms"
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
