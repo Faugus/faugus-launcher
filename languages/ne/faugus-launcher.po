@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 11:39+0000\n"
+"POT-Creation-Date: 2026-10-24 14:33+0000\n"
 "PO-Revision-Date: 2026-08-29 01:18+0000\n"
 "Last-Translator: GitHub webhook <noreply-webhook-github-"
 "integration@weblate.org>\n"
@@ -28,7 +28,7 @@ msgstr ""
 msgid "Game"
 msgstr ""
 
-#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7473
+#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7797
 msgid "Prefix"
 msgstr ""
 
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Total:"
 msgstr ""
 
-#: faugus/backup.py:309 faugus/launcher.py:7588 faugus/launcher.py:7727
+#: faugus/backup.py:309 faugus/launcher.py:7912 faugus/launcher.py:8051
 msgid "Game/App"
 msgstr ""
 
@@ -57,8 +57,8 @@ msgstr "ब्याकअपको सेटिङ"
 msgid "Proton"
 msgstr ""
 
-#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7428
-#: faugus/utils.py:2002
+#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7751
+#: faugus/utils.py:2028
 msgid "Path"
 msgstr ""
 
@@ -114,22 +114,22 @@ msgstr "शनिबार"
 msgid "Sunday"
 msgstr "आइतबार"
 
-#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:5822
-#: faugus/launcher.py:6975 faugus/launcher.py:7025 faugus/launcher.py:7112
-#: faugus/launcher.py:7565 faugus/launcher.py:8073 faugus/proton_manager.py:254
-#: faugus/proton_manager.py:361 faugus/shortcut.py:84 faugus/utils.py:526
+#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:6108
+#: faugus/launcher.py:7298 faugus/launcher.py:7348 faugus/launcher.py:7435
+#: faugus/launcher.py:7889 faugus/launcher.py:8387 faugus/proton_manager.py:254
+#: faugus/proton_manager.py:361 faugus/shortcut.py:83 faugus/utils.py:526
 #: faugus/utils.py:640 faugus/utils.py:651
 msgid "Cancel"
 msgstr "रद्द गर्नुहोस्"
 
 #: faugus/backup.py:748 faugus/backup.py:1043 faugus/backup.py:1229
-#: faugus/launcher.py:5826 faugus/launcher.py:6732 faugus/launcher.py:7029
-#: faugus/launcher.py:7116 faugus/launcher.py:7569 faugus/launcher.py:8069
-#: faugus/shortcut.py:88 faugus/utils.py:530 faugus/utils.py:1217
+#: faugus/launcher.py:6112 faugus/launcher.py:7051 faugus/launcher.py:7352
+#: faugus/launcher.py:7439 faugus/launcher.py:7893 faugus/launcher.py:8383
+#: faugus/shortcut.py:87 faugus/utils.py:530 faugus/utils.py:1217
 msgid "Ok"
 msgstr "ठीक छ"
 
-#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8571
+#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8885
 msgid "Disabled"
 msgstr ""
 
@@ -191,17 +191,17 @@ msgstr ""
 msgid "Failed to restore backup:"
 msgstr "प्रिफिक्स हटाउन सकिएन"
 
-#: faugus/backup.py:1239 faugus/launcher.py:6720
+#: faugus/backup.py:1239 faugus/launcher.py:7039
 msgid "Are you sure you want to overwrite the settings?"
 msgstr ""
 
-#: faugus/backup.py:1241 faugus/launcher.py:4873 faugus/launcher.py:6732
-#: faugus/launcher.py:7183
+#: faugus/backup.py:1241 faugus/launcher.py:5150 faugus/launcher.py:7051
+#: faugus/launcher.py:7506
 msgid "Yes"
 msgstr ""
 
-#: faugus/backup.py:1242 faugus/launcher.py:4874 faugus/launcher.py:6733
-#: faugus/launcher.py:7179
+#: faugus/backup.py:1242 faugus/launcher.py:5151 faugus/launcher.py:7052
+#: faugus/launcher.py:7502
 msgid "No"
 msgstr ""
 
@@ -235,922 +235,926 @@ msgstr "अहिल्यै ब्याकअप गर्नुहोस्"
 msgid "Backup failed."
 msgstr "अहिल्यै ब्याकअप गर्नुहोस्"
 
-#: faugus/launcher.py:1102 faugus/launcher.py:1295 faugus/launcher.py:1757
-#: faugus/launcher.py:2369 faugus/launcher.py:2505 faugus/launcher.py:2562
-#: faugus/launcher.py:2609 faugus/launcher.py:2631
+#: faugus/launcher.py:1098 faugus/launcher.py:1291 faugus/launcher.py:1671
+#: faugus/launcher.py:2288 faugus/launcher.py:2424 faugus/launcher.py:2481
+#: faugus/launcher.py:2528 faugus/launcher.py:2550
 msgid "All"
 msgstr "सबै"
 
-#: faugus/launcher.py:1104 faugus/launcher.py:1297 faugus/launcher.py:1750
-#: faugus/launcher.py:2369 faugus/launcher.py:2505 faugus/launcher.py:2562
+#: faugus/launcher.py:1100 faugus/launcher.py:1293 faugus/launcher.py:1664
+#: faugus/launcher.py:2288 faugus/launcher.py:2424 faugus/launcher.py:2481
 msgid "Uncategorized"
 msgstr "श्रेणीविहीन"
 
-#: faugus/launcher.py:1267
+#: faugus/launcher.py:1263
 msgid "Kill all running games"
 msgstr "चलिरहेका सबै खेलहरू बन्द गर्नुहोस्"
 
-#: faugus/launcher.py:1272
+#: faugus/launcher.py:1268
 msgid "Search..."
 msgstr "खोज..."
 
-#: faugus/launcher.py:1282
+#: faugus/launcher.py:1278
 msgid "Alphabetical"
 msgstr "वर्णानुक्रमिक"
 
-#: faugus/launcher.py:1283
+#: faugus/launcher.py:1279
 msgid "Playtime"
 msgstr "खेल समय"
 
-#: faugus/launcher.py:1284
+#: faugus/launcher.py:1280
 msgid "Last played"
 msgstr "अन्तिम पटक खेलेको"
 
-#: faugus/launcher.py:1285 faugus/launcher.py:5593 faugus/launcher.py:5605
-#: faugus/launcher.py:5641 faugus/launcher.py:6949
+#: faugus/launcher.py:1281 faugus/launcher.py:5876 faugus/launcher.py:5888
+#: faugus/launcher.py:5925 faugus/launcher.py:7272
 msgid "Custom"
 msgstr "अनुकूलित"
 
-#: faugus/launcher.py:1751 faugus/launcher.py:1752 faugus/launcher.py:2505
-#: faugus/launcher.py:2562 faugus/launcher.py:2608 faugus/launcher.py:2821
-#: faugus/launcher.py:2832 faugus/launcher.py:3361
+#: faugus/launcher.py:1665 faugus/launcher.py:1666 faugus/launcher.py:2424
+#: faugus/launcher.py:2481 faugus/launcher.py:2527 faugus/launcher.py:2740
+#: faugus/launcher.py:2751 faugus/launcher.py:3538
 msgid "None"
 msgstr "कुनै पनि छैन"
 
-#: faugus/launcher.py:2391
+#: faugus/launcher.py:2310
 msgid "Manage categories..."
 msgstr "श्रेणीहरूको व्यवस्थापन..."
 
-#: faugus/launcher.py:2423
+#: faugus/launcher.py:2342
 msgid "Manage Categories"
 msgstr "श्रेणीहरूको व्यवस्थापन"
 
-#: faugus/launcher.py:2469
+#: faugus/launcher.py:2388
 msgid "Add"
 msgstr "थप्नुहोस्"
 
-#: faugus/launcher.py:2470 faugus/launcher.py:2866
+#: faugus/launcher.py:2389 faugus/launcher.py:2785
 msgid "Edit"
 msgstr "सम्पादन"
 
-#: faugus/launcher.py:2471 faugus/launcher.py:7717 faugus/proton_manager.py:212
+#: faugus/launcher.py:2390 faugus/launcher.py:8041 faugus/proton_manager.py:212
 #: faugus/proton_manager.py:230 faugus/proton_manager.py:274
 #: faugus/proton_manager.py:303 faugus/proton_manager.py:392
 msgid "Remove"
 msgstr "हटाउनुहोस्"
 
-#: faugus/launcher.py:2709
+#: faugus/launcher.py:2628
 msgid "Shut down"
 msgstr "सट डाउन"
 
-#: faugus/launcher.py:2712
+#: faugus/launcher.py:2631
 msgid "Reboot"
 msgstr "पुनः सुरु गर्नुहोस्"
 
-#: faugus/launcher.py:2715
+#: faugus/launcher.py:2634
 msgid "Close"
 msgstr "बन्द गर्नुहोस्"
 
-#: faugus/launcher.py:2768 faugus/launcher.py:3248
+#: faugus/launcher.py:2687 faugus/launcher.py:3425
 #, fuzzy
 #| msgid "Playtime"
 msgid "Playtime: {}"
 msgstr "खेल समय"
 
-#: faugus/launcher.py:2776 faugus/launcher.py:3261
+#: faugus/launcher.py:2695 faugus/launcher.py:3438
 #, fuzzy
 #| msgid "Playtime"
 msgid "Playing for: {}"
 msgstr "खेल समय"
 
-#: faugus/launcher.py:2781 faugus/launcher.py:3269
+#: faugus/launcher.py:2700 faugus/launcher.py:3446
 #, fuzzy
 #| msgid "Last played"
 msgid "Last played: {}"
 msgstr "अन्तिम पटक खेलेको"
 
-#: faugus/launcher.py:2782 faugus/launcher.py:3270
+#: faugus/launcher.py:2701 faugus/launcher.py:3447
 #, fuzzy
 #| msgid "Last played"
 msgid "Never played"
 msgstr "अन्तिम पटक खेलेको"
 
-#: faugus/launcher.py:2810
+#: faugus/launcher.py:2729
 msgid "Remove from hidden"
 msgstr "लुकेको सूचीबाट हटाउनुहोस्"
 
-#: faugus/launcher.py:2810
+#: faugus/launcher.py:2729
 msgid "Hide"
 msgstr "लुकाउनुहोस्"
 
-#: faugus/launcher.py:2813
+#: faugus/launcher.py:2732
 msgid "Stop"
 msgstr "रोक्नुहोस्"
 
-#: faugus/launcher.py:2815
+#: faugus/launcher.py:2734
 msgid "Play with logs"
 msgstr ""
 
-#: faugus/launcher.py:2817
+#: faugus/launcher.py:2736
 msgid "Play"
 msgstr "खेल्नुहोस्"
 
-#: faugus/launcher.py:2867
+#: faugus/launcher.py:2786
 msgid "Delete"
 msgstr "मेटाउनुहोस्"
 
-#: faugus/launcher.py:2870
+#: faugus/launcher.py:2789
 msgid "Duplicate"
 msgstr "प्रतिलिपि बनाउनुहोस्"
 
-#: faugus/launcher.py:2873
+#: faugus/launcher.py:2792
 msgid "Category"
 msgstr "श्रेणी"
 
-#: faugus/launcher.py:2875
+#: faugus/launcher.py:2794
 msgid "Open game location"
 msgstr "खेलको फोल्डर खोल्नुहोस्"
 
-#: faugus/launcher.py:2878
+#: faugus/launcher.py:2797
 msgid "Open prefix location"
 msgstr "प्रिफिक्स फोल्डर खोल्नुहोस्"
 
-#: faugus/launcher.py:2881
+#: faugus/launcher.py:2800
 msgid "Show logs"
 msgstr "लग देखाउनुहोस्"
 
-#: faugus/launcher.py:2888
+#: faugus/launcher.py:2807
 msgid "Run file in the prefix"
 msgstr "प्रिफिक्समा फाइल चलाउनुहोस्"
 
-#: faugus/launcher.py:2902
+#: faugus/launcher.py:2821
 msgid "Clear recent"
 msgstr ""
 
-#: faugus/launcher.py:2905 faugus/launcher.py:2954
+#: faugus/launcher.py:2824 faugus/launcher.py:2873
 msgid "Recent"
 msgstr ""
 
-#: faugus/launcher.py:3021
+#: faugus/launcher.py:2940
 #, fuzzy
 #| msgid "hour"
 msgid "{} hour"
 msgstr "घण्टा"
 
-#: faugus/launcher.py:3021
+#: faugus/launcher.py:2940
 #, fuzzy
 #| msgid "hours"
 msgid "{} hours"
 msgstr "घण्टा"
 
-#: faugus/launcher.py:3024
+#: faugus/launcher.py:2943
 #, fuzzy
 #| msgid "minute"
 msgid "{} minute"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3024
+#: faugus/launcher.py:2943
 #, fuzzy
 #| msgid "minutes"
 msgid "{} minutes"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3031 faugus/launcher.py:3048
+#: faugus/launcher.py:2950 faugus/launcher.py:2967
 msgid "Less than a minute"
 msgstr ""
 
-#: faugus/launcher.py:3080
+#: faugus/launcher.py:2999
 msgid "Just now"
 msgstr ""
 
-#: faugus/launcher.py:3085
+#: faugus/launcher.py:3004
 #, fuzzy
 #| msgid "minute"
 msgid "A minute ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3086
+#: faugus/launcher.py:3005
 #, fuzzy
 #| msgid "minute"
 msgid "{} minutes ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3091
+#: faugus/launcher.py:3010
 msgid "An hour ago"
 msgstr ""
 
-#: faugus/launcher.py:3092
+#: faugus/launcher.py:3011
 msgid "{} hours ago"
 msgstr ""
 
-#: faugus/launcher.py:3097
+#: faugus/launcher.py:3016
 msgid "Yesterday"
 msgstr ""
 
-#: faugus/launcher.py:3098
+#: faugus/launcher.py:3017
 msgid "{} days ago"
 msgstr ""
 
-#: faugus/launcher.py:3103
+#: faugus/launcher.py:3022
 #, fuzzy
 #| msgid "minute"
 msgid "A week ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3104
+#: faugus/launcher.py:3023
 msgid "{} weeks ago"
 msgstr ""
 
-#: faugus/launcher.py:3109
+#: faugus/launcher.py:3028
 #, fuzzy
 #| msgid "minute"
 msgid "A month ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3110
+#: faugus/launcher.py:3029
 #, fuzzy
 #| msgid "minute"
 msgid "{} months ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3114
+#: faugus/launcher.py:3033
 #, fuzzy
 #| msgid "minute"
 msgid "A year ago"
 msgstr "मिनेट"
 
-#: faugus/launcher.py:3115
+#: faugus/launcher.py:3034
 msgid "{} years ago"
 msgstr ""
 
-#: faugus/launcher.py:3458 faugus/launcher.py:6583 faugus/launcher.py:8605
+#: faugus/launcher.py:3635 faugus/launcher.py:6902 faugus/launcher.py:8919
 msgid "Select a file to run in the prefix"
 msgstr "प्रिफिक्सभित्र चलाउन फाइल छान्नुहोस्"
 
-#: faugus/launcher.py:3502
+#: faugus/launcher.py:3679
 #, python-format
 msgid "%s Logs"
 msgstr "%s लग"
 
-#: faugus/launcher.py:3578
+#: faugus/launcher.py:3755
 msgid "Copy to clipboard"
 msgstr "क्लिपबोर्डमा कपी गर्नुहोस्"
 
-#: faugus/launcher.py:3582
+#: faugus/launcher.py:3759
 msgid "Open file location"
 msgstr "फाइल रहेको स्थान खोल्नुहोस्"
 
-#: faugus/launcher.py:3629 faugus/launcher.py:4702
+#: faugus/launcher.py:3806 faugus/launcher.py:4979
 #, python-format
 msgid "%s already exists"
 msgstr "%s पहिले नै अवस्थित छ"
 
-#: faugus/launcher.py:3737 faugus/launcher.py:4548
+#: faugus/launcher.py:3914 faugus/launcher.py:4825
 #, python-format
 msgid "%s is running"
 msgstr "%s चलिरहेको छ"
 
-#: faugus/launcher.py:4485
+#: faugus/launcher.py:4762
 #, python-format
 msgid "Edit %s"
 msgstr "%s सम्पादन गर्नुहोस्"
 
-#: faugus/launcher.py:4604
+#: faugus/launcher.py:4881
 msgid "Failed to remove prefix"
 msgstr "प्रिफिक्स हटाउन सकिएन"
 
-#: faugus/launcher.py:4825
+#: faugus/launcher.py:5102
 msgid "No internet connection"
 msgstr "इन्टरनेट कनेक्सन छैन"
 
-#: faugus/launcher.py:4859
+#: faugus/launcher.py:5136
 msgid "Do you want to discard these prefixes?"
 msgstr ""
 
-#: faugus/launcher.py:4860
+#: faugus/launcher.py:5137
 msgid "Do you want to discard this prefix?"
 msgstr ""
 
-#: faugus/launcher.py:4931 faugus/runner.py:626
+#: faugus/launcher.py:5208 faugus/runner.py:685 faugus/runner.py:692
 msgid "Downloading"
 msgstr "डाउनलोड हुँदैछ"
 
-#: faugus/launcher.py:5003
+#: faugus/launcher.py:5280
 #, python-format
 msgid "%s was not installed!"
 msgstr "%s इन्स्टल भएन!"
 
-#: faugus/launcher.py:5046
+#: faugus/launcher.py:5328
 msgid "Download complete"
 msgstr "डाउनलोड सम्पन्न भयो"
 
-#: faugus/launcher.py:5049
+#: faugus/launcher.py:5331
 #, python-format
 msgid "Error during download: %s"
 msgstr "डाउनलोडको क्रममा त्रुटि: %s"
 
-#: faugus/launcher.py:5052
+#: faugus/launcher.py:5334
 #, python-format
 msgid "Installing %s..."
 msgstr "%s इन्स्टल हुँदैछ..."
 
-#: faugus/launcher.py:5054 faugus/launcher.py:5057 faugus/launcher.py:5060
-#: faugus/launcher.py:5075
+#: faugus/launcher.py:5336 faugus/launcher.py:5339 faugus/launcher.py:5342
+#: faugus/launcher.py:5357
 msgid "Please close the login window and wait."
 msgstr "कृपया लगइन विन्डो बन्द गर्नुहोस् र पर्खनुहोस्।"
 
-#: faugus/launcher.py:5074
+#: faugus/launcher.py:5356
 msgid "Please don't change the installation path."
 msgstr "कृपया इन्स्टलेसन मार्ग परिवर्तन नगर्नुहोस्।"
 
-#: faugus/launcher.py:5081
+#: faugus/launcher.py:5363
 msgid "Please close Wargaming to finish the installation."
 msgstr "न्स्टलेसन पूरा गर्न कृपया Wargaming बन्द गर्नुहोस्।"
 
-#: faugus/launcher.py:5454
+#: faugus/launcher.py:5737
 msgid "Settings"
 msgstr "सेटिङ"
 
-#: faugus/launcher.py:5574
+#: faugus/launcher.py:5857
 msgid "Language"
 msgstr "भाषा"
 
-#: faugus/launcher.py:5578
+#: faugus/launcher.py:5861
 msgid "Interface Mode"
 msgstr ""
 
-#: faugus/launcher.py:5582
+#: faugus/launcher.py:5865
 msgid "List"
 msgstr "सूची"
 
-#: faugus/launcher.py:5583
+#: faugus/launcher.py:5866
 msgid "Grid"
 msgstr "ग्रिड"
 
-#: faugus/launcher.py:5584
+#: faugus/launcher.py:5867
 msgid "Covers"
 msgstr "कभरहरू"
 
-#: faugus/launcher.py:5585
+#: faugus/launcher.py:5868
 msgid "Carrousel"
 msgstr ""
 
-#: faugus/launcher.py:5587
+#: faugus/launcher.py:5870
 #, fuzzy
 #| msgid "Background"
 msgid "Background Color"
 msgstr "पृष्ठभूमि"
 
-#: faugus/launcher.py:5590 faugus/launcher.py:5602 faugus/launcher.py:5614
-#: faugus/launcher.py:5623 faugus/launcher.py:5632 faugus/launcher.py:5640
-#: faugus/launcher.py:5746 faugus/launcher.py:6946 faugus/launcher.py:8567
-#: faugus/utils.py:1598 faugus/utils.py:2209
+#: faugus/launcher.py:5873 faugus/launcher.py:5885 faugus/launcher.py:5897
+#: faugus/launcher.py:5907 faugus/launcher.py:5916 faugus/launcher.py:5924
+#: faugus/launcher.py:6032 faugus/launcher.py:7269 faugus/launcher.py:8881
+#: faugus/utils.py:1624 faugus/utils.py:2235
 msgid "Default"
 msgstr "पूर्वनिर्धारित"
 
-#: faugus/launcher.py:5591 faugus/launcher.py:5603 faugus/launcher.py:5615
+#: faugus/launcher.py:5874 faugus/launcher.py:5886 faugus/launcher.py:5898
 msgid "Accent color"
 msgstr "मुख्य रङ"
 
-#: faugus/launcher.py:5592 faugus/launcher.py:5604
+#: faugus/launcher.py:5875 faugus/launcher.py:5887
 msgid "Dominant color"
 msgstr "प्रमुख रङ"
 
-#: faugus/launcher.py:5599
+#: faugus/launcher.py:5882
 msgid "Overview Color"
 msgstr ""
 
-#: faugus/launcher.py:5611
+#: faugus/launcher.py:5894
 #, fuzzy
 #| msgid "Accent Color"
 msgid "Widget Color"
 msgstr "विशेष रङ"
 
-#: faugus/launcher.py:5616
+#: faugus/launcher.py:5899
 #, fuzzy
 #| msgid "Dominant color"
 msgid "Solid color"
 msgstr "प्रमुख रङ"
 
-#: faugus/launcher.py:5618
+#: faugus/launcher.py:5902
 msgid "Banner"
 msgstr "ब्यानर"
 
-#: faugus/launcher.py:5620
+#: faugus/launcher.py:5904
 msgid "Theme"
 msgstr "थिम"
 
-#: faugus/launcher.py:5624
+#: faugus/launcher.py:5908
 msgid "System Theme"
 msgstr ""
 
-#: faugus/launcher.py:5629
+#: faugus/launcher.py:5913
 msgid "Color Scheme"
 msgstr ""
 
-#: faugus/launcher.py:5633
+#: faugus/launcher.py:5917
 msgid "Light"
 msgstr "उज्यालो"
 
-#: faugus/launcher.py:5634
+#: faugus/launcher.py:5918
 msgid "Dark"
 msgstr "गाढा"
 
-#: faugus/launcher.py:5637
+#: faugus/launcher.py:5921
 msgid "Accent Color"
 msgstr "विशेष रङ"
 
-#: faugus/launcher.py:5648
+#: faugus/launcher.py:5932
 msgid "Startup Window Size"
 msgstr "सुरुवाती विन्डो नाप"
 
-#: faugus/launcher.py:5652
+#: faugus/launcher.py:5936
 msgid "Default size"
 msgstr "पूर्वनिर्धारित नाप"
 
-#: faugus/launcher.py:5653
+#: faugus/launcher.py:5937
 msgid "Remember size"
 msgstr "नाप याद राख्नुहोस्"
 
-#: faugus/launcher.py:5654
+#: faugus/launcher.py:5938
 msgid "Maximized"
 msgstr "पूर्ण आकारमा"
 
-#: faugus/launcher.py:5655
+#: faugus/launcher.py:5939
 msgid "Fullscreen"
 msgstr "पूरै स्क्रिन"
 
-#: faugus/launcher.py:5656 faugus/launcher.py:6309
+#: faugus/launcher.py:5940 faugus/launcher.py:6604
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter थिचेर पूर्ण स्क्रिन अन वा अफ गर्न सकिन्छ"
 
-#: faugus/launcher.py:5658
+#: faugus/launcher.py:5942
 msgid "Labels"
 msgstr "लेबलहरू"
 
-#: faugus/launcher.py:5660
+#: faugus/launcher.py:5944
 msgid "Zoom"
 msgstr ""
 
-#: faugus/launcher.py:5663
+#: faugus/launcher.py:5947
+msgid "Auto-hide"
+msgstr ""
+
+#: faugus/launcher.py:5949
 msgid "Position"
 msgstr ""
 
-#: faugus/launcher.py:5666
+#: faugus/launcher.py:5952
 msgid "Top"
 msgstr ""
 
-#: faugus/launcher.py:5667
+#: faugus/launcher.py:5953
 msgid "Middle"
 msgstr ""
 
-#: faugus/launcher.py:5668
+#: faugus/launcher.py:5954
 msgid "Bottom"
 msgstr ""
 
-#: faugus/launcher.py:5670
+#: faugus/launcher.py:5956
 msgid "Orientation"
 msgstr ""
 
-#: faugus/launcher.py:5673
+#: faugus/launcher.py:5959
 #, fuzzy
 #| msgid "Alphabetical"
 msgid "Vertical"
 msgstr "वर्णानुक्रमिक"
 
-#: faugus/launcher.py:5674
+#: faugus/launcher.py:5960
 msgid "Horizontal"
 msgstr ""
 
-#: faugus/launcher.py:5676 faugus/launcher.py:5696
+#: faugus/launcher.py:5962 faugus/launcher.py:5982
 msgid "Maximum Columns"
 msgstr ""
 
-#: faugus/launcher.py:5694
+#: faugus/launcher.py:5980
 msgid "Maximum Rows"
 msgstr ""
 
-#: faugus/launcher.py:5700
+#: faugus/launcher.py:5986
 msgid "SteamGridDB"
 msgstr ""
 
-#: faugus/launcher.py:5704
+#: faugus/launcher.py:5990
 msgid "API Key"
 msgstr ""
 
-#: faugus/launcher.py:5711
+#: faugus/launcher.py:5997
 msgid "Default Prefixes Location"
 msgstr "पूर्वनिर्धारित प्रिफिक्सहरूको स्थान"
 
-#: faugus/launcher.py:5715
+#: faugus/launcher.py:6001
 msgid "The location where prefixes are created"
 msgstr "प्रिफिक्सहरू सिर्जना हुने स्थान"
 
-#: faugus/launcher.py:5724
+#: faugus/launcher.py:6010
 msgid "Default Prefix Tools"
 msgstr "पूर्वनिर्धारित प्रिफिक्स उपकरणहरू"
 
-#: faugus/launcher.py:5730
+#: faugus/launcher.py:6016
 msgid "Default Proton"
 msgstr "पूर्वनिर्धारित प्रोटोन"
 
-#: faugus/launcher.py:5734 faugus/proton_manager.py:66
+#: faugus/launcher.py:6020 faugus/proton_manager.py:66
 msgid "Proton Manager"
 msgstr "प्रोटोन व्यवस्थापक"
 
-#: faugus/launcher.py:5737
+#: faugus/launcher.py:6023
 msgid "Miscellaneous"
 msgstr "विविध"
 
-#: faugus/launcher.py:5740
+#: faugus/launcher.py:6026
 msgid "Display"
 msgstr ""
 
-#: faugus/launcher.py:5743
+#: faugus/launcher.py:6029
 msgid "GPU"
 msgstr ""
 
-#: faugus/launcher.py:5752
+#: faugus/launcher.py:6038
 msgid "Auto-close on launch"
 msgstr "सुरु हुँदा आफैँ बन्द होस्"
 
-#: faugus/launcher.py:5754
+#: faugus/launcher.py:6040
 msgid "Autostart"
 msgstr "आफैँ सुरु होस्"
 
-#: faugus/launcher.py:5756
+#: faugus/launcher.py:6042
 msgid "System tray icon"
 msgstr "सिस्टम ट्रे आइकन"
 
-#: faugus/launcher.py:5759
+#: faugus/launcher.py:6045
 msgid "Minimized startup"
 msgstr "मिनिमाइज गरेर सुरु होस्"
 
-#: faugus/launcher.py:5762
+#: faugus/launcher.py:6048
 msgid "Monochrome icon"
 msgstr "एकरङ्गी आइकन"
 
-#: faugus/launcher.py:5765
+#: faugus/launcher.py:6051
 msgid "Splash window"
 msgstr "सुरुवाती विन्डो"
 
-#: faugus/launcher.py:5768
+#: faugus/launcher.py:6054
 msgid "Automatic updates"
 msgstr "आफैँ अपडेट"
 
-#: faugus/launcher.py:5771
+#: faugus/launcher.py:6057
 msgid "Auto-create shortcuts"
 msgstr ""
 
-#: faugus/launcher.py:5773
+#: faugus/launcher.py:6059
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
 msgstr ""
 
-#: faugus/launcher.py:5776
+#: faugus/launcher.py:6062
 #, fuzzy
 #| msgid "Category"
 msgid "Categories"
 msgstr "श्रेणी"
 
-#: faugus/launcher.py:5778
+#: faugus/launcher.py:6064
 msgid "Sort"
 msgstr ""
 
-#: faugus/launcher.py:5780
+#: faugus/launcher.py:6066
 msgid "Header bar"
 msgstr ""
 
-#: faugus/launcher.py:5782
+#: faugus/launcher.py:6068
 msgid "Hidden games"
 msgstr "लुकेका खेलहरू"
 
-#: faugus/launcher.py:5783
+#: faugus/launcher.py:6069
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H ले लुकेका खेलहरू देखाउने वा लुकाउने गर्छ"
 
-#: faugus/launcher.py:5785
+#: faugus/launcher.py:6071
 msgid "Overview"
 msgstr ""
 
-#: faugus/launcher.py:5788
+#: faugus/launcher.py:6074
 msgid "Gamepad navigation"
 msgstr "गेमप्याड नेभिगेसन"
 
-#: faugus/launcher.py:5790
+#: faugus/launcher.py:6076
 msgid "Wayland driver (experimental)"
 msgstr "Wayland ड्राइभर (अस्थिर)"
 
-#: faugus/launcher.py:5792
+#: faugus/launcher.py:6078
 msgid "WOW64 (experimental)"
 msgstr "WOW64 (अस्थिर)"
 
-#: faugus/launcher.py:5802 faugus/launcher.py:7529
+#: faugus/launcher.py:6088 faugus/launcher.py:7853
 msgid "Run"
 msgstr "सुरु गर्नुहोस्"
 
-#: faugus/launcher.py:5805 faugus/launcher.py:7532
+#: faugus/launcher.py:6091 faugus/launcher.py:7856
 msgid "Run a file in the prefix"
 msgstr "प्रिफिक्समा फाइल चलाउनुहोस्"
 
-#: faugus/launcher.py:5809 faugus/launcher.py:7517 faugus/shortcut.py:80
+#: faugus/launcher.py:6095 faugus/launcher.py:7841 faugus/shortcut.py:79
 msgid "May fix gamepad issues with some games"
 msgstr "केही खेलहरूमा गेमप्याड समस्याहरू समाधान गर्न सक्छ"
 
-#: faugus/launcher.py:5810 faugus/launcher.py:7518 faugus/shortcut.py:81
+#: faugus/launcher.py:6096 faugus/launcher.py:7842 faugus/shortcut.py:80
 msgid "No Sleep"
 msgstr "स्लीप हुन नदिनुहोस्"
 
-#: faugus/launcher.py:5811 faugus/launcher.py:7519 faugus/shortcut.py:82
+#: faugus/launcher.py:6097 faugus/launcher.py:7843 faugus/shortcut.py:81
 msgid "Prevents the system from suspending while gaming"
 msgstr "खेल खेल्दा कम्प्युटरलाई सस्पेन्ड हुन दिँदैन"
 
-#: faugus/launcher.py:5813 faugus/launcher.py:6934
+#: faugus/launcher.py:6099 faugus/launcher.py:7257
 msgid "Interface Sounds"
 msgstr ""
 
-#: faugus/launcher.py:5816
+#: faugus/launcher.py:6102
 msgid "Support the Project"
 msgstr "परियोजनालाई सहयोग गर्नुहोस्"
 
-#: faugus/launcher.py:5831
+#: faugus/launcher.py:6117
 msgid "Backup/Restore Settings"
 msgstr "सेटिङहरूको ब्याकअप/पुनर्स्थापना"
 
-#: faugus/launcher.py:5835
+#: faugus/launcher.py:6121
 msgid "Backup"
 msgstr ""
 
-#: faugus/launcher.py:5838
+#: faugus/launcher.py:6124
 msgid "Restore"
 msgstr ""
 
-#: faugus/launcher.py:5845
+#: faugus/launcher.py:6131
 msgid "Global Environment Variables"
 msgstr ""
 
-#: faugus/launcher.py:6120
+#: faugus/launcher.py:6407
 msgid "General"
 msgstr ""
 
-#: faugus/launcher.py:6121
+#: faugus/launcher.py:6408
 msgid "Interface"
 msgstr ""
 
-#: faugus/launcher.py:6228
+#: faugus/launcher.py:6523
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr ""
 
-#: faugus/launcher.py:6231
+#: faugus/launcher.py:6526
 msgid "Clear Logs"
 msgstr ""
 
-#: faugus/launcher.py:6279
+#: faugus/launcher.py:6574
 msgid "Covers or Carrousel mode"
 msgstr ""
 
-#: faugus/launcher.py:6288
+#: faugus/launcher.py:6583
 msgid "Grid, Covers or Carrousel mode"
 msgstr ""
 
-#: faugus/launcher.py:6297
+#: faugus/launcher.py:6592
 msgid "Grid or Covers mode"
 msgstr ""
 
-#: faugus/launcher.py:6340
+#: faugus/launcher.py:6635
 msgid "Covers or Carrousel mode with SteamGridDB"
 msgstr ""
 
-#: faugus/launcher.py:6411
+#: faugus/launcher.py:6733
 msgid "Adwaita theme"
 msgstr ""
 
-#: faugus/launcher.py:6525
+#: faugus/launcher.py:6844
 msgid "Do you want to save the changes?"
 msgstr ""
 
-#: faugus/launcher.py:6635
+#: faugus/launcher.py:6954
 msgid "Select a backup file to restore"
 msgstr ""
 
-#: faugus/launcher.py:6641
+#: faugus/launcher.py:6960
 msgid "Faugus Backup files"
 msgstr ""
 
-#: faugus/launcher.py:6657 faugus/launcher.py:6696
+#: faugus/launcher.py:6976 faugus/launcher.py:7015
 msgid "This is not a valid Faugus backup file."
 msgstr ""
 
-#: faugus/launcher.py:6740 faugus/launcher.py:8912
+#: faugus/launcher.py:7059 faugus/launcher.py:9226
 msgid "Select a prefix location"
 msgstr ""
 
-#: faugus/launcher.py:6940 faugus/utils.py:1998 faugus/utils.py:2174
+#: faugus/launcher.py:7263 faugus/utils.py:2024 faugus/utils.py:2200
 msgid "Enable"
 msgstr ""
 
-#: faugus/launcher.py:6943
+#: faugus/launcher.py:7266
 msgid "Sound"
 msgstr ""
 
-#: faugus/launcher.py:6954
+#: faugus/launcher.py:7277
 msgid "Volume"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7298
 msgid "Navigate"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7298
 msgid "Confirm"
 msgstr ""
 
-#: faugus/launcher.py:6975
+#: faugus/launcher.py:7298
 msgid "Warning"
 msgstr ""
 
-#: faugus/launcher.py:6980
+#: faugus/launcher.py:7303
 msgid "Sound file"
 msgstr ""
 
-#: faugus/launcher.py:6992
+#: faugus/launcher.py:7315
 msgid "Preview"
 msgstr ""
 
-#: faugus/launcher.py:7075
+#: faugus/launcher.py:7398
 msgid "Select a sound file"
 msgstr ""
 
-#: faugus/launcher.py:7079
+#: faugus/launcher.py:7402
 msgid "Audio files"
 msgstr ""
 
-#: faugus/launcher.py:7099
+#: faugus/launcher.py:7422
 #, python-format
 msgid "Duplicate %s"
 msgstr ""
 
-#: faugus/launcher.py:7105 faugus/launcher.py:7363 faugus/launcher.py:7376
-#: faugus/shortcut.py:41
+#: faugus/launcher.py:7428 faugus/launcher.py:7686 faugus/launcher.py:7699
+#: faugus/shortcut.py:40
 msgid "Title"
 msgstr ""
 
-#: faugus/launcher.py:7154
+#: faugus/launcher.py:7477
 #, python-format
 msgid "Delete %s"
 msgstr ""
 
-#: faugus/launcher.py:7162
+#: faugus/launcher.py:7485
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr ""
 
-#: faugus/launcher.py:7171
+#: faugus/launcher.py:7494
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr ""
 
-#: faugus/launcher.py:7173
+#: faugus/launcher.py:7496
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr ""
 
-#: faugus/launcher.py:7187
+#: faugus/launcher.py:7510
 msgid "Also remove the prefix:"
 msgstr ""
 
-#: faugus/launcher.py:7225
+#: faugus/launcher.py:7548
 msgid "New Game/App"
 msgstr ""
 
-#: faugus/launcher.py:7343
+#: faugus/launcher.py:7666
 msgid "Steam User"
 msgstr ""
 
-#: faugus/launcher.py:7360 faugus/launcher.py:7873 faugus/launcher.py:7875
+#: faugus/launcher.py:7683 faugus/launcher.py:8187 faugus/launcher.py:8189
 msgid "No Steam users found"
 msgstr ""
 
-#: faugus/launcher.py:7432
+#: faugus/launcher.py:7755
 msgid "Path to the game executable"
 msgstr ""
 
-#: faugus/launcher.py:7448
+#: faugus/launcher.py:7772
 msgid "Select an executable"
 msgstr ""
 
-#: faugus/launcher.py:7449
+#: faugus/launcher.py:7773
 #, fuzzy
 #| msgid "%s was not installed!"
 msgid "Run an installer"
 msgstr "%s इन्स्टल भएन!"
 
-#: faugus/launcher.py:7467
+#: faugus/launcher.py:7791
 msgid "Runtime"
 msgstr ""
 
-#: faugus/launcher.py:7477
+#: faugus/launcher.py:7801
 msgid "Path to the prefix"
 msgstr ""
 
-#: faugus/launcher.py:7485
+#: faugus/launcher.py:7809
 #, fuzzy
 #| msgid "Default Proton"
 msgid "Specific Proton"
 msgstr "पूर्वनिर्धारित प्रोटोन"
 
-#: faugus/launcher.py:7499 faugus/shortcut.py:58
+#: faugus/launcher.py:7823 faugus/shortcut.py:57
 msgid "Game Arguments"
 msgstr ""
 
-#: faugus/launcher.py:7504 faugus/shortcut.py:63 faugus/utils.py:1695
+#: faugus/launcher.py:7828 faugus/shortcut.py:62 faugus/utils.py:1721
 msgid "Launch Settings"
 msgstr ""
 
-#: faugus/launcher.py:7507 faugus/shortcut.py:66 faugus/utils.py:1979
+#: faugus/launcher.py:7831 faugus/shortcut.py:65 faugus/utils.py:2005
 msgid "Additional Application"
 msgstr ""
 
-#: faugus/launcher.py:7510 faugus/shortcut.py:69
+#: faugus/launcher.py:7834 faugus/shortcut.py:68
 msgid "Additional application to run with the game"
 msgstr ""
 
-#: faugus/launcher.py:7512 faugus/shortcut.py:71 faugus/utils.py:2098
+#: faugus/launcher.py:7836 faugus/shortcut.py:70 faugus/utils.py:2124
 msgid "Lossless Scaling Frame Generation"
 msgstr ""
 
-#: faugus/launcher.py:7534
+#: faugus/launcher.py:7858
 msgid "Shortcut"
 msgstr ""
 
-#: faugus/launcher.py:7539
+#: faugus/launcher.py:7863
 msgid "Desktop"
 msgstr ""
 
-#: faugus/launcher.py:7540
+#: faugus/launcher.py:7864
 msgid "App Menu"
 msgstr ""
 
-#: faugus/launcher.py:7541
+#: faugus/launcher.py:7865
 msgid "Steam"
 msgstr ""
 
-#: faugus/launcher.py:7589 faugus/launcher.py:7736
+#: faugus/launcher.py:7913 faugus/launcher.py:8060
 msgid "Tools"
 msgstr ""
 
-#: faugus/launcher.py:7708
+#: faugus/launcher.py:8032
 msgid "Refresh"
 msgstr ""
 
-#: faugus/launcher.py:7711
+#: faugus/launcher.py:8035
 msgid "Load from file"
 msgstr ""
 
-#: faugus/launcher.py:7714
+#: faugus/launcher.py:8038
 msgid "Load from URL"
 msgstr ""
 
-#: faugus/launcher.py:7879 faugus/shortcut.py:164
+#: faugus/launcher.py:8193 faugus/shortcut.py:163
 msgid "Vulkan Layer not found"
 msgstr ""
 
-#: faugus/launcher.py:8029
+#: faugus/launcher.py:8343
 msgid "Select an image for the cover"
 msgstr ""
 
-#: faugus/launcher.py:8030
+#: faugus/launcher.py:8344
 msgid "Select an image for the banner"
 msgstr ""
 
-#: faugus/launcher.py:8031
+#: faugus/launcher.py:8345
 msgid "Select an image for the icon"
 msgstr ""
 
-#: faugus/launcher.py:8061
+#: faugus/launcher.py:8375
 msgid "Enter the image URL"
 msgstr ""
 
-#: faugus/launcher.py:8554
+#: faugus/launcher.py:8868
 msgid "Windows Game"
 msgstr ""
 
-#: faugus/launcher.py:8555
+#: faugus/launcher.py:8869
 msgid "Linux Game"
 msgstr ""
 
-#: faugus/launcher.py:8556
+#: faugus/launcher.py:8870
 msgid "Steam Game"
 msgstr ""
 
-#: faugus/launcher.py:8656
+#: faugus/launcher.py:8970
 #, fuzzy
 #| msgid "%s was not installed!"
 msgid "Select the game installer"
 msgstr "%s इन्स्टल भएन!"
 
-#: faugus/launcher.py:8886
+#: faugus/launcher.py:9200
 msgid "Select the game executable"
 msgstr ""
 
@@ -1161,52 +1165,48 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
-#: faugus/runner.py:167
+#: faugus/runner.py:171
 msgid "Starting Steam game..."
 msgstr ""
 
-#: faugus/runner.py:420
+#: faugus/runner.py:431
 msgid "Are you enjoying Faugus?"
 msgstr ""
 
-#: faugus/runner.py:424
+#: faugus/runner.py:435
 msgid "Please consider donating"
 msgstr ""
 
-#: faugus/runner.py:430
+#: faugus/runner.py:441
 msgid "Never show this message again"
 msgstr ""
 
-#: faugus/runner.py:440
+#: faugus/runner.py:451
 msgid "Continue"
 msgstr ""
 
-#: faugus/runner.py:474
+#: faugus/runner.py:485
 #, python-format
 msgid "%s was not found"
 msgstr ""
 
-#: faugus/runner.py:475
+#: faugus/runner.py:486
 msgid "Please install it or use another Proton version."
 msgstr ""
 
-#: faugus/runner.py:612
+#: faugus/runner.py:669
 msgid "Components are up to date"
 msgstr ""
 
-#: faugus/runner.py:624
-msgid "Updating"
-msgstr ""
-
-#: faugus/runner.py:628
-msgid "Extracting"
-msgstr ""
-
-#: faugus/runner.py:634
+#: faugus/runner.py:682 faugus/runner.py:699
 msgid "is up to date"
 msgstr ""
 
-#: faugus/runner.py:700
+#: faugus/runner.py:685 faugus/runner.py:690 faugus/runner.py:692
+msgid "Updating"
+msgstr ""
+
+#: faugus/runner.py:768
 msgid "The keys and values were successfully added to the registry."
 msgstr ""
 
@@ -1263,134 +1263,139 @@ msgstr ""
 msgid "Select an icon for the shortcut"
 msgstr ""
 
-#: faugus/utils.py:1598 faugus/utils.py:1599 faugus/utils.py:1600
-#: faugus/utils.py:1601
+#: faugus/utils.py:1624 faugus/utils.py:1625 faugus/utils.py:1626
+#: faugus/utils.py:1627
 msgid "Latest"
 msgstr ""
 
-#: faugus/utils.py:1604
+#: faugus/utils.py:1630
 msgid "System"
 msgstr ""
 
-#: faugus/utils.py:1784
+#: faugus/utils.py:1810
 msgid "Presets"
 msgstr ""
 
-#: faugus/utils.py:1805
+#: faugus/utils.py:1831
 msgid "Launch Arguments"
 msgstr ""
 
-#: faugus/utils.py:1904
+#: faugus/utils.py:1930
 msgid "Select a command or script"
 msgstr ""
 
-#: faugus/utils.py:1929
+#: faugus/utils.py:1955
 msgid "Pre-launch"
 msgstr ""
 
-#: faugus/utils.py:1930
+#: faugus/utils.py:1956
 msgid "Command or script to run before the game"
 msgstr ""
 
-#: faugus/utils.py:1932
+#: faugus/utils.py:1958
 msgid "Post-launch"
 msgstr ""
 
-#: faugus/utils.py:1933
+#: faugus/utils.py:1959
 msgid "Command or script to run after the game"
 msgstr ""
 
-#: faugus/utils.py:2007
+#: faugus/utils.py:2033
 msgid "Path to the application"
 msgstr ""
 
-#: faugus/utils.py:2019
+#: faugus/utils.py:2045
 msgid "Select an additional application"
 msgstr ""
 
-#: faugus/utils.py:2037
+#: faugus/utils.py:2063
 msgid "Delay (seconds)"
 msgstr ""
 
-#: faugus/utils.py:2051
+#: faugus/utils.py:2077
 msgid "Run the application first"
 msgstr ""
 
-#: faugus/utils.py:2125
+#: faugus/utils.py:2151
 msgid "Lossless Scaling Location"
 msgstr ""
 
-#: faugus/utils.py:2133
+#: faugus/utils.py:2159
 msgid "Lossless.dll location"
 msgstr ""
 
-#: faugus/utils.py:2145
+#: faugus/utils.py:2171
 msgid "Select the Lossless.dll file"
 msgstr ""
 
-#: faugus/utils.py:2178
+#: faugus/utils.py:2204
 msgid "Multiplier"
 msgstr ""
 
-#: faugus/utils.py:2184
+#: faugus/utils.py:2210
 msgid "Multiply the FPS"
 msgstr ""
 
-#: faugus/utils.py:2186
+#: faugus/utils.py:2212
 msgid "Flow Scale"
 msgstr ""
 
-#: faugus/utils.py:2193
+#: faugus/utils.py:2219
 msgid "Lower the internal motion estimation resolution"
 msgstr ""
 
-#: faugus/utils.py:2195
+#: faugus/utils.py:2221
 msgid "Performance Mode"
 msgstr ""
 
-#: faugus/utils.py:2196
+#: faugus/utils.py:2222
 msgid "Massively improve performance at the cost of quality"
 msgstr ""
 
-#: faugus/utils.py:2199
+#: faugus/utils.py:2225
 msgid "HDR Mode"
 msgstr ""
 
-#: faugus/utils.py:2200
+#: faugus/utils.py:2226
 msgid "Enable special HDR-only behavior"
 msgstr ""
 
-#: faugus/utils.py:2203
+#: faugus/utils.py:2229
 msgid "Present Mode (Experimental)"
 msgstr ""
 
-#: faugus/utils.py:2207
+#: faugus/utils.py:2233
 msgid "Override the present mode"
 msgstr ""
 
-#: faugus/utils.py:2547
+#: faugus/utils.py:2573
 msgid "No SteamGridDB API key configured."
 msgstr ""
 
-#: faugus/utils.py:2548
+#: faugus/utils.py:2574
 msgid "Add your API key in Settings first."
 msgstr ""
 
-#: faugus/utils.py:2561
+#: faugus/utils.py:2587
 msgid "Choose a cover"
 msgstr ""
 
-#: faugus/utils.py:2562
+#: faugus/utils.py:2588
 msgid "Choose a banner"
 msgstr ""
 
-#: faugus/utils.py:2563
+#: faugus/utils.py:2589
 msgid "Choose an icon"
 msgstr ""
 
-#: faugus/utils.py:2700
+#: faugus/utils.py:2726
 msgid "No results found"
 msgstr ""
+
+#, fuzzy
+#~| msgid "Installing %s..."
+#~ msgid "Installing"
+#~ msgstr "%s इन्स्टल हुँदैछ..."
 
 #~ msgid "Discrete GPU"
 #~ msgstr "डिस्क्रिट GPU"
