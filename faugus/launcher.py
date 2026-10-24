@@ -3335,7 +3335,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         categories = game.category if isinstance(game.category, list) else ([game.category] if game.category else [])
         categories_visible = bool(categories)
-        self.label_overview_categories.set_text(", ".join(categories) if categories else "")
+        self.label_overview_categories.set_text(", ".join(sorted(categories, key=str.lower)) if categories else "")
         self.label_overview_categories.set_visible(categories_visible)
 
         if is_running:
