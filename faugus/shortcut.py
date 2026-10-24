@@ -28,7 +28,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         game_title = os.path.basename(file_path)
         self.set_title(game_title)
-        print(self.file_path)
 
         self.icon_directory = f"{SHORTCUT_ICONS_DIR}/icon_temp/"
 

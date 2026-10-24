@@ -557,39 +557,32 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def update_accent_background_css(self):
         fade_r, fade_g, fade_b = self.fade_rgb(self.get_background_rgb())
 
-        if getattr(self, "_accent_background_provider", None) is None:
-            self._accent_background_provider = Gtk.CssProvider()
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(), self._accent_background_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
-            )
-
-        css = f".accent-background {{ background-color: rgb({fade_r}, {fade_g}, {fade_b}); }}"
-        self._accent_background_provider.load_from_data(css.encode("utf-8"))
+        add_css_once(
+            "accent_background",
+            f".accent-background {{ background-color: rgb({fade_r}, {fade_g}, {fade_b}); }}",
+            Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+        )
 
     def update_placeholder_accent_css(self):
         r, g, b = self.get_accent_rgb()
 
-        if getattr(self, "_placeholder_accent_provider", None) is None:
-            self._placeholder_accent_provider = Gtk.CssProvider()
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(), self._placeholder_accent_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
-            )
-
-        css = f"""
-        .cover-placeholder,
-        .banner-placeholder,
-        .cover-empty {{
-            background-color: rgba({r}, {g}, {b}, 0.4);
-        }}
-        """
-        self._placeholder_accent_provider.load_from_data(css.encode("utf-8"))
+        add_css_once(
+            "placeholder_accent",
+            f"""
+            .cover-placeholder,
+            .banner-placeholder,
+            .cover-empty {{
+                background-color: rgba({r}, {g}, {b}, 0.4);
+            }}
+            """,
+            Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+        )
 
     def refresh_placeholder_covers(self):
-        if hasattr(self, 'flowbox'):
-            for child in widget_children(self.flowbox):
-                game = getattr(child, 'game', None)
-                if game and not os.path.isfile(game.cover):
-                    self.update_game_visual(child)
+        for child in widget_children(self.flowbox):
+            game = child.game
+            if not os.path.isfile(game.cover):
+                self.update_game_visual(child)
 
         for slot in getattr(self, 'carrousel_slots', []):
             game = getattr(slot['box'], 'game', None)
@@ -625,18 +618,16 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         fade_r, fade_g, fade_b = self.fade_rgb(rgb)
 
-        if getattr(self, "_popover_dominant_provider", None) is None:
-            self._popover_dominant_provider = Gtk.CssProvider()
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(), self._popover_dominant_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1
-            )
-
-        self._popover_dominant_provider.load_from_data(f"""
-        popover.popover-dominant-background contents,
-        popover.popover-dominant-background arrow {{
-            background-color: rgb({fade_r}, {fade_g}, {fade_b});
-        }}
-        """.encode("utf-8"))
+        add_css_once(
+            "popover_dominant",
+            f"""
+            popover.popover-dominant-background contents,
+            popover.popover-dominant-background arrow {{
+                background-color: rgb({fade_r}, {fade_g}, {fade_b});
+            }}
+            """,
+            Gtk.STYLE_PROVIDER_PRIORITY_USER + 1,
+        )
         popover.add_css_class("popover-dominant-background")
 
     def build_background_container(self, content_widget):
@@ -734,17 +725,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         overlay.add_overlay(box)
         overlay.set_measure_overlay(box, False)
 
-        banner_ratio = 1920 / 620
-        state = {"width": -1}
-
-        def on_banner_tick(widget, frame_clock):
-            width = widget.get_width()
-            if width > 0 and width != state["width"]:
-                state["width"] = width
-                box.set_size_request(-1, int(width / banner_ratio))
-            return True
-
-        overlay.add_tick_callback(on_banner_tick)
+        keep_banner_ratio(overlay, box)
         return box
 
     def wrap_with_static_banner(self, content_widget, banner_path):
@@ -2268,10 +2249,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game = self.selected()
             if not game:
                 return
-            if game.gameid in self.running:
-                self.running_dialog(game.title)
-            else:
-                self.on_button_play_clicked()
+            self.play_or_notify(game)
 
     def on_carrousel_slot_right_click(self, slot, x=None, y=None):
         offset = round(slot["offset"])
@@ -4323,10 +4301,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not game:
             return
 
-        if game.gameid in self.running:
-            self.running_dialog(game.title)
-        else:
-            self.on_button_play_clicked()
+        self.play_or_notify(game)
 
     def on_button_settings_clicked(self, widget):
 
@@ -7925,7 +7900,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_banner1.add_css_class("add-game-banner-button")
         self.button_banner1.add_css_class("banner-placeholder")
 
-        self.banner_preview1 = Gtk.AspectFrame.new(0.5, 0.5, 1920 / 620, False)
+        self.banner_preview1 = Gtk.AspectFrame.new(0.5, 0.5, BANNER_RATIO, False)
         self.banner_preview1.set_child(self.button_banner1)
         self.banner_preview1.set_hexpand(True)
 
@@ -8045,17 +8020,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         if interface_mode in ("Covers", "Carrousel") and self.steamgriddb_enabled:
             box_tabs.insert_child_after(self.banner_preview1_overlay, None)
 
-            banner_ratio = 1920 / 620
-            banner_size_state = {"width": -1}
-
-            def on_addgame_banner_tick(widget, frame_clock, box=self.banner_preview1_overlay, state=banner_size_state):
-                width = widget.get_width()
-                if width > 0 and width != state["width"]:
-                    state["width"] = width
-                    box.set_size_request(-1, int(width / banner_ratio))
-                return True
-
-            self.banner_preview1_overlay.add_tick_callback(on_addgame_banner_tick)
+            keep_banner_ratio(self.banner_preview1_overlay, self.banner_preview1_overlay)
 
         self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
         self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
