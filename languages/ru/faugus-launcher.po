@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 14:33+0000\n"
+"POT-Creation-Date: 2026-10-24 16:35+0000\n"
 "PO-Revision-Date: 2026-09-29 08:51+0000\n"
 "Last-Translator: Yakov Kungurtsev <FiReOnok@users.noreply.github.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -28,7 +28,7 @@ msgstr "Высчитываю..."
 msgid "Game"
 msgstr "Игра"
 
-#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7797
+#: faugus/backup.py:169 faugus/backup.py:330 faugus/launcher.py:7832
 msgid "Prefix"
 msgstr "Префикс"
 
@@ -41,7 +41,7 @@ msgstr "Размер"
 msgid "Total:"
 msgstr "Всего:"
 
-#: faugus/backup.py:309 faugus/launcher.py:7912 faugus/launcher.py:8051
+#: faugus/backup.py:309 faugus/launcher.py:7947 faugus/launcher.py:8086
 msgid "Game/App"
 msgstr "Игра/Приложение"
 
@@ -57,7 +57,7 @@ msgstr "Настройки резервной копии"
 msgid "Proton"
 msgstr "Proton"
 
-#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7751
+#: faugus/backup.py:571 faugus/backup.py:1134 faugus/launcher.py:7786
 #: faugus/utils.py:2028
 msgid "Path"
 msgstr "Путь"
@@ -114,22 +114,22 @@ msgstr "Суббота"
 msgid "Sunday"
 msgstr "Воскресенье"
 
-#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:6108
-#: faugus/launcher.py:7298 faugus/launcher.py:7348 faugus/launcher.py:7435
-#: faugus/launcher.py:7889 faugus/launcher.py:8387 faugus/proton_manager.py:254
+#: faugus/backup.py:744 faugus/backup.py:1039 faugus/launcher.py:6129
+#: faugus/launcher.py:7333 faugus/launcher.py:7383 faugus/launcher.py:7470
+#: faugus/launcher.py:7924 faugus/launcher.py:8422 faugus/proton_manager.py:254
 #: faugus/proton_manager.py:361 faugus/shortcut.py:83 faugus/utils.py:526
 #: faugus/utils.py:640 faugus/utils.py:651
 msgid "Cancel"
 msgstr "Отмена"
 
 #: faugus/backup.py:748 faugus/backup.py:1043 faugus/backup.py:1229
-#: faugus/launcher.py:6112 faugus/launcher.py:7051 faugus/launcher.py:7352
-#: faugus/launcher.py:7439 faugus/launcher.py:7893 faugus/launcher.py:8383
+#: faugus/launcher.py:6133 faugus/launcher.py:7086 faugus/launcher.py:7387
+#: faugus/launcher.py:7474 faugus/launcher.py:7928 faugus/launcher.py:8418
 #: faugus/shortcut.py:87 faugus/utils.py:530 faugus/utils.py:1217
 msgid "Ok"
 msgstr "Ок"
 
-#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8885
+#: faugus/backup.py:789 faugus/backup.py:820 faugus/launcher.py:8920
 msgid "Disabled"
 msgstr "Отключено"
 
@@ -183,17 +183,17 @@ msgstr "Извлекаю резервную копию..."
 msgid "Failed to restore backup:"
 msgstr "Не удалось восстановить резервную копию:"
 
-#: faugus/backup.py:1239 faugus/launcher.py:7039
+#: faugus/backup.py:1239 faugus/launcher.py:7074
 msgid "Are you sure you want to overwrite the settings?"
 msgstr "Вы уверены, что хотите перезаписать настройки?"
 
-#: faugus/backup.py:1241 faugus/launcher.py:5150 faugus/launcher.py:7051
-#: faugus/launcher.py:7506
+#: faugus/backup.py:1241 faugus/launcher.py:5150 faugus/launcher.py:7086
+#: faugus/launcher.py:7541
 msgid "Yes"
 msgstr "Да"
 
-#: faugus/backup.py:1242 faugus/launcher.py:5151 faugus/launcher.py:7052
-#: faugus/launcher.py:7502
+#: faugus/backup.py:1242 faugus/launcher.py:5151 faugus/launcher.py:7087
+#: faugus/launcher.py:7537
 msgid "No"
 msgstr "Нет"
 
@@ -249,7 +249,7 @@ msgid "Last played"
 msgstr "По дате запуска"
 
 #: faugus/launcher.py:1281 faugus/launcher.py:5876 faugus/launcher.py:5888
-#: faugus/launcher.py:5925 faugus/launcher.py:7272
+#: faugus/launcher.py:5926 faugus/launcher.py:7307
 msgid "Custom"
 msgstr "Пользовательский"
 
@@ -275,7 +275,7 @@ msgstr "Добавить"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: faugus/launcher.py:2390 faugus/launcher.py:8041 faugus/proton_manager.py:212
+#: faugus/launcher.py:2390 faugus/launcher.py:8076 faugus/proton_manager.py:212
 #: faugus/proton_manager.py:230 faugus/proton_manager.py:274
 #: faugus/proton_manager.py:303 faugus/proton_manager.py:392
 msgid "Remove"
@@ -437,7 +437,7 @@ msgstr "Год назад"
 msgid "{} years ago"
 msgstr "{} лет назад"
 
-#: faugus/launcher.py:3635 faugus/launcher.py:6902 faugus/launcher.py:8919
+#: faugus/launcher.py:3635 faugus/launcher.py:6937 faugus/launcher.py:8954
 msgid "Select a file to run in the prefix"
 msgstr "Выберите файл для запуска внутри префикса"
 
@@ -554,8 +554,8 @@ msgid "Background Color"
 msgstr "Цвет фона"
 
 #: faugus/launcher.py:5873 faugus/launcher.py:5885 faugus/launcher.py:5897
-#: faugus/launcher.py:5907 faugus/launcher.py:5916 faugus/launcher.py:5924
-#: faugus/launcher.py:6032 faugus/launcher.py:7269 faugus/launcher.py:8881
+#: faugus/launcher.py:5908 faugus/launcher.py:5917 faugus/launcher.py:5925
+#: faugus/launcher.py:6039 faugus/launcher.py:7304 faugus/launcher.py:8916
 #: faugus/utils.py:1624 faugus/utils.py:2235
 msgid "Default"
 msgstr "По умолчанию"
@@ -588,527 +588,627 @@ msgstr "Преобладающий цвет"
 msgid "Banner"
 msgstr "Баннеры"
 
-#: faugus/launcher.py:5904
+#: faugus/launcher.py:5903 faugus/launcher.py:6669
+msgid "Displays a banner for the currently selected game"
+msgstr ""
+
+#: faugus/launcher.py:5905
 msgid "Theme"
 msgstr "Тема"
 
-#: faugus/launcher.py:5908
+#: faugus/launcher.py:5909
 msgid "System Theme"
 msgstr "Системная тема"
 
-#: faugus/launcher.py:5913
+#: faugus/launcher.py:5914
 msgid "Color Scheme"
 msgstr "Цветовая схема"
 
-#: faugus/launcher.py:5917
+#: faugus/launcher.py:5918
 msgid "Light"
 msgstr "Светлая"
 
-#: faugus/launcher.py:5918
+#: faugus/launcher.py:5919
 msgid "Dark"
 msgstr "Тёмная"
 
-#: faugus/launcher.py:5921
+#: faugus/launcher.py:5922
 msgid "Accent Color"
 msgstr "Вспомогательный цвет"
 
-#: faugus/launcher.py:5932
+#: faugus/launcher.py:5933
 msgid "Startup Window Size"
 msgstr "Размер окна при запуске"
 
-#: faugus/launcher.py:5936
+#: faugus/launcher.py:5937
 msgid "Default size"
 msgstr "Стандартный размер"
 
-#: faugus/launcher.py:5937
+#: faugus/launcher.py:5938
 msgid "Remember size"
 msgstr "Запоминать размер"
 
-#: faugus/launcher.py:5938
+#: faugus/launcher.py:5939
 msgid "Maximized"
 msgstr "Запускать развёрнутым"
 
-#: faugus/launcher.py:5939
+#: faugus/launcher.py:5940
 msgid "Fullscreen"
 msgstr "Полноэкранный режим"
 
-#: faugus/launcher.py:5940 faugus/launcher.py:6604
+#: faugus/launcher.py:5941 faugus/launcher.py:6638
 msgid "Alt+Enter toggles fullscreen"
 msgstr "Alt+Enter переключает полноэкранный режим"
 
-#: faugus/launcher.py:5942
+#: faugus/launcher.py:5943
 msgid "Labels"
 msgstr "Названия"
 
-#: faugus/launcher.py:5944
+#: faugus/launcher.py:5944 faugus/launcher.py:6598
+msgid "Displays the game title below the cover"
+msgstr ""
+
+#: faugus/launcher.py:5946
 msgid "Zoom"
 msgstr "Масштаб"
 
-#: faugus/launcher.py:5947
+#: faugus/launcher.py:5947 faugus/launcher.py:6599
+msgid "Displays a zoom slider to adjust the size of games"
+msgstr ""
+
+#: faugus/launcher.py:5950
 msgid "Auto-hide"
 msgstr ""
 
-#: faugus/launcher.py:5949
+#: faugus/launcher.py:5951
+msgid "Automatically hides widgets"
+msgstr ""
+
+#: faugus/launcher.py:5953
 msgid "Position"
 msgstr "Положение"
 
-#: faugus/launcher.py:5952
+#: faugus/launcher.py:5956 faugus/launcher.py:6614
+msgid "Sets how games are positioned on the screen"
+msgstr ""
+
+#: faugus/launcher.py:5957
 msgid "Top"
 msgstr "Сверху"
 
-#: faugus/launcher.py:5953
+#: faugus/launcher.py:5958
 msgid "Middle"
 msgstr "Посередине"
 
-#: faugus/launcher.py:5954
+#: faugus/launcher.py:5959
 msgid "Bottom"
 msgstr "Снизу"
 
-#: faugus/launcher.py:5956
+#: faugus/launcher.py:5961
 msgid "Orientation"
 msgstr "Ориентация"
 
-#: faugus/launcher.py:5959
+#: faugus/launcher.py:5964 faugus/launcher.py:6628
+msgid "Sets how games are scrolled through"
+msgstr ""
+
+#: faugus/launcher.py:5965
 msgid "Vertical"
 msgstr "Вертикально"
 
-#: faugus/launcher.py:5960
+#: faugus/launcher.py:5966
 msgid "Horizontal"
 msgstr "Горизонтально"
 
-#: faugus/launcher.py:5962 faugus/launcher.py:5982
+#: faugus/launcher.py:5968 faugus/launcher.py:5988
 msgid "Maximum Columns"
 msgstr "Максимум столбцов"
 
-#: faugus/launcher.py:5980
+#: faugus/launcher.py:5986
 msgid "Maximum Rows"
 msgstr "Максимум рядов"
 
-#: faugus/launcher.py:5986
+#: faugus/launcher.py:5992
 msgid "SteamGridDB"
 msgstr "SteamGridDB"
 
-#: faugus/launcher.py:5990
+#: faugus/launcher.py:5993
+msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
+msgstr ""
+
+#: faugus/launcher.py:5997
 msgid "API Key"
 msgstr "API-ключ"
 
-#: faugus/launcher.py:5997
+#: faugus/launcher.py:6004
 msgid "Default Prefixes Location"
 msgstr "Расположение префиксов по умолчанию"
 
-#: faugus/launcher.py:6001
+#: faugus/launcher.py:6008
 msgid "The location where prefixes are created"
 msgstr "Директория, в которой создаются префиксы"
 
-#: faugus/launcher.py:6010
+#: faugus/launcher.py:6017
 msgid "Default Prefix Tools"
 msgstr "Инструменты префикса по умолчанию"
 
-#: faugus/launcher.py:6016
+#: faugus/launcher.py:6023
 msgid "Default Proton"
 msgstr "Proton по умолчанию"
 
-#: faugus/launcher.py:6020 faugus/proton_manager.py:66
+#: faugus/launcher.py:6027 faugus/proton_manager.py:66
 msgid "Proton Manager"
 msgstr "Менеджер Proton"
 
-#: faugus/launcher.py:6023
+#: faugus/launcher.py:6030
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: faugus/launcher.py:6026
+#: faugus/launcher.py:6033
 msgid "Display"
 msgstr "Показать"
 
-#: faugus/launcher.py:6029
+#: faugus/launcher.py:6036
 msgid "GPU"
 msgstr ""
 
-#: faugus/launcher.py:6038
-msgid "Auto-close on launch"
+#: faugus/launcher.py:6045
+#, fuzzy
+#| msgid "Auto-close on launch"
+msgid "Auto-close"
 msgstr "Закрывать после запуска игры"
 
-#: faugus/launcher.py:6040
+#: faugus/launcher.py:6046
+msgid "Automatically closes the application when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6048
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: faugus/launcher.py:6042
+#: faugus/launcher.py:6049
+msgid "Automatically starts the application with the system"
+msgstr ""
+
+#: faugus/launcher.py:6051
 msgid "System tray icon"
 msgstr "Иконка в системном трее"
 
-#: faugus/launcher.py:6045
+#: faugus/launcher.py:6052
+msgid "Displays the application icon in the system tray"
+msgstr ""
+
+#: faugus/launcher.py:6055
 msgid "Minimized startup"
 msgstr "Минимизированный запуск"
 
-#: faugus/launcher.py:6048
+#: faugus/launcher.py:6056
+#, fuzzy
+#| msgid "Start minimized to tray"
+msgid "Starts the application minimized to the system tray"
+msgstr "Запускать свёрнутым в трей"
+
+#: faugus/launcher.py:6059
 msgid "Monochrome icon"
 msgstr "Монохромная иконка"
 
-#: faugus/launcher.py:6051
+#: faugus/launcher.py:6060
+msgid "Displays a monochrome application icon in the system tray"
+msgstr ""
+
+#: faugus/launcher.py:6063
 msgid "Splash window"
 msgstr "Всплывающее окно при запуске"
 
-#: faugus/launcher.py:6054
+#: faugus/launcher.py:6064
+msgid ""
+"Displays a splash window with information about Proton, Steam Linux Runtime, "
+"and other required components when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6067
 msgid "Automatic updates"
 msgstr "Автообновление"
 
-#: faugus/launcher.py:6057
+#: faugus/launcher.py:6068
+msgid ""
+"Checks for and updates Proton, Steam Linux Runtime, and other required "
+"components when launching a game"
+msgstr ""
+
+#: faugus/launcher.py:6071
 msgid "Auto-create shortcuts"
 msgstr "Автоматически создавать ярлыки"
 
-#: faugus/launcher.py:6059
+#: faugus/launcher.py:6073
 msgid ""
 "Automatically creates shortcuts when installing something through the file "
 "manager"
 msgstr "Автоматически создавать ярлыки при установке через файловый менеджер"
 
-#: faugus/launcher.py:6062
+#: faugus/launcher.py:6076
 msgid "Categories"
 msgstr "Категории"
 
-#: faugus/launcher.py:6064
+#: faugus/launcher.py:6077
+msgid "Displays a button to manage game categories"
+msgstr ""
+
+#: faugus/launcher.py:6079
 msgid "Sort"
 msgstr "Сортировка"
 
-#: faugus/launcher.py:6066
+#: faugus/launcher.py:6080
+msgid "Displays a button to change the game sorting order"
+msgstr ""
+
+#: faugus/launcher.py:6082
 msgid "Header bar"
 msgstr "Панель заголовка"
 
-#: faugus/launcher.py:6068
+#: faugus/launcher.py:6083
+msgid "Displays the default GTK header bar"
+msgstr ""
+
+#: faugus/launcher.py:6085
 msgid "Hidden games"
 msgstr "Показать скрытые игры"
 
-#: faugus/launcher.py:6069
+#: faugus/launcher.py:6086
+#, fuzzy
+#| msgid "Hidden games"
+msgid "Displays hidden games"
+msgstr "Показать скрытые игры"
+
+#: faugus/launcher.py:6086
 msgid "Ctrl+H toggles hidden games"
 msgstr "Ctrl+H переключает видимость скрытых игр"
 
-#: faugus/launcher.py:6071
+#: faugus/launcher.py:6088
 msgid "Overview"
 msgstr "Краткие сведения"
 
-#: faugus/launcher.py:6074
+#: faugus/launcher.py:6089 faugus/launcher.py:6619
+msgid ""
+"Displays a panel with the game title, categories, playtime, and last played "
+"date"
+msgstr ""
+
+#: faugus/launcher.py:6092
 msgid "Gamepad navigation"
 msgstr "Навигация с помощью геймпада"
 
-#: faugus/launcher.py:6076
+#: faugus/launcher.py:6093
+msgid "Allows navigation through the application using a gamepad"
+msgstr ""
+
+#: faugus/launcher.py:6095
 msgid "Wayland driver (experimental)"
 msgstr "Драйвер Wayland (экспериментально)"
 
-#: faugus/launcher.py:6078
+#: faugus/launcher.py:6096
+msgid "Runs games using the Wine Wayland driver"
+msgstr ""
+
+#: faugus/launcher.py:6098
 msgid "WOW64 (experimental)"
 msgstr "Включить WOW64 (экспериментально)"
 
-#: faugus/launcher.py:6088 faugus/launcher.py:7853
+#: faugus/launcher.py:6099
+msgid "Runs 32-bit games using the 64-bit driver"
+msgstr ""
+
+#: faugus/launcher.py:6109 faugus/launcher.py:7888
 msgid "Run"
 msgstr "Запустить"
 
-#: faugus/launcher.py:6091 faugus/launcher.py:7856
+#: faugus/launcher.py:6112 faugus/launcher.py:7891
 msgid "Run a file in the prefix"
 msgstr "Запустить файл внутри префикса"
 
-#: faugus/launcher.py:6095 faugus/launcher.py:7841 faugus/shortcut.py:79
+#: faugus/launcher.py:6116 faugus/launcher.py:7876 faugus/shortcut.py:79
 msgid "May fix gamepad issues with some games"
 msgstr "Может устранить проблемы с геймпадом при запуске некоторых игр"
 
-#: faugus/launcher.py:6096 faugus/launcher.py:7842 faugus/shortcut.py:80
+#: faugus/launcher.py:6117 faugus/launcher.py:7877 faugus/shortcut.py:80
 msgid "No Sleep"
 msgstr "Без сна"
 
-#: faugus/launcher.py:6097 faugus/launcher.py:7843 faugus/shortcut.py:81
+#: faugus/launcher.py:6118 faugus/launcher.py:7878 faugus/shortcut.py:81
 msgid "Prevents the system from suspending while gaming"
 msgstr "Не позволяет системе перейти в спящий режим во время игры"
 
-#: faugus/launcher.py:6099 faugus/launcher.py:7257
+#: faugus/launcher.py:6120 faugus/launcher.py:7292
 #, fuzzy
 #| msgid "Interface Mode"
 msgid "Interface Sounds"
 msgstr "Режим интерфейса"
 
-#: faugus/launcher.py:6102
+#: faugus/launcher.py:6123
 msgid "Support the Project"
 msgstr "Поддержать проект"
 
-#: faugus/launcher.py:6117
+#: faugus/launcher.py:6138
 msgid "Backup/Restore Settings"
 msgstr "Резервная копия/Восстановление настроек"
 
-#: faugus/launcher.py:6121
+#: faugus/launcher.py:6142
 msgid "Backup"
 msgstr "Создать резервную копию"
 
-#: faugus/launcher.py:6124
+#: faugus/launcher.py:6145
 msgid "Restore"
 msgstr "Восстановить"
 
-#: faugus/launcher.py:6131
+#: faugus/launcher.py:6152
 msgid "Global Environment Variables"
 msgstr "Глобальные переменные окружения"
 
-#: faugus/launcher.py:6407
+#: faugus/launcher.py:6428
 msgid "General"
 msgstr "Основные"
 
-#: faugus/launcher.py:6408
+#: faugus/launcher.py:6429
 msgid "Interface"
 msgstr "Интерфейс"
 
-#: faugus/launcher.py:6523
+#: faugus/launcher.py:6544
 #, python-format
 msgid "Clear Logs (%s)"
 msgstr "Очистить журнал (%s)"
 
-#: faugus/launcher.py:6526
+#: faugus/launcher.py:6547
 msgid "Clear Logs"
 msgstr "Очистить журнал"
 
-#: faugus/launcher.py:6574
+#: faugus/launcher.py:6595
 msgid "Covers or Carrousel mode"
 msgstr "Режим обложки или карусели"
 
-#: faugus/launcher.py:6583
+#: faugus/launcher.py:6610
 msgid "Grid, Covers or Carrousel mode"
 msgstr "Режим сетки, обложки или карусели"
 
-#: faugus/launcher.py:6592
+#: faugus/launcher.py:6624
 msgid "Grid or Covers mode"
 msgstr "Режим сетки или обложки"
 
-#: faugus/launcher.py:6635
+#: faugus/launcher.py:6670
 msgid "Covers or Carrousel mode with SteamGridDB"
 msgstr "Режим обложки или карусели вместе с SteamGridDB"
 
-#: faugus/launcher.py:6733
+#: faugus/launcher.py:6768
 msgid "Adwaita theme"
 msgstr "Тема Adwaita"
 
-#: faugus/launcher.py:6844
+#: faugus/launcher.py:6879
 msgid "Do you want to save the changes?"
 msgstr "Вы уверены, что хотите сохранить настройки?"
 
-#: faugus/launcher.py:6954
+#: faugus/launcher.py:6989
 msgid "Select a backup file to restore"
 msgstr "Выберите файл резервной копии для восстановления"
 
-#: faugus/launcher.py:6960
+#: faugus/launcher.py:6995
 msgid "Faugus Backup files"
 msgstr "Файлы резервных копий Faugus"
 
-#: faugus/launcher.py:6976 faugus/launcher.py:7015
+#: faugus/launcher.py:7011 faugus/launcher.py:7050
 msgid "This is not a valid Faugus backup file."
 msgstr "Это недопустимый файл резервной копии Faugus."
 
-#: faugus/launcher.py:7059 faugus/launcher.py:9226
+#: faugus/launcher.py:7094 faugus/launcher.py:9261
 msgid "Select a prefix location"
 msgstr "Выберите папку префикса"
 
-#: faugus/launcher.py:7263 faugus/utils.py:2024 faugus/utils.py:2200
+#: faugus/launcher.py:7298 faugus/utils.py:2024 faugus/utils.py:2200
 msgid "Enable"
 msgstr "Включить"
 
-#: faugus/launcher.py:7266
+#: faugus/launcher.py:7301
 msgid "Sound"
 msgstr ""
 
-#: faugus/launcher.py:7277
+#: faugus/launcher.py:7312
 msgid "Volume"
 msgstr ""
 
-#: faugus/launcher.py:7298
+#: faugus/launcher.py:7333
 msgid "Navigate"
 msgstr ""
 
-#: faugus/launcher.py:7298
+#: faugus/launcher.py:7333
 msgid "Confirm"
 msgstr ""
 
-#: faugus/launcher.py:7298
+#: faugus/launcher.py:7333
 msgid "Warning"
 msgstr ""
 
-#: faugus/launcher.py:7303
+#: faugus/launcher.py:7338
 #, fuzzy
 #| msgid "Windows files"
 msgid "Sound file"
 msgstr "Файлы Windows"
 
-#: faugus/launcher.py:7315
+#: faugus/launcher.py:7350
 #, fuzzy
 #| msgid "Overview"
 msgid "Preview"
 msgstr "Краткие сведения"
 
-#: faugus/launcher.py:7398
+#: faugus/launcher.py:7433
 #, fuzzy
 #| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
 msgstr "Выберите файл Lossless.dll"
 
-#: faugus/launcher.py:7402
+#: faugus/launcher.py:7437
 #, fuzzy
 #| msgid "All files"
 msgid "Audio files"
 msgstr "Все файлы"
 
-#: faugus/launcher.py:7422
+#: faugus/launcher.py:7457
 #, python-format
 msgid "Duplicate %s"
 msgstr "Создать копию %s"
 
-#: faugus/launcher.py:7428 faugus/launcher.py:7686 faugus/launcher.py:7699
+#: faugus/launcher.py:7463 faugus/launcher.py:7721 faugus/launcher.py:7734
 #: faugus/shortcut.py:40
 msgid "Title"
 msgstr "Название"
 
-#: faugus/launcher.py:7477
+#: faugus/launcher.py:7512
 #, python-format
 msgid "Delete %s"
 msgstr "Удалить %s"
 
-#: faugus/launcher.py:7485
+#: faugus/launcher.py:7520
 #, python-format
 msgid "Are you sure you want to delete %s?"
 msgstr "Вы уверены, что хотите удалить %s?"
 
-#: faugus/launcher.py:7494
+#: faugus/launcher.py:7529
 #, python-format
 msgid "WARNING: This prefix is used by %d other games."
 msgstr "ПРЕДУПРЕЖДЕНИЕ: Этот префикс используется в %d других играх."
 
-#: faugus/launcher.py:7496
+#: faugus/launcher.py:7531
 msgid "WARNING: This prefix is used by 1 other game."
 msgstr "ПРЕДУПРЕЖДЕНИЕ: Этот префикс используется в 1 другой игре."
 
-#: faugus/launcher.py:7510
+#: faugus/launcher.py:7545
 msgid "Also remove the prefix:"
 msgstr "Также удалить префикс:"
 
-#: faugus/launcher.py:7548
+#: faugus/launcher.py:7583
 msgid "New Game/App"
 msgstr "Новая игра/приложение"
 
-#: faugus/launcher.py:7666
+#: faugus/launcher.py:7701
 msgid "Steam User"
 msgstr "Пользователь Steam"
 
-#: faugus/launcher.py:7683 faugus/launcher.py:8187 faugus/launcher.py:8189
+#: faugus/launcher.py:7718 faugus/launcher.py:8222 faugus/launcher.py:8224
 msgid "No Steam users found"
 msgstr "Пользователей Steam не найдено"
 
-#: faugus/launcher.py:7755
+#: faugus/launcher.py:7790
 msgid "Path to the game executable"
 msgstr "Путь к исполняемому файлу игры"
 
-#: faugus/launcher.py:7772
+#: faugus/launcher.py:7807
 msgid "Select an executable"
 msgstr "Выберите исполняемый файл"
 
-#: faugus/launcher.py:7773
+#: faugus/launcher.py:7808
 msgid "Run an installer"
 msgstr "Запустить установщик"
 
-#: faugus/launcher.py:7791
+#: faugus/launcher.py:7826
 msgid "Runtime"
 msgstr "Среда запуска"
 
-#: faugus/launcher.py:7801
+#: faugus/launcher.py:7836
 msgid "Path to the prefix"
 msgstr "Путь к префиксу"
 
-#: faugus/launcher.py:7809
+#: faugus/launcher.py:7844
 #, fuzzy
 #| msgid "Default Proton"
 msgid "Specific Proton"
 msgstr "Proton по умолчанию"
 
-#: faugus/launcher.py:7823 faugus/shortcut.py:57
+#: faugus/launcher.py:7858 faugus/shortcut.py:57
 msgid "Game Arguments"
 msgstr "Параметры игры"
 
-#: faugus/launcher.py:7828 faugus/shortcut.py:62 faugus/utils.py:1721
+#: faugus/launcher.py:7863 faugus/shortcut.py:62 faugus/utils.py:1721
 msgid "Launch Settings"
 msgstr "Настройки запуска"
 
-#: faugus/launcher.py:7831 faugus/shortcut.py:65 faugus/utils.py:2005
+#: faugus/launcher.py:7866 faugus/shortcut.py:65 faugus/utils.py:2005
 msgid "Additional Application"
 msgstr "Дополнительное приложение"
 
-#: faugus/launcher.py:7834 faugus/shortcut.py:68
+#: faugus/launcher.py:7869 faugus/shortcut.py:68
 msgid "Additional application to run with the game"
 msgstr "Дополнительное приложение для запуска вместе с игрой"
 
-#: faugus/launcher.py:7836 faugus/shortcut.py:70 faugus/utils.py:2124
+#: faugus/launcher.py:7871 faugus/shortcut.py:70 faugus/utils.py:2124
 msgid "Lossless Scaling Frame Generation"
 msgstr "Генерация кадров Lossless Scaling"
 
-#: faugus/launcher.py:7858
+#: faugus/launcher.py:7893
 msgid "Shortcut"
 msgstr "Ярлык"
 
-#: faugus/launcher.py:7863
+#: faugus/launcher.py:7898
 msgid "Desktop"
 msgstr "Рабочий стол"
 
-#: faugus/launcher.py:7864
+#: faugus/launcher.py:7899
 msgid "App Menu"
 msgstr "Меню приложений"
 
-#: faugus/launcher.py:7865
+#: faugus/launcher.py:7900
 msgid "Steam"
 msgstr "Steam"
 
-#: faugus/launcher.py:7913 faugus/launcher.py:8060
+#: faugus/launcher.py:7948 faugus/launcher.py:8095
 msgid "Tools"
 msgstr "Инструменты"
 
-#: faugus/launcher.py:8032
+#: faugus/launcher.py:8067
 msgid "Refresh"
 msgstr "Обновить"
 
-#: faugus/launcher.py:8035
+#: faugus/launcher.py:8070
 msgid "Load from file"
 msgstr "Загрузить из файла"
 
-#: faugus/launcher.py:8038
+#: faugus/launcher.py:8073
 msgid "Load from URL"
 msgstr "Загрузить из ссылки"
 
-#: faugus/launcher.py:8193 faugus/shortcut.py:163
+#: faugus/launcher.py:8228 faugus/shortcut.py:163
 msgid "Vulkan Layer not found"
 msgstr "Слой Vulkan не найден"
 
-#: faugus/launcher.py:8343
+#: faugus/launcher.py:8378
 msgid "Select an image for the cover"
 msgstr "Выберите изображение для обложки"
 
-#: faugus/launcher.py:8344
+#: faugus/launcher.py:8379
 msgid "Select an image for the banner"
 msgstr "Выберите изображение для баннера"
 
-#: faugus/launcher.py:8345
+#: faugus/launcher.py:8380
 msgid "Select an image for the icon"
 msgstr "Выберите изображение для иконки"
 
-#: faugus/launcher.py:8375
+#: faugus/launcher.py:8410
 msgid "Enter the image URL"
 msgstr "Введите ссылку на изображение"
 
-#: faugus/launcher.py:8868
+#: faugus/launcher.py:8903
 msgid "Windows Game"
 msgstr "Игра для Windows"
 
-#: faugus/launcher.py:8869
+#: faugus/launcher.py:8904
 msgid "Linux Game"
 msgstr "Игра для Linux"
 
-#: faugus/launcher.py:8870
+#: faugus/launcher.py:8905
 msgid "Steam Game"
 msgstr "Игра Steam"
 
-#: faugus/launcher.py:8970
+#: faugus/launcher.py:9005
 msgid "Select the game installer"
 msgstr "Выберите установщик игры"
 
-#: faugus/launcher.py:9200
+#: faugus/launcher.py:9235
 msgid "Select the game executable"
 msgstr "Выберите .exe файл игры"
 
@@ -1533,9 +1633,6 @@ msgstr "Результаты не найдены"
 
 #~ msgid "Start on boot"
 #~ msgstr "Запускать при включении компьютера"
-
-#~ msgid "Start minimized to tray"
-#~ msgstr "Запускать свёрнутым в трей"
 
 #~ msgid "Enable logging"
 #~ msgstr "Включить журнал"
