@@ -335,6 +335,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.load_config()
 
+        if os.path.isdir(LOCALE_DIR):
+            run_in_background(get_translation_completions, LOCALE_DIR, "faugus-launcher")
+
         if app.console_mode:
             self.interface_mode = "Carrousel"
             self.gamepad_navigation = True
@@ -8402,12 +8405,22 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         refresh()
 
     def update_banner_preview(self, banner_path):
-        if banner_path and os.path.isfile(banner_path):
-            pixbuf = safe_load_pixbuf(banner_path, None, None, False)
-            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
-            surface = HiDpiPaintable(texture, 480, 155)
-            self.picture_banner1.set_paintable(surface)
+        self._banner_preview_request = getattr(self, "_banner_preview_request", 0) + 1
+        request = self._banner_preview_request
+        closed_event = self.closed_event
+
+        def show(texture):
+            if request != self._banner_preview_request:
+                return
+            self.picture_banner1.set_paintable(HiDpiPaintable(texture, 480, 155))
             self.button_banner1.remove_css_class("banner-placeholder")
+
+        def load():
+            texture = Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(banner_path, None, None, False))
+            idle_add_while_open(closed_event, show, texture)
+
+        if banner_path and os.path.isfile(banner_path):
+            run_in_background(load)
         else:
             self.picture_banner1.set_paintable(None)
             self.button_banner1.add_css_class("banner-placeholder")
@@ -8514,14 +8527,26 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         run_in_background(fetch_artwork)
 
     def update_image_cover(self):
-        if os.path.isfile(self.cover_path_temp):
-            pixbuf = safe_load_pixbuf(self.cover_path_temp, None, None, False)
-            texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+        self._cover_request = getattr(self, "_cover_request", 0) + 1
+        request = self._cover_request
+        closed_event = self.closed_event
+        cover_path = self.cover_path_temp
+
+        def show(texture):
+            if request != self._cover_request:
+                return
             surface = HiDpiPaintable(texture, 260, 390)
             self.image_cover.set_paintable(surface)
             self.image_cover2.set_paintable(surface)
             self.button_cover.remove_css_class("cover-empty")
             self.button_cover2.remove_css_class("cover-empty")
+
+        def load():
+            texture = Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(cover_path, None, None, False))
+            idle_add_while_open(closed_event, show, texture)
+
+        if os.path.isfile(cover_path):
+            run_in_background(load)
         else:
             self.image_cover.set_paintable(None)
             self.image_cover2.set_paintable(None)
