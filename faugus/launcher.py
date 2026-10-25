@@ -577,7 +577,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         )
 
     def update_placeholder_accent_css(self):
-        r, g, b = self.get_accent_rgb()
+        r, g, b = self.placeholder_rgb = self.get_accent_rgb()
 
         add_css_once(
             "placeholder_accent",
@@ -1720,14 +1720,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         hbox.append(picture)
         hbox.append(label)
 
-        deco_entry = Gtk.Entry()
+        deco_entry = GObject.new(Gtk.Box, css_name="entry")
         deco_entry.set_can_target(False)
         deco_entry.set_focusable(False)
-        deco_entry.get_delegate().set_focusable(False)
         deco_entry.set_hexpand(True)
         deco_entry.set_vexpand(True)
-        deco_entry.set_width_chars(0)
-        deco_entry.set_max_width_chars(0)
         deco_entry.set_size_request(1, 1)
         deco_entry.add_css_class("game")
         deco_entry.add_css_class("list-row-entry")
@@ -4097,14 +4094,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             hbox.append(game_label)
 
         overlay = Gtk.Overlay()
-        deco_entry = Gtk.Entry()
+        deco_entry = GObject.new(Gtk.Box, css_name="entry")
         deco_entry.set_can_target(False)
         deco_entry.set_focusable(False)
-        deco_entry.get_delegate().set_focusable(False)
         deco_entry.set_hexpand(True)
         deco_entry.set_vexpand(True)
-        deco_entry.set_width_chars(0)
-        deco_entry.set_max_width_chars(0)
         deco_entry.add_css_class("game")
         deco_entry.add_css_class("list-row-entry")
         overlay.set_child(deco_entry)
@@ -4214,7 +4208,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.icon_textures.trim(keep, len(keep) * 2 + 64)
 
     def get_cover_placeholder(self, width, height):
-        rgb = self.get_accent_rgb()
+        rgb = self.placeholder_rgb
         scale = self.device_scale()
         key = (width, height, tuple(rgb), scale)
         if not hasattr(self, '_cover_placeholders'):
@@ -4355,6 +4349,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.overview_color_mode = settings_dialog.original_overview_color_mode
             self.apply_overview_panel_width()
             self.widget_color_mode = settings_dialog.original_widget_color_mode
+            self.update_placeholder_accent_css()
             self.update_widget_color_css()
             self.apply_interface_options(**settings_dialog.original_interface_options)
             destroy_and_release(settings_dialog)
