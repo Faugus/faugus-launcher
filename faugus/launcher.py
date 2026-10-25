@@ -3636,6 +3636,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         tab_switcher.set_margin_end(10)
 
         text_buffers = {}
+        dialog_open = [True]
         tab_pages = [
             ("proton", "Proton", self.proton_log),
             ("umu", "UMU-Launcher", self.umu_log),
@@ -3645,8 +3646,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for name, label, log_path in tab_pages:
             text_view = Gtk.TextView()
             text_view.set_editable(False)
-            text_view.get_buffer().set_text(read_log_tail(log_path))
             text_buffers[name] = text_view.get_buffer()
+            if os.path.isfile(log_path):
+                load_text_progressively(
+                    log_path, text_view, lambda: dialog_open[0],
+                    lambda buffer, name=name: text_buffers.__setitem__(name, buffer))
 
             scrolled_window = Gtk.ScrolledWindow()
             scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -3712,7 +3716,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         content_area.append(frame)
         content_area.append(box_bottom)
 
-        dialog.connect("response", lambda d, r: destroy_and_release(d))
+        def on_logs_response(d, r):
+            dialog_open[0] = False
+            destroy_and_release(d)
+
+        dialog.connect("response", on_logs_response)
         dialog.present()
 
     def _existing_gameids(self):

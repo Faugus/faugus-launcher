@@ -1,4 +1,5 @@
 import bisect
+import codecs
 import math
 import os
 import functools
@@ -1054,19 +1055,32 @@ def atomic_write(filepath, write_func):
         raise
 
 
-LOG_TAIL_BYTES = 2 * 1024 * 1024
+LOG_CHUNK_BYTES = 128 * 1024
+LOG_SLICE_US = 4000
 
 
-def read_log_tail(path):
-    with open(path, "rb") as log_file:
-        size = log_file.seek(0, os.SEEK_END)
-        log_file.seek(max(0, size - LOG_TAIL_BYTES))
-        text = log_file.read().decode("utf-8", errors="replace")
-    if size > LOG_TAIL_BYTES:
-        notice = _("Showing only the last {size} MB. Use \"Open file location\" for the full log.").format(
-            size=LOG_TAIL_BYTES // (1024 * 1024))
-        text = f"{notice}\n\n{text.split(chr(10), 1)[-1]}"
-    return text
+def load_text_progressively(path, text_view, is_open, on_loaded):
+    log_file = open(path, "rb")
+    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+    text_buffer = Gtk.TextBuffer()
+
+    def step():
+        deadline = GLib.get_monotonic_time() + LOG_SLICE_US
+        while is_open():
+            data = log_file.read(LOG_CHUNK_BYTES)
+            text = decoder.decode(data, final=not data)
+            if text:
+                text_buffer.insert(text_buffer.get_end_iter(), text)
+            if not data:
+                text_view.set_buffer(text_buffer)
+                on_loaded(text_buffer)
+                break
+            if GLib.get_monotonic_time() >= deadline:
+                return GLib.SOURCE_CONTINUE
+        log_file.close()
+        return GLib.SOURCE_REMOVE
+
+    GLib.idle_add(step)
 
 
 def load_json_file(filepath, default=None):
