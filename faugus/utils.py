@@ -1,3 +1,5 @@
+import bisect
+import math
 import os
 import functools
 import json
@@ -11,8 +13,10 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
+gi.require_version('Gsk', '4.0')
+gi.require_version('Graphene', '1.0')
 from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
-from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
+from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw, Gsk, Graphene
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
@@ -105,7 +109,7 @@ class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
         return self._height
 
     def do_snapshot(self, snapshot, width, height):
-        self._texture.snapshot(snapshot, width, height)
+        snapshot.append_scaled_texture(self._texture, Gsk.ScalingFilter.LINEAR, Graphene.Rect().init(0, 0, width, height))
 
 
 class HiDpiMixin:
@@ -188,6 +192,16 @@ def verified_content(response):
     return content
 
 
+def load_resized_pixbuf(path, width, height):
+    from PIL import Image
+    try:
+        with Image.open(path) as image:
+            data = image.convert("RGBA").resize((width, height), Image.LANCZOS).tobytes()
+    except OSError:
+        return safe_load_pixbuf(path, width, height, False)
+    return GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(data), GdkPixbuf.Colorspace.RGB, True, 8, width, height, width * 4)
+
+
 def safe_load_pixbuf(path, w=None, h=None, keep_aspect_ratio=False):
     try:
         if w and h:
@@ -221,6 +235,14 @@ def new_icon_image(icon_filename, size=16):
     image = Gtk.Image.new_from_gicon(icon)
     image.set_pixel_size(size)
     return image
+
+
+def make_descendants_untargetable(widget):
+    child = widget.get_first_child()
+    while child is not None:
+        child.set_can_target(False)
+        make_descendants_untargetable(child)
+        child = child.get_next_sibling()
 
 
 def widget_children(widget):
@@ -281,16 +303,457 @@ def wrap_with_spinner(widget, dim_shape="none"):
     return overlay, spinner
 
 
-def create_accent_placeholder_paintable(width, height, alpha=0.4, rgb=None):
+def create_accent_placeholder_paintable(width, height, scale, alpha=0.4, rgb=None):
     r, g, b = rgb if rgb is not None else get_effective_accent_rgb()
 
-    w = width * HIDPI_SCALE
-    h = height * HIDPI_SCALE
-    pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, w, h)
+    pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, int(width * scale), int(height * scale))
     a = int(alpha * 255)
     pixbuf.fill((r << 24) | (g << 16) | (b << 8) | a)
     texture = Gdk.Texture.new_for_pixbuf(pixbuf)
     return HiDpiPaintable(texture, width, height)
+
+
+texture_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="faugus-cover")
+
+
+def modified_time(path):
+    try:
+        return os.path.getmtime(path)
+    except OSError:
+        return None
+
+
+def cover_key(path, installed, max_width, max_height):
+    return (path, modified_time(path), installed, max_width, max_height)
+
+
+def icon_key(path, installed, width, height):
+    return (path, modified_time(path), installed, width, height)
+
+
+def cover_identity(key):
+    return key[0]
+
+
+def icon_identity(key):
+    return (key[0], key[3:5])
+
+
+def texture_from_pixbuf(pixbuf, installed):
+    if not installed:
+        pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
+    return Gdk.Texture.new_for_pixbuf(pixbuf)
+
+
+def build_cover_texture(key):
+    path, _, installed, max_width, max_height = key
+    info = GdkPixbuf.Pixbuf.get_file_info(path)
+    width, height = (info[1], info[2]) if info and info[0] is not None else (0, 0)
+    if width > max_width or height > max_height:
+        ratio = min(max_width / width, max_height / height)
+        pixbuf = load_resized_pixbuf(path, max(1, int(width * ratio)), max(1, int(height * ratio)))
+    else:
+        pixbuf = safe_load_pixbuf(path)
+    return texture_from_pixbuf(pixbuf, installed)
+
+
+def build_icon_texture(key):
+    path, _, installed, width, height = key
+    return texture_from_pixbuf(load_resized_pixbuf(path, width, height), installed)
+
+
+class TextureCache:
+    def __init__(self, build, identity):
+        self.build = build
+        self.identity = identity
+        self.textures = {}
+        self.pending = {}
+
+    def get(self, key):
+        texture = self.textures.get(key)
+        if texture is None:
+            texture = self.build(key)
+            self.store(key, texture)
+        return texture
+
+    def store(self, key, texture):
+        identity = self.identity(key)
+        for stale in [other for other in self.textures if self.identity(other) == identity]:
+            del self.textures[stale]
+        self.textures[key] = texture
+
+    def load(self, key, callback, loaded=None):
+        texture = self.textures.get(key)
+        if texture is not None:
+            callback(texture)
+            return
+
+        waiting = self.pending.get(key)
+        if waiting is not None:
+            waiting.append(callback)
+            return
+        self.pending[key] = [callback]
+
+        def finish(texture):
+            callbacks = self.pending.pop(key, [])
+            if texture is not None:
+                self.store(key, texture)
+                for waiting_callback in callbacks:
+                    waiting_callback(texture)
+                if loaded is not None:
+                    loaded()
+            return False
+
+        def work():
+            try:
+                texture = self.build(key)
+            except GLib.Error:
+                texture = None
+            GLib.idle_add(finish, texture)
+
+        texture_executor.submit(work)
+
+    def trim(self, keep_paths, limit):
+        for key in [key for key in self.textures if key[0] not in keep_paths]:
+            if len(self.textures) <= limit:
+                break
+            del self.textures[key]
+
+
+LAZY_MODES = ("Covers", "Grid", "List")
+REFRESH_DELAY_MS = 100
+MAX_WAIT_US = 400000
+
+
+class LazyImages:
+    def __init__(self, window):
+        self.window = window
+        self.loaded = set()
+        self.geometry = None
+        self.source = None
+        self.started = 0
+
+    def watch(self, scroll_box):
+        for adjustment in (scroll_box.get_vadjustment(), scroll_box.get_hadjustment()):
+            adjustment.connect("value-changed", lambda adjustment: self.schedule())
+            adjustment.connect("notify::page-size", lambda adjustment, pspec: self.layout_changed())
+            adjustment.connect("notify::upper", lambda adjustment, pspec: self.layout_changed())
+
+    def layout_changed(self):
+        self.geometry = None
+        self.schedule()
+
+    def schedule(self, restart=True):
+        now = GLib.get_monotonic_time()
+        if self.source is not None:
+            if not restart or now - self.started > MAX_WAIT_US:
+                return
+            GLib.source_remove(self.source)
+        else:
+            self.started = now
+        self.source = GLib.timeout_add(REFRESH_DELAY_MS, self.refresh)
+
+    def mark_loaded(self, child):
+        self.loaded.add(child)
+
+    def unload(self, child):
+        self.loaded.discard(child)
+        self.window.unload_child_image(child)
+
+    def reset(self):
+        for child in list(self.loaded):
+            self.unload(child)
+        self.schedule()
+
+    def build_geometry(self, scroll_box, horizontal):
+        flowbox = self.window.flowbox
+        entries = []
+        for child in flowbox:
+            if not child.get_child_visible() or child.get_height() <= 0:
+                continue
+            ok, bounds = child.compute_bounds(flowbox)
+            if not ok:
+                continue
+            start, size = (bounds.origin.x, bounds.size.width) if horizontal else (bounds.origin.y, bounds.size.height)
+            entries.append((start, start + size, child))
+        entries.sort(key=lambda entry: entry[0])
+        starts = [entry[0] for entry in entries]
+        longest = max((end - start for start, end, _ in entries), default=0)
+        self.geometry = (entries, starts, longest, horizontal, scroll_box.get_width(), scroll_box.get_height())
+
+    def children_near(self, scroll_box, horizontal, view):
+        geometry = self.geometry
+        if geometry is None or geometry[3:] != (horizontal, scroll_box.get_width(), scroll_box.get_height()):
+            self.build_geometry(scroll_box, horizontal)
+            geometry = self.geometry
+
+        entries, starts, longest = geometry[:3]
+        ok, origin = self.window.flowbox.compute_bounds(scroll_box)
+        if not ok:
+            return set()
+        offset = origin.origin.x if horizontal else origin.origin.y
+        low = -view - offset
+        high = 2 * view - offset
+        first = bisect.bisect_left(starts, low - longest)
+        last = bisect.bisect_right(starts, high)
+        return {child for start, end, child in entries[first:last] if end >= low and start <= high}
+
+    def refresh(self):
+        self.source = None
+        window = self.window
+        scroll_box = getattr(window, "scroll_box", None)
+        if window.interface_mode not in LAZY_MODES or scroll_box is None or not window.get_realized():
+            return False
+
+        horizontal = scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
+        view = scroll_box.get_width() if horizontal else scroll_box.get_height()
+        if view <= 0:
+            return False
+
+        near = self.children_near(scroll_box, horizontal, view)
+        for child in near - self.loaded:
+            self.loaded.add(child)
+            window.load_child_image(child)
+        for child in [child for child in self.loaded if child not in near or child.get_parent() is None]:
+            self.unload(child)
+        window.trim_image_caches(near)
+        return False
+
+
+SMOOTHING = 18
+MIN_PADDING = 10
+EDGE_TOLERANCE = 20
+SETTLE_THRESHOLD = 0.5
+
+
+class SmoothScroll:
+    def __init__(self, window, scroll_box, flowbox):
+        self.scroll_box = scroll_box
+        self.flowbox = flowbox
+        self.adjustment = None
+        self.target = 0.0
+        self.last = 0.0
+        self.time = 0
+        self.tick = None
+
+        window.connect("notify::focus-widget", self.on_focus_changed)
+        controller = Gtk.EventControllerScroll()
+        controller.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES)
+        controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        controller.connect("scroll", self.on_wheel)
+        scroll_box.add_controller(controller)
+
+    @property
+    def horizontal(self):
+        return self.scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
+
+    def main_adjustment(self):
+        return self.scroll_box.get_hadjustment() if self.horizontal else self.scroll_box.get_vadjustment()
+
+    def current_target(self, adjustment):
+        return self.target if self.adjustment is adjustment else adjustment.get_value()
+
+    def stop(self):
+        if self.tick is not None:
+            self.scroll_box.remove_tick_callback(self.tick)
+            self.tick = None
+        self.adjustment = None
+
+    def on_tick(self, widget, clock):
+        current = self.adjustment.get_value()
+        if abs(current - self.last) > SETTLE_THRESHOLD:
+            self.stop()
+            return GLib.SOURCE_REMOVE
+
+        now = clock.get_frame_time()
+        elapsed = (now - self.time) / 1000000
+        self.time = now
+        value = current + (self.target - current) * (1 - math.exp(-elapsed * SMOOTHING))
+        if abs(self.target - value) < SETTLE_THRESHOLD:
+            value = self.target
+        self.adjustment.set_value(value)
+        self.last = self.adjustment.get_value()
+        if value == self.target:
+            self.stop()
+            return GLib.SOURCE_REMOVE
+        return GLib.SOURCE_CONTINUE
+
+    def animate_to(self, adjustment, target):
+        target = max(adjustment.get_lower(), min(target, adjustment.get_upper() - adjustment.get_page_size()))
+        frame_clock = self.scroll_box.get_frame_clock()
+        if frame_clock is None:
+            adjustment.set_value(target)
+            return
+        self.target = target
+        self.adjustment = adjustment
+        self.last = adjustment.get_value()
+        if self.tick is None:
+            self.time = frame_clock.get_frame_time()
+            self.tick = self.scroll_box.add_tick_callback(self.on_tick)
+
+    def on_wheel(self, controller, dx, dy):
+        if controller.get_unit() != Gdk.ScrollUnit.WHEEL:
+            return False
+        adjustment = self.main_adjustment()
+        if adjustment.get_upper() <= adjustment.get_page_size():
+            return False
+
+        delta = dx + dy if self.horizontal else dy
+        step = adjustment.get_page_size() ** (2 / 3)
+        self.animate_to(adjustment, self.current_target(adjustment) + delta * step)
+        return True
+
+    def on_focus_changed(self, window, pspec):
+        focused = window.get_focus()
+        if isinstance(focused, Gtk.FlowBoxChild) and focused.get_parent() is self.flowbox:
+            self.show_child(focused)
+
+    def show_child(self, child):
+        horizontal = self.horizontal
+        adjustment = self.main_adjustment()
+        ok, bounds = child.compute_bounds(self.scroll_box)
+        if not ok:
+            return
+        if horizontal:
+            start, size, view = bounds.origin.x, bounds.size.width, self.scroll_box.get_width()
+        else:
+            start, size, view = bounds.origin.y, bounds.size.height, self.scroll_box.get_height()
+        padding = max(self.flowbox.get_margin_top(), MIN_PADDING)
+
+        base = self.current_target(adjustment)
+        start -= base - adjustment.get_value()
+        target = base
+
+        ok, in_flowbox = child.compute_bounds(self.flowbox)
+        at_start = at_end = False
+        if ok and not horizontal:
+            at_start = in_flowbox.origin.y < EDGE_TOLERANCE
+            at_end = self.flowbox.get_height() - (in_flowbox.origin.y + in_flowbox.size.height) < EDGE_TOLERANCE
+
+        if at_end:
+            target = adjustment.get_upper()
+        elif at_start:
+            target = adjustment.get_lower()
+        elif start + size > view - padding:
+            target = base + start + size - (view - padding)
+        elif start < padding:
+            target = base - (padding - start)
+        if target != base:
+            self.animate_to(adjustment, target)
+
+
+REVEAL_DURATION_MS = 150
+HIDE_DURATION_MS = 400
+HOT_ZONE_PX = 24
+
+
+class AutoHideBar:
+    def __init__(self, revealer, edge):
+        self.revealer = revealer
+        self.edge = edge
+        self.widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.widget.append(revealer)
+        self.motion = Gtk.EventControllerMotion()
+        self.widget.add_controller(self.motion)
+        self.pointer_inside = False
+
+
+class AutoHide:
+    def __init__(self, window):
+        self.window = window
+        self.bars = []
+        self.pinned = set()
+        self.held = set()
+        self.pointer_y = None
+
+        window.connect("notify::focus-widget", lambda window, pspec: window.auto_hide_enabled and self.apply())
+        window_motion = Gtk.EventControllerMotion()
+        window_motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        window_motion.connect("motion", lambda controller, x, y: self.on_pointer(y))
+        window_motion.connect("leave", lambda controller: self.on_pointer(None))
+        window.add_controller(window_motion)
+
+    def wrap(self, content, edge):
+        revealer = Gtk.Revealer()
+        revealer.set_transition_type(
+            Gtk.RevealerTransitionType.SLIDE_UP if edge == "bottom" else Gtk.RevealerTransitionType.SLIDE_DOWN
+        )
+        revealer.set_reveal_child(True)
+        revealer.set_child(content)
+
+        bar = AutoHideBar(revealer, edge)
+        bar.motion.connect("notify::contains-pointer", lambda controller, pspec: self.refresh(bar))
+        self.bars = [other for other in self.bars if other.widget.get_parent() is not None]
+        self.bars.append(bar)
+        self.refresh(bar)
+        return bar.widget
+
+    def on_pointer(self, y):
+        if not self.window.auto_hide_enabled:
+            return
+        self.pointer_y = y
+        if y is None:
+            self.held = {bar.edge for bar in self.bars if bar.pointer_inside}
+            return
+        self.held = set()
+        for bar in self.bars:
+            bar.pointer_inside = bar.motion.props.contains_pointer or self.in_hot_zone(bar)
+        self.apply()
+
+    def in_hot_zone(self, bar):
+        if self.pointer_y is None:
+            return False
+        ok, bounds = bar.widget.compute_bounds(self.window)
+        if not ok:
+            return False
+        if bar.edge == "bottom":
+            return self.pointer_y >= bounds.origin.y + bounds.size.height - HOT_ZONE_PX
+        return self.pointer_y <= bounds.origin.y + HOT_ZONE_PX
+
+    def refresh(self, bar):
+        focused = self.window.get_focus()
+        focus_inside = focused is not None and focused.is_ancestor(bar.widget)
+        pointer_near = bar.motion.props.contains_pointer or self.in_hot_zone(bar) or bar.edge in self.held
+        hidden = self.window.auto_hide_enabled and not pointer_near and not focus_inside and bar.edge not in self.pinned
+        bar.revealer.set_transition_duration(HIDE_DURATION_MS if hidden else REVEAL_DURATION_MS)
+        bar.revealer.set_reveal_child(not hidden)
+
+    def apply(self):
+        for bar in self.bars:
+            self.refresh(bar)
+
+    def reveal(self, edge):
+        self.pinned.add(edge)
+        was_hidden = False
+        for bar in self.bars:
+            if bar.edge != edge or bar.widget.get_parent() is None:
+                continue
+            was_hidden = was_hidden or not bar.revealer.get_reveal_child()
+            bar.revealer.set_transition_duration(REVEAL_DURATION_MS)
+            bar.revealer.set_reveal_child(True)
+        return was_hidden
+
+    def unpin(self, edge):
+        self.pinned.discard(edge)
+        self.apply()
+
+    def keep_bottom_anchored(self, adjustment):
+        previous = [adjustment.get_page_size()]
+
+        def on_page_size_changed(adjustment, pspec):
+            page_size = adjustment.get_page_size()
+            delta = previous[0] - page_size
+            previous[0] = page_size
+            if not delta or not self.window.auto_hide_enabled:
+                return
+            animating = {
+                bar.edge for bar in self.bars
+                if bar.revealer.get_reveal_child() != bar.revealer.get_child_revealed()
+            }
+            if animating == {"bottom"}:
+                adjustment.set_value(adjustment.get_value() + delta)
+
+        adjustment.connect("notify::page-size", on_page_size_changed)
 
 
 def set_spinner_loading(spinners, loading):

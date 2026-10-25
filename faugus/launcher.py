@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import math
 import shutil
 import subprocess
 import sys
@@ -53,7 +52,6 @@ if fix_legacy_shortcut_icons():
 _ = setup_gettext('faugus-launcher')
 
 
-_cover_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="faugus-cover")
 _banner_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="faugus-banner")
 
 
@@ -115,10 +113,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         apply_titlebar_preference(self)
         self.add_css_class("main-window")
         self.connect("close-request", self.on_close)
-        self.cover_refresh_source = None
-        self.cover_refresh_started = 0
-        self.loaded_covers = set()
-        self.connect("notify::scale-factor", self.on_cover_scale_changed)
+        self.cover_textures = TextureCache(build_cover_texture, cover_identity)
+        self.icon_textures = TextureCache(build_icon_texture, icon_identity)
+        self.lazy_images = LazyImages(self)
+        self.auto_hide = AutoHide(self)
+        self.connect("notify::scale-factor", lambda window, pspec: self.lazy_images.reset())
         print(f"Faugus {VERSION}")
 
         self.fullscreen_activated = False
@@ -407,18 +406,21 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         GLib.timeout_add(1000, self.check_running)
 
-    def update_icon(self):
-        game = self.selected()
+    def update_icon(self, carrousel_games=None):
+        game = self.selected(carrousel_games)
         gameid = game.gameid if game else None
 
         is_running = gameid in self.running if gameid else False
         icon = "faugus-stop-symbolic" if is_running else "faugus-play-symbolic"
+        if icon == self.play_icon:
+            return
 
+        self.play_icon = icon
         self.button_play.set_child(new_icon_image(f"{icon}.svg"))
 
-    def selected(self):
+    def selected(self, carrousel_games=None):
         if self.carrousel_active():
-            games = self.carrousel_visible_games()
+            games = carrousel_games if carrousel_games is not None else self.carrousel_visible_games()
             if not games:
                 return None
             return games[self.carrousel_index % len(games)]
@@ -1273,6 +1275,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.button_settings = create_button("faugus-settings-symbolic", self.on_button_settings_clicked)
         self.button_kill = create_button("faugus-kill-symbolic", self.on_button_kill_clicked, _("Kill all running games"))
         self.button_play = create_button("faugus-play-symbolic", self.on_button_play_clicked)
+        self.play_icon = "faugus-play-symbolic"
 
         self.entry_search = Gtk.Entry()
         self.entry_search.add_css_class("main-control")
@@ -1401,7 +1404,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self._last_zoom = zoom_pct
             self.cover_size = zoom_pct
 
-            self.schedule_zoom_apply(zoom_pct)
+            self.schedule_zoom_apply()
 
         self.scale_zoom.connect("value-changed", on_zoom_changed)
 
@@ -1418,134 +1421,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         scroll_box.set_margin_end(10)
         scroll_box.set_hexpand(True)
 
-        vadjustment = scroll_box.get_vadjustment()
-        last_page_size = [vadjustment.get_page_size()]
-
-        def on_scroll_page_size_changed(adjustment, pspec):
-            page_size = adjustment.get_page_size()
-            delta = last_page_size[0] - page_size
-            last_page_size[0] = page_size
-            if not delta or not self.auto_hide_enabled:
-                return
-            animating = {
-                wrapper.auto_hide[2] for wrapper in getattr(self, "auto_hide_wrappers", [])
-                if wrapper.auto_hide[0].get_reveal_child() != wrapper.auto_hide[0].get_child_revealed()
-            }
-            if animating == {"bottom"}:
-                adjustment.set_value(adjustment.get_value() + delta)
-
-        vadjustment.connect("notify::page-size", on_scroll_page_size_changed)
-        for adjustment in (vadjustment, scroll_box.get_hadjustment()):
-            adjustment.connect("value-changed", lambda adjustment: self.schedule_cover_refresh())
-            adjustment.connect("notify::page-size", lambda adjustment, pspec: self.schedule_cover_refresh())
-            adjustment.connect("notify::upper", lambda adjustment, pspec: self.schedule_cover_refresh())
-
-        smooth_scroll = {"adjustment": None, "target": 0.0, "last": 0.0, "time": None, "tick": None}
-
-        def stop_smooth_scroll():
-            if smooth_scroll["tick"] is not None:
-                scroll_box.remove_tick_callback(smooth_scroll["tick"])
-                smooth_scroll["tick"] = None
-            smooth_scroll["adjustment"] = None
-
-        def smooth_scroll_tick(widget, clock):
-            adjustment = smooth_scroll["adjustment"]
-            current = adjustment.get_value()
-            if abs(current - smooth_scroll["last"]) > 0.5:
-                stop_smooth_scroll()
-                return GLib.SOURCE_REMOVE
-
-            now = clock.get_frame_time()
-            elapsed = (now - smooth_scroll["time"]) / 1000000
-            smooth_scroll["time"] = now
-            target = smooth_scroll["target"]
-            new_value = current + (target - current) * (1 - math.exp(-elapsed * 18))
-            if abs(target - new_value) < 0.5:
-                new_value = target
-            adjustment.set_value(new_value)
-            smooth_scroll["last"] = adjustment.get_value()
-            if new_value == target:
-                stop_smooth_scroll()
-                return GLib.SOURCE_REMOVE
-            return GLib.SOURCE_CONTINUE
-
-        def animate_scroll_to(adjustment, target):
-            maximum = adjustment.get_upper() - adjustment.get_page_size()
-            target = max(adjustment.get_lower(), min(target, maximum))
-            frame_clock = scroll_box.get_frame_clock()
-            if frame_clock is None:
-                adjustment.set_value(target)
-                return
-            smooth_scroll["target"] = target
-            smooth_scroll["adjustment"] = adjustment
-            smooth_scroll["last"] = adjustment.get_value()
-            if smooth_scroll["tick"] is None:
-                smooth_scroll["time"] = frame_clock.get_frame_time()
-                smooth_scroll["tick"] = scroll_box.add_tick_callback(smooth_scroll_tick)
-
-        def on_scroll_wheel(controller, dx, dy):
-            if controller.get_unit() != Gdk.ScrollUnit.WHEEL:
-                return False
-            vertical_policy = scroll_box.get_policy()[1]
-            if vertical_policy == Gtk.PolicyType.NEVER:
-                adjustment = scroll_box.get_hadjustment()
-                delta = dx + dy
-            else:
-                adjustment = vadjustment
-                delta = dy
-            if adjustment.get_upper() <= adjustment.get_page_size():
-                return False
-
-            base = smooth_scroll["target"] if smooth_scroll["adjustment"] is adjustment else adjustment.get_value()
-            step = adjustment.get_page_size() ** (2 / 3)
-            animate_scroll_to(adjustment, base + delta * step)
-            return True
-
-        def scroll_to_show_focus(child):
-            horizontal = scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
-            adjustment = scroll_box.get_hadjustment() if horizontal else vadjustment
-            ok, bounds = child.compute_bounds(scroll_box)
-            if not ok:
-                return
-            if horizontal:
-                start, size, view = bounds.origin.x, bounds.size.width, scroll_box.get_width()
-            else:
-                start, size, view = bounds.origin.y, bounds.size.height, scroll_box.get_height()
-            padding = max(self.flowbox.get_margin_top(), 10)
-
-            base = smooth_scroll["target"] if smooth_scroll["adjustment"] is adjustment else adjustment.get_value()
-            current = adjustment.get_value()
-            start -= base - current
-            target = base
-            ok, in_flowbox = child.compute_bounds(self.flowbox)
-            if horizontal or not ok:
-                at_end = at_start = False
-            else:
-                at_end = self.flowbox.get_height() - (in_flowbox.origin.y + in_flowbox.size.height) < 20
-                at_start = in_flowbox.origin.y < 20
-            if at_end:
-                target = adjustment.get_upper()
-            elif at_start:
-                target = adjustment.get_lower()
-            elif start + size > view - padding:
-                target = base + start + size - (view - padding)
-            elif start < padding:
-                target = base - (padding - start)
-            if target != base:
-                animate_scroll_to(adjustment, target)
-
-        def on_focus_widget_changed(window, pspec):
-            focused = window.get_focus()
-            if isinstance(focused, Gtk.FlowBoxChild) and focused.get_parent() is self.flowbox:
-                scroll_to_show_focus(focused)
-
-        self.connect("notify::focus-widget", on_focus_widget_changed)
-
-        scroll_controller = Gtk.EventControllerScroll()
-        scroll_controller.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES)
-        scroll_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-        scroll_controller.connect("scroll", on_scroll_wheel)
-        scroll_box.add_controller(scroll_controller)
+        self.auto_hide.keep_bottom_anchored(scroll_box.get_vadjustment())
+        self.lazy_images.watch(scroll_box)
 
         self.flowbox = Gtk.FlowBox()
         self.flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
@@ -1627,7 +1504,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.flowbox.set_row_spacing(5)
 
         def sort_games(child1, child2, user_data):
-            self.schedule_cover_refresh(restart=False)
+            self.lazy_images.geometry = None
+            self.lazy_images.schedule(restart=False)
             g1 = child1.game
             g2 = child2.game
 
@@ -1653,13 +1531,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return (t1 > t2) - (t1 < t2)
 
         def filter_games(child, user_data):
-            self.schedule_cover_refresh(restart=False)
+            self.lazy_images.geometry = None
+            self.lazy_images.schedule(restart=False)
             return self.game_matches_filter(child.game, self.entry_search.get_text().lower())
 
         self.flowbox.set_sort_func(sort_games, None)
         self.flowbox.set_filter_func(filter_games, None)
         scroll_box.set_child(self.flowbox)
         scroll_box.get_child().set_scroll_to_focus(False)
+        self.smooth_scroll = SmoothScroll(self, scroll_box, self.flowbox)
 
         bottom_bar_key_controller = Gtk.EventControllerKey()
         bottom_bar_key_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
@@ -1697,7 +1577,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             center_grid.set_vexpand(False)
 
             bottom_bar.set_center_widget(center_grid)
-            self.bottom_bar_wrapper = self.auto_hide_wrapper(bottom_bar, "bottom")
+            self.bottom_bar_wrapper = self.auto_hide.wrap(bottom_bar, "bottom")
             self.scale_zoom.set_valign(Gtk.Align.CENTER)
             self.scale_zoom.set_vexpand(False)
 
@@ -1727,7 +1607,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             grid_controls.attach(self.button_kill,       3, 0, 1, 1)
             grid_controls.attach(self.button_play,  4, 0, 1, 1)
 
-            self.box_bottom.append(self.auto_hide_wrapper(grid_controls, "bottom"))
+            self.box_bottom.append(self.auto_hide.wrap(grid_controls, "bottom"))
 
             list_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             list_container.append(box_top)
@@ -1783,16 +1663,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def carrousel_visible_games(self):
         search_text = self.entry_search.get_text().lower() if hasattr(self, 'entry_search') else ''
 
-        def sort_key(g):
-            if self.current_sort_id == "playtime":
-                return -self.playtime_data.get(g.gameid, 0)
-            if self.current_sort_id == "lastplayed":
-                return self.latest_games_order.get(g.gameid, float('inf'))
-            if self.current_sort_id == "custom":
-                return self.custom_order_data.get(g.gameid, 999999)
-            return g.title.lower()
-
-        ordered = sorted(self.games, key=sort_key)
+        if self.current_sort_id == "playtime":
+            playtime = self.playtime_data
+            ordered = sorted(self.games, key=lambda g: -playtime.get(g.gameid, 0))
+        elif self.current_sort_id == "lastplayed":
+            order = self.latest_games_order
+            ordered = sorted(self.games, key=lambda g: order.get(g.gameid, float('inf')))
+        elif self.current_sort_id == "custom":
+            order = self.custom_order_data
+            ordered = sorted(self.games, key=lambda g: order.get(g.gameid, 999999))
+        else:
+            ordered = sorted(self.games, key=lambda g: g.title.lower())
+        filtering_by_category = self.categories_enabled and self.current_category and self.current_category != _("All")
+        if not search_text and not filtering_by_category:
+            return ordered
         return [g for g in ordered if self.game_matches_filter(g, search_text)]
 
     def game_in_category(self, game, category):
@@ -1866,6 +1750,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         card.add_css_class("cover-container")
         card.add_css_class("carrousel-cover-box")
         card.set_overflow(Gtk.Overflow.HIDDEN)
+        make_descendants_untargetable(card)
 
         style_provider = Gtk.CssProvider()
         card.get_style_context().add_provider(style_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
@@ -2258,7 +2143,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             slot["offset"] = new_offset
 
         self.carrousel_start_animation()
-        self.update_icon()
+        self.update_icon(games)
         self.prefetch_carrousel_covers(games)
 
     def apply_pending_carrousel_reorder(self):
@@ -3311,98 +3196,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 button.set_size_request(110, -1)
                 button.set_hexpand(True)
                 top_bar.append(button)
-            self.top_bar_wrapper = self.auto_hide_wrapper(top_bar, "top")
+            self.top_bar_wrapper = self.auto_hide.wrap(top_bar, "top")
             self.box_top.prepend(self.top_bar_wrapper)
-
-    def auto_hide_wrapper(self, bar, edge):
-        revealer = Gtk.Revealer()
-        revealer.set_transition_type(
-            Gtk.RevealerTransitionType.SLIDE_UP if edge == "bottom" else Gtk.RevealerTransitionType.SLIDE_DOWN
-        )
-        revealer.set_reveal_child(True)
-        revealer.set_child(bar)
-
-        wrapper = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        wrapper.append(revealer)
-
-        motion = Gtk.EventControllerMotion()
-        motion.connect("notify::contains-pointer", lambda c, p: self.refresh_auto_hide(wrapper))
-        wrapper.add_controller(motion)
-
-        if not getattr(self, "_auto_hide_focus_hooked", False):
-            self._auto_hide_focus_hooked = True
-            self.connect("notify::focus-widget", lambda w, p: self.auto_hide_enabled and self.apply_auto_hide())
-
-            window_motion = Gtk.EventControllerMotion()
-            window_motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-            window_motion.connect("motion", self.on_auto_hide_pointer_motion)
-            window_motion.connect("leave", lambda c: self.on_auto_hide_pointer_motion(c, None, None))
-            self.add_controller(window_motion)
-
-        wrapper.auto_hide = (revealer, motion, edge)
-        self.auto_hide_wrappers = [w for w in getattr(self, "auto_hide_wrappers", []) if w.get_parent() is not None]
-        self.auto_hide_wrappers.append(wrapper)
-        self.refresh_auto_hide(wrapper)
-        return wrapper
-
-    def on_auto_hide_pointer_motion(self, controller, x, y):
-        if not self.auto_hide_enabled:
-            return
-        if y is None:
-            self._auto_hide_pointer_y = None
-            self._auto_hide_held = {
-                wrapper.auto_hide[2] for wrapper in getattr(self, "auto_hide_wrappers", [])
-                if getattr(wrapper, "pointer_inside", False)
-            }
-            return
-        self._auto_hide_pointer_y = y
-        self._auto_hide_held = set()
-        for wrapper in getattr(self, "auto_hide_wrappers", []):
-            motion, edge = wrapper.auto_hide[1:]
-            wrapper.pointer_inside = motion.props.contains_pointer or self.auto_hide_pointer_in_zone(wrapper, edge)
-        self.apply_auto_hide()
-
-    def auto_hide_pointer_in_zone(self, wrapper, edge):
-        pointer_y = getattr(self, "_auto_hide_pointer_y", None)
-        if pointer_y is None:
-            return False
-        ok, bounds = wrapper.compute_bounds(self)
-        if not ok:
-            return False
-        if edge == "bottom":
-            return pointer_y >= bounds.origin.y + bounds.size.height - 24
-        return pointer_y <= bounds.origin.y + 24
-
-    def refresh_auto_hide(self, wrapper):
-        revealer, motion, edge = wrapper.auto_hide
-        focused = self.get_focus()
-        focus_inside = focused is not None and focused.is_ancestor(wrapper)
-        in_zone = (motion.props.contains_pointer or self.auto_hide_pointer_in_zone(wrapper, edge)
-                   or edge in getattr(self, "_auto_hide_held", ()))
-        pinned = edge in getattr(self, "_auto_hide_pinned", ())
-        hidden = self.auto_hide_enabled and not in_zone and not focus_inside and not pinned
-        revealer.set_transition_duration(400 if hidden else 150)
-        revealer.set_reveal_child(not hidden)
-
-    def apply_auto_hide(self):
-        for wrapper in getattr(self, "auto_hide_wrappers", []):
-            self.refresh_auto_hide(wrapper)
-
-    def unpin_auto_hide(self, edge):
-        getattr(self, "_auto_hide_pinned", set()).discard(edge)
-        self.apply_auto_hide()
-
-    def reveal_auto_hide(self, edge):
-        self._auto_hide_pinned = getattr(self, "_auto_hide_pinned", set()) | {edge}
-        was_hidden = False
-        for wrapper in getattr(self, "auto_hide_wrappers", []):
-            revealer, motion, wrapper_edge = wrapper.auto_hide
-            if wrapper_edge != edge or wrapper.get_parent() is None:
-                continue
-            was_hidden = was_hidden or not revealer.get_reveal_child()
-            revealer.set_transition_duration(150)
-            revealer.set_reveal_child(True)
-        return was_hidden
 
     def arrange_main_content(self):
         if not hasattr(self, "carrousel_box") and self.carrousel_active():
@@ -3474,7 +3269,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.apply_labels_and_zoom_visibility()
 
         if "auto_hide_enabled" in changed:
-            self.apply_auto_hide()
+            self.auto_hide.apply()
 
         if "show_hidden" in changed:
             self.apply_show_hidden_change()
@@ -4148,7 +3943,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                     break
                 self.add_item_list(game)
 
-            self.schedule_cover_refresh()
+            self.lazy_images.schedule()
             if not self.flowbox.get_selected_children():
                 self.select_first_visible_child()
                 self.update_overview_panel()
@@ -4157,53 +3952,29 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         GLib.idle_add(step)
 
-    def schedule_zoom_apply(self, zoom_pct):
+    def schedule_zoom_apply(self):
         if getattr(self, '_zoom_apply_source', None):
             GLib.source_remove(self._zoom_apply_source)
 
         def fire():
             self._zoom_apply_source = None
-            self.apply_zoom_incremental(zoom_pct)
+            self.apply_zoom()
             return False
 
         self._zoom_apply_source = GLib.timeout_add(150, fire)
 
-    def apply_zoom_incremental(self, zoom_pct, batch_size=15):
+    def apply_zoom(self):
         if self.carrousel_active():
             self.render_carrousel()
             return
 
-        if self.interface_mode not in ("Covers", "Carrousel"):
+        if self.interface_mode != "Covers":
             return
 
-        children_iter = iter(widget_children(self.flowbox))
-
-        generation = object()
-        self._zoom_apply_generation = generation
-
-        zoom_width, zoom_height = self.cover_dimensions(zoom_pct)
-
-        def step():
-            if getattr(self, '_zoom_apply_generation', None) is not generation:
-                return False
-
-            for _ in range(batch_size):
-                child = next(children_iter, None)
-                if child is None:
-                    self.schedule_cover_refresh()
-                    return False
-
-                if not hasattr(child, 'game') or not child.game or not hasattr(child, 'cover'):
-                    continue
-
-                if getattr(child, "cover_loaded", False):
-                    child.cover.set_paintable(self.get_cover_paintable(child.game, zoom_width, zoom_height))
-                else:
-                    child.cover.set_paintable(self.get_cover_placeholder(zoom_width, zoom_height))
-
-            return True
-
-        GLib.idle_add(step)
+        self.cover_textures.textures.clear()
+        for child in self.flowbox:
+            self.lazy_images.unload(child)
+        self.lazy_images.schedule()
 
     def add_item_list(self, game):
         zoom_pct = self.cover_size
@@ -4245,7 +4016,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             image.set_size_request(40, 40)
 
             child.image = image
-            child.cover_loaded = False
 
             image.set_margin_start(10)
             image.set_margin_end(10)
@@ -4278,7 +4048,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             image.set_size_request(block_size, block_size)
 
             child.image = image
-            child.cover_loaded = False
 
             image.set_margin_top(10)
             game_label.set_margin_top(10)
@@ -4317,7 +4086,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             zoom_width, zoom_height = self.cover_dimensions(zoom_pct)
 
             image2.set_paintable(self.get_cover_placeholder(zoom_width, zoom_height))
-            child.cover_loaded = False
 
             hbox.append(image2)
 
@@ -4346,14 +4114,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         anim_box.set_can_target(False)
         child.set_child(overlay)
 
+        make_descendants_untargetable(child)
         self.flowbox.append(child)
         self.setup_dnd_for_widget(child)
 
     def update_game_visual(self, flowbox_child):
         game = flowbox_child.game
 
-        flowbox_child.cover_loaded = True
-        self.loaded_covers.add(flowbox_child)
+        self.lazy_images.mark_loaded(flowbox_child)
 
         if hasattr(flowbox_child, "image"):
             size = 40 if self.interface_mode == "List" else 100
@@ -4364,253 +4132,40 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             surface = self.get_cover_paintable(game, zoom_width, zoom_height)
             flowbox_child.cover.set_paintable(surface)
-            self.schedule_cover_refresh()
+            self.lazy_images.schedule()
 
     def cover_dimensions(self, zoom_pct):
         zoom_width = int(230 * (zoom_pct / 100.0))
         return zoom_width, int(zoom_width * 1.5)
 
-    def icon_cache_key(self, game, width, height):
-        path = game.icon if os.path.isfile(game.icon) else FAUGUS_PNG
-        try:
-            mtime = os.path.getmtime(path)
-        except OSError:
-            mtime = None
-        return (path, mtime, width, height, self.is_game_installed(game), self.cover_scale())
+    def device_scale(self):
+        return max(1, self.get_scale_factor())
 
-    def build_icon_texture(self, cache_key):
-        path, mtime, width, height, installed, scale = cache_key
-        pixbuf = load_downscaled_pixbuf(path, width * scale, height * scale) or safe_load_pixbuf(path, width * scale, height * scale, False)
-        if not installed:
-            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-        return Gdk.Texture.new_for_pixbuf(pixbuf)
+    def icon_path(self, game):
+        return game.icon if os.path.isfile(game.icon) else FAUGUS_PNG
 
-    def store_icon_texture(self, cache_key, texture):
-        for key in [k for k in self._icon_texture_cache if k[0] == cache_key[0] and k[2:4] == cache_key[2:4] and k[5] == cache_key[5]]:
-            del self._icon_texture_cache[key]
-        self._icon_texture_cache[cache_key] = texture
+    def icon_texture_key(self, game, width, height):
+        scale = self.device_scale()
+        return icon_key(self.icon_path(game), self.is_game_installed(game), int(width * scale), int(height * scale))
+
+    def cover_texture_key(self, path, installed):
+        width, height = self.cover_dimensions(self.cover_size)
+        scale = self.device_scale()
+        return cover_key(path, installed, int(width * scale), int(height * scale))
 
     def get_game_artwork(self, game, width, height):
-        if not hasattr(self, '_icon_texture_cache'):
-            self._icon_texture_cache = {}
-
-        cache_key = self.icon_cache_key(game, width, height)
-        texture = self._icon_texture_cache.get(cache_key)
-        if texture is None:
-            texture = self.build_icon_texture(cache_key)
-            self.store_icon_texture(cache_key, texture)
-
+        texture = self.icon_textures.get(self.icon_texture_key(game, width, height))
         return HiDpiPaintable(texture, width, height)
 
     def set_icon_async(self, child, size):
-        if not hasattr(self, '_icon_texture_cache'):
-            self._icon_texture_cache = {}
-
-        cache_key = self.icon_cache_key(child.game, size, size)
-
         def apply(texture):
-            if getattr(child, "cover_loaded", False) and child.get_parent() is not None:
+            if child in self.lazy_images.loaded and child.get_parent() is not None:
                 child.image.set_from_paintable(HiDpiPaintable(texture, size, size))
 
-        texture = self._icon_texture_cache.get(cache_key)
-        if texture is not None:
-            apply(texture)
-            return
-
-        def finish(texture):
-            if texture is not None:
-                self.store_icon_texture(cache_key, texture)
-                apply(texture)
-                self.schedule_cover_refresh()
-            return False
-
-        def work():
-            try:
-                texture = self.build_icon_texture(cache_key)
-            except GLib.Error:
-                texture = None
-            GLib.idle_add(finish, texture)
-
-        _cover_executor.submit(work)
-
-    def cover_scale(self):
-        return max(1, self.get_scale_factor())
-
-    def on_cover_scale_changed(self, widget, pspec):
-        if getattr(self, "flowbox", None) is None:
-            return
-        for child in list(self.loaded_covers):
-            self.unload_cover(child)
-        self.schedule_cover_refresh()
-
-    def schedule_cover_refresh(self, restart=True):
-        now = GLib.get_monotonic_time()
-        if self.cover_refresh_source is not None:
-            if not restart or now - self.cover_refresh_started > 400000:
-                return
-            GLib.source_remove(self.cover_refresh_source)
-        else:
-            self.cover_refresh_started = now
-        self.cover_refresh_source = GLib.timeout_add(100, self.refresh_visible_covers)
-
-    def unload_cover(self, child):
-        self.loaded_covers.discard(child)
-        child.cover_loaded = False
-        if getattr(child, "cover", None) is not None:
-            width, height = self.cover_dimensions(self.cover_size)
-            child.cover.set_paintable(self.get_cover_placeholder(width, height))
-        elif getattr(child, "image", None) is not None:
-            child.image.set_from_paintable(None)
-
-    def children_near_viewport(self, scroll_box, horizontal, view):
-        near = set()
-        for child in self.flowbox:
-            if not child.get_child_visible() or child.get_height() <= 0:
-                continue
-            ok, bounds = child.compute_bounds(scroll_box)
-            if not ok:
-                continue
-            start, size = (bounds.origin.x, bounds.size.width) if horizontal else (bounds.origin.y, bounds.size.height)
-            if start + size >= -view and start <= 2 * view:
-                near.add(child)
-        return near
-
-    def refresh_visible_covers(self):
-        self.cover_refresh_source = None
-        scroll_box = getattr(self, "scroll_box", None)
-        mode = self.interface_mode
-        if mode not in ("Covers", "Grid", "List") or scroll_box is None or not self.get_realized():
-            return False
-
-        horizontal = scroll_box.get_policy()[1] == Gtk.PolicyType.NEVER
-        view = scroll_box.get_width() if horizontal else scroll_box.get_height()
-        if view <= 0:
-            return False
-
-        near = self.children_near_viewport(scroll_box, horizontal, view)
-
-        icon_size = 40 if mode == "List" else 100
-        width, height = self.cover_dimensions(self.cover_size)
-        near_paths = set()
-        for child in near:
-            if getattr(child, "game", None) is None or getattr(child, "cover_loaded", None) is None:
-                continue
-            game = child.game
-            near_paths.add(game.cover if mode == "Covers" else (game.icon if os.path.isfile(game.icon) else FAUGUS_PNG))
-            if child.cover_loaded:
-                continue
-            child.cover_loaded = True
-            self.loaded_covers.add(child)
-            if mode == "Covers":
-                self.set_cover_async(child.cover, game, width, height)
-            else:
-                self.set_icon_async(child, icon_size)
-
-        for child in [c for c in self.loaded_covers if c not in near or c.get_parent() is None]:
-            self.unload_cover(child)
-
-        cache = getattr(self, "_cover_texture_cache" if mode == "Covers" else "_icon_texture_cache", {})
-        limit = len(near_paths) * 2 + 64
-        for key in [key for key in cache if key[0] not in near_paths]:
-            if len(cache) <= limit:
-                break
-            del cache[key]
-        return False
-
-    def cover_cache_key(self, path, installed):
-        try:
-            mtime = os.path.getmtime(path)
-        except OSError:
-            mtime = None
-        return (path, mtime, installed, self.cover_scale())
-
-    def build_cover_texture(self, path, installed, scale):
-        max_width, max_height = self.cover_dimensions(100)
-        max_width *= scale
-        max_height *= scale
-        info = GdkPixbuf.Pixbuf.get_file_info(path)
-        width, height = (info[1], info[2]) if info and info[0] is not None else (0, 0)
-        if width > max_width or height > max_height:
-            ratio = min(max_width / width, max_height / height)
-            target = (max(1, int(width * ratio)), max(1, int(height * ratio)))
-            pixbuf = load_downscaled_pixbuf(path, *target) or safe_load_pixbuf(path, *target, False)
-        else:
-            pixbuf = safe_load_pixbuf(path, None, None, False)
-        if not installed:
-            pixbuf.saturate_and_pixelate(pixbuf, 0.0, False)
-
-        return Gdk.Texture.new_for_pixbuf(pixbuf)
-
-    def store_cover_texture(self, cache_key, texture):
-        for key in [k for k in self._cover_texture_cache if k[0] == cache_key[0]]:
-            del self._cover_texture_cache[key]
-        self._cover_texture_cache[cache_key] = texture
+        self.icon_textures.load(self.icon_texture_key(child.game, size, size), apply, self.lazy_images.schedule)
 
     def get_cover_texture(self, path, installed):
-        if not hasattr(self, '_cover_texture_cache'):
-            self._cover_texture_cache = {}
-
-        cache_key = self.cover_cache_key(path, installed)
-        texture = self._cover_texture_cache.get(cache_key)
-        if texture is not None:
-            return texture
-
-        texture = self.build_cover_texture(path, installed, cache_key[3])
-        self.store_cover_texture(cache_key, texture)
-        return texture
-
-    def load_cover_texture_async(self, path, installed, callback):
-        if not hasattr(self, '_cover_texture_cache'):
-            self._cover_texture_cache = {}
-        if not hasattr(self, '_cover_pending'):
-            self._cover_pending = {}
-
-        cache_key = self.cover_cache_key(path, installed)
-        texture = self._cover_texture_cache.get(cache_key)
-        if texture is not None:
-            callback(texture)
-            return
-
-        waiting = self._cover_pending.get(cache_key)
-        if waiting is not None:
-            waiting.append(callback)
-            return
-        self._cover_pending[cache_key] = [callback]
-
-        def finish(texture):
-            callbacks = self._cover_pending.pop(cache_key, [])
-            if texture is not None and self.cover_cache_key(path, installed) == cache_key:
-                self.store_cover_texture(cache_key, texture)
-                for callback in callbacks:
-                    callback(texture)
-                self.schedule_cover_refresh()
-            return False
-
-        def work():
-            try:
-                texture = self.build_cover_texture(path, installed, cache_key[3])
-            except GLib.Error:
-                texture = None
-            GLib.idle_add(finish, texture)
-
-        _cover_executor.submit(work)
-
-    def prefetch_carrousel_covers(self, games):
-        n = len(games)
-        if not n:
-            return
-        window_paths = set()
-        for offset in range(-7, 8):
-            game = games[(self.carrousel_index + offset) % n]
-            window_paths.add(game.cover)
-            if os.path.isfile(game.cover):
-                self.load_cover_texture_async(game.cover, self.is_game_installed(game), lambda texture: None)
-
-        cache = getattr(self, "_cover_texture_cache", {})
-        for key in [key for key in cache if key[0] not in window_paths]:
-            if len(cache) <= 40:
-                break
-            del cache[key]
+        return self.cover_textures.get(self.cover_texture_key(path, installed))
 
     def set_cover_async(self, picture, game, width, height):
         picture.set_paintable(self.get_cover_placeholder(width, height))
@@ -4621,17 +4176,53 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             width, height = self.cover_dimensions(self.cover_size)
             picture.set_paintable(HiDpiPaintable(texture, width, height))
 
-        self.load_cover_texture_async(game.cover, self.is_game_installed(game), apply)
+        key = self.cover_texture_key(game.cover, self.is_game_installed(game))
+        self.cover_textures.load(key, apply, self.lazy_images.schedule)
+
+    def prefetch_carrousel_covers(self, games):
+        n = len(games)
+        if not n:
+            return
+        window_paths = set()
+        for offset in range(-7, 8):
+            game = games[(self.carrousel_index + offset) % n]
+            window_paths.add(game.cover)
+            if os.path.isfile(game.cover):
+                self.cover_textures.load(self.cover_texture_key(game.cover, self.is_game_installed(game)), lambda texture: None)
+        self.cover_textures.trim(window_paths, 40)
+
+    def load_child_image(self, child):
+        if self.interface_mode == "Covers":
+            width, height = self.cover_dimensions(self.cover_size)
+            self.set_cover_async(child.cover, child.game, width, height)
+        else:
+            self.set_icon_async(child, 40 if self.interface_mode == "List" else 100)
+
+    def unload_child_image(self, child):
+        if getattr(child, "cover", None) is not None:
+            width, height = self.cover_dimensions(self.cover_size)
+            child.cover.set_paintable(self.get_cover_placeholder(width, height))
+        elif getattr(child, "image", None) is not None:
+            child.image.set_from_paintable(None)
+
+    def trim_image_caches(self, near):
+        if self.interface_mode == "Covers":
+            keep = {child.game.cover for child in near}
+            self.cover_textures.trim(keep, len(keep) * 2 + 64)
+        else:
+            keep = {self.icon_path(child.game) for child in near}
+            self.icon_textures.trim(keep, len(keep) * 2 + 64)
 
     def get_cover_placeholder(self, width, height):
         rgb = self.get_accent_rgb()
+        scale = self.device_scale()
+        key = (width, height, tuple(rgb), scale)
         if not hasattr(self, '_cover_placeholders'):
             self._cover_placeholders = {}
-        key = (width, height, tuple(rgb), self.cover_scale())
         placeholder = self._cover_placeholders.get(key)
         if placeholder is None:
             self._cover_placeholders.clear()
-            placeholder = create_accent_placeholder_paintable(width, height, rgb=rgb, scale=self.cover_scale())
+            placeholder = create_accent_placeholder_paintable(width, height, scale, rgb=rgb)
             self._cover_placeholders[key] = placeholder
         return placeholder
 

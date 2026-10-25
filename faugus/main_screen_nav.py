@@ -289,9 +289,9 @@ def _focus_first_focusable(widget):
 
 
 def _focus_after_reveal(window, edge, focus_fn):
-    if not window.reveal_auto_hide(edge):
+    if not window.auto_hide.reveal(edge):
         result = focus_fn()
-        window.unpin_auto_hide(edge)
+        window.auto_hide.unpin(edge)
         return result
 
     attempts = 0
@@ -300,7 +300,7 @@ def _focus_after_reveal(window, edge, focus_fn):
         nonlocal attempts
         attempts += 1
         if focus_fn() or attempts >= 10:
-            window.unpin_auto_hide(edge)
+            window.auto_hide.unpin(edge)
             return GLib.SOURCE_REMOVE
         return GLib.SOURCE_CONTINUE
 
