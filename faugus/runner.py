@@ -83,6 +83,12 @@ def warm_up_gpu():
         pass
 
 
+STATUS_LINE = re.compile(
+    "Downloading|Updating|Components are up to date|UMU-Launcher|BattlEye|Easy Anti-Cheat|"
+    "GE-Proton|Proton-CachyOS|DW-Proton|Proton-Wineland|steamrt3|steamrt4|SteamLinuxRuntime"
+)
+
+
 class FaugusRun(HiDpiMixin):
     def __init__(self, message, command=None, pre_launch="", post_launch="", gameid="", with_logs=False):
         self.message = message
@@ -642,6 +648,9 @@ class FaugusRun(HiDpiMixin):
 
     def check_game_output(self, clean_line):
         if "Downloading upscaler file" in clean_line:
+            return False
+
+        if not clean_line.startswith("PROGRESS ") and not STATUS_LINE.search(clean_line):
             return False
 
         if clean_line.startswith("PROGRESS "):

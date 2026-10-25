@@ -118,10 +118,15 @@ class _RowCapMixin:
         self.scrolled_window.set_max_content_height(self._max_height_for_rows(10))
         return False
 
+    def cancel(self):
+        self.cancelled = True
+
     def _compute_sizes(self, size_lookup):
         for item in self.items:
             gameid = item["gameid"]
-            inode_map = size_lookup(item["path"])
+            inode_map = size_lookup(item["path"], lambda: self.cancelled)
+            if self.cancelled:
+                return
             self.inode_maps[gameid] = inode_map
             size_bytes = sum(inode_map.values())
             self.sizes[gameid] = size_bytes
@@ -131,6 +136,7 @@ class _RowCapMixin:
 class PrefixSelectionList(_RowCapMixin):
     def __init__(self, items, size_lookup=None, title_column_label=None, path_column_label=None):
         self.items = items
+        self.cancelled = False
         self.sizes = {}
         self.inode_maps = {}
         self.total_size_bytes = 0
@@ -203,6 +209,8 @@ class PrefixSelectionList(_RowCapMixin):
             run_in_background(self._compute_sizes, size_lookup)
 
     def _apply_size(self, gameid, size_bytes):
+        if self.cancelled:
+            return False
         for row in self.liststore:
             if row[4] == gameid:
                 row[3] = format_size(size_bytes)
@@ -270,6 +278,7 @@ class PrefixShortcutList(_RowCapMixin):
 
     def __init__(self, items, size_lookup=None):
         self.items = items
+        self.cancelled = False
         self.sizes = {}
         self.inode_maps = {}
         self.shortcut_files = {item["gameid"]: item.get("shortcut_files", []) for item in items}
@@ -385,6 +394,8 @@ class PrefixShortcutList(_RowCapMixin):
             run_in_background(self._compute_sizes, size_lookup)
 
     def _apply_size(self, gameid, size_bytes):
+        if self.cancelled:
+            return False
         for row in self.liststore:
             if row[self.COL_GAMEID] == gameid:
                 row[self.COL_SIZE_TEXT] = format_size(size_bytes)
@@ -888,6 +899,8 @@ class BackupWindow(Gtk.Dialog):
         GLib.idle_add(self._apply_settings_size, size)
 
     def _apply_settings_size(self, size):
+        if getattr(self, "prefix_list", None) is None:
+            return False
         self.settings_size_bytes = size
         self.update_backup_button_label()
         return False
@@ -960,6 +973,8 @@ class BackupWindow(Gtk.Dialog):
         return True
 
     def close_dialog(self):
+        self.prefix_list.cancel()
+        self.proton_list.cancel()
         if self.backup_running_poll_id is not None:
             GLib.source_remove(self.backup_running_poll_id)
             self.backup_running_poll_id = None

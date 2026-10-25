@@ -998,11 +998,15 @@ def build_dialog_ok_cancel_box(dialog):
     return build_bottom_button_box(button_cancel, button_ok)
 
 
-def _release_combo_boxes(widget):
+def _release_widgets(widget):
     if isinstance(widget, IdComboBox):
         widget.release()
+    if isinstance(widget, Gtk.Picture):
+        widget.set_paintable(None)
+    elif isinstance(widget, Gtk.Image):
+        widget.clear()
     for child in widget_children(widget):
-        _release_combo_boxes(child)
+        _release_widgets(child)
     if isinstance(widget, Gtk.Popover):
         widget.popdown()
         widget.unparent()
@@ -1017,7 +1021,7 @@ def destroy_and_release(widget):
     if isinstance(widget, Gtk.Window):
         widget.set_focus(None)
 
-    _release_combo_boxes(widget)
+    _release_widgets(widget)
 
     if isinstance(widget, Gtk.Dialog):
         content = widget.get_content_area()
@@ -1048,6 +1052,21 @@ def atomic_write(filepath, write_func):
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
         raise
+
+
+LOG_TAIL_BYTES = 2 * 1024 * 1024
+
+
+def read_log_tail(path):
+    with open(path, "rb") as log_file:
+        size = log_file.seek(0, os.SEEK_END)
+        log_file.seek(max(0, size - LOG_TAIL_BYTES))
+        text = log_file.read().decode("utf-8", errors="replace")
+    if size > LOG_TAIL_BYTES:
+        notice = _("Showing only the last {size} MB. Use \"Open file location\" for the full log.").format(
+            size=LOG_TAIL_BYTES // (1024 * 1024))
+        text = f"{notice}\n\n{text.split(chr(10), 1)[-1]}"
+    return text
 
 
 def load_json_file(filepath, default=None):

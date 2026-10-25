@@ -69,15 +69,22 @@ def save_config(config):
     save_json_file(config, CONFIG_FILE_DIR)
 
 
-def get_dir_inode_map(path):
+def get_dir_inode_map(path, cancelled=None):
     sizes = {}
+    unique_size = 0
     for dirpath, _dirnames, filenames in os.walk(path):
+        if cancelled is not None and cancelled():
+            return {}
         for name in filenames:
             try:
                 st = os.lstat(os.path.join(dirpath, name))
             except OSError:
                 continue
-            sizes[(st.st_dev, st.st_ino)] = st.st_size
+            if st.st_nlink > 1:
+                sizes[(st.st_dev, st.st_ino)] = st.st_size
+            else:
+                unique_size += st.st_size
+    sizes[("unique", path)] = unique_size
     return sizes
 
 

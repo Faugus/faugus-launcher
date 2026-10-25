@@ -169,14 +169,25 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         os.makedirs(self.icon_directory, exist_ok=True)
 
-        status = extract_ico(self.file_path, self.icon_temp)
-        if status == "ok":
-            texture = self.new_texture_from_image(self.icon_temp, 50, 50)
-            self.button_shortcut_icon.set_child(new_icon(texture))
-        elif status == "no_icons":
-            self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
+        def apply_icon(status):
+            if getattr(self, "button_shortcut_icon", None) is not None:
+                if status == "ok":
+                    texture = self.new_texture_from_image(self.icon_temp, 50, 50)
+                    self.button_shortcut_icon.set_child(new_icon(texture))
+                elif status == "no_icons":
+                    self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
 
-        shutil.rmtree(self.icon_directory, ignore_errors=True)
+            shutil.rmtree(icon_directory, ignore_errors=True)
+            return False
+
+        icon_directory = self.icon_directory
+        file_path = self.file_path
+        icon_temp = self.icon_temp
+
+        def extract():
+            GLib.idle_add(apply_icon, extract_ico(file_path, icon_temp))
+
+        run_in_background(extract)
 
     def on_button_launch_settings_clicked(self, widget):
         def on_result(result, pre_launch, post_launch):

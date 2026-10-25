@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import filecmp
 import shutil
 import subprocess
 import sys
@@ -3641,8 +3642,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         for name, label, log_path in tab_pages:
             text_view = Gtk.TextView()
             text_view.set_editable(False)
-            with open(log_path, "r") as log_file:
-                text_view.get_buffer().set_text(log_file.read())
+            text_view.get_buffer().set_text(read_log_tail(log_path))
             text_buffers[name] = text_view.get_buffer()
 
             scrolled_window = Gtk.ScrolledWindow()
@@ -5342,6 +5342,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def resize_temp_image(self, temp_path, dest, width, height, kind):
         try:
+            if os.path.isfile(dest) and filecmp.cmp(temp_path, dest, shallow=False):
+                return True
             resize_image_file(temp_path, dest, width, height)
             return True
         except Exception as e:
@@ -8330,17 +8332,30 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 show_invalid_image_dialog()
                 return
 
-            try:
-                import urllib.request
-                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                with urllib.request.urlopen(req) as r, open(dest_path, "wb") as f:
-                    f.write(r.read())
+            dialog.set_sensitive(False)
 
-                refresh()
-                destroy_and_release(dialog)
+            def finish(loaded):
+                if loaded:
+                    refresh()
+                    destroy_and_release(dialog)
+                else:
+                    dialog.set_sensitive(True)
+                    show_invalid_image_dialog()
 
-            except Exception:
-                show_invalid_image_dialog()
+            def fetch():
+                try:
+                    import urllib.request
+                    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                    with urllib.request.urlopen(req, timeout=15) as r:
+                        content = r.read()
+                    with open(dest_path, "wb") as f:
+                        f.write(content)
+                    loaded = True
+                except Exception:
+                    loaded = False
+                idle_add_while_open(self.closed_event, finish, loaded)
+
+            run_in_background(fetch)
 
         dialog.connect("response", on_response)
         dialog.present()
@@ -9120,8 +9135,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
                 path = dialog_fc.get_file().get_path()
 
                 if not self.steamgriddb_enabled:
-                    status = self.extract_shortcut_icon(path)
-                    self.apply_shortcut_icon_status(status)
+                    def extract():
+                        status = self.extract_shortcut_icon(path)
+                        idle_add_while_open(self.closed_event, self.apply_shortcut_icon_status, status)
+
+                    run_in_background(extract)
 
                 self.entry_path.set_text(path)
 

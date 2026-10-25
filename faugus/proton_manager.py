@@ -24,6 +24,8 @@ GLib.set_prgname("io.github.Faugus.faugus-launcher")
 
 _ = setup_gettext('faugus-launcher')
 
+RELEASES_PER_PAGE = 100
+
 VARIANTS = {
     "cachyos": {
         "tab_label": "Proton-CachyOS",
@@ -153,7 +155,7 @@ class ProtonDownloader(Gtk.Dialog):
         prefix = variant["tag_prefix"]
 
         while not closed_event.is_set():
-            response = requests.get(url, params={"page": page, "per_page": 100})
+            response = requests.get(url, params={"page": page, "per_page": RELEASES_PER_PAGE}, timeout=30)
             if response.status_code == 200:
                 page_releases = response.json()
                 if not page_releases:
@@ -186,6 +188,9 @@ class ProtonDownloader(Gtk.Dialog):
                         continue
 
                     GLib.idle_add(self.add_release_to_grid, release, grid, variant, closed_event)
+
+                if len(page_releases) < RELEASES_PER_PAGE:
+                    break
 
                 page += 1
             else:
