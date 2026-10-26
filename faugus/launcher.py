@@ -109,6 +109,10 @@ class FaugusApp(Gtk.Application):
 
 
 class Main(Gtk.ApplicationWindow, HiDpiMixin):
+    _background_dirty = False
+    _background_time = 0
+    _background_source = None
+
     def __init__(self, app):
         super().__init__(application=app, title="Faugus")
         apply_titlebar_preference(self)
@@ -398,7 +402,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         def on_selected_children_changed(*_):
             GLib.idle_add(self.update_icon)
-            GLib.idle_add(self.schedule_background_update)
+            GLib.idle_add(self.queue_background_sync)
 
         self.flowbox.connect("selected-children-changed", on_selected_children_changed)
 
@@ -912,6 +916,31 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return False
 
         self._banner_update_source = GLib.timeout_add(120, fire)
+
+    def queue_background_sync(self):
+        self._background_dirty = True
+        self.sync_background()
+
+    def sync_background(self, force=False):
+        if not self._background_dirty:
+            return
+        now = GLib.get_monotonic_time()
+        remaining = 150000 - (now - self._background_time)
+        if remaining > 0 and not force:
+            if self._background_source is None:
+                self._background_source = GLib.timeout_add(remaining // 1000 + 1, self.flush_background_sync)
+            return
+        if self._background_source is not None:
+            GLib.source_remove(self._background_source)
+            self._background_source = None
+        self._background_dirty = False
+        self._background_time = now
+        self.apply_background_update_now()
+
+    def flush_background_sync(self):
+        self._background_source = None
+        self.sync_background(True)
+        return False
 
     def load_css_if_changed(self, provider, css):
         if getattr(provider, "loaded_css", None) == css:
@@ -2145,6 +2174,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             slot["offset"] = new_offset
 
+        self._background_dirty = True
         self.carrousel_start_animation(interrupted)
         self.update_icon(games)
         self.prefetch_carrousel_covers(games)
@@ -2199,13 +2229,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             for slot in self.carrousel_slots:
                 current = slot["anim_from"] + (slot["anim_to"] - slot["anim_from"]) * eased
                 self.layout_carrousel_slot(slot, current)
+            if elapsed >= duration - 200000:
+                self.sync_background()
             if t >= 1.0:
                 for slot in self.carrousel_slots:
                     settle_offset = slot.pop("_settle_offset", None)
                     if settle_offset is not None:
                         self.layout_carrousel_slot(slot, settle_offset)
                 self._carrousel_anim_id = None
-                self.apply_background_update_now()
+                self.sync_background(True)
                 return False
             return True
 
