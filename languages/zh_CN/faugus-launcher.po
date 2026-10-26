@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-24 16:35+0000\n"
-"PO-Revision-Date: 2026-10-23 12:56+0000\n"
+"PO-Revision-Date: 2026-10-25 11:40+0000\n"
 "Last-Translator: EyKettle <eykettle@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -583,7 +583,7 @@ msgstr "海报"
 
 #: faugus/launcher.py:5903 faugus/launcher.py:6669
 msgid "Displays a banner for the currently selected game"
-msgstr ""
+msgstr "显示所选游戏的海报"
 
 #: faugus/launcher.py:5905
 msgid "Theme"
@@ -639,7 +639,7 @@ msgstr "标签"
 
 #: faugus/launcher.py:5944 faugus/launcher.py:6598
 msgid "Displays the game title below the cover"
-msgstr ""
+msgstr "在封面下显示游戏标题"
 
 #: faugus/launcher.py:5946
 msgid "Zoom"
@@ -647,15 +647,15 @@ msgstr "缩放"
 
 #: faugus/launcher.py:5947 faugus/launcher.py:6599
 msgid "Displays a zoom slider to adjust the size of games"
-msgstr ""
+msgstr "显示调整视图大小的缩放滑条"
 
 #: faugus/launcher.py:5950
 msgid "Auto-hide"
-msgstr ""
+msgstr "自动隐藏"
 
 #: faugus/launcher.py:5951
 msgid "Automatically hides widgets"
-msgstr ""
+msgstr "自动隐藏组件"
 
 #: faugus/launcher.py:5953
 msgid "Position"
@@ -663,7 +663,7 @@ msgstr "位置"
 
 #: faugus/launcher.py:5956 faugus/launcher.py:6614
 msgid "Sets how games are positioned on the screen"
-msgstr ""
+msgstr "设置游戏列表在屏幕上的位置"
 
 #: faugus/launcher.py:5957
 msgid "Top"
@@ -683,7 +683,7 @@ msgstr "方向"
 
 #: faugus/launcher.py:5964 faugus/launcher.py:6628
 msgid "Sets how games are scrolled through"
-msgstr ""
+msgstr "设置游戏列表的滚动方式"
 
 #: faugus/launcher.py:5965
 msgid "Vertical"
@@ -707,7 +707,7 @@ msgstr "SteamGridDB"
 
 #: faugus/launcher.py:5993
 msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
-msgstr ""
+msgstr "自动从 SteamGridDB 中获取游戏图标、封面和海报"
 
 #: faugus/launcher.py:5997
 msgid "API Key"
@@ -746,14 +746,12 @@ msgid "GPU"
 msgstr "GPU"
 
 #: faugus/launcher.py:6045
-#, fuzzy
-#| msgid "Auto-close on launch"
 msgid "Auto-close"
-msgstr "启动时自动关闭"
+msgstr "自动关闭"
 
 #: faugus/launcher.py:6046
 msgid "Automatically closes the application when launching a game"
-msgstr ""
+msgstr "启动游戏是自动关闭此程序"
 
 #: faugus/launcher.py:6048
 msgid "Autostart"
@@ -761,7 +759,7 @@ msgstr "自启动"
 
 #: faugus/launcher.py:6049
 msgid "Automatically starts the application with the system"
-msgstr ""
+msgstr "跟随系统自动启动应用程序"
 
 #: faugus/launcher.py:6051
 msgid "System tray icon"
@@ -769,17 +767,15 @@ msgstr "系统托盘图标"
 
 #: faugus/launcher.py:6052
 msgid "Displays the application icon in the system tray"
-msgstr ""
+msgstr "在系统托盘中显示应用程序图标"
 
 #: faugus/launcher.py:6055
 msgid "Minimized startup"
 msgstr "最小化启动"
 
 #: faugus/launcher.py:6056
-#, fuzzy
-#| msgid "Start minimized to tray"
 msgid "Starts the application minimized to the system tray"
-msgstr "启动时最小化到托盘"
+msgstr "应用程序启动时最小化到系统托盘"
 
 #: faugus/launcher.py:6059
 msgid "Monochrome icon"
@@ -787,7 +783,7 @@ msgstr "单色图标"
 
 #: faugus/launcher.py:6060
 msgid "Displays a monochrome application icon in the system tray"
-msgstr ""
+msgstr "在系统托盘中显示单色应用程序图标"
 
 #: faugus/launcher.py:6063
 msgid "Splash window"
@@ -798,6 +794,8 @@ msgid ""
 "Displays a splash window with information about Proton, Steam Linux Runtime, "
 "and other required components when launching a game"
 msgstr ""
+"在启动游戏时显示启动画面，展示关于 Proton、Steam Linux 运行时和其他所需组件的"
+"信息"
 
 #: faugus/launcher.py:6067
 msgid "Automatic updates"
@@ -807,7 +805,7 @@ msgstr "自动更新"
 msgid ""
 "Checks for and updates Proton, Steam Linux Runtime, and other required "
 "components when launching a game"
-msgstr ""
+msgstr "在启动游戏时自动检查并更新 Proton、Steam Linux 运行时和其他所需组件"
 
 #: faugus/launcher.py:6071
 msgid "Auto-create shortcuts"
@@ -825,7 +823,7 @@ msgstr "分类"
 
 #: faugus/launcher.py:6077
 msgid "Displays a button to manage game categories"
-msgstr ""
+msgstr "显示管理游戏分类的按钮"
 
 #: faugus/launcher.py:6079
 msgid "Sort"
@@ -833,7 +831,7 @@ msgstr "排序"
 
 #: faugus/launcher.py:6080
 msgid "Displays a button to change the game sorting order"
-msgstr ""
+msgstr "显示改变游戏排列顺序的按钮"
 
 #: faugus/launcher.py:6082
 msgid "Header bar"
@@ -841,17 +839,15 @@ msgstr "标题栏"
 
 #: faugus/launcher.py:6083
 msgid "Displays the default GTK header bar"
-msgstr ""
+msgstr "显示默认的 GTK 标题栏"
 
 #: faugus/launcher.py:6085
 msgid "Hidden games"
 msgstr "隐藏的游戏"
 
 #: faugus/launcher.py:6086
-#, fuzzy
-#| msgid "Hidden games"
 msgid "Displays hidden games"
-msgstr "隐藏的游戏"
+msgstr "显示隐藏的游戏"
 
 #: faugus/launcher.py:6086
 msgid "Ctrl+H toggles hidden games"
@@ -865,7 +861,7 @@ msgstr "概览"
 msgid ""
 "Displays a panel with the game title, categories, playtime, and last played "
 "date"
-msgstr ""
+msgstr "显示一个面板，展示游戏标题、分类、游玩时长和上次游玩日期"
 
 #: faugus/launcher.py:6092
 msgid "Gamepad navigation"
@@ -873,7 +869,7 @@ msgstr "手柄导航"
 
 #: faugus/launcher.py:6093
 msgid "Allows navigation through the application using a gamepad"
-msgstr ""
+msgstr "支持使用游戏手柄在应用程序中浏览"
 
 #: faugus/launcher.py:6095
 msgid "Wayland driver (experimental)"
@@ -881,7 +877,7 @@ msgstr "Wayland 驱动 (实验性)"
 
 #: faugus/launcher.py:6096
 msgid "Runs games using the Wine Wayland driver"
-msgstr ""
+msgstr "使用 Wine Wayland 驱动程序运行游戏"
 
 #: faugus/launcher.py:6098
 msgid "WOW64 (experimental)"
@@ -889,7 +885,7 @@ msgstr "WOW64 (实验性)"
 
 #: faugus/launcher.py:6099
 msgid "Runs 32-bit games using the 64-bit driver"
-msgstr ""
+msgstr "使用 64 位驱动程序运行 32 位游戏"
 
 #: faugus/launcher.py:6109 faugus/launcher.py:7888
 msgid "Run"
