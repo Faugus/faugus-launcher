@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-25 20:10+0000\n"
-"PO-Revision-Date: 2026-10-25 11:40+0000\n"
+"PO-Revision-Date: 2026-10-26 11:39+0000\n"
 "Last-Translator: Hosted Weblate user 158752 "
 "<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -749,7 +749,7 @@ msgstr "GPU"
 
 #: faugus/launcher.py:5933
 msgid "Auto-close"
-msgstr "automatisch schließen"
+msgstr "Automatisch schließen"
 
 #: faugus/launcher.py:5934
 msgid "Automatically closes the application when launching a game"
