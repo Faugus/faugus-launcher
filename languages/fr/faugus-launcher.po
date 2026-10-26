@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-25 20:10+0000\n"
-"PO-Revision-Date: 2026-10-23 17:02+0000\n"
-"Last-Translator: Loïc "
-"<loc637d4b91fab64b58@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-10-26 21:45+0000\n"
+"Last-Translator: Loïc <loc637d4b91fab64b58@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -586,7 +586,7 @@ msgstr "Bannière"
 
 #: faugus/launcher.py:5791 faugus/launcher.py:6557
 msgid "Displays a banner for the currently selected game"
-msgstr ""
+msgstr "Affiche une bannière pour le jeu actuellement sélectionné"
 
 #: faugus/launcher.py:5793
 msgid "Theme"
@@ -642,7 +642,7 @@ msgstr "Etiquettes"
 
 #: faugus/launcher.py:5832 faugus/launcher.py:6486
 msgid "Displays the game title below the cover"
-msgstr ""
+msgstr "Affiche le titre du jeu sous la couverture"
 
 #: faugus/launcher.py:5834
 msgid "Zoom"
@@ -650,15 +650,15 @@ msgstr "Zoom"
 
 #: faugus/launcher.py:5835 faugus/launcher.py:6487
 msgid "Displays a zoom slider to adjust the size of games"
-msgstr ""
+msgstr "Affiche une barre de zoom pour ajuster la taille des jeux"
 
 #: faugus/launcher.py:5838
 msgid "Auto-hide"
-msgstr ""
+msgstr "Masquer automatiquement"
 
 #: faugus/launcher.py:5839
 msgid "Automatically hides widgets"
-msgstr ""
+msgstr "Masque automatiquement les widgets"
 
 #: faugus/launcher.py:5841
 msgid "Position"
@@ -666,7 +666,7 @@ msgstr "Position"
 
 #: faugus/launcher.py:5844 faugus/launcher.py:6502
 msgid "Sets how games are positioned on the screen"
-msgstr ""
+msgstr "Règle la manière dont les jeux sont positionnés sur l'écran"
 
 #: faugus/launcher.py:5845
 msgid "Top"
@@ -686,7 +686,7 @@ msgstr "Orientation"
 
 #: faugus/launcher.py:5852 faugus/launcher.py:6516
 msgid "Sets how games are scrolled through"
-msgstr ""
+msgstr "Défini la manière dont les jeux défilent"
 
 #: faugus/launcher.py:5853
 msgid "Vertical"
@@ -711,6 +711,8 @@ msgstr "SteamGridDB"
 #: faugus/launcher.py:5881
 msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
 msgstr ""
+"Importe automatiquement les icônes de jeux, affiches, et bannières depuis "
+"SteamGridDB"
 
 #: faugus/launcher.py:5885
 msgid "API Key"
@@ -749,14 +751,12 @@ msgid "GPU"
 msgstr "GPU"
 
 #: faugus/launcher.py:5933
-#, fuzzy
-#| msgid "Auto-close on launch"
 msgid "Auto-close"
-msgstr "Fermer automatiquement au lancement"
+msgstr "Fermer automatiquement"
 
 #: faugus/launcher.py:5934
 msgid "Automatically closes the application when launching a game"
-msgstr ""
+msgstr "Ferme automatiquement l'application après le lancement d'un jeu"
 
 #: faugus/launcher.py:5936
 msgid "Autostart"
@@ -764,7 +764,7 @@ msgstr "Démarrage automatique"
 
 #: faugus/launcher.py:5937
 msgid "Automatically starts the application with the system"
-msgstr ""
+msgstr "Démarre automatiquement l'application avec le système"
 
 #: faugus/launcher.py:5939
 msgid "System tray icon"
@@ -772,7 +772,7 @@ msgstr "Icône dans la barre des tâches"
 
 #: faugus/launcher.py:5940
 msgid "Displays the application icon in the system tray"
-msgstr ""
+msgstr "Affiche l'icône de l'application dans la barre d'état"
 
 #: faugus/launcher.py:5943
 msgid "Minimized startup"
@@ -780,7 +780,7 @@ msgstr "Démarrage minimisé"
 
 #: faugus/launcher.py:5944
 msgid "Starts the application minimized to the system tray"
-msgstr ""
+msgstr "Démarre l'application minimisée dans la barre d'état"
 
 #: faugus/launcher.py:5947
 msgid "Monochrome icon"
@@ -788,7 +788,7 @@ msgstr "Icône monochrome"
 
 #: faugus/launcher.py:5948
 msgid "Displays a monochrome application icon in the system tray"
-msgstr ""
+msgstr "Affiche une icône monochrome de l'application dans la barre d'état"
 
 #: faugus/launcher.py:5951
 msgid "Splash window"
