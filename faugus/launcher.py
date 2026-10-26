@@ -4034,6 +4034,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game_label.set_margin_end(10)
             game_label.set_margin_top(10)
             game_label.set_margin_bottom(10)
+            game_label.set_ellipsize(Pango.EllipsizeMode.END)
+            game_label.set_max_width_chars(1)
+            game_label.set_hexpand(True)
+            game_label.set_xalign(0)
 
             hbox.append(image)
             hbox.append(game_label)
