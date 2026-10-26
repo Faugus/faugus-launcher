@@ -1995,7 +1995,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         css = (
             f"entry.flowbox-entry.cover-container.carrousel-cover-box {{ "
             f"transition: {transition}; "
-            f"transform: translate({translate_x:.2f}px, 0.00px) scale({scale:.2f}); "
+            f"transform: translate({translate_x:.3f}px, 0.000px) scale({scale:.4f}); "
             f"box-shadow: {box_shadow}; }}"
         )
         if slot.get("_css") != css:
@@ -2110,12 +2110,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not games:
             return
 
-        if self._carrousel_anim_id is not None:
+        interrupted = self._carrousel_anim_id is not None
+        if interrupted:
             self.carrousel_fixed.remove_tick_callback(self._carrousel_anim_id)
             self._carrousel_anim_id = None
             for slot in self.carrousel_slots:
-                slot.pop("_settle_offset", None)
-                self.layout_carrousel_slot(slot, slot["offset"])
+                settle_offset = slot.pop("_settle_offset", None)
+                if settle_offset is not None:
+                    self.layout_carrousel_slot(slot, settle_offset)
 
         self.carrousel_radius = self.carrousel_fit_radius(n, self.carrousel_layout_extent())
         self.carrousel_index = (self.carrousel_index + delta) % n
@@ -2143,7 +2145,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
             slot["offset"] = new_offset
 
-        self.carrousel_start_animation()
+        self.carrousel_start_animation(interrupted)
         self.update_icon(games)
         self.prefetch_carrousel_covers(games)
 
@@ -2183,7 +2185,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.schedule_background_update()
         self.update_icon()
 
-    def carrousel_start_animation(self):
+    def carrousel_start_animation(self, interrupted=False):
         if self._carrousel_anim_id is not None:
             self.carrousel_fixed.remove_tick_callback(self._carrousel_anim_id)
 
@@ -2193,7 +2195,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         def step(widget, frame_clock):
             elapsed = GLib.get_monotonic_time() - start
             t = min(1.0, elapsed / duration)
-            eased = t * t * (3.0 - 2.0 * t)
+            eased = 1.0 - (1.0 - t) ** 3 if interrupted else t * t * (3.0 - 2.0 * t)
             for slot in self.carrousel_slots:
                 current = slot["anim_from"] + (slot["anim_to"] - slot["anim_from"]) * eased
                 self.layout_carrousel_slot(slot, current)
