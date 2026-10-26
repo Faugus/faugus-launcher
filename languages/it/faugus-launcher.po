@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-25 20:10+0000\n"
-"PO-Revision-Date: 2026-10-22 22:09+0000\n"
-"Last-Translator: nixxo <nixxo@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-10-26 01:42+0000\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -653,7 +653,7 @@ msgstr ""
 
 #: faugus/launcher.py:5838
 msgid "Auto-hide"
-msgstr ""
+msgstr "Auto-nascondi"
 
 #: faugus/launcher.py:5839
 msgid "Automatically hides widgets"
@@ -748,10 +748,8 @@ msgid "GPU"
 msgstr "GPU"
 
 #: faugus/launcher.py:5933
-#, fuzzy
-#| msgid "Auto-close on launch"
 msgid "Auto-close"
-msgstr "Chiudi automaticamente all'avvio"
+msgstr "Chiudi automaticamente"
 
 #: faugus/launcher.py:5934
 msgid "Automatically closes the application when launching a game"
@@ -778,10 +776,8 @@ msgid "Minimized startup"
 msgstr "Avvio minimizzato"
 
 #: faugus/launcher.py:5944
-#, fuzzy
-#| msgid "Start minimized to tray"
 msgid "Starts the application minimized to the system tray"
-msgstr "Avvia minimizzato nel vassoio"
+msgstr "Avvia il programma minimizzato nel vassoio di sistema"
 
 #: faugus/launcher.py:5947
 msgid "Monochrome icon"
@@ -852,10 +848,8 @@ msgid "Hidden games"
 msgstr "Giochi nascosti"
 
 #: faugus/launcher.py:5974
-#, fuzzy
-#| msgid "Hidden games"
 msgid "Displays hidden games"
-msgstr "Giochi nascosti"
+msgstr "Mostra giochi nascosti"
 
 #: faugus/launcher.py:5974
 msgid "Ctrl+H toggles hidden games"
