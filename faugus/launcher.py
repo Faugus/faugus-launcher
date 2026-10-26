@@ -760,7 +760,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         banner_picture.set_can_shrink(True)
         banner_picture.set_hexpand(True)
         try:
-            banner_picture.set_paintable(Gdk.Texture.new_from_filename(banner_path))
+            banner_picture.set_paintable(load_full_texture(banner_path))
         except GLib.Error:
             pass
         banner_image_box.append(banner_picture)
@@ -985,7 +985,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 if request != self._banner_request:
                     return
                 try:
-                    texture = Gdk.Texture.new_from_filename(banner_path)
+                    texture = load_full_texture(banner_path)
                 except GLib.Error:
                     texture = None
                 GLib.idle_add(show, texture)
@@ -4214,13 +4214,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         elif getattr(child, "image", None) is not None:
             child.image.set_from_paintable(None)
 
-    def trim_image_caches(self, near):
+    def trim_image_caches(self, near, tight=False):
         if self.interface_mode == "Covers":
             keep = {child.game.cover for child in near}
-            self.cover_textures.trim(keep, len(keep) * 2 + 64)
+            self.cover_textures.trim(keep, len(keep) if tight else len(keep) * 2 + 64)
         else:
             keep = {self.icon_path(child.game) for child in near}
-            self.icon_textures.trim(keep, len(keep) * 2 + 64)
+            self.icon_textures.trim(keep, len(keep) if tight else len(keep) * 2 + 64)
 
     def get_cover_placeholder(self, width, height):
         rgb = self.placeholder_rgb

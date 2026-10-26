@@ -1,5 +1,6 @@
 import bisect
 import codecs
+import ctypes
 import math
 import os
 import functools
@@ -346,16 +347,40 @@ def texture_from_pixbuf(pixbuf, installed):
     return Gdk.Texture.new_for_pixbuf(pixbuf)
 
 
+def load_fitted_pixbuf(path, max_width, max_height):
+    from PIL import Image
+    try:
+        with Image.open(path) as image:
+            width, height = image.size
+            if width > max_width or height > max_height:
+                ratio = min(max_width / width, max_height / height)
+                width, height = max(1, int(width * ratio)), max(1, int(height * ratio))
+                image = image.resize((width, height), Image.LANCZOS)
+            data = image.convert("RGBA").tobytes()
+    except OSError:
+        pixbuf = safe_load_pixbuf(path)
+        if pixbuf.get_width() > max_width or pixbuf.get_height() > max_height:
+            ratio = min(max_width / pixbuf.get_width(), max_height / pixbuf.get_height())
+            pixbuf = pixbuf.scale_simple(
+                max(1, int(pixbuf.get_width() * ratio)), max(1, int(pixbuf.get_height() * ratio)), GdkPixbuf.InterpType.BILINEAR)
+        return pixbuf
+    return GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(data), GdkPixbuf.Colorspace.RGB, True, 8, width, height, width * 4)
+
+
 def build_cover_texture(key):
     path, _, installed, max_width, max_height = key
-    info = GdkPixbuf.Pixbuf.get_file_info(path)
-    width, height = (info[1], info[2]) if info and info[0] is not None else (0, 0)
-    if width > max_width or height > max_height:
-        ratio = min(max_width / width, max_height / height)
-        pixbuf = load_resized_pixbuf(path, max(1, int(width * ratio)), max(1, int(height * ratio)))
-    else:
-        pixbuf = safe_load_pixbuf(path)
-    return texture_from_pixbuf(pixbuf, installed)
+    return texture_from_pixbuf(load_fitted_pixbuf(path, max_width, max_height), installed)
+
+
+def load_full_texture(path):
+    return Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(path))
+
+
+def release_unused_memory():
+    try:
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except (OSError, AttributeError):
+        pass
 
 
 def build_icon_texture(key):
@@ -422,6 +447,7 @@ class TextureCache:
 
 
 LAZY_MODES = ("Covers", "Grid", "List")
+SETTLE_SECONDS = 5
 REFRESH_DELAY_MS = 100
 MAX_WAIT_US = 400000
 
@@ -430,8 +456,10 @@ class LazyImages:
     def __init__(self, window):
         self.window = window
         self.loaded = set()
+        self.near = set()
         self.geometry = None
         self.source = None
+        self.settle_source = None
         self.started = 0
 
     def watch(self, scroll_box):
@@ -518,6 +546,16 @@ class LazyImages:
         for child in [child for child in self.loaded if child not in near or child.get_parent() is None]:
             self.unload(child)
         window.trim_image_caches(near)
+        self.near = near
+        if self.settle_source is not None:
+            GLib.source_remove(self.settle_source)
+        self.settle_source = GLib.timeout_add_seconds(SETTLE_SECONDS, self.settle)
+        return False
+
+    def settle(self):
+        self.settle_source = None
+        self.window.trim_image_caches(self.near, tight=True)
+        release_unused_memory()
         return False
 
 
