@@ -1990,6 +1990,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         d = abs(offset)
         if d > radius:
             opacity *= max(0.0, radius + 1 - d)
+        scale = round(scale * 400) / 400
         translate_x = offset * self.carrousel_step
         slot["box"].set_opacity(opacity)
 
