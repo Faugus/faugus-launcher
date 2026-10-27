@@ -868,7 +868,9 @@ class FaugusRun(HiDpiMixin):
 
         if self.post_launch:
             try:
-                subprocess.Popen(self.post_launch, shell=True, env=child_env())
+                post_env = child_env()
+                post_env.pop("FAUGUSID", None)
+                subprocess.Popen(self.post_launch, shell=True, env=post_env)
             except Exception as e:
                 print(f"Error running post-launch command: {e}")
 
