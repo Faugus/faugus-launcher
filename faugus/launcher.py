@@ -24,7 +24,7 @@ from faugus.migration import fix_legacy_shortcut_icons
 from faugus.main_screen_nav import adjust_widget_value, carrousel_move_coalesced, focus_bottom_bar_by_column, focus_flowbox_child, focus_top_bar, navigate_focus
 from faugus.tray_only import spawn as tray_only_spawn
 
-VERSION = "2.5.1"
+VERSION = "2.5.2"
 
 GLib.set_prgname(APP_ID)
 

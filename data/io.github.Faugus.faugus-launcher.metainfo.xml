@@ -94,16 +94,29 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.1-1" date="2026-10-22">
+    <release version="2.5.2" date="2026-10-27">
       <description>
         <ul>
-          <li>Added an option to select the GPU to run games.</li>
-          <li>Removed the "Discrete GPU" option.</li>
-          <li>Removed Proton-EM support because the last version was released 6 months ago.</li>
-          <li>Removed UMU-Proton support because it is no longer being updated.</li>
-          <li>Fixed Splash Windows icon missing on the task bar.</li>
-          <li>Fixed an issue on Flatpak that caused games to remain stuck as "already running" even when they weren't.</li>
-          <li>Fixed Steam shortcut not being detected after the game being moved to a game collection.</li>
+          <li>Added an option to auto-hide widgets on the main screen.</li>
+          <li>Added a progress bar to the splash window.</li>
+          <li>Updated the splash window strings.</li>
+          <li>Added tooltips to most options in the Settings window.</li>
+          <li>Most settings can now be changed in real time without restarting the app. Settings that still require a restart are marked with an asterisk (*) after their names.</li>
+          <li>The gamecontrollerdb is now updated weekly.</li>
+          <li>Categories in the Overview panel are now sorted alphabetically.</li>
+          <li>Implemented smooth scrolling.</li>
+          <li>Kept Proton runners read-only during extraction. Thanks, @vsharha.</li>
+          <li>Long game titles are now truncated in List mode to prevent the window from stretching.</li>
+          <li>The absolute path is now set for PROTONPATH to prevent issues.</li>
+          <li>Improved carousel animations.</li>
+          <li>Fixed some inconsistencies in interface customization.</li>
+          <li>Fixed an issue where scrolling would stop before reaching the end when navigating through games using the keyboard or gamepad.</li>
+          <li>Fixed an issue where the post-launch script would be killed when closing the game.</li>
+          <li>Covers and banners are now loaded on demand.</li>
+          <li>Images are resized to match their display scale.</li>
+          <li>Image memory is now freed when scrolling.</li>
+          <li>Banners are now loaded in a separate thread.</li>
+          <li>Removed and modified visual effects to reduce rendering overhead.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
