@@ -15,10 +15,8 @@ from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-gi.require_version('Gsk', '4.0')
-gi.require_version('Graphene', '1.0')
 from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
-from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw, Gsk, Graphene
+from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
@@ -111,7 +109,7 @@ class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
         return self._height
 
     def do_snapshot(self, snapshot, width, height):
-        snapshot.append_scaled_texture(self._texture, Gsk.ScalingFilter.LINEAR, Graphene.Rect().init(0, 0, width, height))
+        self._texture.snapshot(snapshot, width, height)
 
 
 class HiDpiMixin:

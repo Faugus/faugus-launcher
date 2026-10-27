@@ -122,7 +122,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.icon_textures = TextureCache(build_icon_texture, icon_identity)
         self.lazy_images = LazyImages(self)
         self.auto_hide = AutoHide(self)
-        self.connect("notify::scale-factor", lambda window, pspec: self.lazy_images.reset())
+        self.connect("notify::scale-factor", self.on_scale_factor_changed)
         print(f"Faugus {VERSION}")
 
         self.fullscreen_activated = False
@@ -440,6 +440,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def banner_overlay_enabled(self):
         return self.interface_mode in ("Covers", "Carrousel") and self.banner_enabled
+
+    def on_scale_factor_changed(self, window, pspec):
+        self.lazy_images.reset()
+        self.render_carrousel()
 
     def carrousel_active(self):
         return self.interface_mode == "Carrousel"
