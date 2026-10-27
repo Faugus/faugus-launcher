@@ -54,7 +54,6 @@ jobs:
     needs: resolve
     if: github.event_name != 'workflow_dispatch' || inputs.jobs == 'all' || contains(inputs.jobs, 'appimage')
     runs-on: ubuntu-latest
-    container: archlinux:base-devel
     env:
       RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
     steps:
@@ -62,9 +61,9 @@ jobs:
 
       - name: Install build tools
         run: |
-          pacman -Syu --noconfirm --needed curl jq meson gettext patchelf strace xorg-server-xvfb \
-            python python-gobject python-requests python-pillow python-psutil python-vdf icoextract \
-            gtk4 libadwaita libmanette
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build python3-pip python3-dev curl libgtk-3-bin \
+            build-essential pkg-config libglib2.0-dev gettext
 
       - name: Build AppImage
         run: |
