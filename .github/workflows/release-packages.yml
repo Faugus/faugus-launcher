@@ -13,6 +13,10 @@ on:
         description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"
         type: boolean
         default: false
+      revision:
+        description: "Debian revision (use 2 or higher to re-upload an already published version)"
+        type: string
+        default: "1"
       jobs:
         description: "Which jobs to run: 'all' or a comma-separated list (appimage,arch,debian,fedora)"
         type: string
@@ -23,6 +27,7 @@ permissions:
 
 env:
   TAG: ${{ github.event.release.tag_name || inputs.tag }}
+  REVISION: ${{ inputs.revision || '1' }}
   DO_PUBLISH: ${{ github.run_attempt == '1' && (github.event_name == 'release' || inputs.publish == true) }}
 
 jobs:
@@ -203,7 +208,7 @@ jobs:
         run: |
           set -e
           PACKAGE_NAME="faugus-launcher"
-          DEB_VERSION="${TAG}-1"
+          DEB_VERSION="${TAG}-${REVISION}"
           DEB_NAME="${PACKAGE_NAME}_${DEB_VERSION}_all.deb"
           BUILD_DIR=$(mktemp -d)
           INSTALL_DIR=$(mktemp -d)
@@ -324,7 +329,7 @@ jobs:
           EOF
 
             cat > debian/changelog <<EOF
-          $PACKAGE ($TAG-1~${DISTRO}1) $DISTRO; urgency=medium
+          $PACKAGE ($TAG-${REVISION}~${DISTRO}1) $DISTRO; urgency=medium
 
             * Release $TAG for $DISTRO
 
@@ -343,7 +348,7 @@ jobs:
             chmod +x debian/rules
 
             UPLOADED_ORIG=0
-            if [ "$FIRST_DISTRO" = "1" ]; then
+            if [ "$FIRST_DISTRO" = "1" ] && [ "$REVISION" = "1" ]; then
               SOURCE_FLAG="-sa"
               UPLOADED_ORIG=1
               FIRST_DISTRO=0
