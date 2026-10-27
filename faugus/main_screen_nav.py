@@ -412,7 +412,7 @@ def carrousel_move_coalesced(window, delta):
         pending = window._carrousel_pending_delta
         window._carrousel_pending_delta = 0
         if pending != 0:
-            window.carrousel_move(pending)
+            window.carrousel_move(1 if pending > 0 else -1)
         return False
 
     window._carrousel_pending_timeout_id = GLib.timeout_add(70, flush)
