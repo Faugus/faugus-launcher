@@ -90,7 +90,7 @@ class PathManager:
 
     @staticmethod
     def get_compatibilitytools():
-        base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
+        base_dir = Path(os.getenv('HOST_XDG_DATA_HOME') or os.getenv('XDG_DATA_HOME') or Path.home() / '.local' / 'share')
         native_steam = base_dir / 'Steam'
         flatpak_steam = Path(PathManager.user_home('.var/app/com.valvesoftware.Steam/.local/share/Steam'))
         if not native_steam.is_dir() and flatpak_steam.is_dir():
@@ -99,7 +99,7 @@ class PathManager:
 
     @staticmethod
     def get_compatibilitytools_dirs():
-        base_dir = Path(os.getenv('HOST_XDG_DATA_HOME', Path.home() / '.local' / 'share'))
+        base_dir = Path(os.getenv('HOST_XDG_DATA_HOME') or os.getenv('XDG_DATA_HOME') or Path.home() / '.local' / 'share')
         native_steam = base_dir / 'Steam' / 'compatibilitytools.d'
         flatpak_steam = Path(
             PathManager.user_home('.var/app/com.valvesoftware.Steam/.local/share/Steam')
