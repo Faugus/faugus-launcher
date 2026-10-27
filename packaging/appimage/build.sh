@@ -14,7 +14,6 @@ cd "$SCRIPT_DIR"
 
 APP_ID="io.github.Faugus.faugus-launcher"
 REPO_URL="https://github.com/Faugus/faugus-launcher"
-QUICK_SHARUN_URL="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/c28bb80743106fdf08cb10fb27d19d9932eb0865/useful-tools/quick-sharun.sh"
 VERSION="$TAG-$PKGREL"
 ARCH=$(uname -m)
 
@@ -23,22 +22,36 @@ RELEASE_TAR="$BUILD_ROOT/faugus-launcher-$TAG.tar.gz"
 RELEASE_SRC_ROOT="$BUILD_ROOT/release-src"
 MESON_BUILD_DIR="$BUILD_ROOT/build"
 APPDIR="$BUILD_ROOT/AppDir"
-QUICK_SHARUN="$BUILD_ROOT/quick-sharun.sh"
+TOOLS_DIR="$SCRIPT_DIR/.appimage-tools"
+APPIMAGETOOL="$TOOLS_DIR/appimagetool-$ARCH.AppImage"
 OUTPUT="$SCRIPT_DIR/Faugus-$VERSION-$ARCH.AppImage"
 
-for cmd in meson ninja python3 curl tar msgfmt patchelf strace xvfb-run; do
+for cmd in meson ninja python3 curl tar msgfmt; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "Missing required tool: $cmd" >&2
         exit 1
     fi
 done
 
+if ! python3 -m pip --version >/dev/null 2>&1; then
+    echo "pip for python3 is required to bundle dependencies (requests, vdf, icoextract, pefile)." >&2
+    echo "Install it first, e.g. on Arch: sudo pacman -S python-pip" >&2
+    exit 1
+fi
+
+echo "This AppImage bundles Faugus's own Python code and its pure-Python"
+echo "pip dependencies. It relies on the host system for Python 3, GTK4,"
+echo "libadwaita, libmanette, PyGObject, Pillow and psutil,"
+echo "since anything with a compiled extension is tied to the host's"
+echo "Python ABI and can't be safely bundled without shipping Python"
+echo "itself. Target systems need those installed."
+echo
+
 rm -rf "$BUILD_ROOT"
-mkdir -p "$BUILD_ROOT" "$RELEASE_SRC_ROOT"
+mkdir -p "$BUILD_ROOT" "$RELEASE_SRC_ROOT" "$TOOLS_DIR"
 
 echo "Downloading release $TAG..."
 curl -fL -o "$RELEASE_TAR" "$REPO_URL/archive/refs/tags/$TAG.tar.gz"
-curl -fL -o "$QUICK_SHARUN" "$QUICK_SHARUN_URL"
 
 tar -xzf "$RELEASE_TAR" -C "$RELEASE_SRC_ROOT"
 SOURCE_DIR=$(find "$RELEASE_SRC_ROOT" -mindepth 1 -maxdepth 1 -type d)
@@ -54,32 +67,33 @@ trap cleanup EXIT
 
 meson setup "$MESON_BUILD_DIR" "$SOURCE_DIR" --prefix=/usr
 ninja -C "$MESON_BUILD_DIR"
-ninja -C "$MESON_BUILD_DIR" install
+DESTDIR="$APPDIR" ninja -C "$MESON_BUILD_DIR" install
 
-PY_DIR=$(python3 -c 'import sysconfig; print(sysconfig.get_path("purelib"))')
+PY_TAG=$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")')
+VENDOR_DIR="$APPDIR/usr/lib/$PY_TAG/site-packages"
+mkdir -p "$VENDOR_DIR"
+python3 -m pip install --target="$VENDOR_DIR" --no-compile \
+    requests vdf icoextract pefile
 
-export APPDIR
-export OUTPATH="$BUILD_ROOT"
-export VERSION
-export UPINFO="gh-releases-zsync|Faugus|faugus-launcher|latest|*$ARCH.AppImage.zsync"
-export APPIMAGE_EXTRACT_AND_RUN=1
-export DEPLOY_PYTHON=1
-export DEPLOY_GTK=1
-export USE_HOST_DRIVERS_EXPERIMENTAL=1
-export MAIN_BIN=faugus-launcher
-export DESKTOP="/usr/share/applications/$APP_ID.desktop"
-export ICON="/usr/share/icons/hicolor/scalable/apps/$APP_ID.svg"
+DESKTOP_SRC="$APPDIR/usr/share/applications/$APP_ID.desktop"
+ICON_SVG_SRC="$APPDIR/usr/share/icons/hicolor/scalable/apps/$APP_ID.svg"
+ICON_PNG_SRC="$SOURCE_DIR/assets/faugus-launcher-raster.png"
 
-xvfb-run -a sh "$QUICK_SHARUN" \
-    /usr/bin/faugus-launcher \
-    "$PY_DIR/faugus" \
-    /usr/lib/girepository-1.0/Adw-1.typelib \
-    /usr/lib/girepository-1.0/Manette-0.2.typelib \
-    /usr/lib/libadwaita-1.so* \
-    /usr/lib/libmanette-0.2.so*
+cp "$DESKTOP_SRC" "$APPDIR/$APP_ID.desktop"
+cp "$ICON_SVG_SRC" "$APPDIR/$APP_ID.svg"
+cp "$ICON_PNG_SRC" "$APPDIR/$APP_ID.png"
+ln -sf "$APP_ID.png" "$APPDIR/.DirIcon"
 
-cat > "$APPDIR/bin/faugus-launcher" <<'WRAPPER'
-#!/bin/sh
+cat > "$APPDIR/AppRun" <<'APPRUN'
+#!/bin/bash
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+for site_packages in "$HERE"/usr/lib/python3*/site-packages "$HERE"/usr/lib/python3*/dist-packages; do
+    [ -d "$site_packages" ] && export PYTHONPATH="$site_packages${PYTHONPATH:+:$PYTHONPATH}"
+done
+
+export XDG_DATA_DIRS="$HERE/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+
 case "$1" in
     --shortcut) shift; exec python3 -m faugus.shortcut "$@";;
     --game)     shift; exec python3 -m faugus.runner --game "$@";;
@@ -87,13 +101,17 @@ case "$1" in
     --daemon)   shift; exec python3 -m faugus.backup_daemon --daemon;;
     *)          exec python3 -m faugus.launcher "$@";;
 esac
-WRAPPER
-chmod +x "$APPDIR/bin/faugus-launcher"
+APPRUN
+chmod +x "$APPDIR/AppRun"
 
-sh "$QUICK_SHARUN" --make-appimage
+if [ ! -x "$APPIMAGETOOL" ]; then
+    curl -L -o "$APPIMAGETOOL" \
+        "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+    chmod +x "$APPIMAGETOOL"
+fi
 
 rm -f "$OUTPUT"
-mv "$BUILD_ROOT"/*.AppImage "$OUTPUT"
+ARCH="$ARCH" "$APPIMAGETOOL" "$APPDIR" "$OUTPUT"
 
 echo
 echo "Built: $OUTPUT"
