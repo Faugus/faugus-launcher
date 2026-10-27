@@ -112,6 +112,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     _background_dirty = False
     _background_time = 0
     _background_source = None
+    _background_delay_source = None
 
     def __init__(self, app):
         super().__init__(application=app, title="Faugus")
@@ -923,7 +924,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
     def queue_background_sync(self):
         self._background_dirty = True
+        if self._background_delay_source is None:
+            self._background_delay_source = GLib.timeout_add(115, self.flush_queued_background_sync)
+
+    def flush_queued_background_sync(self):
+        self._background_delay_source = None
         self.sync_background()
+        return False
 
     def sync_background(self, force=False):
         if not self._background_dirty:
@@ -1994,7 +2001,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         d = abs(offset)
         if d > radius:
             opacity *= max(0.0, radius + 1 - d)
-        scale = round(scale * 400) / 400
+        scale = (int(scale * 400) + 0.5) / 400
         translate_x = offset * self.carrousel_step
         slot["box"].set_opacity(opacity)
 
@@ -2234,7 +2241,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             for slot in self.carrousel_slots:
                 current = slot["anim_from"] + (slot["anim_to"] - slot["anim_from"]) * eased
                 self.layout_carrousel_slot(slot, current)
-            if elapsed >= duration - 200000:
+            if elapsed >= duration - 60000:
                 self.sync_background()
             if t >= 1.0:
                 for slot in self.carrousel_slots:
