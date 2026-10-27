@@ -236,6 +236,13 @@ class FaugusRun(HiDpiMixin):
             self.proton_latest = latest_flags[protonpath]
             self.proton_exists = find_compatibilitytool(protonpath) is not None
 
+        if protonpath:
+            protonpath_path = find_compatibilitytool(protonpath)
+            if protonpath in latest_flags:
+                protonpath_path = protonpath_path or COMPATIBILITY_DIR / protonpath
+            if protonpath_path:
+                set_env("PROTONPATH", str(protonpath_path))
+
         if protonpath and "wineland" in protonpath.lower():
             os.environ.pop("PROTON_ENABLE_WAYLAND", None)
             _env_set.discard("PROTON_ENABLE_WAYLAND")
@@ -968,11 +975,7 @@ def build_launch_command(game):
             elif runner in reserved_names:
                 command_parts.append(f"PROTONPATH='{runner}'")
             else:
-                resolved_runner = find_compatibilitytool(runner)
-                if resolved_runner and len(COMPATIBILITY_DIRS) > 1 and resolved_runner.parent == COMPATIBILITY_DIRS[-1]:
-                    command_parts.append(f"PROTONPATH={shlex.quote(str(resolved_runner))}")
-                else:
-                    command_parts.append(f"PROTONPATH='{runner}'")
+                command_parts.append(f"PROTONPATH='{runner}'")
     else:
         command_parts.append(f"WINEPREFIX={shlex.quote(prefix)}")
     command_parts.extend(build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow, lossless_performance, lossless_hdr, lossless_present))
