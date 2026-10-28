@@ -2230,19 +2230,6 @@ def prepare_game_kwargs(data):
     return {f: data.get(f, defaults[f]) for f in GAME_FIELDS}
 
 
-def init_addon_defaults(obj):
-    obj.addapp_enabled = False
-    obj.addapp = ""
-    obj.addapp_delay = ""
-    obj.addapp_first = False
-    obj.lossless_enabled = False
-    obj.lossless_multiplier = 1
-    obj.lossless_flow = 100
-    obj.lossless_performance = False
-    obj.lossless_hdr = False
-    obj.lossless_present = False
-
-
 def build_hook_command_grid(parent, title, key, tooltip):
     label = Gtk.Label(label=title)
     label.set_halign(Gtk.Align.START)
@@ -2473,39 +2460,6 @@ class LaunchArgumentsMixin:
         lambda self, value: self.launch_arguments_editor.set_arguments(value))
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
-    dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
-    apply_titlebar_preference(dialog)
-    hide_dialog_action_area(dialog)
-    dialog.set_resizable(False)
-    dialog.set_modal(True)
-
-    frame = Gtk.Frame()
-    frame.set_margin_start(10)
-    frame.set_margin_end(10)
-    frame.set_margin_top(10)
-    frame.set_margin_bottom(10)
-
-    editor = LaunchArgumentsEditor(current_launch_arguments)
-    frame.set_child(editor.widget)
-
-    content_area = dialog.get_content_area()
-    content_area.append(frame)
-    content_area.append(build_dialog_ok_cancel_box(dialog))
-
-    def on_response(dialog, response):
-        result = current_launch_arguments
-        if response == Gtk.ResponseType.OK:
-            editor.save_presets()
-            result = editor.get_arguments()
-
-        destroy_and_release(dialog)
-        callback(result)
-
-    dialog.connect("response", on_response)
-    dialog.present()
-
-
 class AddAppPanel:
     def __init__(self, parent, enabled=False, path="", delay="", first=False):
         self.checkbox_enable = Gtk.CheckButton(label=_("Enable"))
@@ -2605,39 +2559,6 @@ class AddAppMixin:
     addapp_first = property(
         lambda self: self.addapp_panel.checkbox_first.get_active(),
         lambda self, value: self.addapp_panel.checkbox_first.set_active(bool(value)))
-
-
-def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first, callback):
-    dialog = Gtk.Dialog(title=_("Additional Application"), transient_for=parent)
-    apply_titlebar_preference(dialog)
-    hide_dialog_action_area(dialog)
-    dialog.set_modal(True)
-    dialog.set_resizable(False)
-
-    frame = Gtk.Frame()
-    frame.set_margin_start(10)
-    frame.set_margin_end(10)
-    frame.set_margin_top(10)
-    frame.set_margin_bottom(10)
-
-    panel = AddAppPanel(dialog, addapp_enabled if addapp_enabled != "" else False, addapp, addapp_delay,
-                        addapp_first if addapp_first != "" else False)
-    frame.set_child(panel.widget)
-
-    content_area = dialog.get_content_area()
-    content_area.append(frame)
-    content_area.append(build_dialog_ok_cancel_box(dialog))
-
-    def on_response(dialog, response):
-        result = (addapp_enabled, addapp, addapp_delay, addapp_first)
-        if response == Gtk.ResponseType.OK:
-            result = panel.get_values()
-
-        destroy_and_release(dialog)
-        callback(result)
-
-    dialog.connect("response", on_response)
-    dialog.present()
 
 
 class LosslessPanel:
@@ -2811,46 +2732,6 @@ class LosslessMixin:
     lossless_present = property(
         lambda self: self.lossless_panel.combobox_present.get_active_id(),
         lambda self, value: self.lossless_panel.combobox_present.set_active_id(value) or self.lossless_panel.combobox_present.set_active(0))
-
-
-def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
-                         lossless_performance, lossless_hdr, lossless_present, callback):
-    dialog = Gtk.Dialog(title=_("Lossless Scaling Frame Generation"), transient_for=parent)
-    apply_titlebar_preference(dialog)
-    hide_dialog_action_area(dialog)
-    dialog.set_modal(True)
-    dialog.set_resizable(False)
-
-    frame = Gtk.Frame()
-    frame.set_margin_start(10)
-    frame.set_margin_end(10)
-    frame.set_margin_top(10)
-    frame.set_margin_bottom(10)
-
-    panel = LosslessPanel(dialog)
-    panel.set_values(lossless_enabled, lossless_multiplier, lossless_flow,
-                     lossless_performance, lossless_hdr, lossless_present)
-    frame.set_child(panel.widget)
-
-    content_area = dialog.get_content_area()
-    content_area.append(frame)
-    content_area.append(build_dialog_ok_cancel_box(dialog))
-
-    def on_response(dialog, response):
-        result = (lossless_enabled, lossless_multiplier, lossless_flow,
-                  lossless_performance, lossless_hdr, lossless_present)
-        if response == Gtk.ResponseType.OK:
-            if not panel.validate():
-                return
-
-            result = panel.get_values()
-            panel.save_location()
-
-        destroy_and_release(dialog)
-        callback(result)
-
-    dialog.connect("response", on_response)
-    dialog.present()
 
 
 def suppress_adwaita_theme_warning():
