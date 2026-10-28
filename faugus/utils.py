@@ -1866,14 +1866,14 @@ BANNER_RATIO = 1920 / 620
 COVER_RATIO = 2 / 3
 
 
-def keep_banner_ratio(source, target):
+def keep_banner_ratio(source, target, ratio=BANNER_RATIO, min_width=-1):
     state = {"width": -1}
 
     def on_tick(widget, frame_clock):
         width = widget.get_width()
         if width > 0 and width != state["width"]:
             state["width"] = width
-            target.set_size_request(-1, math.ceil(width / BANNER_RATIO))
+            target.set_size_request(min_width, math.ceil(width / ratio))
         return True
 
     source.add_tick_callback(on_tick)

@@ -7612,6 +7612,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         }
         .add-game-media-button {
             padding: 0;
+            margin: 0;
             border: none;
             box-shadow: none;
         }
@@ -7913,6 +7914,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             button.set_size_request(300, -1)
             button.set_hexpand(True)
             button.set_vexpand(True)
+            button.set_halign(Gtk.Align.FILL)
+            button.set_valign(Gtk.Align.FILL)
             button.set_overflow(Gtk.Overflow.HIDDEN)
             button.set_child(content)
             button.add_css_class("add-game-media-button")
@@ -7922,13 +7925,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             click_secondary.set_button(Gdk.BUTTON_SECONDARY)
             click_secondary.connect("pressed", self.on_image_clicked)
             button.add_controller(click_secondary)
-            frame = Gtk.AspectFrame.new(0.5, 0.5, COVER_RATIO, False)
+            frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            frame.set_size_request(300, 450)
+            frame.set_hexpand(True)
             frame.set_margin_top(10)
             frame.set_margin_bottom(10)
             frame.set_margin_start(5)
             frame.set_margin_end(10)
             frame.set_valign(Gtk.Align.CENTER)
-            frame.set_child(button)
+            frame.append(button)
+            keep_banner_ratio(frame, frame, COVER_RATIO, 300)
             return picture, button, spinner, frame
 
         self.image_cover, self.button_cover, self.spinner_cover1, self.frame_cover = build_cover_button()
