@@ -2336,10 +2336,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if not game:
             return
 
-        if x is not None and y is not None:
-            rect = self.pointing_rect(x, y)
-        else:
-            rect = self.pointing_rect(0, 0, slot["box"].get_width() or 1)
+        rect = self.pointing_rect(0, 0, slot["box"].get_width() or 1)
         self.open_context_menu(game, slot["box"], rect)
 
         def on_menu_closed(popover):
@@ -2967,13 +2964,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         game = self.selected()
 
-        rect = None
-        if x is not None and y is not None:
-            translated = self.flowbox.translate_coordinates(item, x, y)
-            if translated is not None:
-                rect = self.pointing_rect(*translated)
-        else:
-            rect = self.pointing_rect(0, 0, item.get_width() or 1)
+        rect = self.pointing_rect(0, 0, item.get_width() or 1)
         self.open_context_menu(game, item, rect)
         self.context_menu.popup()
 
@@ -2981,6 +2972,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         rect = Gdk.Rectangle()
         rect.x, rect.y, rect.width, rect.height = int(x), int(y), width, 1
         return rect
+
+    def anchor_menu_to_base(self, popover, parent, rect):
+        ok, bounds = popover.get_child().compute_bounds(parent)
+        if ok and bounds.get_y() < rect.y:
+            rect.y = max(parent.get_height() - 1, 0)
+            popover.set_pointing_to(rect)
+            popover.set_position(Gtk.PositionType.TOP)
+        return GLib.SOURCE_REMOVE
 
     def open_context_menu(self, game, parent, rect):
         if self.context_menu is not None and self.context_menu.get_parent():
@@ -2991,6 +2990,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.context_menu.set_parent(parent)
         if rect is not None:
             self.context_menu.set_pointing_to(rect)
+            self.context_menu.connect("map", lambda popover: GLib.idle_add(self.anchor_menu_to_base, popover, parent, rect))
         self.context_menu.connect("closed", lambda popover: play_ui_sound("navigate"))
         play_ui_sound("navigate")
 
