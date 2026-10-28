@@ -7563,10 +7563,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_page1 = Gtk.Grid()
         self.grid_page1.set_column_homogeneous(True)
-        self.grid_page1.set_column_spacing(10)
         self.grid_page2 = Gtk.Grid()
         self.grid_page2.set_column_homogeneous(True)
-        self.grid_page2.set_column_spacing(10)
 
         self.grid_launcher = build_grid(margin_bottom=False)
 
@@ -7918,14 +7916,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             picture.set_valign(Gtk.Align.FILL)
             content, spinner = wrap_with_spinner(picture, dim_shape="cover")
             button = Gtk.Button()
-            button.set_size_request(260, 390)
-            button.set_margin_top(10)
-            button.set_margin_bottom(10)
-            button.set_margin_start(10)
-            button.set_margin_end(10)
+            button.set_size_request(300, -1)
+            button.set_hexpand(True)
             button.set_vexpand(True)
-            button.set_valign(Gtk.Align.CENTER)
-            button.set_halign(Gtk.Align.CENTER)
             button.set_overflow(Gtk.Overflow.HIDDEN)
             button.set_child(content)
             button.add_css_class("add-game-media-button")
@@ -7935,10 +7928,17 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             click_secondary.set_button(Gdk.BUTTON_SECONDARY)
             click_secondary.connect("pressed", self.on_image_clicked)
             button.add_controller(click_secondary)
-            return picture, button, spinner
+            frame = Gtk.AspectFrame.new(0.5, 0.5, COVER_RATIO, False)
+            frame.set_margin_top(10)
+            frame.set_margin_bottom(10)
+            frame.set_margin_start(5)
+            frame.set_margin_end(10)
+            frame.set_valign(Gtk.Align.CENTER)
+            frame.set_child(button)
+            return picture, button, spinner, frame
 
-        self.image_cover, self.button_cover, self.spinner_cover1 = build_cover_button()
-        self.image_cover2, self.button_cover2, self.spinner_cover2 = build_cover_button()
+        self.image_cover, self.button_cover, self.spinner_cover1, self.frame_cover = build_cover_button()
+        self.image_cover2, self.button_cover2, self.spinner_cover2, self.frame_cover2 = build_cover_button()
 
         self.picture_banner1 = new_picture()
         self.picture_banner1.set_can_shrink(True)
@@ -8002,8 +8002,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_page1.attach(page1, 0, 1, 1, 1)
         if interface_mode in ("Covers", "Carrousel"):
-            self.grid_page1.attach(self.button_cover, 1, 1, 1, 1)
+            self.grid_page1.attach(self.frame_cover, 1, 1, 1, 1)
         page1.set_hexpand(True)
+        page1.set_size_request(320, -1)
 
         self.view_stack.add_titled(self.grid_page1, "page1", _("Game/App"))
 
@@ -8011,8 +8012,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self.grid_page2.attach(page2, 0, 1, 1, 1)
         if interface_mode in ("Covers", "Carrousel"):
-            self.grid_page2.attach(self.button_cover2, 1, 1, 1, 1)
+            self.grid_page2.attach(self.frame_cover2, 1, 1, 1, 1)
         page2.set_hexpand(True)
+        page2.set_size_request(320, -1)
 
         self.view_stack.add_titled(self.grid_page2, "page2", _("Tools"))
 
@@ -8110,6 +8112,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         page2.append(self.grid_addapp)
         page2.append(self.grid_lossless)
         page2.append(self.grid_tools)
+
+        for widget in () if interface_mode not in ("Covers", "Carrousel") else (
+            *widget_children(page1),
+            self.grid_game_arguments,
+            self.grid_launch_settings,
+            self.grid_addapp,
+            self.grid_lossless,
+            self.grid_tools,
+        ):
+            widget.set_margin_end(5)
 
         bottom_box = build_bottom_button_box(self.button_cancel, self.button_ok)
         bottom_box.set_margin_top(10)
@@ -8571,7 +8583,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         def show(texture):
             if request != self._cover_request:
                 return
-            surface = HiDpiPaintable(texture, 260, 390)
+            surface = HiDpiPaintable(texture, 300, 450)
             self.image_cover.set_paintable(surface)
             self.image_cover2.set_paintable(surface)
             self.button_cover.remove_css_class("cover-empty")

@@ -1863,6 +1863,7 @@ def choose_shortcut_icon(obj):
 
 
 BANNER_RATIO = 1920 / 620
+COVER_RATIO = 2 / 3
 
 
 def keep_banner_ratio(source, target):
@@ -1872,7 +1873,7 @@ def keep_banner_ratio(source, target):
         width = widget.get_width()
         if width > 0 and width != state["width"]:
             state["width"] = width
-            target.set_size_request(-1, int(width / BANNER_RATIO))
+            target.set_size_request(-1, math.ceil(width / BANNER_RATIO))
         return True
 
     source.add_tick_callback(on_tick)
