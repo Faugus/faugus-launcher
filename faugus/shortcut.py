@@ -19,7 +19,7 @@ GLib.set_prgname("io.github.Faugus.faugus-launcher")
 _ = setup_gettext('faugus-launcher')
 
 
-class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
+class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin, HookEntriesMixin):
     def __init__(self, file_path):
         super().__init__(title="Faugus")
         apply_titlebar_preference(self)
@@ -36,6 +36,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.icon_temp = f'{self.icons_path}/icon_temp.png'
 
         init_addon_defaults(self)
+        self.launch_arguments = ""
 
         self.label_title = Gtk.Label(label=_("Title"))
         self.label_title.set_halign(Gtk.Align.START)
@@ -93,6 +94,11 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_launch_settings = build_grid(margin_bottom=False)
 
+        self.grid_pre_launch, self.entry_pre_launch = build_hook_command_grid(
+            self, _("Pre-launch"), "pre_launch", _("Command or script to run before the game"))
+        self.grid_post_launch, self.entry_post_launch = build_hook_command_grid(
+            self, _("Post-launch"), "post_launch", _("Command or script to run after the game"))
+
         self.grid_game_arguments = build_grid(margin_bottom=False)
 
         self.grid_lossless = build_grid(margin_bottom=False)
@@ -130,8 +136,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_main.append(self.grid_title)
-        self.box_main.append(self.grid_game_arguments)
         self.box_main.append(self.grid_launch_settings)
+        self.box_main.append(self.grid_pre_launch)
+        self.box_main.append(self.grid_post_launch)
+        self.box_main.append(self.grid_game_arguments)
         self.box_main.append(self.grid_addapp)
         self.box_main.append(self.grid_lossless)
         self.box_main.append(self.grid_tools)
@@ -172,11 +180,9 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         run_in_background(extract)
 
     def on_button_launch_settings_clicked(self, widget):
-        def on_result(result, pre_launch, post_launch):
+        def on_result(result):
             self.launch_arguments = result
-            self.pre_launch = pre_launch
-            self.post_launch = post_launch
-        show_launch_arguments_dialog(self, self.launch_arguments, self.pre_launch, self.post_launch, on_result)
+        show_launch_arguments_dialog(self, self.launch_arguments, on_result)
 
     def on_button_addapp_clicked(self, widget):
         def on_result(result):

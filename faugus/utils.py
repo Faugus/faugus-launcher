@@ -2235,15 +2235,57 @@ def init_addon_defaults(obj):
     obj.addapp = ""
     obj.addapp_delay = ""
     obj.addapp_first = False
-    obj.launch_arguments = ""
-    obj.pre_launch = ""
-    obj.post_launch = ""
     obj.lossless_enabled = False
     obj.lossless_multiplier = 1
     obj.lossless_flow = 100
     obj.lossless_performance = False
     obj.lossless_hdr = False
     obj.lossless_present = False
+
+
+def build_hook_command_grid(parent, title, key, tooltip):
+    label = Gtk.Label(label=title)
+    label.set_halign(Gtk.Align.START)
+
+    entry = Gtk.Entry()
+    entry.set_hexpand(True)
+    entry.set_tooltip_text(tooltip)
+
+    button_search = Gtk.Button()
+    button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+    button_search.set_size_request(50, -1)
+    button_search.set_tooltip_text(tooltip)
+
+    def on_search_clicked(widget):
+        filechooser = new_file_chooser(parent, _("Select a command or script"), Gtk.FileChooserAction.OPEN)
+        set_file_chooser_start_folder(filechooser, key, entry.get_text() or None)
+
+        def on_response_fc(dialog_fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                selected_file = dialog_fc.get_file().get_path()
+                if selected_file:
+                    entry.set_text(selected_file)
+            destroy_and_release(dialog_fc)
+
+        filechooser.connect("response", on_response_fc)
+        filechooser.present()
+
+    button_search.connect("clicked", on_search_clicked)
+
+    grid = build_grid(margin_bottom=False)
+    grid.attach(label, 0, 0, 4, 1)
+    grid.attach(entry, 0, 1, 3, 1)
+    grid.attach(button_search, 3, 1, 1, 1)
+    return grid, entry
+
+
+class HookEntriesMixin:
+    pre_launch = property(
+        lambda self: self.entry_pre_launch.get_text().strip(),
+        lambda self, value: self.entry_pre_launch.set_text(value))
+    post_launch = property(
+        lambda self: self.entry_post_launch.get_text().strip(),
+        lambda self, value: self.entry_post_launch.set_text(value))
 
 
 class LaunchArgumentsEditor:
@@ -2415,7 +2457,13 @@ class LaunchArgumentsEditor:
         save_json_file([row[0] for row in self.store_presets if row[0].strip()], PRESETS_FILE)
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
+class LaunchArgumentsMixin:
+    launch_arguments = property(
+        lambda self: self.launch_arguments_editor.get_arguments(),
+        lambda self, value: self.launch_arguments_editor.set_arguments(value))
+
+
+def show_launch_arguments_dialog(parent, current_launch_arguments, callback):
     dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
     apply_titlebar_preference(dialog)
     hide_dialog_action_area(dialog)
@@ -2429,89 +2477,124 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
     frame.set_margin_bottom(10)
 
     editor = LaunchArgumentsEditor(current_launch_arguments)
-    hbox = editor.widget
-
-    def build_hook_command_box(title, current_value, key, tooltip):
-        label = Gtk.Label(label=title)
-        label.set_halign(Gtk.Align.START)
-
-        entry = Gtk.Entry()
-        entry.set_text(current_value)
-        entry.set_hexpand(True)
-        entry.set_tooltip_text(tooltip)
-
-        button_search = Gtk.Button()
-        button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
-        button_search.set_size_request(50, -1)
-        button_search.set_tooltip_text(tooltip)
-
-        def on_search_clicked(widget):
-            filechooser = new_file_chooser(dialog, _("Select a command or script"), Gtk.FileChooserAction.OPEN)
-            set_file_chooser_start_folder(filechooser, key, entry.get_text() or None)
-
-            def on_response_fc(dialog_fc, response):
-                if response == Gtk.ResponseType.ACCEPT:
-                    selected_file = dialog_fc.get_file().get_path()
-                    if selected_file:
-                        entry.set_text(selected_file)
-                destroy_and_release(dialog_fc)
-
-            filechooser.connect("response", on_response_fc)
-            filechooser.present()
-
-        button_search.connect("clicked", on_search_clicked)
-
-        entry_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        entry_row.append(entry)
-        entry_row.append(button_search)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        box.append(label)
-        box.append(entry_row)
-        return box, entry
-
-    box_pre_launch, entry_pre_launch = build_hook_command_box(
-        _("Pre-launch"), current_pre_launch, "pre_launch",
-        _("Command or script to run before the game"))
-    box_post_launch, entry_post_launch = build_hook_command_box(
-        _("Post-launch"), current_post_launch, "post_launch",
-        _("Command or script to run after the game"))
-
-    hbox_hooks = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    hbox_hooks.set_homogeneous(True)
-    hbox_hooks.set_margin_start(10)
-    hbox_hooks.set_margin_end(10)
-    hbox_hooks.set_margin_bottom(10)
-    hbox_hooks.append(box_pre_launch)
-    hbox_hooks.append(box_post_launch)
-
-    frame_content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    frame_content.append(hbox)
-    frame_content.append(hbox_hooks)
-    frame.set_child(frame_content)
+    frame.set_child(editor.widget)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)
-
-    bottom_box = build_dialog_ok_cancel_box(dialog)
-
-    content_area.append(bottom_box)
+    content_area.append(build_dialog_ok_cancel_box(dialog))
 
     def on_response(dialog, response):
         result = current_launch_arguments
-        pre_launch = current_pre_launch
-        post_launch = current_post_launch
         if response == Gtk.ResponseType.OK:
             editor.save_presets()
             result = editor.get_arguments()
-            pre_launch = entry_pre_launch.get_text().strip()
-            post_launch = entry_post_launch.get_text().strip()
 
         destroy_and_release(dialog)
-        callback(result, pre_launch, post_launch)
+        callback(result)
 
     dialog.connect("response", on_response)
     dialog.present()
+
+
+class AddAppPanel:
+    def __init__(self, parent, enabled=False, path="", delay="", first=False):
+        self.checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+        self.checkbox_enable.set_halign(Gtk.Align.START)
+
+        self.label_path = Gtk.Label(label=_("Path"))
+        self.label_path.set_halign(Gtk.Align.START)
+
+        self.entry_path = Gtk.Entry()
+        self.entry_path.set_tooltip_text(_("Path to the application"))
+        self.entry_path.set_has_tooltip(True)
+        self.entry_path.connect("query-tooltip", on_entry_query_tooltip)
+        self.entry_path.set_hexpand(True)
+
+        self.button_search = Gtk.Button()
+        self.button_search.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_search.set_size_request(50, -1)
+
+        def on_search_clicked(w):
+            filechooser = new_file_chooser(
+                parent,
+                _("Select an additional application"),
+                Gtk.FileChooserAction.OPEN,
+            )
+            set_file_chooser_start_folder(filechooser, "addapp", self.entry_path.get_text() or None)
+            add_windows_file_filters(filechooser)
+
+            def on_search_response(dialog_fc, resp):
+                if resp == Gtk.ResponseType.ACCEPT:
+                    selected_file = dialog_fc.get_file().get_path()
+                    if selected_file:
+                        self.entry_path.set_text(selected_file)
+                destroy_and_release(dialog_fc)
+
+            filechooser.connect("response", on_search_response)
+            filechooser.present()
+
+        self.button_search.connect("clicked", on_search_clicked)
+
+        self.label_delay = Gtk.Label(label=_("Delay (seconds)"))
+        self.label_delay.set_halign(Gtk.Align.START)
+
+        self.spin_delay = Gtk.SpinButton()
+        self.spin_delay.set_adjustment(Gtk.Adjustment(
+            value=0, lower=0, upper=60, step_increment=1, page_increment=10, page_size=0))
+        self.spin_delay.set_numeric(True)
+        self.spin_delay.connect("value-changed", play_navigate_if_window_active)
+        self.spin_delay.set_hexpand(True)
+
+        self.checkbox_first = Gtk.CheckButton(label=_("Run the application first"))
+        self.checkbox_first.set_halign(Gtk.Align.START)
+
+        self.checkbox_enable.connect("toggled", self.on_enable_toggled)
+
+        self.widget = build_grid()
+        self.widget.attach(self.checkbox_enable, 0, 0, 1, 1)
+        self.widget.attach(self.label_path, 0, 1, 1, 1)
+        self.widget.attach(self.entry_path, 0, 2, 3, 1)
+        self.widget.attach(self.button_search, 3, 2, 1, 1)
+        self.widget.attach(self.label_delay, 0, 3, 1, 1)
+        self.widget.attach(self.spin_delay, 0, 4, 4, 1)
+        self.widget.attach(self.checkbox_first, 0, 5, 1, 1)
+
+        self.set_values(enabled, path, delay, first)
+
+    def on_enable_toggled(self, checkbox):
+        active = checkbox.get_active()
+        for widget in (self.label_path, self.entry_path, self.button_search, self.label_delay, self.spin_delay, self.checkbox_first):
+            widget.set_sensitive(active)
+
+    def set_values(self, enabled, path, delay, first):
+        self.checkbox_enable.set_active(bool(enabled))
+        self.entry_path.set_text(path)
+        self.spin_delay.set_value(int(delay) if delay else 0)
+        self.checkbox_first.set_active(bool(first))
+        self.on_enable_toggled(self.checkbox_enable)
+
+    def get_values(self):
+        return (
+            self.checkbox_enable.get_active(),
+            self.entry_path.get_text(),
+            self.spin_delay.get_text(),
+            self.checkbox_first.get_active(),
+        )
+
+
+class AddAppMixin:
+    addapp_enabled = property(
+        lambda self: self.addapp_panel.checkbox_enable.get_active(),
+        lambda self, value: self.addapp_panel.checkbox_enable.set_active(bool(value)))
+    addapp = property(
+        lambda self: self.addapp_panel.entry_path.get_text(),
+        lambda self, value: self.addapp_panel.entry_path.set_text(value))
+    addapp_delay = property(
+        lambda self: self.addapp_panel.spin_delay.get_text(),
+        lambda self, value: self.addapp_panel.spin_delay.set_value(int(value) if value else 0))
+    addapp_first = property(
+        lambda self: self.addapp_panel.checkbox_first.get_active(),
+        lambda self, value: self.addapp_panel.checkbox_first.set_active(bool(value)))
 
 
 def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_first, callback):
@@ -2527,109 +2610,197 @@ def show_addapp_dialog(parent, addapp_enabled, addapp, addapp_delay, addapp_firs
     frame.set_margin_top(10)
     frame.set_margin_bottom(10)
 
-    grid = build_grid()
-
-    enabled = addapp_enabled if addapp_enabled != "" else False
-    cur_path = addapp
-    cur_delay = addapp_delay
-    cur_first = addapp_first if addapp_first != "" else False
-
-    checkbox_enable = Gtk.CheckButton(label=_("Enable"))
-    checkbox_enable.set_active(enabled)
-    checkbox_enable.set_halign(Gtk.Align.START)
-
-    label_path = Gtk.Label(label=_("Path"))
-    label_path.set_halign(Gtk.Align.START)
-
-    entry_addapp = Gtk.Entry()
-    entry_addapp.set_text(cur_path)
-    entry_addapp.set_tooltip_text(_("Path to the application"))
-    entry_addapp.set_has_tooltip(True)
-    entry_addapp.connect("query-tooltip", on_entry_query_tooltip)
-    entry_addapp.set_hexpand(True)
-
-    button_search_addapp = Gtk.Button()
-    button_search_addapp.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
-    button_search_addapp.set_size_request(50, -1)
-
-    def on_search_clicked(w):
-        filechooser = new_file_chooser(
-            dialog,
-            _("Select an additional application"),
-            Gtk.FileChooserAction.OPEN,
-        )
-        set_file_chooser_start_folder(filechooser, "addapp", entry_addapp.get_text() or None)
-        add_windows_file_filters(filechooser)
-
-        def on_search_response(dialog_fc, resp):
-            if resp == Gtk.ResponseType.ACCEPT:
-                selected_file = dialog_fc.get_file().get_path()
-                if selected_file:
-                    entry_addapp.set_text(selected_file)
-            destroy_and_release(dialog_fc)
-
-        filechooser.connect("response", on_search_response)
-        filechooser.present()
-
-    button_search_addapp.connect("clicked", on_search_clicked)
-
-    label_delay = Gtk.Label(label=_("Delay (seconds)"))
-    label_delay.set_halign(Gtk.Align.START)
-
-    adjustment = Gtk.Adjustment(
-        value=int(cur_delay) if cur_delay else 0,
-        lower=0, upper=60, step_increment=1, page_increment=10, page_size=0
-    )
-
-    entry_delay = Gtk.SpinButton()
-    entry_delay.set_adjustment(adjustment)
-    entry_delay.set_numeric(True)
-    entry_delay.connect("value-changed", play_navigate_if_window_active)
-    entry_delay.set_hexpand(True)
-
-    checkbox_addapp_first = Gtk.CheckButton(label=_("Run the application first"))
-    checkbox_addapp_first.set_active(cur_first)
-    checkbox_addapp_first.set_halign(Gtk.Align.START)
-
-    def on_enable_toggled(cb):
-        active = cb.get_active()
-        for widget in (label_path, entry_addapp, button_search_addapp, label_delay, entry_delay, checkbox_addapp_first):
-            widget.set_sensitive(active)
-
-    checkbox_enable.connect("toggled", on_enable_toggled)
-    on_enable_toggled(checkbox_enable)
-
-    grid.attach(checkbox_enable,        0, 0, 1, 1)
-    grid.attach(label_path,             0, 1, 1, 1)
-    grid.attach(entry_addapp,           0, 2, 3, 1)
-    grid.attach(button_search_addapp,   3, 2, 1, 1)
-    grid.attach(label_delay,            0, 3, 1, 1)
-    grid.attach(entry_delay,            0, 4, 4, 1)
-    grid.attach(checkbox_addapp_first,  0, 5, 1, 1)
-
-    frame.set_child(grid)
-
-    bottom_box = build_dialog_ok_cancel_box(dialog)
+    panel = AddAppPanel(dialog, addapp_enabled if addapp_enabled != "" else False, addapp, addapp_delay,
+                        addapp_first if addapp_first != "" else False)
+    frame.set_child(panel.widget)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)
-    content_area.append(bottom_box)
+    content_area.append(build_dialog_ok_cancel_box(dialog))
 
     def on_response(dialog, response):
         result = (addapp_enabled, addapp, addapp_delay, addapp_first)
         if response == Gtk.ResponseType.OK:
-            result = (
-                checkbox_enable.get_active(),
-                entry_addapp.get_text(),
-                entry_delay.get_text(),
-                checkbox_addapp_first.get_active(),
-            )
+            result = panel.get_values()
 
         destroy_and_release(dialog)
         callback(result)
 
     dialog.connect("response", on_response)
     dialog.present()
+
+
+class LosslessPanel:
+    def __init__(self, parent):
+        from faugus.config_manager import ConfigManager
+        from faugus.steam_setup import LOSSLESS_DLL
+
+        self.cfg = ConfigManager()
+        current_location = self.cfg.config.get('lossless-location', '').strip('"')
+        if not current_location and LOSSLESS_DLL:
+            current_location = str(LOSSLESS_DLL)
+
+        self.label_location = Gtk.Label(label=_("Lossless Scaling Location"))
+        self.label_location.set_halign(Gtk.Align.START)
+
+        load_red_entry_css()
+
+        self.entry_location = Gtk.Entry()
+        self.entry_location.set_text(current_location)
+        self.entry_location.set_hexpand(True)
+        self.entry_location.set_tooltip_text(_("Lossless.dll location"))
+        self.entry_location.set_has_tooltip(True)
+        self.entry_location.connect("query-tooltip", on_entry_query_tooltip)
+        self.entry_location.connect("changed", on_entry_changed)
+
+        self.button_search_location = Gtk.Button()
+        self.button_search_location.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_search_location.set_size_request(50, -1)
+
+        def on_search_location_clicked(widget):
+            filechooser = new_file_chooser(
+                parent,
+                _("Select the Lossless.dll file"),
+                Gtk.FileChooserAction.OPEN,
+            )
+            entry_value = self.entry_location.get_text()
+            preferred_path = expand_path(entry_value) if entry_value else None
+            set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
+
+            filter_dll = Gtk.FileFilter()
+            filter_dll.set_name("Lossless.dll")
+            filter_dll.add_pattern("Lossless.dll")
+            filechooser.add_filter(filter_dll)
+            filechooser.set_filter(filter_dll)
+
+            def on_response_fc(dialog_fc, response):
+                if response == Gtk.ResponseType.ACCEPT:
+                    selected_file = dialog_fc.get_file().get_path()
+                    if selected_file and os.path.basename(selected_file) == "Lossless.dll":
+                        self.entry_location.set_text(selected_file)
+                destroy_and_release(dialog_fc)
+
+            filechooser.connect("response", on_response_fc)
+            filechooser.present()
+
+        self.button_search_location.connect("clicked", on_search_location_clicked)
+
+        self.checkbox_enable = Gtk.CheckButton(label=_("Enable"))
+        self.checkbox_enable.set_halign(Gtk.Align.START)
+
+        self.label_multiplier = Gtk.Label(label=_("Multiplier"))
+        self.label_multiplier.set_halign(Gtk.Align.START)
+        self.spin_multiplier = Gtk.SpinButton()
+        self.spin_multiplier.set_adjustment(Gtk.Adjustment(value=1, lower=1, upper=20, step_increment=1))
+        self.spin_multiplier.set_numeric(True)
+        self.spin_multiplier.connect("value-changed", play_navigate_if_window_active)
+        self.spin_multiplier.set_tooltip_text(_("Multiply the FPS"))
+
+        self.label_flow = Gtk.Label(label=_("Flow Scale"))
+        self.label_flow.set_halign(Gtk.Align.START)
+        self.scale_flow = Gtk.Scale(
+            orientation=Gtk.Orientation.HORIZONTAL,
+            adjustment=Gtk.Adjustment(value=100, lower=25, upper=100, step_increment=1))
+        self.scale_flow.set_digits(0)
+        self.scale_flow.set_hexpand(True)
+        self.scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
+        self.scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution"))
+
+        self.checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
+        self.checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality"))
+
+        self.checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
+        self.checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior"))
+
+        self.label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
+        self.label_present.set_halign(Gtk.Align.START)
+
+        self.combobox_present = IdComboBox()
+        self.combobox_present.set_tooltip_text(_("Override the present mode"))
+        self.combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")), "VSync/FIFO")
+        self.combobox_present.append("mailbox", "Mailbox")
+        self.combobox_present.append("immediate", "Immediate")
+
+        self.checkbox_enable.connect("toggled", self.on_enable_toggled)
+
+        box_location = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_location.append(self.entry_location)
+        box_location.append(self.button_search_location)
+
+        self.widget = build_grid()
+        self.widget.attach(self.checkbox_enable, 0, 0, 1, 1)
+        self.widget.attach(self.label_location, 0, 1, 1, 1)
+        self.widget.attach(box_location, 0, 2, 1, 1)
+        self.widget.attach(self.label_multiplier, 0, 3, 1, 1)
+        self.widget.attach(self.spin_multiplier, 0, 4, 1, 1)
+        self.widget.attach(self.label_flow, 0, 5, 1, 1)
+        self.widget.attach(self.scale_flow, 0, 6, 1, 1)
+        self.widget.attach(self.checkbox_performance, 0, 7, 1, 1)
+        self.widget.attach(self.checkbox_hdr, 0, 8, 1, 1)
+        self.widget.attach(self.label_present, 0, 9, 1, 1)
+        self.widget.attach(self.combobox_present, 0, 10, 1, 1)
+
+        self.set_values("", "", "", "", "", "")
+
+    def on_enable_toggled(self, checkbox):
+        active = checkbox.get_active()
+        for widget in (self.label_location, self.entry_location, self.button_search_location, self.label_multiplier,
+                       self.spin_multiplier, self.label_flow, self.scale_flow, self.checkbox_performance,
+                       self.checkbox_hdr, self.label_present, self.combobox_present):
+            widget.set_sensitive(active)
+
+    def set_values(self, enabled, multiplier, flow, performance, hdr, present):
+        self.checkbox_enable.set_active(bool(enabled))
+        self.spin_multiplier.set_value(multiplier if multiplier != "" else 1)
+        self.scale_flow.set_value(flow if flow != "" else 100)
+        self.checkbox_performance.set_active(bool(performance))
+        self.checkbox_hdr.set_active(bool(hdr))
+        if not self.combobox_present.set_active_id(present):
+            self.combobox_present.set_active(0)
+        self.on_enable_toggled(self.checkbox_enable)
+
+    def get_values(self):
+        return (
+            self.checkbox_enable.get_active(),
+            self.spin_multiplier.get_value_as_int(),
+            self.scale_flow.get_value(),
+            self.checkbox_performance.get_active(),
+            self.checkbox_hdr.get_active(),
+            self.combobox_present.get_active_id(),
+        )
+
+    def validate(self):
+        if self.checkbox_enable.get_active() and not self.entry_location.get_text():
+            mark_invalid_widget(self.entry_location)
+            return False
+        return True
+
+    def save_location(self):
+        location = self.entry_location.get_text()
+        if location != self.cfg.config.get('lossless-location', '').strip('"'):
+            self.cfg.set_value("lossless-location", location)
+            self.cfg.save_config()
+
+
+class LosslessMixin:
+    lossless_enabled = property(
+        lambda self: self.lossless_panel.checkbox_enable.get_active(),
+        lambda self, value: self.lossless_panel.checkbox_enable.set_active(bool(value)))
+    lossless_multiplier = property(
+        lambda self: self.lossless_panel.spin_multiplier.get_value_as_int(),
+        lambda self, value: self.lossless_panel.spin_multiplier.set_value(value if value != "" else 1))
+    lossless_flow = property(
+        lambda self: self.lossless_panel.scale_flow.get_value(),
+        lambda self, value: self.lossless_panel.scale_flow.set_value(value if value != "" else 100))
+    lossless_performance = property(
+        lambda self: self.lossless_panel.checkbox_performance.get_active(),
+        lambda self, value: self.lossless_panel.checkbox_performance.set_active(bool(value)))
+    lossless_hdr = property(
+        lambda self: self.lossless_panel.checkbox_hdr.get_active(),
+        lambda self, value: self.lossless_panel.checkbox_hdr.set_active(bool(value)))
+    lossless_present = property(
+        lambda self: self.lossless_panel.combobox_present.get_active_id(),
+        lambda self, value: self.lossless_panel.combobox_present.set_active_id(value) or self.lossless_panel.combobox_present.set_active(0))
 
 
 def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless_flow,
@@ -2646,159 +2817,24 @@ def show_lossless_dialog(parent, lossless_enabled, lossless_multiplier, lossless
     frame.set_margin_top(10)
     frame.set_margin_bottom(10)
 
-    grid = build_grid()
-
-    enabled = lossless_enabled if lossless_enabled != "" else False
-    multiplier = lossless_multiplier if lossless_multiplier != "" else 1
-    flow = lossless_flow if lossless_flow != "" else 100
-    performance = lossless_performance if lossless_performance != "" else False
-    hdr = lossless_hdr if lossless_hdr != "" else False
-    from faugus.config_manager import ConfigManager
-    from faugus.steam_setup import LOSSLESS_DLL
-
-    cfg = ConfigManager()
-    current_location = cfg.config.get('lossless-location', '').strip('"')
-    if not current_location and LOSSLESS_DLL:
-        current_location = str(LOSSLESS_DLL)
-
-    label_location = Gtk.Label(label=_("Lossless Scaling Location"))
-    label_location.set_halign(Gtk.Align.START)
-
-    load_red_entry_css()
-
-    entry_location = Gtk.Entry()
-    entry_location.set_text(current_location)
-    entry_location.set_hexpand(True)
-    entry_location.set_tooltip_text(_("Lossless.dll location"))
-    entry_location.set_has_tooltip(True)
-    entry_location.connect("query-tooltip", on_entry_query_tooltip)
-    entry_location.connect("changed", on_entry_changed)
-
-    button_search_location = Gtk.Button()
-    button_search_location.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
-    button_search_location.set_size_request(50, -1)
-
-    def on_search_location_clicked(widget):
-        filechooser = new_file_chooser(
-            dialog,
-            _("Select the Lossless.dll file"),
-            Gtk.FileChooserAction.OPEN,
-        )
-        entry_value = entry_location.get_text()
-        preferred_path = expand_path(entry_value) if entry_value else None
-        set_file_chooser_start_folder(filechooser, "settings_lossless", preferred_path)
-
-        filter_dll = Gtk.FileFilter()
-        filter_dll.set_name("Lossless.dll")
-        filter_dll.add_pattern("Lossless.dll")
-        filechooser.add_filter(filter_dll)
-        filechooser.set_filter(filter_dll)
-
-        def on_response_fc(dialog_fc, response):
-            if response == Gtk.ResponseType.ACCEPT:
-                selected_file = dialog_fc.get_file().get_path()
-                if selected_file and os.path.basename(selected_file) == "Lossless.dll":
-                    entry_location.set_text(selected_file)
-            destroy_and_release(dialog_fc)
-
-        filechooser.connect("response", on_response_fc)
-        filechooser.present()
-
-    button_search_location.connect("clicked", on_search_location_clicked)
-
-    box_location = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    box_location.append(entry_location)
-    box_location.append(button_search_location)
-
-    checkbox_enable = Gtk.CheckButton(label=_("Enable"))
-    checkbox_enable.set_active(enabled)
-    checkbox_enable.set_halign(Gtk.Align.START)
-
-    label_multiplier = Gtk.Label(label=_("Multiplier"))
-    label_multiplier.set_halign(Gtk.Align.START)
-    spin_multiplier = Gtk.SpinButton()
-    spin_multiplier.set_adjustment(Gtk.Adjustment(value=multiplier, lower=1, upper=20, step_increment=1))
-    spin_multiplier.set_numeric(True)
-    spin_multiplier.connect("value-changed", play_navigate_if_window_active)
-    spin_multiplier.set_tooltip_text(_("Multiply the FPS"))
-
-    label_flow = Gtk.Label(label=_("Flow Scale"))
-    label_flow.set_halign(Gtk.Align.START)
-    adjustment = Gtk.Adjustment(value=flow, lower=25, upper=100, step_increment=1)
-    scale_flow = Gtk.Scale(orientation=Gtk.Orientation.HORIZONTAL, adjustment=adjustment)
-    scale_flow.set_digits(0)
-    scale_flow.set_hexpand(True)
-    scale_flow.set_value_pos(Gtk.PositionType.RIGHT)
-    scale_flow.set_tooltip_text(_("Lower the internal motion estimation resolution"))
-
-    checkbox_performance = Gtk.CheckButton(label=_("Performance Mode"))
-    checkbox_performance.set_tooltip_text(_("Massively improve performance at the cost of quality"))
-    checkbox_performance.set_active(performance)
-
-    checkbox_hdr = Gtk.CheckButton(label=_("HDR Mode"))
-    checkbox_hdr.set_tooltip_text(_("Enable special HDR-only behavior"))
-    checkbox_hdr.set_active(hdr)
-
-    label_present = Gtk.Label(label=_("Present Mode (Experimental)"))
-    label_present.set_halign(Gtk.Align.START)
-
-    combobox_present = IdComboBox()
-    combobox_present.set_tooltip_text(_("Override the present mode"))
-
-    combobox_present.append("fifo", "VSync/FIFO ({})".format(_("Default")), "VSync/FIFO")
-    combobox_present.append("mailbox", "Mailbox")
-    combobox_present.append("immediate", "Immediate")
-
-    if not combobox_present.set_active_id(lossless_present):
-        combobox_present.set_active(0)
-
-    def on_enable_toggled(cb):
-        active = cb.get_active()
-        for widget in (label_location, entry_location, button_search_location, label_multiplier, spin_multiplier,
-                       label_flow, scale_flow, checkbox_performance, checkbox_hdr, label_present, combobox_present):
-            widget.set_sensitive(active)
-
-    checkbox_enable.connect("toggled", on_enable_toggled)
-    on_enable_toggled(checkbox_enable)
-
-    grid.attach(checkbox_enable,        0, 0, 1, 1)
-    grid.attach(label_location,         0, 1, 1, 1)
-    grid.attach(box_location,           0, 2, 1, 1)
-    grid.attach(label_multiplier,       0, 3, 1, 1)
-    grid.attach(spin_multiplier,        0, 4, 1, 1)
-    grid.attach(label_flow,             0, 5, 1, 1)
-    grid.attach(scale_flow,             0, 6, 1, 1)
-    grid.attach(checkbox_performance,   0, 7, 1, 1)
-    grid.attach(checkbox_hdr,           0, 8, 1, 1)
-    grid.attach(label_present,          0, 9, 1, 1)
-    grid.attach(combobox_present,       0, 10, 1, 1)
-
-    frame.set_child(grid)
-
-    bottom_box = build_dialog_ok_cancel_box(dialog)
+    panel = LosslessPanel(dialog)
+    panel.set_values(lossless_enabled, lossless_multiplier, lossless_flow,
+                     lossless_performance, lossless_hdr, lossless_present)
+    frame.set_child(panel.widget)
 
     content_area = dialog.get_content_area()
     content_area.append(frame)
-    content_area.append(bottom_box)
+    content_area.append(build_dialog_ok_cancel_box(dialog))
 
     def on_response(dialog, response):
         result = (lossless_enabled, lossless_multiplier, lossless_flow,
                   lossless_performance, lossless_hdr, lossless_present)
         if response == Gtk.ResponseType.OK:
-            if checkbox_enable.get_active() and not entry_location.get_text():
-                mark_invalid_widget(entry_location)
+            if not panel.validate():
                 return
 
-            result = (
-                checkbox_enable.get_active(),
-                spin_multiplier.get_value_as_int(),
-                scale_flow.get_value(),
-                checkbox_performance.get_active(),
-                checkbox_hdr.get_active(),
-                combobox_present.get_active_id(),
-            )
-            cfg.set_value("lossless-location", entry_location.get_text())
-            cfg.save_config()
+            result = panel.get_values()
+            panel.save_location()
 
         destroy_and_release(dialog)
         callback(result)
