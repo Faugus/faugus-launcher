@@ -922,7 +922,6 @@ def build_launch_command(game):
     prefix = expand_path(game.get("prefix", ""))
     launch_arguments = expand_path(game.get("launch_arguments", ""))
     game_arguments = expand_path(game.get("game_arguments", ""))
-    protonfix = game.get("protonfix", "")
     runner = resolve_game_runner(game.get("runner", ""))
     addapp_bat = expand_path(game.get("addapp_bat", ""))
     mangohud = game.get("mangohud", "")
@@ -954,8 +953,6 @@ def build_launch_command(game):
         command_parts.append("PROTON_PREFER_SDL=1")
     if no_sleep:
         command_parts.append("NO_SLEEP=1")
-    if protonfix:
-        command_parts.append(f"GAMEID={protonfix}")
     if runner:
         if runner == "Linux-Native":
             if disable_umu:

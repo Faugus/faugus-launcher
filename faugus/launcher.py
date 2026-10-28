@@ -4696,7 +4696,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         edit_game_dialog.post_launch = game.post_launch
         edit_game_dialog.entry_game_arguments.set_text(game.game_arguments)
         edit_game_dialog.set_title(_("Edit %s") % game.title)
-        edit_game_dialog.entry_protonfix.set_text(game.protonfix)
         edit_game_dialog.grid_launcher.set_visible(False)
         edit_game_dialog.button_path_action.set_visible(False)
         edit_game_dialog.button_search.set_visible(True)
@@ -4920,7 +4919,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             path = add_game_dialog.entry_path.get_text()
             launch_arguments = add_game_dialog.launch_arguments
             game_arguments = add_game_dialog.entry_game_arguments.get_text()
-            protonfix = add_game_dialog.entry_protonfix.get_text()
             runner = add_game_dialog.selected_runner()
             addapp = add_game_dialog.addapp
             addapp_delay = add_game_dialog.addapp_delay
@@ -4993,7 +4991,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 mangohud,
                 gamemode,
                 sdl_enabled,
-                protonfix,
                 runner,
                 addapp_enabled,
                 addapp,
@@ -5323,7 +5320,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.mangohud = edit_game_dialog.checkbox_mangohud.get_active()
             game.gamemode = edit_game_dialog.checkbox_gamemode.get_active()
             game.sdl_enabled = edit_game_dialog.checkbox_sdl.get_active()
-            game.protonfix = edit_game_dialog.entry_protonfix.get_text()
             game.runner = edit_game_dialog.selected_runner()
             game.addapp_enabled = edit_game_dialog.addapp_enabled
             game.addapp = edit_game_dialog.addapp
@@ -7161,7 +7157,6 @@ class Game:
         mangohud,
         gamemode,
         sdl_enabled,
-        protonfix,
         runner,
         addapp_enabled,
         addapp,
@@ -7197,7 +7192,6 @@ class Game:
         self.gamemode = gamemode
         self.prefix = prefix
         self.sdl_enabled = sdl_enabled
-        self.protonfix = protonfix
         self.runner = runner
         self.addapp_enabled = addapp_enabled
         self.addapp = addapp
@@ -7596,8 +7590,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         self.grid_shortcut_icon.set_valign(Gtk.Align.CENTER)
 
-        self.grid_protonfix = build_grid(margin_bottom=False)
-
         self.grid_launch_settings = build_grid(margin_bottom=False)
 
         self.grid_game_arguments = build_grid(margin_bottom=False)
@@ -7784,16 +7776,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_custom_runner = Gtk.CheckButton(label=_("Specific Proton"))
         self.checkbox_custom_runner.connect("toggled", self.on_checkbox_custom_runner_toggled)
         self.combobox_runner = IdComboBox()
-
-        self.label_protonfix = Gtk.Label(label="Protonfix")
-        self.label_protonfix.set_halign(Gtk.Align.START)
-        self.entry_protonfix = Gtk.Entry()
-        self.entry_protonfix.set_tooltip_text("UMU ID")
-        self.button_search_protonfix = Gtk.Button()
-        self.button_search_protonfix.set_child(
-            Gtk.Image.new_from_icon_name("system-search-symbolic"))
-        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
-        self.button_search_protonfix.set_size_request(50, -1)
 
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
@@ -8096,11 +8078,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
             keep_banner_ratio(self.banner_preview1_overlay, self.banner_preview1_overlay)
 
-        self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
-        self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
-        self.entry_protonfix.set_hexpand(True)
-        self.grid_protonfix.attach(self.button_search_protonfix, 3, 1, 1, 1)
-
         self.grid_game_arguments.attach(self.label_game_arguments, 0, 0, 4, 1)
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
         self.entry_game_arguments.set_hexpand(True)
@@ -8128,7 +8105,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_sdl.set_hexpand(True)
         self.grid_tools.attach(box_buttons, 2, 0, 1, 4)
 
-        page2.append(self.grid_protonfix)
         page2.append(self.grid_game_arguments)
         page2.append(self.grid_launch_settings)
         page2.append(self.grid_addapp)
@@ -8770,7 +8746,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.checkbox_shortcut_desktop.set_active(False)
         self.checkbox_shortcut_appmenu.set_active(False)
         self.checkbox_shortcut_steam.set_active(False)
-        self.entry_protonfix.set_text("")
         self.entry_game_arguments.set_text("")
         self.checkbox_mangohud.set_active(self.default_mangohud)
         self.checkbox_gamemode.set_active(self.default_gamemode)
@@ -8808,7 +8783,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.button_winetricks.set_visible(False)
         self.button_winecfg.set_visible(False)
         self.button_run.set_visible(False)
-        self.grid_protonfix.set_visible(False)
         self.grid_addapp.set_visible(False)
         self.checkbox_sdl.set_visible(False)
         self.checkbox_no_sleep.set_visible(True)
@@ -8830,7 +8804,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
             self.grid_addapp.set_visible(True)
             self.checkbox_sdl.set_visible(True)
 
@@ -8856,7 +8829,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
             self.button_winetricks.set_visible(True)
             self.button_winecfg.set_visible(True)
             self.button_run.set_visible(True)
-            self.grid_protonfix.set_visible(True)
             self.checkbox_sdl.set_visible(True)
             self.button_shortcut_icon.set_visible(self.steamgriddb_enabled)
 

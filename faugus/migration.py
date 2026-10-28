@@ -149,6 +149,12 @@ def _migrate_games_json_fields():
     for game in games:
         if not isinstance(game, dict):
             continue
+        if "protonfix" in game:
+            protonfix = game.pop("protonfix")
+            if protonfix:
+                args = game.get("launch_arguments", "")
+                game["launch_arguments"] = f"{args}\nGAMEID={protonfix}" if args else f"GAMEID={protonfix}"
+            changed = True
         for old_field, new_field in field_renames.items():
             if old_field in game:
                 game[new_field] = game.pop(old_field)

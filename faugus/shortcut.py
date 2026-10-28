@@ -44,16 +44,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.entry_title.set_has_tooltip(True)
         self.entry_title.connect("query-tooltip", on_entry_query_tooltip)
 
-        self.label_protonfix = Gtk.Label(label="Protonfix")
-        self.label_protonfix.set_halign(Gtk.Align.START)
-        self.entry_protonfix = Gtk.Entry()
-        self.entry_protonfix.set_tooltip_text("UMU ID")
-        self.button_search_protonfix = Gtk.Button()
-        self.button_search_protonfix.set_child(
-            Gtk.Image.new_from_icon_name("system-search-symbolic"))
-        self.button_search_protonfix.connect("clicked", on_button_search_protonfix_clicked)
-        self.button_search_protonfix.set_size_request(50, -1)
-
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
         self.entry_game_arguments = Gtk.Entry()
@@ -101,8 +91,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.grid_title = build_grid(margin_bottom=False)
 
-        self.grid_protonfix = build_grid(margin_bottom=False)
-
         self.grid_launch_settings = build_grid(margin_bottom=False)
 
         self.grid_game_arguments = build_grid(margin_bottom=False)
@@ -114,11 +102,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         self.grid_title.attach(self.label_title, 0, 0, 4, 1)
         self.grid_title.attach(self.entry_title, 0, 1, 4, 1)
         self.entry_title.set_hexpand(True)
-
-        self.grid_protonfix.attach(self.label_protonfix, 0, 0, 1, 1)
-        self.grid_protonfix.attach(self.entry_protonfix, 0, 1, 3, 1)
-        self.entry_protonfix.set_hexpand(True)
-        self.grid_protonfix.attach(self.button_search_protonfix, 3, 1, 1, 1)
 
         self.grid_game_arguments.attach(self.label_game_arguments, 0, 0, 4, 1)
         self.grid_game_arguments.attach(self.entry_game_arguments, 0, 1, 4, 1)
@@ -147,7 +130,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
 
         self.box_main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_main.append(self.grid_title)
-        self.box_main.append(self.grid_protonfix)
         self.box_main.append(self.grid_game_arguments)
         self.box_main.append(self.grid_launch_settings)
         self.box_main.append(self.grid_addapp)
@@ -258,8 +240,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
         if not os.path.exists(new_icon_path):
             new_icon_path = FAUGUS_PNG
 
-        protonfix = self.entry_protonfix.get_text()
-
         env_vars = []
         other_args = []
         for arg in self.launch_arguments.split():
@@ -278,8 +258,6 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin):
             command_parts.append("PROTON_PREFER_SDL=1")
         if self.checkbox_no_sleep.get_active():
             command_parts.append("NO_SLEEP=1")
-        if protonfix:
-            command_parts.append(f'GAMEID={protonfix}')
         if launch_arguments:
             command_parts.append(launch_arguments)
         command_parts.extend(build_lossless_env(self.lossless_enabled, self.lossless_multiplier, self.lossless_flow, self.lossless_performance, self.lossless_hdr, self.lossless_present))

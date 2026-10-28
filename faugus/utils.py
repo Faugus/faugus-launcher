@@ -2006,10 +2006,6 @@ def open_uri(widget, uri):
     Gtk.UriLauncher.new(uri).launch(widget.get_root(), None, on_launched)
 
 
-def on_button_search_protonfix_clicked(widget):
-    open_uri(widget, "https://umu.openwinecomponents.org/")
-
-
 def on_button_kofi_clicked(widget):
     play_ui_sound("confirm")
     open_uri(widget, "https://ko-fi.com/K3K210EMDU")
@@ -2199,7 +2195,7 @@ GAME_FIELDS = [
     "gameid", "title", "path", "prefix",
     "launch_arguments", "game_arguments",
     "mangohud", "gamemode", "sdl_enabled",
-    "protonfix", "runner",
+    "runner",
     "addapp_enabled", "addapp", "addapp_bat", "addapp_delay", "addapp_first",
     "cover",
     "lossless_enabled", "lossless_multiplier", "lossless_flow",
