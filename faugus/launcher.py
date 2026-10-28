@@ -113,6 +113,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     _background_time = 0
     _background_source = None
     _background_delay_source = None
+    _carrousel_scroll_accum = 0.0
+    _carrousel_scroll_time = 0
 
     def __init__(self, app):
         super().__init__(application=app, title="Faugus")
@@ -2308,6 +2310,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if delta == 0:
             return False
 
+        now = GLib.get_monotonic_time()
+        if now - self._carrousel_scroll_time < 40000:
+            return True
+
+        if self._carrousel_scroll_accum * delta < 0:
+            self._carrousel_scroll_accum = 0.0
+        self._carrousel_scroll_accum += delta
+        if abs(self._carrousel_scroll_accum) < 0.999:
+            return True
+
+        self._carrousel_scroll_accum = 0.0
+        self._carrousel_scroll_time = now
         self.carrousel_fixed.grab_focus()
         self.on_carrousel_focus_changed(self.carrousel_fixed, None)
         carrousel_move_coalesced(self, 1 if delta > 0 else -1)
