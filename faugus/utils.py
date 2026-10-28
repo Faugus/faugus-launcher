@@ -2309,6 +2309,7 @@ class LaunchArgumentsEditor:
             self.store_presets, _("Presets"))
         self.tree_args, box_args, self.commit_args_edit = self.build_editable_list(
             self.store_args, _("Launch Arguments"))
+        self.tree_presets.gamepad_copy = self.copy_selected_preset
 
         sel_presets = self.tree_presets.get_selection()
         sel_args = self.tree_args.get_selection()
@@ -2357,6 +2358,7 @@ class LaunchArgumentsEditor:
         key_controller = Gtk.EventControllerKey()
         key_controller.connect("key-pressed", on_key_press)
         tree.add_controller(key_controller)
+        tree.keyboard_editable = True
         column = Gtk.TreeViewColumn("", renderer, text=0)
         column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         column.set_expand(True)
@@ -2388,6 +2390,14 @@ class LaunchArgumentsEditor:
         box.append(label_header)
         box.append(scroll)
         return tree, box, commit_edit
+
+    def copy_selected_preset(self):
+        path, _column = self.tree_presets.get_cursor()
+        if path is None:
+            return
+        value = self.store_presets[path][0].strip()
+        if value:
+            self.store_args.insert(len(self.store_args) - 1, [value])
 
     def row_index_at(self, tree, x, y):
         bx, by = tree.convert_widget_to_bin_window_coords(x, y)

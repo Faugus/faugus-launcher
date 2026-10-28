@@ -2,7 +2,7 @@ import time
 import gi
 gi.require_version("Manette", "0.2")
 gi.require_version("Gtk", "4.0")
-from gi.repository import GLib, Gtk, Manette
+from gi.repository import Gdk, GLib, Gtk, Manette
 from faugus.keyboard import VirtualKeyboard
 from faugus.path_manager import PathManager
 from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker, play_ui_sound
@@ -419,6 +419,9 @@ def _handle_button_down(self, button, win):
     elif active_combo:
         return
 
+    elif is_dialog_active and role in ("square", "triangle") and _handle_treeview_action(role, win.get_focus()):
+        return
+
     elif not is_dialog_active:
         if role == "square":
             self.button_kill.emit("clicked")
@@ -461,6 +464,26 @@ def _switch_stack_tab(win, delta):
     buttons[index].set_active(True)
 
 
+def _handle_treeview_action(role, treeview):
+    if not isinstance(treeview, Gtk.TreeView):
+        return False
+
+    if role == "triangle":
+        copy = getattr(treeview, "gamepad_copy", None)
+        if copy is None:
+            return False
+        copy()
+        return True
+
+    key_controller = next(
+        (c for c in treeview.observe_controllers() if isinstance(c, Gtk.EventControllerKey)),
+        None
+    )
+    if key_controller is None:
+        return False
+    return bool(key_controller.emit("key-pressed", Gdk.KEY_Delete, 0, Gdk.ModifierType(0)))
+
+
 def _handle_treeview_confirm(treeview):
     path, column = treeview.get_cursor()
     if path is None:
@@ -479,7 +502,9 @@ def _handle_treeview_confirm(treeview):
         return
 
     editable_renderer = next(
-        (r for r in column.get_cells() if isinstance(r, Gtk.CellRendererText) and r.get_property("editable")),
+        (r for r in column.get_cells()
+         if isinstance(r, Gtk.CellRendererText)
+         and (r.get_property("editable") or getattr(treeview, "keyboard_editable", False))),
         None
     )
 
