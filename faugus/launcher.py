@@ -7585,6 +7585,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
         self.grid_path = build_grid(margin_bottom=False)
 
         self.grid_runtime = build_grid(margin_bottom=False)
+        self.grid_runtime.set_visible(False)
 
         self.grid_prefix = build_grid(margin_bottom=False)
 
