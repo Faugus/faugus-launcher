@@ -36,6 +36,36 @@ sudo apt install -y ~/faugus-launcher/*.deb
 sudo rm -r ~/faugus-launcher
 ```
 
+## NixOS
+### Add flake input:
+```
+{
+  inputs.faugus-launcher = {
+    url = "github:Faugus/faugus-launcher";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+```
+
+### Home Manager:
+```
+{
+  imports = [
+    inputs.faugus-launcher.homeManagerModules.default
+  ];
+
+  programs.faugus-launcher = {
+    enable = true;
+
+    # accepts JSON or paths to JSON files
+    config = {};
+    games = {};
+    categories = {};
+    envar = {};
+  };
+}
+```
+
 ## [Flatpak](https://flathub.org/apps/io.github.Faugus.faugus-launcher)
 ### Installation:
 ```
