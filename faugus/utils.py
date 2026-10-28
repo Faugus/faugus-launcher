@@ -32,7 +32,7 @@ def _log_writer_filter(log_level, fields, n_fields, user_data):
             except Exception:
                 message = ""
             if ("GtkGizmo" in message and "reported min" in message) or any(
-                s in message for s in ("gtk_css_node_insert_after", "mapped without a transient parent", "swapchain")
+                s in message for s in ("gtk_css_node_insert_after", "mapped without a transient parent", "swapchain", "gdk_frame_timings_presented")
             ):
                 return GLib.LogWriterOutput.HANDLED
             break
