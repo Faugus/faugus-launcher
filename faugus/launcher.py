@@ -7682,6 +7682,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
 
         self._steamgriddb_suggestion_id = None
         self._steamgriddb_steam_appid = None
+        self._artwork_title = None
         self._suggestion_source = None
         self._suggestion_programmatic = False
         self._virtual_keyboard_active_for_title = False
@@ -8614,7 +8615,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin):
     def on_entry_focus_out(self):
         if self._steamgriddb_suggestion_id is not None:
             return
-        if self.entry_title.get_text() != "":
+        title = self.entry_title.get_text()
+        if title == self._artwork_title:
+            return
+        self._artwork_title = title
+        if title != "":
             self.get_artwork()
         else:
             if os.path.isfile(self.cover_path_temp):
