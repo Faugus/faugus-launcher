@@ -74,6 +74,8 @@ def _load_gamecontrollerdb():
 
 
 def _apply_gamecontrollerdb_mapping(device):
+    if not hasattr(device, "get_mapping") or not hasattr(device, "save_user_mapping"):
+        return
     if device.get_mapping() is not None or not device.supports_mapping():
         return
     mapping = _load_gamecontrollerdb().get(device.get_guid())
