@@ -2245,34 +2245,50 @@ def init_addon_defaults(obj):
     obj.lossless_present = False
 
 
-def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
-    dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
-    apply_titlebar_preference(dialog)
-    hide_dialog_action_area(dialog)
-    dialog.set_resizable(False)
-    dialog.set_modal(True)
-    dialog.set_default_size(950, 500)
+class LaunchArgumentsEditor:
+    def __init__(self, current_launch_arguments=""):
+        self.store_presets = Gtk.ListStore(str)
+        for item in load_json_file(PRESETS_FILE, default=[]):
+            self.store_presets.append([item])
+        self.store_presets.append([""])
 
-    frame = Gtk.Frame()
-    frame.set_margin_start(10)
-    frame.set_margin_end(10)
-    frame.set_margin_top(10)
-    frame.set_margin_bottom(10)
+        self.store_args = Gtk.ListStore(str)
+        self.set_arguments(current_launch_arguments)
 
-    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-    hbox.set_margin_start(10)
-    hbox.set_margin_end(10)
-    hbox.set_margin_top(10)
-    hbox.set_margin_bottom(10)
+        add_css_once(
+            "launch_arguments_selected",
+            ".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
+        )
 
-    def build_editable_list(store, header):
+        self.drag_origin = None
+
+        self.tree_presets, box_presets, self.commit_presets_edit = self.build_editable_list(
+            self.store_presets, _("Presets"))
+        self.tree_args, box_args, self.commit_args_edit = self.build_editable_list(
+            self.store_args, _("Launch Arguments"))
+
+        sel_presets = self.tree_presets.get_selection()
+        sel_args = self.tree_args.get_selection()
+        sel_presets.connect("changed", lambda sel: sel_args.unselect_all() if sel.count_selected_rows() > 0 else None)
+        sel_args.connect("changed", lambda sel: sel_presets.unselect_all() if sel.count_selected_rows() > 0 else None)
+
+        self.widget = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.widget.set_margin_start(10)
+        self.widget.set_margin_end(10)
+        self.widget.set_margin_top(10)
+        self.widget.set_margin_bottom(10)
+        self.widget.set_vexpand(True)
+        self.widget.append(box_args)
+        self.widget.append(box_presets)
+
+    def build_editable_list(self, store, header):
         tree = Gtk.TreeView(model=store)
         tree.connect("cursor-changed", play_navigate_if_window_active)
         tree.add_css_class("selected-list")
         tree.set_hexpand(True)
         tree.set_vexpand(True)
         renderer = Gtk.CellRendererText()
-        renderer.set_property("editable", True)
+        renderer.set_property("editable", False)
         renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
 
         def on_edited(r, path, new_text):
@@ -2302,12 +2318,22 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         column.set_expand(True)
         tree.append_column(column)
+
+        def on_row_activated(tv, path, col):
+            renderer.set_property("editable", True)
+            tv.set_cursor(path, col, True)
+            renderer.set_property("editable", False)
+
+        tree.connect("row-activated", on_row_activated)
         tree.set_headers_visible(False)
         tree.set_has_tooltip(True)
         tree.connect("query-tooltip", on_treeview_query_tooltip, store)
 
+        self.attach_drag_and_drop(tree)
+
         scroll = Gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_min_content_height(150)
         scroll.set_child(tree)
 
         label_header = Gtk.Label(label=header)
@@ -2320,125 +2346,89 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         box.append(scroll)
         return tree, box, commit_edit
 
-    def build_arrow_button(css_class):
-        button = Gtk.Button()
-        button.set_size_request(50, 50)
-        button.set_valign(Gtk.Align.CENTER)
-        img = new_icon_image("faugus-play-symbolic.svg")
-        img.add_css_class(css_class)
-        button.set_child(img)
-        return button
+    def row_index_at(self, tree, x, y):
+        bx, by = tree.convert_widget_to_bin_window_coords(x, y)
+        info = tree.get_path_at_pos(int(bx), int(by))
+        return info[0].get_indices()[0] if info else None
 
-    store_presets = Gtk.ListStore(str)
+    def attach_drag_and_drop(self, tree):
+        def on_prepare(source, x, y):
+            index = self.row_index_at(tree, x, y)
+            if index is None or not tree.get_model()[index][0].strip():
+                return None
+            self.drag_origin = (tree, index)
+            return Gdk.ContentProvider.new_for_value(tree.get_model()[index][0])
 
-    for item in load_json_file(PRESETS_FILE, default=[]):
-        store_presets.append([item])
-    store_presets.append([""])
+        def on_drag_begin(source, drag):
+            tree_origin, index = self.drag_origin
+            Gtk.DragIcon.get_for_drag(drag).set_child(Gtk.Label(label=tree_origin.get_model()[index][0]))
 
-    tree_presets, box_presets, commit_presets_edit = build_editable_list(store_presets, _("Presets"))
+        def on_drop(target, value, x, y):
+            if self.drag_origin is None:
+                return False
+            tree_origin, src_index = self.drag_origin
+            self.drag_origin = None
+            store = tree.get_model()
+            last = len(store) - 1
+            dst_index = self.row_index_at(tree, x, y)
+            if tree_origin is tree:
+                dst_index = last - 1 if dst_index is None else min(dst_index, last - 1)
+                if dst_index == src_index:
+                    return False
+                src_iter = store.get_iter((src_index,))
+                dst_iter = store.get_iter((dst_index,))
+                if dst_index > src_index:
+                    store.move_after(src_iter, dst_iter)
+                else:
+                    store.move_before(src_iter, dst_iter)
+                return True
+            if tree is self.tree_args and tree_origin is self.tree_presets:
+                dst_index = last if dst_index is None else min(dst_index, last)
+                store.insert(dst_index, [value])
+                return True
+            return False
 
-    btn_copy = build_arrow_button("flip-x")
-    btn_move_up = build_arrow_button("move_up")
-    btn_move_down = build_arrow_button("move_down")
+        source = Gtk.DragSource()
+        source.set_actions(Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
+        source.connect("prepare", on_prepare)
+        source.connect("drag-begin", on_drag_begin)
+        tree.add_controller(source)
 
-    add_css_once(
-        "launch_arguments_flip",
-        ".flip-x { transform: scaleX(-1); }"
-        ".move_up { transform: rotate(270deg); }"
-        ".move_down { transform: rotate(90deg); }"
-        ".selected-list:selected { background-color: @theme_selected_bg_color; color: @theme_selected_fg_color; }"
-    )
+        target = Gtk.DropTarget.new(str, Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
+        target.connect("drop", on_drop)
+        tree.add_controller(target)
 
-    store_args = Gtk.ListStore(str)
-    current_args = current_launch_arguments.split("\n")
-    for arg in current_args:
-        if arg.strip():
-            store_args.append([arg])
-    store_args.append([""])
+    def set_arguments(self, text):
+        self.store_args.clear()
+        for arg in text.split("\n"):
+            if arg.strip():
+                self.store_args.append([arg])
+        self.store_args.append([""])
 
-    tree_args, box_args, commit_args_edit = build_editable_list(store_args, _("Launch Arguments"))
+    def get_arguments(self):
+        self.commit_args_edit()
+        return "\n".join(row[0] for row in self.store_args if row[0].strip())
 
-    sel_presets = tree_presets.get_selection()
-    sel_args = tree_args.get_selection()
+    def save_presets(self):
+        self.commit_presets_edit()
+        save_json_file([row[0] for row in self.store_presets if row[0].strip()], PRESETS_FILE)
 
-    def on_presets_selection_changed(sel):
-        if sel.count_selected_rows() > 0:
-            sel_args.unselect_all()
 
-    def on_args_selection_changed(sel):
-        if sel.count_selected_rows() > 0:
-            sel_presets.unselect_all()
+def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_launch, current_post_launch, callback):
+    dialog = Gtk.Dialog(title=_("Launch Settings"), transient_for=parent)
+    apply_titlebar_preference(dialog)
+    hide_dialog_action_area(dialog)
+    dialog.set_resizable(False)
+    dialog.set_modal(True)
 
-    sel_presets.connect("changed", on_presets_selection_changed)
-    sel_args.connect("changed", on_args_selection_changed)
+    frame = Gtk.Frame()
+    frame.set_margin_start(10)
+    frame.set_margin_end(10)
+    frame.set_margin_top(10)
+    frame.set_margin_bottom(10)
 
-    def on_move_clicked(btn, direction):
-        # direction = -1 or 1 for up or down
-        # check both treeviews; use the one that has a selection
-        for tv in (tree_args, tree_presets):
-            sel = tv.get_selection()
-            model, treeiter = sel.get_selected()
-            if treeiter is not None:
-                break
-        else:
-            return
-
-        path = model.get_path(treeiter)
-        if path is None:
-            return
-
-        index = path[0]
-
-        if index == len(model) - 1: # the last element is always empty so, no move necessary
-            return
-
-        if direction == -1:  # move up
-            if index == 0:
-                return
-            other_iter = model.get_iter((index - 1,))
-            model.move_before(treeiter, other_iter)
-        elif direction == 1:  # move down
-            if index == len(model) - 2: # -2 because the last element in the list is empty
-                return
-            other_iter = model.get_iter((index + 1,))
-            model.move_after(treeiter, other_iter)
-
-        # move selection in the new position
-        new_path = model.get_path(treeiter)
-        if new_path is not None:
-            tv.set_cursor(new_path)
-
-    btn_move_up.connect("clicked", lambda b: on_move_clicked(b, -1))
-    btn_move_down.connect("clicked", lambda b: on_move_clicked(b, 1))
-    sep_buttons = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-    sep_buttons.set_margin_top(10)
-    sep_buttons.set_margin_bottom(10)
-
-    box_buttons = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-    box_buttons.set_vexpand(True)
-    box_buttons.set_valign(Gtk.Align.CENTER)
-    box_buttons.append(btn_copy)
-    box_buttons.append(sep_buttons)
-    box_buttons.append(btn_move_up)
-    box_buttons.append(btn_move_down)
-
-    def on_copy_clicked(btn):
-        selection = tree_presets.get_selection()
-        model, treeiter = selection.get_selected()
-        if treeiter is not None:
-            val = model[treeiter][0].strip()
-            if val:
-                store_args.insert(len(store_args) - 1, [val])
-
-    btn_copy.connect("clicked", on_copy_clicked)
-
-    size_group = Gtk.SizeGroup(mode=Gtk.SizeGroupMode.HORIZONTAL)
-    size_group.add_widget(box_args)
-    size_group.add_widget(box_presets)
-
-    hbox.append(box_args)
-    hbox.append(box_buttons)
-    hbox.append(box_presets)
+    editor = LaunchArgumentsEditor(current_launch_arguments)
+    hbox = editor.widget
 
     def build_hook_command_box(title, current_value, key, tooltip):
         label = Gtk.Label(label=title)
@@ -2511,14 +2501,8 @@ def show_launch_arguments_dialog(parent, current_launch_arguments, current_pre_l
         pre_launch = current_pre_launch
         post_launch = current_post_launch
         if response == Gtk.ResponseType.OK:
-            commit_presets_edit()
-            commit_args_edit()
-
-            presets_to_save = [row[0] for row in store_presets if row[0].strip()]
-            save_json_file(presets_to_save, PRESETS_FILE)
-
-            args_to_save = [row[0] for row in store_args if row[0].strip()]
-            result = "\n".join(args_to_save)
+            editor.save_presets()
+            result = editor.get_arguments()
             pre_launch = entry_pre_launch.get_text().strip()
             post_launch = entry_post_launch.get_text().strip()
 
