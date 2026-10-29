@@ -1872,8 +1872,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         try:
             if game and game.icon:
                 if os.path.isfile(game.icon):
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(game.icon, 48, 48, True)
-                    source.set_icon(Gdk.Texture.new_for_pixbuf(pixbuf), 24, 24)
+                    scale = self.device_scale()
+                    texture = texture_from_pixbuf(load_resized_pixbuf(game.icon, 48 * scale, 48 * scale), True)
+                    source.set_icon(HiDpiPaintable(texture, 48, 48), 24, 24)
                 else:
                     theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
                     icon_paintable = theme.lookup_icon(
@@ -4206,9 +4207,6 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def cover_dimensions(self, zoom_pct):
         zoom_width = int(230 * (zoom_pct / 100.0))
         return zoom_width, int(zoom_width * 1.5)
-
-    def device_scale(self):
-        return max(1, self.get_scale_factor())
 
     def icon_path(self, game):
         return game.icon if os.path.isfile(game.icon) else FAUGUS_PNG
@@ -7532,6 +7530,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
     def __init__(self, parent, interface_mode):
         super().__init__(title=_("New Game/App"), transient_for=parent)
         apply_titlebar_preference(self)
+        self.connect("notify::scale-factor", self.on_scale_factor_changed)
         hide_dialog_action_area(self)
         self.set_modal(True)
         self.set_resizable(False)
@@ -8462,6 +8461,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
     def refresh_banner_preview(self):
         self.update_banner_preview(self.banner_path_temp)
 
+    def on_scale_factor_changed(self, widget, pspec):
+        self.update_image_cover()
+
     def apply_downloaded_artwork(self, category, content):
         if category == "icon":
             content = resize_icon_bytes(normalize_icon_bytes(content), 256)
@@ -8485,7 +8487,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             self.button_banner1.remove_css_class("banner-placeholder")
 
         def load():
-            texture = Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(banner_path, None, None, False))
+            texture = load_full_texture(banner_path)
             idle_add_while_open(closed_event, show, texture)
 
         if banner_path and os.path.isfile(banner_path):
@@ -8610,8 +8612,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             self.button_cover.remove_css_class("cover-empty")
             self.button_cover2.remove_css_class("cover-empty")
 
+        scale = self.device_scale()
+
         def load():
-            texture = Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(cover_path, None, None, False))
+            texture = Gdk.Texture.new_for_pixbuf(load_fitted_pixbuf(cover_path, 300 * scale, 450 * scale))
+            release_unused_memory()
             idle_add_while_open(closed_event, show, texture)
 
         if os.path.isfile(cover_path):

@@ -92,15 +92,14 @@ def kill_by_faugusid(gameid):
                 pass
 
 
-HIDPI_SCALE = 2
-
-
 class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
-    def __init__(self, texture, width, height):
+    def __init__(self, texture, width, height, loader=None, scale=1):
         super().__init__()
         self._texture = texture
         self._width = width
         self._height = height
+        self._loader = loader
+        self._scale = scale
 
     def do_get_intrinsic_width(self):
         return self._width
@@ -111,18 +110,30 @@ class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
     def do_snapshot(self, snapshot, width, height):
         self._texture.snapshot(snapshot, width, height)
 
+    def set_texture(self, texture):
+        self._texture = texture
+        self.invalidate_contents()
+
+    def set_scale(self, scale):
+        if self._loader is None or scale == self._scale:
+            return
+        self._scale = scale
+        self.set_texture(self._loader(scale))
+
 
 class HiDpiMixin:
+    def device_scale(self: Gtk.Widget):
+        return max(1, self.get_scale_factor())
+
     def new_texture_from_image(self: Gtk.Widget, path, width=None, height=None, keep_aspect_ratio=False):
-        w = width * HIDPI_SCALE if width else None
-        h = height * HIDPI_SCALE if height else None
+        if not (width and height):
+            return Gdk.Texture.new_for_pixbuf(safe_load_pixbuf(path, None, None, keep_aspect_ratio))
 
-        pixbuf = safe_load_pixbuf(path, w, h, keep_aspect_ratio)
-        texture = Gdk.Texture.new_for_pixbuf(pixbuf)
+        def build(scale):
+            return texture_from_pixbuf(load_resized_pixbuf(path, int(width * scale), int(height * scale)), True)
 
-        if width and height:
-            return HiDpiPaintable(texture, width, height)
-        return texture
+        scale = self.device_scale() if isinstance(self, Gtk.Widget) else 1
+        return HiDpiPaintable(build(scale), width, height, build, scale)
 
 
 def normalize_icon_bytes(data):
@@ -266,6 +277,12 @@ def new_picture(paintable=None):
 def new_icon(paintable):
     image = Gtk.Image.new_from_paintable(paintable)
     image.set_pixel_size(paintable.get_intrinsic_width())
+    if isinstance(paintable, HiDpiPaintable):
+        def sync_scale(widget, *_):
+            paintable.set_scale(max(1, widget.get_scale_factor()))
+
+        image.connect("map", sync_scale)
+        image.connect("notify::scale-factor", sync_scale)
     return image
 
 
