@@ -19,6 +19,7 @@ from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBI
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
+os.environ.setdefault("GSK_RENDERER", "gl" if Gtk.get_minor_version() >= 18 else "ngl")
 
 def _log_writer_filter(log_level, fields, n_fields, user_data):
     import ctypes
