@@ -7431,6 +7431,7 @@ class DuplicateDialog(Gtk.Dialog):
 
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         box_top.set_hexpand(True)
+        box_top.set_size_request(320, -1)
         box_top.set_margin_start(10)
         box_top.set_margin_end(10)
         box_top.set_margin_top(10)
@@ -8372,6 +8373,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         button_cancel.connect("clicked", lambda x: dialog.response(Gtk.ResponseType.CANCEL))
 
         box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_size_request(320, -1)
         box_top.set_margin_start(10)
         box_top.set_margin_end(10)
         box_top.set_margin_top(10)
