@@ -2439,11 +2439,9 @@ class LaunchArgumentsEditor:
                 else:
                     store.move_before(src_iter, dst_iter)
                 return True
-            if tree is self.tree_args and tree_origin is self.tree_presets:
-                dst_index = last if dst_index is None else min(dst_index, last)
-                store.insert(dst_index, [value])
-                return True
-            return False
+            dst_index = last if dst_index is None else min(dst_index, last)
+            store.insert(dst_index, [value])
+            return True
 
         source = Gtk.DragSource()
         source.set_actions(Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
