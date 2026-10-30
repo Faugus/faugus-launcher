@@ -8114,17 +8114,16 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
         settings_stack = Gtk.Stack()
 
-        settings_stack.add_named(self.grid_tools, "tools")
+        box_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box_tools.append(self.grid_game_arguments)
+        box_tools.append(self.grid_pre_launch)
+        box_tools.append(self.grid_post_launch)
+        box_tools.append(self.grid_tools)
+        settings_stack.add_named(box_tools, "tools")
         settings_stack.add_named(self.addapp_panel.widget, "addapp")
         settings_stack.add_named(self.lossless_panel.widget, "lossless")
 
         settings_stack.add_named(self.launch_arguments_editor.widget, "launch_arguments")
-
-        box_launch_settings = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box_launch_settings.append(self.grid_game_arguments)
-        box_launch_settings.append(self.grid_pre_launch)
-        box_launch_settings.append(self.grid_post_launch)
-        settings_stack.add_named(box_launch_settings, "launch_settings")
 
         self.combobox_settings = IdComboBox()
         self.populate_combobox_settings(True)
@@ -8225,7 +8224,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.combobox_settings.remove_all()
         self.combobox_settings.append("tools", _("Tools"))
         self.combobox_settings.append("launch_arguments", _("Launch Arguments"))
-        self.combobox_settings.append("launch_settings", _("Launch Settings"))
         if show_addapp:
             self.combobox_settings.append("addapp", _("Additional Application"))
         self.combobox_settings.append("lossless", _("Lossless Scaling Frame Generation"))
