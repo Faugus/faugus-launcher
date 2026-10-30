@@ -94,29 +94,18 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.4" date="2026-10-27">
+    <release version="2.5.5" date="2026-10-30">
       <description>
         <ul>
-          <li>Added an option to auto-hide widgets on the main screen.</li>
-          <li>Added a progress bar to the splash window.</li>
-          <li>Updated the splash window strings.</li>
-          <li>Added tooltips to most options in the Settings window.</li>
-          <li>Most settings can now be changed in real time without restarting the app. Settings that still require a restart are marked with an asterisk (*) after their names.</li>
-          <li>The gamecontrollerdb is now updated weekly.</li>
-          <li>Categories in the Overview panel are now sorted alphabetically.</li>
-          <li>Implemented smooth scrolling.</li>
-          <li>Kept Proton runners read-only during extraction. Thanks, @vsharha.</li>
-          <li>Long game titles are now truncated in List mode to prevent the window from stretching.</li>
-          <li>The absolute path is now set for PROTONPATH to prevent issues.</li>
-          <li>Improved carousel animations.</li>
-          <li>Fixed some inconsistencies in interface customization.</li>
-          <li>Fixed an issue where scrolling would stop before reaching the end when navigating through games using the keyboard or gamepad.</li>
-          <li>Fixed an issue where the post-launch script would be killed when closing the game.</li>
-          <li>Covers and banners are now loaded on demand.</li>
-          <li>Images are resized to match their display scale.</li>
-          <li>Image memory is now freed when scrolling.</li>
-          <li>Banners are now loaded in a separate thread.</li>
-          <li>Removed and modified visual effects to reduce rendering overhead.</li>
+          <li>Reorganized the Add/Edit Game and Shortcut tools into a dropdown menu.</li>
+          <li>Replaced the Launch Arguments buttons with a drag and drop feature.</li>
+          <li>Removed the manual Protonfix option.</li>
+          <li>Now prevents redundant asset downloads when the title entry loses focus without any changes.</li>
+          <li>Fine-tuned the carousel animation.</li>
+          <li>The mouse cursor is now hidden when using a gamepad.</li>
+          <li>Minor visual adjustments.</li>
+          <li>Now bundles python-psutil in the AppImage.</li>
+          <li>Fixed a startup crash with older versions of libmanette when a gamepad is connected.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
