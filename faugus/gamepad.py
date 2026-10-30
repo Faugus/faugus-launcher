@@ -1,8 +1,9 @@
 import time
+import weakref
 import gi
 gi.require_version("Manette", "0.2")
 gi.require_version("Gtk", "4.0")
-from gi.repository import Gdk, GLib, Gtk, Manette
+from gi.repository import Gdk, GLib, GObject, Gtk, Manette
 from faugus.keyboard import VirtualKeyboard
 from faugus.path_manager import PathManager
 from faugus.utils import widget_children, IdComboBox, show_steamgriddb_picker, play_ui_sound
@@ -85,6 +86,7 @@ def _apply_gamecontrollerdb_mapping(device):
 
 def init_gamepad(self):
     self.gamepad_monitor = Manette.Monitor.new()
+    _init_cursor_mode()
     self.gamepad_devices = {}
 
     self.axis_threshold = 0.7
@@ -143,8 +145,108 @@ def _attach_device(self, device):
     self.gamepad_devices[device] = device.connect("event", lambda dev, event: _on_device_event(self, event))
 
 
+_cursor_hidden = False
+_cursor_grace_until = 0
+_cursor_natives = weakref.WeakSet()
+_cursor_initialized = False
+CURSOR_GRACE = 0.5
+
+
+def _init_cursor_mode():
+    global _cursor_initialized
+    if _cursor_initialized:
+        return
+    _cursor_initialized = True
+    toplevels = Gtk.Window.get_toplevels()
+    for i in range(toplevels.get_n_items()):
+        _register_native(toplevels.get_item(i))
+    toplevels.connect("items-changed", _on_toplevels_changed)
+    GObject.type_class_ref(Gtk.Popover)
+    GObject.add_emission_hook(Gtk.Popover, "realize", _on_popover_realize)
+
+
+def _on_toplevels_changed(model, position, removed, added):
+    for i in range(position, position + added):
+        window = model.get_item(i)
+        _register_native(window)
+        window.connect("map", _on_window_map)
+
+
+def _on_window_map(window):
+    if _cursor_hidden:
+        _set_cursor_hidden(True, force=True)
+        for delay in (50, 150, 400):
+            GLib.timeout_add(delay, _reapply_hidden_cursor)
+
+
+def _reapply_hidden_cursor():
+    if _cursor_hidden:
+        _set_cursor_hidden(True, force=True)
+    return False
+
+
+def _on_popover_realize(popover):
+    if isinstance(popover, Gtk.Popover):
+        _register_native(popover)
+    return True
+
+
+def _register_native(native):
+    if native in _cursor_natives:
+        return
+    _cursor_natives.add(native)
+    motion = Gtk.EventControllerMotion()
+    motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+    motion.connect("motion", lambda c, x, y: _on_pointer_motion(native, x, y))
+    key = Gtk.EventControllerKey()
+    key.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+    key.connect("key-pressed", lambda c, *args: _on_key_pressed())
+    native.add_controller(motion)
+    native.add_controller(key)
+    if _cursor_hidden:
+        _apply_cursor(native, True)
+
+
+def _on_key_pressed():
+    _set_cursor_hidden(False)
+    return False
+
+
+def _on_pointer_motion(native, x, y):
+    last = getattr(native, "_last_pointer", None)
+    native._last_pointer = (x, y)
+    if time.monotonic() < _cursor_grace_until:
+        return
+    if _cursor_hidden and last is not None and last != (x, y):
+        _set_cursor_hidden(False)
+
+
+def _apply_cursor(native, hidden):
+    native.set_cursor(Gdk.Cursor.new_from_name("none") if hidden else None)
+    surface = native.get_surface()
+    if surface is not None:
+        surface.set_cursor(Gdk.Cursor.new_from_name("none") if hidden else None)
+    child = native.get_child()
+    if child is not None:
+        child.set_can_target(not hidden)
+
+
+def _set_cursor_hidden(hidden, force=False):
+    global _cursor_hidden, _cursor_grace_until
+    if hidden == _cursor_hidden and not force:
+        return
+    if hidden and not _cursor_hidden:
+        _cursor_grace_until = time.monotonic() + CURSOR_GRACE
+    _cursor_hidden = hidden
+    for native in list(_cursor_natives):
+        _apply_cursor(native, hidden)
+
+
 def _on_device_event(self, event):
     event_type = event.get_event_type()
+
+    if event_type == Manette.EventType.EVENT_BUTTON_PRESS and _is_usable(self)[0]:
+        _set_cursor_hidden(True)
 
     if event_type == Manette.EventType.EVENT_BUTTON_PRESS:
         _on_button_press(self, event)
@@ -205,6 +307,7 @@ def _tick_repeat(self):
 
 def _set_held_direction(self, direction):
     if direction is not None:
+        _set_cursor_hidden(True)
         if self.held_direction != direction:
             self.held_direction = direction
             self.hold_start_time = time.time()
@@ -215,6 +318,18 @@ def _set_held_direction(self, direction):
         self.held_direction = None
 
 
+def _sync_active_popover(self):
+    if self.active_popover and not self.active_popover.get_visible():
+        self.active_popover = None
+    if self.active_popover:
+        return
+    active_win = get_active_window()
+    for native in list(_cursor_natives):
+        if isinstance(native, Gtk.Popover) and native.get_visible() and native.get_autohide() and native is not self.gamepad_combo_popover and native.get_root() is active_win:
+            self.active_popover = native
+            return
+
+
 def _dispatch_navigation(self, direction):
     combo_popover = self.gamepad_combo_popover
     if self.gamepad_active_combo and combo_popover and combo_popover.get_visible():
@@ -222,6 +337,7 @@ def _dispatch_navigation(self, direction):
         return
     self.gamepad_active_combo = None
 
+    _sync_active_popover(self)
     active_popover = self.active_popover
     if active_popover and active_popover.get_visible():
         _navigate_popover(self, direction)
@@ -367,8 +483,7 @@ def _on_button_press(self, event):
         _set_held_direction(self, direction)
         return
 
-    if self.active_popover and not self.active_popover.get_visible():
-        self.active_popover = None
+    _sync_active_popover(self)
 
     if self.active_popover:
         _handle_menu_button(self, button)
