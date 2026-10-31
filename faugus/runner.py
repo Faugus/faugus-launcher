@@ -180,8 +180,17 @@ def discord_find_game(index):
             candidates.append(cmdline[0])
         for candidate in candidates:
             normalized = candidate.replace("\\", "/").lower()
-            for suffix, app_id, name, launcher in index.get(normalized.rsplit("/", 1)[-1], []):
-                if normalized == suffix or normalized.endswith("/" + suffix):
+            entries = index.get(normalized.rsplit("/", 1)[-1], [])
+            if not entries:
+                continue
+            paths = [normalized]
+            if "/" not in normalized:
+                try:
+                    paths.append(proc.cwd().lower() + "/" + normalized)
+                except (psutil.Error, OSError):
+                    pass
+            for suffix, app_id, name, launcher in entries:
+                if any(path == suffix or path.endswith("/" + suffix) for path in paths):
                     if found is None or (found[2] and not launcher):
                         found = [app_id, name, launcher]
     return found
@@ -197,6 +206,7 @@ class FaugusRun(HiDpiMixin):
         self.title = title
         self.exe = exe.replace("\\", "/").rsplit("/", 1)[-1].lower()
         self.discord_socket = None
+        self.discord_icon = None
         self.discord_stop = Event()
         self.logging_enabled = with_logs
         self.process = None
@@ -896,12 +906,33 @@ class FaugusRun(HiDpiMixin):
         game = discord_find_game(index)
         if game:
             return game[0], {}
-        for _, app_id, _, launcher in index.get(self.exe, []):
-            if not launcher:
-                return app_id, {}
+        title = re.sub(r"[^a-z0-9]", "", self.title.lower())
+        matches = []
+        for _, app_id, name, launcher in index.get(self.exe, []):
+            name = re.sub(r"[^a-z0-9]", "", name.lower())
+            if title and not launcher and (name in title or title in name):
+                matches.append((name != title, app_id))
+        if matches:
+            return min(matches)[1], {}
         if any(gameid != self.gameid for gameid in load_json_file(RUNNING_GAMES, {})):
             return None
-        return DISCORD_FALLBACK_CLIENT_ID, {"details": self.title, "status_display_type": 2}
+        activity = {"details": self.title, "status_display_type": 2}
+        if self.discord_icon is None:
+            self.discord_icon = self._discord_find_icon()
+        if self.discord_icon:
+            activity["assets"] = {"large_image": self.discord_icon}
+        return DISCORD_FALLBACK_CLIENT_ID, activity
+
+    def _discord_find_icon(self):
+        cfg = ConfigManager()
+        api_key = cfg.config.get("steamgriddb-api-key", "").strip('"')
+        if not api_key or cfg.config.get("steamgriddb-enabled", "False") != "True":
+            return ""
+        game_id = next((g.get("steamgriddb_id") for g in load_json_file(GAMES_JSON, []) if g.get("gameid") == self.gameid), None)
+        icons = fetch_steamgriddb_candidates(api_key, self.title, limit=1, game_id=game_id or None)["icons"]
+        if not icons:
+            return ""
+        return icons[0]["thumb"] if icons[0]["url"].lower().endswith(".ico") else icons[0]["url"]
 
     def _discord_start(self):
         index = discord_load_detectable()
