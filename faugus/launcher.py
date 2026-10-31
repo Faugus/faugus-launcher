@@ -10,6 +10,7 @@ import weakref
 import gi
 import vdf
 from datetime import datetime
+from pathlib import Path
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -4651,7 +4652,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             return False
 
         file_path = files[0].get_path()
-        if not file_path or not os.path.isfile(file_path):
+        if not file_path:
+            return False
+
+        target_path = Path(file_path)
+        if not target_path.is_file():
             return False
 
         windows_extensions = (".exe", ".msi", ".bat", ".lnk", ".reg")
@@ -4663,6 +4668,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         add_game_dialog.combobox_launcher.set_active_id_silent(launcher_id)
         add_game_dialog.on_combobox_changed(add_game_dialog.combobox_launcher, skip_cleanup=True)
         add_game_dialog.entry_path.set_text(file_path)
+        add_game_dialog.entry_title.set_text(target_path.stem)
+
+        if extract_ico(file_path, add_game_dialog.icon_temp) == "ok":
+            set_shortcut_icon(add_game_dialog, add_game_dialog.icon_temp)
 
         add_game_dialog.present()
         return True

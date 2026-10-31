@@ -1848,6 +1848,12 @@ def create_mangohud_gamemode_checkboxes(obj):
     obj.checkbox_gamemode.set_tooltip_text(_("Tweaks your system to improve performance"))
 
 
+def set_shortcut_icon(obj, icon_path):
+    texture = obj.new_texture_from_image(icon_path, 50, 50)
+    image = new_picture(texture)
+    obj.button_shortcut_icon.set_child(image)
+
+
 def choose_shortcut_icon(obj):
     filechooser = new_file_chooser(
         obj,
@@ -1866,9 +1872,7 @@ def choose_shortcut_icon(obj):
                 show_invalid_image_dialog(obj)
             else:
                 shutil.copyfile(file_path, obj.icon_temp)
-                texture = obj.new_texture_from_image(obj.icon_temp, 50, 50)
-                image = new_picture(texture)
-                obj.button_shortcut_icon.set_child(image)
+                set_shortcut_icon(obj, obj.icon_temp)
 
         destroy_and_release(dialog)
 
