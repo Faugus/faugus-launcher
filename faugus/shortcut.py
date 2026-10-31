@@ -223,7 +223,10 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin, HookEntriesMixin, Launch
 
         env_vars = []
         other_args = []
-        for arg in self.launch_arguments.split():
+        for arg in self.launch_arguments.splitlines():
+            arg = arg.strip()
+            if not arg:
+                continue
             if "=" in arg and not arg.startswith("-"):
                 env_vars.append(arg)
             else:
@@ -263,15 +266,15 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin, HookEntriesMixin, Launch
 
         hook_args = ""
         if self.pre_launch:
-            hook_args += f' --pre-launch "{self.pre_launch}"'
+            hook_args += f' --pre-launch {quote_desktop_exec_arg(self.pre_launch)}'
         if self.post_launch:
-            hook_args += f' --post-launch "{self.post_launch}"'
+            hook_args += f' --post-launch {quote_desktop_exec_arg(self.post_launch)}'
 
         exec_prefix = f"flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher" if IS_FLATPAK else LAUNCHER_PATH
         desktop_file_content = (
             f'[Desktop Entry]\n'
             f'Name={title}\n'
-            f'Exec={exec_prefix} {LAUNCHER_MODULE_ARGS}--run "{command}"{hook_args}\n'
+            f'Exec={exec_prefix} {LAUNCHER_MODULE_ARGS}--run {quote_desktop_exec_arg(command)}{hook_args}\n'
             f'Icon={new_icon_path}\n'
             f'Type=Application\n'
             f'Categories=Game;\n'
