@@ -9,6 +9,10 @@ import time
 import shlex
 import signal
 import warnings
+import socket
+import struct
+import json
+import uuid
 from datetime import datetime
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -89,13 +93,111 @@ STATUS_LINE = re.compile(
 )
 
 
+DISCORD_FALLBACK_CLIENT_ID = "1566097048770707516"
+DISCORD_DETECTABLE_URL = "https://discord.com/api/v10/applications/detectable"
+DISCORD_DETECTABLE_CACHE = os.path.join(FAUGUS_LAUNCHER_SHARE_DIR, "discord-detectable.json")
+DISCORD_IPC_DIRS = (
+    "app/com.discordapp.Discord",
+    "app/com.discordapp.DiscordCanary",
+    "app/dev.vencord.Vesktop",
+    ".flatpak/com.discordapp.Discord/xdg-run",
+    ".flatpak/dev.vencord.Vesktop/xdg-run",
+    "snap.discord",
+    "snap.discord-canary",
+)
+
+
+def discord_frame(opcode, payload):
+    data = json.dumps(payload).encode()
+    return struct.pack("<II", opcode, len(data)) + data
+
+
+def discord_connect(client_id):
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+    if not runtime_dir:
+        return None
+    for directory in DISCORD_IPC_DIRS:
+        for index in range(10):
+            path = os.path.join(runtime_dir, directory, f"discord-ipc-{index}")
+            if not os.path.exists(path):
+                continue
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.settimeout(3)
+            try:
+                sock.connect(path)
+                sock.sendall(discord_frame(0, {"v": 1, "client_id": client_id}))
+                if not sock.recv(8):
+                    raise OSError
+                sock.recv(65536)
+                return sock
+            except OSError:
+                sock.close()
+    return None
+
+
+def discord_load_detectable():
+    try:
+        if time.time() - os.path.getmtime(DISCORD_DETECTABLE_CACHE) < 7 * 86400:
+            with open(DISCORD_DETECTABLE_CACHE, encoding="utf-8") as f:
+                return json.load(f)
+    except (OSError, ValueError):
+        pass
+    try:
+        import urllib.request
+        request = urllib.request.Request(DISCORD_DETECTABLE_URL, headers={"User-Agent": "Faugus-Launcher"})
+        with urllib.request.urlopen(request, timeout=15) as response:
+            apps = json.load(response)
+    except (OSError, ValueError):
+        try:
+            with open(DISCORD_DETECTABLE_CACHE, encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, ValueError):
+            return {}
+    index = {}
+    for app in apps:
+        for exe in app.get("executables", []):
+            if exe.get("os") not in ("win32", "linux"):
+                continue
+            name = exe["name"].lower().lstrip(">")
+            index.setdefault(name.rsplit("/", 1)[-1], []).append(
+                [name, app["id"], app["name"], bool(exe.get("is_launcher"))]
+            )
+    try:
+        with open(DISCORD_DETECTABLE_CACHE, "w", encoding="utf-8") as f:
+            json.dump(index, f)
+    except OSError:
+        pass
+    return index
+
+
+def discord_find_game(index):
+    import psutil
+    found = None
+    for proc in psutil.process_iter(["name", "cmdline"]):
+        cmdline = proc.info["cmdline"] or []
+        candidates = [proc.info["name"] or ""]
+        if cmdline:
+            candidates.append(cmdline[0])
+        for candidate in candidates:
+            normalized = candidate.replace("\\", "/").lower()
+            for suffix, app_id, name, launcher in index.get(normalized.rsplit("/", 1)[-1], []):
+                if normalized == suffix or normalized.endswith("/" + suffix):
+                    if found is None or (found[2] and not launcher):
+                        found = [app_id, name, launcher]
+    return found
+
+
 class FaugusRun(HiDpiMixin):
-    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid="", with_logs=False):
+    def __init__(self, message, command=None, pre_launch="", post_launch="", gameid="", with_logs=False, title="", exe=""):
         self.message = message
         self.command = command
         self.pre_launch = pre_launch
         self.post_launch = post_launch
         self.gameid = gameid
+        self.title = title
+        self.exe = exe.replace("\\", "/").rsplit("/", 1)[-1].lower()
+        self.discord_socket = None
+        self.discord_stop = Event()
         self.logging_enabled = with_logs
         self.process = None
         self.splash_window = None
@@ -317,6 +419,8 @@ class FaugusRun(HiDpiMixin):
                 self.progress_save_source = GLib.timeout_add_seconds(30, self._save_progress_tick)
                 if self.gameid:
                     self._mark_running(True)
+                    if os.environ.get("DISCORD_RPC"):
+                        Thread(target=self._discord_start, daemon=True).start()
                     try:
                         os.remove(stop_request_path(self.gameid))
                     except FileNotFoundError:
@@ -788,6 +892,54 @@ class FaugusRun(HiDpiMixin):
 
         return False
 
+    def _discord_target(self, index):
+        game = discord_find_game(index)
+        if game:
+            return game[0], {}
+        for _, app_id, _, launcher in index.get(self.exe, []):
+            if not launcher:
+                return app_id, {}
+        if any(gameid != self.gameid for gameid in load_json_file(RUNNING_GAMES, {})):
+            return None
+        return DISCORD_FALLBACK_CLIENT_ID, {"details": self.title, "status_display_type": 2}
+
+    def _discord_start(self):
+        index = discord_load_detectable()
+        current = None
+        while not self.discord_stop.is_set():
+            try:
+                target = self._discord_target(index)
+                if target != current:
+                    self._discord_close()
+                    current = target
+                    sock = discord_connect(target[0]) if target else None
+                    self.discord_socket = sock
+                    if sock:
+                        activity = {"timestamps": {"start": int(time.time())}, **target[1]}
+                        sock.sendall(discord_frame(1, {
+                            "cmd": "SET_ACTIVITY",
+                            "args": {"pid": os.getpid(), "activity": activity},
+                            "nonce": str(uuid.uuid4()),
+                        }))
+            except OSError:
+                self._discord_close()
+                current = None
+            self.discord_stop.wait(5)
+        self._discord_close()
+
+    def _discord_close(self):
+        sock, self.discord_socket = self.discord_socket, None
+        if sock:
+            try:
+                sock.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+            sock.close()
+
+    def _discord_stop(self):
+        self.discord_stop.set()
+        self._discord_close()
+
     def _mark_running(self, running):
         games = load_json_file(RUNNING_GAMES, {})
         if running:
@@ -850,6 +1002,8 @@ class FaugusRun(HiDpiMixin):
                     parent.kill()
                 except psutil.NoSuchProcess:
                     pass
+
+        self._discord_stop()
 
         if getattr(self, "inhibit_handle", None):
             try:
@@ -928,6 +1082,7 @@ def build_launch_command(game):
     gamemode = game.get("gamemode", "")
     sdl_enabled = game.get("sdl_enabled", "")
     no_sleep = game.get("no_sleep", "")
+    discord_rpc = game.get("discord_rpc", "")
     addapp_enabled = game.get("addapp_enabled", "")
     lossless_enabled = game.get("lossless_enabled", "")
     lossless_multiplier = game.get("lossless_multiplier", "")
@@ -953,6 +1108,8 @@ def build_launch_command(game):
         command_parts.append("PROTON_PREFER_SDL=1")
     if no_sleep:
         command_parts.append("NO_SLEEP=1")
+    if discord_rpc:
+        command_parts.append("DISCORD_RPC=1")
     if runner:
         if runner == "Linux-Native":
             if disable_umu:
@@ -1048,7 +1205,7 @@ def main():
             return
 
         launch_options = build_launch_command(game)
-        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game, with_logs=args.logs).run()
+        FaugusRun(launch_options, None, game.get("pre_launch", ""), game.get("post_launch", ""), args.game, with_logs=args.logs, title=game.get("title", ""), exe=game.get("path", "")).run()
     else:
         FaugusRun(args.message, args.command, args.pre_launch, args.post_launch, with_logs=args.logs).run()
 

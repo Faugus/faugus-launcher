@@ -4752,6 +4752,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         edit_game_dialog.checkbox_sdl.set_active(game.sdl_enabled == True)
         edit_game_dialog.checkbox_no_sleep.set_active(game.no_sleep == True)
+        edit_game_dialog.checkbox_discord_rpc.set_active(game.discord_rpc == True)
 
         if edit_game_dialog.steam_shortcut_users:
             matched_user = self.find_steam_shortcut_user(game.title)
@@ -4984,12 +4985,14 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 sdl_enabled = ""
                 addapp_enabled = ""
                 no_sleep = ""
+                discord_rpc = ""
             else:
                 mangohud = True if add_game_dialog.checkbox_mangohud.get_active() else ""
                 gamemode = True if add_game_dialog.checkbox_gamemode.get_active() else ""
                 sdl_enabled = True if add_game_dialog.checkbox_sdl.get_active() else ""
                 addapp_enabled = "addapp_enabled" if add_game_dialog.addapp_enabled else ""
                 no_sleep = True if add_game_dialog.checkbox_no_sleep.get_active() else ""
+                discord_rpc = True if add_game_dialog.checkbox_discord_rpc.get_active() else ""
 
             disable_umu = True if (
                 launcher_id == "linux" and add_game_dialog.combobox_runtime.get_active_id() == "disable-runtime"
@@ -5028,6 +5031,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 post_launch=add_game_dialog.post_launch,
                 steam_user=add_game_dialog.combobox_steam_user.get_active_id() if launcher_id == "steam" else "",
                 disable_umu=disable_umu,
+                discord_rpc=discord_rpc,
                 runtime=add_game_dialog.combobox_runtime.get_active_id()
             )
 
@@ -5348,6 +5352,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             game.lossless_hdr = edit_game_dialog.lossless_hdr
             game.lossless_present = edit_game_dialog.lossless_present
             game.no_sleep = edit_game_dialog.checkbox_no_sleep.get_active()
+            game.discord_rpc = edit_game_dialog.checkbox_discord_rpc.get_active()
             game.steamgriddb_id = edit_game_dialog._steamgriddb_suggestion_id or ""
 
             game.addapp_bat = f"{os.path.dirname(expand_path(game.path))}/faugus-{game.gameid}.bat"
@@ -5658,6 +5663,7 @@ class Settings(Gtk.Dialog):
         ("auto-close-on-launch", "checkbox_auto_close_on_launch", False),
         ("mangohud", "checkbox_mangohud", False),
         ("gamemode", "checkbox_gamemode", False),
+        ("discord-rpc-enabled", "checkbox_discord_rpc", False),
         ("sdl-enabled", "checkbox_sdl", False),
         ("no-sleep-enabled", "checkbox_no_sleep", False),
         ("splash-window-enabled", "checkbox_splash_window", True),
@@ -6066,6 +6072,8 @@ class Settings(Gtk.Dialog):
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
         self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
+        self.checkbox_discord_rpc = Gtk.CheckButton(label="Discord RPC")
+        self.checkbox_discord_rpc.set_tooltip_text(_("Shows the running game as your Discord activity"))
 
         self.button_interface_sounds = Gtk.Button(label=_("Interface Sounds"))
         self.button_interface_sounds.connect("clicked", self.on_button_interface_sounds_clicked)
@@ -6236,9 +6244,10 @@ class Settings(Gtk.Dialog):
         grid_tools.attach(self.checkbox_mangohud, 0, 0, 1, 1)
         self.checkbox_mangohud.set_hexpand(True)
         grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
-        grid_tools.attach(self.checkbox_no_sleep, 0, 2, 1, 1)
-        grid_tools.attach(self.checkbox_sdl, 0, 3, 1, 1)
-        grid_tools.attach(box_buttons, 2, 0, 1, 4)
+        grid_tools.attach(self.checkbox_discord_rpc, 0, 2, 1, 1)
+        grid_tools.attach(self.checkbox_no_sleep, 0, 3, 1, 1)
+        grid_tools.attach(self.checkbox_sdl, 0, 4, 1, 1)
+        grid_tools.attach(box_buttons, 2, 0, 1, 5)
 
         grid_logs.attach(self.button_clearlogs, 0, 0, 1, 1)
         self.button_clearlogs.set_hexpand(True)
@@ -7198,6 +7207,7 @@ class Game:
         disable_umu="",
         runtime="",
         last_played="",
+        discord_rpc="",
     ):
         self.gameid = gameid
         self.title = title
@@ -7206,6 +7216,7 @@ class Game:
         self.game_arguments = game_arguments
         self.mangohud = mangohud
         self.gamemode = gamemode
+        self.discord_rpc = discord_rpc
         self.prefix = prefix
         self.sdl_enabled = sdl_enabled
         self.runner = runner
@@ -7805,6 +7816,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.checkbox_sdl.set_tooltip_text(_("May fix gamepad issues with some games"))
         self.checkbox_no_sleep = Gtk.CheckButton(label=_("No Sleep"))
         self.checkbox_no_sleep.set_tooltip_text(_("Prevents the system from suspending while gaming"))
+        self.checkbox_discord_rpc = Gtk.CheckButton(label="Discord RPC")
+        self.checkbox_discord_rpc.set_tooltip_text(_("Shows the running game as your Discord activity"))
 
         self.button_winecfg = Gtk.Button(label="Winecfg")
         self.button_winecfg.set_size_request(120, -1)
@@ -8106,11 +8119,13 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.checkbox_mangohud.set_hexpand(True)
         self.grid_tools.attach(self.checkbox_gamemode, 0, 1, 1, 1)
         self.checkbox_gamemode.set_hexpand(True)
-        self.grid_tools.attach(self.checkbox_no_sleep, 0, 2, 1, 1)
+        self.grid_tools.attach(self.checkbox_discord_rpc, 0, 2, 1, 1)
+        self.checkbox_discord_rpc.set_hexpand(True)
+        self.grid_tools.attach(self.checkbox_no_sleep, 0, 3, 1, 1)
         self.checkbox_no_sleep.set_hexpand(True)
-        self.grid_tools.attach(self.checkbox_sdl, 0, 3, 1, 1)
+        self.grid_tools.attach(self.checkbox_sdl, 0, 4, 1, 1)
         self.checkbox_sdl.set_hexpand(True)
-        self.grid_tools.attach(box_buttons, 2, 0, 1, 4)
+        self.grid_tools.attach(box_buttons, 2, 0, 1, 5)
 
         settings_stack = Gtk.Stack()
 
@@ -8167,6 +8182,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.checkbox_mangohud.set_active(self.default_mangohud)
         self.checkbox_gamemode.set_active(self.default_gamemode)
         self.checkbox_no_sleep.set_active(self.default_no_sleep)
+        self.checkbox_discord_rpc.set_active(self.default_discord_rpc)
         self.checkbox_sdl.set_active(self.default_sdl_enabled)
 
         disable_mangohud_gamemode_if_missing(self)
@@ -8789,6 +8805,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.checkbox_gamemode.set_active(self.default_gamemode)
         self.checkbox_sdl.set_active(self.default_sdl_enabled)
         self.checkbox_no_sleep.set_active(self.default_no_sleep)
+        self.checkbox_discord_rpc.set_active(self.default_discord_rpc)
         self.button_shortcut_icon.set_child(self.set_image_shortcut_icon())
         if os.path.isfile(self.cover_path_temp):
             os.remove(self.cover_path_temp)
@@ -8929,6 +8946,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.default_gamemode = cfg.config.get('gamemode') == 'True'
         self.default_sdl_enabled = cfg.config.get('sdl-enabled') == 'True'
         self.default_no_sleep = cfg.config.get('no-sleep-enabled') == 'True'
+        self.default_discord_rpc = cfg.config.get('discord-rpc-enabled') == 'True'
 
     def record_created_prefix(self, prefix):
         if prefix and os.path.isdir(prefix) and prefix not in self.created_prefixes:

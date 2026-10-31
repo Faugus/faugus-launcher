@@ -2220,7 +2220,7 @@ GAME_FIELDS = [
     "lossless_performance", "lossless_hdr", "lossless_present",
     "playtime", "hidden", "no_sleep", "category", "icon",
     "steamgriddb_id", "pre_launch", "post_launch",
-    "steam_user", "disable_umu", "runtime", "last_played",
+    "steam_user", "disable_umu", "runtime", "last_played", "discord_rpc",
 ]
 
 
@@ -2233,6 +2233,7 @@ def game_to_save_dict(game, hidden=None):
          "mangohud": True if game.mangohud else "",
          "gamemode": True if game.gamemode else "",
          "sdl_enabled": True if game.sdl_enabled else "",
+         "discord_rpc": True if game.discord_rpc else "",
          "addapp_enabled": "addapp_enabled" if game.addapp_enabled else "",
          "disable_umu": True if game.disable_umu else ""}
     if hidden is not None:
