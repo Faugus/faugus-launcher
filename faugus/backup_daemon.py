@@ -448,7 +448,7 @@ def perform_backup(dest_path, prefixes=None, shortcuts=None, protons=None, games
 
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         if os.path.exists(dest_path):
-            os.remove(dest_path)
+            dest_path = unique_backup_path(os.path.dirname(dest_path), os.path.basename(dest_path))
 
         shutil.move(zip_path + ".tar", dest_path)
 
@@ -533,7 +533,7 @@ def _daemon_token_path():
 
 def _perform_scheduled_backup(config):
     dest_dir = config.get('backup-dest-dir', '') or os.path.expanduser("~")
-    dest_path = os.path.join(dest_dir, backup_filename())
+    dest_path = unique_backup_path(dest_dir)
     prefixes, shortcuts, protons, games = backup_selection_from_config(config)
 
     needed_bytes = estimate_backup_size_bytes(prefixes, shortcuts, protons)
@@ -657,7 +657,19 @@ def setup_autostart(enable):
 
 
 def backup_filename():
-    return f"faugus-launcher-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.tar"
+    return f"faugus-launcher-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.tar"
+
+
+def unique_backup_path(dest_dir, filename=None):
+    dest_dir = expand_path(dest_dir)
+    filename = filename or backup_filename()
+    stem, extension = os.path.splitext(filename)
+    path = os.path.join(dest_dir, filename)
+    suffix = 2
+    while os.path.exists(path):
+        path = os.path.join(dest_dir, f"{stem}-{suffix}{extension}")
+        suffix += 1
+    return path
 
 
 def suppress_immediate_auto_backup(config):

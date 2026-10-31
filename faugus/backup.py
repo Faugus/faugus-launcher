@@ -30,7 +30,7 @@ from faugus.backup_daemon import (
     is_backup_running,
     request_backup_cancel,
     setup_autostart,
-    backup_filename,
+    unique_backup_path,
     suppress_immediate_auto_backup,
     _copy_dir_including,
     faugus_roots,
@@ -934,7 +934,7 @@ class BackupWindow(Gtk.Dialog):
             )
             return
 
-        dest_path = os.path.join(dest_dir, backup_filename())
+        dest_path = unique_backup_path(dest_dir)
 
         prefixes, shortcuts, protons, games = self.current_selection()
 
