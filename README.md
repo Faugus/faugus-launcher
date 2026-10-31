@@ -2,8 +2,8 @@
 A simple and lightweight app for running Windows games using [UMU-Launcher](https://github.com/Open-Wine-Components/umu-launcher)
 
 ### Support the project
-<a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/assets/ko-fi.png width="155" height="35"/></a>&nbsp;&nbsp;
-<a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD' target='_blank'><img src=https://github.com/Faugus/faugus-launcher/blob/main/assets/paypal.png width="155" height="35"/></a>
+<a href='https://ko-fi.com/K3K210EMDU' target='_blank'><img src="https://github.com/Faugus/faugus-launcher/blob/main/assets/ko-fi.png" width="155" height="35"/></a>&nbsp;&nbsp;
+<a href='https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD' target='_blank'><img src="https://github.com/Faugus/faugus-launcher/blob/main/assets/paypal.png" width="155" height="35"/></a>
 
 # Installation
 ## Arch-based distributions (AUR)
@@ -130,37 +130,35 @@ Translations are managed on [Weblate](https://hosted.weblate.org/projects/faugus
 <br>
 
 **List**
-<br><img src=screenshots/main-list.png/>
+<br><img src="screenshots/main-list.png">
 
 **Grid**
-<br><img src=screenshots/main-grid.png/>
+<br><img src="screenshots/main-grid.png">
 
 **Covers**
-<br><img src=screenshots/main-covers.png/>
+<br><img src="screenshots/main-covers.png">
 
 **Carrousel**
-<br><img src=screenshots/main-carrousel.png/>
+<br><img src="screenshots/main-carrousel.png">
 
 </details>
 
 <details>
 <summary><b>Add/Edit game</b></summary>
 <br>
-<img src=screenshots/add-main.png/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src=screenshots/add-tool.png/>
-<br><br>
-<img src=screenshots/launch-settings.png/>
+<img src="screenshots/add-main.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="screenshots/add-tool.png">
 </details>
 
 <details>
 <summary><b>Settings</b></summary>
 <br>
-<img src=screenshots/settings-general.png/>
+<img src="screenshots/settings-general.png">
 <br>
-<img src=screenshots/settings-interface.png/>
+<img src="screenshots/settings-interface.png">
 </details>
 
 <details>
 <summary><b>Proton Manager</b></summary>
 <br>
-<img src=screenshots/proton-manager.png/>
+<img src="screenshots/proton-manager.png">
 </details>
