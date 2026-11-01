@@ -2,7 +2,9 @@
 <component type="desktop-application">
   <id>io.github.Faugus.faugus-launcher</id>
   <name>Faugus</name>
-  <developer_name>Faugus</developer_name>
+  <developer id="io.github.faugus">
+    <name>Faugus</name>
+  </developer>
   <summary>A simple and lightweight app for running games using UMU-Launcher</summary>
   <url type="homepage">https://github.com/Faugus/faugus-launcher</url>
   <url type="donation">https://ko-fi.com/faugus</url>
@@ -15,6 +17,7 @@
     <color type="primary" scheme_preference="dark">#00334E</color>
   </branding>
   <description>
+    <p>Faugus is a simple and lightweight application for running Windows games using UMU-Launcher.</p>
     <p>Main Features:</p>
     <ul>
       <li>Play Windows games using Proton</li>
@@ -75,10 +78,6 @@
     <screenshot>
       <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/585c88b5/screenshots/add-tool.png</image>
       <caption>Add/Edit Game: Tools</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/1bd58dfb/screenshots/launch-settings.png</image>
-      <caption>Add/Edit Game: Launch Settings</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/Faugus/faugus-launcher/01b91cb6/screenshots/settings-general.png</image>
