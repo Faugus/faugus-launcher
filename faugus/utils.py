@@ -2040,6 +2040,19 @@ def expand_path(value):
     return os.path.expandvars(os.path.expanduser(value))
 
 
+def is_env_assignment(arg):
+    name = arg.partition("=")[0]
+    return "=" in arg and not name.startswith("-") and len(name.split()) == 1
+
+
+def quote_desktop_exec_arg(value):
+    """Quote a value for the Exec key of a desktop entry."""
+    value = value.replace("\\", "\\\\\\\\")
+    value = value.replace('"', '\\\\"')
+    value = value.replace("%", "%%")
+    return f'"{value}"'
+
+
 def latest_installed_umu_proton():
     names = set()
     for compat_dir in COMPATIBILITY_DIRS:

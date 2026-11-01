@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag to build (e.g. 2.0.1)"
+        description: "Release tag to build (e.g. 2.5.5)"
         required: true
       publish:
         description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"

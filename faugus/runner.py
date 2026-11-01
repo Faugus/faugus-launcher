@@ -186,7 +186,7 @@ class FaugusRun(HiDpiMixin):
             GLib.timeout_add(5000, close_app)
             return
 
-        if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK-ENV"):
+        if os.environ.get("LSFG_LEGACY") or os.environ.get("LSFGVK_ENV"):
             if self.lossless_location:
                 set_env("LSFG_DLL_PATH", self.lossless_location)
                 set_env("LSFGVK_DLL_PATH", self.lossless_location)
