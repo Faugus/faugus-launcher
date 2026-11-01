@@ -1954,6 +1954,30 @@ def load_compact_time_spin_css():
     )
 
 
+def extract_exe_title(exe_path):
+    try:
+        import pefile
+        pe = pefile.PE(exe_path, fast_load=True)
+        try:
+            pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_RESOURCE"]])
+            for file_info in getattr(pe, "FileInfo", None) or []:
+                for entry in file_info:
+                    if getattr(entry, "Key", b"") != b"StringFileInfo":
+                        continue
+                    for table in entry.StringTable:
+                        for key in (b"ProductName", b"FileDescription"):
+                            value = table.entries.get(key, b"")
+                            value = value.decode("utf-8", "ignore") if isinstance(value, bytes) else value
+                            value = value.strip().strip("\x00")
+                            if value:
+                                return value
+        finally:
+            pe.close()
+    except Exception:
+        pass
+    return ""
+
+
 def extract_ico(exe_path, output_path):
     tmp_dir = tempfile.mkdtemp()
     try:
@@ -1965,7 +1989,7 @@ def extract_ico(exe_path, output_path):
             capture_output=True, text=True
         )
         if result.returncode != 0:
-            if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr:
+            if "NoIconsAvailableError" in result.stderr or "PEFormatError" in result.stderr or "UnknownExecutableError" in result.stderr:
                 print("The file does not contain icons.")
                 return "no_icons"
             print(f"Error extracting icon: {result.stderr}")

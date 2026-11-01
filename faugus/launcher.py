@@ -4662,6 +4662,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         add_game_dialog.combobox_launcher.set_active_id_silent(launcher_id)
         add_game_dialog.on_combobox_changed(add_game_dialog.combobox_launcher, skip_cleanup=True)
+
+        add_game_dialog.fill_from_executable(file_path)
+
         add_game_dialog.entry_path.set_text(file_path)
 
         add_game_dialog.present()
@@ -9075,6 +9078,23 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
         return image
 
+    def fill_from_executable(self, path):
+        def set_title(title):
+            if not self.entry_title.get_text().strip():
+                self.set_title_silently(title)
+                self._artwork_title = title
+                self.get_artwork()
+
+        def extract():
+            title = extract_exe_title(path) or os.path.splitext(os.path.basename(path))[0]
+            if title:
+                idle_add_while_open(self.closed_event, set_title, title)
+            if not self.steamgriddb_enabled:
+                status = self.extract_shortcut_icon(path)
+                idle_add_while_open(self.closed_event, self.apply_shortcut_icon_status, status)
+
+        run_in_background(extract)
+
     def extract_shortcut_icon(self, path):
         os.makedirs(self.icon_directory, exist_ok=True)
         return extract_ico(path, self.icon_temp)
@@ -9251,13 +9271,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             if response == Gtk.ResponseType.ACCEPT:
                 path = dialog_fc.get_file().get_path()
 
-                if not self.steamgriddb_enabled:
-                    def extract():
-                        status = self.extract_shortcut_icon(path)
-                        idle_add_while_open(self.closed_event, self.apply_shortcut_icon_status, status)
-
-                    run_in_background(extract)
-
+                self.fill_from_executable(path)
                 self.entry_path.set_text(path)
 
             destroy_and_release(dialog_fc)

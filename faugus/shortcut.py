@@ -169,7 +169,15 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin, HookEntriesMixin, Launch
         file_path = self.file_path
         icon_temp = self.icon_temp
 
+        def apply_title(title):
+            if not self.entry_title.get_text().strip():
+                self.entry_title.set_text(title)
+            return False
+
         def extract():
+            title = extract_exe_title(file_path) or os.path.splitext(os.path.basename(file_path))[0]
+            if title:
+                GLib.idle_add(apply_title, title)
             GLib.idle_add(apply_icon, extract_ico(file_path, icon_temp))
 
         run_in_background(extract)
