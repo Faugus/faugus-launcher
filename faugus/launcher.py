@@ -1490,11 +1490,13 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             fb_child._dnd_ready = True
 
             def on_prepare(source, x, y):
+                fb_child = source.get_widget()
                 self._drag_source_id = fb_child.game.gameid
                 self.flowbox.select_child(fb_child)
                 return Gdk.ContentProvider.new_for_value(fb_child.game.gameid)
 
             def on_drag_begin(source, drag):
+                fb_child = source.get_widget()
                 self.set_drag_icon(source, fb_child.game, fb_child)
 
             def on_drag_end(source, drag, delete_data):
@@ -1510,6 +1512,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             fb_child.add_controller(drag_source)
 
             def on_drop_motion(target, x, y):
+                fb_child = target.get_widget()
                 if self.current_sort_id != "custom" or not getattr(self, '_drag_source_id', None):
                     return 0
 
@@ -3968,6 +3971,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.steam_user = cfg.config.get('steam-user', 'all')
 
     def load_games(self):
+        schedule_malloc_trim()
         games_data = load_json_file(GAMES_JSON, [])
 
         self.games.clear()
@@ -6983,7 +6987,7 @@ class Settings(Gtk.Dialog):
                     global faugus_backup
                     faugus_backup = True
                     self.response(Gtk.ResponseType.OK)
-                destroy_and_release(dialog)
+                dialog.discard()
 
             restore_dialog.connect("response", on_restore_response)
             restore_dialog.present()

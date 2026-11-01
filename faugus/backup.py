@@ -6,7 +6,7 @@ import gi
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib, Gio, Gdk
+from gi.repository import Gtk, GLib, Gio, Gdk, GObject
 from faugus.language_config import *
 from faugus.utils import mark_invalid_widget, play_navigate_if_window_active, play_ui_sound, on_entry_changed, on_entry_query_tooltip, load_red_entry_css, load_frame_css, load_compact_time_spin_css, hide_dialog_action_area, new_file_chooser, destroy_and_release, set_file_chooser_start_folder, build_bottom_button_box, expand_path, run_in_background, add_css_once, show_message_dialog, widget_children
 
@@ -42,8 +42,8 @@ _ = setup_gettext('faugus-launcher')
 
 
 def enable_cursor_cell_highlight(treeview):
-    def get_highlight_rgba():
-        found, rgba = treeview.get_style_context().lookup_color("theme_selected_bg_color")
+    def get_highlight_rgba(tv):
+        found, rgba = tv.get_style_context().lookup_color("theme_selected_bg_color")
         if not found:
             rgba = Gdk.RGBA()
             rgba.parse("#3584e4")
@@ -56,29 +56,28 @@ def enable_cursor_cell_highlight(treeview):
         if isinstance(renderer, Gtk.CellRendererToggle)
     ]
 
-    def make_data_func(target_column):
-        def data_func(col, cell, model, it, _data=None):
-            cursor_path, cursor_column = treeview.get_cursor()
-            row_path = model.get_path(it)
-            is_cursor = (
-                treeview.has_focus()
-                and cursor_path is not None
-                and cursor_path.to_string() == row_path.to_string()
-                and cursor_column is target_column
-            )
-            cell.set_property("cell-background-set", is_cursor)
-            if is_cursor:
-                cell.set_property("cell-background-rgba", get_highlight_rgba())
-        return data_func
+    def data_func(col, cell, model, it, _data=None):
+        tv = col.get_tree_view()
+        cursor_path, cursor_column = tv.get_cursor()
+        row_path = model.get_path(it)
+        is_cursor = (
+            tv.has_focus()
+            and cursor_path is not None
+            and cursor_path.to_string() == row_path.to_string()
+            and cursor_column is col
+        )
+        cell.set_property("cell-background-set", is_cursor)
+        if is_cursor:
+            cell.set_property("cell-background-rgba", get_highlight_rgba(tv))
 
     for column, renderer in toggle_entries:
-        column.set_cell_data_func(renderer, make_data_func(column))
+        column.set_cell_data_func(renderer, data_func)
 
     treeview.connect("cursor-changed", lambda tv: tv.queue_draw())
 
     focus_controller = Gtk.EventControllerFocus()
-    focus_controller.connect("enter", lambda c: treeview.queue_draw())
-    focus_controller.connect("leave", lambda c: treeview.queue_draw())
+    focus_controller.connect("enter", lambda c: c.get_widget().queue_draw())
+    focus_controller.connect("leave", lambda c: c.get_widget().queue_draw())
     treeview.add_controller(focus_controller)
 
 
@@ -98,12 +97,17 @@ def load_header_focus_css():
 def enable_header_focus_highlight(button):
     load_header_focus_css()
     focus_controller = Gtk.EventControllerFocus()
-    focus_controller.connect("enter", lambda c: button.add_css_class("header-focus-highlight"))
-    focus_controller.connect("leave", lambda c: button.remove_css_class("header-focus-highlight"))
+    focus_controller.connect("enter", lambda c: c.get_widget().add_css_class("header-focus-highlight"))
+    focus_controller.connect("leave", lambda c: c.get_widget().remove_css_class("header-focus-highlight"))
     button.add_controller(focus_controller)
 
 
 class _RowCapMixin:
+    def release(self):
+        for name, value in list(vars(self).items()):
+            if isinstance(value, GObject.Object):
+                delattr(self, name)
+
     def _max_height_for_rows(self, max_rows):
         _min, natural, _min_baseline, _natural_baseline = self.treeview.measure(Gtk.Orientation.VERTICAL, -1)
         row_count = max(1, len(self.items))
@@ -978,6 +982,9 @@ class BackupWindow(Gtk.Dialog):
         if self.backup_running_poll_id is not None:
             GLib.source_remove(self.backup_running_poll_id)
             self.backup_running_poll_id = None
+        self.insert_action_group("backupfreq", None)
+        self.prefix_list.release()
+        self.proton_list.release()
         destroy_and_release(self)
 
     def on_cancel_clicked(self, widget):
@@ -1183,6 +1190,9 @@ class RestoreWindow(Gtk.Dialog):
         if self.progress_timer_id is not None:
             GLib.source_remove(self.progress_timer_id)
             self.progress_timer_id = None
+        for selection_list in (getattr(self, "prefix_list", None), getattr(self, "proton_list", None)):
+            if selection_list is not None:
+                selection_list.release()
         destroy_and_release(self)
 
     def on_cancel_clicked(self, widget):

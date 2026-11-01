@@ -1043,7 +1043,22 @@ def _release_widgets(widget):
         widget.unparent()
 
 
+_trim_source = [0]
+
+
+def _malloc_trim():
+    _trim_source[0] = 0
+    ctypes.CDLL("libc.so.6").malloc_trim(0)
+    return GLib.SOURCE_REMOVE
+
+
+def schedule_malloc_trim():
+    if not _trim_source[0]:
+        _trim_source[0] = GLib.timeout_add_seconds(2, _malloc_trim)
+
+
 def destroy_and_release(widget):
+    schedule_malloc_trim()
     if isinstance(widget, Gtk.NativeDialog):
         widget.destroy()
         widget.__dict__.clear()
@@ -1061,7 +1076,14 @@ def destroy_and_release(widget):
     elif hasattr(widget, "set_child"):
         widget.set_child(None)
 
+    controllers = widget.observe_controllers()
+    for controller in [controllers.get_item(i) for i in range(controllers.get_n_items())]:
+        widget.remove_controller(controller)
+
     widget.destroy()
+    for value in vars(widget).values():
+        if isinstance(value, (LaunchArgumentsEditor, AddAppPanel, LosslessPanel)):
+            value.__dict__.clear()
     widget.__dict__.clear()
 
 
@@ -1798,12 +1820,13 @@ COVER_RATIO = 2 / 3
 
 def keep_banner_ratio(source, target, ratio=BANNER_RATIO, min_width=-1):
     state = {"width": -1}
+    other = None if target is source else target
 
     def on_tick(widget, frame_clock):
         width = widget.get_width()
         if width > 0 and width != state["width"]:
             state["width"] = width
-            target.set_size_request(min_width, math.ceil(width / ratio))
+            (widget if other is None else other).set_size_request(min_width, math.ceil(width / ratio))
         return True
 
     source.add_tick_callback(on_tick)
@@ -2165,7 +2188,7 @@ class LaunchArgumentsEditor:
 
         def on_key_press(controller, keyval, keycode, state):
             if keyval == Gdk.KEY_Delete:
-                selection = tree.get_selection()
+                selection = controller.get_widget().get_selection()
                 model, treeiter = selection.get_selected()
                 if treeiter is not None:
                     if model[treeiter][0] != "" or len(model) > 1:
@@ -2229,6 +2252,7 @@ class LaunchArgumentsEditor:
 
     def attach_drag_and_drop(self, tree):
         def on_prepare(source, x, y):
+            tree = source.get_widget()
             index = self.row_index_at(tree, x, y)
             if index is None or not tree.get_model()[index][0].strip():
                 return None
@@ -2240,6 +2264,7 @@ class LaunchArgumentsEditor:
             Gtk.DragIcon.get_for_drag(drag).set_child(Gtk.Label(label=tree_origin.get_model()[index][0]))
 
         def on_drop(target, value, x, y):
+            tree = target.get_widget()
             if self.drag_origin is None:
                 return False
             tree_origin, src_index = self.drag_origin
@@ -2804,6 +2829,11 @@ def show_steamgriddb_picker(obj, category):
         closed_state[0] = True
         return False
     dialog.connect("close-request", on_close_request)
+
+    def on_response(d, response_id):
+        closed_state[0] = True
+        destroy_and_release(d)
+    dialog.connect("response", on_response)
 
     spinner = Gtk.Spinner()
     spinner.set_size_request(32, 32)

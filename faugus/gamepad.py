@@ -197,7 +197,7 @@ def _register_native(native):
     _cursor_natives.add(native)
     motion = Gtk.EventControllerMotion()
     motion.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-    motion.connect("motion", lambda c, x, y: _on_pointer_motion(native, x, y))
+    motion.connect("motion", lambda c, x, y: _on_pointer_motion(c.get_widget(), x, y))
     key = Gtk.EventControllerKey()
     key.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
     key.connect("key-pressed", lambda c, *args: _on_key_pressed())
