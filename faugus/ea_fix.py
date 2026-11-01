@@ -5,7 +5,7 @@ import vdf
 
 from faugus.path_manager import *
 from faugus.steam_setup import get_all_shortcut_paths, normalize_shortcuts
-from faugus.utils import load_json_file, save_json_file, expand_path
+from faugus.core import load_json_file, save_json_file, expand_path
 
 
 def update_desktop_path(shortcut_path, new_dir_path):

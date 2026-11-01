@@ -4,10 +4,7 @@ import zlib
 
 import vdf
 from pathlib import Path
-import gi
-gi.require_version('GdkPixbuf', '2.0')
 from faugus.path_manager import PathManager, IS_FLATPAK
-from gi.repository import GdkPixbuf
 
 
 def _check_command(cmd):
@@ -302,6 +299,10 @@ def get_steam_icon_path(appid):
     cache = LIBRARYCACHE / str(appid)
     if not cache.exists():
         return None
+
+    import gi
+    gi.require_version('GdkPixbuf', '2.0')
+    from gi.repository import GdkPixbuf
 
     images = []
 

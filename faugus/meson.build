@@ -3,6 +3,7 @@ py.install_sources(
   'backup_daemon.py',
   'components.py',
   'config_manager.py',
+  'core.py',
   'ea_fix.py',
   'gamepad.py',
   'keyboard.py',

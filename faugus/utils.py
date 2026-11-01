@@ -10,13 +10,16 @@ import shlex
 import shutil
 import signal
 import subprocess
+import sys
 import tempfile
+from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from faugus.path_manager import PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
+from faugus.path_manager import FAUGUS_PNG_RASTER, PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
+from faugus.core import stop_request_path, kill_by_faugusid, ensure_parent_dir, atomic_write, load_json_file, save_json_file, build_lossless_env, expand_path, resolve_protonpath, resolve_game_runner, get_gpus, scan_gpus, get_steamgriddb_session, fetch_steamgriddb_candidates, load_json_file_or_none, version_key, latest_installed_umu_proton, update_games_json
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 
@@ -57,10 +60,6 @@ def idle_add_while_open(closed_event, fn, *args):
     GLib.idle_add(run)
 
 
-def stop_request_path(gameid):
-    return os.path.join(FAUGUS_LAUNCHER_STATE_DIR, f"stop-{gameid}")
-
-
 def request_game_stop(gameid):
     if not gameid:
         return
@@ -68,28 +67,6 @@ def request_game_stop(gameid):
         open(stop_request_path(gameid), "w").close()
     except OSError:
         pass
-
-
-def kill_by_faugusid(gameid):
-    if not gameid:
-        return
-
-    marker = f"FAUGUSID={gameid}".encode()
-    own_pid = os.getpid()
-
-    for entry in os.scandir("/proc"):
-        if not entry.name.isdigit() or int(entry.name) == own_pid:
-            continue
-        try:
-            with open(f"/proc/{entry.name}/environ", "rb") as f:
-                environ = f.read()
-        except OSError:
-            continue
-        if marker in environ.split(b"\0"):
-            try:
-                os.kill(int(entry.name), signal.SIGKILL)
-            except OSError:
-                pass
 
 
 class HiDpiPaintable(GObject.GObject, Gdk.Paintable):
@@ -1088,26 +1065,6 @@ def destroy_and_release(widget):
     widget.__dict__.clear()
 
 
-def ensure_parent_dir(path):
-    parent = os.path.dirname(path)
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-
-
-def atomic_write(filepath, write_func):
-    ensure_parent_dir(filepath)
-    dir_name = os.path.dirname(filepath) or "."
-    fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".tmp-")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            write_func(f)
-        os.replace(tmp_path, filepath)
-    except BaseException:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-        raise
-
-
 LOG_CHUNK_BYTES = 128 * 1024
 LOG_SLICE_US = 4000
 
@@ -1134,29 +1091,6 @@ def load_text_progressively(path, text_view, is_open, on_loaded):
         return GLib.SOURCE_REMOVE
 
     GLib.idle_add(step)
-
-
-def load_json_file(filepath, default=None):
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return default if default is not None else []
-
-
-def load_json_file_or_none(filepath):
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-    except (json.JSONDecodeError, OSError) as e:
-        print(f"Faugus Launcher: refusing to touch {filepath}, failed to read it ({e})")
-        return None
-
-
-def save_json_file(data, filepath, indent=4):
-    atomic_write(filepath, lambda f: json.dump(data, f, indent=indent, ensure_ascii=False))
 
 
 def format_title(title):
@@ -1672,27 +1606,6 @@ def install_ui_sound_hooks():
     GObject.add_emission_hook(Gtk.Dialog, "response", _on_dialog_response)
 
 
-def build_lossless_env(lossless_enabled, lossless_multiplier, lossless_flow,
-                       lossless_performance, lossless_hdr, lossless_present):
-    parts = []
-    if not lossless_enabled:
-        return parts
-    parts.append("LSFG_LEGACY=1")
-    parts.append("LSFGVK_ENV=1")
-    if lossless_multiplier:
-        parts.append(f"LSFG_MULTIPLIER={lossless_multiplier}")
-        parts.append(f"LSFGVK_MULTIPLIER={lossless_multiplier}")
-    if lossless_flow:
-        parts.append(f"LSFG_FLOW_SCALE={lossless_flow/100}")
-        parts.append(f"LSFGVK_FLOW_SCALE={lossless_flow/100}")
-    parts.append(f"LSFG_PERFORMANCE_MODE={1 if lossless_performance else 0}")
-    parts.append(f"LSFGVK_PERFORMANCE_MODE={1 if lossless_performance else 0}")
-    parts.append(f"LSFG_HDR_MODE={1 if lossless_hdr else 0}")
-    if lossless_present:
-        parts.append(f"LSFG_EXPERIMENTAL_PRESENT_MODE={lossless_present}")
-    return parts
-
-
 def write_addapp_bat(bat_path, exe_path, addapp, addapp_delay, addapp_first, game_arguments):
     bat_path = expand_path(bat_path)
     exe_path = expand_path(exe_path)
@@ -2058,12 +1971,6 @@ def on_button_paypal_clicked(widget):
     open_uri(widget, "https://www.paypal.com/donate/?business=57PP9DVD3VWAN&no_recurring=0&currency_code=USD")
 
 
-def expand_path(value):
-    if not value:
-        return value
-    return os.path.expandvars(os.path.expanduser(value))
-
-
 def is_env_assignment(arg):
     name = arg.partition("=")[0]
     return "=" in arg and not name.startswith("-") and len(name.split()) == 1
@@ -2075,132 +1982,6 @@ def quote_desktop_exec_arg(value):
     value = value.replace('"', '\\\\"')
     value = value.replace("%", "%%")
     return f'"{value}"'
-
-
-def latest_installed_umu_proton():
-    names = set()
-    for compat_dir in COMPATIBILITY_DIRS:
-        if not os.path.isdir(compat_dir):
-            continue
-        for entry in os.listdir(compat_dir):
-            if entry.startswith("UMU-Proton-") and os.path.isdir(os.path.join(compat_dir, entry)):
-                names.add(entry)
-    return max(names, key=version_key) if names else None
-
-
-def update_games_json():
-    games = load_json_file_or_none(GAMES_JSON)
-    if not games:
-        return
-
-    changed = False
-
-    for game in games:
-        if game.get("runner") == "Proton-CachyOS":
-            game["runner"] = "Proton-CachyOS (System)"
-            changed = True
-
-        if game.get("runner") == "":
-            game["runner"] = latest_installed_umu_proton() or "Default"
-            changed = True
-
-        if game.get("disable_umu") and game.get("runtime") != "disable-runtime":
-            game["runtime"] = "disable-runtime"
-            changed = True
-
-        if "favorite" in game:
-            if game["favorite"] == True:
-                game["category"] = False
-
-            game.pop("favorite")
-            changed = True
-
-        game_id = game.get("gameid")
-
-        if game_id:
-            ico_path = os.path.join(ICONS_DIR, f"{game_id}.ico")
-            png_path = os.path.join(ICONS_DIR, f"{game_id}.png")
-
-            if os.path.exists(png_path):
-                new_icon_path = png_path
-            elif os.path.exists(ico_path):
-                new_icon_path = ico_path
-            else:
-                new_icon_path = png_path
-
-            if game.get("icon") != new_icon_path:
-                game["icon"] = new_icon_path
-                changed = True
-
-            if game.get("cover"):
-                new_cover_path = os.path.join(COVERS_DIR, f"{game_id}.png")
-                if game.get("cover") != new_cover_path:
-                    game["cover"] = new_cover_path
-                    changed = True
-
-    if changed:
-        save_json_file(games, GAMES_JSON)
-
-
-def resolve_protonpath(runner):
-    return PROTON_CACHYOS if runner == "Proton-CachyOS (System)" else runner
-
-
-def resolve_game_runner(runner):
-    if runner != "Default":
-        return runner
-    from faugus.config_manager import ConfigManager
-    return ConfigManager().config.get('default-runner', '').strip('"')
-
-
-def version_key(v):
-    cleaned = re.sub(r'^[^\d]+', '', v)
-    parts = re.split(r'(\d+)', cleaned)
-    return [int(p) if p.isdigit() else p for p in parts]
-
-
-_gpus_cache = None
-
-
-def get_gpus():
-    global _gpus_cache
-    if _gpus_cache is None:
-        _gpus_cache = scan_gpus()
-    return [dict(gpu) for gpu in _gpus_cache]
-
-
-def scan_gpus():
-    gpus = []
-    drm = "/sys/class/drm"
-    try:
-        cards = sorted(c for c in os.listdir(drm) if re.fullmatch(r"card\d+", c))
-    except OSError:
-        return gpus
-
-    for card in cards:
-        device = os.path.join(drm, card, "device")
-        try:
-            with open(os.path.join(device, "uevent")) as f:
-                slot = next(l.split("=", 1)[1].strip() for l in f if l.startswith("PCI_SLOT_NAME="))
-            with open(os.path.join(device, "vendor")) as f:
-                vendor = f.read().strip()[2:]
-            with open(os.path.join(device, "device")) as f:
-                device_id = f.read().strip()[2:]
-        except (OSError, StopIteration):
-            continue
-
-        name = slot
-        try:
-            out = subprocess.check_output(["lspci", "-s", slot, "-mm"], text=True, timeout=5)
-            parts = shlex.split(out.strip())
-            vendor_name = {"10de": "NVIDIA", "1002": "AMD", "8086": "Intel"}.get(vendor, parts[2])
-            model = re.search(r"\[(.+)\]", parts[3])
-            name = "{} {}".format(vendor_name, model.group(1) if model else parts[3])
-        except (OSError, subprocess.SubprocessError, ValueError, IndexError):
-            pass
-
-        gpus.append({"slot": slot, "vendor": vendor, "device": device_id, "name": name})
-    return gpus
 
 
 def populate_combobox_with_runners(combobox):
@@ -2961,25 +2742,6 @@ def _contrasting_fg_color(rgb_color):
     return "#000000" if luminance > 0.55 else "#ffffff"
 
 
-@functools.cache
-def get_steamgriddb_session():
-    import requests
-    from requests.adapters import HTTPAdapter
-    from urllib3.util.retry import Retry
-
-    session = requests.Session()
-    retry = Retry(
-        total=3,
-        backoff_factor=0.3,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET"],
-    )
-    adapter = HTTPAdapter(max_retries=retry, pool_maxsize=16)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
-    return session
-
-
 def fetch_steamgriddb_autocomplete(api_key, term, limit=10):
     import requests
     from urllib.parse import quote
@@ -2996,60 +2758,6 @@ def fetch_steamgriddb_autocomplete(api_key, term, limit=10):
         return [{"id": item["id"], "name": item["name"]} for item in results[:limit] if item.get("name")]
     except requests.RequestException:
         return []
-
-
-def fetch_steamgriddb_candidates(api_key, game_name, limit=12, game_id=None, steam_appid=None):
-    import requests
-    from urllib.parse import quote
-
-    session = get_steamgriddb_session()
-    headers = {"Authorization": f"Bearer {api_key}"}
-    result = {"game_id": None, "grids": [], "heroes": [], "icons": []}
-
-    try:
-        if steam_appid is not None:
-            id_type, lookup_id = "steam", steam_appid
-        else:
-            if game_id is None:
-                search = session.get(
-                    f"https://www.steamgriddb.com/api/v2/search/autocomplete/{quote(game_name)}",
-                    headers=headers, timeout=10,
-                )
-                search.raise_for_status()
-                results = search.json().get("data") or []
-                if not results:
-                    return result
-                game_id = results[0]["id"]
-            id_type, lookup_id = "game", game_id
-            result["game_id"] = game_id
-
-        endpoints = {
-            "grids": (f"https://www.steamgriddb.com/api/v2/grids/{id_type}/{lookup_id}", {"dimensions": "600x900"}),
-            "heroes": (f"https://www.steamgriddb.com/api/v2/heroes/{id_type}/{lookup_id}", {}),
-            "icons": (f"https://www.steamgriddb.com/api/v2/icons/{id_type}/{lookup_id}", {}),
-        }
-
-        def fetch_one(key):
-            url, params = endpoints[key]
-            try:
-                response = session.get(url, headers=headers, params=params, timeout=10)
-                if response.ok:
-                    data = response.json().get("data") or []
-                    return key, [
-                        {"url": item["url"], "thumb": item.get("thumb") or item["url"]}
-                        for item in data[:limit] if item.get("url")
-                    ]
-            except requests.RequestException:
-                pass
-            return key, []
-
-        with ThreadPoolExecutor(max_workers=3) as pool:
-            for key, items in pool.map(fetch_one, endpoints.keys()):
-                result[key] = items
-
-        return result
-    except requests.RequestException:
-        return result
 
 
 def show_steamgriddb_picker(obj, category):
@@ -3366,3 +3074,238 @@ def compute_dominant_color(image_path):
 
     r_total, g_total, b_total, weight = max(hue_bins.values(), key=lambda bucket: bucket[3])
     return int(r_total / weight), int(g_total / weight), int(b_total / weight)
+
+
+def _load_config():
+    from faugus.config_manager import ConfigManager
+    return ConfigManager()
+
+
+def apply_runner_theme(cfg):
+    theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+    apply_theme_engine(theme_engine)
+    apply_interface_customization(
+        cfg.config.get('interface-theme', 'system'),
+        cfg.get_accent_color(),
+        theme_engine,
+    )
+
+
+class FaugusSplash(HiDpiMixin):
+    def __init__(self, image_path):
+        apply_runner_theme(_load_config())
+        load_frame_css()
+
+        self.pulse_source = None
+        self.window = Gtk.Window(title="Faugus")
+        self.window.set_decorated(False)
+        self.window.set_resizable(False)
+        self.window.set_default_size(280, 10)
+
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box.set_halign(Gtk.Align.CENTER)
+        box.set_valign(Gtk.Align.CENTER)
+        frame.set_child(box)
+
+        image = new_icon(self.new_texture_from_image(image_path, 75, 75))
+        image.set_margin_top(20)
+        image.set_margin_start(20)
+        image.set_margin_end(20)
+        image.set_margin_bottom(20)
+        box.append(image)
+
+        status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        status_box.set_margin_start(20)
+        status_box.set_margin_end(20)
+        status_box.set_margin_bottom(20)
+
+        self.label = Gtk.Label()
+        status_box.append(self.label)
+
+        self.progress_bar = Gtk.ProgressBar()
+        self.progress_bar.set_size_request(240, -1)
+        self.progress_bar.set_visible(False)
+        status_box.append(self.progress_bar)
+
+        box.append(status_box)
+
+        self.window.set_child(frame)
+        self.window.present()
+
+    def run(self):
+        self.loop = GLib.MainLoop()
+        Thread(target=self.read_commands, daemon=True).start()
+        self.loop.run()
+
+    def read_commands(self):
+        for line in sys.stdin:
+            GLib.idle_add(self.handle_command, line.rstrip("\n"))
+        GLib.idle_add(self.loop.quit)
+
+    def handle_command(self, line):
+        name, _sep, value = line.partition(" ")
+        if name == "LABEL":
+            self.label.set_text(value)
+        elif name == "FRACTION":
+            self.stop_pulse()
+            self.progress_bar.set_visible(True)
+            self.progress_bar.set_fraction(float(value))
+        elif name == "PULSE":
+            self.progress_bar.set_visible(True)
+            if self.pulse_source is None:
+                self.pulse_source = GLib.timeout_add(100, self.pulse_progress)
+        elif name == "HIDE":
+            self.stop_pulse()
+            self.progress_bar.set_visible(False)
+        return False
+
+    def pulse_progress(self):
+        self.progress_bar.pulse()
+        return True
+
+    def stop_pulse(self):
+        if self.pulse_source is not None:
+            GLib.source_remove(self.pulse_source)
+            self.pulse_source = None
+
+
+class FaugusDonate(HiDpiMixin):
+    def __init__(self):
+        apply_runner_theme(_load_config())
+        load_frame_css()
+        self.loop = GLib.MainLoop()
+
+        dialog = self.dialog = Gtk.Dialog(title="Faugus")
+        dialog.set_default_size(10, 10)
+        hide_dialog_action_area(dialog)
+        dialog.set_decorated(False)
+        dialog.set_resizable(False)
+        play_ui_sound("confirm")
+
+        add_css_once("donate_dialog", """
+        .paypal {
+            color: white;
+            background: #001C64;
+        }
+        .kofi {
+            color: white;
+            background: #1AC0FF;
+        }
+        """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        content_area = dialog.get_content_area()
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5)
+        frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        frame.set_child(frame_box)
+        content_area.append(frame)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 75, 75)
+        image = new_icon(texture)
+
+        label = Gtk.Label(label=_("Are you enjoying Faugus?"))
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label(
+            label = _("Please consider donating") + " ❤️"
+        )
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_kofi, button_paypal = make_donate_buttons()
+
+        checkbox = Gtk.CheckButton(label=_("Never show this message again"))
+        checkbox.set_halign(Gtk.Align.CENTER)
+
+        box_top.append(image)
+        box_top.append(label)
+        box_top.append(label2)
+        box_top.append(button_kofi)
+        box_top.append(button_paypal)
+        box_top.append(checkbox)
+
+        button_continue = Gtk.Button(label=_("Continue"))
+        button_continue.set_size_request(150, -1)
+        button_continue.set_hexpand(True)
+        button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        box_bottom.append(button_continue)
+
+        frame_box.append(box_top)
+        frame_box.append(box_bottom)
+
+        def on_dialog_response(dialog, response_id):
+            if response_id == Gtk.ResponseType.OK and checkbox.get_active():
+                print("checked", flush=True)
+            self.loop.quit()
+
+        dialog.connect("response", on_dialog_response)
+        dialog.present()
+
+    def run(self):
+        self.loop.run()
+
+
+class FaugusMessage:
+    def __init__(self, text1, text2=""):
+        apply_runner_theme(_load_config())
+        load_frame_css()
+        self.loop = GLib.MainLoop()
+        show_message_dialog(text1, text2, callback=lambda ok: self.loop.quit())
+
+    def run(self):
+        self.loop.run()
+
+
+class FaugusLogWindow:
+    def __init__(self):
+        apply_runner_theme(_load_config())
+        load_frame_css()
+        self.window = Gtk.Window(title="Winetricks Logs")
+        self.window.set_default_size(600, 400)
+
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
+        self.text_view = Gtk.TextView()
+        self.text_view.set_editable(False)
+        scrolled_window.set_child(self.text_view)
+        self.window.set_child(scrolled_window)
+
+        self.window.connect("close-request", lambda window: True)
+        self.window.present()
+
+    def run(self):
+        self.loop = GLib.MainLoop()
+        Thread(target=self.read_lines, daemon=True).start()
+        self.loop.run()
+
+    def read_lines(self):
+        for line in sys.stdin:
+            GLib.idle_add(self.append_line, line.rstrip("\n"))
+        GLib.idle_add(self.loop.quit)
+
+    def append_line(self, line):
+        buffer = self.text_view.get_buffer()
+        buffer.insert(buffer.get_end_iter(), line + "\n")
+        adj = self.text_view.get_parent().get_vadjustment()
+        adj.set_value(adj.get_upper() - adj.get_page_size())
+        return False
