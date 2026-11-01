@@ -396,7 +396,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             item = self.flowbox.get_child_at_pos(int(x), int(y))
             self.on_item_right_click(item, x, y)
 
-        right_click.connect("pressed", on_right_click)
+        right_click.connect("released", on_right_click)
         self.flowbox.add_controller(right_click)
 
         file_drop_target = Gtk.DropTarget.new(Gdk.FileList, Gdk.DragAction.COPY)
@@ -1818,7 +1818,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         right_click = Gtk.GestureClick()
         right_click.set_button(Gdk.BUTTON_SECONDARY)
-        right_click.connect("pressed", lambda g, n, x, y, slot=slot: self.on_carrousel_slot_right_click(slot, x, y))
+        right_click.connect("released", lambda g, n, x, y, slot=slot: self.on_carrousel_slot_right_click(slot, x, y))
         card.add_controller(right_click)
 
         def on_prepare(source, x, y, slot=slot):
@@ -7866,9 +7866,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         icon_click_secondary = Gtk.GestureClick()
         icon_click_secondary.set_button(Gdk.BUTTON_SECONDARY)
         if self.steamgriddb_enabled:
-            icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "icon"))
+            icon_click_secondary.connect("released", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "icon"))
         else:
-            icon_click_secondary.connect("pressed", lambda g, n, x, y: self.on_button_shortcut_icon_clicked(self.button_shortcut_icon))
+            icon_click_secondary.connect("released", lambda g, n, x, y: self.on_button_shortcut_icon_clicked(self.button_shortcut_icon))
         self.button_shortcut_icon.add_controller(icon_click_secondary)
 
         self.button_cancel = Gtk.Button(label=_("Cancel"))
@@ -7958,7 +7958,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
             button.connect("clicked", on_cover_primary_click)
             click_secondary = Gtk.GestureClick()
             click_secondary.set_button(Gdk.BUTTON_SECONDARY)
-            click_secondary.connect("pressed", self.on_image_clicked)
+            click_secondary.connect("released", self.on_image_clicked)
             button.add_controller(click_secondary)
             frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
             frame.set_size_request(300, 450)
@@ -7999,7 +7999,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
         banner_click_secondary1 = Gtk.GestureClick()
         banner_click_secondary1.set_button(Gdk.BUTTON_SECONDARY)
-        banner_click_secondary1.connect("pressed", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "banner"))
+        banner_click_secondary1.connect("released", lambda g, n, x, y: self.on_image_clicked(g, n, x, y, "banner"))
         self.button_banner1.add_controller(banner_click_secondary1)
 
         self.banner_preview1_overlay, self.spinner_banner1 = wrap_with_spinner(self.banner_preview1)
