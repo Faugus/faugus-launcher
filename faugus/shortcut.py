@@ -227,7 +227,7 @@ class CreateShortcut(Gtk.ApplicationWindow, HiDpiMixin, HookEntriesMixin, Launch
             arg = arg.strip()
             if not arg:
                 continue
-            if "=" in arg and not arg.startswith("-"):
+            if is_env_assignment(arg):
                 env_vars.append(arg)
             else:
                 other_args.append(arg)

@@ -3606,8 +3606,9 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             command_parts.append(f"WINEPREFIX='{prefix}'")
         if runner:
             command_parts.append(f"PROTONPATH='{resolve_protonpath(runner)}'")
-        for arg in expand_path(game.launch_arguments).split():
-            if "=" in arg and not arg.startswith("-"):
+        for arg in expand_path(game.launch_arguments).splitlines():
+            arg = arg.strip()
+            if is_env_assignment(arg):
                 command_parts.append(arg)
         if escaped_file_run.endswith(".reg"):
             command_parts.append(f"'{UMU_RUN}' regedit '{escaped_file_run}'")
