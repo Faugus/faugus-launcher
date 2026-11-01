@@ -1,5 +1,3 @@
-
-
 import gi
 import sys
 import subprocess
@@ -196,6 +194,189 @@ def discord_find_game(index):
     return found
 
 
+def apply_runner_theme(cfg):
+    theme_engine = cfg.config.get('theme-engine', 'adwaita').strip('"')
+    apply_theme_engine(theme_engine)
+    apply_interface_customization(
+        cfg.config.get('interface-theme', 'system'),
+        cfg.get_accent_color(),
+        theme_engine,
+    )
+
+
+class FaugusSplash(HiDpiMixin):
+    def __init__(self, image_path):
+        apply_runner_theme(ConfigManager())
+        load_frame_css()
+
+        self.pulse_source = None
+        self.window = Gtk.Window(title="Faugus")
+        self.window.set_decorated(False)
+        self.window.set_resizable(False)
+        self.window.set_default_size(280, 10)
+
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        box.set_halign(Gtk.Align.CENTER)
+        box.set_valign(Gtk.Align.CENTER)
+        frame.set_child(box)
+
+        image = new_icon(self.new_texture_from_image(image_path, 75, 75))
+        image.set_margin_top(20)
+        image.set_margin_start(20)
+        image.set_margin_end(20)
+        image.set_margin_bottom(20)
+        box.append(image)
+
+        status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        status_box.set_margin_start(20)
+        status_box.set_margin_end(20)
+        status_box.set_margin_bottom(20)
+
+        self.label = Gtk.Label()
+        status_box.append(self.label)
+
+        self.progress_bar = Gtk.ProgressBar()
+        self.progress_bar.set_size_request(240, -1)
+        self.progress_bar.set_visible(False)
+        status_box.append(self.progress_bar)
+
+        box.append(status_box)
+
+        self.window.set_child(frame)
+        self.window.present()
+
+    def run(self):
+        self.loop = GLib.MainLoop()
+        Thread(target=self.read_commands, daemon=True).start()
+        self.loop.run()
+
+    def read_commands(self):
+        for line in sys.stdin:
+            GLib.idle_add(self.handle_command, line.rstrip("\n"))
+        GLib.idle_add(self.loop.quit)
+
+    def handle_command(self, line):
+        name, _sep, value = line.partition(" ")
+        if name == "LABEL":
+            self.label.set_text(value)
+        elif name == "FRACTION":
+            self.stop_pulse()
+            self.progress_bar.set_visible(True)
+            self.progress_bar.set_fraction(float(value))
+        elif name == "PULSE":
+            self.progress_bar.set_visible(True)
+            if self.pulse_source is None:
+                self.pulse_source = GLib.timeout_add(100, self.pulse_progress)
+        elif name == "HIDE":
+            self.stop_pulse()
+            self.progress_bar.set_visible(False)
+        return False
+
+    def pulse_progress(self):
+        self.progress_bar.pulse()
+        return True
+
+    def stop_pulse(self):
+        if self.pulse_source is not None:
+            GLib.source_remove(self.pulse_source)
+            self.pulse_source = None
+
+
+class FaugusDonate(HiDpiMixin):
+    def __init__(self):
+        apply_runner_theme(ConfigManager())
+        load_frame_css()
+        self.loop = GLib.MainLoop()
+
+        dialog = self.dialog = Gtk.Dialog(title="Faugus")
+        dialog.set_default_size(10, 10)
+        hide_dialog_action_area(dialog)
+        dialog.set_decorated(False)
+        dialog.set_resizable(False)
+        play_ui_sound("confirm")
+
+        add_css_once("donate_dialog", """
+        .paypal {
+            color: white;
+            background: #001C64;
+        }
+        .kofi {
+            color: white;
+            background: #1AC0FF;
+        }
+        """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        content_area = dialog.get_content_area()
+        content_area.set_halign(Gtk.Align.CENTER)
+        content_area.set_valign(Gtk.Align.CENTER)
+        content_area.set_vexpand(True)
+        content_area.set_hexpand(True)
+
+        frame = Gtk.Frame()
+        frame.set_label_align(0.5)
+        frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+
+        frame.set_child(frame_box)
+        content_area.append(frame)
+
+        box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        box_top.set_margin_start(20)
+        box_top.set_margin_end(20)
+        box_top.set_margin_top(20)
+        box_top.set_margin_bottom(20)
+
+        texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 75, 75)
+        image = new_icon(texture)
+
+        label = Gtk.Label(label=_("Are you enjoying Faugus?"))
+        label.set_halign(Gtk.Align.CENTER)
+
+        label2 = Gtk.Label(
+            label = _("Please consider donating") + " ❤️"
+        )
+        label2.set_halign(Gtk.Align.CENTER)
+
+        button_kofi, button_paypal = make_donate_buttons()
+
+        checkbox = Gtk.CheckButton(label=_("Never show this message again"))
+        checkbox.set_halign(Gtk.Align.CENTER)
+
+        box_top.append(image)
+        box_top.append(label)
+        box_top.append(label2)
+        box_top.append(button_kofi)
+        box_top.append(button_paypal)
+        box_top.append(checkbox)
+
+        button_continue = Gtk.Button(label=_("Continue"))
+        button_continue.set_size_request(150, -1)
+        button_continue.set_hexpand(True)
+        button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
+
+        box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box_bottom.set_margin_start(10)
+        box_bottom.set_margin_end(10)
+        box_bottom.set_margin_bottom(10)
+        box_bottom.append(button_continue)
+
+        frame_box.append(box_top)
+        frame_box.append(box_bottom)
+
+        def on_dialog_response(dialog, response_id):
+            if response_id == Gtk.ResponseType.OK and checkbox.get_active():
+                print("checked", flush=True)
+            self.loop.quit()
+
+        dialog.connect("response", on_dialog_response)
+        dialog.present()
+
+    def run(self):
+        self.loop.run()
+
+
 class FaugusRun(HiDpiMixin):
     def __init__(self, message, command=None, pre_launch="", post_launch="", gameid="", with_logs=False, title="", exe=""):
         self.message = message
@@ -210,9 +391,7 @@ class FaugusRun(HiDpiMixin):
         self.discord_stop = Event()
         self.logging_enabled = with_logs
         self.process = None
-        self.splash_window = None
-        self.progress_bar = None
-        self.pulse_source = None
+        self.splash_process = None
         self.steam_runtime_installed = False
         self.log_window = None
         self.text_view = None
@@ -285,8 +464,8 @@ class FaugusRun(HiDpiMixin):
             subprocess.Popen(self.message, shell=True, env=child_env())
 
             def update_ui():
-                if self.splash_window:
-                    self.label.set_text(_("Starting Steam game..."))
+                if self.splash_process:
+                    self.splash_label(_("Starting Steam game..."))
                 return False
 
             GLib.idle_add(update_ui)
@@ -511,98 +690,11 @@ class FaugusRun(HiDpiMixin):
         start_and_watch(game_cmd, is_game=True)
 
     def show_donate_dialog(self):
-        done = Event()
-        result = {"checked": False}
-
-        def build_and_show():
-            dialog = Gtk.Dialog(title="Faugus")
-            dialog.set_default_size(10, 10)
-            hide_dialog_action_area(dialog)
-            dialog.set_decorated(False)
-            dialog.set_resizable(False)
-            play_ui_sound("confirm")
-
-            add_css_once("donate_dialog", """
-            .paypal {
-                color: white;
-                background: #001C64;
-            }
-            .kofi {
-                color: white;
-                background: #1AC0FF;
-            }
-            """, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
-            content_area = dialog.get_content_area()
-            content_area.set_halign(Gtk.Align.CENTER)
-            content_area.set_valign(Gtk.Align.CENTER)
-            content_area.set_vexpand(True)
-            content_area.set_hexpand(True)
-
-            frame = Gtk.Frame()
-            frame.set_label_align(0.5)
-            frame_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-
-            frame.set_child(frame_box)
-            content_area.append(frame)
-
-            box_top = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-            box_top.set_margin_start(20)
-            box_top.set_margin_end(20)
-            box_top.set_margin_top(20)
-            box_top.set_margin_bottom(20)
-
-            texture = self.new_texture_from_image(FAUGUS_PNG_RASTER, 75, 75)
-            image = new_icon(texture)
-
-            label = Gtk.Label(label=_("Are you enjoying Faugus?"))
-            label.set_halign(Gtk.Align.CENTER)
-
-            label2 = Gtk.Label(
-                label = _("Please consider donating") + " ❤️"
-            )
-            label2.set_halign(Gtk.Align.CENTER)
-
-            button_kofi, button_paypal = make_donate_buttons()
-
-            checkbox = Gtk.CheckButton(label=_("Never show this message again"))
-            checkbox.set_halign(Gtk.Align.CENTER)
-
-            box_top.append(image)
-            box_top.append(label)
-            box_top.append(label2)
-            box_top.append(button_kofi)
-            box_top.append(button_paypal)
-            box_top.append(checkbox)
-
-            button_continue = Gtk.Button(label=_("Continue"))
-            button_continue.set_size_request(150, -1)
-            button_continue.set_hexpand(True)
-            button_continue.connect("clicked", lambda w: dialog.response(Gtk.ResponseType.OK))
-
-            box_bottom = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            box_bottom.set_margin_start(10)
-            box_bottom.set_margin_end(10)
-            box_bottom.set_margin_bottom(10)
-            box_bottom.append(button_continue)
-
-            frame_box.append(box_top)
-            frame_box.append(box_bottom)
-
-            def on_dialog_response(dialog, response_id):
-                if response_id == Gtk.ResponseType.OK:
-                    result["checked"] = checkbox.get_active()
-                destroy_and_release(dialog)
-                done.set()
-
-            dialog.connect("response", on_dialog_response)
-            dialog.present()
-            return False
-
-        GLib.idle_add(build_and_show)
-        done.wait()
-
-        if result["checked"]:
+        result = subprocess.run(
+            [sys.executable, "-m", "faugus.runner", "--donate"],
+            stdout=subprocess.PIPE, text=True, env=child_env(),
+        )
+        if result.stdout.strip() == "checked":
             self.cfg.set_value("show-donate", False)
             self.cfg.save_config()
 
@@ -667,90 +759,34 @@ class FaugusRun(HiDpiMixin):
         self.playtime = int(self.cfg.config.get("playtime", 0))
         self.automatic_updates = self.cfg.config.get('automatic-updates', 'True') == 'True'
 
-        theme_engine = self.cfg.config.get('theme-engine', 'adwaita').strip('"')
-        apply_theme_engine(theme_engine)
-        apply_interface_customization(
-            self.cfg.config.get('interface-theme', 'system'),
-            self.cfg.get_accent_color(),
-            theme_engine,
-        )
+        apply_runner_theme(self.cfg)
 
     def show_splash(self):
-        self.splash_window = Gtk.Window(title="Faugus")
-        self.splash_window.set_decorated(False)
-        self.splash_window.set_resizable(False)
-        self.splash_window.set_default_size(280, 10)
-
-        frame = Gtk.Frame()
-        frame.set_label_align(0.5)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        box.set_halign(Gtk.Align.CENTER)
-        box.set_valign(Gtk.Align.CENTER)
-        frame.set_child(box)
-
         game_icon = os.environ.get("SPLASHICON")
-        if game_icon and os.path.exists(game_icon):
-            image_path = game_icon
-        else:
-            image_path = FAUGUS_PNG_RASTER
-        texture = self.new_texture_from_image(image_path, 75, 75)
-        image = new_icon(texture)
-        image.set_margin_top(20)
-        image.set_margin_start(20)
-        image.set_margin_end(20)
-        image.set_margin_bottom(20)
-        box.append(image)
+        image_path = game_icon if game_icon and os.path.exists(game_icon) else FAUGUS_PNG_RASTER
+        self.splash_process = subprocess.Popen(
+            [sys.executable, "-m", "faugus.runner", "--splash", image_path],
+            stdin=subprocess.PIPE, text=True, env=child_env(),
+        )
 
-        status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        status_box.set_margin_start(20)
-        status_box.set_margin_end(20)
-        status_box.set_margin_bottom(20)
+    def splash_send(self, command):
+        try:
+            self.splash_process.stdin.write(command + "\n")
+            self.splash_process.stdin.flush()
+        except (OSError, ValueError, AttributeError):
+            pass
 
-        self.label = Gtk.Label()
-        status_box.append(self.label)
-
-        self.progress_bar = Gtk.ProgressBar()
-        self.progress_bar.set_size_request(240, -1)
-        self.progress_bar.set_visible(False)
-        status_box.append(self.progress_bar)
-
-        box.append(status_box)
-
-        self.splash_window.set_child(frame)
-        self.splash_window.present()
-
-        main_context = GLib.MainContext.default()
-        while main_context.pending():
-            main_context.iteration(False)
+    def splash_label(self, text):
+        self.splash_send("LABEL " + text)
 
     def show_progress(self, fraction=None):
-        if not self.progress_bar:
+        if not self.splash_process:
             return
-        self.progress_bar.set_visible(True)
-        if fraction is None:
-            if self.pulse_source is None:
-                self.pulse_source = GLib.timeout_add(100, self.pulse_progress)
-        else:
-            self.stop_pulse()
-            self.progress_bar.set_fraction(fraction)
-
-    def pulse_progress(self):
-        if not self.progress_bar:
-            self.pulse_source = None
-            return False
-        self.progress_bar.pulse()
-        return True
-
-    def stop_pulse(self):
-        if self.pulse_source is not None:
-            GLib.source_remove(self.pulse_source)
-            self.pulse_source = None
+        self.splash_send("PULSE" if fraction is None else f"FRACTION {fraction}")
 
     def hide_progress(self):
-        self.stop_pulse()
-        if self.progress_bar:
-            self.progress_bar.set_visible(False)
+        if self.splash_process:
+            self.splash_send("HIDE")
 
     def show_log_window(self):
         self.log_window = Gtk.Window(title="Winetricks Logs")
@@ -791,12 +827,12 @@ class FaugusRun(HiDpiMixin):
                 or "Updating Easy Anti-Cheat..." in clean_line
                 or "Updating UMU-Launcher..." in clean_line
             ):
-                if self.splash_window is None:
+                if self.splash_process is None:
                     self.show_splash()
 
             if "Components are up to date" in clean_line:
-                if self.splash_window:
-                    self.label.set_text(_("Components are up to date"))
+                if self.splash_process:
+                    self.splash_label(_("Components are up to date"))
                     self.hide_progress()
                 return False
 
@@ -807,26 +843,26 @@ class FaugusRun(HiDpiMixin):
             if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
                 component = "Steam Runtime"
 
-            if component == "Steam Runtime" and self.splash_window:
+            if component == "Steam Runtime" and self.splash_process:
                 if "is up to date" in clean_line or "mtree is OK" in clean_line:
-                    self.label.set_text(f"{component} " + _("is up to date"))
+                    self.splash_label(f"{component} " + _("is up to date"))
                     self.hide_progress()
                 elif "Downloading" in clean_line or "Extracting" in clean_line or "SteamLinuxRuntime_sniper.tar.xz" in clean_line:
                     action = _("Updating") if self.steam_runtime_installed else _("Downloading")
-                    self.label.set_text(f"{action} {component}...")
+                    self.splash_label(f"{action} {component}...")
                     self.show_progress()
-            elif component and self.splash_window:
+            elif component and self.splash_process:
                 if "Updating" in clean_line:
-                    self.label.set_text(_("Updating") + f" {component}...")
+                    self.splash_label(_("Updating") + f" {component}...")
                 elif "Downloading" in clean_line or "Extracting" in clean_line:
                     action = _("Updating") if self.proton_exists else _("Downloading")
-                    self.label.set_text(f"{action} {component}...")
+                    self.splash_label(f"{action} {component}...")
                 elif (
                     "is up to date" in clean_line
                     or "mtree is OK" in clean_line
                     or ("->" in clean_line and component in clean_line)
                 ):
-                    self.label.set_text(f"{component} " + _("is up to date"))
+                    self.splash_label(f"{component} " + _("is up to date"))
                     self.hide_progress()
             return False
 
@@ -870,11 +906,13 @@ class FaugusRun(HiDpiMixin):
             adj.set_value(adj.get_upper() - adj.get_page_size())
 
     def close_splash_window(self):
-        if self.splash_window:
-            self.stop_pulse()
-            self.progress_bar = None
-            destroy_and_release(self.splash_window)
-            self.splash_window = None
+        process, self.splash_process = self.splash_process, None
+        if process:
+            try:
+                process.stdin.close()
+            except OSError:
+                pass
+            Thread(target=process.wait, daemon=True).start()
 
     def close_log_window(self):
         if self.log_window:
@@ -1227,10 +1265,16 @@ def main():
     parser.add_argument("--pre-launch", default="")
     parser.add_argument("--post-launch", default="")
     parser.add_argument("--logs", action="store_true")
+    parser.add_argument("--splash")
+    parser.add_argument("--donate", action="store_true")
 
     args = parser.parse_args()
 
-    if args.game:
+    if args.splash:
+        FaugusSplash(args.splash).run()
+    elif args.donate:
+        FaugusDonate().run()
+    elif args.game:
         game = load_game_from_json(args.game)
         if not game:
             return
