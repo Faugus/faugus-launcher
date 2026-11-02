@@ -93,18 +93,20 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.5" date="2026-10-30">
+    <release version="2.5.6" date="2026-11-02">
       <description>
         <ul>
-          <li>Reorganized the Add/Edit Game and Shortcut tools into a dropdown menu.</li>
-          <li>Replaced the Launch Arguments buttons with a drag and drop feature.</li>
-          <li>Removed the manual Protonfix option.</li>
-          <li>Now prevents redundant asset downloads when the title entry loses focus without any changes.</li>
-          <li>Fine-tuned the carousel animation.</li>
-          <li>The mouse cursor is now hidden when using a gamepad.</li>
-          <li>Minor visual adjustments.</li>
-          <li>Now bundles python-psutil in the AppImage.</li>
-          <li>Fixed a startup crash with older versions of libmanette when a gamepad is connected.</li>
+          <li>Added Discord Rich Presence support.</li>
+          <li>Now detects the title, icon and cover from the executable when adding a game.</li>
+          <li>The running theme is now kept until restart when changing the color scheme or accent.</li>
+          <li>Fixed shortcut desktop quoting and launch arguments. Thanks, @Yousef-Mohamed22.</li>
+          <li>Fixed launch argument environment variable detection for shortcuts and file runs. Thanks, @Yousef-Mohamed22.</li>
+          <li>Fixed the Lossless Scaling environment variable check. Thanks, @Yousef-Mohamed22.</li>
+          <li>Fixed backups overwriting existing archives. Thanks, @Yousef-Mohamed22.</li>
+          <li>Fixed the context menu activating an item on right-click release.</li>
+          <li>Fixed memory leaks when closing dialogs.</li>
+          <li>The splash and donate windows now run in separate processes to free memory.</li>
+          <li>GTK is now loaded on demand in the runner.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
