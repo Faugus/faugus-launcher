@@ -19,7 +19,7 @@ gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from faugus.path_manager import FAUGUS_PNG_RASTER, PathManager, GAMES_JSON, PRESETS_FILE, COMPATIBILITY_DIRS, FAUGUS_LAUNCHER_STATE_DIR, PROTON_CACHYOS, MANGOHUD_DIR, GAMEMODERUN, ICONS_DIR, COVERS_DIR, FILECHOOSER_FOLDERS_FILE, CONFIG_FILE_DIR
 from gi.repository import Gtk, Gdk, Gio, GLib, GdkPixbuf, Pango, GObject, Adw
-from faugus.core import stop_request_path, kill_by_faugusid, ensure_parent_dir, atomic_write, load_json_file, save_json_file, build_lossless_env, expand_path, resolve_protonpath, resolve_game_runner, get_gpus, scan_gpus, get_steamgriddb_session, fetch_steamgriddb_candidates, load_json_file_or_none, version_key, latest_installed_umu_proton, update_games_json
+from faugus.core import umu_game_id, stop_request_path, kill_by_faugusid, ensure_parent_dir, atomic_write, load_json_file, save_json_file, build_lossless_env, expand_path, resolve_protonpath, resolve_game_runner, get_gpus, scan_gpus, get_steamgriddb_session, fetch_steamgriddb_candidates, load_json_file_or_none, version_key, latest_installed_umu_proton, update_games_json
 
 os.environ.setdefault("VK_LOADER_LAYERS_DISABLE", "VK_LAYER_LSFGVK_frame_generation")
 

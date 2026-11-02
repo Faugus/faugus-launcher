@@ -6,9 +6,14 @@ import shlex
 import signal
 import subprocess
 import tempfile
+import zlib
 from concurrent.futures import ThreadPoolExecutor
 
 from faugus.path_manager import COMPATIBILITY_DIRS, COVERS_DIR, FAUGUS_LAUNCHER_STATE_DIR, GAMES_JSON, ICONS_DIR, PROTON_CACHYOS
+
+
+def umu_game_id(gameid):
+    return f"umu-faugus{zlib.crc32(gameid.encode()):08x}"
 
 
 def stop_request_path(gameid):
