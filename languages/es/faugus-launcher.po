@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-10-28 08:30+0000\n"
+"PO-Revision-Date: 2026-11-01 15:20+0000\n"
 "Last-Translator: grego9 <grego9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
@@ -390,19 +390,19 @@ msgstr "Recién"
 
 #: faugus/launcher.py:3094
 msgid "A minute ago"
-msgstr "Hace un minuto"
+msgstr "hace un minuto"
 
 #: faugus/launcher.py:3095
 msgid "{} minutes ago"
-msgstr "Hace {} minutos"
+msgstr "hace {} minutos"
 
 #: faugus/launcher.py:3100
 msgid "An hour ago"
-msgstr "Hace una hora"
+msgstr "hace una hora"
 
 #: faugus/launcher.py:3101
 msgid "{} hours ago"
-msgstr "Hace {} horas"
+msgstr "hace {} horas"
 
 #: faugus/launcher.py:3106
 msgid "Yesterday"
@@ -410,31 +410,31 @@ msgstr "Ayer"
 
 #: faugus/launcher.py:3107
 msgid "{} days ago"
-msgstr "Hace {} días"
+msgstr "hace {} días"
 
 #: faugus/launcher.py:3112
 msgid "A week ago"
-msgstr "Hace una semana"
+msgstr "hace una semana"
 
 #: faugus/launcher.py:3113
 msgid "{} weeks ago"
-msgstr "Hace {} semanas"
+msgstr "hace {} semanas"
 
 #: faugus/launcher.py:3118
 msgid "A month ago"
-msgstr "Hace un mes"
+msgstr "hace un mes"
 
 #: faugus/launcher.py:3119
 msgid "{} months ago"
-msgstr "Hace {} meses"
+msgstr "hace {} meses"
 
 #: faugus/launcher.py:3123
 msgid "A year ago"
-msgstr "Hace un año"
+msgstr "hace un año"
 
 #: faugus/launcher.py:3124
 msgid "{} years ago"
-msgstr "Hace {} años"
+msgstr "hace {} años"
 
 #: faugus/launcher.py:3638 faugus/launcher.py:6900 faugus/launcher.py:8965
 msgid "Select a file to run in the prefix"
@@ -919,7 +919,7 @@ msgstr "Evita que el sistema se suspenda mientras se juega"
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr ""
+msgstr "Muestra el juego que estás jugando como tu actividad en Discord"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
 msgid "Interface Sounds"
