@@ -441,10 +441,12 @@ class FaugusRun:
                     log_file.close()
 
         self.inhibit_handle = None
+        self.inhibit_bus = None
         self.inhibit_fd = None
         if os.environ.get("NO_SLEEP"):
             try:
-                result = Gio.bus_get_sync(Gio.BusType.SESSION, None).call_sync(
+                self.inhibit_bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+                result = self.inhibit_bus.call_sync(
                     "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
                     "org.freedesktop.portal.Inhibit", "Inhibit",
                     GLib.Variant("(sua{sv})", ("", 4 | 8, {"reason": GLib.Variant("s", "Game is running")})),
@@ -871,7 +873,7 @@ class FaugusRun:
 
         if getattr(self, "inhibit_handle", None):
             try:
-                Gio.bus_get_sync(Gio.BusType.SESSION, None).call_sync(
+                self.inhibit_bus.call_sync(
                     "org.freedesktop.portal.Desktop", self.inhibit_handle,
                     "org.freedesktop.portal.Request", "Close",
                     None, None, Gio.DBusCallFlags.NONE, -1, None,
@@ -879,6 +881,7 @@ class FaugusRun:
             except GLib.Error as e:
                 print(f"Failed to release sleep inhibitor: {e}")
             self.inhibit_handle = None
+            self.inhibit_bus = None
 
         if getattr(self, "inhibit_fd", None) is not None:
             os.close(self.inhibit_fd)
