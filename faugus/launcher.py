@@ -4389,7 +4389,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             apply_interface_customization(
                 settings_dialog.interface_theme,
                 settings_dialog.accent_color,
-                settings_dialog.combobox_theme_engine.get_active_id(),
+                self.theme_engine,
             )
             self.apply_overview_panel_width()
 
@@ -6672,7 +6672,7 @@ class Settings(Gtk.Dialog):
         else:
             self.accent_color = "system"
 
-        apply_interface_customization(self.interface_theme, self.accent_color, self.theme_engine)
+        apply_interface_customization(self.interface_theme, self.accent_color, self.parent.theme_engine)
 
         self.parent.interface_theme = self.interface_theme
         self.parent.accent_color = self.accent_color
@@ -6830,7 +6830,7 @@ class Settings(Gtk.Dialog):
                 if self.entry_default_prefix.get_text() == "":
                     mark_invalid_widget(self.entry_default_prefix)
                     return
-                apply_interface_customization(self.interface_theme, self.accent_color, self.combobox_theme_engine.get_active_id())
+                apply_interface_customization(self.interface_theme, self.accent_color, self.parent.theme_engine)
                 self.update_envar_file()
                 self.update_config_file()
                 self.parent.manage_autostart_file(self.checkbox_autostart.get_active(), self.checkbox_minimized_startup.get_active())
