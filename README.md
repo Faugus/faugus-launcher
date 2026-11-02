@@ -116,6 +116,8 @@ Native only.
 | `Alt+Enter`  | Toggle fullscreen                           |
 | `Delete`     | Delete the selected game                    |
 
+You can also right-click a game and choose **Copy launch command** to copy the exact command used to launch it.
+
 ### Gamepad mapping
 | Action        | Playstation | Xbox     |
 |---------------|-------------|----------|
