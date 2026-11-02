@@ -343,6 +343,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.action_context_show_logs.connect("activate", self.on_context_show_logs)
         self.add_action(self.action_context_show_logs)
 
+        self.action_context_copy_command = Gio.SimpleAction.new("context-copy-command", None)
+        self.action_context_copy_command.connect("activate", self.on_context_copy_command)
+        self.add_action(self.action_context_copy_command)
+
         self.load_config()
 
         if os.path.isdir(LOCALE_DIR):
@@ -2899,6 +2903,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if supports_logs:
             actions_section.append(_("Show logs"), "win.context-show-logs")
 
+        actions_section.append(_("Copy launch command"), "win.context-copy-command")
+
         root.append_section(None, actions_section)
 
         run_section = Gio.Menu()
@@ -3690,6 +3696,20 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game = self.selected()
         if game:
             self.on_show_logs_clicked()
+
+    def on_context_copy_command(self, action, param):
+        self.context_menu.popdown()
+        game = self.selected()
+        if not game:
+            return
+
+        try:
+            command = build_launch_command(game_to_save_dict(game))
+        except Exception:
+            return
+
+        self.get_clipboard().set(command)
+        play_ui_sound("confirm")
 
     def on_show_logs_clicked(self):
         dialog = Gtk.Dialog(title=_("%s Logs") % self.current_title, transient_for=self)

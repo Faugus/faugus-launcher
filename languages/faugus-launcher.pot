@@ -348,6 +348,10 @@ msgstr ""
 msgid "Show logs"
 msgstr ""
 
+#: faugus/launcher.py:2906
+msgid "Copy launch command"
+msgstr ""
+
 #: faugus/launcher.py:2894
 msgid "Run file in the prefix"
 msgstr ""
