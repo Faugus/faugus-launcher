@@ -107,6 +107,15 @@ Native only.
 /usr/share/themes
 ```
 
+### Keyboard shortcuts
+| Shortcut     | Action                                      |
+|--------------|---------------------------------------------|
+| `Ctrl+F`     | Focus the search bar                        |
+| `Escape`     | Clear the search                            |
+| `Ctrl+H`     | Show or hide hidden games                   |
+| `Alt+Enter`  | Toggle fullscreen                           |
+| `Delete`     | Delete the selected game                    |
+
 ### Gamepad mapping
 | Action        | Playstation | Xbox     |
 |---------------|-------------|----------|

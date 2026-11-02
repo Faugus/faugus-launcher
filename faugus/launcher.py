@@ -1745,8 +1745,15 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return category in (cats or [_("None")])
 
     def game_matches_filter(self, game, search_text):
-        if search_text and search_text not in game.title.lower():
-            return False
+        if search_text:
+            values = [game.title, game.path, getattr(game, "runner", "")]
+            raw_category = game.category
+            if isinstance(raw_category, str):
+                values.append(raw_category)
+            elif isinstance(raw_category, list):
+                values.extend(raw_category)
+            if not any(search_text in str(value).lower() for value in values if value):
+                return False
         if self.categories_enabled and self.current_category and self.current_category != _("All"):
             return self.game_in_category(game, self.current_category)
         return True
@@ -3882,6 +3889,18 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.play_or_notify(self.selected())
 
     def on_key_press_event(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_f and state & Gdk.ModifierType.CONTROL_MASK:
+            if hasattr(self, "entry_search"):
+                self.entry_search.grab_focus()
+                self.entry_search.select_region(0, -1)
+                return True
+
+        if (keyval == Gdk.KEY_Escape
+                and hasattr(self, "entry_search")
+                and self.entry_search.get_text()):
+            self.entry_search.set_text("")
+            return True
+
         if keyval == Gdk.KEY_h and state & Gdk.ModifierType.CONTROL_MASK:
             try:
                 config = ConfigManager()
