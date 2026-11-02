@@ -1,14 +1,18 @@
 name: Build and publish release packages
-run-name: Faugus ${{ github.event.release.tag_name || inputs.tag }}
+run-name: Faugus ${{ github.event.release.tag_name || (inputs.from_git && 'git build') || inputs.tag }}
 
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
+      from_git:
+        description: "Build from the selected branch's current code instead of a release tag (build-only, never publishes)"
+        type: boolean
+        default: false
       tag:
-        description: "Release tag to build (e.g. 2.5.5)"
-        required: true
+        description: "Release tag to build (e.g. 2.5.5). Ignored when 'from_git' is checked"
+        required: false
       publish:
         description: "Actually push to AUR/PPA/COPR (leave unchecked for a build-only test)"
         type: boolean
@@ -22,20 +26,27 @@ permissions:
   contents: write
 
 env:
-  TAG: ${{ github.event.release.tag_name || inputs.tag }}
-  DO_PUBLISH: ${{ github.run_attempt == '1' && (github.event_name == 'release' || inputs.publish == true) }}
+  FROM_GIT: ${{ github.event_name == 'workflow_dispatch' && inputs.from_git == true }}
+  DO_PUBLISH: ${{ github.run_attempt == '1' && inputs.from_git != true && (github.event_name == 'release' || inputs.publish == true) }}
 
 jobs:
   resolve:
     runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.resolve.outputs.release_id }}
+      version: ${{ steps.resolve.outputs.version }}
     steps:
       - name: Resolve release id
         id: resolve
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          if [ "$FROM_GIT" = "true" ]; then
+            echo "release_id=" >> "$GITHUB_OUTPUT"
+            echo "version=0.git$(date +%Y%m%d).${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "version=${{ github.event.release.tag_name || inputs.tag }}" >> "$GITHUB_OUTPUT"
           if [ -n "${{ github.event.release.id }}" ]; then
             echo "release_id=${{ github.event.release.id }}" >> "$GITHUB_OUTPUT"
             exit 0
@@ -56,8 +67,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
+      TAG: ${{ needs.resolve.outputs.version }}
+      SOURCE_TARBALL: /tmp/faugus-launcher-${{ needs.resolve.outputs.version }}.tar.gz
     steps:
       - uses: actions/checkout@v7
+
+      - name: Create source tarball from current git
+        if: env.FROM_GIT == 'true'
+        run: tar -czf "$SOURCE_TARBALL" --exclude=.git --transform "s,^\./,faugus-launcher-$TAG/," .
 
       - name: Install build tools
         run: |
@@ -109,8 +126,14 @@ jobs:
     container: archlinux:base-devel
     env:
       RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
+      TAG: ${{ needs.resolve.outputs.version }}
+      SOURCE_TARBALL: /tmp/faugus-launcher-${{ needs.resolve.outputs.version }}.tar.gz
     steps:
       - uses: actions/checkout@v7
+
+      - name: Create source tarball from current git
+        if: env.FROM_GIT == 'true'
+        run: tar -czf "$SOURCE_TARBALL" --exclude=.git --transform "s,^\./,faugus-launcher-$TAG/," .
 
       - name: Install build dependencies
         run: |
@@ -124,6 +147,10 @@ jobs:
           cp packaging/arch/PKGBUILD /build/PKGBUILD
           sed -i "s/^pkgver=.*/pkgver=${TAG}/" /build/PKGBUILD
           sed -i "s/^pkgrel=.*/pkgrel=1/" /build/PKGBUILD
+          if [ "$FROM_GIT" = "true" ]; then
+            cp "$SOURCE_TARBALL" /build/
+            sed -i "s|^source=.*|source=(\"$(basename "$SOURCE_TARBALL")\")|" /build/PKGBUILD
+          fi
 
       - name: Build package as non-root
         run: |
@@ -189,8 +216,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
+      TAG: ${{ needs.resolve.outputs.version }}
+      SOURCE_TARBALL: /tmp/faugus-launcher-${{ needs.resolve.outputs.version }}.tar.gz
     steps:
       - uses: actions/checkout@v7
+
+      - name: Create source tarball from current git
+        if: env.FROM_GIT == 'true'
+        run: tar -czf "$SOURCE_TARBALL" --exclude=.git --transform "s,^\./,faugus-launcher-$TAG/," .
 
       - name: Install build dependencies
         run: |
@@ -208,8 +241,12 @@ jobs:
           BUILD_DIR=$(mktemp -d)
           INSTALL_DIR=$(mktemp -d)
 
-          wget -q -O "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz" \
-            "https://github.com/Faugus/${PACKAGE_NAME}/archive/refs/tags/${TAG}.tar.gz"
+          if [ "$FROM_GIT" = "true" ]; then
+            cp "$SOURCE_TARBALL" "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz"
+          else
+            wget -q -O "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz" \
+              "https://github.com/Faugus/${PACKAGE_NAME}/archive/refs/tags/${TAG}.tar.gz"
+          fi
           tar -xzf "${BUILD_DIR}/${PACKAGE_NAME}.tar.gz" -C "${BUILD_DIR}"
           cd "${BUILD_DIR}/${PACKAGE_NAME}-${TAG}"
 
@@ -387,8 +424,14 @@ jobs:
     container: fedora:latest
     env:
       RELEASE_ID: ${{ needs.resolve.outputs.release_id }}
+      TAG: ${{ needs.resolve.outputs.version }}
+      SOURCE_TARBALL: /tmp/faugus-launcher-${{ needs.resolve.outputs.version }}.tar.gz
     steps:
       - uses: actions/checkout@v7
+
+      - name: Create source tarball from current git
+        if: env.FROM_GIT == 'true'
+        run: tar -czf "$SOURCE_TARBALL" --exclude=.git --transform "s,^\./,faugus-launcher-$TAG/," .
 
       - name: Install build dependencies
         run: dnf install -y rpmdevtools rpm-build curl jq meson gtk-update-icon-cache python3-devel gtk4-devel
@@ -399,7 +442,12 @@ jobs:
           cp packaging/fedora/faugus-launcher.spec ~/rpmbuild/SPECS/
           sed -i "s/^Version:.*/Version:        ${TAG}/" ~/rpmbuild/SPECS/faugus-launcher.spec
           cd ~/rpmbuild/SPECS
-          spectool -g -C ../SOURCES faugus-launcher.spec
+          if [ "$FROM_GIT" = "true" ]; then
+            cp "$SOURCE_TARBALL" ../SOURCES/faugus-launcher-${TAG}.tar.gz
+            sed -i "s|^Source0:.*|Source0:        faugus-launcher-%{version}.tar.gz|" faugus-launcher.spec
+          else
+            spectool -g -C ../SOURCES faugus-launcher.spec
+          fi
           rpmbuild -ba faugus-launcher.spec
 
           mkdir -p "$GITHUB_WORKSPACE/dist"

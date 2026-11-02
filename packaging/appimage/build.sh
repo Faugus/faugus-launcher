@@ -51,7 +51,11 @@ rm -rf "$BUILD_ROOT"
 mkdir -p "$BUILD_ROOT" "$RELEASE_SRC_ROOT" "$TOOLS_DIR"
 
 echo "Downloading release $TAG..."
-curl -fL -o "$RELEASE_TAR" "$REPO_URL/archive/refs/tags/$TAG.tar.gz"
+if [ -n "$SOURCE_TARBALL" ]; then
+    cp "$SOURCE_TARBALL" "$RELEASE_TAR"
+else
+    curl -fL -o "$RELEASE_TAR" "$REPO_URL/archive/refs/tags/$TAG.tar.gz"
+fi
 
 tar -xzf "$RELEASE_TAR" -C "$RELEASE_SRC_ROOT"
 SOURCE_DIR=$(find "$RELEASE_SRC_ROOT" -mindepth 1 -maxdepth 1 -type d)
