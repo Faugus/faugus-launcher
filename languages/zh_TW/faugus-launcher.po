@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-10-25 11:40+0000\n"
-"Last-Translator: orange-seele <orange-"
-"seele@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-01 21:52+0000\n"
+"Last-Translator: orange-seele <orange-seele@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hant/>\n"
 "Language: zh_TW\n"
@@ -910,7 +910,7 @@ msgstr "阻止遊戲進行時，系統進入睡眠或暫停模式"
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr ""
+msgstr "在 Discord 活動狀態中顯示目前正在遊玩的遊戲"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
 msgid "Interface Sounds"
