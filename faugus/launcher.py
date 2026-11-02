@@ -4707,6 +4707,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             if not edit_game_dialog.combobox_runner.set_active_id(game_runner):
                 edit_game_dialog.combobox_runner.set_active(0)
         edit_game_dialog.set_title_silently(game.title)
+        edit_game_dialog._artwork_title = game.title
         edit_game_dialog._steamgriddb_suggestion_id = getattr(game, "steamgriddb_id", "") or None
         edit_game_dialog._steamgriddb_steam_appid = game.path if game_runner == "Steam" else None
         edit_game_dialog.entry_path.set_text(game.path)
