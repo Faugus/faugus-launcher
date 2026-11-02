@@ -48,8 +48,15 @@ GLib.log_set_writer_func(_log_writer_filter, None)
 _background_executor = ThreadPoolExecutor(max_workers=32, thread_name_prefix="faugus-worker")
 
 
+def _run_then_trim(fn, args, kwargs):
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        GLib.idle_add(schedule_malloc_trim)
+
+
 def run_in_background(fn, *args, **kwargs):
-    return _background_executor.submit(fn, *args, **kwargs)
+    return _background_executor.submit(_run_then_trim, fn, args, kwargs)
 
 
 def idle_add_while_open(closed_event, fn, *args):
@@ -373,6 +380,17 @@ def release_unused_memory():
         ctypes.CDLL("libc.so.6").malloc_trim(0)
     except (OSError, AttributeError):
         pass
+
+
+def pin_mmap_threshold():
+    M_MMAP_THRESHOLD = -3
+    try:
+        ctypes.CDLL("libc.so.6").mallopt(M_MMAP_THRESHOLD, 128 * 1024)
+    except (OSError, AttributeError):
+        pass
+
+
+pin_mmap_threshold()
 
 
 def build_icon_texture(key):
@@ -1046,15 +1064,14 @@ def _release_widgets(widget):
 _trim_source = [0]
 
 
-def _malloc_trim():
-    _trim_source[0] = 0
-    ctypes.CDLL("libc.so.6").malloc_trim(0)
-    return GLib.SOURCE_REMOVE
+def _trim_tick():
+    release_unused_memory()
+    return GLib.SOURCE_CONTINUE
 
 
 def schedule_malloc_trim():
     if not _trim_source[0]:
-        _trim_source[0] = GLib.timeout_add_seconds(2, _malloc_trim)
+        _trim_source[0] = GLib.timeout_add_seconds(10, _trim_tick)
 
 
 def destroy_and_release(widget):
