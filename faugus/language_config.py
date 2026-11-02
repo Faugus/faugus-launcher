@@ -6,6 +6,15 @@ from faugus.path_manager import *
 
 MIN_TRANSLATION_PERCENT = 70
 
+RTL_LANGUAGES = {"ar", "ckb", "dv", "fa", "he", "iw", "ks", "ku", "ps", "sd", "ug", "ur", "yi"}
+
+
+def is_rtl_language(language):
+    if not language:
+        return False
+    code = language.replace("-", "_").split("_", 1)[0].lower()
+    return code in RTL_LANGUAGES
+
 
 def get_system_locale():
     lang = os.environ.get('LANG') or os.environ.get('LC_MESSAGES')

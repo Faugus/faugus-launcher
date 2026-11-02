@@ -17,6 +17,7 @@ gi.require_version('Gtk', '4.0')
 
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Gio, GObject, Pango
 from faugus.config_manager import *
+from faugus.language_config import is_rtl_language, lang
 from faugus.utils import *
 from faugus.steam_setup import *
 from faugus.ea_fix import *
@@ -75,6 +76,8 @@ class FaugusApp(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+        if is_rtl_language(lang):
+            Gtk.Widget.set_default_direction(Gtk.TextDirection.RTL)
         install_ui_sound_hooks()
 
         app_icon_dir = os.path.join(
