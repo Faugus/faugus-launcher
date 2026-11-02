@@ -2802,6 +2802,92 @@ def fetch_steamgriddb_autocomplete(api_key, term, limit=10):
         return []
 
 
+def create_suggestion_popover(entry, window, on_pick, align_start=False):
+    popover = Gtk.Popover()
+    popover.set_has_arrow(False)
+    popover.set_autohide(False)
+    if align_start:
+        popover.set_halign(Gtk.Align.START)
+    popover.add_css_class("suggestion-popover")
+    popover.set_parent(entry)
+    entry.connect("destroy", lambda w: popover.unparent())
+    window.connect("notify::is-active", lambda w, p: None if w.is_active() else popover.popdown())
+
+    def on_key_pressed(controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Escape and popover.get_visible():
+            popover.popdown()
+            return True
+        return False
+
+    key_controller = Gtk.EventControllerKey()
+    key_controller.connect("key-pressed", on_key_pressed)
+    entry.add_controller(key_controller)
+
+    def on_focus_leave(controller):
+        def check():
+            root = entry.get_root()
+            w = root.get_focus() if root else None
+            while w is not None:
+                if w is popover:
+                    return False
+                w = w.get_parent()
+            popover.popdown()
+            return False
+
+        GLib.idle_add(check)
+
+    focus_controller = Gtk.EventControllerFocus()
+    focus_controller.connect("leave", on_focus_leave)
+    entry.add_controller(focus_controller)
+
+    def on_click_outside(gesture, n_press, x, y):
+        if not popover.get_visible():
+            return
+        w = window.pick(x, y, Gtk.PickFlags.DEFAULT)
+        while w is not None:
+            if w is popover or w is entry:
+                return
+            w = w.get_parent()
+        popover.popdown()
+
+    click_controller = Gtk.GestureClick()
+    click_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+    click_controller.connect("pressed", on_click_outside)
+    window.add_controller(click_controller)
+
+    listbox = Gtk.ListBox()
+    listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+    listbox.connect("row-activated", lambda lb, row: on_pick(row.suggestion))
+
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+    scroll.set_max_content_height(250)
+    scroll.set_propagate_natural_height(True)
+    scroll.set_size_request(300, -1)
+    scroll.set_child(listbox)
+    popover.set_child(scroll)
+
+    def populate(suggestions):
+        listbox.remove_all()
+        if not suggestions:
+            popover.popdown()
+            return
+        for item in suggestions:
+            row = Gtk.ListBoxRow()
+            label = Gtk.Label(label=item["name"], halign=Gtk.Align.START)
+            label.set_margin_start(8)
+            label.set_margin_end(8)
+            label.set_margin_top(6)
+            label.set_margin_bottom(6)
+            row.set_child(label)
+            row.suggestion = item
+            listbox.append(row)
+        popover.popup()
+
+    popover.populate = populate
+    return popover
+
+
 def show_steamgriddb_picker(obj, category):
     from faugus.config_manager import ConfigManager
 
@@ -3035,9 +3121,55 @@ def show_steamgriddb_picker(obj, category):
         run_in_background(fetch_candidates, term, term_game_id, term_steam_appid, token)
 
     def on_search_activate(entry):
+        suggestion_popover.popdown()
         start_search(entry.get_text().strip())
 
     search_entry.connect("activate", on_search_activate)
+
+    def on_suggestion_picked(item):
+        name = re.sub(r'\s*\(\d{4}\)\s*$', '', item["name"]).strip()
+        suggestion_popover.popdown()
+        suggestion_state["request"] += 1
+        suggestion_state["term"] = name
+        search_entry.set_text(name)
+        obj._steamgriddb_suggestion_id = item["id"]
+        obj._steamgriddb_steam_appid = None
+        start_search(name, item["id"])
+
+    suggestion_state = {"term": game_name, "request": 0}
+    suggestion_popover = create_suggestion_popover(search_entry, dialog, on_suggestion_picked, align_start=True)
+
+    dialog.entry_title = search_entry
+    dialog.steamgriddb_enabled = True
+    dialog.popover_suggestion = suggestion_popover
+    dialog._virtual_keyboard_active_for_title = False
+    dialog.on_keyboard_suggestion_selected = on_suggestion_picked
+    dialog.fetch_title_suggestions_for_keyboard = lambda term: [
+        {"label": item["name"], "value": item}
+        for item in fetch_steamgriddb_autocomplete(api_key, term, limit=10)
+    ]
+
+    def show_suggestions(request, suggestions):
+        if not closed_state[0] and request == suggestion_state["request"]:
+            suggestion_popover.populate(suggestions)
+
+    def on_search_changed(entry):
+        term = entry.get_text().strip()
+        if dialog._virtual_keyboard_active_for_title:
+            return
+        if not term:
+            suggestion_popover.popdown()
+            return
+        if term == suggestion_state["term"]:
+            return
+        suggestion_state["term"] = term
+        suggestion_state["request"] += 1
+        request = suggestion_state["request"]
+        run_in_background(
+            lambda: GLib.idle_add(show_suggestions, request, fetch_steamgriddb_autocomplete(api_key, term, limit=10))
+        )
+
+    search_entry.connect("search-changed", on_search_changed)
 
     start_search(game_name, game_id, steam_appid)
 

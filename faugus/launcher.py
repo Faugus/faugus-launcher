@@ -7720,39 +7720,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self._virtual_keyboard_active_for_title = False
 
         if self.steamgriddb_enabled:
-            self.popover_suggestion = Gtk.Popover()
-            self.popover_suggestion.set_has_arrow(False)
-            self.popover_suggestion.set_autohide(False)
-            self.popover_suggestion.add_css_class("suggestion-popover")
-            self.popover_suggestion.set_parent(self.entry_title)
-
-            self.listbox_suggestion = Gtk.ListBox()
-            self.listbox_suggestion.set_selection_mode(Gtk.SelectionMode.NONE)
-            self.listbox_suggestion.connect("row-activated", self.on_suggestion_row_activated)
-
-            suggestion_scroll = Gtk.ScrolledWindow()
-            suggestion_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-            suggestion_scroll.set_max_content_height(250)
-            suggestion_scroll.set_propagate_natural_height(True)
-            suggestion_scroll.set_size_request(300, -1)
-            suggestion_scroll.set_child(self.listbox_suggestion)
-
-            self.popover_suggestion.set_child(suggestion_scroll)
-
+            self.popover_suggestion = create_suggestion_popover(self.entry_title, self, self.on_title_suggestion_picked)
             self.entry_title.connect("changed", self.on_title_changed_for_suggestions)
-
-            title_key_controller = Gtk.EventControllerKey()
-            title_key_controller.connect("key-pressed", self.on_title_key_pressed)
-            self.entry_title.add_controller(title_key_controller)
-
-            title_suggestion_focus_controller = Gtk.EventControllerFocus()
-            title_suggestion_focus_controller.connect("leave", lambda c: self.on_title_focus_leave_for_suggestions())
-            self.entry_title.add_controller(title_suggestion_focus_controller)
-
-            suggestion_click_outside_controller = Gtk.GestureClick()
-            suggestion_click_outside_controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-            suggestion_click_outside_controller.connect("pressed", self.on_dialog_click_for_suggestions)
-            self.add_controller(suggestion_click_outside_controller)
 
         self.label_path = Gtk.Label(label=_("Path"))
         self.label_path.set_halign(Gtk.Align.START)
@@ -8667,42 +8636,6 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
                 os.remove(self.cover_path_temp)
             self.update_image_cover()
 
-    def on_title_key_pressed(self, controller, keyval, keycode, state):
-        if keyval == Gdk.KEY_Escape and self.popover_suggestion.get_visible():
-            self.popover_suggestion.popdown()
-            return True
-        return False
-
-    def on_title_focus_leave_for_suggestions(self):
-        closed_event = self.closed_event
-        entry_title = self.entry_title
-
-        def check():
-            if closed_event.is_set():
-                return False
-            root = entry_title.get_root()
-            w = root.get_focus() if root else None
-            while w is not None:
-                if w is self.popover_suggestion:
-                    return False
-                w = w.get_parent()
-            self.popover_suggestion.popdown()
-            return False
-
-        GLib.idle_add(check)
-
-    def on_dialog_click_for_suggestions(self, gesture, n_press, x, y):
-        if not self.popover_suggestion.get_visible():
-            return
-
-        w = self.pick(x, y, Gtk.PickFlags.DEFAULT)
-        while w is not None:
-            if w is self.popover_suggestion or w is self.entry_title:
-                return
-            w = w.get_parent()
-
-        self.popover_suggestion.popdown()
-
     def on_title_changed_for_suggestions(self, entry):
         if self._suggestion_programmatic or self._virtual_keyboard_active_for_title:
             return
@@ -8748,30 +8681,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         if self.entry_title.get_text().strip() != term:
             return
 
-        child = self.listbox_suggestion.get_first_child()
-        while child:
-            nxt = child.get_next_sibling()
-            self.listbox_suggestion.remove(child)
-            child = nxt
-
-        if not suggestions:
-            self.popover_suggestion.popdown()
-            return
-
-        for item in suggestions:
-            row = Gtk.ListBoxRow()
-            label = Gtk.Label(label=item["name"])
-            label.set_halign(Gtk.Align.START)
-            label.set_margin_start(8)
-            label.set_margin_end(8)
-            label.set_margin_top(6)
-            label.set_margin_bottom(6)
-            row.set_child(label)
-            row.steamgriddb_id = item["id"]
-            row.steamgriddb_name = item["name"]
-            self.listbox_suggestion.append(row)
-
-        self.popover_suggestion.popup()
+        self.popover_suggestion.populate(suggestions)
 
     def set_title_silently(self, text):
         self._suggestion_programmatic = True
@@ -8782,8 +8692,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.set_title_silently(re.sub(r'\s*\(\d{4}\)\s*$', '', name).strip())
         self._steamgriddb_suggestion_id = game_id
 
-    def on_suggestion_row_activated(self, listbox, row):
-        self.apply_title_suggestion(row.steamgriddb_name, row.steamgriddb_id)
+    def on_title_suggestion_picked(self, item):
+        self.apply_title_suggestion(item["name"], item["id"])
         self.popover_suggestion.popdown()
         self.entry_title.grab_focus_without_selecting()
         self.get_artwork()
