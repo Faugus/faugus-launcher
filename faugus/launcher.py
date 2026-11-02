@@ -5466,7 +5466,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
 
         game_directory = os.path.dirname(expand_path(game.path))
         desktop_file_content = build_desktop_file_content(
-            game.title, f'--game {game.gameid}', new_icon_path, game_directory, game.gameid
+            game.title, f'--game {game.gameid}', new_icon_path, game_directory,
+            game_wm_class({"gameid": game.gameid, "runner": game.runner, "launch_arguments": game.launch_arguments})
         )
 
         os.makedirs(APP_DIR, exist_ok=True)
@@ -9333,7 +9334,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         return True
 
 
-def build_desktop_file_content(title, exec_args, icon_path, working_directory, gameid=None):
+def build_desktop_file_content(title, exec_args, icon_path, working_directory, wm_class=None):
     if IS_FLATPAK:
         exec_line = f'Exec=flatpak run --command={LAUNCHER_PATH} io.github.Faugus.faugus-launcher {LAUNCHER_MODULE_ARGS}{exec_args}\n'
     else:
@@ -9347,7 +9348,7 @@ def build_desktop_file_content(title, exec_args, icon_path, working_directory, g
         f'Type=Application\n'
         f'Categories=Game;\n'
         f'Path={working_directory}\n'
-        + (f'StartupWMClass=steam_app_{umu_game_id(gameid)[4:]}\n' if gameid else '')
+        + (f'StartupWMClass={wm_class}\n' if wm_class else '')
     )
 
 

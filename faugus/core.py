@@ -16,6 +16,16 @@ def umu_game_id(gameid):
     return f"umu-faugus{zlib.crc32(gameid.encode()):08x}"
 
 
+def game_wm_class(game):
+    if game.get("runner") == "Steam":
+        return None
+    match = re.search(r'(?:^|\s)GAMEID=["\']?(\S+?)["\']?(?:\s|$)', game.get("launch_arguments", "") or "")
+    umu_id = match.group(1) if match else umu_game_id(game.get("gameid", ""))
+    if re.fullmatch(r"umu-\w+", umu_id):
+        return f"steam_app_{umu_id[4:]}"
+    return "steam_app_0"
+
+
 def stop_request_path(gameid):
     return os.path.join(FAUGUS_LAUNCHER_STATE_DIR, f"stop-{gameid}")
 
