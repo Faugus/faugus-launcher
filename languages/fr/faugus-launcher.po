@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-30 15:21+0000\n"
-"PO-Revision-Date: 2026-10-26 21:45+0000\n"
-"Last-Translator: Loïc "
-"<loc637d4b91fab64b58@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-01 13:59+0000\n"
+"Last-Translator: Loïc <loc637d4b91fab64b58@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: French <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fr/>\n"
 "Language: fr\n"
@@ -799,6 +799,8 @@ msgid ""
 "Displays a splash window with information about Proton, Steam Linux Runtime, "
 "and other required components when launching a game"
 msgstr ""
+"Affiche une fenêtre de démarrage avec des informations sur Proton, Steam "
+"Linux Runtime et les autres composants requis lors du lancement d'un jeu"
 
 #: faugus/launcher.py:6017
 msgid "Automatic updates"
@@ -809,6 +811,8 @@ msgid ""
 "Checks for and updates Proton, Steam Linux Runtime, and other required "
 "components when launching a game"
 msgstr ""
+"Vérifie et mets à jour Proton, la Steam Linux Runtime, et d'autres éléments "
+"nécessaires lors du lancement d'un jeu"
 
 #: faugus/launcher.py:6021
 msgid "Auto-create shortcuts"
@@ -828,7 +832,7 @@ msgstr "Catégories"
 
 #: faugus/launcher.py:6027
 msgid "Displays a button to manage game categories"
-msgstr ""
+msgstr "Affiche un bouton pour gérer les catégories de jeux"
 
 #: faugus/launcher.py:6029
 msgid "Sort"
@@ -836,7 +840,7 @@ msgstr "Trier"
 
 #: faugus/launcher.py:6030
 msgid "Displays a button to change the game sorting order"
-msgstr ""
+msgstr "Affiche un bouton pour changer l'ordre de tri des jeux"
 
 #: faugus/launcher.py:6032
 msgid "Header bar"
@@ -844,17 +848,15 @@ msgstr "Barre d'en-tête"
 
 #: faugus/launcher.py:6033
 msgid "Displays the default GTK header bar"
-msgstr ""
+msgstr "Affiche la décoration de fenêtre par défaut de GTK"
 
 #: faugus/launcher.py:6035
 msgid "Hidden games"
 msgstr "Jeux masqués"
 
 #: faugus/launcher.py:6036
-#, fuzzy
-#| msgid "Hidden games"
 msgid "Displays hidden games"
-msgstr "Jeux masqués"
+msgstr "Affiche les jeux masqués"
 
 #: faugus/launcher.py:6036
 msgid "Ctrl+H toggles hidden games"
@@ -869,6 +871,8 @@ msgid ""
 "Displays a panel with the game title, categories, playtime, and last played "
 "date"
 msgstr ""
+"Affiche un panneau avec le titre du jeu, ses catégories, le temps de jeu, et "
+"la date du dernier lancement"
 
 #: faugus/launcher.py:6042
 msgid "Gamepad navigation"
@@ -876,7 +880,7 @@ msgstr "Navigation à la manette"
 
 #: faugus/launcher.py:6043
 msgid "Allows navigation through the application using a gamepad"
-msgstr ""
+msgstr "Autorise la navigation à travers l'application avec une manette"
 
 #: faugus/launcher.py:6045
 msgid "Wayland driver (experimental)"
@@ -884,7 +888,7 @@ msgstr "driver Wayland (expérimental)"
 
 #: faugus/launcher.py:6046
 msgid "Runs games using the Wine Wayland driver"
-msgstr ""
+msgstr "Lance les jeux en utilisant le driver Wayland de Wine"
 
 #: faugus/launcher.py:6048
 msgid "WOW64 (experimental)"
@@ -892,7 +896,7 @@ msgstr "WOW64 (expérimental)"
 
 #: faugus/launcher.py:6049
 msgid "Runs 32-bit games using the 64-bit driver"
-msgstr ""
+msgstr "Lance les jeux 32 bits en utilisant le driver 64 bits"
 
 #: faugus/launcher.py:6059 faugus/launcher.py:7817
 msgid "Run"
