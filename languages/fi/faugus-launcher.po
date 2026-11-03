@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-08-29 01:19+0000\n"
-"Last-Translator: Linus Virtanen <linus.virtanen@protonmail.com>\n"
+"PO-Revision-Date: 2026-11-03 15:12+0000\n"
+"Last-Translator: Yousef <aboyossefmohamed22@gmail.com>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fi/>\n"
 "Language: fi\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.11.1.dev0\n"
 
 #: faugus/backup.py:147 faugus/backup.py:296
 msgid "Calculating..."
@@ -221,10 +221,8 @@ msgid "Backup completed"
 msgstr "Varmuuskopioi nyt"
 
 #: faugus/backup_daemon.py:567 faugus/backup_daemon.py:762
-#, fuzzy
-#| msgid "Backup now"
 msgid "Backup failed."
-msgstr "Varmuuskopioi nyt"
+msgstr "Varmuuskopiointi epäonnistui."
 
 #: faugus/launcher.py:1157 faugus/launcher.py:1351 faugus/launcher.py:1723
 #: faugus/launcher.py:1744 faugus/launcher.py:2375 faugus/launcher.py:2511
