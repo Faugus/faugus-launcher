@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-11-03 15:12+0000\n"
-"Last-Translator: Yousef <aboyossefmohamed22@gmail.com>\n"
+"PO-Revision-Date: 2026-11-03 15:50+0000\n"
+"Last-Translator: Faugus <faugus@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/fi/>\n"
 "Language: fi\n"
@@ -221,8 +221,9 @@ msgid "Backup completed"
 msgstr "Varmuuskopioi nyt"
 
 #: faugus/backup_daemon.py:567 faugus/backup_daemon.py:762
+#, fuzzy
 msgid "Backup failed."
-msgstr "Varmuuskopiointi epäonnistui."
+msgstr "Varmuuskopioi nyt"
 
 #: faugus/launcher.py:1157 faugus/launcher.py:1351 faugus/launcher.py:1723
 #: faugus/launcher.py:1744 faugus/launcher.py:2375 faugus/launcher.py:2511
