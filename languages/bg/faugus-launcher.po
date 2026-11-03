@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-10-25 19:10+0000\n"
-"Last-Translator: Любомир Василев "
-"<lyubomirv@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-03 01:51+0000\n"
+"Last-Translator: Любомир Василев <lyubomirv@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
 "Language: bg\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.11.dev0\n"
+"X-Generator: Weblate 2026.11.1.dev0\n"
 
 #: faugus/backup.py:147 faugus/backup.py:296
 msgid "Calculating..."
@@ -920,7 +920,7 @@ msgstr "Не позволява на системата да заспива по
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr ""
+msgstr "Показва пуснатата игра като активност в Discord"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
 msgid "Interface Sounds"
