@@ -274,9 +274,8 @@ def _detach_device(self, device):
 def _is_usable(self):
     active_win = get_active_window()
     is_focused = active_win is not None
-    is_running = hasattr(self, "running") and bool(self.running)
 
-    if is_running or not is_focused:
+    if not is_focused:
         self.held_direction = None
         return False, active_win
 
