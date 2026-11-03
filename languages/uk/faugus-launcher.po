@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-10-25 11:40+0000\n"
+"PO-Revision-Date: 2026-11-03 15:12+0000\n"
 "Last-Translator: Михайло Щетінін "
 "<karnemorkon@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/faugus-"
@@ -855,7 +855,7 @@ msgstr "Показати приховані ігри"
 
 #: faugus/launcher.py:6046
 msgid "Displays hidden games"
-msgstr "Показати приховані ігри"
+msgstr "Відобразити приховані ігри"
 
 #: faugus/launcher.py:6046
 msgid "Ctrl+H toggles hidden games"
