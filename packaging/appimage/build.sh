@@ -51,7 +51,7 @@ rm -rf "$BUILD_ROOT"
 mkdir -p "$BUILD_ROOT" "$RELEASE_SRC_ROOT" "$TOOLS_DIR"
 
 echo "Downloading release $TAG..."
-if [ -n "$SOURCE_TARBALL" ]; then
+if [ "$FROM_GIT" = "true" ] && [ -n "$SOURCE_TARBALL" ]; then
     cp "$SOURCE_TARBALL" "$RELEASE_TAR"
 else
     curl -fL -o "$RELEASE_TAR" "$REPO_URL/archive/refs/tags/$TAG.tar.gz"
