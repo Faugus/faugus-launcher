@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-11-03 15:12+0000\n"
-"Last-Translator: Yousef <aboyossefmohamed22@gmail.com>\n"
+"PO-Revision-Date: 2026-11-03 15:49+0000\n"
+"Last-Translator: Faugus <faugus@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Georgian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/ka/>\n"
 "Language: ka\n"
@@ -585,7 +585,7 @@ msgstr "ბანერები"
 
 #: faugus/launcher.py:5863 faugus/launcher.py:6632
 msgid "Displays a banner for the currently selected game"
-msgstr "აჩვენებს ბანერს ამჟამად არჩეული თამაშისთვის"
+msgstr ""
 
 #: faugus/launcher.py:5865
 msgid "Theme"
@@ -641,7 +641,7 @@ msgstr "იარლიყები"
 
 #: faugus/launcher.py:5904 faugus/launcher.py:6561
 msgid "Displays the game title below the cover"
-msgstr "აჩვენებს თამაშის სათაურს გარეკანის ქვემოთ"
+msgstr ""
 
 #: faugus/launcher.py:5906
 msgid "Zoom"
@@ -649,15 +649,15 @@ msgstr "გადიდება"
 
 #: faugus/launcher.py:5907 faugus/launcher.py:6562
 msgid "Displays a zoom slider to adjust the size of games"
-msgstr "აჩვენებს ზუმის სლაიდერს თამაშების ზომის შესაცვლელად"
+msgstr ""
 
 #: faugus/launcher.py:5910
 msgid "Auto-hide"
-msgstr "ავტომატური დამალვა"
+msgstr ""
 
 #: faugus/launcher.py:5911
 msgid "Automatically hides widgets"
-msgstr "ავტომატურად მალავს ვიჯეტებს"
+msgstr ""
 
 #: faugus/launcher.py:5913
 msgid "Position"
@@ -665,7 +665,7 @@ msgstr "პოზიცია"
 
 #: faugus/launcher.py:5916 faugus/launcher.py:6577
 msgid "Sets how games are positioned on the screen"
-msgstr "ადგენს, როგორ განლაგდეს თამაშები ეკრანზე"
+msgstr ""
 
 #: faugus/launcher.py:5917
 msgid "Top"
@@ -685,7 +685,7 @@ msgstr "ორიენტაცია"
 
 #: faugus/launcher.py:5924 faugus/launcher.py:6591
 msgid "Sets how games are scrolled through"
-msgstr "ადგენს, როგორ მოხდეს თამაშებში გადახვევა"
+msgstr ""
 
 #: faugus/launcher.py:5925
 msgid "Vertical"
@@ -710,7 +710,6 @@ msgstr "SteamGridDB"
 #: faugus/launcher.py:5953
 msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
 msgstr ""
-"ავტომატურად იღებს თამაშების ხატულებს, გარეკანებსა და ბანერებს SteamGridDB-დან"
 
 #: faugus/launcher.py:5957
 msgid "API Key"
@@ -746,15 +745,16 @@ msgstr "ეკრანი"
 
 #: faugus/launcher.py:5996
 msgid "GPU"
-msgstr "GPU"
+msgstr ""
 
 #: faugus/launcher.py:6005
+#, fuzzy
 msgid "Auto-close"
-msgstr "ავტომატურად დახუროს თამაშის გაშვებისას"
+msgstr "აუტომატურად დახურე ჩართვისას"
 
 #: faugus/launcher.py:6006
 msgid "Automatically closes the application when launching a game"
-msgstr "ავტომატურად ხურავს აპლიკაციას თამაშის გაშვებისას"
+msgstr ""
 
 #: faugus/launcher.py:6008
 msgid "Autostart"
@@ -762,7 +762,7 @@ msgstr "აუტომატურად დაიწყე"
 
 #: faugus/launcher.py:6009
 msgid "Automatically starts the application with the system"
-msgstr "ავტომატურად უშვებს აპლიკაციას სისტემასთან ერთად"
+msgstr ""
 
 #: faugus/launcher.py:6011
 msgid "System tray icon"
@@ -770,15 +770,16 @@ msgstr "სისტემური პანელის ხატულა"
 
 #: faugus/launcher.py:6012
 msgid "Displays the application icon in the system tray"
-msgstr "აჩვენებს აპლიკაციის ხატულას სისტემის უჯრაში"
+msgstr ""
 
 #: faugus/launcher.py:6015
 msgid "Minimized startup"
 msgstr "ჩაკეცილი დაწყება"
 
 #: faugus/launcher.py:6016
+#, fuzzy
 msgid "Starts the application minimized to the system tray"
-msgstr "უშვებს აპლიკაციას სისტემის უჯრაში შემცირებულად"
+msgstr "გაშლილად გაშვება"
 
 #: faugus/launcher.py:6019
 msgid "Monochrome icon"
@@ -786,7 +787,7 @@ msgstr "მონოქრომული ხატულა"
 
 #: faugus/launcher.py:6020
 msgid "Displays a monochrome application icon in the system tray"
-msgstr "აჩვენებს აპლიკაციის მონოქრომულ ხატულას სისტემის უჯრაში"
+msgstr ""
 
 #: faugus/launcher.py:6023
 msgid "Splash window"
@@ -797,8 +798,6 @@ msgid ""
 "Displays a splash window with information about Proton, Steam Linux Runtime, "
 "and other required components when launching a game"
 msgstr ""
-"თამაშის გაშვებისას აჩვენებს ეკრანს Proton-ის, Steam Linux Runtime-ისა და "
-"სხვა საჭირო კომპონენტების ინფორმაციით"
 
 #: faugus/launcher.py:6027
 msgid "Automatic updates"
@@ -809,8 +808,6 @@ msgid ""
 "Checks for and updates Proton, Steam Linux Runtime, and other required "
 "components when launching a game"
 msgstr ""
-"თამაშის გაშვებისას ამოწმებს და აახლებს Proton-ს, Steam Linux Runtime-სა და "
-"სხვა საჭირო კომპონენტებს"
 
 #: faugus/launcher.py:6031
 msgid "Auto-create shortcuts"
@@ -830,7 +827,7 @@ msgstr "კატეგორიები"
 
 #: faugus/launcher.py:6037
 msgid "Displays a button to manage game categories"
-msgstr "აჩვენებს ღილაკს თამაშის კატეგორიების სამართავად"
+msgstr ""
 
 #: faugus/launcher.py:6039
 msgid "Sort"
@@ -838,7 +835,7 @@ msgstr "დახარისხება"
 
 #: faugus/launcher.py:6040
 msgid "Displays a button to change the game sorting order"
-msgstr "აჩვენებს ღილაკს თამაშების დალაგების რიგის შესაცვლელად"
+msgstr ""
 
 #: faugus/launcher.py:6042
 msgid "Header bar"
@@ -846,15 +843,16 @@ msgstr "ზედა პანელი"
 
 #: faugus/launcher.py:6043
 msgid "Displays the default GTK header bar"
-msgstr "აჩვენებს GTK-ის ნაგულისხმევ სათაურის ზოლს"
+msgstr ""
 
 #: faugus/launcher.py:6045
 msgid "Hidden games"
 msgstr "დამალული თამაშები"
 
 #: faugus/launcher.py:6046
+#, fuzzy
 msgid "Displays hidden games"
-msgstr "აჩვენებს დამალულ თამაშებს"
+msgstr "დამალული თამაშები"
 
 #: faugus/launcher.py:6046
 msgid "Ctrl+H toggles hidden games"
@@ -869,8 +867,6 @@ msgid ""
 "Displays a panel with the game title, categories, playtime, and last played "
 "date"
 msgstr ""
-"აჩვენებს პანელს თამაშის სათაურით, კატეგორიებით, თამაშის დროითა და ბოლო "
-"თამაშის თარიღით"
 
 #: faugus/launcher.py:6052
 msgid "Gamepad navigation"
@@ -878,7 +874,7 @@ msgstr "გეიმპედით ნავიგაცია"
 
 #: faugus/launcher.py:6053
 msgid "Allows navigation through the application using a gamepad"
-msgstr "საშუალებას გაძლევთ აპლიკაციაში გადაადგილდეთ გეიმპადით"
+msgstr ""
 
 #: faugus/launcher.py:6055
 msgid "Wayland driver (experimental)"
@@ -886,7 +882,7 @@ msgstr "Wayland დრაივერი (ექსპერიმენტუ�
 
 #: faugus/launcher.py:6056
 msgid "Runs games using the Wine Wayland driver"
-msgstr "თამაშებს უშვებს Wine Wayland დრაივერის გამოყენებით"
+msgstr ""
 
 #: faugus/launcher.py:6058
 msgid "WOW64 (experimental)"
@@ -894,7 +890,7 @@ msgstr "WOW64 (ექსპერიმენტული)"
 
 #: faugus/launcher.py:6059
 msgid "Runs 32-bit games using the 64-bit driver"
-msgstr "32-ბიტიან თამაშებს უშვებს 64-ბიტიანი დრაივერით"
+msgstr ""
 
 #: faugus/launcher.py:6069 faugus/launcher.py:7834
 msgid "Run"
@@ -918,11 +914,12 @@ msgstr "თამაშის დროს სისტემის ლოდი
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr "გაშვებულ თამაშს აჩვენებს როგორც თქვენს Discord აქტივობას"
+msgstr ""
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
+#, fuzzy
 msgid "Interface Sounds"
-msgstr "ინტერფეისის ხმები"
+msgstr "ინტერფეისის რეჟიმი"
 
 #: faugus/launcher.py:6085
 msgid "Support the Project"
@@ -1008,39 +1005,43 @@ msgstr "ჩართვა"
 
 #: faugus/launcher.py:7264
 msgid "Sound"
-msgstr "ხმა"
+msgstr ""
 
 #: faugus/launcher.py:7275
 msgid "Volume"
-msgstr "ხმის დონე"
+msgstr ""
 
 #: faugus/launcher.py:7296
 msgid "Navigate"
-msgstr "ნავიგაცია"
+msgstr ""
 
 #: faugus/launcher.py:7296
 msgid "Confirm"
-msgstr "დადასტურება"
+msgstr ""
 
 #: faugus/launcher.py:7296
 msgid "Warning"
-msgstr "გაფრთხილება"
+msgstr ""
 
 #: faugus/launcher.py:7301
+#, fuzzy
 msgid "Sound file"
-msgstr "ხმის ფაილი"
+msgstr "Windows-ის ფაილები"
 
 #: faugus/launcher.py:7313
+#, fuzzy
 msgid "Preview"
-msgstr "მოსმენა"
+msgstr "მიმოხილვა"
 
 #: faugus/launcher.py:7396
+#, fuzzy
 msgid "Select a sound file"
-msgstr "აირჩიეთ ხმის ფაილი"
+msgstr "აირჩიეთ Lossless.dll ფაილი"
 
 #: faugus/launcher.py:7400
+#, fuzzy
 msgid "Audio files"
-msgstr "აუდიო ფაილები"
+msgstr "ყველა ფაილი"
 
 #: faugus/launcher.py:7420
 #, python-format
