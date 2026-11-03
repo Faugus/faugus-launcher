@@ -93,20 +93,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.6" date="2026-11-02">
+    <release version="2.5.7" date="2026-11-03">
       <description>
         <ul>
-          <li>Added Discord Rich Presence support.</li>
-          <li>Now detects the title, icon and cover from the executable when adding a game.</li>
-          <li>The running theme is now kept until restart when changing the color scheme or accent.</li>
-          <li>Fixed shortcut desktop quoting and launch arguments. Thanks, @Yousef-Mohamed22.</li>
-          <li>Fixed launch argument environment variable detection for shortcuts and file runs. Thanks, @Yousef-Mohamed22.</li>
-          <li>Fixed the Lossless Scaling environment variable check. Thanks, @Yousef-Mohamed22.</li>
-          <li>Fixed backups overwriting existing archives. Thanks, @Yousef-Mohamed22.</li>
-          <li>Fixed the context menu activating an item on right-click release.</li>
-          <li>Fixed memory leaks when closing dialogs.</li>
-          <li>The splash and donate windows now run in separate processes to free memory.</li>
-          <li>GTK is now loaded on demand in the runner.</li>
+          <li>Each game now has a unique window class, fixing taskbar grouping and pinned shortcuts.</li>
+          <li>Added a suggestion menu to the SteamGridDB asset picker.</li>
+          <li>Now skips the SteamGridDB asset fetch when the title entry loses focus while editing a game.</li>
+          <li>Fixed the sleep inhibitor not being released on game exit.</li>
+          <li>Gamepad navigation is now locked by window focus instead of running games.</li>
+          <li>Fixed retained memory after asset downloads and dialogs.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
