@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-09-22 12:31+0000\n"
-"Last-Translator: howoz <howoz@proton.me>\n"
+"PO-Revision-Date: 2026-11-03 15:12+0000\n"
+"Last-Translator: Yousef <aboyossefmohamed22@gmail.com>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.10.dev0\n"
+"X-Generator: Weblate 2026.11.1.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:147 faugus/backup.py:296
@@ -153,20 +153,17 @@ msgid "Select the backup destination"
 msgstr "Geri yüklenecek yedek konumunu seç"
 
 #: faugus/backup.py:919
-#, fuzzy
-#| msgid "Calculating..."
 msgid "Cancelling..."
-msgstr "Hesaplanıyor..."
+msgstr "İptal Ediliyor..."
 
 #: faugus/backup.py:932 faugus/backup_daemon.py:544
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
+"Yedekleme başarısız: disk alanı yetersiz ({} gerekli, {} kullanılabilir)."
 
 #: faugus/backup.py:942 faugus/backup.py:969
-#, fuzzy
-#| msgid "Last backup:"
 msgid "Cancel backup"
-msgstr "Son yedekleme:"
+msgstr "Yedeklemeyi iptal et"
 
 #: faugus/backup.py:1015
 msgid "Restore Backup"
@@ -207,20 +204,16 @@ msgid "Backup started"
 msgstr "Yedekleme başladı"
 
 #: faugus/backup_daemon.py:507
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup cancelled"
-msgstr "Yedekleme tamamlandı"
+msgstr "Yedekleme iptal edildi"
 
 #: faugus/backup_daemon.py:509
 msgid "Backup completed"
 msgstr "Yedekleme tamamlandı"
 
 #: faugus/backup_daemon.py:567 faugus/backup_daemon.py:762
-#, fuzzy
-#| msgid "Backup completed"
 msgid "Backup failed."
-msgstr "Yedekleme tamamlandı"
+msgstr "Yedekleme başarısız."
 
 #: faugus/launcher.py:1157 faugus/launcher.py:1351 faugus/launcher.py:1723
 #: faugus/launcher.py:1744 faugus/launcher.py:2375 faugus/launcher.py:2511
@@ -303,8 +296,6 @@ msgid "Playtime: {}"
 msgstr "Oynama süresi: {}"
 
 #: faugus/launcher.py:2782 faugus/launcher.py:3440
-#, fuzzy
-#| msgid "Playtime: {}"
 msgid "Playing for: {}"
 msgstr "Oynama süresi: {}"
 
@@ -330,7 +321,7 @@ msgstr "Durdur"
 
 #: faugus/launcher.py:2821
 msgid "Play with logs"
-msgstr ""
+msgstr "Günlüklerle oynat"
 
 #: faugus/launcher.py:2823
 msgid "Play"
@@ -390,7 +381,7 @@ msgstr "{} dakika"
 
 #: faugus/launcher.py:3040 faugus/launcher.py:3057
 msgid "Less than a minute"
-msgstr ""
+msgstr "Bir dakikadan az"
 
 #: faugus/launcher.py:3089
 msgid "Just now"
@@ -557,10 +548,8 @@ msgid "Carrousel"
 msgstr "Kayan Kartlar"
 
 #: faugus/launcher.py:5830
-#, fuzzy
-#| msgid "Background"
 msgid "Background Color"
-msgstr "Arka plan"
+msgstr "Arka plan rengi"
 
 #: faugus/launcher.py:5833 faugus/launcher.py:5845 faugus/launcher.py:5857
 #: faugus/launcher.py:5868 faugus/launcher.py:5877 faugus/launcher.py:5885
@@ -579,19 +568,15 @@ msgstr "Ana renk"
 
 #: faugus/launcher.py:5842
 msgid "Overview Color"
-msgstr ""
+msgstr "Genel bakış rengi"
 
 #: faugus/launcher.py:5854
-#, fuzzy
-#| msgid "Accent Color"
 msgid "Widget Color"
-msgstr "Vurgu Rengi"
+msgstr "Widget rengi"
 
 #: faugus/launcher.py:5859
-#, fuzzy
-#| msgid "Dominant color"
 msgid "Solid color"
-msgstr "Ana renk"
+msgstr "Düz renk"
 
 #: faugus/launcher.py:5862
 msgid "Banner"
@@ -599,7 +584,7 @@ msgstr "Pankart"
 
 #: faugus/launcher.py:5863 faugus/launcher.py:6632
 msgid "Displays a banner for the currently selected game"
-msgstr ""
+msgstr "Seçili oyun için bir banner gösterir"
 
 #: faugus/launcher.py:5865
 msgid "Theme"
@@ -655,7 +640,7 @@ msgstr "Başlıklar"
 
 #: faugus/launcher.py:5904 faugus/launcher.py:6561
 msgid "Displays the game title below the cover"
-msgstr ""
+msgstr "Oyun başlığını kapağın altında gösterir"
 
 #: faugus/launcher.py:5906
 msgid "Zoom"
@@ -664,14 +649,15 @@ msgstr "Yakınlaştırma"
 #: faugus/launcher.py:5907 faugus/launcher.py:6562
 msgid "Displays a zoom slider to adjust the size of games"
 msgstr ""
+"Oyunların boyutunu ayarlamak için bir yakınlaştırma kaydırıcısı gösterir"
 
 #: faugus/launcher.py:5910
 msgid "Auto-hide"
-msgstr ""
+msgstr "Otomatik gizle"
 
 #: faugus/launcher.py:5911
 msgid "Automatically hides widgets"
-msgstr ""
+msgstr "Araçları otomatik olarak gizler"
 
 #: faugus/launcher.py:5913
 msgid "Position"
@@ -679,7 +665,7 @@ msgstr "Konum"
 
 #: faugus/launcher.py:5916 faugus/launcher.py:6577
 msgid "Sets how games are positioned on the screen"
-msgstr ""
+msgstr "Oyunların ekranda nasıl konumlandırılacağını ayarlar"
 
 #: faugus/launcher.py:5917
 msgid "Top"
@@ -699,7 +685,7 @@ msgstr "Yön"
 
 #: faugus/launcher.py:5924 faugus/launcher.py:6591
 msgid "Sets how games are scrolled through"
-msgstr ""
+msgstr "Oyunlar arasında nasıl kaydırılacağını ayarlar"
 
 #: faugus/launcher.py:5925
 msgid "Vertical"
@@ -724,6 +710,8 @@ msgstr "SteamGridDB"
 #: faugus/launcher.py:5953
 msgid "Automatically fetches game icons, covers, and banners from SteamGridDB"
 msgstr ""
+"Oyun simgelerini, kapaklarını ve banner'larını SteamGridDB'den otomatik "
+"olarak getirir"
 
 #: faugus/launcher.py:5957
 msgid "API Key"
@@ -759,17 +747,15 @@ msgstr "Görünüm"
 
 #: faugus/launcher.py:5996
 msgid "GPU"
-msgstr ""
+msgstr "GPU"
 
 #: faugus/launcher.py:6005
-#, fuzzy
-#| msgid "Auto-close on launch"
 msgid "Auto-close"
-msgstr "Oyun başladığında otomatik kapat"
+msgstr "Oyun başlatıldığında otomatik kapat"
 
 #: faugus/launcher.py:6006
 msgid "Automatically closes the application when launching a game"
-msgstr ""
+msgstr "Oyun başlatılırken uygulamayı otomatik olarak kapatır"
 
 #: faugus/launcher.py:6008
 msgid "Autostart"
@@ -777,7 +763,7 @@ msgstr "Sistemle birlikte başlat"
 
 #: faugus/launcher.py:6009
 msgid "Automatically starts the application with the system"
-msgstr ""
+msgstr "Uygulamayı sistemle birlikte otomatik olarak başlatır"
 
 #: faugus/launcher.py:6011
 msgid "System tray icon"
@@ -785,16 +771,15 @@ msgstr "Sistem tepsi simgesi"
 
 #: faugus/launcher.py:6012
 msgid "Displays the application icon in the system tray"
-msgstr ""
+msgstr "Uygulama simgesini sistem tepsisinde gösterir"
 
 #: faugus/launcher.py:6015
 msgid "Minimized startup"
 msgstr "Arka planda başlat"
 
 #: faugus/launcher.py:6016
-#, fuzzy
 msgid "Starts the application minimized to the system tray"
-msgstr "Büyütülmüş ekranda başlat"
+msgstr "Uygulamayı sistem tepsisine küçültülmüş olarak başlatır"
 
 #: faugus/launcher.py:6019
 msgid "Monochrome icon"
@@ -802,7 +787,7 @@ msgstr "Tek renkli tepsi simgesi"
 
 #: faugus/launcher.py:6020
 msgid "Displays a monochrome application icon in the system tray"
-msgstr ""
+msgstr "Sistem tepsisinde tek renkli uygulama simgesi gösterir"
 
 #: faugus/launcher.py:6023
 msgid "Splash window"
@@ -813,6 +798,8 @@ msgid ""
 "Displays a splash window with information about Proton, Steam Linux Runtime, "
 "and other required components when launching a game"
 msgstr ""
+"Oyun başlatılırken Proton, Steam Linux Runtime ve diğer gerekli bileşenler "
+"hakkında bilgi içeren bir açılış penceresi gösterir"
 
 #: faugus/launcher.py:6027
 msgid "Automatic updates"
@@ -823,6 +810,8 @@ msgid ""
 "Checks for and updates Proton, Steam Linux Runtime, and other required "
 "components when launching a game"
 msgstr ""
+"Oyun başlatılırken Proton, Steam Linux Runtime ve diğer gerekli bileşenleri "
+"denetler ve günceller"
 
 #: faugus/launcher.py:6031
 msgid "Auto-create shortcuts"
@@ -840,7 +829,7 @@ msgstr "Kategoriler"
 
 #: faugus/launcher.py:6037
 msgid "Displays a button to manage game categories"
-msgstr ""
+msgstr "Oyun kategorilerini yönetmek için bir düğme gösterir"
 
 #: faugus/launcher.py:6039
 msgid "Sort"
@@ -848,7 +837,7 @@ msgstr "Sırala"
 
 #: faugus/launcher.py:6040
 msgid "Displays a button to change the game sorting order"
-msgstr ""
+msgstr "Oyunların sıralama düzenini değiştirmek için bir düğme gösterir"
 
 #: faugus/launcher.py:6042
 msgid "Header bar"
@@ -856,17 +845,15 @@ msgstr "Başlık çubuğu"
 
 #: faugus/launcher.py:6043
 msgid "Displays the default GTK header bar"
-msgstr ""
+msgstr "Varsayılan GTK başlık çubuğunu gösterir"
 
 #: faugus/launcher.py:6045
 msgid "Hidden games"
 msgstr "Gizli oyunları göster"
 
 #: faugus/launcher.py:6046
-#, fuzzy
-#| msgid "Hidden games"
 msgid "Displays hidden games"
-msgstr "Gizli oyunları göster"
+msgstr "Gizli oyunları gösterir"
 
 #: faugus/launcher.py:6046
 msgid "Ctrl+H toggles hidden games"
@@ -874,13 +861,15 @@ msgstr "Ctrl+H ile gizli oyunları göstermeyi aç/kapat"
 
 #: faugus/launcher.py:6048
 msgid "Overview"
-msgstr ""
+msgstr "Genel bakış"
 
 #: faugus/launcher.py:6049 faugus/launcher.py:6582
 msgid ""
 "Displays a panel with the game title, categories, playtime, and last played "
 "date"
 msgstr ""
+"Oyun başlığını, kategorilerini, oynama süresini ve son oynanma tarihini "
+"gösteren bir panel gösterir"
 
 #: faugus/launcher.py:6052
 msgid "Gamepad navigation"
@@ -888,7 +877,7 @@ msgstr "Oyun kumandasıyla gezinme"
 
 #: faugus/launcher.py:6053
 msgid "Allows navigation through the application using a gamepad"
-msgstr ""
+msgstr "Oyun koluyla uygulamada gezinmeye olanak tanır"
 
 #: faugus/launcher.py:6055
 msgid "Wayland driver (experimental)"
@@ -896,7 +885,7 @@ msgstr "Wayland sürücüsü kullan (deneysel)"
 
 #: faugus/launcher.py:6056
 msgid "Runs games using the Wine Wayland driver"
-msgstr ""
+msgstr "Oyunları Wine Wayland sürücüsüyle çalıştırır"
 
 #: faugus/launcher.py:6058
 msgid "WOW64 (experimental)"
@@ -904,7 +893,7 @@ msgstr "WOW64'ü etkinleştir (deneysel)"
 
 #: faugus/launcher.py:6059
 msgid "Runs 32-bit games using the 64-bit driver"
-msgstr ""
+msgstr "32 bit oyunları 64 bit sürücüyle çalıştırır"
 
 #: faugus/launcher.py:6069 faugus/launcher.py:7834
 msgid "Run"
@@ -928,13 +917,11 @@ msgstr "Oyun oynarken sistemin uyku moduna girmesini engeller"
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr ""
+msgstr "Çalışan oyunu Discord etkinliğiniz olarak gösterir"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
-#, fuzzy
-#| msgid "Interface Mode"
 msgid "Interface Sounds"
-msgstr "Arayüz Modu"
+msgstr "Arayüz sesleri"
 
 #: faugus/launcher.py:6085
 msgid "Support the Project"
@@ -1020,45 +1007,39 @@ msgstr "Etkinleştir"
 
 #: faugus/launcher.py:7264
 msgid "Sound"
-msgstr ""
+msgstr "Ses"
 
 #: faugus/launcher.py:7275
 msgid "Volume"
-msgstr ""
+msgstr "Ses düzeyi"
 
 #: faugus/launcher.py:7296
 msgid "Navigate"
-msgstr ""
+msgstr "Gezinme"
 
 #: faugus/launcher.py:7296
 msgid "Confirm"
-msgstr ""
+msgstr "Onaylama"
 
 #: faugus/launcher.py:7296
 msgid "Warning"
-msgstr ""
+msgstr "Uyarı"
 
 #: faugus/launcher.py:7301
-#, fuzzy
-#| msgid "Windows files"
 msgid "Sound file"
-msgstr "Windows dosyaları"
+msgstr "Ses dosyası"
 
 #: faugus/launcher.py:7313
 msgid "Preview"
-msgstr ""
+msgstr "Önizleme"
 
 #: faugus/launcher.py:7396
-#, fuzzy
-#| msgid "Select the Lossless.dll file"
 msgid "Select a sound file"
-msgstr "Lossless.dll dosyasını seç"
+msgstr "Bir ses dosyası seç"
 
 #: faugus/launcher.py:7400
-#, fuzzy
-#| msgid "All files"
 msgid "Audio files"
-msgstr "Tüm dosyalar"
+msgstr "Ses dosyaları"
 
 #: faugus/launcher.py:7420
 #, python-format
@@ -1142,10 +1123,8 @@ msgid "Path to the prefix"
 msgstr "Ortam yolu"
 
 #: faugus/launcher.py:7809
-#, fuzzy
-#| msgid "Default Proton"
 msgid "Specific Proton"
-msgstr "Varsayılan Proton"
+msgstr "Belirli Proton"
 
 #: faugus/launcher.py:7813 faugus/shortcut.py:49
 msgid "Game Arguments"

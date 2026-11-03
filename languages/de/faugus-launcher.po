@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-11-01 21:52+0000\n"
-"Last-Translator: SirRoscoe <sirroscoe@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-03 01:51+0000\n"
+"Last-Translator: Hosted Weblate user 158752 "
+"<mistahl@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.11.dev0\n"
+"X-Generator: Weblate 2026.11.1.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:147 faugus/backup.py:296
@@ -913,12 +914,12 @@ msgstr "Energiesparmodus verhindern"
 #: faugus/launcher.py:6078 faugus/launcher.py:7822 faugus/shortcut.py:62
 msgid "Prevents the system from suspending while gaming"
 msgstr ""
-"Verhindert, dass das System während dem Spielen in den Energiesparmodus "
+"Verhindert, dass das System während des Spielens in den Energiesparmodus "
 "wechselt"
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr "Zeigt das laufende Speil als Discord Aktivität an"
+msgstr "Zeigt das laufende Spiel als Discord Aktivität an"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
 msgid "Interface Sounds"
