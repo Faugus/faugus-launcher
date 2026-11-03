@@ -854,7 +854,7 @@ msgstr "Показати приховані ігри"
 
 #: faugus/launcher.py:6046
 msgid "Displays hidden games"
-msgstr "Показати приховані ігри"
+msgstr "Відобразити приховані ігри"
 
 #: faugus/launcher.py:6046
 msgid "Ctrl+H toggles hidden games"
@@ -1438,7 +1438,6 @@ msgstr "Немає результатів"
 #~ msgstr "Додатковий додаток для запуску разом із грою"
 
 #, fuzzy
-#~| msgid "Installing %s..."
 #~ msgid "Installing"
 #~ msgstr "Встановлення %s..."
 
