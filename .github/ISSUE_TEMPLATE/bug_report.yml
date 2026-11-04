@@ -34,13 +34,6 @@ body:
         - AppImage
     validations:
       required: true
-  - type: input
-    id: version
-    attributes:
-      label: Faugus version
-      placeholder: e.g. 2.5.7
-    validations:
-      required: true
   - type: textarea
     id: description
     attributes:
