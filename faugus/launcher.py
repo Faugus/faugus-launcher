@@ -8573,10 +8573,10 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
                 api_url = f"https://steamgrid.usebottles.com/api/search/{game_name}"
                 try:
-                    response = requests.get(api_url)
+                    response = requests.get(api_url, timeout=15)
                     response.raise_for_status()
                     image_url = response.text.strip('"')
-                    content = verified_content(requests.get(image_url))
+                    content = verified_content(requests.get(image_url, timeout=15))
                     idle_add_while_open(closed_event, self.apply_downloaded_artwork, "cover", content)
 
                 except requests.RequestException as e:
