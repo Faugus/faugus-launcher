@@ -1,0 +1,74 @@
+name: Bug report
+description: Report bugs related to Faugus Launcher only
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please read before reporting:
+        - If a specific game is not launching, crashing, or experiencing bugs, there's nothing I can do, as I'm not a Proton or GPU driver developer.
+        - Please make sure Faugus Launcher is up to date before reporting an issue.
+        - Issues that ignore this form may be closed.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I'm using the latest version of Faugus Launcher.
+          required: true
+        - label: This bug is about Faugus Launcher itself, not about a specific game, Proton or GPU drivers.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect to happen? If possible, include the steps to reproduce it.
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Distro
+      placeholder: e.g. Arch Linux, Fedora 43, Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: desktop
+    attributes:
+      label: Desktop environment
+      placeholder: e.g. KDE Plasma 6 (Wayland), GNOME 49 (Wayland), Xfce (X11)
+    validations:
+      required: true
+  - type: dropdown
+    id: package
+    attributes:
+      label: Installation type
+      options:
+        - Native
+        - Flatpak
+        - AppImage
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Faugus Launcher version
+      placeholder: e.g. 2.5.7
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Terminal logs
+      description: |
+        Run Faugus Launcher in a terminal and check if any errors appear when the issue occurs:
+        - Native: `faugus-launcher`
+        - Flatpak: `flatpak run io.github.Faugus.faugus-launcher`
+        - AppImage: run the AppImage file
+
+        If any errors appear, paste them here.
+      render: shell
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, drag and drop screenshots here.
