@@ -4514,14 +4514,19 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         game_directory = os.path.dirname(expand_path(game.path))
         cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
 
-        cmd = [sys.executable, "-m", "faugus.runner", "--game", gameid]
+        if APPIMAGE_PATH:
+            cmd = [APPIMAGE_PATH, "--game", gameid]
+            run_env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+        else:
+            cmd = [sys.executable, "-m", "faugus.runner", "--game", gameid]
+            run_env = subprocess_env()
         if with_logs:
             cmd.append("--logs")
 
         if game.runner == "Steam":
             self.update_last_played(gameid)
             self.sync_last_played_order(gameid)
-            subprocess.Popen(cmd, cwd=cwd, env=subprocess_env())
+            subprocess.Popen(cmd, cwd=cwd, env=run_env)
             return
 
         if gameid in self.running:
@@ -4534,7 +4539,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.update_icon()
             return
 
-        proc = subprocess.Popen(cmd, cwd=cwd, env=subprocess_env())
+        proc = subprocess.Popen(cmd, cwd=cwd, env=run_env)
 
         if not IS_FLATPAK or not self.auto_close_on_launch:
             self.running[gameid] = proc.pid
