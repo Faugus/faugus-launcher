@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
 "PO-Revision-Date: 2026-11-13 15:51+0000\n"
-"Last-Translator: nixxo <nixxo@users.noreply.hosted.weblate.org>\n"
+"Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
 "Language: it\n"
@@ -919,7 +919,7 @@ msgstr ""
 
 #: faugus/launcher.py:6080 faugus/launcher.py:7824
 msgid "Shows the running game as your Discord activity"
-msgstr "Mostra il gioco in esecuzione come tua attività su Discord"
+msgstr "Mostra il gioco in esecuzione come una tua attività di Discord"
 
 #: faugus/launcher.py:6082 faugus/launcher.py:7255
 msgid "Interface Sounds"
