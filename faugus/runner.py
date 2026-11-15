@@ -206,6 +206,7 @@ class FaugusRun:
         self.logging_enabled = with_logs
         self.process = None
         self.splash_process = None
+        self.splash_allowed = False
         self.steam_runtime_installed = False
         self.log_process = None
         self.proton_latest = None
@@ -266,8 +267,7 @@ class FaugusRun:
         if os.environ.get("FAUGUS_LOG") == "1":
             self.logging_enabled = True
 
-        if self.splash_window_enabled and self.automatic_updates and not os.environ.get("DISABLE_UMU") and not os.environ.get("FAUGUS_DISABLE_UPDATES"):
-            GLib.idle_add(self.show_splash)
+        self.splash_allowed = self.splash_window_enabled and self.automatic_updates and not os.environ.get("DISABLE_UMU") and not os.environ.get("FAUGUS_DISABLE_UPDATES")
 
         if self.command == "winetricks":
             GLib.idle_add(self.show_log_window)
@@ -276,7 +276,7 @@ class FaugusRun:
             subprocess.Popen(self.message, shell=True, env=child_env())
 
             def update_ui():
-                if self.splash_process:
+                if self.splash_allowed:
                     self.splash_label(_("Starting Steam game..."))
                 return False
 
@@ -597,6 +597,8 @@ class FaugusRun:
         self.pipe_send(self.splash_process, command)
 
     def splash_label(self, text):
+        if self.splash_process is None:
+            self.show_splash()
         self.splash_send("LABEL " + text)
 
     def show_progress(self, fraction=None):
@@ -642,7 +644,7 @@ class FaugusRun:
                     self.show_splash()
 
             if "Components are up to date" in clean_line:
-                if self.splash_process:
+                if self.splash_process or self.splash_allowed:
                     self.splash_label(_("Components are up to date"))
                     self.hide_progress()
                 return False
@@ -654,7 +656,7 @@ class FaugusRun:
             if component is None and ("steamrt3" in clean_line or "steamrt4" in clean_line or "SteamLinuxRuntime" in clean_line):
                 component = "Steam Runtime"
 
-            if component == "Steam Runtime" and self.splash_process:
+            if component == "Steam Runtime" and (self.splash_process or self.splash_allowed):
                 if "is up to date" in clean_line or "mtree is OK" in clean_line:
                     self.splash_label(f"{component} " + _("is up to date"))
                     self.hide_progress()
@@ -662,7 +664,7 @@ class FaugusRun:
                     action = _("Updating") if self.steam_runtime_installed else _("Downloading")
                     self.splash_label(f"{action} {component}...")
                     self.show_progress()
-            elif component and self.splash_process:
+            elif component and (self.splash_process or self.splash_allowed):
                 if "Updating" in clean_line:
                     self.splash_label(_("Updating") + f" {component}...")
                 elif "Downloading" in clean_line or "Extracting" in clean_line:
@@ -697,9 +699,12 @@ class FaugusRun:
                     if any(x in name for x in ignore):
                         continue
 
+                    self.splash_allowed = False
                     GLib.idle_add(self.close_splash_window)
                     return
             except:
+                self.splash_allowed = False
+                GLib.idle_add(self.close_splash_window)
                 return
             time.sleep(0.5)
 
