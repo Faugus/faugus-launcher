@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-01 13:58+0000\n"
-"PO-Revision-Date: 2026-11-01 15:20+0000\n"
-"Last-Translator: grego9 <grego9@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-06 08:51+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Weblate 2026.11.dev0\n"
+"X-Generator: Weblate 2026.11.2.dev0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: faugus/backup.py:147 faugus/backup.py:296
@@ -29,7 +29,7 @@ msgstr "Juego"
 
 #: faugus/backup.py:175 faugus/backup.py:339 faugus/launcher.py:7797
 msgid "Prefix"
-msgstr "Prefix"
+msgstr "Prefijo"
 
 #: faugus/backup.py:180 faugus/backup.py:365
 msgid "Size"
@@ -42,15 +42,15 @@ msgstr "Total:"
 
 #: faugus/backup.py:318
 msgid "Game/App"
-msgstr "Juego/App"
+msgstr "Juego/aplicación"
 
 #: faugus/backup.py:350
 msgid "Shortcuts"
-msgstr "Accesos directos"
+msgstr "Atajos"
 
 #: faugus/backup.py:531
 msgid "Backup Settings"
-msgstr "Ajustes de backup"
+msgstr "Configuración de respaldo"
 
 #: faugus/backup.py:582 faugus/backup.py:1149
 msgid "Proton"
@@ -63,27 +63,27 @@ msgstr "Ruta"
 
 #: faugus/backup.py:616
 msgid "Backup Destination"
-msgstr "Destino del backup"
+msgstr "Destino del respaldo"
 
 #: faugus/backup.py:629
 msgid "Backup destination path"
-msgstr "Ruta de destino del backup"
+msgstr "Ruta de destino del respaldo"
 
 #: faugus/backup.py:642
 msgid "No backup yet"
-msgstr "Aún no hay backups"
+msgstr "Aún no hay respaldos"
 
 #: faugus/backup.py:643 faugus/backup.py:961
 msgid "Last backup:"
-msgstr "Último backup:"
+msgstr "Último respaldo:"
 
 #: faugus/backup.py:647 faugus/backup.py:913
 msgid "Backup now"
-msgstr "Crear backup ahora"
+msgstr "Respaldar ahora"
 
 #: faugus/backup.py:658
 msgid "Automatic Backup"
-msgstr "Backup automático"
+msgstr "Respaldo automático"
 
 #: faugus/backup.py:664
 msgid "Monday"
@@ -130,7 +130,7 @@ msgstr "Aceptar"
 
 #: faugus/backup.py:800 faugus/backup.py:831 faugus/launcher.py:8930
 msgid "Disabled"
-msgstr "Deshabilitado"
+msgstr "Desactivado"
 
 #: faugus/backup.py:801 faugus/backup.py:833
 msgid "Daily"
@@ -150,7 +150,7 @@ msgstr "Día"
 
 #: faugus/backup.py:876
 msgid "Select the backup destination"
-msgstr "Seleccione el destino del backup"
+msgstr "Seleccione el destino del respaldo"
 
 #: faugus/backup.py:919
 msgid "Cancelling..."
@@ -159,32 +159,32 @@ msgstr "Cancelando..."
 #: faugus/backup.py:932 faugus/backup_daemon.py:544
 msgid "Backup failed: not enough disk space ({} needed, {} available)."
 msgstr ""
-"Falló el backup: no hay suficiente espacio en el disco ({} requerido, {} "
+"Falló el respaldo: no hay suficiente espacio en el disco ({} requerido, {} "
 "disponible)."
 
 #: faugus/backup.py:942 faugus/backup.py:969
 msgid "Cancel backup"
-msgstr "Cancelar backup"
+msgstr "Cancelar respaldo"
 
 #: faugus/backup.py:1015
 msgid "Restore Backup"
-msgstr "Restaurar backup"
+msgstr "Restaurar respaldo"
 
 #: faugus/backup.py:1044
 msgid "Extracting backup..."
-msgstr "Extrayendo backup..."
+msgstr "Extrayendo respaldo..."
 
 #: faugus/backup.py:1200
 msgid "Restoring backup..."
-msgstr "Restaurando backup..."
+msgstr "Restaurando respaldo..."
 
 #: faugus/backup.py:1242
 msgid "Failed to restore backup:"
-msgstr "Fallo al restaurar backup:"
+msgstr "No se pudo restaurar el respaldo:"
 
 #: faugus/backup.py:1254 faugus/launcher.py:7037
 msgid "Are you sure you want to overwrite the settings?"
-msgstr "¿Estás seguro de que deseas sobrescribir la configuración?"
+msgstr "¿Confirma que quiere sobrescribir la configuración?"
 
 #: faugus/backup.py:1256 faugus/launcher.py:5105 faugus/launcher.py:7049
 #: faugus/launcher.py:7505
@@ -198,23 +198,23 @@ msgstr "No"
 
 #: faugus/backup_daemon.py:203
 msgid "Default Prefix"
-msgstr "Prefix predeterminado"
+msgstr "Prefijo predeterminado"
 
 #: faugus/backup_daemon.py:497
 msgid "Backup started"
-msgstr "Backup iniciado"
+msgstr "Respaldo iniciado"
 
 #: faugus/backup_daemon.py:507
 msgid "Backup cancelled"
-msgstr "Backup cancelado"
+msgstr "Respaldo cancelado"
 
 #: faugus/backup_daemon.py:509
 msgid "Backup completed"
-msgstr "Backup completado"
+msgstr "Respaldo completado"
 
 #: faugus/backup_daemon.py:567 faugus/backup_daemon.py:762
 msgid "Backup failed."
-msgstr "Falló el backup."
+msgstr "Falló el respaldo."
 
 #: faugus/launcher.py:1157 faugus/launcher.py:1351 faugus/launcher.py:1723
 #: faugus/launcher.py:1744 faugus/launcher.py:2375 faugus/launcher.py:2511
@@ -260,11 +260,11 @@ msgstr "Ninguna"
 
 #: faugus/launcher.py:2397
 msgid "Manage categories..."
-msgstr "Administrar categorías..."
+msgstr "Gestionar categorías..."
 
 #: faugus/launcher.py:2429
 msgid "Manage Categories"
-msgstr "Administrar categorías"
+msgstr "Gestionar categorías"
 
 #: faugus/launcher.py:2475
 msgid "Add"
@@ -278,7 +278,7 @@ msgstr "Editar"
 #: faugus/proton_manager.py:235 faugus/proton_manager.py:279
 #: faugus/proton_manager.py:308 faugus/proton_manager.py:397
 msgid "Remove"
-msgstr "Eliminar"
+msgstr "Quitar"
 
 #: faugus/launcher.py:2715
 msgid "Shut down"
@@ -322,7 +322,7 @@ msgstr "Detener"
 
 #: faugus/launcher.py:2821
 msgid "Play with logs"
-msgstr "Jugar con logs"
+msgstr "Jugar con registros"
 
 #: faugus/launcher.py:2823
 msgid "Play"
@@ -346,7 +346,7 @@ msgstr "Abrir ubicación del juego"
 
 #: faugus/launcher.py:2884
 msgid "Open prefix location"
-msgstr "Abrir ubicación del prefix"
+msgstr "Abrir ubicación del prefijo"
 
 #: faugus/launcher.py:2887
 msgid "Show logs"
@@ -354,7 +354,7 @@ msgstr "Mostrar registros"
 
 #: faugus/launcher.py:2894
 msgid "Run file in the prefix"
-msgstr "Ejecutar un archivo dentro del prefix"
+msgstr "Ejecutar un archivo dentro del prefijo"
 
 #: faugus/launcher.py:2908
 msgid "Clear recent"
@@ -386,23 +386,23 @@ msgstr "Menos de un minuto"
 
 #: faugus/launcher.py:3089
 msgid "Just now"
-msgstr "Recién"
+msgstr "Ahora mismo"
 
 #: faugus/launcher.py:3094
 msgid "A minute ago"
-msgstr "hace un minuto"
+msgstr "Hace un minuto"
 
 #: faugus/launcher.py:3095
 msgid "{} minutes ago"
-msgstr "hace {} minutos"
+msgstr "Hace {} minutos"
 
 #: faugus/launcher.py:3100
 msgid "An hour ago"
-msgstr "hace una hora"
+msgstr "Hace una hora"
 
 #: faugus/launcher.py:3101
 msgid "{} hours ago"
-msgstr "hace {} horas"
+msgstr "Hace {} horas"
 
 #: faugus/launcher.py:3106
 msgid "Yesterday"
@@ -410,44 +410,44 @@ msgstr "Ayer"
 
 #: faugus/launcher.py:3107
 msgid "{} days ago"
-msgstr "hace {} días"
+msgstr "Hace {} días"
 
 #: faugus/launcher.py:3112
 msgid "A week ago"
-msgstr "hace una semana"
+msgstr "Hace una semana"
 
 #: faugus/launcher.py:3113
 msgid "{} weeks ago"
-msgstr "hace {} semanas"
+msgstr "Hace {} semanas"
 
 #: faugus/launcher.py:3118
 msgid "A month ago"
-msgstr "hace un mes"
+msgstr "Hace un mes"
 
 #: faugus/launcher.py:3119
 msgid "{} months ago"
-msgstr "hace {} meses"
+msgstr "Hace {} meses"
 
 #: faugus/launcher.py:3123
 msgid "A year ago"
-msgstr "hace un año"
+msgstr "Hace un año"
 
 #: faugus/launcher.py:3124
 msgid "{} years ago"
-msgstr "hace {} años"
+msgstr "Hace {} años"
 
 #: faugus/launcher.py:3638 faugus/launcher.py:6900 faugus/launcher.py:8965
 msgid "Select a file to run in the prefix"
-msgstr "Seleccionar un archivo para ejecutar dentro del prefix"
+msgstr "Seleccionar un archivo para ejecutar dentro del prefijo"
 
 #: faugus/launcher.py:3682
 #, python-format
 msgid "%s Logs"
-msgstr "Logs de %s"
+msgstr "Registros de %s"
 
 #: faugus/launcher.py:3761
 msgid "Copy to clipboard"
-msgstr "Copiar al portapapeles"
+msgstr "Copiar en el portapapeles"
 
 #: faugus/launcher.py:3765
 msgid "Open file location"
@@ -470,7 +470,7 @@ msgstr "Editar %s"
 
 #: faugus/launcher.py:4833
 msgid "Failed to remove prefix"
-msgstr "Error al eliminar el prefix"
+msgstr "Error al eliminar el prefijo"
 
 #: faugus/launcher.py:5057
 msgid "No internet connection"
@@ -478,11 +478,11 @@ msgstr "Sin conexión a internet"
 
 #: faugus/launcher.py:5091
 msgid "Do you want to discard these prefixes?"
-msgstr "¿Desea descartar estos prefixes?"
+msgstr "¿Quiere descartar estos prefijos?"
 
 #: faugus/launcher.py:5092
 msgid "Do you want to discard this prefix?"
-msgstr "¿Desea descartar este prefix?"
+msgstr "¿Quiere descartar este prefijo?"
 
 #: faugus/launcher.py:5163 faugus/runner.py:815 faugus/runner.py:822
 msgid "Downloading"
@@ -491,7 +491,7 @@ msgstr "Descargando"
 #: faugus/launcher.py:5235
 #, python-format
 msgid "%s was not installed!"
-msgstr "¡%s no fue instalado!"
+msgstr "%s no se instaló."
 
 #: faugus/launcher.py:5283
 msgid "Download complete"
@@ -510,19 +510,19 @@ msgstr "Instalando %s..."
 #: faugus/launcher.py:5291 faugus/launcher.py:5294 faugus/launcher.py:5297
 #: faugus/launcher.py:5312
 msgid "Please close the login window and wait."
-msgstr "Por favor, cierra la ventana de inicio de sesión y espera."
+msgstr "Cierra la ventana de acceso y espere."
 
 #: faugus/launcher.py:5311
 msgid "Please don't change the installation path."
-msgstr "Por favor, no cambies la ruta de instalación."
+msgstr "No cambie la ruta de instalación."
 
 #: faugus/launcher.py:5318
 msgid "Please close Wargaming to finish the installation."
-msgstr "Por favor, cierra Wargaming para finalizar la instalación."
+msgstr "Cierre Wargaming para finalizar la instalación."
 
 #: faugus/launcher.py:5697 faugus/launcher.py:7894 faugus/launcher.py:8050
 msgid "Settings"
-msgstr "Ajustes"
+msgstr "Configuración"
 
 #: faugus/launcher.py:5817
 msgid "Language"
