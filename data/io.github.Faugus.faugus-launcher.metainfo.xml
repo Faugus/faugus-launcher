@@ -93,15 +93,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.5.7" date="2026-11-03">
+    <release version="2.5.8" date="2026-11-19">
       <description>
         <ul>
-          <li>Each game now has a unique window class, fixing taskbar grouping and pinned shortcuts.</li>
-          <li>Added a suggestion menu to the SteamGridDB asset picker.</li>
-          <li>Now skips the SteamGridDB asset fetch when the title entry loses focus while editing a game.</li>
-          <li>Fixed the sleep inhibitor not being released on game exit.</li>
-          <li>Gamepad navigation is now locked by window focus instead of running games.</li>
-          <li>Fixed retained memory after asset downloads and dialogs.</li>
+          <li>Ctrl+F now focuses the search field, and ESC clears it.</li>
+          <li>Added timeouts for cover search requests.</li>
+          <li>Fixed an issue where the Splash Window would get stuck when there was no internet connection.</li>
+          <li>Fixed the Auto-close feature not working in the AppImage.</li>
           <li>Updated translations.</li>
         </ul>
       </description>
