@@ -2002,6 +2002,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
             self.layout_carrousel_slot(slot, slot.get("visual_offset", slot["offset"]))
 
     def layout_carrousel_slot(self, slot, offset):
+        if getattr(slot["box"], "game", None) is None:
+            slot["box"].set_opacity(0.0)
+            return
+
         scale, opacity = self.carrousel_scale_opacity(offset)
         radius = getattr(self, 'carrousel_radius', 3)
         d = abs(offset)
@@ -2138,6 +2142,8 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
                 slot["style_provider"].load_from_data(
                     b"entry.flowbox-entry.cover-container.carrousel-cover-box { transition: none; box-shadow: none; }"
                 )
+            self.schedule_background_update()
+            self.update_icon()
             return
 
         self.carrousel_index %= n
@@ -2281,6 +2287,10 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         return navigate_focus(direction)
 
     def on_search_entry_key(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Escape:
+            self.leave_search()
+            return True
+
         if keyval not in (Gdk.KEY_Left, Gdk.KEY_Right):
             return False
 
@@ -3878,7 +3888,22 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
     def on_item_double_click(self, item):
         self.play_or_notify(self.selected())
 
+    def leave_search(self):
+        game = self.selected()
+        self.entry_search.set_text("")
+        if getattr(self, '_carrousel_search_source', None):
+            GLib.source_remove(self._carrousel_search_source)
+            self._carrousel_search_source = None
+        if game:
+            self.select_game_by_title(game.title)
+        else:
+            self.select_first_child()
+
     def on_key_press_event(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_f and state & Gdk.ModifierType.CONTROL_MASK:
+            self.entry_search.grab_focus()
+            return True
+
         if keyval == Gdk.KEY_h and state & Gdk.ModifierType.CONTROL_MASK:
             try:
                 config = ConfigManager()
@@ -4341,6 +4366,7 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         self.flowbox.invalidate_filter()
 
         self.select_first_visible_child()
+        self.update_overview_panel()
 
     def on_search_activate(self, entry):
         game = self.selected()
