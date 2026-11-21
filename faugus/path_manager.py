@@ -303,6 +303,8 @@ def _write_json_atomic(path, data):
     tmp_path = path + '.tmp'
     with open(tmp_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+        f.flush()
+        os.fsync(f.fileno())
     os.replace(tmp_path, path)
 
 
