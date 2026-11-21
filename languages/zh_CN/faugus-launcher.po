@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-19 03:20+0000\n"
-"PO-Revision-Date: 2026-11-03 01:51+0000\n"
+"PO-Revision-Date: 2026-11-20 06:12+0000\n"
 "Last-Translator: EyKettle <eykettle@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 2026.11.1.dev0\n"
+"X-Generator: Weblate 2026.12.dev0\n"
 
 #: faugus/backup.py:151 faugus/backup.py:300
 msgid "Calculating..."
@@ -1306,7 +1306,7 @@ msgstr "系统"
 
 #: faugus/utils.py:2055 faugus/utils.py:2061
 msgid "Flatpak"
-msgstr ""
+msgstr "Flatpak"
 
 #: faugus/utils.py:2123
 msgid "Select a command or script"
