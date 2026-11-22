@@ -7,6 +7,7 @@ import shutil
 
 from faugus.proton_downloader import ProgressPrinter
 from faugus.path_manager import FAUGUS_LAUNCHER_SHARE_DIR, DOWNLOAD_DIR, UMU_RUN
+from faugus.core import github_api_headers
 
 UMU_URL_TEMPLATE = "https://github.com/Faugus/umu-launcher/releases/download/{}/umu-run"
 UMU_VERSION_API = "https://api.github.com/repos/Faugus/umu-launcher/releases"
@@ -15,7 +16,7 @@ UMU_VERSION_FILE = os.path.join(FAUGUS_LAUNCHER_SHARE_DIR, "version.txt")
 
 def get_latest_umu_version():
     try:
-        r = requests.get(UMU_VERSION_API, timeout=5)
+        r = requests.get(UMU_VERSION_API, headers=github_api_headers(UMU_VERSION_API), timeout=5)
         if r.status_code == 200:
             releases = r.json()
             if releases:
@@ -87,7 +88,7 @@ VERSION_FILE = f"{DOWNLOAD_DIR}/version.txt"
 
 def get_latest_version():
     try:
-        response = requests.get(REPO_URL, timeout=5)
+        response = requests.get(REPO_URL, headers=github_api_headers(REPO_URL), timeout=5)
         if response.status_code == 200:
             release_info = response.json()
             return release_info['tag_name']

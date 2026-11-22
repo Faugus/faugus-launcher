@@ -8,6 +8,7 @@ import shutil
 import argparse
 
 from faugus.path_manager import COMPATIBILITY_DIR
+from faugus.core import github_api_headers
 
 CONFIGS = {
     "ge": {
@@ -100,7 +101,7 @@ class StreamProgress:
 
 def get_latest_tag_and_url(api, archive_ext):
     try:
-        req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT})
+        req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT, **github_api_headers(api)})
         with urllib.request.urlopen(req, timeout=5) as r:
             data = json.loads(r.read())
     except Exception:
