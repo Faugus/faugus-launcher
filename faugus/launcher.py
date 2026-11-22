@@ -4736,7 +4736,11 @@ class Main(Gtk.ApplicationWindow, HiDpiMixin):
         if game_runner != "Default":
             edit_game_dialog.checkbox_custom_runner.set_active(True)
             if not edit_game_dialog.combobox_runner.set_active_id(game_runner):
-                edit_game_dialog.combobox_runner.set_active(0)
+                if os.path.isdir(expand_path(game_runner)):
+                    edit_game_dialog.combobox_runner.set_active_id("custom")
+                    edit_game_dialog.entry_runner.set_text(game_runner)
+                else:
+                    edit_game_dialog.combobox_runner.set_active(0)
         edit_game_dialog.set_title_silently(game.title)
         edit_game_dialog._artwork_title = game.title
         edit_game_dialog._steamgriddb_suggestion_id = getattr(game, "steamgriddb_id", "") or None
@@ -7655,6 +7659,9 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
         self.grid_runner = build_grid(margin_bottom=False)
 
+        self.grid_runner_path = build_grid(margin_bottom=False)
+        self.grid_runner_path.set_visible(False)
+
         self.grid_shortcut = build_grid(column_homogeneous=True)
 
         self.grid_shortcut_icon = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -7815,6 +7822,20 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.checkbox_custom_runner = Gtk.CheckButton(label=_("Specific Proton"))
         self.checkbox_custom_runner.connect("toggled", self.on_checkbox_custom_runner_toggled)
         self.combobox_runner = IdComboBox()
+
+        self.entry_runner = Gtk.Entry()
+        self.entry_runner.set_placeholder_text(_("Path to the Proton directory"))
+        self.entry_runner.set_tooltip_text(_("Path to the Proton directory"))
+        self.entry_runner.set_has_tooltip(True)
+        self.entry_runner.connect("query-tooltip", on_entry_query_tooltip)
+        self.entry_runner.connect("changed", on_entry_changed)
+
+        self.button_search_runner = Gtk.Button()
+        self.button_search_runner.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_search_runner.connect("clicked", self.on_button_search_runner_clicked)
+        self.button_search_runner.set_size_request(50, -1)
+
+        self.combobox_runner.connect("changed", self.on_combobox_runner_changed)
 
         self.label_game_arguments = Gtk.Label(label=_("Game Arguments"))
         self.label_game_arguments.set_halign(Gtk.Align.START)
@@ -8086,8 +8107,11 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.grid_prefix.attach(self.button_search_prefix, 3, 1, 1, 1)
 
         self.grid_runner.attach(self.checkbox_custom_runner, 0, 0, 1, 1)
-        self.grid_runner.attach(self.combobox_runner, 0, 1, 1, 1)
+        self.grid_runner.attach(self.combobox_runner, 0, 1, 4, 1)
         self.combobox_runner.set_hexpand(True)
+        self.grid_runner_path.attach(self.entry_runner, 0, 1, 3, 1)
+        self.entry_runner.set_hexpand(True)
+        self.grid_runner_path.attach(self.button_search_runner, 3, 1, 1, 1)
 
         self.label_shortcut.set_hexpand(True)
         self.grid_shortcut.attach(self.checkbox_shortcut_desktop, 0, 0, 1, 1)
@@ -8109,6 +8133,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         page1.append(self.grid_runtime)
         page1.append(self.grid_prefix)
         page1.append(self.grid_runner)
+        page1.append(self.grid_runner_path)
         page1.append(self.label_shortcut)
         page1.append(self.grid_shortcut)
 
@@ -8878,15 +8903,26 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
 
     def populate_combobox_with_runners(self):
         populate_combobox_with_runners(self.combobox_runner)
+        self.combobox_runner.append("custom", _("Custom"))
 
     def on_checkbox_custom_runner_toggled(self, checkbox):
         custom = checkbox.get_active()
         self.combobox_runner.set_sensitive(custom)
         if not custom and not self.combobox_runner.set_active_id(self.default_runner):
             self.combobox_runner.set_active(0)
+        self.on_combobox_runner_changed(self.combobox_runner)
+
+    def on_combobox_runner_changed(self, combobox):
+        custom = self.checkbox_custom_runner.get_active() and combobox.get_active_id() == "custom"
+        self.grid_runner_path.set_visible(custom)
 
     def selected_runner(self):
-        return self.combobox_runner.get_active_id() if self.checkbox_custom_runner.get_active() else "Default"
+        if not self.checkbox_custom_runner.get_active():
+            return "Default"
+        if self.combobox_runner.get_active_id() == "custom":
+            path = expand_path(self.entry_runner.get_text().strip())
+            return os.path.abspath(path) if path else path
+        return self.combobox_runner.get_active_id()
 
     def load_config(self):
         cfg = ConfigManager()
@@ -8923,6 +8959,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
                 prefix = expand_path(self.entry_prefix.get_text())
                 title_formatted = format_title(title)
                 runner = self.combobox_runner.get_active_id()
+                if runner == "custom":
+                    runner = expand_path(self.entry_runner.get_text().strip())
                 game_directory = os.path.dirname(file_run)
                 cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
                 escaped_file_run = file_run.replace("'", "'\\''")
@@ -8974,6 +9012,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
                 prefix = expand_path(self.entry_prefix.get_text())
                 title_formatted = format_title(title)
                 runner = self.combobox_runner.get_active_id()
+                if runner == "custom":
+                    runner = expand_path(self.entry_runner.get_text().strip())
                 game_directory = os.path.dirname(file_run)
                 cwd = game_directory if game_directory and os.path.isdir(game_directory) else None
                 escaped_file_run = file_run.replace("'", "'\\''")
@@ -9137,6 +9177,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_id()
+        if runner == "custom":
+            runner = expand_path(self.entry_runner.get_text().strip())
 
         command_parts = []
 
@@ -9174,6 +9216,8 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         prefix = expand_path(self.entry_prefix.get_text())
         title_formatted = format_title(title)
         runner = self.combobox_runner.get_active_id()
+        if runner == "custom":
+            runner = expand_path(self.entry_runner.get_text().strip())
 
         command_parts = []
 
@@ -9247,6 +9291,25 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         filechooser.connect("response", on_response)
         filechooser.present()
 
+    def on_button_search_runner_clicked(self, widget):
+        filechooser = new_file_chooser(
+            self,
+            _("Select the Proton directory"),
+            Gtk.FileChooserAction.SELECT_FOLDER,
+        )
+
+        set_file_chooser_start_folder(
+            filechooser, "custom_proton", expand_path(self.entry_runner.get_text()) or None)
+
+        def on_response(dialog_fc, response):
+            if response == Gtk.ResponseType.ACCEPT:
+                self.entry_runner.set_text(dialog_fc.get_file().get_path())
+
+            destroy_and_release(dialog_fc)
+
+        filechooser.connect("response", on_response)
+        filechooser.present()
+
     def validate_fields(self, entry):
         title = self.entry_title.get_text()
         prefix = self.entry_prefix.get_text()
@@ -9256,6 +9319,7 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         self.entry_title.remove_css_class("entry")
         self.entry_prefix.remove_css_class("entry")
         self.entry_path.remove_css_class("entry")
+        self.entry_runner.remove_css_class("entry")
 
         if self.grid_steam_title.get_visible() and not self.combobox_steam_title.get_active_text():
             mark_invalid_widget(self.combobox_steam_title, "combobox")
@@ -9272,6 +9336,12 @@ class AddGame(Gtk.Dialog, HiDpiMixin, HookEntriesMixin, LaunchArgumentsMixin, Ad
         if invalid:
             self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
             return False
+        if self.checkbox_custom_runner.get_active() and self.combobox_runner.get_active_id() == "custom":
+            path = expand_path(self.entry_runner.get_text().strip())
+            if not path or not os.path.isdir(os.path.abspath(path)):
+                mark_invalid_widget(self.entry_runner)
+                self.tab_button_widgets[self.tab_names.index("page1")].set_active(True)
+                return False
         return True
 
 
