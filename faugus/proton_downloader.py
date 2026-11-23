@@ -3,6 +3,7 @@
 import json
 import platform
 import tarfile
+import urllib.error
 import urllib.request
 import shutil
 import argparse
@@ -99,17 +100,41 @@ class StreamProgress:
         self.raw.close()
 
 
+class ReleaseApiError(Exception):
+    def __init__(self, message, rate_limited=False, reset_time=None):
+        super().__init__(message)
+        self.rate_limited = rate_limited
+        # Unix time at which an exhausted GitHub rate limit resets, if known.
+        self.reset_time = reset_time
+
+
+def raise_for_api_status(status, headers):
+    if status == 200:
+        return
+    if status in (403, 429) and headers.get("X-RateLimit-Remaining") == "0":
+        reset = headers.get("X-RateLimit-Reset", "")
+        raise ReleaseApiError(
+            "API rate limit exceeded",
+            rate_limited=True,
+            reset_time=int(reset) if reset.isdigit() else None,
+        )
+    raise ReleaseApiError(f"HTTP {status}")
+
+
 def get_latest_tag_and_url(api, archive_ext):
+    req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT, **github_api_headers(api)})
     try:
-        req = urllib.request.Request(api, headers={"User-Agent": USER_AGENT, **github_api_headers(api)})
         with urllib.request.urlopen(req, timeout=5) as r:
             data = json.loads(r.read())
-    except Exception:
-        return None, None, None
+    except urllib.error.HTTPError as e:
+        raise_for_api_status(e.code, e.headers)
+        raise
+    except (OSError, ValueError) as e:
+        raise ReleaseApiError(str(e)) from e
 
     asset = select_asset(data.get("assets", []), archive_ext)
     if not asset:
-        return None, None, None
+        raise ReleaseApiError("the latest release has no matching archive")
 
     return data["tag_name"], asset["browser_download_url"], asset["name"]
 
@@ -179,7 +204,7 @@ def install_proton_latest(proton_dir, url, asset_name, label, progress=None):
         print(f"Error downloading/extracting {label}: {e}", flush=True)
         if tmp.exists():
             shutil.rmtree(tmp)
-        return False
+        raise
 
     extracted = next(tmp.iterdir())
 
@@ -188,7 +213,6 @@ def install_proton_latest(proton_dir, url, asset_name, label, progress=None):
 
     extracted.rename(proton_dir)
     shutil.rmtree(tmp)
-    return True
 
 
 def ensure_latest(kind, progress=None):
@@ -197,10 +221,11 @@ def ensure_latest(kind, progress=None):
     proton_dir = COMPATIBILITY_DIR / cfg["dir"]
     proton_dir.parent.mkdir(parents=True, exist_ok=True)
 
-    latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
-    if not url:
+    try:
+        latest_tag, url, asset_name = get_latest_tag_and_url(cfg["api"], cfg["archive_ext"])
+    except ReleaseApiError:
         print(f"Could not determine the latest {cfg['label']} release.", flush=True)
-        return
+        raise
 
     installed = get_installed_version(proton_dir)
 
@@ -208,8 +233,8 @@ def ensure_latest(kind, progress=None):
         print(f"{cfg['label']} is up to date.", flush=True)
         return
 
-    if install_proton_latest(proton_dir, url, asset_name, cfg["label"], progress):
-        rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
+    install_proton_latest(proton_dir, url, asset_name, cfg["label"], progress)
+    rewrite_compatibilitytool_vdf(proton_dir, cfg["dir"])
 
 
 def main():
@@ -221,7 +246,11 @@ def main():
 
     for key in vars(args):
         if getattr(args, key):
-            ensure_latest(key, ProgressPrinter())
+            try:
+                ensure_latest(key, ProgressPrinter())
+            except Exception:
+                # ensure_latest has already printed the error for the runner's log.
+                pass
 
 
 if __name__ == "__main__":
