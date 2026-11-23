@@ -254,16 +254,17 @@ class ProtonDownloader(Gtk.Dialog):
             grid.remove_row(1)
 
         paths = [self.get_installed_path(release["tag_name"], variant) for release in releases]
-        installed = [release for release, path in zip(releases, paths) if path.exists()]
-        available = [release for release, path in zip(releases, paths) if not path.exists()]
+        installed_paths = {path for path in paths if path.exists()}
+        installed = [release for release, path in zip(releases, paths) if path in installed_paths]
+        available = [release for release, path in zip(releases, paths) if path not in installed_paths]
 
         for release in installed:
-            self.add_release_to_grid(release, grid, variant)
+            self.add_release_to_grid(release, grid, variant, True)
         for path in self.find_installed(key):
-            if path not in paths:
+            if path not in installed_paths:
                 self.add_installed_row(grid, path)
         for release in available:
-            self.add_release_to_grid(release, grid, variant)
+            self.add_release_to_grid(release, grid, variant, False)
 
         self.hide_status(key, "list")
 
@@ -352,7 +353,7 @@ class ProtonDownloader(Gtk.Dialog):
         grid.remove_row(row)
         play_ui_sound("cancel")
 
-    def add_release_to_grid(self, release, grid, variant):
+    def add_release_to_grid(self, release, grid, variant, is_installed):
         tag_name = release["tag_name"]
         display_tag_name = variant["tag_to_display"](tag_name)
 
@@ -362,9 +363,6 @@ class ProtonDownloader(Gtk.Dialog):
         label.set_halign(Gtk.Align.START)
         label.set_hexpand(True)
         grid.attach(label, 0, row_index, 1, 1)
-
-        version_path = self.get_installed_path(tag_name, variant)
-        is_installed = version_path.exists()
 
         button = Gtk.Button()
         self.set_button_label(button, _("Remove") if is_installed else _("Download"))
