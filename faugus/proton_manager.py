@@ -1,15 +1,18 @@
 
 
+import os
 import re
 import requests
 import gi
 import tarfile
 import shutil
 import threading
+import time
 import warnings
 
 from faugus.proton_downloader import (
     CONFIGS, StreamProgress, select_asset, get_tar_mode, ensure_latest,
+    ReleaseApiError, raise_for_api_status,
 )
 
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -33,6 +36,7 @@ VARIANTS = {
         "api_url": "https://api.github.com/repos/CachyOS/proton-cachyos/releases",
         "tag_prefix": "cachyos-",
         "archive_ext": ("x86_64.tar.xz",),
+        "installed_prefixes": ("proton-cachyos",),
         "tag_to_display": lambda tag: f"Proton-CachyOS-{tag.removeprefix('cachyos-')}",
     },
     "ge": {
@@ -40,6 +44,7 @@ VARIANTS = {
         "api_url": "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases",
         "tag_prefix": "GE-Proton",
         "archive_ext": (".tar.gz", ".tar.xz"),
+        "installed_prefixes": ("ge-proton",),
         "min_version": (9, 1),
         "tag_to_display": lambda tag: tag,
     },
@@ -48,6 +53,7 @@ VARIANTS = {
         "api_url": "https://dawn.wine/api/v1/repos/dawn-winery/dwproton/releases",
         "tag_prefix": "dwproton-",
         "archive_ext": ("x86_64.tar.xz",),
+        "installed_prefixes": ("dwproton", "dw-proton-"),
         "tag_to_display": lambda tag: f"DW-Proton-{tag.removeprefix('dwproton-')}",
     },
     "wineland": {
@@ -55,6 +61,7 @@ VARIANTS = {
         "api_url": "https://api.github.com/repos/nanomatters/proton-cachyos/releases",
         "tag_prefix": "",
         "archive_ext": ("x86_64.tar.xz",),
+        "installed_prefixes": ("proton-wineland",),
         "tag_to_display": lambda tag: f"Proton-Wineland-{tag.removeprefix('cachyos-wineland-').removeprefix('wineland-')}",
     },
 }
@@ -74,6 +81,7 @@ class ProtonDownloader(Gtk.Dialog):
 
         self.closed_event = threading.Event()
         self.fetched_variants = set()
+        self.fetching_variants = set()
 
         self.content_area = self.get_content_area()
         self.content_area.set_halign(Gtk.Align.CENTER)
@@ -115,17 +123,22 @@ class ProtonDownloader(Gtk.Dialog):
         self.content_area.append(frame)
 
         self.grids = {}
+        self.status_rows = {}
         for key, variant in VARIANTS.items():
             grid = Gtk.Grid()
             grid.set_hexpand(True)
-            grid.set_valign(Gtk.Align.CENTER)
             grid.set_row_spacing(5)
             grid.set_column_spacing(20)
-            grid.set_margin_start(10)
-            grid.set_margin_end(10)
-            grid.set_margin_bottom(10)
 
-            self.view_stack.add_titled(grid, key, variant["tab_label"])
+            page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            page.set_valign(Gtk.Align.START)
+            page.set_margin_start(10)
+            page.set_margin_end(10)
+            page.set_margin_bottom(10)
+            page.append(grid)
+            page.append(self.build_status_row(key))
+
+            self.view_stack.add_titled(page, key, variant["tab_label"])
 
             self.tab_switcher.append(key, variant["tab_label"])
 
@@ -133,6 +146,8 @@ class ProtonDownloader(Gtk.Dialog):
 
         for key in self.grids:
             self.add_latest_row(key)
+            for path in self.find_installed(key):
+                self.add_installed_row(self.grids[key], path)
 
         self.tab_switcher.set_active(0)
 
@@ -143,64 +158,201 @@ class ProtonDownloader(Gtk.Dialog):
         self.view_stack.set_visible_child_name(key)
         self.ensure_releases_fetched(key)
 
-    def ensure_releases_fetched(self, key):
-        if key is None or key in self.fetched_variants:
-            return
-        self.fetched_variants.add(key)
-        run_in_background(self.fetch_releases_from_url, VARIANTS[key], self.grids[key], self.closed_event)
+    def build_status_row(self, key):
+        spinner = Gtk.Spinner()
+        spinner.set_size_request(32, 32)
 
-    def fetch_releases_from_url(self, variant, grid, closed_event):
-        page = 1
+        label = Gtk.Label()
+        label.set_wrap(True)
+        label.set_justify(Gtk.Justification.CENTER)
+
+        retry_button = Gtk.Button(label=_("Retry"))
+        retry_button.set_halign(Gtk.Align.CENTER)
+        retry_button.connect("clicked", lambda _button: self.fetch_releases(key))
+
+        row = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        row.set_halign(Gtk.Align.CENTER)
+        row.set_margin_top(20)
+        row.append(spinner)
+        row.append(label)
+        row.append(retry_button)
+        row.set_visible(False)
+
+        row.spinner = spinner
+        row.label = label
+        row.retry_button = retry_button
+        row.source = None
+        self.status_rows[key] = row
+        return row
+
+    def show_status(self, key, text, source, loading=False, retry=False, tooltip=None):
+        row = self.status_rows[key]
+        row.source = source
+        row.label.set_label(text)
+        row.label.set_tooltip_text(tooltip)
+        row.label.set_visible(bool(text))
+        row.spinner.set_visible(loading)
+        row.spinner.set_spinning(loading)
+        row.retry_button.set_visible(retry)
+        row.set_visible(True)
+
+    def hide_status(self, key, source):
+        row = self.status_rows[key]
+        if row.source == source:
+            row.spinner.set_spinning(False)
+            row.set_visible(False)
+            row.source = None
+
+    def show_error(self, key, error, failure, source, retry=False):
+        tooltip = None
+        if isinstance(error, ReleaseApiError) and error.rate_limited:
+            if error.reset_time:
+                reset = time.strftime("%H:%M", time.localtime(error.reset_time))
+                text = _("GitHub rate limit reached until %s") % reset
+            else:
+                text = _("GitHub rate limit reached")
+            if not os.environ.get("GITHUB_TOKEN", "").strip():
+                tooltip = _("Set the GITHUB_TOKEN environment variable to raise the limit")
+        elif isinstance(error, (requests.ConnectionError, requests.Timeout)):
+            text = _("Could not reach the server")
+        else:
+            text = failure
+            tooltip = str(error)
+        self.show_status(key, text, source, retry=retry, tooltip=tooltip)
+
+    def ensure_releases_fetched(self, key):
+        if key is None or key in self.fetched_variants or key in self.fetching_variants:
+            return
+        self.fetch_releases(key)
+
+    def fetch_releases(self, key):
+        self.fetching_variants.add(key)
+        self.show_status(key, "", "list", loading=True)
+        run_in_background(self.fetch_releases_worker, key, self.closed_event)
+
+    def fetch_releases_worker(self, key, closed_event):
+        try:
+            releases = self.fetch_releases_from_url(VARIANTS[key], closed_event)
+        except (ReleaseApiError, requests.RequestException) as e:
+            idle_add_while_open(closed_event, self.on_releases_failed, key, e)
+        else:
+            idle_add_while_open(closed_event, self.on_releases_fetched, key, releases)
+
+    def on_releases_failed(self, key, error):
+        self.fetching_variants.discard(key)
+        self.show_error(key, error, _("Could not load releases"), "list", retry=True)
+
+    def on_releases_fetched(self, key, releases):
+        self.fetching_variants.discard(key)
+        self.fetched_variants.add(key)
+
+        grid = self.grids[key]
+        variant = VARIANTS[key]
+
+        # Drop the rows shown while loading, keeping the Latest row.
+        while len(widget_children(grid)) > 2:
+            grid.remove_row(1)
+
+        paths = [self.get_installed_path(release["tag_name"], variant) for release in releases]
+        installed = [release for release, path in zip(releases, paths) if path.exists()]
+        available = [release for release, path in zip(releases, paths) if not path.exists()]
+
+        for release in installed:
+            self.add_release_to_grid(release, grid, variant)
+        for path in self.find_installed(key):
+            if path not in paths:
+                self.add_installed_row(grid, path)
+        for release in available:
+            self.add_release_to_grid(release, grid, variant)
+
+        self.hide_status(key, "list")
+
+    def fetch_releases_from_url(self, variant, closed_event):
+        releases = []
         seen_tags = set()
         url = variant["api_url"]
+        params = {"per_page": RELEASES_PER_PAGE}
         prefix = variant["tag_prefix"]
 
-        while not closed_event.is_set():
-            response = requests.get(url, params={"page": page, "per_page": RELEASES_PER_PAGE}, headers=github_api_headers(url), timeout=30)
-            if response.status_code == 200:
-                page_releases = response.json()
-                if not page_releases:
-                    break
+        while url and not closed_event.is_set():
+            response = requests.get(url, params=params, headers=github_api_headers(url), timeout=30)
+            raise_for_api_status(response.status_code, response.headers)
 
-                for release in page_releases:
-                    if closed_event.is_set():
-                        return
+            for release in response.json():
+                tag_name = release["tag_name"]
+                if tag_name in seen_tags:
+                    continue
+                seen_tags.add(tag_name)
 
-                    tag_name = release["tag_name"]
-                    if tag_name in seen_tags:
-                        continue
-                    seen_tags.add(tag_name)
+                if not tag_name.startswith(prefix):
+                    continue
 
-                    if not tag_name.startswith(prefix):
-                        continue
-
-                    if "min_version" in variant:
-                        try:
-                            version_str = tag_name.replace(prefix, "")
-                            major, minor = map(int, version_str.split("-"))
-                            if (major, minor) < variant["min_version"]:
-                                continue
-                        except Exception:
+                if "min_version" in variant:
+                    try:
+                        version_str = tag_name.replace(prefix, "")
+                        major, minor = map(int, version_str.split("-"))
+                        if (major, minor) < variant["min_version"]:
                             continue
-
-                    assets = release.get("assets", [])
-                    has_valid_asset = any(asset["name"].endswith(variant["archive_ext"]) for asset in assets)
-                    if not has_valid_asset:
+                    except Exception:
                         continue
 
-                    GLib.idle_add(self.add_release_to_grid, release, grid, variant, closed_event)
+                assets = release.get("assets", [])
+                has_valid_asset = any(asset["name"].endswith(variant["archive_ext"]) for asset in assets)
+                if not has_valid_asset:
+                    continue
 
-                if len(page_releases) < RELEASES_PER_PAGE:
-                    break
+                releases.append(release)
 
-                page += 1
-            else:
-                break
+            # Servers may return fewer releases per page than requested
+            # (dawn.wine caps pages at 30), so follow the Link header.
+            url = response.links.get("next", {}).get("url")
+            params = None
 
-    def add_release_to_grid(self, release, grid, variant, closed_event):
-        if closed_event.is_set():
+        return releases
+
+    def find_installed(self, key):
+        prefixes = VARIANTS[key]["installed_prefixes"]
+        latest_dirs = {cfg["dir"] for cfg in CONFIGS.values()}
+
+        found = []
+        for compat_dir in COMPATIBILITY_DIRS:
+            if not compat_dir.is_dir():
+                continue
+            for folder in compat_dir.iterdir():
+                if (folder.is_dir() and folder.name not in latest_dirs
+                        and folder.name.lower().startswith(prefixes)):
+                    found.append(folder)
+
+        def natural_key(path):
+            return [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", path.name)]
+
+        return sorted(found, key=natural_key, reverse=True)
+
+    def add_installed_row(self, grid, path):
+        row_index = len(widget_children(grid)) // 2
+
+        label = Gtk.Label(label=path.name, xalign=0)
+        label.set_halign(Gtk.Align.START)
+        label.set_hexpand(True)
+        grid.attach(label, 0, row_index, 1, 1)
+
+        button = Gtk.Button()
+        self.set_button_label(button, _("Remove"))
+        button.connect("clicked", self.on_installed_remove_clicked, grid, path)
+        button.set_size_request(120, -1)
+        grid.attach(button, 1, row_index, 1, 1)
+
+    def on_installed_remove_clicked(self, button, grid, path):
+        try:
+            shutil.rmtree(path)
+        except OSError as e:
+            print(f"Error removing {path}: {e}")
             return
+        _column, row, _width, _height = grid.query_child(button)
+        grid.remove_row(row)
+        play_ui_sound("cancel")
 
+    def add_release_to_grid(self, release, grid, variant):
         tag_name = release["tag_name"]
         display_tag_name = variant["tag_to_display"](tag_name)
 
@@ -257,6 +409,7 @@ class ProtonDownloader(Gtk.Dialog):
         cancel_event = threading.Event()
         button.download_cancel_event = cancel_event
 
+        self.hide_status(kind, "latest")
         self.set_button_label(button, _("Cancel"))
         self.set_button_progress(button, 0)
 
@@ -276,7 +429,12 @@ class ProtonDownloader(Gtk.Dialog):
                     last_pct[0] = pct
                     idle_add_while_open(closed_event, self.set_button_progress, button, frac)
 
-            ensure_latest(kind, _progress)
+            try:
+                ensure_latest(kind, _progress)
+            except _DownloadCancelled:
+                pass
+            except Exception as e:
+                idle_add_while_open(closed_event, self.show_error, kind, e, _("Download failed"), "latest")
             idle_add_while_open(closed_event, finish, _("Remove") if proton_dir.exists() else _("Download"))
             if proton_dir.exists():
                 idle_add_while_open(closed_event, play_ui_sound, "confirm")

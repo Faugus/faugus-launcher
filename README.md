@@ -107,6 +107,9 @@ Native only.
 /usr/share/themes
 ```
 
+### GitHub API limit
+The Proton Manager and the "Latest" runners look up releases through the GitHub API, which allows 60 requests an hour without a token. Set `GITHUB_TOKEN` in the environment Faugus starts with (not in Global Environment Variables) to a GitHub access token to raise this to 5,000 an hour. A fine-grained token with no permissions is enough.
+
 ### Gamepad mapping
 | Action        | Playstation | Xbox     |
 |---------------|-------------|----------|
