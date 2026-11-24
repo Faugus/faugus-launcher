@@ -108,7 +108,7 @@ Native only.
 ```
 
 ### GitHub API limit
-The Proton Manager and the "Latest" runners look up releases through the GitHub API, which allows 60 requests an hour without a token. Set `GITHUB_TOKEN` in the environment Faugus starts with (not in Global Environment Variables) to a GitHub access token to raise this to 5,000 an hour. A fine-grained token with no permissions is enough.
+The Proton Manager and the "Latest" runners look up releases through the GitHub API, which allows 60 requests an hour without a token. Enter a GitHub access token under GitHub Token in Settings → Interface to raise this to 5,000 an hour. A fine-grained token with no permissions is enough. The token is saved in plain text in `config.json`. A `GITHUB_TOKEN` variable in the environment Faugus starts with takes precedence over the saved token; Do not set it in Global Environment Variables, which pass it to every game.
 
 ### Gamepad mapping
 | Action        | Playstation | Xbox     |

@@ -13,8 +13,17 @@ from concurrent.futures import ThreadPoolExecutor
 from faugus.path_manager import COMPATIBILITY_DIRS, COVERS_DIR, FAUGUS_LAUNCHER_STATE_DIR, GAMES_JSON, ICONS_DIR, PROTON_CACHYOS
 
 
-def github_api_headers(url):
+def github_token():
+    # GITHUB_TOKEN takes precedence over the token saved in Settings.
     token = os.environ.get("GITHUB_TOKEN", "").strip()
+    if token:
+        return token
+    from faugus.config_manager import ConfigManager
+    return ConfigManager().config.get('github-token', '').strip('"').strip()
+
+
+def github_api_headers(url):
+    token = github_token()
     if token and urllib.parse.urlsplit(url).hostname == "api.github.com":
         return {"Authorization": f"Bearer {token}"}
     return {}

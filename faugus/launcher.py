@@ -5998,6 +5998,19 @@ class Settings(Gtk.Dialog):
         self.button_steamgriddb_key.connect("clicked", self.on_button_steamgriddb_key_clicked)
         self.button_steamgriddb_key.set_size_request(50, -1)
 
+        self.label_github_token = Gtk.Label(label=_("GitHub Token"))
+        self.label_github_token.set_halign(Gtk.Align.START)
+        self.label_github_token.set_tooltip_text(_("Raises the GitHub API limit used to look up Proton releases from 60 to 5,000 requests an hour"))
+
+        self.entry_github_token = Gtk.Entry()
+        self.entry_github_token.set_placeholder_text(_("Access Token"))
+        self.entry_github_token.set_visibility(False)
+
+        self.button_github_token = Gtk.Button()
+        self.button_github_token.set_child(Gtk.Image.new_from_icon_name("system-search-symbolic"))
+        self.button_github_token.connect("clicked", self.on_button_github_token_clicked)
+        self.button_github_token.set_size_request(50, -1)
+
         self.label_default_prefix = Gtk.Label(label=_("Default Prefixes Location"))
         self.label_default_prefix.set_halign(Gtk.Align.START)
 
@@ -6364,6 +6377,9 @@ class Settings(Gtk.Dialog):
         grid_steamgriddb.attach(self.entry_steamgriddb_key, 0, 1, 1, 1)
         grid_steamgriddb.attach(self.button_steamgriddb_key, 1, 1, 1, 1)
         self.entry_steamgriddb_key.set_hexpand(True)
+        grid_steamgriddb.attach(self.label_github_token, 0, 2, 2, 1)
+        grid_steamgriddb.attach(self.entry_github_token, 0, 3, 1, 1)
+        grid_steamgriddb.attach(self.button_github_token, 1, 3, 1, 1)
 
         self.grid_big_interface.attach(self.label_startup_window_size, 0, 0, 2, 1)
         self.grid_big_interface.attach(self.combobox_startup_window_size, 0, 1, 2, 1)
@@ -6661,6 +6677,10 @@ class Settings(Gtk.Dialog):
         play_ui_sound("confirm")
         open_uri(widget, "https://www.steamgriddb.com/profile/preferences/api")
 
+    def on_button_github_token_clicked(self, widget):
+        play_ui_sound("confirm")
+        open_uri(widget, "https://github.com/settings/personal-access-tokens/new")
+
     def _refresh_banner_checkbox_sensitivity(self):
         covers_or_carrousel = self.combobox_interface.get_active_id() in ("Covers", "Carrousel")
         enabled = covers_or_carrousel and self.checkbox_steamgriddb.get_active()
@@ -6799,6 +6819,7 @@ class Settings(Gtk.Dialog):
         config.set_value("grid-orientation", self.combobox_grid_orientation.get_active_id())
         config.set_value("grid-max-children-per-line", int(self.entry_grid_max_children.get_value()))
         config.set_value("steamgriddb-api-key", self.entry_steamgriddb_key.get_text().strip())
+        config.set_value("github-token", self.entry_github_token.get_text().strip())
         config.set_value("startup-window-size", self.combobox_startup_window_size.get_active_id())
         config.set_value("interface-theme", self.interface_theme)
         config.set_value("accent-mode", self.combobox_accent.get_active_id())
@@ -7145,6 +7166,7 @@ class Settings(Gtk.Dialog):
         if not self.combobox_gpu.set_active_id(cfg.config.get('gpu', '').strip('"')):
             self.combobox_gpu.set_active(0)
         self.entry_steamgriddb_key.set_text(steamgriddb_api_key)
+        self.entry_github_token.set_text(cfg.config.get('github-token', '').strip('"'))
         self.combobox_interface.set_active_id(interface_mode)
         self.set_button_color(self.background_color_button, background_color)
         self.background_color_button.set_sensitive(background_mode == "custom")

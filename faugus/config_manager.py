@@ -49,6 +49,7 @@ class ConfigManager:
             'theme-engine': 'adwaita',
             'steamgriddb-api-key': '',
             'steamgriddb-enabled': 'False',
+            'github-token': '',
             'background-mode': 'default',
             'overview-color-mode': 'default',
             'widget-color-mode': 'default',

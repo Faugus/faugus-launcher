@@ -1,6 +1,5 @@
 
 
-import os
 import re
 import requests
 import gi
@@ -21,7 +20,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gtk, GLib
 from faugus.language_config import *
-from faugus.core import github_api_headers
+from faugus.core import github_api_headers, github_token
 from faugus.utils import play_ui_sound, widget_children, hide_dialog_action_area, run_in_background, idle_add_while_open, IdComboBox, apply_titlebar_preference, get_effective_accent_rgb
 
 GLib.set_prgname("io.github.Faugus.faugus-launcher")
@@ -211,8 +210,8 @@ class ProtonDownloader(Gtk.Dialog):
                 text = _("GitHub rate limit reached until %s") % reset
             else:
                 text = _("GitHub rate limit reached")
-            if not os.environ.get("GITHUB_TOKEN", "").strip():
-                tooltip = _("Set the GITHUB_TOKEN environment variable to raise the limit")
+            if not github_token():
+                tooltip = _("Set a GitHub token in Settings to raise the limit")
         elif isinstance(error, (requests.ConnectionError, requests.Timeout)):
             text = _("Could not reach the server")
         else:
