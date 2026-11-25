@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-23 23:36+0000\n"
-"PO-Revision-Date: 2026-11-20 11:05+0000\n"
-"Last-Translator: Любомир Василев "
-"<lyubomirv@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-25 00:51+0000\n"
+"Last-Translator: Любомир Василев <lyubomirv@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: Bulgarian <https://hosted.weblate.org/projects/faugus-"
 "launcher/faugus-launcher/bg/>\n"
 "Language: bg\n"
@@ -1220,28 +1220,28 @@ msgstr "Изберете изпълнимия файл на играта"
 
 #: faugus/proton_manager.py:169
 msgid "Retry"
-msgstr ""
+msgstr "Повторен опит"
 
 #: faugus/proton_manager.py:211
 #, python-format
 msgid "GitHub rate limit reached until %s"
-msgstr ""
+msgstr "Достигнато е ограничението на GitHub за честота на заявките, до %s"
 
 #: faugus/proton_manager.py:213
 msgid "GitHub rate limit reached"
-msgstr ""
+msgstr "Достигнато е ограничението на GitHub за честота на заявките"
 
 #: faugus/proton_manager.py:215
 msgid "Set the GITHUB_TOKEN environment variable to raise the limit"
-msgstr ""
+msgstr "Задайте променлива на средата GITHUB_TOKEN, за да увеличите лимита"
 
 #: faugus/proton_manager.py:217
 msgid "Could not reach the server"
-msgstr ""
+msgstr "Няма връзка със сървъра"
 
 #: faugus/proton_manager.py:243
 msgid "Could not load releases"
-msgstr ""
+msgstr "Изданията не могат да бъдат заредени"
 
 #: faugus/proton_manager.py:368 faugus/proton_manager.py:386
 #: faugus/proton_manager.py:402 faugus/proton_manager.py:436
@@ -1251,10 +1251,8 @@ msgid "Download"
 msgstr "Сваляне"
 
 #: faugus/proton_manager.py:435
-#, fuzzy
-#| msgid "Download"
 msgid "Download failed"
-msgstr "Сваляне"
+msgstr "Свалянето беше неуспешно"
 
 #: faugus/runner.py:280
 msgid "Starting Steam game..."
