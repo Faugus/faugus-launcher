@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-23 23:36+0000\n"
-"PO-Revision-Date: 2026-11-19 16:47+0000\n"
+"PO-Revision-Date: 2026-11-25 00:51+0000\n"
 "Last-Translator: cas9 <cas9@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/faugus-launcher/"
 "faugus-launcher/it/>\n"
@@ -1219,7 +1219,7 @@ msgstr "Seleziona l'eseguibile del gioco"
 
 #: faugus/proton_manager.py:169
 msgid "Retry"
-msgstr ""
+msgstr "Riprova"
 
 #: faugus/proton_manager.py:211
 #, python-format
@@ -1236,11 +1236,11 @@ msgstr ""
 
 #: faugus/proton_manager.py:217
 msgid "Could not reach the server"
-msgstr ""
+msgstr "Impossibile raggiungere il server"
 
 #: faugus/proton_manager.py:243
 msgid "Could not load releases"
-msgstr ""
+msgstr "Impossibile caricare le versioni"
 
 #: faugus/proton_manager.py:368 faugus/proton_manager.py:386
 #: faugus/proton_manager.py:402 faugus/proton_manager.py:436
@@ -1250,10 +1250,8 @@ msgid "Download"
 msgstr "Scarica"
 
 #: faugus/proton_manager.py:435
-#, fuzzy
-#| msgid "Download"
 msgid "Download failed"
-msgstr "Scarica"
+msgstr "Scaricamento non riuscito"
 
 #: faugus/runner.py:280
 msgid "Starting Steam game..."
