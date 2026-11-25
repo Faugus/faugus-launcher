@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-23 23:36+0000\n"
-"PO-Revision-Date: 2026-11-20 06:12+0000\n"
+"PO-Revision-Date: 2026-11-25 00:51+0000\n"
 "Last-Translator: EyKettle <eykettle@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hans/>\n"
@@ -1209,28 +1209,28 @@ msgstr "选择游戏的可执行文件"
 
 #: faugus/proton_manager.py:169
 msgid "Retry"
-msgstr ""
+msgstr "重试"
 
 #: faugus/proton_manager.py:211
 #, python-format
 msgid "GitHub rate limit reached until %s"
-msgstr ""
+msgstr "已达 GitHub 速率限制，持续至 %s"
 
 #: faugus/proton_manager.py:213
 msgid "GitHub rate limit reached"
-msgstr ""
+msgstr "已达 GitHub 速率限制"
 
 #: faugus/proton_manager.py:215
 msgid "Set the GITHUB_TOKEN environment variable to raise the limit"
-msgstr ""
+msgstr "设置环境变量 GITHUB_TOKEN 以提升速率限制"
 
 #: faugus/proton_manager.py:217
 msgid "Could not reach the server"
-msgstr ""
+msgstr "无法连接至服务器"
 
 #: faugus/proton_manager.py:243
 msgid "Could not load releases"
-msgstr ""
+msgstr "无法加载发布版本"
 
 #: faugus/proton_manager.py:368 faugus/proton_manager.py:386
 #: faugus/proton_manager.py:402 faugus/proton_manager.py:436
@@ -1240,10 +1240,8 @@ msgid "Download"
 msgstr "下载"
 
 #: faugus/proton_manager.py:435
-#, fuzzy
-#| msgid "Download"
 msgid "Download failed"
-msgstr "下载"
+msgstr "下载失败"
 
 #: faugus/runner.py:280
 msgid "Starting Steam game..."
