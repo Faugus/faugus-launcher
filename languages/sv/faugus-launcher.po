@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: faugus-launcher\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-23 23:36+0000\n"
-"PO-Revision-Date: 2026-11-19 14:54+0000\n"
+"PO-Revision-Date: 2026-11-25 00:51+0000\n"
 "Last-Translator: bittin1ddc447d824349b2 "
 "<bittin1ddc447d824349b2@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/faugus-launcher/"
@@ -1216,28 +1216,28 @@ msgstr "Välj spelets körbara fil"
 
 #: faugus/proton_manager.py:169
 msgid "Retry"
-msgstr ""
+msgstr "Försök igen"
 
 #: faugus/proton_manager.py:211
 #, python-format
 msgid "GitHub rate limit reached until %s"
-msgstr ""
+msgstr "GitHub-hastighetsgräns nådd till %s"
 
 #: faugus/proton_manager.py:213
 msgid "GitHub rate limit reached"
-msgstr ""
+msgstr "GitHub-hastighetsgräns nådd"
 
 #: faugus/proton_manager.py:215
 msgid "Set the GITHUB_TOKEN environment variable to raise the limit"
-msgstr ""
+msgstr "Ange GITHUB_TOKEN miljövariabeln för att höja gränsen"
 
 #: faugus/proton_manager.py:217
 msgid "Could not reach the server"
-msgstr ""
+msgstr "Kunde inte nå servern"
 
 #: faugus/proton_manager.py:243
 msgid "Could not load releases"
-msgstr ""
+msgstr "Kunde inte ladda utgåvor"
 
 #: faugus/proton_manager.py:368 faugus/proton_manager.py:386
 #: faugus/proton_manager.py:402 faugus/proton_manager.py:436
@@ -1247,10 +1247,8 @@ msgid "Download"
 msgstr "Ladda ned"
 
 #: faugus/proton_manager.py:435
-#, fuzzy
-#| msgid "Download"
 msgid "Download failed"
-msgstr "Ladda ned"
+msgstr "Nedladdningen misslyckades"
 
 #: faugus/runner.py:280
 msgid "Starting Steam game..."
