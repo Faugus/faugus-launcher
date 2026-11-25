@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-23 23:36+0000\n"
-"PO-Revision-Date: 2026-11-20 19:55+0000\n"
-"Last-Translator: orange-seele <orange-"
-"seele@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-11-25 00:51+0000\n"
+"Last-Translator: orange-seele <orange-seele@users.noreply.hosted.weblate.org>"
+"\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/faugus-launcher/faugus-launcher/zh_Hant/>\n"
 "Language: zh_TW\n"
@@ -1210,28 +1210,28 @@ msgstr "選擇遊戲主執行檔"
 
 #: faugus/proton_manager.py:169
 msgid "Retry"
-msgstr ""
+msgstr "重試"
 
 #: faugus/proton_manager.py:211
 #, python-format
 msgid "GitHub rate limit reached until %s"
-msgstr ""
+msgstr "已達 GitHub 請求次數上限，限制將於 %s 結束"
 
 #: faugus/proton_manager.py:213
 msgid "GitHub rate limit reached"
-msgstr ""
+msgstr "已達 GitHub 請求次數上限"
 
 #: faugus/proton_manager.py:215
 msgid "Set the GITHUB_TOKEN environment variable to raise the limit"
-msgstr ""
+msgstr "設定 GITHUB_TOKEN 環境變數以提高請求次數上限"
 
 #: faugus/proton_manager.py:217
 msgid "Could not reach the server"
-msgstr ""
+msgstr "無法連線至伺服器"
 
 #: faugus/proton_manager.py:243
 msgid "Could not load releases"
-msgstr ""
+msgstr "無法載入版本資訊"
 
 #: faugus/proton_manager.py:368 faugus/proton_manager.py:386
 #: faugus/proton_manager.py:402 faugus/proton_manager.py:436
@@ -1241,10 +1241,8 @@ msgid "Download"
 msgstr "下載"
 
 #: faugus/proton_manager.py:435
-#, fuzzy
-#| msgid "Download"
 msgid "Download failed"
-msgstr "下載"
+msgstr "下載失敗"
 
 #: faugus/runner.py:280
 msgid "Starting Steam game..."
