@@ -745,15 +745,16 @@ class FaugusRun:
     def _discord_target(self, index):
         game = discord_find_game(index)
         if game:
-            return game[0], {}
+            return game[0], {"name": game[1]}
         title = re.sub(r"[^a-z0-9]", "", self.title.lower())
         matches = []
-        for _, app_id, name, launcher in index.get(self.exe, []):
-            name = re.sub(r"[^a-z0-9]", "", name.lower())
+        for _, app_id, app_name, launcher in index.get(self.exe, []):
+            name = re.sub(r"[^a-z0-9]", "", app_name.lower())
             if title and not launcher and (name in title or title in name):
-                matches.append((name != title, app_id))
+                matches.append((name != title, app_id, app_name))
         if matches:
-            return min(matches)[1], {}
+            match = min(matches)
+            return match[1], {"name": match[2]}
         if any(gameid != self.gameid for gameid in load_json_file(RUNNING_GAMES, {})):
             return None
         activity = {"details": self.title, "status_display_type": 2}
