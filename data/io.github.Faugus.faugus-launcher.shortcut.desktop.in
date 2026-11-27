@@ -3,6 +3,7 @@ Type=Application
 Name=Create Shortcut with Faugus
 Name[pt_BR]=Criar Atalho com Faugus
 Name[it]=Crea Scorciatoia con Faugus
+Name[ru]=Создать ярлык с помощью Faugus
 Exec=faugus-launcher --shortcut %f
 MimeType=application/x-ms-dos-executable;application/x-msi;application/x-ms-shortcut;application/x-bat;text/x-ms-regedit
 Icon=@ICON@
