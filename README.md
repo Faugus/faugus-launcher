@@ -47,7 +47,7 @@ flatpak run io.github.Faugus.faugus-launcher
 ```
 ### MangoHud installation:
 ```
-flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/25.08
+flatpak install org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/26.08
 ```
 ### Important permissions:
 ```
