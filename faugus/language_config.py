@@ -88,6 +88,9 @@ def scan_translation_completions(locale_dir, domain):
 
 def setup_gettext(domain):
     mo_path = find_mo_file(LOCALE_DIR, lang, domain) if lang else None
+    if not mo_path and lang and '_' in lang:
+        # A system locale such as ru_RU usually has no catalog of its own; fall back to ru.
+        mo_path = find_mo_file(LOCALE_DIR, lang.split('_')[0], domain)
     if mo_path:
         with open(mo_path, 'rb') as f:
             translation = gettext.GNUTranslations(f)
